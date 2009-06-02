@@ -1,0 +1,29 @@
+# Create image from executables (kernel & servers)
+# Note: Keep a watch of the correct order!
+bin-y := arch/$(SRCARCH)/kernel/kernel
+bin-y += servers/pm/pm
+bin-y += servers/vfs/vfs
+bin-y += servers/rs/rs
+bin-y += servers/ds/ds
+bin-y += drivers/tty/tty
+bin-y += drivers/memory/memory
+bin-y += drivers/log/log
+bin-y += servers/mfs/mfs
+bin-y += servers/vm/vm
+bin-y += servers/init/init
+
+quiet_cmd_create_image = GEN     $@
+      cmd_create_image = scripts/tools/installboot -c -i $@ -l "$(filter $(bin-y),$^)"
+
+define rule_create_image
+	rm -f $@; \
+	$(echo-cmd) $(cmd_$(1)); \
+	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+endef
+
+# create final image from kernel and servers
+$(src)/image: scripts/tools/installboot
+$(src)/image: $(bin-y) FORCE
+	$(call if_changed_rule,create_image)
+
+targets += image

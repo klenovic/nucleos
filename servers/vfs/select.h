@@ -1,0 +1,19 @@
+/*
+ *  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+ *
+ *  This file is part of Nucleos kernel.
+ *
+ *  Nucleos kernel is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, version 2 of the License.
+ */
+#ifndef _FS_SELECT_H
+#define _FS_SELECT_H 1
+
+/* return codes for select_request_* and select_cancel_* */
+#define SEL_OK		0	/* ready */
+#define SEL_ERROR	1	/* failed */
+#define SEL_DEFERRED	2	/* request is sent to driver */
+
+#endif
+

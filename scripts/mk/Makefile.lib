@@ -1,0 +1,68 @@
+##############################################################################
+#  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+#
+#  This file is part of Nucleos kernel.
+#
+#  Nucleos kernel is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, version 2 of the License.
+##############################################################################
+
+# `lib-y' without dir
+notdir_lib-y := $(lib-y)
+
+lib-y := $(addprefix $(src)/,$(lib-y))
+
+# Add object files and another library if needed
+# ----------------------------------------------------------------------------
+quiet_cmd_ar_ao = AR      $@
+      cmd_ar_ao = $(AR) $(KBUILD_ARFLAGS) $(ARFLAGS_$(notdir $@)) $@ $(filter $($(notdir $@)-obj-y),$^) \
+                  $(if $($(notdir $@)-mri),;$(AR) -M < $($(notdir $@)-mri))
+
+define rule_ar_ao
+	rm -f $@; \
+	$(echo-cmd) $(cmd_$(1)); \
+	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+endef
+
+# Link library
+# param1 library name (without `$(src)' prefix)
+# param2 list objects (without `$(src)' prefix)
+# ----------------------------------------------------------------------------
+define rule_link_lib
+# add `$(src)/ prefix
+$(1)-obj-y := $$(filter %.o,$$(addprefix $$(src)/,$(2)))
+
+# add to object list
+objs-y += $$($(1)-obj-y)
+
+# subdirs we must descend into
+$(1)-subdirs := $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o,$(2))))
+$(1)-subdirs := $$(patsubst $$(srctree)/%,%,$$(patsubst %/,%,$$($(1)-subdirs)))
+subdir-y += $$($(1)-subdirs)
+
+$(1)-libs := $$(addsuffix /$(1),$$($(1)-subdirs))
+
+# Create mri if needed
+# This script is used to merge libraries
+# ----------------------------------------------------------------------------
+quiet_cmd_create_$(1)_mri = GEN     $$@
+      cmd_create_$(1)_mri = echo -e 'OPEN $$(src)/$(1)\n$$(foreach l,$$(filter %.a,$$^),ADDLIB $$(l)\n)SAVE\nEND' > $$@
+
+$$(src)/$(1).mri: $$($(1)-libs) FORCE
+	$$(call if_changed,create_$(1)_mri)
+
+# create only if there is a requirement to add another library
+$(1)-mri := $$(if $$($(1)-libs),$$(src)/$(1).mri)
+targets += $$($(1)-mri)
+
+$$(src)/$(1): $$($(1)-obj-y) $$($(1)-mri) FORCE
+	$$(call if_changed_rule,ar_ao)
+
+targets += $$(src)/$(1)
+endef
+
+# Generate goals
+# Note that library and its objects are without `$(src)' prefix.
+# ----------------------------------------------------------------------------
+$(foreach lib,$(lib-y),$(eval $(call rule_link_lib,$(notdir $(lib)),$($(notdir $(lib))-obj-y))))

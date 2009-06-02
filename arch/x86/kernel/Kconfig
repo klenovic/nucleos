@@ -1,0 +1,37 @@
+# Kernel options
+menu "Kernel options"
+
+comment "Only separated I&D linkage type is supported for now."
+choice
+	prompt "Type of linkage of kernel"
+	default KERNEL_LINKAGE_SEPID if ARCH_KERNEL_LINKAGE_SEPID
+	---help---
+	  Choose the type of linkage for kernel.
+
+config KERNEL_LINKAGE_COMID
+	depends on !NULL_DEREFER
+	bool "Common I&D"
+	---help---
+	  This will link kernel with common I&D.
+
+config KERNEL_LINKAGE_SEPID
+	bool "Separate I&D"
+	---help---
+	  This will link kernel with separate I&D.
+
+endchoice
+
+config KERNEL_LINKAGE_TYPE
+	hex
+	default "0x00" if KERNEL_LINKAGE_COMID=y
+	default "0x20" if KERNEL_LINKAGE_SEPID=y
+
+config KERNEL_STACK_SIZE
+	int "Kernel stack size (in bytes)"
+	default 1024
+	---help---
+	  Specify the kernel stack size (in bytes).
+
+source "kernel/Kconfig"
+
+endmenu

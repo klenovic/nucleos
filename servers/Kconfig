@@ -1,0 +1,23 @@
+menu "Servers"
+choice
+  prompt "Type of linkage of servers"
+  default SERVERS_LINKAGE_SEPID if ARCH_SERVERS_LINKAGE_SEPID
+
+config SERVERS_LINKAGE_COMID
+  depends on !NULL_DEREFER
+  bool "Common I&D"
+  ---help---
+    This will link servers with common I&D.
+
+config SERVERS_LINKAGE_SEPID
+  bool "Separate I&D"
+  ---help---
+    This will link servers with separate I&D.
+
+endchoice
+
+config SERVERS_LINKAGE_TYPE
+  hex
+  default "0x00" if SERVERS_LINKAGE_COMID=y
+  default "0x20" if SERVERS_LINKAGE_SEPID=y
+endmenu

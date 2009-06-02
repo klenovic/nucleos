@@ -1,0 +1,15 @@
+config SELECT_MEMORY_MODEL
+  def_bool y
+  depends on ARCH_SELECT_MEMORY_MODEL
+
+choice
+  prompt "Memory model"
+  depends on SELECT_MEMORY_MODEL
+  default MEMORY_MODEL_FLAT
+
+config MEMORY_MODEL_FLAT
+  bool "Flat memory"
+  ---help---
+    Flat memory model.
+
+endchoice

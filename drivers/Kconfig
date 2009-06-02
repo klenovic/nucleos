@@ -1,0 +1,27 @@
+menu "Device drivers"
+choice
+  prompt "Type of linkage of servers"
+  default DRIVERS_LINKAGE_SEPID if ARCH_DRIVERS_LINKAGE_SEPID
+
+config DRIVERS_LINKAGE_COMID
+  depends on !NULL_DEREFER
+  bool "Common I&D"
+  ---help---
+    This will link servers with common I&D.
+
+config DRIVERS_LINKAGE_SEPID
+  bool "Separate I&D"
+  ---help---
+    This will link servers with separate I&D.
+
+endchoice
+
+config DRIVERS_LINKAGE_TYPE
+  hex
+  default "0x00" if DRIVERS_LINKAGE_COMID=y
+  default "0x20" if DRIVERS_LINKAGE_SEPID=y
+
+source "drivers/memory/Kconfig"
+endmenu
+
+

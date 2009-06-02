@@ -1,0 +1,39 @@
+/*
+ *  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+ *
+ *  This file is part of Nucleos kernel.
+ *
+ *  Nucleos kernel is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, version 2 of the License.
+ */
+#ifndef KERNEL_H
+#define KERNEL_H
+
+/* This is the master header for the kernel.  It includes some other files
+ * and defines the principal constants.
+ */
+#define _POSIX_SOURCE      1	/* tell headers to include POSIX stuff */
+#define _MINIX             1	/* tell headers to include MINIX stuff */
+#define _SYSTEM            1	/* tell headers that this is the kernel */
+
+/* The following are so basic, all the *.c files get them automatically. */
+#include <nucleos/config.h>	/* global configuration, MUST be first */
+#include <ansi.h>		/* C style: ANSI or K&R, MUST be second */
+#include <sys/types.h>		/* general system types */
+#include <nucleos/const.h>	/* MINIX specific constants */
+#include <nucleos/type.h>		/* MINIX specific types, e.g. message */
+#include <nucleos/ipc.h>		/* MINIX run-time system */
+#include <timers.h>		/* watchdog timer management */
+#include <errno.h>		/* return codes and error numbers */
+
+/* Important kernel header files. */
+#include <kernel/const.h>		/* constants, MUST be second */
+#include <kernel/type.h>		/* type definitions, MUST be third */
+#include <kernel/proto.h>		/* function prototypes */
+#include <kernel/glo.h>			/* global variables */
+#include <nucleos/ipc.h>		/* IPC constants */
+#include <kernel/profile.h>		/* system profiling */
+#include <kernel/debug.h>		/* debugging, MUST be last kernel header */
+
+#endif /* KERNEL_H */

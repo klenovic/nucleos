@@ -1,0 +1,64 @@
+##############################################################################
+#  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+#
+#  This file is part of Nucleos kernel.
+#
+#  Nucleos kernel is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, version 2 of the License.
+##############################################################################
+
+include scripts/mk/Kbuild.include
+
+# final flags
+a_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) \
+	        $(asflags-y) $(ASFLAGS_$(basetarget).o)
+
+c_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
+	        $(ccflags-y) $(CFLAGS_$(basetarget).o)
+
+cpp_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) \
+	          $(cppflags-y) $(CPPFLAGS_$(notdir $@))
+
+ld_flags = $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(notdir $@))
+
+# C (.c) files
+# The C file is compiled and updated dependency information is generated.
+# (See cmd_cc_o_c + relevant part of rule_cc_o_c)
+# ----------------------------------------------------------------------------
+quiet_cmd_cc_o_c = CC      $@
+      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+
+define rule_cc_o_c
+	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c); \
+	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+	                                              $(dot-target).tmp;  \
+	rm -f $(depfile); \
+	mv -f $(dot-target).tmp $(dot-target).cmd
+endef
+
+$(src)/%.o: $(src)/%.c FORCE
+	$(call if_changed_rule,cc_o_c)
+
+quiet_cmd_cc_o_S = AS      $@
+      cmd_cc_o_S = $(CC) $(a_flags) -c -o $@ $<
+
+$(src)/%.o: $(src)/%.S FORCE
+	$(call if_changed_dep,cc_o_S)
+
+# Linker scripts preprocessor (.lds.S -> .lds)
+# ---------------------------------------------------------------------------
+quiet_cmd_cpp_lds_S = LDS     $@
+      cmd_cpp_lds_S = $(CPP) $(cpp_flags) -D__ASSEMBLY__ -o $@ $<
+
+$(src)/%.lds: $(src)/%.lds.S FORCE
+	$(call if_changed_dep,cpp_lds_S)
+
+# Shipped files
+# ---------------------------------------------------------------------------
+
+quiet_cmd_shipped = SHIPPED $@
+      cmd_shipped = cat $< > $@
+
+$(src)/%:: $(src)/%_shipped
+	$(call cmd,shipped)

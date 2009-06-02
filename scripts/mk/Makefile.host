@@ -1,0 +1,171 @@
+##############################################################################
+#  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+#
+#  This file is part of Nucleos kernel.
+#
+#  Nucleos kernel is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, version 2 of the License.
+##############################################################################
+
+host-cobjs :=
+host-Sobjs :=
+host-cxxobjs :=
+
+# host's applications
+hostprogs-y := $(sort $(addprefix $(src)/,$(hostprogs-y)))
+
+notdir_hostlib-y := $(hostlib-y)
+hostlib-y := $(addprefix $(src)/,$(hostlib-y))
+
+hosta_flags = -Wp,-MD,$(depfile) $(HOST_PPFLAGS) $(HOST_ASFLAGS) $(HOST_EXTRA_ASFLAGS) \
+	            $(HOST_ASFLAGS_$(basetarget).o)
+
+hostc_flags = -Wp,-MD,$(depfile) $(HOST_PPFLAGS) $(HOST_CFLAGS) $(HOST_EXTRA_CFLAGS) \
+	            $(HOST_CFLAGS_$(basetarget).o)
+
+hostcxx_flags = -Wp,-MD,$(depfile) $(HOST_PPFLAGS) $(HOST_CXXFLAGS) $(HOST_EXTRA_CXXFLAGS) \
+	              $(HOST_CXXFLAGS_$(basetarget).o)
+
+hostld_flags = $(HOST_LDFLAGS) $(hostldflags-y) $(HOST_LDFLAGS_$(notdir $@))
+
+quiet_cmd_host-cobjs = HOSTCC  $@
+      cmd_host-cobjs = $(HOSTCC) $(hostc_flags) -c -o $@ $<
+
+quiet_cmd_host-Sobjs = HOSTAS  $@
+      cmd_host-Sobjs = $(HOSTAS) $(hosta_flags) -c -o $@ $<
+
+quiet_cmd_host-cxxobjs = HOSTCXX $@
+      cmd_host-cxxobjs = $(HOSTCXX) $(hostcxx_flags) -c -o $@ $<
+
+quiet_cmd_host-csingle = HOSTCC  $@
+      cmd_host-csingle = $(HOSTCC) $(hostc_flags) -o $@ $<
+
+quiet_cmd_host-cxxsingle = HOSTCXX  $@
+      cmd_host-cxxsingle = $(HOSTCXX) $(hostcxx_flags) -o $@ $<
+
+# Rule to generate hostprogs goals
+# ----------------------------------------------------------------------------
+define rule_link_hostprogs
+
+quiet_cmd_link-$(1)-cmulti = HOSTLD  $$@
+      cmd_link-$(1)-cmulti = $$(HOSTLD) -o $$@ $$(filter $$($(1)-obj-y),$$^) $$(hostld_flags)
+
+quiet_cmd_link-$(1)-cxxmulti = HOSTLD  $$@
+      cmd_link-$(1)-cxxmulti = $$(HOSTCXX) -o $$@ $$(filter $$($(1)-obj-y),$$^) $$(hostld_flags)
+
+$(1)-obj-y := $$(filter %.o,$$(addprefix $$(src)/,$$($$(subst $$(src)/,,$(1))-obj-y)))
+targets += $$($(1)-obj-y)
+
+# add to cobjs group?
+__$(1)-cobjs := $$(wildcard $$(patsubst %.o,%.c,$$($(1)-obj-y)))
+$(1)-cobjs := $$(patsubst %.c,%.o,$$(__$(1)-cobjs))
+
+# Shipped .c files
+__$(1)-cobjs := $$(wildcard $$(patsubst %.o,%.c_shipped,$$($(1)-obj-y)))
+$(1)-cobjs += $$(patsubst %.c_shipped,%.o,$$(__$(1)-cobjs))
+
+host-cobjs += $$($(1)-cobjs)
+
+# add to Sobjs group?
+__$(1)-Sobjs := $$(wildcard $$(patsubst %.o,%.S,$$($(1)-obj-y)))
+$(1)-Sobjs := $$(patsubst %.S,%.o,$$(__$(1)-Sobjs))
+host-Sobjs += $$($(1)-Sobjs)
+
+# add to cxxobjs group?
+__$(1)-cxxobjs := $$(wildcard $$(patsubst %.o,%.cc,$$($(1)-obj-y)))
+$(1)-cxxobjs := $$(patsubst %.cc,%.o,$$(__$(1)-cxxobjs))
+host-cxxobjs += $$($(1)-cxxobjs)
+
+# prog from single .c file (if $($(1)-obj-y) is empty) 
+host-$(1)-csingle := $$(if $$($(1)-obj-y),,$(1))
+
+# prog from multi objects (only .c or .S)
+host-$(1)-cmulti := $$(if $$($(1)-obj-y), \
+	                    $$(if $$(filter $$($(1)-cxxobjs),$$($(1)-obj-y)),,$(1)))
+
+# prog from multi objects (.c and .cc or .S)
+host-$(1)-cxxmulti := $$(if $$($(1)-obj-y), \
+	                      $$(if $$(filter $$($(1)-cxxobjs),$$($(1)-obj-y)),$(1)))
+
+hostld_flags_$(1) := $$(HOST_LDFLAGS) $$(hostldflags-y) $$(HOST_LDFLAGS_$$(notdir $(1)))
+
+# goals for hostprogs (single .c)
+$$(host-$(1)-csingle): $(1).c $$(call get_libs,$$(hostc_flags)) FORCE
+	$$(call if_changed_dep,host-csingle)
+
+# goals for hostprogs (multi .c)
+$$(host-$(1)-cmulti): $$($(1)-obj-y) $$(call get_libs,$$(hostld_flags_$(1))) FORCE
+	$$(call if_changed,link-$(1)-cmulti)
+
+# goals for hostprogs (only .cc or mixed with .c)
+$$(host-$(1)-cxxmulti): $$($(1)-obj-y) $$(call get_libs,$$(hostld_flags_$(1))) FORCE
+	$$(call if_changed,link-$(1)-cxxmulti)
+
+targets += $(1)
+endef
+
+# Generate hostprogs-y goals
+# ----------------------------------------------------------------------------
+$(foreach hostprogs,$(hostprogs-y),$(eval $(call rule_link_hostprogs,$(hostprogs))))
+
+# Host object files i.e. which do not belong to any host application
+# just required to be built (rarely needed)
+# ----------------------------------------------------------------------------
+host-cobjs += $(hobj-y)
+targets += $(hobj-y)
+
+# Command to add objects and libraries into target library
+# ----------------------------------------------------------------------------
+quiet_cmd_host_ar_ao = HOSTAR  $@
+      cmd_host_ar_ao = $(AR) $(KBUILD_ARFLAGS) $(ARFLAGS_$(notdir $@)) $@ $(filter $($(notdir $@)-obj-y),$^)
+
+define rule_host_ar_ao
+	rm -f $@; \
+	$(echo-cmd) $(cmd_$(1)); \
+	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+endef
+
+# Rule to create hostlib
+# ----------------------------------------------------------------------------
+define rule_link_hostlib
+# add `$(src)/ prefix
+$(1)-obj-y := $$(filter %.o,$$(addprefix $$(src)/,$(2)))
+
+targets += $$($(1)-obj-y)
+
+host-cobjs += $$($(1)-obj-y)
+
+# subdirs we must descend into
+$(1)-subdirs := $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o,$(2))))
+$(1)-subdirs := $$(patsubst $$(srctree)/%,%,$$(patsubst %/,%,$$($(1)-subdirs)))
+
+subdir-y += $$($(1)-subdirs)
+
+$(1)-libs := $$(addsuffix /$(1),$$($(1)-subdirs))
+
+$$(src)/$(1): $$($(1)-obj-y) FORCE
+	$$(call if_changed_rule,host_ar_ao)
+
+targets += $$(src)/$(1)
+endef
+
+# Generate hostlib goals
+# ----------------------------------------------------------------------------
+# Note that library and its objects are without `$(src)' prefix.
+$(foreach lib,$(hostlib-y),$(eval $(call rule_link_hostlib,$(notdir $(lib)),$($(notdir $(lib))-obj-y))))
+
+$(sort $(host-cobjs)): $(src)/%.o: $(src)/%.c FORCE
+	$(call if_changed_dep,host-cobjs)
+
+$(sort $(host-Sobjs)): $(src)/%.o: $(src)/%.S FORCE
+	$(call if_changed_dep,host-Sobjs)
+
+$(sort $(host-cxxobjs)): $(src)/%.o: $(src)/%.cc FORCE
+	$(call if_changed_dep,host-cxxobjs)
+
+# Include hosts' cmd files if exist
+# ---------------------------------------------------------------------------
+ifneq ($(wildcard $(cmd_files)),)
+  include $(wildcard $(cmd_files))
+endif

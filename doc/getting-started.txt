@@ -1,0 +1,98 @@
+Technical notes:
+----------------
+  - compiler: gcc version 4.3.2 [gcc-4_3-branch revision 141291] (SUSE Linux)
+  - host system: openSUSE 11.1 (i586) (Linux 2.6.27.19-3.2-pae i686)
+  - test environment: qemu-0.10.x, vmware
+
+BIG FAT NOTE: You will have to have minix3 installed and just then you
+                          can replaced by using mkboot.sh utility. This software
+                          has never been tried on real hardware but only under
+                          qemu and vmware.
+
+To build the kernel and user-space apps:
+----------------------------------------
+1.Move to source tree and configure the kernel:
+    make config
+ 
+  You can run other configuration commands like make menuconfig or make xconfig
+  but just use default configuration for now.
+
+2.Run the build (silent):
+    make kernel
+
+  If you what to know what commands, flags etc. are used during build then type the
+  command with V defined on command line:
+    make V=1 kernel
+
+  If you made some changes in sources then just type one of the mentioned commands and
+  build system should rebuild/create all neccessary modules, apps and other binaries.
+
+3.If everything went well you should have image file in arch/x86/boot directory and
+  boot and bootblock in arch/x86/monitor directory. Regarding image see Makefile
+  in arch/x86/boot directory which binaries it involves.
+
+4.To clean-up the source tree (delete object and dependency files but no applications)
+    make clean
+ 
+  For a complete clean run:
+    make mrproper
+
+Install the kernel on hdd image used by qemu:
+---------------------------------------------
+1.Create hdd image by dd command e.g.(512MB hdd):
+    dd if=/dev/zero of=minix.img bs=512 count=1048576
+
+2.Install the minix3 from cdrom iso to hdd image:
+    qemu -cdrom /path/to/IDE-3.1.2a.iso -hda /path/to/minix.img -boot d
+ 
+  Follow the instruction from minix home site regarding how to install minix.
+
+3.Be sure that you can mount the image so you can modify the system from linux
+  host. You must have linux kernel compiled with the following options allowed:
+    CONFIG_MINIX_FS
+    CONFIG_PARTITION_ADVANCED
+    CONFIG_MINIX_SUBPARTITION
+
+4.If you have minix installed (and you were succeed in step 3.) you can install the
+  built kernel and monitor. Move to scripts directory and type:
+    sudo ./mkboot.sh -a install -b ../arch/x86/monitor/boot -B ../arch/x86/monitor/bootblock -i ../arch/x86/boot/image -t hdd /path/to/minix.img
+
+  You will need root priviledges since mkboot.sh will need to allocate some loop device for minix.img.
+  After this command you should see something like this:
+    ==> Setup loop device: /dev/loop0...done
+    ==> Install boot monitor '../arch/x86/monitor/boot'
+    ==> Install image '../arch/x86/boot/image'
+    ../arch/x86/monitor/bootblock and 7 addresses to /boot/boot patched into /dev/loop0
+    ==> install done
+    ==> Release /dev/loop0 device...done
+
+5. Run qemu but boot from hdd:
+    qemu -hda /path/to/minix.img -boot c
+
+   Choose option three in menu.
+
+You can create boot floppy image too.
+
+Creating boot floppy image:
+---------------------------
+1.Create floppy image by dd command:
+    dd if=/dev/zero of=floppy.img bs=512 count=2880
+
+2.If you have minix installed you can install the built kernel and monitor.
+  Move to scripts directory and type:
+    sudo ./mkboot.sh -a fdboot -b ../arch/x86/monitor/boot -B ../arch/x86/monitor/bootblock -i ../arch/x86/boot/image -t fd /path/to/floppy.img
+
+  You should see then something like this:
+    ==> Setup loop device: /dev/loop0...done
+    ==> Creating minix filesystem (V3) on /dev/loop0
+    ==> Installing binaries
+    ==> Installing /dev
+    ==> Patching boot code address and boot paramenters
+    ../arch/x86/monitor/bootblock and 2 addresses to /boot/boot patched into /dev/loop0
+    Using floppy boot parameters from file ../tmp/fdbootparams.
+    Test kernel installed on /dev/loop0
+    ==> fdboot done
+    ==> Release /dev/loop0 device...done
+
+3. Now you can boot from floppy:
+     qemu -hda /path/to/minix.img -fda /path/to/floppy.img -boot a 

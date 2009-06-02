@@ -1,0 +1,27 @@
+config BUILTIN_INITRD
+  bool "Initial ramdisk built into memory driver"
+  default n
+  ---help---
+    Say Y if you want to have initial ramdisk built
+    into memory driver. Helpful for small embedded or
+    diskless systems.
+
+    If unsure say N here.
+
+config INITRD_FSIMG_SOURCE
+  string
+  prompt "The path to filesystem image which shall be built into driver"
+  depends on BUILTIN_INITRD
+  ---help---
+    Specify the path (on host) to filesystem image (consists all servers,
+    drivers etc. that are needed in initial ramdisk). Path can be relative
+    to source tree or an absolute path. 
+
+config INITRD_TARGET_PATH
+  string
+  prompt "The path to initial ramdisk on target filesystem"
+  depends on !BUILTIN_INITRD
+  default "/boot/initrd"
+  ---help---
+    Specify the path to initial ramdisk image on target filesystem. Path
+    must be absolute.

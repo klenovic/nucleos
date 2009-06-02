@@ -1,0 +1,4 @@
+depend-ack:
+	rm .depend-ack
+	touch .depend-ack
+	mkdep 'cc -O -D_MINIX -D_POSIX_SOURCE -E' openpty.c | sed -e 's:^\(.\):../obj-ack//./util/\1:' >> .depend-ack

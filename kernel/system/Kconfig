@@ -1,0 +1,23 @@
+config KERNEL_NR_IRQ_HOOKS
+	int "Number of interrupts hooks"
+	default 16
+	---help---
+	  Number of interrupt hooks.
+
+config KERNEL_VDEVIO_BUF_SIZE
+	int "Maximum number of elements per VDEVIO request"
+	default 64
+	---help---
+	  Maximum number of elements per VDEVIO request.
+
+config KERNEL_VCOPY_VEC_SIZE
+	int "Maximum number of elements per VCOPY request"
+	default 16
+	---help---
+	  Maximum number of elements per VCOPY request.
+
+config KERNEL_P_NAME_LEN
+	int "Length of program names stored in the process table."
+	default 8
+	---help---
+	  Length of program names stored in the process table.

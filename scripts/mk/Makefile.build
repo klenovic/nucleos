@@ -1,0 +1,192 @@
+##############################################################################
+#  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
+#
+#  This file is part of Nucleos kernel.
+#
+#  Nucleos kernel is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, version 2 of the License.
+##############################################################################
+
+# build prerequisite and object files
+src := $(patsubst $(srctree)/%,%,$(abspath $(obj)))
+
+include scripts/mk/Kbuild.include
+
+# read config file
+-include include/config/auto.conf
+
+PHONY := __build
+__build:
+
+# initialization
+# subdirectories descent into
+subdir-y   :=
+# helper variable
+host-subdir-y :=
+
+# host's applications
+hobj-y    :=
+hostprogs-y :=
+
+# unneeded command files
+cmd_files-n :=
+
+# target's applications
+cmd_files  :=
+obj-y      :=
+obj-n      :=
+app-y      :=
+
+# some external objects (do not add $(src))
+extobj-y :=
+
+# An arbitrary goal that should be achieved
+targets :=
+first :=
+# list of all object files (libs',apps',... but not host)
+objs-y :=
+
+# target's libs
+lib-y :=
+
+# come from Makefiles
+asflags-y  :=
+ccflags-y  :=
+cppflags-y :=
+ldflags-y  :=
+
+# Include Makefile to parse or the object file
+kbuild-file := $(src)/Makefile
+include $(kbuild-file)
+
+# Simple object files
+# ---------------------------------------------------------------------------
+# sub-directories
+__subdir-y := $(abspath $(addprefix $(src)/,$(filter-out %.o,$(obj-y))))
+subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
+
+# get object files %.o
+obj-y := $(sort $(addprefix $(src)/,$(filter %.o,$(obj-y))))
+# add to global list
+objs-y += $(obj-y)
+
+# unneeded object files
+obj-n := $(sort $(addprefix $(src)/,$(filter %.o,$(obj-))))
+# unneeded command files
+cmd_files-n += $(addsuffix .cmd,$(filter %.o,$(obj-n)))
+
+# Simple host object files
+# ---------------------------------------------------------------------------
+# Host object files which do not belong to any host applicationjust required to be built
+__host-subdir-y := $(abspath $(addprefix $(src)/,$(filter-out %.o,$(hobj-y))))
+host-subdir-y := $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__host-subdir-y)))
+
+__subdir-y := $(host-subdir-y)
+subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
+
+hobj-y := $(sort $(addprefix $(src)/,$(filter %.o,$(hobj-y))))
+# unneeded object files
+hobj-n := $(sort $(addprefix $(src)/,$(filter %.o,$(hobj-))))
+
+# Targets to do first `first'
+# ---------------------------------------------------------------------------
+first := $(sort $(addprefix $(src)/,$(first)))
+
+# Host's applications handling
+ifneq ($(strip $(hostprogs-y) $(hobj-y) $(hostlib-y)),)
+# include helper makefile to build host's applications
+include scripts/mk/Makefile.host
+endif
+
+# Libs
+ifneq ($(strip $(lib-y)),)
+# include helper makefile to build host's applications
+include scripts/mk/Makefile.lib
+endif
+
+# Target's applications handling
+ifneq ($(strip $(app-y)),)
+# include helper makefile to build target's applications
+include scripts/mk/Makefile.app
+endif
+
+# Build compiled-in targets
+# ---------------------------------------------------------------------------
+
+ifneq ($(strip $(create-builtin)),)
+builtin-target := $(src)/built-in.o
+
+# If the list of objects to link is empty, just create an empty built-in.o
+quiet_cmd_link_o_target = LD      $@
+      cmd_link_o_target = $(if $(strip $(obj-y)), \
+                            $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^), \
+                            rm -f $@; $(AR) rcs $@)
+
+$(builtin-target): $(obj-y) FORCE
+	$(call if_changed,link_o_target)
+targets += $(builtin-target)
+endif
+
+# add `$(objs-y)' to targets
+targets += $(objs-y)
+
+# Targets
+# ---------------------------------------------------------------------------
+
+# Add `$(src)' to targets
+# Note that some of targets may be already with $(src) prefix thus
+# we need to remove this and add it then
+targets := $(patsubst $(src)/%,%,$(targets))
+targets := $(sort $(addprefix $(src)/,$(targets)))
+
+# remove those that were specified to make as first
+targets := $(filter-out $(first),$(targets))
+
+# some flags for for build. for know only sort attribute for directories
+ifneq ($(strip $(subdir-y-flags)),)
+# sort of obj-y is default so add `no-sort' if not allowed
+subdir-y_not-sort := $(if $(filter $(subdir-y-flags),not-sort),y)
+endif
+
+# check whether to sort directories
+subdir-y := $(if $(subdir-y_not-sort),$(subdir-y),$(sort $(subdir-y)))
+
+# dot unneeded command files
+cmd_files-n := $(call do_dotfile,$(cmd_files-n))
+
+__build: $(first) $(subdir-y) $(targets) \
+	$(if $(create-builtin),$(filter %.o,$(builtin-target)))
+	@:
+# \
+#	 $(if $(wildcard $(obj-n) $(cmd_files-n)),$(shell rm -f $(obj-n) $(cmd_files-n)))
+
+# if obj-y contains directory then descend into
+PHONY += $(subdir-y)
+$(subdir-y):
+	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
+
+# Add FORCE to the prequisites of a target to force it to be always rebuilt.
+# ---------------------------------------------------------------------------
+PHONY += FORCE
+FORCE:
+
+# build rules
+include scripts/mk/Makefile.rules
+
+# Read all saved command lines and dependencies for the $(targets) we
+# may be building above, using $(if_changed{,_dep}). As an
+# optimization, we don't need to read them if the target does not
+# exist, we will rebuild anyway in that case.
+targets := $(wildcard $(sort $(targets)))
+cmd_files += $(wildcard $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
+
+first := $(wildcard $(sort $(first)))
+cmd_files += $(wildcard $(foreach f,$(first),$(dir $(f)).$(notdir $(f)).cmd))
+
+# include dependency files if exist
+ifneq ($(wildcard $(cmd_files)),)
+  include $(wildcard $(cmd_files))
+endif
+
+.PHONY: $(PHONY)

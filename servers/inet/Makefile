@@ -1,0 +1,25 @@
+# Makefile for inet.
+app-y := inet.elf32
+inet.elf32-obj-y := generic/
+inet.elf32-obj-y += buf.o clock.o inet.o inet_config.o \
+	                  mnx_eth.o mq.o qp.o queryparam.o sr.o sha2.o
+
+inet.elf32-obj-y += generic/built-in.o
+
+ccflags-y := -D_MINIX
+
+ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
+
+LDFLAGS_inet.elf32 := -Llib -lsys -lnucc \
+	                    -L$(cc-lib-dir) -lgcc \
+	                    -Tservers/server_32.lds
+
+$(src)/inet.elf32: servers/server_32.lds
+
+# Create in minix3's aout format
+inet_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
+inet_a_hdrlen  := 0x20
+inet_a_cpu     := i386
+inet_stackheap := 0x8000
+
+e2a-y := inet.elf32,inet
