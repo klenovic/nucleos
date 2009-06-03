@@ -463,6 +463,28 @@ lib: __all $(libs-y)
 # Note that we must compile the `fixdep' too
 tools: scripts_basic scripts_tools
 
+# dirs to build
+PHONY += $(nucleos-dirs)
+$(nucleos-dirs): prepare scripts_tools
+	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
+
+else # KBUILD_EXTMOD
+module-dirs := $(KBUILD_EXTMOD)
+
+__build: $(module-dirs)
+
+# targets to clean
+clean-targets += $(KBUILD_EXTMOD)
+
+# targets to distclean (note `distclean' runs also `clean')
+distclean-targets += $(KBUILD_EXTMOD)
+
+PHONY += $(module-dirs)
+$(module-dirs):
+	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
+
+endif # KBUILD_EXTMOD
+
 # if distclean then clean everything
 ifneq ($(filter distclean mrproper,$(MAKECMDGOALS)),)
 clean-targets += $(distclean-targets)
@@ -470,11 +492,6 @@ do-distclean := __distclean
 else
 do-distclean :=
 endif
-
-# dirs to build
-PHONY += $(nucleos-dirs)
-$(nucleos-dirs): prepare scripts_tools
-	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
 
 # do clean
 quite_cmd_clean = CLEAN   $(call mark2undel,$(call rm_px_c,$@))
@@ -484,17 +501,6 @@ $(sort $(strip $(call add_px_c,$(clean-targets)))):
 	$(Q)$(MAKE) $(clean)=$(call rm_px_c,$@) $(do-distclean)
 
 clean distclean mrproper: $(call add_px_c,$(clean-targets))
-
-else # KBUILD_EXTMOD
-# external module support
-build-targets += $(KBUILD_EXTMOD)
-
-# targets to clean
-clean-targets += $(KBUILD_EXTMOD)
-
-# targets to distclean (note `distclean' runs also `clean')
-distclean-targets += $(KBUILD_EXTMOD)
-endif # KBUILD_EXTMOD
 
 endif # ifeq ($(config-targets),1)
 endif # ifeq ($(mixed-targets),1)
