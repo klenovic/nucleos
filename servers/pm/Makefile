@@ -6,7 +6,7 @@ pm.elf32-obj-y := break.o dma.o exec.o forkexit.o getset.o main.o \
 pm.elf32-extobj-y := lib/x86/rts/crtso.o
 
 # files to be removed upon make clean
-clean-files := include/nucleos/compile.h
+clean-files := ../../include/nucleos/compile.h
 
 # dependencies on generated files need to be listed explicitly
 $(src)/version.o: include/nucleos/compile.h

@@ -24,6 +24,8 @@ ifeq ($(CONFIG_X86_32),y)
   KBUILD_CFLAGS += $(cflags-y)
 endif
 
+boot := arch/x86/boot
+
 # speed up the build
 KBUILD_CFLAGS += -pipe
 
@@ -40,3 +42,6 @@ __cc-version-str = $(shell echo __VERSION__ | gcc -E - | grep -v "\#")
 __cc-install-dir = $(dir $(shell $(CC) -print-libgcc-file-name))
 __cc-include-dir = $(__cc-install-dir)include
 __cc-lib-dir = $(__cc-install-dir)
+
+archclean:
+	$(Q)$(MAKE) $(clean)=$(boot)

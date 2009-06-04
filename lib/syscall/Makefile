@@ -4,10 +4,11 @@ libnucc.a-obj-y := _exit.o _pm_findproc.o access.o alarm.o brk.o cfgetispeed.o c
 	 devctl.o dup.o dup2.o execl.o execle.o execlp.o execv.o execve.o execvp.o fcntl.o fork.o \
 	 fpathconf.o fstat.o fstatfs.o getcwd.o getegid.o geteuid.o getgid.o getgroups.o \
 	 getnpid.o getnprocnr.o getpgrp.o getpid.o getppid.o getpprocnr.o getprocnr.o getsigset.o \
-	 getsysinfo.o getuid.o ioctl.o isatty.o kill.o link.o lseek.o lstat.o mapdriver5.o mkdir.o mkfifo.o mmap.o mknod.o \
-	 mount.o open.o opendir.o pathconf.o pause.o pipe.o ptrace.o read.o readdir.o readlink.o reboot.o \
-	 rename.o rewinddir.o rmdir.o sbrk.o seekdir.o select.o setgid.o setsid.o setuid.o sigaction.o sigaddset.o \
-	 sigdelset.o sigemptyset.o sigfillset.o sigismember.o sigpending.o sigprocmask.o sigreturn.o \
-	 sigsuspend.o sleep.o stat.o stime.o svrctl.o symlink.o sync.o tcdrain.o tcflow.o tcflush.o tcgetattr.o \
-	 tcsendbreak.o tcsetattr.o time.o times.o truncate.o umask.o umount.o uname.o unlink.o utime.o vm_dmacalls.o\
+	 getsysinfo.o getuid.o ioctl.o isatty.o kill.o link.o lseek.o lseek64.o lstat.o mapdriver5.o \
+	 mkdir.o mkfifo.o mmap.o mknod.o mount.o open.o opendir.o pathconf.o pause.o pipe.o ptrace.o \
+	 read.o readdir.o readlink.o reboot.o rename.o rewinddir.o rmdir.o sbrk.o seekdir.o select.o \
+	 setgid.o setsid.o setuid.o sigaction.o sigaddset.o sigdelset.o sigemptyset.o sigfillset.o \
+	 sigismember.o sigpending.o sigprocmask.o sigreturn.o sigsuspend.o sleep.o stat.o stime.o \
+	 svrctl.o symlink.o sync.o sysuname.o tcdrain.o tcflow.o tcflush.o tcgetattr.o tcsendbreak.o \
+	 tcsetattr.o time.o times.o truncate.o umask.o umount.o uname.o unlink.o utime.o vm_dmacalls.o \
 	 wait.o waitpid.o write.o

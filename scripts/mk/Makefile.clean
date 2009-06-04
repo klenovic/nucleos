@@ -8,152 +8,109 @@
 #  the Free Software Foundation, version 2 of the License.
 ##############################################################################
 
-# provide  clean
-src := $(patsubst $(srctree)/%,%,$(abspath $(obj)))
+# ==========================================================================
+# Cleaning up
+# ==========================================================================
 
-# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=dir
-# Usage:
-# $(Q)$(MAKE) $(clean)=dir
-clean := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/mk/Makefile.clean obj
-
-include scripts/mk/Kbuild.include
+src := $(obj)
 
 PHONY := __clean
 __clean:
 
--include include/config/auto.conf
+include $(srctree)/scripts/mk/Kbuild.include
 
-# initialization
-obj-y :=
-hobj-y :=
-lib-y :=
-hostlib-y :=
-hostprogs-y :=
-subdir-y :=
-clean-files :=
-targets :=
+# Shorthand for $(Q)$(MAKE) scripts/Makefile.clean obj=dir
+# Usage:
+# $(Q)$(MAKE) $(clean)=dir
+clean := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/mk/Makefile.clean obj
 
-# Check whether input argument is a directory (has to have Makefile)
-# or it's just a file to delete.
-check_isdir = $(shell if [ ! -h "$(1)" ]; then \
-	if [ -d "$(1)" ]; then echo "$(1)"; fi; fi)
+# The filename Kbuild has precedence over Makefile
+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
+include $(if $(wildcard $(kbuild-dir)/Kbuild), $(kbuild-dir)/Kbuild, $(kbuild-dir)/Makefile)
 
-# check whether input shall be deleted
-check_srctodelete = $(if $(call grep2del,$(1)),delete)
+# Figure out what we need to build from the various variables
+# ==========================================================================
 
-# if `src' is directory then look for Makefile
-#  and parse it
-ifeq ($(call check_srctodelete,$(src)),)
+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+subdir-y	+= $(__subdir-y)
+__subdir-n	:= $(patsubst %/,%,$(filter %/, $(obj-n)))
+subdir-n	+= $(__subdir-n)
+__subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
+subdir-		+= $(__subdir-)
 
-ifeq ($(call check_isdir,$(realpath $(src))),)
-$(error "$(src) is not a directory")
+# directories from app-y and app-
+subdir-y	+= $(foreach a,$(app-y) $(app-),$(filter %/,$($(a)-obj-y) $($(a)-obj-)))
+
+# directories from lib-y and lib-
+subdir-y	+= $(foreach l,$(lib-y) $(lib-),$(filter %/,$($(l)-obj-y) $($(l)-obj-)))
+
+# Subdirectories we need to descend into
+
+subdir-y	:= $(sort $(subdir-y))
+subdir-yn	:= $(sort $(subdir-y) $(subdir-n) $(subdir-))
+
+# Add subdir path
+
+subdir-yn	:= $(addprefix $(obj)/,$(subdir-yn))
+
+# build a list of files to remove, usually relative to the current
+# directory
+
+__clean-files	:= $(extra-y) $(first)                  \
+		   $(targets) $(clean-files)            \
+		   $(app-y) \
+		   $(subst $(comma), ,$(e2a-y)) \
+		   $(hostprogs-y) $(hostprogs-)
+
+# as clean-files is given relative to the current directory, this adds
+# a $(obj) prefix, except for absolute paths
+__clean-files   := $(wildcard                                               \
+                   $(addprefix $(obj)/, $(filter-out /%, $(__clean-files))) \
+		   $(filter /%, $(__clean-files)))
+
+# as clean-dirs is given relative to the current directory, this adds
+# a $(obj) prefix, except for absolute paths
+
+__clean-dirs    := $(wildcard                                               \
+                   $(addprefix $(obj)/, $(filter-out /%, $(clean-dirs)))    \
+		   $(filter /%, $(clean-dirs)))
+
+# ==========================================================================
+
+quiet_cmd_clean    = CLEAN   $(obj)
+      cmd_clean    = rm -f $(__clean-files)
+quiet_cmd_cleandir = CLEAN   $(__clean-dirs)
+      cmd_cleandir = rm -rf $(__clean-dirs)
+
+__clean: $(subdir-yn)
+ifneq ($(strip $(__clean-files)),)
+	+$(call cmd,clean)
 endif
-
-# include Makefile to parse
-include $(src)/Makefile
-
-__subdir/foo := $(dir $(filter %.o, $(clean-files) $(obj-y) $(hobj-y)))
-__subdir/foo := $(sort $(subst ./,,$(__subdir/foo)))
-
-# this is needed because somebody might add something into clean-files explicitely
-clean-files += $(if $(strip $(clean-files)), $(addprefix $(src)/,$(strip $(clean-files))))
-
-# Get subdirs descend into
-# ----------------------------------------------------------------------------
-__subdir-y := $(abspath $(sort $(addprefix $(src)/,$(filter-out %.o,$(obj-y) $(hobj-y)))))
-# remove trailing slash & srctree
-subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
-
-# handle libraries
-ifneq ($(strip $(lib-y)),)
-# get dirs
-__subdir-y := $(foreach l,$(lib-y),$(filter-out %.o,$($(l)-obj-y) $($(l)-obj-)))
-__subdir-y := $(abspath $(sort $(addprefix $(src)/,$(__subdir-y))))
-# remove trailing slash & srctree
-subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
+ifneq ($(strip $(__clean-dirs)),)
+	+$(call cmd,cleandir)
 endif
-
-distclean-y += $(wildcard $(src)/*.a)
-
-ifneq ($(strip $(app-y)),)
-# get dirs
-__subdir-y := $(foreach a,$(app-y),$(filter-out %.o,$($(a)-obj-y) $($(a)-obj-)))
-__subdir-y := $(abspath $(sort $(addprefix $(src)/,$(__subdir-y))))
-# remove trailing slash & srctree
-subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
-
-# grep src/foo from applications
-__subdir/foo += $(foreach a,$(app-y),$(dir $(filter %.o, $($(a)-obj-y))))
-__subdir/foo := $(sort $(subst ./,,$(__subdir/foo)))
+ifneq ($(strip $(clean-rule)),)
+	+$(clean-rule)
 endif
-distclean-y += $(app-y)
-
-ifneq ($(strip $(hostprogs-y) $(hostlib-y)),)
-# get dirs
-__subdir-y := $(foreach l,$(hostlib-y) $(hostprogs-y),$(filter-out %.o,$($(l)-obj-y) $($(l)-obj-)))
-__subdir-y := $(abspath $(sort $(addprefix $(src)/,$(__subdir-y))))
-
-# remove trailing slash & srctree
-subdir-y += $(patsubst $(srctree)/%,%,$(patsubst %/,%,$(__subdir-y)))
-
-# grep src/foo from applications
-__subdir/foo += $(foreach a,$(hostprogs-y) $(hostlib-y),$(dir $(filter %.o, $($(a)-obj-y))))
-__subdir/foo := $(sort $(subst ./,,$(__subdir/foo)))
-endif
-distclean-y += $(hostprogs-y) $(hostlib-y) 
-
-clean-files += $(wildcard $(src)/*.mri)
-clean-files += $(wildcard $(src)/*.o)
-
-# Add `targets'
-# ----------------------------------------------------------------------------
-clean-files += $(addprefix $(src)/,$(targets))
-
-# get cmd files in directory
-clean-files += $(wildcard $(src)/.*.cmd)
-
-# get depend files (generated by gcc)
-clean-files += $(wildcard $(src)/.*.d)
-
-# tmp cmd files for subdir/foo.o object and command files files
-clean-files += $(if $(__subdir/foo), \
-	               $(foreach d,$(__subdir/foo),$(wildcard $(src)/$(d)/.*.cmd) $(wildcard $(src)/$(d)/*.o)))
-
-ifneq ($(strip $(e2a-y)),)
-aout-targets     := $(strip $(foreach e2a,$(e2a-y),$(lastword $(subst $(comma), ,$(e2a)))))
-aout-targets-tmp := $(foreach at,$(aout-targets),.tmp.$(at).ahdr .tmp.$(at).rawbin) 
-clean-files      += $(addprefix $(src)/,$(aout-targets) $(aout-targets-tmp))
-endif
-
-ifneq ($(filter __distclean,$(MAKECMDGOALS)),)
-do-distclean := __distclean
-distclean-y := $(addprefix $(src)/,$(patsubst $(src)/%,%,$(distclean-y)))
-clean-files += $(strip $(distclean-y))
-else
-do-distclean :=
-endif
-
-# if `src' is a directory or file for deletion
-else #! is a directory or file to delete
-# in case `src' is file or in form %=del (a directory to delete) then delete
-clean-files += $(call mark2undel,$(src))
-endif
-
-cmd_clean = rm -rf $(1)
-
-__distclean: __clean
-
-# remove duplicates & sort
-subdir-y := $(sort $(subdir-y))
-
-# do clean
-__clean: $(subdir-y)
-	$(Q)$(if $(wildcard $(sort $(clean-files))),$(call cmd_clean,$(wildcard $(sort $(clean-files)))))
 	@:
 
-# if obj-y contains directory then descend into
-PHONY += $(subdir-y)
-$(subdir-y):
-	$(Q)$(MAKE) $(clean)=$@ $(do-distclean)
+# ===========================================================================
+# Generic stuff
+# ===========================================================================
+
+# Descending
+# ---------------------------------------------------------------------------
+
+PHONY += $(subdir-yn)
+$(subdir-yn):
+	$(Q)$(MAKE) $(clean)=$@
+
+# If quiet is set, only print short version of command
+
+cmd = @$(if $($(quiet)cmd_$(1)),echo '  $($(quiet)cmd_$(1))' &&) $(cmd_$(1))
+
+
+# Declare the contents of the .PHONY variable as phony.  We keep that
+# information in a variable se we can use it in if_changed and friends.
 
 .PHONY: $(PHONY)

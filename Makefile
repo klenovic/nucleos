@@ -21,7 +21,7 @@ EXTRAVERSION = -alpha1
 # name/motto/quote for release
 NAME = Get the ball rolling!
 
-# default goal (build object files)
+# default goal
 PHONY := __all
 __all:
 
@@ -50,7 +50,7 @@ export KBUILD_EXTMOD
 srctree	:= $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
 objtree	:= $(CURDIR)
 src	:= $(srctree)
-obj	:= $(src)
+obj	:= $(objtree)
 VPATH	:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
 
 MAKE ?= make
@@ -149,9 +149,6 @@ NUCLEOSINCLUDE := -Iinclude \
 	          -imacros include/nucleos/macros.h \
 	          -include include/nucleos/autoconf.h
 
-# include arch phonies
-#PHONY += $(arch_phony)
-
 # shell used by build system
 CONFIG_SHELL := $(shell if [ -x "$BASH" ]; then echo $BASH; \
 		  else if [ -x /bin/bash ]; then echo /bin/bash; \
@@ -186,20 +183,9 @@ export AR ARCH AS AS16 AS64 KBUILD_AFLAGS CC CC16 CC64 CONFIG_SHELL CPP \
 
 export KBUILD_ARFLAGS KBUILD_CFLAGS KBUILD_CPPFLAGS
 
-### Helper functions
-# Is directory (note that if this is a symlink to directory
-#  then it is returns also true)
-cmd_isdir = $(shell if [ -d "$(1)" ]; then echo "$(1)"; fi)
-cmd_grepdirs = $(foreach m, $(patsubst $(2),$(1)), $(call cmd_isdir,$(m)))
+# Files to ignore in find ... statements
 
-# add prefixes (c-clean, d-distclean)
-add_px_c = $(addprefix __nucs_clean_,$(1))
-add_px_bl = $(addprefix __nucs_build_lib_,$(1))
-
-# remove prefixes (c-clean, d-distclean)
-rm_px_c = $(patsubst __nucs_clean_%,%,$(1))
-rm_px_bl = $(patsubst __nucs_build_lib_%,%,$(1))
-###
+RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS -o -name .pc -o -name .hg -o -name .git \) -prune -o
 
 ### Configuration
 ifeq ($(KBUILD_VERBOSE),1)
@@ -220,8 +206,8 @@ export quiet Q KBUILD_VERBOSE
 MAKEFLAGS += --include-dir=$(srctree)
 
 # Include some helper functions
-scripts/mk/Kbuild.include: ;
-include scripts/mk/Kbuild.include
+$(srctree)/scripts/mk/Kbuild.include: ;
+include $(srctree)/scripts/mk/Kbuild.include
 
 ### Preparation for build (common for all architecture)
 KCONFIG_CONFIG ?= .config
@@ -231,31 +217,30 @@ PHONY += scripts_basic
 scripts_basic:
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=scripts/basic
 
-clean-targets += scripts/basic
+# To avoid any implicit rule to kick in, define an empty command.
+scripts/basic/%: scripts_basic ;
 
 scripts_tools:
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=scripts/tools
-
-clean-targets += scripts/tools
 endif
 
 # goals that don't need .config
-no-dot-config-targets := clean distclean help mrproper tools
+no-dot-config-targets := clean distclean help mrproper tools \
+			 include/nucleos/version.h
 
 # possible %config goals
 config-goals := config menuconfig xconfig gconfig \
-	              randconfig allyesconfig allnoconfig \
-	              silentoldconfig
+	        randconfig allyesconfig allnoconfig \
+	        silentoldconfig
 
 config-targets := 0
-# config goals mixed with others
 mixed-targets  := 0
 dot-config     := 1
 
-ifneq ($(filter $(no-dot-config-targets),$(MAKECMDGOALS)),)
-    ifeq ($(filter-out $(no-dot-config-targets),$(MAKECMDGOALS)),)
-        dot-config := 0
-    endif
+ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
+		dot-config := 0
+	endif
 endif
 
 ifeq ($(KBUILD_EXTMOD),)
@@ -273,28 +258,35 @@ ifeq ($(mixed-targets),1)
 # Handle them one by one.
 $(MAKECMDGOALS): FORCE
 	$(Q)$(MAKE) -f $(srctree)/Makefile $@
-else
 
-### Configuration tool: xconfig, menuconfig, ...
+else
 ifeq ($(config-targets),1)
 # include architecture goals, vars,...
-include arch/$(SRCARCH)/Makefile
+include $(srctree)/arch/$(SRCARCH)/Makefile
 
-$(filter $(config-goals),$(MAKECMDGOALS)): scripts_basic
-	$(Q)mkdir -p include/config
+config: scripts_basic FORCE
+	$(Q)mkdir -p include/nucleos include/config
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=scripts/kconfig $@
-#! Configuration tool: xconfig, menuconfig, ...
+
+%config: scripts_basic FORCE
+	$(Q)mkdir -p include/nucleos include/config
+	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=scripts/kconfig $@
+
 else # $(config-targets) == 1
 # ===========================================================================
 # Build targets only. In general all targets except *config targets.
 
 ifeq ($(KBUILD_EXTMOD),)
-clean-targets += scripts/kconfig
-distclean-targets += $(if $(wildcard .config*),$(call mark2del,.config .config.old))
+# directories we have to visit
+drivers-y := drivers/
+servers-y := servers/
+core-y := kernel/
+libs-y := lib/
 endif
 
 # we need .config
 ifeq ($(dot-config),1)
+
 # Read in config
 -include include/config/auto.conf
 
@@ -312,9 +304,22 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
 # we execute the config step to be sure to catch updated Kconfig files
 include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
-
-endif # KBUILD_EXTMOD
 else
+# external modules needs include/nucleos/autoconf.h and include/config/auto.conf
+# but do not care if they are up-to-date. Use auto.conf to trigger the test
+PHONY += include/config/auto.conf
+
+include/config/auto.conf:
+	$(Q)test -e include/nucleos/autoconf.h -a -e $@ || (              \
+	echo;                                                           \
+	echo "  ERROR: Kernel configuration is invalid.";               \
+	echo "         include/nucleos/autoconf.h or $@ are missing.";    \
+	echo "         Run 'make oldconfig && make prepare' on kernel src to fix it.";  \
+	echo;                                                           \
+	/bin/false)
+endif # KBUILD_EXTMOD
+
+else # $(dot-config) == 0
 # Dummy target needed, because used as prerequisite
 include/config/auto.conf: ;
 endif # $(dot-config)
@@ -338,19 +343,6 @@ KBUILD_CXXFLAGS += -fomit-frame-pointer
 endif
 
 ifeq ($(KBUILD_EXTMOD),)
-# directories we have to visit
-drivers-y := drivers/
-servers-y := servers/
-core-y := kernel/
-libs-y := lib/
-endif
-
-ifeq ($(KBUILD_EXTMOD),)
-# clean include/config directory except include/config/Makefile
-#  `=del' suffix means that if it is directory then do not descend 
-#  into but delete.
-distclean-targets += $(call mark2del,$(wildcard include/config))
-
 # Generate some files
 # ---------------------------------------------------------------------------
 # KERNELRELEASE can change from a few different places, meaning version.h
@@ -385,17 +377,7 @@ include/nucleos/version.h: $(srctree)/Makefile FORCE
 include/nucleos/utsrelease.h: include/config/kernel.release FORCE
 	$(call filechk,utsrelease.h)
 
-distclean-targets += $(if $(wildcard include/nucleos/version.h), \
-	               $(call mark2del,include/nucleos/version.h))
-
-distclean-targets += $(if $(wildcard include/nucleos/utsrelease.h), \
-	               $(call mark2del,include/nucleos/utsrelease.h))
-
-distclean-targets += $(if $(wildcard .version),$(call mark2del,.version))
 # ---------------------------------------------------------------------------
-
-distclean-targets += $(if $(wildcard include/nucleos/autoconf.h), \
-	               $(call mark2del,include/nucleos/autoconf.h))
 
 # Things we need to do before we recursively start building the kernel
 # or the modules are listed in "prepare".
@@ -426,6 +408,9 @@ endif
 # default goal (build everything)
 __all: __build
 
+# Cancel implicit rules on top Makefile
+$(CURDIR)/Makefile Makefile: ;
+
 # include architecture goals, vars,...
 # expand others if needed
 include arch/$(SRCARCH)/Makefile
@@ -446,9 +431,8 @@ ifeq ($(KBUILD_EXTMOD),)
 # Here we have setup in this Makefile plus expanded in arch Makefile
 # @devel: keep the libs as first for now
 nucleos-dirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y)
-
-clean-targets += $(nucleos-dirs)
-distclean-targets += $(nucleos-dirs)
+nucleos-alldirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y) \
+		   $(libs-) $(drivers-) $(servers-) $(core-)
 
 # build object files
 __build: $(nucleos-dirs)
@@ -468,39 +452,96 @@ PHONY += $(nucleos-dirs)
 $(nucleos-dirs): prepare scripts_tools
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
 
+###
+# Cleaning is done on three levels.
+# make clean     Delete most generated files
+#                Leave enough to build external modules
+# make mrproper  Delete the current configuration, and all generated files
+# make distclean Remove editor backup files, patch leftover files and the like
+
+# Directories & files removed with 'make clean'
+CLEAN_DIRS  +=
+CLEAN_FILES +=
+
+# Directories & files removed with 'make mrproper'
+MRPROPER_DIRS  += include/config
+MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+		  include/nucleos/autoconf.h include/nucleos/version.h \
+		  include/nucleos/utsrelease.h cscope*
+
+# clean - Delete most, but leave enough to build external modules
+#
+clean: rm-dirs  := $(CLEAN_DIRS)
+clean: rm-files := $(CLEAN_FILES)
+clean-dirs      := $(addprefix _clean_,$(srctree) $(nucleos-alldirs))
+
+PHONY += $(clean-dirs) clean archclean
+
+$(clean-dirs):
+	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+
+clean: archclean $(clean-dirs)
+	$(call cmd,rmdirs)
+	$(call cmd,rmfiles)
+	@find . $(RCS_FIND_IGNORE) \
+		\( -name '*.[oas]' -o -name '.*.cmd' \
+		-o -name '.*.d' -o -name '.*.tmp' \
+		-o -name '.tmp.*' -o -name '*.mri' \) \
+		-type f -print | xargs rm -f
+
+# mrproper - Delete all generated files, including .config
+#
+mrproper: rm-dirs  := $(wildcard $(MRPROPER_DIRS))
+mrproper: rm-files := $(wildcard $(MRPROPER_FILES))
+mrproper-dirs      := $(addprefix _mrproper_, scripts)
+
+PHONY += $(mrproper-dirs) mrproper archmrproper
+$(mrproper-dirs):
+	$(Q)$(MAKE) $(clean)=$(patsubst _mrproper_%,%,$@)
+
+mrproper: clean archmrproper $(mrproper-dirs)
+	$(call cmd,rmdirs)
+	$(call cmd,rmfiles)
+
+# distclean
+#
+PHONY += distclean
+
+distclean: mrproper
+	@find $(srctree) $(RCS_FIND_IGNORE) \
+		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
+		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
+		-o -name '.*.rej' -o -size 0 \
+		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
+		-type f -print | xargs rm -f
+
 else # KBUILD_EXTMOD
 module-dirs := $(KBUILD_EXTMOD)
 
 __build: $(module-dirs)
 
-# targets to clean
-clean-targets += $(KBUILD_EXTMOD)
-
-# targets to distclean (note `distclean' runs also `clean')
-distclean-targets += $(KBUILD_EXTMOD)
-
 PHONY += $(module-dirs)
 $(module-dirs):
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
 
+clean-dirs := $(addprefix _clean_,$(KBUILD_EXTMOD))
+
+PHONY += $(clean-dirs) clean
+$(clean-dirs):
+	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+
+clean: rm-dirs :=
+clean: rm-files :=
+clean: $(clean-dirs)
+	$(call cmd,rmdirs)
+	$(call cmd,rmfiles)
+	@find $(KBUILD_EXTMOD) $(RCS_FIND_IGNORE) \
+		\( -name '*.[oas]' -o -name '.*.cmd' \
+		-o -name '.*.d' -o -name '.*.tmp' -o -name '.tmp.*' \) \
+		-type f -print | xargs rm -f
+
 endif # KBUILD_EXTMOD
 
-# if distclean then clean everything
-ifneq ($(filter distclean mrproper,$(MAKECMDGOALS)),)
-clean-targets += $(distclean-targets)
-do-distclean := __distclean
-else
-do-distclean :=
-endif
-
-# do clean
-quite_cmd_clean = CLEAN   $(call mark2undel,$(call rm_px_c,$@))
-PHONY += $(call add_px_c,$(clean-targets))
-$(sort $(strip $(call add_px_c,$(clean-targets)))):
-	$(if $(wildcard $(call mark2undel,$(call rm_px_c,$@))),$(Q)echo "  $(call quite_cmd_clean)")
-	$(Q)$(MAKE) $(clean)=$(call rm_px_c,$@) $(do-distclean)
-
-clean distclean mrproper: $(call add_px_c,$(clean-targets))
 
 endif # ifeq ($(config-targets),1)
 endif # ifeq ($(mixed-targets),1)
@@ -509,6 +550,12 @@ endif # ifeq ($(mixed-targets),1)
 # Usage:
 # $(Q)$(MAKE) $(clean)=dir
 clean := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/mk/Makefile.clean obj
+
+quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
+      cmd_rmdirs = rm -rf $(rm-dirs)
+
+quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
+      cmd_rmfiles = rm -f $(rm-files)
 
 PHONY += FORCE
 FORCE:

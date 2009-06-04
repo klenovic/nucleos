@@ -158,8 +158,6 @@ cmd_files-n := $(call do_dotfile,$(cmd_files-n))
 __build: $(first) $(subdir-y) $(targets) \
 	$(if $(create-builtin),$(filter %.o,$(builtin-target)))
 	@:
-# \
-#	 $(if $(wildcard $(obj-n) $(cmd_files-n)),$(shell rm -f $(obj-n) $(cmd_files-n)))
 
 # if obj-y contains directory then descend into
 PHONY += $(subdir-y)
