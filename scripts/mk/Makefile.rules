@@ -62,3 +62,9 @@ quiet_cmd_shipped = SHIPPED $@
 
 $(src)/%:: $(src)/%_shipped
 	$(call cmd,shipped)
+
+# Objcopy
+# ---------------------------------------------------------------------------
+
+quiet_cmd_objcopy = OBJCOPY $@
+      cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(notdir $@)) $< $@

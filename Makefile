@@ -446,9 +446,6 @@ __build: $(nucleos-dirs)
 # create kernel
 kernel: __all
 
-# build libraries
-lib: __all $(libs-y)
-
 # explicit goal to create tools
 # Note that we must compile the `fixdep' too
 tools: scripts_basic scripts_tools

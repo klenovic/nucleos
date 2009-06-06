@@ -55,14 +55,13 @@ $(src)/bootblock.elf32: $(src)/bootblock.lds
 LDFLAGS_bootblock.elf32 += -N -S -e $(BOOTBLOCK_ENTRY) \
 	                   -Tarch/x86/monitor/bootblock.lds
 
-quiet_cmd_create_bootblock = GEN     $@
-      cmd_create_bootblock = $(OBJCOPY) -S -O binary $< $@
-
 targets += bootblock
+
+OBJCOPYFLAGS_bootblock := -S -O binary
 
 # create a raw binary from ELF32 boot
 $(src)/bootblock: $(src)/bootblock.elf32
-	$(call if_changed,create_bootblock)
+	$(call if_changed,objcopy)
 
 ### masterboot
 app-y += masterboot.elf32

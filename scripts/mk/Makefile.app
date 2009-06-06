@@ -59,15 +59,12 @@ $$(src)/.tmp.$(2).ahdr: $$(src)/$(1) FORCE
 
 targets += $$(src)/.tmp.$(2).ahdr
 
-OBJCOPYFLAGS_$(2) := -O binary
-OBJCOPYFLAGS_$(2) += $$(if $$(strip $$($(2)_keepsyms)),--keep-file-symbols,-S)
-
-quiet_cmd_create_rawbin_$(2) = OBJCOPY $$@
-      cmd_create_rawbin_$(2) = $$(OBJCOPY) $$(OBJCOPYFLAGS_$(2)) $$< $$@
+OBJCOPYFLAGS_.tmp.$(2).rawbin := -O binary
+OBJCOPYFLAGS_.tmp.$(2).rawbin += $$(if $$(strip $$($(2)_keepsyms)),--keep-file-symbols,-S)
 
 # create a raw binary from ELF32 boot
 $$(src)/.tmp.$(2).rawbin: $$(src)/$(1) FORCE
-	$$(call if_changed,create_rawbin_$(2))
+	$$(call if_changed,objcopy)
 
 targets += $$(src)/.tmp.$(2).rawbin
 
