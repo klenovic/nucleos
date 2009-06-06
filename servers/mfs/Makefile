@@ -5,7 +5,7 @@ mfs.elf32-obj-y := cache.o device.o link.o mount.o misc.o \
 	                 table.o time.o utility.o write.o inode.o \
 	                 main.o path.o super.o
 
-mfs.elf32-extobj-y := lib/x86/rts/crtso.o
+mfs.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 NR_BUFS=1024
 BS=4096
@@ -13,9 +13,10 @@ BS=4096
 ccflags-y := -DNR_BUFS=$(NR_BUFS)
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-LDFLAGS_mfs.elf32 := -Llib -lsys -ltimers -lnucc \
-	                   -L$(cc-lib-dir) -lgcc \
-	                   -Tservers/server_32.lds
+LDFLAGS_mfs.elf32 := -L$(lib-arch) -Llib \
+		     -lsys -ltimers -lnucc \
+		     -L$(cc-lib-dir) -lgcc \
+		     -Tservers/server_32.lds
 
 $(src)/mfs.elf32: servers/server_32.lds
 

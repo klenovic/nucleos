@@ -39,10 +39,13 @@ __subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
 subdir-		+= $(__subdir-)
 
 # directories from app-y and app-
-subdir-y	+= $(foreach a,$(app-y) $(app-),$(filter %/,$($(a)-obj-y) $($(a)-obj-)))
+subdir-y	+= $(patsubst %/,%,$(foreach a,$(app-y) $(app-), \
+			$(filter %/,$($(a)-obj-y) $($(a)-obj-))))
 
 # directories from lib-y and lib-
-subdir-y	+= $(foreach l,$(lib-y) $(lib-),$(filter %/,$($(l)-obj-y) $($(l)-obj-)))
+# Don't descend into directories specified by absolute path 
+subdir-y	+= $(patsubst %/,%,$(foreach l,$(lib-y) $(lib-), \
+			$(filter-out /%,$(filter %/,$($(l)-obj-y) $($(l)-obj-)))))
 
 # Subdirectories we need to descend into
 

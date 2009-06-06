@@ -2,11 +2,12 @@
 app-y := random.elf32
 random.elf32-obj-y := main.o random.o sha2.o aes/rijndael_api.o aes/rijndael_alg.o 
 
-random.elf32-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+random.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_random.elf32 := -Llib -ldriver_asyn -lsys -lnucc \
-	                       -L$(cc-lib-dir) -lgcc \
-	                       -Tdrivers/driver_32.lds
+LDFLAGS_random.elf32 := -L$(lib-arch) -Llib \
+			-ldriver_asyn -lsys -lnucc \
+			-L$(cc-lib-dir) -lgcc \
+			-Tdrivers/driver_32.lds
 
 $(src)/random.elf32: drivers/driver_32.lds
 

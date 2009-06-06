@@ -2,12 +2,13 @@
 app-y := init.elf32
 init.elf32-obj-y := init.o
 
-init.elf32-extobj-y := lib/x86/rts/crtso.o 
+init.elf32-extobj-y := $(lib-arch)/rts/crtso.o 
 
 ccflags-y += -O -D_MINIX -D_POSIX_SOURCE
 
-LDFLAGS_init.elf32 := -Llib -lnucc \
-	                    -Tservers/server_32.lds
+LDFLAGS_init.elf32 := -L$(lib-arch) -Llib \
+		      -lnucc \
+		      -Tservers/server_32.lds
 
 $(src)/init.elf32: servers/server_32.lds 
 

@@ -1,12 +1,13 @@
 # Makefile for Data Store Server (DS)
 app-y := ds.elf32
 ds.elf32-obj-y := main.o store.o
-ds.elf32-extobj-y :=	lib/x86/rts/crtso.o
+ds.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-LDFLAGS_ds.elf32 := -Llib -lsys -lnucc \
-	                  -Tservers/server_32.lds
+LDFLAGS_ds.elf32 := -L$(lib-arch) -Llib \
+		    -lsys -lnucc \
+		    -Tservers/server_32.lds
 
 $(src)/ds.elf32: servers/server_32.lds
 

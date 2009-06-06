@@ -2,10 +2,11 @@
 app-y := pci.elf32
 pci.elf32-obj-y := main.o pci.o pci_table.o
 
-pci.elf32-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+pci.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_pci.elf32 := -Llib -lsys -ltimers -lnucc \
-	                   -Tdrivers/driver_32.lds
+LDFLAGS_pci.elf32 := -L$(lib-arch) -Llib \
+		     -lsys -ltimers -lnucc \
+		     -Tdrivers/driver_32.lds
 
 $(src)/pci.elf32: drivers/driver_32.lds
 

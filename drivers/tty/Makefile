@@ -2,11 +2,12 @@
 app-y := tty.elf32
 tty.elf32-obj-y := tty.o console.o keyboard.o pty.o rs232.o
 
-tty.elf32-extobj-y := lib/x86/rts/crtso.o
+tty.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_tty.elf32 := -Llib -lsys -ltimers -lnucc \
-	                   -L$(cc-lib-dir) -lgcc \
-	                   -Tdrivers/driver_32.lds
+LDFLAGS_tty.elf32 := -L$(lib-arch) -Llib \
+		     -lsys -ltimers -lnucc \
+		     -L$(cc-lib-dir) -lgcc \
+		     -Tdrivers/driver_32.lds
 
 $(src)/tty.elf32: drivers/driver_32.lds
 

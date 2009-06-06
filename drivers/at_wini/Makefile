@@ -2,11 +2,13 @@
 app-y := at_wini.elf32
 at_wini.elf32-obj-y := at_wini.o 
 
-at_wini.elf32-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+at_wini.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_at_wini.elf32 := -Llib -lsys -ldriver -lnucc \
-	                       -L$(cc-lib-dir) -lgcc \
-	                       -Tdrivers/driver_32.lds
+# arch. library path has precedence over generic
+LDFLAGS_at_wini.elf32 := -L$(lib-arch) -Llib/ \
+			 -lsys -ldriver -lnucc \
+			 -L$(cc-lib-dir) -lgcc \
+			 -Tdrivers/driver_32.lds
 
 $(src)/at_wini.elf32: drivers/driver_32.lds
 

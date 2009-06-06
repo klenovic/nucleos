@@ -37,10 +37,13 @@ $(1)-obj-y := $$(filter %.o,$$(addprefix $$(src)/,$(2)))
 objs-y += $$($(1)-obj-y)
 
 # subdirs we must descend into
-$(1)-subdirs := $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o,$(2))))
-$(1)-subdirs := $$(patsubst $$(srctree)/%,%,$$(patsubst %/,%,$$($(1)-subdirs)))
-subdir-y += $$($(1)-subdirs)
+$(1)-subdirs	:= $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o /%,$(2))))
+$(1)-subdirs	:= $$(patsubst $$(srctree)/%,%,$$(patsubst %/,%,$$($(1)-subdirs)))
+# add those with absolute path
+$(1)-subdirs	+= $$(filter /%,$(2))
+subdir-y	+= $$($(1)-subdirs)
 
+# add library name
 $(1)-libs := $$(addsuffix /$(1),$$($(1)-subdirs))
 
 # Create mri if needed

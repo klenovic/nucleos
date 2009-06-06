@@ -4,10 +4,11 @@ rs.elf32-obj-y := exec.o main.o manager.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-rs.elf32-extobj-y := lib/x86/rts/crtso.o 
+rs.elf32-extobj-y := $(lib-arch)/rts/crtso.o 
 
-LDFLAGS_rs.elf32 := -Llib -lsys -lnucc \
-	                  -Tservers/server_32.lds
+LDFLAGS_rs.elf32 := -L$(lib-arch) -Llib \
+		    -lsys -lnucc \
+		    -Tservers/server_32.lds
 
 $(src)/rs.elf32: servers/server_32.lds 
 

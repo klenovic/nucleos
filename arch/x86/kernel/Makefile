@@ -28,8 +28,9 @@ CPPFLAGS_nucleos_32.lds += -C -P
 $(src)/kernel.elf32: arch/x86/kernel/nucleos_32.lds
 
 LDFLAGS_kernel.elf32 := -N -S -e $(KERN_ENTRY) \
-	                      -Llib -ltimers -lsys -lnucc \
-	                      -Tarch/x86/kernel/nucleos_32.lds
+			-L$(lib-arch) -Llib \
+			-ltimers -lsys -lnucc \
+			-Tarch/x86/kernel/nucleos_32.lds
 
 # Create in minix3's aout format
 kernel_a_flags   := $(CONFIG_KERNEL_LINKAGE_TYPE)

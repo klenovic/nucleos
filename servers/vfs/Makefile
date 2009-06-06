@@ -8,11 +8,12 @@ vfs.elf32-obj-y := main.o open.o read.o write.o pipe.o dmap.o \
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-vfs.elf32-extobj-y := lib/x86/rts/crtso.o
+vfs.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_vfs.elf32 := -Llib -lsys -ltimers -lnucc \
-	                   -L$(cc-lib-dir) -lgcc \
-	                   -Tservers/server_32.lds
+LDFLAGS_vfs.elf32 := -L$(lib-arch) -Llib \
+		     -lsys -ltimers -lnucc \
+		     -L$(cc-lib-dir) -lgcc \
+		     -Tservers/server_32.lds
 
 $(src)/vfs.elf32: servers/server_32.lds
 

@@ -3,7 +3,7 @@ app-y := pm.elf32
 pm.elf32-obj-y := break.o dma.o exec.o forkexit.o getset.o main.o \
 	          misc.o profile.o signal.o table.o time.o timers.o \
 	          trace.o utility.o version.o
-pm.elf32-extobj-y := lib/x86/rts/crtso.o
+pm.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 # files to be removed upon make clean
 clean-files := ../../include/nucleos/compile.h
@@ -27,9 +27,10 @@ include/nucleos/compile.h: FORCE
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-LDFLAGS_pm.elf32 := -Llib -lsys -ltimers -lnucc \
-	            -L$(cc-lib-dir) -lgcc \
-	            -Tservers/server_32.lds
+LDFLAGS_pm.elf32 := -L$(lib-arch) -Llib \
+		    -lsys -ltimers -lnucc \
+		    -L$(cc-lib-dir) -lgcc \
+		    -Tservers/server_32.lds
 
 $(src)/pm.elf32: servers/server_32.lds
 

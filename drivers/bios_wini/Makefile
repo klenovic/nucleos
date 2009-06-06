@@ -2,11 +2,12 @@
 app-y := bios_wini.elf32
 bios_wini.elf32-obj-y := bios_wini.o
 
-bios_wini.elf32-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+bios_wini.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_bios_wini.elf32 := -Llib -ldriver -lsys -ltimers -lnucc \
-	                         -L$(cc-lib-dir) -lgcc \
-	                         -Tdrivers/driver_32.lds
+LDFLAGS_bios_wini.elf32 := -L$(lib-arch) -Llib \
+			   -ldriver -lsys -ltimers -lnucc \
+			   -L$(cc-lib-dir) -lgcc \
+			   -Tdrivers/driver_32.lds
 
 $(src)/bios_wini.elf32: drivers/driver_32.lds
 

@@ -53,6 +53,8 @@ src	:= $(srctree)
 obj	:= $(objtree)
 VPATH	:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
 
+export srctree objtree VPATH
+
 MAKE ?= make
 
 # no built-in implicit rules variables
@@ -115,7 +117,12 @@ ifeq ($(ARCH),i386)
 endif
 
 # Where to locate arch specific headers
-hdr-arch  := $(SRCARCH)
+hdr-arch := $(SRCARCH)
+
+# Where to locate arch specific libraries
+lib-arch := arch/$(SRCARCH)/lib
+
+export lib-arch hdr-arch
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
 KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
@@ -178,8 +185,7 @@ export HOST_CFLAGS HOST_PPFLAGS
 # variables to export
 export AR ARCH AS AS16 AS64 KBUILD_AFLAGS CC CC16 CC64 CONFIG_SHELL CPP \
 	CXX CXX16 CXX64 CXXFLAGS EXTRA_CFLAGS INSTALL_PATH LD LDFLAGS \
-	MAKE NUCLEOSINCLUDE OBJCOPY  RANLIB READELF SRCARCH \
-	srctree
+	MAKE NUCLEOSINCLUDE OBJCOPY RANLIB READELF SRCARCH
 
 export KBUILD_ARFLAGS KBUILD_CFLAGS KBUILD_CPPFLAGS
 

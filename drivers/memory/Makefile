@@ -6,11 +6,12 @@ memory.elf32-obj-y := allocmem.o memory.o
 # Compile the initial ramdisk into memory driver
 memory.elf32-obj-$(CONFIG_BUILTIN_INITRD) += initrd.o
 
-memory.elf32-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+memory.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
-LDFLAGS_memory.elf32 := -Llib -ldriver -lsys -lnucc \
-	                      -L$(cc-lib-dir) -lgcc \
-	                      -Tdrivers/driver_32.lds
+LDFLAGS_memory.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-L$(cc-lib-dir) -lgcc \
+			-Tdrivers/driver_32.lds
 
 $(src)/memory.elf32: drivers/driver_32.lds
 
@@ -42,8 +43,7 @@ first := initrd.h
 $(src)/initrd.h: scripts/tools/bintoc
 $(src)/initrd.h: $(initrd_path)
 	$(call if_changed,gen_initrd_h)
-
-else
-# just delete if exists
-distclean-y := initrd.h
 endif
+
+# just delete if exists
+clean-files := initrd.h

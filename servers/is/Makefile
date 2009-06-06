@@ -1,12 +1,13 @@
 # Makefile for Data Store Server (DS)
 app-y := is.elf32
 is.elf32-obj-y := main.o dmp.o dmp_kernel.o dmp_pm.o dmp_fs.o dmp_rs.o dmp_ds.o
-is.elf32-extobj-y :=	lib/x86/rts/crtso.o
+is.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
-LDFLAGS_is.elf32 := -Llib -lsys -lnucc \
-	                  -Tservers/server_32.lds
+LDFLAGS_is.elf32 := -L$(lib-arch) -Llib \
+		    -lsys -lnucc \
+		    -Tservers/server_32.lds
 
 $(src)/is.elf32: servers/server_32.lds
 

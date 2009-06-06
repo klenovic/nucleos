@@ -32,6 +32,7 @@ KBUILD_CFLAGS += -pipe
 core-y += arch/$(SRCARCH)/kernel/
 core-y += arch/$(SRCARCH)/monitor/
 core-y += arch/$(SRCARCH)/boot/
+libs-y += arch/$(SRCARCH)/lib/
 
 # tied with gcc
 __gcc-version = $(shell echo "__GNUC__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__" | gcc -E - | grep -v "\#" | tr ' ' .)

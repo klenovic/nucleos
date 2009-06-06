@@ -26,8 +26,9 @@ targets += boot.lds
 $(src)/boot.elf32: $(src)/boot.lds
 
 LDFLAGS_boot.elf32 += -N -S -e $(BOOT_ENTRY) \
-	                    -Llib -lnucc_16 \
-	                    -Tarch/x86/monitor/boot.lds
+		      -L$(lib-arch) \
+		      -lnucc_16 \
+		      -Tarch/x86/monitor/boot.lds
 
 # Create in minix3's aout format
 boot_a_flags   := $(CONFIG_BOOTMONITOR_LINKAGE_TYPE)

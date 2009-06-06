@@ -13,7 +13,7 @@ newroot.elf32-obj-y     := newroot.o
 service.elf32-obj-y     := service.o
 sysenv.elf32-obj-y      := sysenv.o
 
-extobj-y := lib/$(SRCARCH)/rts/crtso.o
+extobj-y := $(lib-arch)/rts/crtso.o
 
 # cflags commong for all files in this directory
 CFLAGS_cdprobe.o += -D_MINIX -D_POSIX_SOURCE
@@ -24,12 +24,12 @@ CFLAGS_sysenv.o += -D_MINIX -D_POSIX_SOURCE
 
 LDFLAGS += -Tservers/server_32.lds
 
-LDFLAGS_cdprobe.elf32 := -Llib -lnucc
-LDFLAGS_dev2name.elf32 := -Llib -lnucc
-LDFLAGS_loadramdisk.elf32 := -Llib -lnucc
-LDFLAGS_newroot.elf32 := -Llib -lnucc
-LDFLAGS_sysenv.elf32 := -Llib -lnucc
-LDFLAGS_service.elf32 := -Llib -lnucc
+LDFLAGS_cdprobe.elf32 := -L$(lib-arch) -Llib -lnucc
+LDFLAGS_dev2name.elf32 := -L$(lib-arch) -Llib -lnucc
+LDFLAGS_loadramdisk.elf32 := -L$(lib-arch) -Llib -lnucc
+LDFLAGS_newroot.elf32 := -L$(lib-arch) -Llib -lnucc
+LDFLAGS_sysenv.elf32 := -L$(lib-arch) -Llib -lnucc
+LDFLAGS_service.elf32 := -L$(lib-arch) -Llib -lnucc
 
 $(src)/cdprobe.elf32: servers/server_32.lds
 $(src)/dev2name.elf32: servers/server_32.lds
