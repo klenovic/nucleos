@@ -1,8 +1,7 @@
 # Makefile for the AT disk driver (AT_WINI)
 app-y := pci.elf32
+pci.elf32-type := driver
 pci.elf32-obj-y := main.o pci.o pci_table.o
-
-pci.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_pci.elf32 := -L$(lib-arch) -Llib \
 		     -lsys -ltimers -lnucc \

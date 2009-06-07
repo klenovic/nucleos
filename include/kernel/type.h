@@ -13,7 +13,7 @@
 #include <nucleos/com.h>
 #include <ibm/interrupt.h>
 
-#ifdef __KERNEL__
+#if defined (__KERNEL__) || defined(__UKERNEL__)
 
 typedef _PROTOTYPE( void task_t, (void) );
 
@@ -53,5 +53,5 @@ typedef struct irq_hook {
 } irq_hook_t;
 
 typedef int (*irq_handler_t)(struct irq_hook *);
-#endif /* __KERNEL__ */
+#endif /* !(__KERNEL__ || __UKERNEL__) */
 #endif /* TYPE_H */

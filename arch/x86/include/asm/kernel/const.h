@@ -14,7 +14,7 @@
 #include <ibm/interrupt.h>
 #include <ibm/memory.h>
 
-#ifdef __KERNEL__
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 
 #define NR_REMOTE_SEGS     3    /* # remote memory regions (variable) */
 
@@ -147,5 +147,5 @@
 #define IOPL_MASK 0x003000
 
 #define vir2phys(vir)   (kinfo.data_base + (vir_bytes) (vir))
-#endif /* __KERNEL__ */
+#endif /* !(__KERNEL__ || __UKERNEL__) */
 #endif /* __X86_ASM_KERNEL_CONST_H */

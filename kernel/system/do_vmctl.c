@@ -18,7 +18,6 @@
 
 #include <kernel/vm.h>
 #include <kernel/system.h>
-#include <kernel/debug.h>
 #include <nucleos/type.h>
 #include <nucleos/config.h>
 
@@ -85,7 +84,7 @@ register message *m_ptr;	/* pointer to request message */
 		rp->p_vmrequest.nextrestart = vmrestart;
 		vmrestart = rp;
 
-#if DEBUG_VMASSERT
+#ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 		/* Sanity check. */
 		if(rp->p_vmrequest.vmresult == OK) {
 			if(CHECKRANGE(p,

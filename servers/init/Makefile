@@ -1,8 +1,7 @@
 # Makefile for the init program (init)
 app-y := init.elf32
+init.elf32-type := server
 init.elf32-obj-y := init.o
-
-init.elf32-extobj-y := $(lib-arch)/rts/crtso.o 
 
 ccflags-y += -O -D_MINIX -D_POSIX_SOURCE
 

@@ -14,7 +14,7 @@ targets := driver_32.lds
 first := $(targets)
 
 CPPFLAGS_driver_32.lds := -D__PAGE_OFFSET__=$(DRV_PAGE_OFFSET) \
-	                  -D__PAGE_ALIGNMENT__=$(DRV_PAGE_ALIGNMENT) \
-	                  -D__LOAD_PHYSICAL_ADDR__=$(DRV_LOAD_PHYSICAL_ADDR)
-
-CPPFLAGS_driver_32.lds += -P -C
+			  -D__PAGE_ALIGNMENT__=$(DRV_PAGE_ALIGNMENT) \
+			  -D__LOAD_PHYSICAL_ADDR__=$(DRV_LOAD_PHYSICAL_ADDR)
+CPPFLAGS_driver_32.lds += -P
+CPPFLAGS_driver_32.lds += -D__UKERNEL__

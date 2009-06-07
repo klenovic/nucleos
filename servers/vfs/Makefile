@@ -1,5 +1,6 @@
 # Makefile for File System (FS)
 app-y := vfs.elf32
+vfs.elf32-type := server
 vfs.elf32-obj-y := main.o open.o read.o write.o pipe.o dmap.o \
 	                 path.o device.o mount.o link.o exec.o \
 	                 filedes.o stadir.o protect.o time.o \
@@ -7,8 +8,6 @@ vfs.elf32-obj-y := main.o open.o read.o write.o pipe.o dmap.o \
 	                 vnode.o vmnt.o request.o mmap.o fscall.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
-
-vfs.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_vfs.elf32 := -L$(lib-arch) -Llib \
 		     -lsys -ltimers -lnucc \

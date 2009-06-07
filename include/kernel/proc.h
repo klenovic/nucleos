@@ -22,8 +22,7 @@
 #include <kernel/const.h>
 #include <kernel/priv.h>
 
-#ifdef __KERNEL__
-
+#if defined (__KERNEL__) || defined (__UKERNEL__)
 struct proc {
   struct stackframe_s p_reg;	/* process' registers saved in stack frame */
   struct segframe p_seg;	/* segment descriptors */
@@ -113,7 +112,7 @@ struct proc {
   struct proc *next_soft_notify;
   int p_softnotified;
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   int p_ready, p_found;
 #define PMAGIC 0xC0FFEE1
   int p_magic;	/* check validity of proc pointers */
@@ -225,5 +224,5 @@ EXTERN struct proc *pproc_addr[NR_TASKS + NR_PROCS];
 EXTERN struct proc *rdy_head[NR_SCHED_QUEUES]; /* ptrs to ready list headers */
 EXTERN struct proc *rdy_tail[NR_SCHED_QUEUES]; /* ptrs to ready list tails */
 
-#endif /* __KERNEL__ */
+#endif /* !(__KERNEL__ || __UKERNEL__) */
 #endif /* PROC_H */

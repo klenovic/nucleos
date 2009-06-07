@@ -25,7 +25,7 @@
 #include <kernel/type.h>
 #include <asm/kernel/types.h>
 
-#ifdef __KERNEL__
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 
 /* Max. number of I/O ranges that can be assigned to a process */
 #define NR_IO_RANGE	32

@@ -1,12 +1,10 @@
 # Makefile for memory driver (MEMORY)
 app-y := memory.elf32
-
+memory.elf32-type := driver
 memory.elf32-obj-y := allocmem.o memory.o
 
 # Compile the initial ramdisk into memory driver
 memory.elf32-obj-$(CONFIG_BUILTIN_INITRD) += initrd.o
-
-memory.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_memory.elf32 := -L$(lib-arch) -Llib \
 			-ldriver -lsys -lnucc \

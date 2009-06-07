@@ -16,7 +16,6 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/sys_config.h>
 #include <kernel/const.h>
-#include <kernel/debug.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
 #include <kernel/ipc.h>

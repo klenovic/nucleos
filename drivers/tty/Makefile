@@ -1,8 +1,7 @@
 # Makefile for terminal driver (TTY)
 app-y := tty.elf32
+tty.elf32-type := driver
 tty.elf32-obj-y := tty.o console.o keyboard.o pty.o rs232.o
-
-tty.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_tty.elf32 := -L$(lib-arch) -Llib \
 		     -lsys -ltimers -lnucc \

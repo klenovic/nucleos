@@ -1,7 +1,7 @@
 # Makefile for Data Store Server (DS)
 app-y := ds.elf32
+ds.elf32-type := server
 ds.elf32-obj-y := main.o store.o
-ds.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 

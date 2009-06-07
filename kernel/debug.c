@@ -14,13 +14,11 @@
 
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <kernel/debug.h>
-
 #include <nucleos/sysutil.h>
 #include <limits.h>
 #include <string.h>
 
-#if DEBUG_SCHED_CHECK		/* only include code if enabled */
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK		/* only include code if enabled */
 
 #define MAX_LOOP (NR_PROCS + NR_TASKS)
 
@@ -111,4 +109,4 @@ check_runqueues_f(char *file, int line)
   }
 }
 
-#endif /* DEBUG_SCHED_CHECK */
+#endif /* CONFIG_DEBUG_KERNEL_SCHED_CHECK */

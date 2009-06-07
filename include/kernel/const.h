@@ -13,9 +13,9 @@
 
 #include <nucleos/config.h>
 #include <nucleos/bitmap.h>
-#include <kernel/debug.h>
 
-#ifdef __KERNEL__
+#if defined (__KERNEL__) || defined (__UKERNEL__)
+
 /* Some constant macros are used in both assembler and
  * C code.  Therefore we cannot annotate them always with
  * 'UL' and other type specifiers unilaterally.  We
@@ -24,7 +24,6 @@
  * Similarly, _AT() will cast an expression with a type in C, but
  * leave it unchanged in asm.
  */
-
 #ifdef __ASSEMBLER__
 #define _AC(X,Y)  X
 #define _AT(T,X)  X
@@ -60,13 +59,16 @@
 #define unset_sys_bit(map,bit) \
 	( MAP_CHUNK(map.chunk,bit) &= ~(1 << CHUNK_OFFSET(bit) )
 #define NR_SYS_CHUNKS	BITMAP_CHUNKS(NR_SYS_PROCS)
+#endif /* !(__KERNEL__ || __UKERNEL__) */
 
+#ifdef __KERNEL__
 #define reallock  do { int d; d = intr_disabled(); intr_disable(); locklevel++; if(d && locklevel == 1) { minix_panic("reallock while interrupts disabled first time", __LINE__); } } while(0)
 
 #define realunlock   do { if(!intr_disabled()) { minix_panic("realunlock while interrupts enabled", __LINE__); } if(locklevel < 1) { minix_panic("realunlock while locklevel below 1", __LINE__); } locklevel--; if(locklevel == 0) { intr_enable(); } } while(0)
 
+
 /* Disable/ enable hardware interrupts. The parameters of lock() and unlock()
- * are used when debugging is enabled. See debug.h for more information.
+ * are used when debugging is enabled.
  */
 #define lock      reallock
 #define unlock    realunlock
@@ -78,6 +80,9 @@
 /* for kputc() */
 #define END_OF_KMESS	0
 
+#endif /* !__KERNEL__ */
+
+#if defined (__KERNEL__) || defined (__UKERNEL__)
 /* This section contains defines for valuable system resources that are used
  * by device drivers. The number of elements of the vectors is determined by
  * the maximum needed by any given driver. The number of interrupt hooks may
@@ -128,5 +133,6 @@
 #define USE_PHYSVCOPY  	   1	/* vector with physical copy requests */
 #define USE_MEMSET  	   1	/* write char to a given memory area */
 
-#endif /* __KERNEL__ */
+#endif /* !(__KERNEL__ || __UKERNEL__) */
+
 #endif /* __NUCLEOS_KERNEL_CONST_H */

@@ -1,7 +1,7 @@
 # Makefile for readclock 'driver'
 app-y := readclock.drv.elf32
+readclock.drv.elf32-type := driver
 readclock.drv.elf32-obj-y := readclock.o
-readclock.drv.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 ccflags-y := -D_MINIX=1 -D_POSIX_SOURCE=1 -D_SYSTEM=1
 

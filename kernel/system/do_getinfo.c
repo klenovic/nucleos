@@ -160,7 +160,7 @@ register message *m_ptr;	/* pointer to request message */
 		src_vir = (vir_bytes) &kmess;
 		break;
 
-#if DEBUG_TIME_LOCKS
+#ifdef CONFIG_DEBUG_KERNEL_TIME_LOCKS
 	case GET_LOCKTIMING:
 		length = sizeof(timingdata);
 		src_vir = (vir_bytes) timingdata;

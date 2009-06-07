@@ -1,8 +1,7 @@
 # Makefile for the AT disk driver (AT_WINI)
 app-y := at_wini.elf32
-at_wini.elf32-obj-y := at_wini.o 
-
-at_wini.elf32-extobj-y := $(lib-arch)/rts/crtso.o
+at_wini.elf32-type := driver
+at_wini.elf32-obj-y := at_wini.o
 
 # arch. library path has precedence over generic
 LDFLAGS_at_wini.elf32 := -L$(lib-arch) -Llib/ \

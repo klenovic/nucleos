@@ -1,7 +1,7 @@
 # Makefile for log driver
 app-y := log.elf32
+log.elf32-type := driver
 log.elf32-obj-y := log.o diag.o
-log.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_log.elf32 := -L$(lib-arch) -Llib \
 		     -ldriver_asyn -lsys -lnucc \

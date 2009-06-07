@@ -40,7 +40,6 @@
 #define __KERNEL_SYSTEM_H
 
 /* Common includes for the system library. */
-#include <kernel/debug.h>
 #include <kernel/kernel.h>
 #include <kernel/proto.h>
 #include <kernel/proc.h>

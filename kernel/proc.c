@@ -52,8 +52,6 @@
 #include <signal.h>
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>
-
-#include <kernel/debug.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
 #include <kernel/ipc.h>
@@ -199,7 +197,7 @@ long bit_map;			/* notification event set or flags */
   {
 	if (call_nr != RECEIVE)
 	{
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 		kprintf("sys_call: trap %d by %d with bad endpoint %d\n", 
 			call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
@@ -212,7 +210,7 @@ long bit_map;			/* notification event set or flags */
   else
   {
 	if(caller_ptr->p_endpoint == src_dst_e) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 		kprintf("sys_call: trap %d by %d with self %d\n", 
 			call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
@@ -220,7 +218,7 @@ long bit_map;			/* notification event set or flags */
 	}
 	/* Require a valid source and/or destination process. */
 	if(!isokendpt(src_dst_e, &src_dst_p)) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 		kprintf("sys_call: trap %d by %d with bad endpoint %d\n", 
 			call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
@@ -237,7 +235,7 @@ long bit_map;			/* notification event set or flags */
 	{
 		if (! get_sys_bit(priv(caller_ptr)->s_ipc_sendrec,
 			nr_to_id(src_dst_p))) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 			kprintf(
 	"sys_call: ipc sendrec mask denied trap %d from %d ('%s') to %d\n",
 				call_nr, proc_nr(caller_ptr),
@@ -252,7 +250,7 @@ long bit_map;			/* notification event set or flags */
 	{
 		if (! get_sys_bit(priv(caller_ptr)->s_ipc_to,
 			nr_to_id(src_dst_p))) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 			kprintf(
 			"sys_call: ipc mask denied trap %d from %d to %d\n",
 				call_nr, proc_nr(caller_ptr), src_dst_p);
@@ -267,7 +265,7 @@ long bit_map;			/* notification event set or flags */
   /* Only allow non-negative call_nr values less than 32 */
   if (call_nr < 0 || call_nr >= 32)
   {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
       kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_p);
 #endif
@@ -281,7 +279,7 @@ long bit_map;			/* notification event set or flags */
    * if the caller doesn't do receive(). 
    */
   if (!(priv(caller_ptr)->s_trap_mask & (1 << call_nr))) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
       kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_p);
 #endif
@@ -291,7 +289,7 @@ long bit_map;			/* notification event set or flags */
   }
 
   if ((iskerneln(src_dst_p) && call_nr != SENDREC && call_nr != RECEIVE)) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
       kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
@@ -442,7 +440,7 @@ int src_dst;					/* src or dst process */
   register struct proc *xp;			/* process pointer */
   int group_size = 1;				/* start with only caller */
   int trap_flags;
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
   static struct proc *processes[NR_PROCS + NR_TASKS];
   processes[0] = cp;
 #endif
@@ -450,7 +448,7 @@ int src_dst;					/* src or dst process */
   while (src_dst != ANY) { 			/* check while process nr */
       int src_dst_e;
       xp = proc_addr(src_dst);			/* follow chain of processes */
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
       processes[group_size] = xp;
 #endif
       group_size ++;				/* extra process in group */
@@ -478,7 +476,7 @@ int src_dst;					/* src or dst process */
 	          return(0);			/* not a deadlock */
 	      }
 	  }
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  {
 		int i;
 		kprintf("deadlock between these processes:\n");
@@ -618,7 +616,7 @@ int flags;
             src_id = (chunk - &map->chunk[0]) * BITCHUNK_BITS + i;
             if (src_id >= NR_SYS_PROCS) break;		/* out of range */
             src_proc_nr = id_to_nr(src_id);		/* get source proc */
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	    if(src_proc_nr == NONE) {
 		kprintf("mini_receive: sending notify from NONE\n");
 	    }
@@ -1127,7 +1125,7 @@ register struct proc *rp;	/* this process is now runnable */
   int q;	 				/* scheduling queue to use */
   int front;					/* add to front or back */
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   if(!intr_disabled()) { minix_panic("enqueue with interrupts enabled", NO_NUM); }
   CHECK_RUNQUEUES;
   if (rp->p_ready) minix_panic("enqueue already ready process", NO_NUM);
@@ -1160,7 +1158,7 @@ register struct proc *rp;	/* this process is now runnable */
      pick_proc();
   }
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   rp->p_ready = 1;
   CHECK_RUNQUEUES;
 #endif
@@ -1186,7 +1184,7 @@ register struct proc *rp;	/* this process is no longer runnable */
 		minix_panic("stack overrun by task", proc_nr(rp));
   }
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   CHECK_RUNQUEUES;
   if(!intr_disabled()) { minix_panic("dequeue with interrupts enabled", NO_NUM); }
   if (! rp->p_ready) minix_panic("dequeue() already unready process", NO_NUM);
@@ -1210,7 +1208,7 @@ register struct proc *rp;	/* this process is no longer runnable */
       prev_xp = *xpp;				/* save previous in chain */
   }
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   rp->p_ready = 0;
   CHECK_RUNQUEUES;
 #endif
@@ -1384,7 +1382,7 @@ PUBLIC struct proc *endpoint_lookup(endpoint_t e)
 /*===========================================================================*
  *				isokendpt_f				     *
  *===========================================================================*/
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 PUBLIC int isokendpt_f(file, line, e, p, fatalflag)
 char *file;
 int line;
@@ -1400,7 +1398,7 @@ int *p, fatalflag;
 	 * generation number, zero otherwise.
 	 *
 	 * This function is called with file and line number by the
-	 * isokendpt_d macro if DEBUG_ENABLE_IPC_WARNINGS is defined,
+	 * isokendpt_d macro if CONFIG_DEBUG_KERNEL_IPC_WARNIGS is defined,
 	 * otherwise without. This allows us to print the where the
 	 * conversion was attempted, making the errors verbose without
 	 * adding code for that at every call.
@@ -1410,20 +1408,20 @@ int *p, fatalflag;
 	 */
 	*p = _ENDPOINT_P(e);
 	if(!isokprocn(*p)) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 #if 0
 		kprintf("kernel:%s:%d: bad endpoint %d: proc %d out of range\n",
 		file, line, e, *p);
 #endif
 #endif
 	} else if(isemptyn(*p)) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 #if 0
 	kprintf("kernel:%s:%d: bad endpoint %d: proc %d empty\n", file, line, e, *p);
 #endif
 #endif
 	} else if(proc_addr(*p)->p_endpoint != e) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 #if 0
 		kprintf("kernel:%s:%d: bad endpoint %d: proc %d has ept %d (generation %d vs. %d)\n", file, line,
 		e, *p, proc_addr(*p)->p_endpoint,

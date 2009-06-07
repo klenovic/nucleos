@@ -1,11 +1,10 @@
 # Makefile for File System (FS)
 app-y := mfs.elf32
+mfs.elf32-type := server
 mfs.elf32-obj-y := cache.o device.o link.o mount.o misc.o \
 	                 open.o pipe.o protect.o read.o stadir.o \
 	                 table.o time.o utility.o write.o inode.o \
 	                 main.o path.o super.o
-
-mfs.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 NR_BUFS=1024
 BS=4096

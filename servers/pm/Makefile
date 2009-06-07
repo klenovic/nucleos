@@ -1,9 +1,9 @@
 # Makefile for Data Store Server (DS)
 app-y := pm.elf32
+pm.elf32-type := server
 pm.elf32-obj-y := break.o dma.o exec.o forkexit.o getset.o main.o \
 	          misc.o profile.o signal.o table.o time.o timers.o \
 	          trace.o utility.o version.o
-pm.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 # files to be removed upon make clean
 clean-files := ../../include/nucleos/compile.h

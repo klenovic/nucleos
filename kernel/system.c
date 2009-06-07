@@ -35,7 +35,6 @@
  *   Sep 30, 2004   source code documentation updated  (Jorrit N. Herder)
  */
 
-#include <kernel/debug.h>
 #include <kernel/kernel.h>
 #include <kernel/system.h>
 #include <kernel/proc.h>
@@ -117,7 +116,7 @@ PUBLIC void sys_task()
 
       /* See if the caller made a valid request and try to handle it. */
       if (call_nr < 0 || call_nr >= NR_SYS_CALLS) {	/* check call number */
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("SYSTEM: illegal request %d from %d.\n",
 		call_nr,m.m_source);
 #endif
@@ -126,7 +125,7 @@ PUBLIC void sys_task()
 	  result = EBADREQUEST;			/* illegal message type */
       } 
       else if (!GET_BIT(priv(caller_ptr)->s_k_call_mask, call_nr)) {
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	static int curr= 0, limit= 100, extra= 20;
 
 	if (curr < limit+extra)
@@ -468,7 +467,7 @@ register struct proc *rc;		/* slot of process to clean up */
       while (*xpp != NIL_PROC) {		/* check entire queue */
           if (*xpp == rc) {			/* process is on the queue */
               *xpp = (*xpp)->p_q_link;		/* replace by next process */
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	      kprintf("endpoint %d / %s removed from queue at %d\n",
 	          rc->p_endpoint, rc->p_name, rc->p_sendto_e);
 #endif
@@ -495,7 +494,7 @@ register struct proc *rc;		/* slot of process to clean up */
       if (RTS_ISSET(rp, RECEIVING) && rp->p_getfrom_e == rc->p_endpoint) {
           rp->p_reg.retreg = ESRCDIED;		/* report source died */
 	  RTS_LOCK_UNSET(rp, RECEIVING);	/* no longer receiving */
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s receiving from dead src ep %d / %s\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
 #endif
@@ -504,7 +503,7 @@ register struct proc *rc;		/* slot of process to clean up */
 	  rp->p_sendto_e == rc->p_endpoint) {
           rp->p_reg.retreg = EDSTDIED;		/* report destination died */
 	  RTS_LOCK_UNSET(rp, SENDING);
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s send to dying dst ep %d (%s)\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
 #endif

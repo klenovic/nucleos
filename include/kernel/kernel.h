@@ -34,6 +34,5 @@
 #include <kernel/glo.h>			/* global variables */
 #include <nucleos/ipc.h>		/* IPC constants */
 #include <kernel/profile.h>		/* system profiling */
-#include <kernel/debug.h>		/* debugging, MUST be last kernel header */
 
 #endif /* KERNEL_H */

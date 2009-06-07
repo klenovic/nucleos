@@ -5,4 +5,6 @@ obj-y := do_abort.o do_endksig.o do_getinfo.o do_mapdma.o do_privctl.o do_setala
 	 do_sysctl.o do_unused.o do_vm_setbuf.o do_devio.o do_fork.o do_kill.o do_nice.o \
 	 do_segctl.o do_sigsend.o do_times.o do_vcopy.o 
 
+ccflags-y := -D__KERNEL__
+
 create-builtin := y

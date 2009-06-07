@@ -14,7 +14,7 @@
 #include <nucleos/sys_config.h>
 #include <asm/kernel/const.h>
 
-#ifdef __KERNEL__
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 
 typedef unsigned reg_t;         /* machine register */
 typedef reg_t segdesc_t;
@@ -79,6 +79,5 @@ struct pagefault
 	u32_t   pf_flags;       /* Pagefault flags on stack. */
 };
 
-#endif /* __KERNEL__ */
+#endif /* !(__KERNEL__ || __UKERNEL__) */
 #endif /* __X86_ASM_KERNEL_TYPES_H */
-

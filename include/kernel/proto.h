@@ -53,7 +53,7 @@ _PROTOTYPE( void enqueue, (struct proc *rp)				);
 _PROTOTYPE( void dequeue, (struct proc *rp)				);
 _PROTOTYPE( void balance_queues, (struct timer *tp)			);
 _PROTOTYPE( struct proc *endpoint_lookup, (endpoint_t ep)		);
-#if DEBUG_ENABLE_IPC_WARNINGS
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 _PROTOTYPE( int isokendpt_f, (char *file, int line, endpoint_t e, int *p, int f));
 #define isokendpt_d(e, p, f) isokendpt_f(__FILE__, __LINE__, (e), (p), (f))
 #else
@@ -95,7 +95,7 @@ _PROTOTYPE( void cons_setc, (int pos, int c)				);
 _PROTOTYPE( void cons_seth, (int pos, int n)				);
 
 /* debug.c */
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 #define CHECK_RUNQUEUES check_runqueues_f(__FILE__, __LINE__)
 _PROTOTYPE( void check_runqueues_f, (char *file, int line) );
 #endif

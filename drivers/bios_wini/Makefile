@@ -1,8 +1,7 @@
 # Makefile for the BIOS disk driver (BIOS_WINI)
 app-y := bios_wini.elf32
+bios_wini.elf32-type := driver
 bios_wini.elf32-obj-y := bios_wini.o
-
-bios_wini.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 
 LDFLAGS_bios_wini.elf32 := -L$(lib-arch) -Llib \
 			   -ldriver -lsys -ltimers -lnucc \

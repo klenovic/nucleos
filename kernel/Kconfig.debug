@@ -1,13 +1,13 @@
 config DEBUG_KERNEL
   bool "Kernel debugging"
-  default n
+  default y
   ---help---
     Say Y if want to debug kernel.
 
 config DEBUG_KERNEL_IPC_WARNINGS
   bool "Kernel IPC warnings debugging"
   depends on DEBUG_KERNEL
-  default n
+  default y
   ---help---
     Say Y if want to debug kernel IPC warnings.
     Enable prints such as:
@@ -29,13 +29,20 @@ config DEBUG_KERNEL_SCHED_CHECK
 config DEBUG_KERNEL_TIME_LOCKS
   bool "Debug time spent in locks"
   depends on DEBUG_KERNEL
-  default n
+  default y
   ---help---
     Say Y if you want to measure time spent in locks.
 
 config DEBUG_KERNEL_LOCK_CHECK
   bool "Interrupt lock/unlock sanity checking"
   depends on DEBUG_KERNEL
-  default n
+  default y
+  ---help---
+    Say Y if you want interrupt lock/unlock sanity checking.
+
+config DEBUG_KERNEL_VMASSERT
+  bool "Sanity checking regarding virtual memory"
+  depends on DEBUG_KERNEL
+  default y
   ---help---
     Say Y if you want interrupt lock/unlock sanity checking.

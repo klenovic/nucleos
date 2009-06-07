@@ -45,7 +45,7 @@ PUBLIC void main()
    */
   for (rp = BEG_PROC_ADDR, i = -NR_TASKS; rp < END_PROC_ADDR; ++rp, ++i) {
   	rp->p_rts_flags = SLOT_FREE;		/* initialize free slot */
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	rp->p_magic = PMAGIC;
 #endif
 	rp->p_nr = i;				/* proc number from ptr */

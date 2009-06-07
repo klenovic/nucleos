@@ -11,20 +11,15 @@
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
 #include <kernel/vm.h>
-
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 #include <asm/cpufeature.h>
 #include <string.h>
-
 #include <sys/vm_i386.h>
-
 #include <nucleos/portio.h>
-
 #include <asm/kernel/proto.h>
 #include <kernel/proto.h>
-#include <kernel/debug.h>
 
 /* VM functions and data. */
 PRIVATE u32_t vm_cr3;
@@ -40,7 +35,7 @@ FORWARD _PROTOTYPE( void vm_set_cr3, (u32_t value)			);
 FORWARD _PROTOTYPE( void set_cr3, (void)				);
 FORWARD _PROTOTYPE( void vm_enable_paging, (void)			);
 
-#if DEBUG_VMASSERT
+#ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 #define vmassert(t) { \
 	if(!(t)) { minix_panic("vm: assert " #t " failed\n", __LINE__); } }
 #else

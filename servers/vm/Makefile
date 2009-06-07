@@ -1,11 +1,11 @@
 # Makefile for VM server
 app-y := vm.elf32
+vm.elf32-type := server
 obj-y := $(SRCARCH)/
 vm.elf32-obj-y := alloc.o break.o exec.o exit.o fork.o main.o \
 	                mmap.o signal.o slaballoc.o region.o pagefaults.o \
 	                utility.o vfs.o
 
-vm.elf32-extobj-y := $(lib-arch)/rts/crtso.o
 vm.elf32-extobj-y += $(src)/$(SRCARCH)/built-in.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)

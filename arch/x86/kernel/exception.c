@@ -117,7 +117,7 @@ struct proc *t;
   register struct ex_s *ep;
   struct proc *saved_proc;
 
-#if DEBUG_SCHED_CHECK
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   for (t = BEG_PROC_ADDR; t < END_PROC_ADDR; ++t) {
 	if(t->p_magic != PMAGIC)
 		kprintf("entry %d broken\n", t->p_nr);

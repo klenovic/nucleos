@@ -1,10 +1,9 @@
 # Makefile for Reincarnation Server (RS)
 app-y := rs.elf32
+rs.elf32-type := server
 rs.elf32-obj-y := exec.o main.o manager.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
-
-rs.elf32-extobj-y := $(lib-arch)/rts/crtso.o 
 
 LDFLAGS_rs.elf32 := -L$(lib-arch) -Llib \
 		    -lsys -lnucc \
