@@ -968,7 +968,7 @@ tty_t *tp;
   int line;
   int s;
   static int vdu_initialized = 0;
-  static unsigned page_size;
+  static unsigned page_size = 0;
 
   /* Associate console and TTY. */
   line = tp - &tty_table[0];
@@ -1250,13 +1250,11 @@ PUBLIC void toggle_scroll()
  *===========================================================================*/
 PUBLIC void cons_stop()
 {
-/* Prepare for halt or reboot. */
-  select_console(0);
-#if 0
-  cons_org0();
-  softscroll = 1;
-  cons_table[0].c_attr = cons_table[0].c_blank = BLANK_COLOR;
-#endif
+	/* Prepare for halt or reboot. */
+	cons_org0();
+	softscroll = 1;
+	select_console(0);
+	cons_table[0].c_attr = cons_table[0].c_blank = BLANK_COLOR;
 }
 
 /*===========================================================================*
