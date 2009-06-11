@@ -42,41 +42,41 @@ $(src)/sysenv.elf32: servers/server_32.lds
 cdprobe_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 cdprobe_a_hdrlen  := 0x20
 cdprobe_a_cpu     := i386
-cdprobe_stackheap := 0x1C000
+cdprobe_stackheap := 112k
 
 e2a-y := cdprobe.elf32,cdprobe
 
 dev2name_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 dev2name_a_hdrlen  := 0x20
 dev2name_a_cpu     := i386
-dev2name_stackheap := 0x4000
+dev2name_stackheap := 16k
 
 e2a-y += dev2name.elf32,dev2name
 
 loadramdisk_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 loadramdisk_a_hdrlen  := 0x20
 loadramdisk_a_cpu     := i386
-loadramdisk_stackheap := 0x4000
+loadramdisk_stackheap := 16k
 
 e2a-y += loadramdisk.elf32,loadramdisk
 
 newroot_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 newroot_a_hdrlen  := 0x20
 newroot_a_cpu     := i386
-newroot_stackheap := 0x20000
+newroot_stackheap := 128k
 
 e2a-y += newroot.elf32,newroot
 
 service_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 service_a_hdrlen  := 0x20
 service_a_cpu     := i386
-service_stackheap := 0x20000
+service_stackheap := 128k
 
 e2a-y += service.elf32,service
 
 sysenv_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 sysenv_a_hdrlen  := 0x20
 sysenv_a_cpu     := i386
-sysenv_stackheap := 0x4000
+sysenv_stackheap := 16k
 
 e2a-y += sysenv.elf32,sysenv

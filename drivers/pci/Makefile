@@ -13,6 +13,6 @@ $(src)/pci.elf32: drivers/driver_32.lds
 pci_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 pci_a_hdrlen  := 0x20
 pci_a_cpu     := i386
-pci_stackheap := 0x8000
+pci_stackheap := 32k
 
 e2a-y := pci.elf32,pci

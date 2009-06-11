@@ -15,6 +15,6 @@ $(src)/init.elf32: servers/server_32.lds
 init_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 init_a_hdrlen  := 0x20
 init_a_cpu     := i386
-init_stackheap := 0x10000
+init_stackheap := 64k
 
 e2a-y := init.elf32,init

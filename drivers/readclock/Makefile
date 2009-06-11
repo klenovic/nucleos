@@ -15,6 +15,6 @@ $(src)/readclock.drv.elf32: drivers/driver_32.lds
 readclock.drv_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 readclock.drv_a_hdrlen  := 0x20
 readclock.drv_a_cpu     := i386
-readclock.drv_stackheap := 0x4000
+readclock.drv_stackheap := 16k
 
 e2a-y := readclock.drv.elf32,readclock.drv

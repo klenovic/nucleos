@@ -38,6 +38,6 @@ $(src)/pm.elf32: servers/server_32.lds
 pm_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 pm_a_hdrlen  := 0x20
 pm_a_cpu     := i386
-pm_stackheap := 0x8000
+pm_stackheap := 32k
 
 e2a-y := pm.elf32,pm

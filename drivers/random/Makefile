@@ -14,6 +14,6 @@ $(src)/random.elf32: drivers/driver_32.lds
 random_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 random_a_hdrlen  := 0x20
 random_a_cpu     := i386
-random_stackheap := 0x2000
+random_stackheap := 8k
 
 e2a-y := random.elf32,random

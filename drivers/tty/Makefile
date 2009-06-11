@@ -14,6 +14,6 @@ $(src)/tty.elf32: drivers/driver_32.lds
 tty_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 tty_a_hdrlen  := 0x20
 tty_a_cpu     := i386
-tty_stackheap := 0x4000
+tty_stackheap := 16k
 
 e2a-y := tty.elf32,tty

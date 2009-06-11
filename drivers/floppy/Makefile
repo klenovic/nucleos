@@ -14,6 +14,6 @@ $(src)/floppy.elf32: drivers/driver_32.lds
 floppy_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 floppy_a_hdrlen  := 0x20
 floppy_a_cpu     := i386
-floppy_stackheap := 0x4000
+floppy_stackheap := 16k
 
 e2a-y := floppy.elf32,floppy

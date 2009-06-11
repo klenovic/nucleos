@@ -21,6 +21,6 @@ $(src)/inet.elf32: servers/server_32.lds
 inet_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 inet_a_hdrlen  := 0x20
 inet_a_cpu     := i386
-inet_stackheap := 0x8000
+inet_stackheap := 32k
 
 e2a-y := inet.elf32,inet

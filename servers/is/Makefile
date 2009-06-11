@@ -15,6 +15,6 @@ $(src)/is.elf32: servers/server_32.lds
 is_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 is_a_hdrlen  := 0x20
 is_a_cpu     := i386
-is_stackheap := 0x0400
+is_stackheap := 1k
 
 e2a-y := is.elf32,is

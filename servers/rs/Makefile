@@ -15,6 +15,6 @@ $(src)/rs.elf32: servers/server_32.lds
 rs_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 rs_a_hdrlen  := 0x20
 rs_a_cpu     := i386
-rs_stackheap := 0x32000
+rs_stackheap := 200k
 
 e2a-y := rs.elf32,rs

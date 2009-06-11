@@ -14,6 +14,6 @@ $(src)/bios_wini.elf32: drivers/driver_32.lds
 bios_wini_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 bios_wini_a_hdrlen  := 0x20
 bios_wini_a_cpu     := i386
-bios_wini_stackheap := 0x2000
+bios_wini_stackheap := 8k
 
 e2a-y := bios_wini.elf32,bios_wini

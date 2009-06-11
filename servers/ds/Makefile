@@ -15,6 +15,6 @@ $(src)/ds.elf32: servers/server_32.lds
 ds_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 ds_a_hdrlen  := 0x20
 ds_a_cpu     := i386
-ds_stackheap := 0x4000
+ds_stackheap := 16k
 
 e2a-y        := ds.elf32,ds

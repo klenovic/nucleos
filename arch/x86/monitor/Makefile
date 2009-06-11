@@ -34,7 +34,7 @@ LDFLAGS_boot.elf32 += -N -S -e $(BOOT_ENTRY) \
 boot_a_flags   := $(CONFIG_BOOTMONITOR_LINKAGE_TYPE)
 boot_a_hdrlen  := $(HDRLEN)
 boot_a_cpu     := i8086
-boot_stackheap := 0x2000
+boot_stackheap := 8k
 
 e2a-y += boot.elf32,boot
 

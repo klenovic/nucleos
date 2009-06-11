@@ -17,7 +17,7 @@ $(src)/memory.elf32: drivers/driver_32.lds
 memory_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 memory_a_hdrlen  := 0x20
 memory_a_cpu     := i386
-memory_stackheap := 0x2000
+memory_stackheap := 8k
 
 e2a-y := memory.elf32,memory
 

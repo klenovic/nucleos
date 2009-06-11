@@ -14,6 +14,6 @@ $(src)/log.elf32: drivers/driver_32.lds
 log_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 log_a_hdrlen  := 0x20
 log_a_cpu     := i386
-log_stackheap := 0x8000
+log_stackheap := 32k
 
 e2a-y := log.elf32,log

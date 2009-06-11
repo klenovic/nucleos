@@ -20,6 +20,6 @@ $(src)/vfs.elf32: servers/server_32.lds
 vfs_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 vfs_a_hdrlen  := 0x20
 vfs_a_cpu     := i386
-vfs_stackheap := 0x4000
+vfs_stackheap := 16k
 
 e2a-y := vfs.elf32,vfs

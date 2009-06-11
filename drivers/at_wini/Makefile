@@ -15,6 +15,6 @@ $(src)/at_wini.elf32: drivers/driver_32.lds
 at_wini_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
 at_wini_a_hdrlen  := 0x20
 at_wini_a_cpu     := i386
-at_wini_stackheap := 0x4000
+at_wini_stackheap := 16k
 
 e2a-y := at_wini.elf32,at_wini

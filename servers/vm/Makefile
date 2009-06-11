@@ -20,6 +20,6 @@ $(src)/vm.elf32: servers/server_32.lds
 vm_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 vm_a_hdrlen  := 0x20
 vm_a_cpu     := i386
-vm_stackheap := 0x20000
+vm_stackheap := 128k
 
 e2a-y        := vm.elf32,vm
