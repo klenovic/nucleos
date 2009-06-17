@@ -129,7 +129,7 @@
            but forget to change also here! */
 
 /* legacy features (see monitor sources) */
-#define K_FLAGS	0x01FD
+#define K_FLAGS			0x01FD
 
 #ifdef CONFIG_BUILTIN_INITRD
 #define K_BUILTIN_INITRD	0x0001
@@ -166,7 +166,6 @@ flags_ext:
 over_flags:
 // Set up a C stack frame on the monitor stack.  (The monitor sets cs and ds
 // right.  The ss descriptor still references the monitor data segment.)
-//        movzx   %sp, %esp         // monitor stack is a 16 bit stack
         movzwl  %sp, %esp         // monitor stack is a 16 bit stack
         push    %ebp
         mov     %esp, %ebp
@@ -185,7 +184,6 @@ noret:
         mov     $gdt, %ebx                   // address of kernel GDT
         mov     $8*8, %ecx                   // copying eight descriptors
 copygdt:
-// eseg   movb    (%esi), %al
         movb    %es:(%esi), %al
         movb    %al, (%ebx)
         inc     %esi

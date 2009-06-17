@@ -35,9 +35,9 @@ int printf(const char *fmt,...)
 	long i;
 	unsigned long u;
 	char temp[8 * sizeof(long) / 3 + 2];
-  va_list argp;
+	va_list argp;
 
-  va_start(argp,fmt);
+	va_start(argp,fmt);
 
 	while ((c= *fmt++) != 0) {
 		if (c != '%') {
@@ -183,7 +183,7 @@ int printf(const char *fmt,...)
 	/* Mark the end with a null (should be something else, like -1). */
 	putch(0);
 
-  va_end(argp);
+	va_end(argp);
 
 	return charcount;
 }

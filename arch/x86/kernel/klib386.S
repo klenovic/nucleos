@@ -355,19 +355,16 @@ phys_copy:
         and     $3, %ecx                 // count for alignment
         sub     %ecx, %eax
         rep
-//   eseg movsb
         movsb   %es:(%esi), %es:(%edi)   // @devel: this long form is important here
                                          //         otherwise the source %ds is used for source
         mov     %eax, %ecx
         shr     $2, %ecx                 // count of dwords
         rep
-//   eseg movs
         movsl   %es:(%esi), %es:(%edi)
         and     $3, %eax
 pc_small:
         xchg    %eax, %ecx               // remainder
         rep
-//   eseg movsb
         movsb   %es:(%esi), %es:(%edi)
         pop     %es
         pop     %edi

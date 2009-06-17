@@ -83,9 +83,7 @@ MNX(u32_t) mon2abs(void *ptr);
 /* Vector to absolute address. */
 MNX(u32_t) vec2abs(vector *vec);
 
-#define MAX_RAWCOPY_ADDR 0xffffff
-
-/* Copy bytes from anywhere up to MAX_RAWCOPY_ADDR */
+/* Copy bytes from anywhere to anywhere (extended memory too) */
 void raw_copy(MNX(u32_t) dstaddr, MNX(u32_t) srcaddr, MNX(u32_t) count);
 
 #define MAX_GETWORD_ADDR 0xfffff
