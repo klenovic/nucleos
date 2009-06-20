@@ -17,7 +17,7 @@ lib-y := $(addprefix $(src)/,$(lib-y))
 # ----------------------------------------------------------------------------
 quiet_cmd_ar_ao = AR      $@
       cmd_ar_ao = $(AR) $(KBUILD_ARFLAGS) $(ARFLAGS_$(notdir $@)) $@ $(filter $($(notdir $@)-obj-y),$^) \
-                  $(if $($(notdir $@)-mri),;$(AR) -M < $($(notdir $@)-mri))
+                  $(if $($(notdir $@)-mri),;$(AR) -M < $($(notdir $@)-mri) && ranlib $@) 
 
 define rule_ar_ao
 	rm -f $@; \
@@ -30,27 +30,30 @@ endef
 # param2 list objects (without `$(src)' prefix)
 # ----------------------------------------------------------------------------
 define rule_link_lib
-# add `$(src)/ prefix
+# add `$(src)/ prefix to object files
 $(1)-obj-y := $$(filter %.o,$$(addprefix $$(src)/,$(2)))
 
 # add to object list
 objs-y += $$($(1)-obj-y)
 
 # subdirs we must descend into
-$(1)-subdirs	:= $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o /%,$(2))))
+$(1)-subdirs	:= $$(abspath $$(addprefix $$(src)/,$$(filter-out %.o %.a /%/,$(2))))
 $(1)-subdirs	:= $$(patsubst $$(srctree)/%,%,$$(patsubst %/,%,$$($(1)-subdirs)))
 # add those with absolute path
-$(1)-subdirs	+= $$(filter /%,$(2))
+$(1)-subdirs	+= $$(filter /%/,$(2))
 subdir-y	+= $$($(1)-subdirs)
 
 # add library name
 $(1)-libs := $$(addsuffix /$(1),$$($(1)-subdirs))
+# add explicitly specified libraries (do not build them).
+$(1)-libs += $$(filter %.a,$(2))
 
 # Create mri if needed
-# This script is used to merge libraries
+# This script is used to merge libraries. You can overide this command by 
+# defining your own.
 # ----------------------------------------------------------------------------
-quiet_cmd_create_$(1)_mri = GEN     $$@
-      cmd_create_$(1)_mri = echo -e 'OPEN $$(src)/$(1)\n$$(foreach l,$$(filter %.a,$$^),ADDLIB $$(l)\n)SAVE\nEND' > $$@
+quiet_cmd_create_$(1)_mri ?= GEN     $$@
+      cmd_create_$(1)_mri ?= echo -e 'OPEN $$(src)/$(1)\n $$(foreach l,$$(filter %.a,$$^),ADDLIB $$(l)\n)SAVE\nEND' > $$@
 
 $$(src)/$(1).mri: $$($(1)-libs) FORCE
 	$$(call if_changed,create_$(1)_mri)
