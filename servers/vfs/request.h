@@ -7,6 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_REQUEST_H
+#define __SERVERS_VFS_REQUEST_H
 
 /* Low level request messages are built and sent by wrapper functions.
  * This file contains the request and response structures for accessing
@@ -49,3 +51,4 @@ typedef struct lookup_res {
 
 
 /* Structure for REQ_ request */
+#endif /* __SERVERS_VFS_REQUEST_H */

@@ -11,7 +11,7 @@
 #ifndef _MINIX_SAFECOPIES_H
 #define _MINIX_SAFECOPIES_H 1
 
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 #include <sys/types.h>
 #include <stdint.h>
 

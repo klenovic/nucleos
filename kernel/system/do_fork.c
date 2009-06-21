@@ -29,9 +29,10 @@ PUBLIC int do_fork(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_fork().  PR_ENDPT has forked.  The child is PR_SLOT. */
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
   reg_t old_ldt_sel;
 #endif
+
   register struct proc *rpc;		/* child process pointer */
   struct proc *rpp;			/* parent process pointer */
   struct mem_map *map_ptr;	/* virtual address of map inside caller (PM) */
@@ -48,13 +49,15 @@ register message *m_ptr;	/* pointer to request message */
 
   /* Copy parent 'proc' struct to child. And reinitialize some fields. */
   gen = _ENDPOINT_G(rpc->p_endpoint);
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
   old_ldt_sel = rpc->p_seg.p_ldt_sel;	/* backup local descriptors */
 #endif
   *rpc = *rpp;				/* copy 'proc' struct */
-#if (_MINIX_CHIP == _CHIP_INTEL)
+
+#ifdef CONFIG_X86_32
   rpc->p_seg.p_ldt_sel = old_ldt_sel;	/* restore descriptors */
 #endif
+
   if(++gen >= _ENDPOINT_MAX_GENERATION)	/* increase generation */
 	gen = 1;			/* generation number wraparound */
   rpc->p_nr = m_ptr->PR_SLOT;		/* this was obliterated by copy */

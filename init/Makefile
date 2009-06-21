@@ -1,2 +1,1 @@
-obj-y := simple/ 
-# ramdisk/#
+obj-y := simple/

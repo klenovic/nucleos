@@ -7,8 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* Function prototypes. */
+#ifndef __SERVERS_VFS_PROTO_H
+#define __SERVERS_VFS_PROTO_H
 
+/* Function prototypes. */
 #include "timers.h"
 #include "request.h"
 
@@ -288,5 +290,4 @@ _PROTOTYPE( void fs_set_timer, (timer_t *tp, int delta,
 _PROTOTYPE( void fs_expire_timers, (clock_t now)			);
 _PROTOTYPE( void fs_cancel_timer, (timer_t *tp)				);
 _PROTOTYPE( void fs_init_timer, (timer_t *tp)				);
-
-
+#endif

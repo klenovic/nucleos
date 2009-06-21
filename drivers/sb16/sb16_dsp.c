@@ -368,7 +368,7 @@ PRIVATE void init_buffer()
  * Its absolute address is 'DmaPhys', the normal address is 'DmaPtr'.
  */
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 	unsigned left;
 
 	DmaPtr = DmaBuffer;
@@ -379,9 +379,9 @@ PRIVATE void init_buffer()
 		DmaPtr += left;
 		DmaPhys += left;
 	}
-#else /* CHIP != INTEL */
-	panic("SB16DSP","init_buffer() failed, CHIP != INTEL", 0);
-#endif /* CHIP == INTEL */
+#else /* !CONFIG_X86_32 */
+	panic("SB16DSP","init_buffer() failed, not x86", 0);
+#endif /* CONFIG_X86_32 */
 }
 
 

@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_LOCK_H
+#define __SERVERS_VFS_LOCK_H
+
 /* This is the file locking table.  Like the filp table, it points to the
  * inode table, however, in this case to achieve advisory locking.
  */
@@ -17,3 +20,4 @@ EXTERN struct file_lock {
   off_t lock_first;		/* offset of first byte locked */
   off_t lock_last;		/* offset of last byte locked */
 } file_lock[NR_LOCKS];
+#endif /* __SERVERS_VFS_LOCK_H */

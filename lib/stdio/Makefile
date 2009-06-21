@@ -7,4 +7,4 @@ libnucc.a-obj-y := clearerr.o data.o doprnt.o doscan.o ecvt.o fclose.o feof.o fe
 	       scanf.o setbuf.o setvbuf.o sprintf.o sscanf.o tmpfile.o tmpnam.o ungetc.o vfprintf.o \
 	       vprintf.o vscanf.o vsprintf.o vsscanf.o
 
-ccflags-y := -O -D_MINIX -D_POSIX_SOURCE
+ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__UKERNEL__

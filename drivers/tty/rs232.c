@@ -148,7 +148,7 @@ typedef struct rs232 {
   char *ohead;			/* next free spot in output buffer */
   char *otail;			/* next char to output */
 
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
   port_t xmit_port;		/* i/o ports */
   port_t recv_port;
   port_t div_low_port;
@@ -159,7 +159,7 @@ typedef struct rs232 {
   port_t modem_ctl_port;
   port_t line_status_port;
   port_t modem_status_port;
-#endif
+#endif /* CONFIG_X86_32 */
 
   unsigned char lstatus;	/* last line status */
   unsigned char pad;		/* ensure alignment for 16-bit ints */
@@ -177,7 +177,7 @@ typedef struct rs232 {
 
 PUBLIC rs232_t rs_lines[NR_RS_LINES];
 
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
 /* 8250 base addresses. */
 PRIVATE port_t addr_8250[] = {
   0x3F8,	/* COM1 */
@@ -185,7 +185,7 @@ PRIVATE port_t addr_8250[] = {
   0x3E8,	/* COM3 */
   0x2E8,	/* COM4 */
 };
-#endif
+#endif /* CONFIG_X86_32 */
 
 FORWARD _PROTOTYPE( void in_int, (rs232_t *rs)				);
 FORWARD _PROTOTYPE( void line_int, (rs232_t *rs)			);
@@ -373,7 +373,7 @@ rs232_t *rs;			/* which line */
 	speed_t	speed;
 	int	divisor;
   } s2d[] = {
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
 	{ B50,		UART_FREQ / 50		},
 #endif
 	{ B75,		UART_FREQ / 75		},
@@ -384,14 +384,14 @@ rs232_t *rs;			/* which line */
 	{ B300,		UART_FREQ / 300		},
 	{ B600,		UART_FREQ / 600		},
 	{ B1200,	UART_FREQ / 1200	},
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
 	{ B1800,	UART_FREQ / 1800	},
 #endif
 	{ B2400,	UART_FREQ / 2400	},
 	{ B4800,	UART_FREQ / 4800	},
 	{ B9600,	UART_FREQ / 9600	},
 	{ B19200,	UART_FREQ / 19200	},
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
 	{ B38400,	UART_FREQ / 38400	},
 	{ B57600,	UART_FREQ / 57600	},
 	{ B115200,	UART_FREQ / 115200L	},

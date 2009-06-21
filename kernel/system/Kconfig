@@ -17,7 +17,13 @@ config KERNEL_VCOPY_VEC_SIZE
 	  Maximum number of elements per VCOPY request.
 
 config KERNEL_P_NAME_LEN
-	int "Length of program names stored in the process table."
+	int "Length of program names stored in the process table"
 	default 8
 	---help---
 	  Length of program names stored in the process table.
+
+config KERNEL_MESSAGES_BUFFER_SIZE
+	int "Size of buffer for kernel messages"
+	default 10000
+	---help---
+	  Size of buffer for kernel messages.

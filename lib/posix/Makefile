@@ -12,4 +12,4 @@ libnucc.a-obj-y := __exit.o _access.o _alarm.o _cfgetispeed.o _cfgetospeed.o _cf
 	       _uname.o _unlink.o _utime.o _wait.o _waitpid.o _write.o getloadavg.o getopt.o gettimeofday.o glob.o \
 	       priority.o nice.o usleep.o
 
-ccflags-y := -O -D_MINIX -D_POSIX_SOURCE
+ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__UKERNEL__

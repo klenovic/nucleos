@@ -20,7 +20,7 @@
 #include <fcntl.h>
 #include <nucleos/type.h>
 #include <nucleos/safecopies.h>
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 
 #include "log.h"
 
@@ -32,7 +32,7 @@ message *m;					/* notification message */
 {
 /* Notification for a new kernel message. */
   static struct kmessages kmess;		/* entire kmess structure */
-  static char print_buf[_KMESS_BUF_SIZE];	/* copy new message here */
+  static char print_buf[KMESS_BUF_SIZE];	/* copy new message here */
   int bytes;
   int i, r;
   int *prev_nextp;
@@ -86,12 +86,11 @@ message *m;					/* notification message */
    * Check for size being positive, the buffer might as well be emptied!
    */
   if (kmess.km_size > 0) {
-      bytes = ((kmess.km_next + _KMESS_BUF_SIZE) - (*prev_nextp)) %
-	_KMESS_BUF_SIZE;
+      bytes = (((kmess.km_next + KMESS_BUF_SIZE) - (*prev_nextp)) % KMESS_BUF_SIZE);
       r= *prev_nextp;				/* start at previous old */ 
       i=0;
       while (bytes > 0) {			
-          print_buf[i] = kmess.km_buf[(r%_KMESS_BUF_SIZE)];
+          print_buf[i] = kmess.km_buf[(r%KMESS_BUF_SIZE)];
           bytes --;
           r ++;
           i ++;

@@ -395,12 +395,14 @@ int *hdrlenp;
 
   /* Check magic number, cpu type, and flags. */
   if (BADMAG(hdr)) return(ENOEXEC);
-#if (CHIP == INTEL && _WORD_SIZE == 2)
+#if defined (CONFIG_X86_32) && (_WORD_SIZE == 2)
   if (hdr.a_cpu != A_I8086) return(ENOEXEC);
 #endif
-#if (CHIP == INTEL && _WORD_SIZE == 4)
+
+#if defined (CONFIG_X86_32) && (_WORD_SIZE == 4)
   if (hdr.a_cpu != A_I80386) return(ENOEXEC);
 #endif
+
   if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(ENOEXEC);
 
   *sep_id = !!(hdr.a_flags & A_SEP);	    /* separate I & D or not */

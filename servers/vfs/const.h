@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_CONST_H
+#define __SERVERS_VFS_CONST_H
+
 /* Tables sizes */
 #define NR_FILPS         512	/* # slots in filp table */
 #define NR_LOCKS           8	/* # slots in the file locking table */
@@ -43,3 +46,5 @@
 #define VFS_DEV_GATHER	2004
 #define VFS_DEV_IOCTL	2005
 #define VFS_DEV_SELECT	2006
+
+#endif /* __SERVERS_VFS_CONST_H */

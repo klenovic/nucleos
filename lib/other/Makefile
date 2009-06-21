@@ -11,4 +11,4 @@ libnucc.a-obj-y := __pm_findproc.o _adddma.o _brk.o _cprofile.o _deldma.o _devct
 	       strlcat.o strlcpy.o strtok_r.o swab.o sys_eniop.o syscall.o sysconf.o syslog.o taskcall.o \
 	       telldir.o termcap.o ttyname.o ttyslot.o v8regerror.o v8regexp.o v8regsub.o writev.o
 
-ccflags-y := -O -D_MINIX -D_POSIX_SOURCE -I$(srctree)/servers/
+ccflags-y := -D_MINIX -D_POSIX_SOURCE -I$(srctree)/servers/ -D__UKERNEL__

@@ -135,7 +135,7 @@ register message *m_ptr;
 	     tr_addr > sizeof(struct stackframe_s) - sizeof(reg_t))
 		return(EIO);
 	i = (int) tr_addr;
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
 	/* Altering segment registers might crash the kernel when it
 	 * tries to load them prior to restarting a process, so do
 	 * not allow it.
@@ -149,7 +149,7 @@ register message *m_ptr;
 #endif
 	    i == (int) &((struct proc *) 0)->p_reg.ss)
 		return(EIO);
-#endif
+#endif /* CONFIG_X86_32 */
 	if (i == (int) &((struct proc *) 0)->p_reg.psw)
 		/* only selected bits are changeable */
 		SETPSW(rp, tr_data);

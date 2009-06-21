@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_PARAM_H
+#define __SERVERS_VFS_PARAM_H
+
 /* The following names are synonyms for the variables in the input message. */
 #define acc_time      m2_l1
 #define addr	      m1_i3
@@ -78,3 +81,5 @@
 #define reply_t3      m4_l3
 #define reply_t4      m4_l4
 #define reply_t5      m4_l5
+
+#endif /* __SERVERS_VFS_PARAM_H */

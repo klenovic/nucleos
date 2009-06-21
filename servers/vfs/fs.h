@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_FS_H
+#define __SERVERS_VFS_FS_H
+
 /* This is the master header for fs.  It includes some other files
  * and defines the principal constants.
  */
@@ -46,3 +49,5 @@
 #include "dmap.h"
 #include "proto.h"
 #include "glo.h"
+
+#endif /* __SERVERS_VFS_FS_H */

@@ -7,7 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
+#ifndef __SERVERS_VFS_VNODE_H
+#define __SERVERS_VFS_VNODE_H
 
 EXTERN struct vnode {
   endpoint_t v_fs_e;            /* FS process' endpoint number */
@@ -24,10 +25,10 @@ EXTERN struct vnode {
   off_t v_pipe_wr_pos;
   endpoint_t v_bfs_e;		/* endpoint number for the FS proces in case
 				   of a block special file */
-  
+
   dev_t v_dev;                  /* device number on which the corresponding 
                                    inode resides */
-  
+
   dev_t v_sdev;                 /* device number for special files */
   unsigned short v_index;       /* inode's index in the FS inode table */
   struct vmnt *v_vmnt;          /* vmnt object of the partition */
@@ -43,3 +44,4 @@ EXTERN struct vnode {
 #define NO_PIPE            0	/* i_pipe is NO_PIPE if inode is not a pipe */
 #define I_PIPE             1	/* i_pipe is I_PIPE if inode is a pipe */
 
+#endif /* __SERVERS_VFS_VNODE_H */

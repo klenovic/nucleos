@@ -22,7 +22,7 @@
 #ifndef _MINIX__TYPES_H
 #include <sys/types.h>
 #endif
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 
 #if (_WORD_SIZE != 2 && _WORD_SIZE != 4) || \
 	(_PTR_SIZE != _WORD_SIZE && _PTR_SIZE != 2*_WORD_SIZE)

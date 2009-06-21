@@ -70,7 +70,7 @@
 #include <sys/ioc_tty.h>
 #include <signal.h>
 #include <nucleos/callnr.h>
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 #include <nucleos/tty.h>
 #include <nucleos/keymap.h>
 #include "tty.h"
@@ -557,7 +557,7 @@ int safe;
         size = sizeof(struct winsize);
         break;
 
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
     case KIOCSMAP:	/* load keymap (Minix extension) */
         size = sizeof(keymap_t);
         break;
@@ -565,8 +565,7 @@ int safe;
     case TIOCSFON:	/* load font (Minix extension) */
         size = sizeof(u8_t [8192]);
         break;
-
-#endif
+#endif /* CONFIG_X86_32 */
     case TCDRAIN:	/* Posix tcdrain function -- no parameter */
     default:		size = 0;
   }
@@ -683,7 +682,7 @@ int safe;
 	sigchar(tp, SIGWINCH, 0);
 	break;
 
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
     case KIOCSMAP:
 	/* Load a new keymap (only /dev/console). */
 	if (isconsole(tp)) r = kbd_loadmap(m_ptr, safe);
@@ -698,17 +697,11 @@ int safe;
 	break;
 #endif
 
-#if (MACHINE == ATARI)
-    case VDU_LOADFONT:
-	r = vdu_loadfont(m_ptr);
-	break;
-#endif
-
 /* These Posix functions are allowed to fail if _POSIX_JOB_CONTROL is 
  * not defined.
  */
-    case TIOCGPGRP:     
-    case TIOCSPGRP:	
+    case TIOCGPGRP:
+    case TIOCSPGRP:
     default:
 	r = ENOTTY;
   }

@@ -890,7 +890,7 @@ PRIVATE void data_to_user(sub_dev_t *sub_dev_ptr)
 
 PRIVATE int init_buffers(sub_dev_t *sub_dev_ptr)
 {
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 	char *base;
 	size_t size, off;
 	unsigned left;
@@ -940,10 +940,10 @@ PRIVATE int init_buffers(sub_dev_t *sub_dev_ptr)
 			sub_dev_ptr->DmaSize, sub_dev_ptr->Nr);
 	return OK;
 
-#else /* CHIP != INTEL */
-	error("%s: init_buffer() failed, CHIP != INTEL", drv.DriverName);
+#else /* !CONFIG_X86_32 */
+	error("%s: init_buffer() failed, not x86", drv.DriverName);
 	return EIO;
-#endif /* CHIP == INTEL */
+#endif /* CONFIG_X86_32 */
 }
 
 

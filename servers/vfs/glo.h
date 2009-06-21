@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_GLO_H
+#define __SERVERS_VFS_GLO_H
+
 /* EXTERN should be extern except for the table file */
 #ifdef _TABLE
 #undef EXTERN
@@ -43,3 +46,5 @@ EXTERN int err_code;		/* temporary storage for error number */
 extern _PROTOTYPE (int (*call_vec[]), (void) ); /* sys call table */
 extern char dot1[2];   /* dot1 (&dot1[0]) and dot2 (&dot2[0]) have a special */
 extern char dot2[3];   /* meaning to search_dir: no access permission check. */
+
+#endif /* __SERVERS_VFS_GLO_H */

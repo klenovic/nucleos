@@ -257,8 +257,8 @@ PRIVATE void initialize(void)
   map(SYS_CPROF, do_cprofile);         /* get/reset call profiling data */
   map(SYS_PROFBUF, do_profbuf);        /* announce locations to kernel */
 
-  /* i386-specific. */
-#if _MINIX_CHIP == _CHIP_INTEL
+  /* x86-specific. */
+#ifdef CONFIG_X86_32
   map(SYS_INT86, do_int86);  		/* real-mode BIOS calls */ 
   map(SYS_READBIOS, do_readbios);	/* read from BIOS locations */
   map(SYS_IOPENABLE, do_iopenable); 	/* Enable I/O */
@@ -355,8 +355,7 @@ int sig_nr;			/* signal to be sent, 1 to _NSIG */
   }
 }
 
-#if _MINIX_CHIP == _CHIP_INTEL
-
+#ifdef CONFIG_X86_32
 /*===========================================================================*
  *				umap_bios				     *
  *===========================================================================*/

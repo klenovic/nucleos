@@ -7,7 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
+#ifndef __SERVERS_VFS_VMNT_H
+#define __SERVERS_VFS_VMNT_H
 
 EXTERN struct vmnt {
   int m_fs_e;                   /* FS process' kernel endpoint */
@@ -18,3 +19,5 @@ EXTERN struct vmnt {
 } vmnt[NR_MNTS];
 
 #define NIL_VMNT (struct vmnt *) 0
+
+#endif /* __SERVERS_VFS_VMNT_H */

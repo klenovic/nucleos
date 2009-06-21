@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* General macros and constants used by the kernel. */
-#ifndef __NUCLEOS_KERNEL_CONST_H
-#define __NUCLEOS_KERNEL_CONST_H
+#ifndef __KERNEL_CONST_H
+#define __KERNEL_CONST_H
 
 #include <nucleos/config.h>
 #include <nucleos/bitmap.h>
@@ -42,10 +42,6 @@
 #define structof(type, field, ptr) \
 	((type *) (((char *) (ptr)) - offsetof(type, field)))
 
-/* Translate an endpoint number to a process number, return success. */
-#define isokendpt(e,p) isokendpt_d((e),(p),0)
-#define okendpt(e,p)   isokendpt_d((e),(p),1)
-
 /* Constants used in virtual_copy(). Values must be 0 and 1, respectively. */
 #define _SRC_	0
 #define _DST_	1
@@ -62,10 +58,33 @@
 #endif /* !(__KERNEL__ || __UKERNEL__) */
 
 #ifdef __KERNEL__
-#define reallock  do { int d; d = intr_disabled(); intr_disable(); locklevel++; if(d && locklevel == 1) { minix_panic("reallock while interrupts disabled first time", __LINE__); } } while(0)
+/* Translate an endpoint number to a process number, return success. */
+#define isokendpt(e,p) isokendpt_d((e),(p),0)
+#define okendpt(e,p)   isokendpt_d((e),(p),1)
 
-#define realunlock   do { if(!intr_disabled()) { minix_panic("realunlock while interrupts enabled", __LINE__); } if(locklevel < 1) { minix_panic("realunlock while locklevel below 1", __LINE__); } locklevel--; if(locklevel == 0) { intr_enable(); } } while(0)
+#define reallock										\
+	do {											\
+		int d;										\
+		d = intr_disabled();								\
+		intr_disable();									\
+		locklevel++;									\
+		if(d && locklevel == 1) {							\
+			minix_panic("reallock while interrupts disabled first time", __LINE__);	\
+		} \
+	} while(0)
 
+#define realunlock									\
+	do {										\
+		if(!intr_disabled()) {							\
+			minix_panic("realunlock while interrupts enabled", __LINE__);	\
+		}									\
+		if(locklevel < 1) {							\
+			minix_panic("realunlock while locklevel below 1", __LINE__);	\
+		} locklevel--;								\
+		if(locklevel == 0) {							\
+			intr_enable();							\
+		}									\
+	} while(0)
 
 /* Disable/ enable hardware interrupts. The parameters of lock() and unlock()
  * are used when debugging is enabled.
@@ -92,6 +111,7 @@
 #define VDEVIO_BUF_SIZE	CONFIG_KERNEL_VDEVIO_BUF_SIZE
 #define VCOPY_VEC_SIZE	CONFIG_KERNEL_VCOPY_VEC_SIZE
 #define NR_IRQ_HOOKS	CONFIG_KERNEL_NR_IRQ_HOOKS
+#define KMESS_BUF_SIZE	CONFIG_KERNEL_MESSAGES_BUFFER_SIZE
 
 /* Length of program names stored in the process table. This is only used
  * for the debugging dumps that can be generated with the IS server. The PM
@@ -135,4 +155,4 @@
 
 #endif /* !(__KERNEL__ || __UKERNEL__) */
 
-#endif /* __NUCLEOS_KERNEL_CONST_H */
+#endif /* __KERNEL_CONST_H */

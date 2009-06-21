@@ -1,5 +1,6 @@
 # Makefile for inet.
 app-y := inet.elf32
+inet.elf32-type := server
 inet.elf32-obj-y := generic/
 inet.elf32-obj-y += buf.o clock.o inet.o inet_config.o \
 		    mnx_eth.o mq.o qp.o queryparam.o sr.o sha2.o

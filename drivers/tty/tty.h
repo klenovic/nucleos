@@ -174,7 +174,7 @@ _PROTOTYPE( int select_retry, (struct tty *tp)				);
 _PROTOTYPE( void rs_init, (struct tty *tp)				);
 _PROTOTYPE( void rs_interrupt, (message *m)				);
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 /* console.c */
 _PROTOTYPE( void kputc, (int c)						);
 _PROTOTYPE( void cons_stop, (void)					);
@@ -206,5 +206,5 @@ _PROTOTYPE( void pty_init, (struct tty *tp)				);
 _PROTOTYPE( void select_retry_pty, (struct tty *tp)			);
 _PROTOTYPE( int pty_status, (message *m_ptr)				);
 
-#endif /* (CHIP == INTEL) */
+#endif /* CONFIG_X86_32 */
 

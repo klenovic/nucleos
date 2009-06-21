@@ -2,14 +2,14 @@
 ### boot aka boot monitor
 app-y      += boot.elf32
 boot.elf32-obj-y := boot.o boothead.o bootimage.o bootutils.o rawfs.o \
-	                  errno.o malloc.o printf.o
+	            errno.o malloc.o printf.o
 
 BOOT_ORG    = 0x0000
 BOOT_ENTRY  = bootcode_entry
 HDRLEN      = 0x20
 
 # %.c files
-ccflags-y := -D__CODE16__ -D_EM_WSIZE=4 -include arch/$(SRCARCH)/include/asm/code16gcc.h
+ccflags-y := -D__CODE16__ -D_EM_WSIZE=4 -D__KERNEL__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
 
 # %.S files
 asflags-y := -D__CODE16__ -D_EM_WSIZE=4 -include arch/$(SRCARCH)/include/asm/code16gcc.h

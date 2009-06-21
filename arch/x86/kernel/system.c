@@ -40,7 +40,7 @@ PUBLIC void arch_shutdown(int how)
 
 		/* Return to the boot monitor. Set
 		 * the program if not already done.
- */
+		 */
 		if (how != RBT_MONITOR)
 			arch_set_params("", 1);
 		if(minix_panicing) {
@@ -50,13 +50,11 @@ PUBLIC void arch_shutdown(int how)
 			int leadlen = strlen(lead);
 			strcpy(mybuffer, lead);
 
-#define DECSOURCE source = (source - 1 + _KMESS_BUF_SIZE) % _KMESS_BUF_SIZE
-
 			dest = sizeof(mybuffer)-1;
 			mybuffer[dest--] = '\0';
 
 			source = kmess.km_next;
-			DECSOURCE; 
+			source = ((source - 1 + KMESS_BUF_SIZE) % KMESS_BUF_SIZE); 
 
 			while(dest >= leadlen) {
 				char c = kmess.km_buf[source];
@@ -69,7 +67,7 @@ PUBLIC void arch_shutdown(int how)
 					mybuffer[dest] = c;
 				} else	mybuffer[dest] = ' ';
 
-				DECSOURCE;
+				source = ((source - 1 + KMESS_BUF_SIZE) % KMESS_BUF_SIZE);
 				dest--;
   }
 

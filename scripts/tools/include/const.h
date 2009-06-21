@@ -7,11 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#ifndef CHIP
-#error CHIP is not defined
-#endif
-
 #ifndef EXTERN
 #define EXTERN        extern	/* used in *.h files */
 #endif
@@ -85,14 +80,9 @@
 #define MIN(a, b)   ((a) < (b) ? (a) : (b))
 
 /* Memory is allocated in clicks. */
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 #define CLICK_SIZE      4096	/* unit in which memory is allocated */
 #define CLICK_SHIFT       12	/* log2 of CLICK_SIZE */
-#endif
-
-#if (CHIP == SPARC) || (CHIP == M68000)
-#define CLICK_SIZE	4096	/* unit in which memory is allocated */
-#define CLICK_SHIFT	  12	/* log2 of CLICK_SIZE */
 #endif
 
 /* Sizes of memory tables. The boot monitor distinguishes three memory areas,
@@ -100,7 +90,6 @@
  * for DOS MINIX.
 */
 #define NR_MEMS            8 
-
 
 /* Click to byte conversions (and vice versa). */
 #define HCLICK_SHIFT       4	/* log2 of HCLICK_SIZE */

@@ -34,7 +34,7 @@
 #include <nucleos/tty.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 #include <nucleos/vm.h>
 #include "tty.h"
 
@@ -1078,9 +1078,9 @@ int c;
 	cons_putk(c);
   if (c != 0) {
       kmess.km_buf[kmess.km_next] = c;	/* put normal char in buffer */
-      if (kmess.km_size < _KMESS_BUF_SIZE)
+      if (kmess.km_size < KMESS_BUF_SIZE)
           kmess.km_size += 1;		
-      kmess.km_next = (kmess.km_next + 1) % _KMESS_BUF_SIZE;
+      kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
   } else {
       notify(LOG_PROC_NR);
   }
@@ -1113,15 +1113,15 @@ message *m;
 
   /* Print only the new part. Determine how many new bytes there are with 
    * help of the current and previous 'next' index. Note that the kernel
-   * buffer is circular. This works fine if less then _KMESS_BUF_SIZE bytes
-   * is new data; else we miss % _KMESS_BUF_SIZE here.  
+   * buffer is circular. This works fine if less then KMESS_BUF_SIZE bytes
+   * is new data; else we miss % KMESS_BUF_SIZE here.  
    * Check for size being positive, the buffer might as well be emptied!
    */
   if (kmess.km_size > 0) {
-      bytes = ((kmess.km_next + _KMESS_BUF_SIZE) - prev_next) % _KMESS_BUF_SIZE;
+      bytes = ((kmess.km_next + KMESS_BUF_SIZE) - prev_next) % KMESS_BUF_SIZE;
       r=prev_next;				/* start at previous old */ 
       while (bytes > 0) {			
-          cons_putk( kmess.km_buf[(r%_KMESS_BUF_SIZE)] );
+          cons_putk( kmess.km_buf[(r%KMESS_BUF_SIZE)] );
           bytes --;
           r ++;
       }

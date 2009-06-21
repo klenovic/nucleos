@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include <nucleos/sysutil.h>
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 
 /*===========================================================================*
  *			panic                                        *
@@ -86,7 +86,7 @@ int c;					/* character to append */
       kmess.km_buf[kmess.km_next] = c;	/* put normal char in buffer */
       if (kmess.km_size < sizeof(kmess.km_buf))
           kmess.km_size += 1;		
-      kmess.km_next = (kmess.km_next + 1) % _KMESS_BUF_SIZE;
+      kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
   } else {
       int p, outprocs[] = OUTPUT_PROCS_ARRAY;
       if(do_serial_debug) return;

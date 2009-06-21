@@ -12,7 +12,7 @@
 #ifndef _PORTS_H
 #define _PORTS_H
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 
 /* Miscellaneous ports. */
 #define PCR		0x65	/* Planar Control Register */
@@ -21,6 +21,6 @@
 #define TIMER2          0x42	/* I/O port for timer channel 2 */
 #define TIMER_MODE      0x43	/* I/O port for timer mode control */
 
-#endif /* (CHIP == INTEL) */
+#endif /* CONFIG_X86_32 */
 
 #endif /* _PORTS_H */

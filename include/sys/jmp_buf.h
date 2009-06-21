@@ -27,15 +27,14 @@
 #define JB_MASK		JB_LB + _EM_PSIZE
 #define JB_FLAGS	JB_MASK + _EM_LSIZE
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 #define JB_BP		JB_LB
 #endif
 
 #elif defined(__GNUC__)
 
-#if (CHIP == INTEL) && (_WORD_SIZE == 4)
+#if defined(CONFIG_X86_32) && (_WORD_SIZE == 4)
 /* as per lib/gnu/rts/__setjmp.gs */
-
 #define JB_FLAGS	0
 #define JB_MASK		4
 #define JB_PC		8
@@ -46,8 +45,7 @@
 #define JB_DX		28
 #define JB_SI		32
 #define JB_DI		36
-
-#endif /* (CHIP == INTEL) && (_WORD_SIZE == 4) */
+#endif /* CONFIG_X86_32 */
 
 #endif /* __GNU__ */
 

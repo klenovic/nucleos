@@ -1,4 +1,5 @@
 obj-y := vm.o pagetable.o arch_pagefaults.o util.o
-CLFAGS += $(CPROFILE)
+
+ccflags-y := -D__UKERNEL__
 
 create-builtin := y

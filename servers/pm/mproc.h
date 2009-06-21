@@ -45,8 +45,7 @@ EXTERN struct mproc {
   struct sigaction mp_sigact[_NSIG + 1]; /* as in sigaction(2) */
   vir_bytes mp_sigreturn; 	/* address of C library __sigreturn function */
   struct sigmsg mp_sigmsg;	/* Save the details of the signal until the
-				 * PM_UNPAUSE request is delivered.
-				 */
+				 * PM_UNPAUSE request is delivered. */
   struct timer mp_timer;	/* watchdog timer for alarm(2) */
 
   /* Backwards compatibility for signals. */
@@ -86,8 +85,7 @@ EXTERN struct mproc {
 #define PARTIAL_EXEC   0x8000	/* Process got a new map but no content */
 #define TOLD_PARENT   0x10000	/* Parent wait() completed, ZOMBIE off */
 #define HAS_DMA	      0x20000	/* Process directly or indirectly granted
-				 * DMA buffers.
-				 */
+				 * DMA buffers. */
 
 #define NIL_MPROC ((struct mproc *) 0)
 

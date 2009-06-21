@@ -50,7 +50,7 @@ message *m_ptr;			/* pointer to request message */
   sc.sc_psw  =  (sc.sc_psw & X86_FLAGS_USER) |
                 (rp->p_reg.psw & ~X86_FLAGS_USER);
 
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
   /* Don't panic kernel if user gave bad selectors. */
   sc.sc_cs = rp->p_reg.cs;
   sc.sc_ds = rp->p_reg.ds;
@@ -59,14 +59,11 @@ message *m_ptr;			/* pointer to request message */
   sc.sc_fs = rp->p_reg.fs;
   sc.sc_gs = rp->p_reg.gs;
 #endif
-#endif
+#endif /* CONFIG_X86_32 */
 
   /* Restore the registers. */
-#if _MINIX_CHIP == _CHIP_POWERPC
-  memcpy(&rp->p_reg, &sc.sc_regs, sizeof(struct stackframe_s));
-#else
   memcpy(&rp->p_reg, &sc.sc_regs, sizeof(struct sigregs));
-#endif
+
   return(OK);
 }
 #endif /* USE_SIGRETURN */

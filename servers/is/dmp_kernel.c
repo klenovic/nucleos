@@ -14,7 +14,7 @@
 #include <ibm/interrupt.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/sysutil.h>
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
@@ -102,7 +102,7 @@ PUBLIC void timing_dmp()
 PUBLIC void kmessages_dmp()
 {
   struct kmessages kmess;		/* get copy of kernel messages */
-  char print_buf[_KMESS_BUF_SIZE+1];	/* this one is used to print */
+  char print_buf[KMESS_BUF_SIZE+1];	/* this one is used to print */
   int start;				/* calculate start of messages */
   int r;
 
@@ -116,10 +116,10 @@ PUBLIC void kmessages_dmp()
    * buffer into a print-buffer. This is done because the messages in the
    * copy may wrap (the kernel buffer is circular).
    */
-  start = ((kmess.km_next + _KMESS_BUF_SIZE) - kmess.km_size) % _KMESS_BUF_SIZE;
+  start = ((kmess.km_next + KMESS_BUF_SIZE) - kmess.km_size) % KMESS_BUF_SIZE;
   r = 0;
   while (kmess.km_size > 0) {
-  	print_buf[r] = kmess.km_buf[(start+r) % _KMESS_BUF_SIZE];
+  	print_buf[r] = kmess.km_buf[(start+r) % KMESS_BUF_SIZE];
   	r ++;
   	kmess.km_size --;
   }
@@ -318,7 +318,7 @@ PUBLIC void kenv_dmp()
     printf("- nr_tasks:     %3u\n", kinfo.nr_tasks); 
     printf("- release:      %.6s\n", kinfo.release); 
     printf("- version:      %.6s\n", kinfo.version); 
-#if DEBUG_LOCK_CHECK
+#if CONFIG_DEBUG_KERNEL_LOCK_CHECK
     printf("- relocking:    %d\n", kinfo.relocking); 
 #endif
     printf("\n");
@@ -417,7 +417,7 @@ PRIVATE char *p_rts_flags_str(int flags)
 /*===========================================================================*
  *				proctab_dmp    				     *
  *===========================================================================*/
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 PUBLIC void proctab_dmp()
 {
 /* Proc table dump */
@@ -450,7 +450,7 @@ PUBLIC void proctab_dmp()
 	printf("\n");
   }
 }
-#endif				/* (CHIP == INTEL) */
+#endif /* CONFIG_X86_32 */
 
 /*===========================================================================*
  *				procstack_dmp  				     *

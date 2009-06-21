@@ -10,68 +10,60 @@
 #ifndef _TYPE_H
 #define _TYPE_H
 
-#ifndef _MINIX_SYS_CONFIG_H
-#include <nucleos/sys_config.h>
-#endif
+#include <nucleos/config.h>
 
 #ifndef _TYPES_H
 #include <sys/types.h>
 #endif
 
+#include <kernel/const.h>
+
 /* Type definitions. */
-typedef unsigned int vir_clicks; 	/*  virtual addr/length in clicks */
+typedef unsigned int vir_clicks;	/* virtual addr/length in clicks */
 typedef unsigned long phys_bytes;	/* physical addr/length in bytes */
 typedef unsigned int phys_clicks;	/* physical addr/length in clicks */
 typedef int endpoint_t;			/* process identifier */
 
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
 typedef long unsigned int vir_bytes;	/* virtual addresses/lengths in bytes */
-#endif
-
-#if (_MINIX_CHIP == _CHIP_M68000)
-typedef unsigned long vir_bytes;/* virtual addresses and lengths in bytes */
-#endif
-
-#if (_MINIX_CHIP == _CHIP_SPARC)
-typedef unsigned long vir_bytes;/* virtual addresses and lengths in bytes */
 #endif
 
 /* Memory map for local text, stack, data segments. */
 struct mem_map {
-  vir_clicks mem_vir;		/* virtual address */
-  phys_clicks mem_phys;		/* physical address */
-  vir_clicks mem_len;		/* length */
+	vir_clicks mem_vir;		/* virtual address */
+	phys_clicks mem_phys;		/* physical address */
+	vir_clicks mem_len;		/* length */
 };
 
 /* Memory map for remote memory areas, e.g., for the RAM disk. */
 struct far_mem {
-  int in_use;			/* entry in use, unless zero */
-  phys_clicks mem_phys;		/* physical address */
-  vir_clicks mem_len;		/* length */
+	int in_use;			/* entry in use, unless zero */
+	phys_clicks mem_phys;		/* physical address */
+	vir_clicks mem_len;		/* length */
 };
 
 /* Structure for virtual copying by means of a vector with requests. */
 struct vir_addr {
-  int proc_nr_e;
-  int segment;
-  vir_bytes offset;
+	int proc_nr_e;
+	int segment;
+	vir_bytes offset;
 };
 
 #define phys_cp_req vir_cp_req 
 struct vir_cp_req {
-  struct vir_addr src;
-  struct vir_addr dst;
-  phys_bytes count;
+	struct vir_addr src;
+	struct vir_addr dst;
+	phys_bytes count;
 };
 
 typedef struct {
-  vir_bytes iov_addr;		/* address of an I/O buffer */
-  vir_bytes iov_size;		/* sizeof an I/O buffer */
+	vir_bytes iov_addr;		/* address of an I/O buffer */
+	vir_bytes iov_size;		/* sizeof an I/O buffer */
 } iovec_t;
 
 typedef struct {
-  int iov_grant;		/* grant ID of an I/O buffer */
-  vir_bytes iov_size;		/* sizeof an I/O buffer */
+	int iov_grant;		/* grant ID of an I/O buffer */
+	vir_bytes iov_size;		/* sizeof an I/O buffer */
 } iovec_s_t;
 
 /* PM passes the address of a structure of this type to KERNEL when
@@ -80,34 +72,34 @@ typedef struct {
  * the signal stack.
  */
 struct sigmsg {
-  int sm_signo;			/* signal number being caught */
-  unsigned long sm_mask;	/* mask to restore when handler returns */
-  vir_bytes sm_sighandler;	/* address of handler */
-  vir_bytes sm_sigreturn;	/* address of _sigreturn in C library */
-  vir_bytes sm_stkptr;		/* user stack pointer */
+	int sm_signo;			/* signal number being caught */
+	unsigned long sm_mask;	/* mask to restore when handler returns */
+	vir_bytes sm_sighandler;	/* address of handler */
+	vir_bytes sm_sigreturn;	/* address of _sigreturn in C library */
+	vir_bytes sm_stkptr;		/* user stack pointer */
 };
 
 /* This is used to obtain system information through SYS_GETINFO. */
 struct kinfo {
-  phys_bytes code_base;		/* base of kernel code */
-  phys_bytes code_size;		
-  phys_bytes data_base;		/* base of kernel data */
-  phys_bytes data_size;
-  vir_bytes proc_addr;		/* virtual address of process table */
-  phys_bytes _kmem_base;	/* kernel memory layout (/dev/kmem) */
-  phys_bytes _kmem_size;
-  phys_bytes bootdev_base;	/* boot device from boot image (/dev/boot) */
-  phys_bytes bootdev_size;
-  phys_bytes ramdev_base;	/* boot device from boot image (/dev/boot) */
-  phys_bytes ramdev_size;
-  phys_bytes _params_base;	/* parameters passed by boot monitor */
-  phys_bytes _params_size;
-  int nr_procs;			/* number of user processes */
-  int nr_tasks;			/* number of kernel tasks */
-  char release[6];		/* kernel release number */
-  char version[6];		/* kernel version number */
-#if DEBUG_LOCK_CHECK
-  int relocking;		/* interrupt locking depth (should be 0) */
+	phys_bytes code_base;		/* base of kernel code */
+	phys_bytes code_size;		
+	phys_bytes data_base;		/* base of kernel data */
+	phys_bytes data_size;
+	vir_bytes proc_addr;		/* virtual address of process table */
+	phys_bytes _kmem_base;	/* kernel memory layout (/dev/kmem) */
+	phys_bytes _kmem_size;
+	phys_bytes bootdev_base;	/* boot device from boot image (/dev/boot) */
+	phys_bytes bootdev_size;
+	phys_bytes ramdev_base;	/* boot device from boot image (/dev/boot) */
+	phys_bytes ramdev_size;
+	phys_bytes _params_base;	/* parameters passed by boot monitor */
+	phys_bytes _params_size;
+	int nr_procs;			/* number of user processes */
+	int nr_tasks;			/* number of kernel tasks */
+	char release[6];		/* kernel release number */
+	char version[6];		/* kernel version number */
+#if CONFIG_DEBUG_KERNEL_LOCK_CHECK
+	int relocking;		/* interrupt locking depth (should be 0) */
 #endif
 };
 
@@ -123,18 +115,18 @@ struct kinfo {
 
 /* Runnable processes and other load-average information. */
 struct loadinfo {
-  u16_t proc_load_history[_LOAD_HISTORY];	/* history of proc_s_cur */
-  u16_t proc_last_slot;
-  clock_t last_clock;
+	u16_t proc_load_history[_LOAD_HISTORY];	/* history of proc_s_cur */
+	u16_t proc_last_slot;
+	clock_t last_clock;
 };
 
 struct machine {
-  int pc_at;
-  int ps_mca;
-  int processor;
-  int padding;	/* used to be protected */
-  int vdu_ega;
-  int vdu_vga;
+	int pc_at;
+	int ps_mca;
+	int processor;
+	int padding;	/* used to be protected */
+	int vdu_ega;
+	int vdu_vga;
 };
 
 struct io_range
@@ -182,9 +174,9 @@ struct memory {
 
 /* The kernel outputs diagnostic messages in a circular buffer. */
 struct kmessages {
-  int km_next;                          /* next index to write */
-  int km_size;                          /* current size in buffer */
-  char km_buf[_KMESS_BUF_SIZE];          /* buffer for messages */
+	int km_next;                          /* next index to write */
+	int km_size;                          /* current size in buffer */
+	char km_buf[KMESS_BUF_SIZE];          /* buffer for messages */
 };
 
 #include <ibm/interrupt.h>
@@ -196,12 +188,12 @@ struct kmessages {
 typedef unsigned short rand_t;
 
 struct k_randomness {
-  int random_elements, random_sources;
-  struct k_randomness_bin {
-        int r_next;                             /* next index to write */
-        int r_size;                             /* number of random elements */
-        rand_t r_buf[RANDOM_ELEMENTS]; /* buffer for random info */
-  } bin[RANDOM_SOURCES];
+	int random_elements, random_sources;
+	struct k_randomness_bin {
+		int r_next;                             /* next index to write */
+		int r_size;                             /* number of random elements */
+		rand_t r_buf[RANDOM_ELEMENTS]; /* buffer for random info */
+	} bin[RANDOM_SOURCES];
 };
 
 #endif /* _TYPE_H */

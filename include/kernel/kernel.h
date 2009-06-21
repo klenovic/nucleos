@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef __KERNEL_KERNEL_H
+#define __KERNEL_KERNEL_H
 
 /* This is the master header for the kernel.  It includes some other files
  * and defines the principal constants.
@@ -35,4 +35,4 @@
 #include <nucleos/ipc.h>		/* IPC constants */
 #include <kernel/profile.h>		/* system profiling */
 
-#endif /* KERNEL_H */
+#endif /* __KERNEL_KERNEL_H */

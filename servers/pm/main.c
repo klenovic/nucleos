@@ -343,10 +343,10 @@ PRIVATE void pm_init()
   if (sendrec(FS_PROC_NR, &mess) != OK || mess.m_type != OK)
 	panic(__FILE__,"can't sync up with FS", NO_NUM);
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
         uts_val.machine[0] = 'i';
         strcpy(uts_val.machine + 1, itoa(getprocessor()));
-#endif  
+#endif
 
  if(f > 0) printf("PM: failed to register %d processes with DS.\n", f);
 

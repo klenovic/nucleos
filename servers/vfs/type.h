@@ -7,12 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#if 1
+#ifndef __SERVERS_VFS_TYPE_H
+#define __SERVERS_VFS_TYPE_H
+
 extern struct dmap {
   int _PROTOTYPE ((*dmap_opcl), (int, Dev_t, int, int) );
   int _PROTOTYPE ((*dmap_io), (int, message *) );
   int dmap_driver;
   int dmap_flags;
 } dmap[];
-#endif
-
+#endif /* __SERVERS_VFS_TYPE_H */

@@ -50,7 +50,7 @@ PRIVATE struct dmap init_dmap[] = {
   DT(1, ctty_opcl,ctty_io, TTY_PROC_NR, 0, "")     	 /* 5 = /dev/tty   */
   DT(0, no_dev,   0,       NONE,	DMAP_MUTABLE, "")	/* 6 = /dev/lp    */
 
-#if (MACHINE == IBM_PC)
+#ifdef CONFIG_X86_32
   DT(1, no_dev,   0,       0,   	DMAP_MUTABLE, "")   /* 7 = /dev/ip    */
   DT(0, no_dev,   0,       NONE,        DMAP_MUTABLE, "")   /* 8 = /dev/c1    */
   DT(0, 0,        0,       0,   	DMAP_MUTABLE, "")   /* 9 = not used   */
@@ -62,7 +62,7 @@ PRIVATE struct dmap init_dmap[] = {
   DT(1, gen_opcl, gen_io,  LOG_PROC_NR, 0, "")  	    /*15 = /dev/klog  */
   DT(0, no_dev,   0,       NONE,	DMAP_MUTABLE, "")   /*16 = /dev/random*/
   DT(0, 0,	  0,       0,		DMAP_MUTABLE, "")   /*17 = not used   */
-#endif /* IBM_PC */
+#endif /* CONFIG_X86_32 */
 };
 
 FORWARD _PROTOTYPE( int map_driverX, (char *label, int major,

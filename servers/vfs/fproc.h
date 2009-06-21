@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_FPROC_H
+#define __SERVERS_VFS_FPROC_H
+
 #include <sys/select.h>
 #include <nucleos/safecopies.h>
 
@@ -18,10 +21,10 @@ EXTERN struct fproc {
   unsigned fp_flags;
 
   mode_t fp_umask;		/* mask set by umask system call */
- 
+
   struct vnode *fp_wd;		/* working directory; NULL during reboot */
   struct vnode *fp_rd;		/* root directory; NULL during reboot */
-  
+
   struct filp *fp_filp[OPEN_MAX];/* the file descriptor table */
 
   fd_set fp_filp_inuse;		/* which fd's are in use? */
@@ -37,14 +40,14 @@ EXTERN struct fproc {
   int fp_suspended;		/* set to indicate process hanging */
   int fp_revived;		/* set to indicate process being revived */
   int fp_task;			/* which task is proc suspended on */
-  
+
   endpoint_t fp_ioproc;		/* proc no. in suspended-on i/o message */
   cp_grant_id_t fp_grant;	/* revoke this grant on unsuspend if > -1 */
-  
+
   char fp_sesldr;		/* true if proc is a session leader */
   char fp_execced;		/* true if proc has exec()ced after fork */
   pid_t fp_pid;			/* process id */
-  
+
   fd_set fp_cloexec_set;	/* bit map for POSIX Table 6-2 FD_CLOEXEC */
   endpoint_t fp_endpoint;	/* kernel endpoint number of this process */
 } fproc[NR_PROCS];
@@ -52,8 +55,7 @@ EXTERN struct fproc {
 /* fp_flags */
 #define NO_FLAGS	0
 #define SUSP_REOPEN	1	/* Process is suspended until the reopens are
-				 * completed (after the restart of a driver).
-				 */
+				 * completed (after the restart of a driver). */
 
 /* Field values. */
 /* fp_suspended is one of these. */
@@ -66,4 +68,4 @@ EXTERN struct fproc {
 
 /* Check is process number is acceptable - includes system processes. */
 #define isokprocnr(n)	((unsigned)((n)+NR_TASKS) < NR_PROCS + NR_TASKS)
-
+#endif /* __SERVERS_VFS_FPROC_H */

@@ -87,7 +87,7 @@ _PROTOTYPE( void init_buffer, (void) );
 #define USE_EXTRA_DMA_BUF  0	/* usually not needed */
 #define DMA_BUF_SIZE	(DMA_SECTORS * SECTOR_SIZE)
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 extern u8_t *tmp_buf;			/* the DMA buffer */
 #else
 extern u8_t tmp_buf[];			/* the DMA buffer */

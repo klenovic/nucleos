@@ -12,7 +12,7 @@
 #ifndef _INTERRUPT_H
 #define _INTERRUPT_H
 
-#if (CHIP == INTEL)
+#ifdef CONFIG_X86_32
 
 /* 8259A interrupt controller ports. */
 #define INT_CTL         0x20	/* I/O port for interrupt controller */
@@ -66,6 +66,6 @@
 #define VECTOR(irq)	\
 	(((irq) < 8 ? IRQ0_VECTOR : IRQ8_VECTOR) + ((irq) & 0x07))
 
-#endif /* (CHIP == INTEL) */
+#endif /* CONFIG_X86_32 */
 
 #endif /* _INTERRUPT_H */

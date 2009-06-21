@@ -71,11 +71,6 @@ _PROTOTYPE( int do_allocmem, (void)					);
 _PROTOTYPE( int do_freemem, (void)					);
 _PROTOTYPE( int do_getsetpriority, (void)					);
 
-
-#if (MACHINE == MACINTOSH)
-_PROTOTYPE( phys_clicks start_click, (void)				);
-#endif
-
 _PROTOTYPE( void setreply, (int proc_nr, int result)			);
 
 /* profile.c */

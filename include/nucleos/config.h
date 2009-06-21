@@ -18,32 +18,23 @@
  * It is divided up into two main sections.  The first section contains
  * user-settable parameters.  In the second section, various internal system
  * parameters are set based on the user-settable parameters.
- *
- * Parts of config.h have been moved to sys_config.h, which can be included
- * by other include files that wish to get at the configuration data, but
- * don't want to pollute the users namespace. Some editable values have
- * gone there.
- *
  */
 
-/* The MACHINE (called _MINIX_MACHINE) setting can be done
- * in <minix/machine.h>.
- */
-#include <nucleos/sys_config.h>
+/*===========================================================================*
+ *              This section contains user-settable parameters               *
+ *===========================================================================*/
+/* Word size in bytes (a constant equal to sizeof(int)). */
+#if __ACK__ || __GNUC__
+#define _WORD_SIZE      _EM_WSIZE
+#define _PTR_SIZE       _EM_WSIZE
+#endif
 
-#define MACHINE      _MINIX_MACHINE
-
-#define IBM_PC       _MACHINE_IBM_PC
-#define SUN_4        _MACHINE_SUN_4
-#define SUN_4_60     _MACHINE_SUN_4_60
-#define ATARI        _MACHINE_ATARI
-#define MACINTOSH    _MACHINE_MACINTOSH
+#define _NR_PROCS       100
+#define _NR_SYS_PROCS   32
 
 /* Number of slots in the process table for non-kernel processes. The number
  * of system processes defines how many processes with special privileges 
  * there can be. User processes share the same properties and count for one. 
- *
- * These can be changed in sys_config.h.
  */
 #define NR_PROCS 	  _NR_PROCS 
 #define NR_SYS_PROCS      _NR_SYS_PROCS
@@ -78,25 +69,6 @@
 /*===========================================================================*
  *	There are no user-settable parameters after this line		     *
  *===========================================================================*/
-/* Set the CHIP type based on the machine selected. The symbol CHIP is actually
- * indicative of more than just the CPU.  For example, machines for which
- * CHIP == INTEL are expected to have 8259A interrrupt controllers and the
- * other properties of IBM PC/XT/AT/386 types machines in general. */
-#define INTEL             _CHIP_INTEL	/* CHIP type for PC, XT, AT, 386 and clones */
-#define M68000            _CHIP_M68000	/* CHIP type for Atari, Amiga, Macintosh    */
-#define SPARC             _CHIP_SPARC	/* CHIP type for SUN-4 (e.g. SPARCstation)  */
-
-/* Set the FP_FORMAT type based on the machine selected, either hw or sw    */
-#define FP_NONE	 _FP_NONE	/* no floating point support                */
-#define FP_IEEE	 _FP_IEEE	/* conform IEEE floating point standard     */
-
-/* _MINIX_CHIP is defined in sys_config.h. */
-#define CHIP	_MINIX_CHIP
-
-/* _MINIX_FP_FORMAT is defined in sys_config.h. */
-#define FP_FORMAT	_MINIX_FP_FORMAT
-
-/* _ASKDEV and _FASTLOAD are defined in sys_config.h. */
 #define ASKDEV _ASKDEV
 #define FASTLOAD _FASTLOAD
 
@@ -105,6 +77,6 @@
 #define CPROFILE          0    /* call profiling */
 
 /* Compile kernel so that first page of code and data can be unmapped. */
-#define VM_KERN_NOPAGEZERO      1       
+#define VM_KERN_NOPAGEZERO      1
 
 #endif /* _CONFIG_H */

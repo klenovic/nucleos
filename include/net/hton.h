@@ -17,24 +17,15 @@ htons means convert a (unsigned) short in host byte order to network byte order.
 #ifndef _NET__HTON_H
 #define _NET__HTON_H
 
-#include <nucleos/sys_config.h>
+#include <nucleos/config.h>
 
 extern u16_t _tmp;
 extern u32_t _tmp_l;
 
 /* Find out about the byte order. */
 
-/* assume <nucleos/config.h> is included, let's check */
-#if (_MINIX_CHIP == 0)
-#include "_MINIX_CHIP macro not set, include <nucleos/config.h>"
-#endif
-
-#if (_MINIX_CHIP == _CHIP_INTEL)
+#ifdef CONFIG_X86_32
 #define LITTLE_ENDIAN	1
-#endif
-
-#if (_MINIX_CHIP == _CHIP_M68000 || _MINIX_CHIP == _CHIP_SPARC)
-#define BIG_ENDIAN	1
 #endif
 
 #if (LITTLE_ENDIAN) && (BIG_ENDIAN)

@@ -10,6 +10,8 @@
 /*
 dmap.h
 */
+#ifndef __SERVERS_VFS_DMAP_H
+#define __SERVERS_VFS_DMAP_H
 
 /*===========================================================================*
  *               	 Device <-> Driver Table  			     *
@@ -33,3 +35,5 @@ extern struct dmap {
   int dmap_async_driver;
   struct filp *dmap_sel_filp;
 } dmap[];
+
+#endif /* __SERVERS_VFS_DMAP_H */

@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_VFS_FILE_H
+#define __SERVERS_VFS_FILE_H
+
 /* This is the filp table.  It is an intermediary between file descriptors and
  * inodes.  A slot is free if filp_count == 0.
  */
@@ -49,3 +52,5 @@ EXTERN struct filp {
 				 */
 
 #define NIL_FILP (struct filp *) 0	/* indicates absence of a filp slot */
+
+#endif /* __SERVERS_VFS_FILE_H */
