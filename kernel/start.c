@@ -18,6 +18,7 @@
 #include <asm/kernel/const.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
+#include <nucleos/compile.h>
 
 FORWARD _PROTOTYPE( char *get_value, (_CONST char *params, _CONST char *key));
 /*===========================================================================*
@@ -56,7 +57,7 @@ U16_t parmoff, parmsize;	/* boot parameters offset and length */
 
   kinfo.release[sizeof(kinfo.release)-1] = '\0';
 
-  strncpy(kinfo.version, MKSTR(NUCLEOS_VERSION_CODE), sizeof(kinfo.version));
+  strncpy(kinfo.version, UTS_VERSION, sizeof(kinfo.version));
 
   kinfo.version[sizeof(kinfo.version)-1] = '\0';
   kinfo.proc_addr = (vir_bytes) proc;

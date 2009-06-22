@@ -10,12 +10,8 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-/* Minix release and version numbers. */
-#define OS_RELEASE "3"
-#define OS_VERSION "1.4"
-
 /* Word size in bytes (a constant equal to sizeof(int)). */
-#if __ACK__ || __GNUC__
+#ifdef __GNUC__
 #define _WORD_SIZE      _EM_WSIZE
 #define _PTR_SIZE       _EM_WSIZE
 #endif

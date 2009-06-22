@@ -65,13 +65,7 @@
 #endif
 
 typedef struct {
-#if defined(__ACK__)
-  _PROTOTYPE(void (*__pc),(void));	/* program counter */
-  void *__sp;			/* stack pointer */
-  void *__lb;			/* local base (ACKspeak for frame pointer) */
-  long __mask;			/* must have size >= sizeof(sigset_t) */
-  int __flags;
-#else /* GCC */
+#ifdef __GNUC__
   int __flags;			/* XXX - long might give better alignment */
   long __mask;			/* must have size >= sizeof(sigset_t) */
   void *__regs[16];		/* actual use is architecture dependent */
