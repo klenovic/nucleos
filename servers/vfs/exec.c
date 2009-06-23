@@ -106,7 +106,7 @@ vir_bytes frame_len;
     if (r != OK)
     {
         printf("pm_exec: fetch_name failed\n");
-printf("return at %s, %d\n", __FILE__, __LINE__);
+	printf("return at %s, %d\n", __FILE__, __LINE__);
         return(r);	/* file name not in user data segment */
     }
 
@@ -114,7 +114,7 @@ printf("return at %s, %d\n", __FILE__, __LINE__);
     if (frame_len > ARG_MAX)
     {
         printf("pm_exec: bad frame_len\n");
-printf("return at %s, %d\n", __FILE__, __LINE__);
+	printf("return at %s, %d\n", __FILE__, __LINE__);
         return(ENOMEM);	/* stack too big */
     }
     r = sys_datacopy(proc_e, (vir_bytes) frame,
@@ -123,7 +123,7 @@ printf("return at %s, %d\n", __FILE__, __LINE__);
     if (r != OK)
     {
         printf("pm_exec: sys_datacopy failed\n");
-printf("return at %s, %d\n", __FILE__, __LINE__);
+	printf("return at %s, %d\n", __FILE__, __LINE__);
         return(r);	
     }
 
@@ -185,23 +185,27 @@ printf("return at %s, %d\n", __FILE__, __LINE__);
         /* Read the file header and extract the segment sizes. */
         r = read_header(vp, &sep_id, &text_bytes, &data_bytes, &bss_bytes, 
                 &tot_bytes, &pc, &hdrlen);
+
         if (r != ESCRIPT || round != 0)
             break;
 
         /* Get fresh copy of the file name. */
         r= fetch_name(path, path_len, 0);
+
         if (r != OK)
         {
             printf("pm_exec: 2nd fetch_name failed\n");
             put_vnode(vp);
             return(r);	/* strange */
         }
+
         r= patch_stack(vp, mbuf, &frame_len);
         put_vnode(vp);
+
         if (r != OK)
         {
             printf("pm_exec: patch stack\n");
-printf("return at %s, %d\n", __FILE__, __LINE__);
+		printf("return at %s, %d\n", __FILE__, __LINE__);
             return r;
         }
     }
@@ -395,12 +399,9 @@ int *hdrlenp;
 
   /* Check magic number, cpu type, and flags. */
   if (BADMAG(hdr)) return(ENOEXEC);
-#if defined (CONFIG_X86_32) && (_WORD_SIZE == 2)
-  if (hdr.a_cpu != A_I8086) return(ENOEXEC);
-#endif
 
-#if defined (CONFIG_X86_32) && (_WORD_SIZE == 4)
-  if (hdr.a_cpu != A_I80386) return(ENOEXEC);
+#ifdef CONFIG_X86_32
+  if (hdr.a_cpu != A_I8086 && hdr.a_cpu != A_I80386) return(ENOEXEC);
 #endif
 
   if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(ENOEXEC);

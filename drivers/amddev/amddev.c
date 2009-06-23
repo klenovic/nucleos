@@ -16,7 +16,6 @@ Driver for the AMD Device Exclusion Vector (DEV)
 #define _SYSTEM
 #define _MINIX
 
-#include <nucleos/config.h>
 #include <nucleos/type.h>
 
 #include <errno.h>

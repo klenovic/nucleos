@@ -18,7 +18,6 @@ Copyright 1995 Philip Homburg
 #include <ansi.h>
 #include <assert.h>
 
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>

@@ -37,7 +37,6 @@ Copyright 1995 Philip Homburg
 #include <unistd.h>
 #include <sys/ioc_file.h>
 #include <sys/time.h>
-#include <nucleos/config.h>
 #include <nucleos/type.h>
 
 #define _NORETURN	/* Should be non empty for GCC */

@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <unistd.h>
 //#include <sys/stat.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <servers/mfs/const.h>

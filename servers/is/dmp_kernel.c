@@ -14,7 +14,6 @@
 #include <ibm/interrupt.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/sysutil.h>
-#include <nucleos/config.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>

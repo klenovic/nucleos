@@ -17,7 +17,6 @@
  *   14 Aug, 2006  Created (Rogier Meurs)
  */
 
-#include <nucleos/config.h>
 #include <nucleos/profile.h>
 #include "pm.h"
 #include <sys/wait.h>

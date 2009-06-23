@@ -10,8 +10,6 @@
 #ifndef _TYPE_H
 #define _TYPE_H
 
-#include <nucleos/config.h>
-
 #ifndef _TYPES_H
 #include <sys/types.h>
 #endif

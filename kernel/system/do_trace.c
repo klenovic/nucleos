@@ -143,10 +143,8 @@ register message *m_ptr;
 	if (i == (int) &((struct proc *) 0)->p_reg.cs ||
 	    i == (int) &((struct proc *) 0)->p_reg.ds ||
 	    i == (int) &((struct proc *) 0)->p_reg.es ||
-#if _WORD_SIZE == 4
 	    i == (int) &((struct proc *) 0)->p_reg.gs ||
 	    i == (int) &((struct proc *) 0)->p_reg.fs ||
-#endif
 	    i == (int) &((struct proc *) 0)->p_reg.ss)
 		return(EIO);
 #endif /* CONFIG_X86_32 */

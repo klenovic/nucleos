@@ -34,7 +34,6 @@
 #include <nucleos/tty.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
-#include <nucleos/config.h>
 #include <nucleos/vm.h>
 #include "tty.h"
 

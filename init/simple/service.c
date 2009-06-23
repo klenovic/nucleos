@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <pwd.h>
 #include <unistd.h>
-#include <nucleos/config.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>

@@ -19,7 +19,6 @@
 #include <kernel/vm.h>
 #include <kernel/system.h>
 #include <nucleos/type.h>
-#include <nucleos/config.h>
 
 /*===========================================================================*
  *				do_vmctl				     *

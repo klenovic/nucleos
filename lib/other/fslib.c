@@ -9,7 +9,6 @@
  */
 /* fslib.c - routines needed by fs and fs utilities */
 
-#include <nucleos/config.h>	/* for unused stuff in <nucleos/type.h> :-( */
 #include <ansi.h>
 #include <limits.h>
 #include <dirent.h>

@@ -19,7 +19,6 @@
 #define _MINIX             1	/* tell headers to include MINIX stuff */
 
 /* The following are so basic, all the lib files get them automatically. */
-#include <nucleos/config.h>	/* must be first */
 #include <sys/types.h>
 #include <limits.h>
 #include <errno.h>

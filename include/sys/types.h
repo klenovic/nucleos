@@ -116,22 +116,12 @@ typedef long           I32_t;
 
 typedef unsigned long  Ino_t;
 
-#if _EM_WSIZE == 2
-/*typedef unsigned int      Ino_t; Ino_t is now 32 bits */
-typedef unsigned int    Zone1_t;
-typedef unsigned int Bitchunk_t;
-typedef unsigned int      U16_t;
-typedef unsigned int  _mnx_Mode_t;
-
-#else /* _EM_WSIZE == 4, or _EM_WSIZE undefined */
 /*typedef int	          Ino_t; Ino_t is now 32 bits */
 typedef int 	        Zone1_t;
 typedef int	     Bitchunk_t;
 typedef int	          U16_t;
 typedef int         _mnx_Mode_t;
 
-#endif /* _EM_WSIZE == 2, etc */
- 
 /* Signal handler type, e.g. SIG_IGN */
 typedef void _PROTOTYPE( (*sighandler_t), (int) );
 

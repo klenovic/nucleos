@@ -19,20 +19,14 @@
 #include <ansi.h>
 #endif
 
-#ifndef _MINIX_SYS_CONFIG_H
-#include <nucleos/config.h>
-#endif
-
 /* The following structure should match the stackframe_s structure used
  * by the kernel's context switching code.  Floating point registers should
  * be added in a different struct.
  */
 #ifdef CONFIG_X86_32
 struct sigregs {  
-#if _WORD_SIZE == 4
   short sr_gs;
   short sr_fs;
-#endif /* _WORD_SIZE == 4 */
   short sr_es;
   short sr_ds;
   int sr_di;
@@ -70,12 +64,8 @@ struct sigcontext {
 };
 
 #ifdef CONFIG_X86_32
-
-#if _WORD_SIZE == 4
 #define sc_gs sc_regs.sr_gs
 #define sc_fs sc_regs.sr_fs
-#endif /* _WORD_SIZE == 4 */
-
 #define sc_es sc_regs.sr_es
 #define sc_ds sc_regs.sr_ds
 #define sc_di sc_regs.sr_di

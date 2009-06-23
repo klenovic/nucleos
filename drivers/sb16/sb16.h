@@ -24,11 +24,7 @@
                                          */
 #define SB_DMA_8	1		/* 0, 1, 3 */
 #define SB_DMA_16	5		/* 5, 6, 7 */
-#if _WORD_SIZE == 2
-#define DMA_SIZE	8192		/* Dma buffer MUST BE MULTIPLE OF 2 */
-#else
 #define DMA_SIZE	(64 * 1024)		/* Dma buffer MUST BE MULTIPLE OF 2 */
-#endif
 
 /* Some defaults for the DSP */
 #define DEFAULT_SPEED		22050      /* Sample rate */

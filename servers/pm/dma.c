@@ -13,7 +13,6 @@
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
 #include <nucleos/type.h>
-#include <nucleos/config.h>
 #include <nucleos/vm.h>
 #include <signal.h>
 #include <stdlib.h>

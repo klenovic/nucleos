@@ -41,7 +41,6 @@
 #include "param.h"
 
 #include <kernel/const.h>
-#include <nucleos/config.h>
 #include <kernel/proc.h>
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS

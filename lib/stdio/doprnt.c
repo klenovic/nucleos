@@ -38,14 +38,7 @@ gnum(register const char *f, int *ip, va_list *app)
 	return f;
 }
 
-#if	_EM_WSIZE == _EM_PSIZE
 #define set_pointer(flags)				/* nothing */
-#elif	_EM_LSIZE == _EM_PSIZE
-#define set_pointer(flags)	(flags |= FL_LONG)
-#else
-#error garbage pointer size
-#define set_pointer(flags)		/* compilation might continue */
-#endif
 
 /* print an ordinal number */
 static char *

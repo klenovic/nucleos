@@ -10,7 +10,6 @@
 
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 
 #define HIGHCOUNT	0

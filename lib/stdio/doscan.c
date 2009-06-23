@@ -18,15 +18,7 @@
 #include	<stdarg.h>
 #include	"loc_incl.h"
 
-#if	_EM_WSIZE == _EM_PSIZE
 #define set_pointer(flags)				/* nothing */
-#elif	_EM_LSIZE == _EM_PSIZE
-#define set_pointer(flags)	(flags |= FL_LONG)
-#else
-#error garbage pointer size
-#define set_pointer(flags)		/* compilation might continue */
-#endif
-
 #define	NUMLEN	512
 #define	NR_CHARS	256
 

@@ -10,11 +10,9 @@ ehdr2ahdr-obj-y := ehdr2ahdr.o
 HOST_LDFLAGS_ehdr2ahdr := -L$(src)/ -lutils
 
 installboot-obj-y := installboot.o
-HOST_CFLAGS_installboot.o := -D_EM_WSIZE=4
 HOST_LDFLAGS_installboot := -L$(src)/ -lutils
 
 mkfs-obj-y := mkfs.o
-HOST_CFLAGS_mkfs.o := -D_EM_WSIZE=4
 HOST_LDFLAGS_mkfs := -L$(src)/ -lutils
 
 mkinitrd-obj-y := mkinitrd.o
@@ -23,6 +21,6 @@ partition-obj-y := partition.o
 
 hostlib-y := libutils.a
 libutils.a-obj-y := elfparse.o rawfs.o
-HOST_CFLAGS_rawfs.o := -D_EM_WSIZE=4 -DUNIX
+HOST_CFLAGS_rawfs.o := -DUNIX
 
 first := $(hostlib-y)

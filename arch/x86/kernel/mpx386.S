@@ -51,7 +51,6 @@
 
 #include <sys/vm_i386.h>
 
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/com.h>
 #include <ibm/interrupt.h>

@@ -32,7 +32,6 @@
 #endif
 
 /* The following are so basic, all the *.c files get them automatically. */
-#include <nucleos/config.h>	/* MUST be first */
 #include <ansi.h>		/* MUST be second */
 #include <sys/types.h>
 #include <nucleos/const.h>

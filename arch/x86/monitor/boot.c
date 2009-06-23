@@ -26,7 +26,6 @@ char version[]=   "2.20";
 #include <errno.h>
 #include <ibm/partition.h>
 #include <ibm/bios.h>
-#include <nucleos/config.h>
 #include <nucleos/type.h>
 #include <nucleos/com.h>
 #include <nucleos/dmap.h>

@@ -7,7 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/config.h>
 /*---------------------------------------------------------------------------*
  *		rs232.c - serial driver for 8250 and 16450 UARTs	     *
  *		Added support for Atari ST M68901 and YM-2149	--kub	     *

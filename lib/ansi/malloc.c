@@ -22,17 +22,9 @@
 #include	<errno.h>
 #include	<assert.h>
 
-#if _EM_WSIZE == _EM_PSIZE
 #define	ptrint		int
-#else
-#define	ptrint		long
-#endif
 
-#if	_EM_PSIZE == 2
-#define BRKSIZE		1024
-#else
 #define BRKSIZE		4096
-#endif
 #define	PTRSIZE		((int) sizeof(void *))
 #define Align(x,a)	(((x) + (a - 1)) & ~(a - 1))
 #define NextSlot(p)	(* (void **) ((p) - PTRSIZE))

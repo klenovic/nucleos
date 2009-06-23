@@ -14,7 +14,6 @@
 
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <server/ds/ds.h>
 #include <nucleos/endpoint.h>
@@ -43,7 +42,6 @@ extern int missing_spares;
 
 #include <asm/kernel/types.h>
 #include <kernel/const.h>
-#include <nucleos/config.h>
 #include <kernel/proc.h>
 
 typedef u32_t mask_t;

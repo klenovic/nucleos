@@ -10,7 +10,6 @@
 #ifndef _DMAP_H
 #define _DMAP_H
 
-#include <nucleos/config.h>
 #include <nucleos/ipc.h>
 
 enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };

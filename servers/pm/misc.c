@@ -30,7 +30,6 @@
 #include <sys/resource.h>
 #include <nucleos/utsname.h>
 #include <nucleos/com.h>
-#include <nucleos/config.h>
 #include <nucleos/sysinfo.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>

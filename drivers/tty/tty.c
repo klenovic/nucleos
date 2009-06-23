@@ -70,7 +70,6 @@
 #include <sys/ioc_tty.h>
 #include <signal.h>
 #include <nucleos/callnr.h>
-#include <nucleos/config.h>
 #include <nucleos/tty.h>
 #include <nucleos/keymap.h>
 #include "tty.h"

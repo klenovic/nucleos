@@ -11,7 +11,6 @@
 #ifndef __KERNEL_CONST_H
 #define __KERNEL_CONST_H
 
-#include <nucleos/config.h>
 #include <nucleos/bitmap.h>
 
 #if defined (__KERNEL__) || defined (__UKERNEL__)

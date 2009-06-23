@@ -26,7 +26,6 @@
 #include <unistd.h>
 
 #include <nucleos/callnr.h>
-#include <nucleos/config.h>
 #include <nucleos/type.h>
 #include <nucleos/const.h>
 #include <nucleos/com.h>

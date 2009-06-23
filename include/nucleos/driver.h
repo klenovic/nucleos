@@ -16,7 +16,6 @@
 #define _SYSTEM		   1	/* get negative error number in <errno.h> */
 
 /* The following are so basic, all the *.c files get them automatically. */
-#include <nucleos/config.h>	/* MUST be first */
 #include <ansi.h>		/* MUST be second */
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>

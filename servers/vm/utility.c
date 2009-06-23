@@ -17,7 +17,6 @@
 
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <server/ds/ds.h>
 #include <nucleos/endpoint.h>
@@ -39,7 +38,6 @@
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <kernel/const.h>
-#include <nucleos/config.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
 

@@ -10,7 +10,6 @@
 #ifndef _MINIX_ENDPOINT_H
 #define _MINIX_ENDPOINT_H 1
 
-#include <nucleos/config.h>
 #include <nucleos/com.h>
 #include <limits.h>
 

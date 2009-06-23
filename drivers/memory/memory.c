@@ -31,7 +31,6 @@
 #include <nucleos/vm.h>
 #include <sys/mman.h>
 #include <kernel/const.h>
-#include <nucleos/config.h>
 #include <kernel/type.h>
 #include <sys/vm.h>
 #include <sys/vm_i386.h>

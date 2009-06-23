@@ -10,13 +10,7 @@ ifeq ($(CONFIG_X86_32),y)
   KBUILD_CFLAGS += $(biarch)
 
   KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2)
-
-  # insert specific flags
-  # @devel: Minix's compiler-generated symbol _EM_WSIZE giving the word size in
-  #         bytes. We need this until we completely turn gcc. We use code16gcc
-  #         for generating 16-bit code thus _EM_WSIZE is still 4. code16gcc uses
-  #         32-bit size and address prefixes.
-  KBUILD_CPPFLAGS += -D__CODE32__ -D_EM_WSIZE=4 -D_EM_PSIZE=4 -D_EM_LSIZE=4 
+  KBUILD_CPPFLAGS += -D__CODE32__
 
   # include compiler stuffs
   include arch/$(SRCARCH)/Makefile_32.cpu

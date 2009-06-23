@@ -15,11 +15,9 @@
 #ifndef _JMP_BUF_H
 #define _JMP_BUF_H
 
-#include <nucleos/config.h>
-
 #ifdef __GNUC__
 
-#if defined(CONFIG_X86_32) && (_WORD_SIZE == 4)
+#ifdef CONFIG_X86_32
 /* as per lib/gnu/rts/__setjmp.S */
 #define JB_FLAGS	0
 #define JB_MASK		4

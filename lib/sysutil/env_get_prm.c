@@ -8,7 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "sysutil.h"
-#include <nucleos/config.h>
 #include <string.h>
 
 PRIVATE int argc = 0;

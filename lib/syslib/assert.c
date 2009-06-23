@@ -13,7 +13,6 @@
 
 #include	<assert.h>
 #include	<stdio.h>
-#include	<nucleos/config.h>
 #include	<nucleos/const.h>
 #include	<nucleos/sysutil.h>
 

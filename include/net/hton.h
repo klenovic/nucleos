@@ -17,8 +17,6 @@ htons means convert a (unsigned) short in host byte order to network byte order.
 #ifndef _NET__HTON_H
 #define _NET__HTON_H
 
-#include <nucleos/config.h>
-
 extern u16_t _tmp;
 extern u32_t _tmp_l;
 
@@ -48,7 +46,6 @@ extern u32_t _tmp_l;
 #define NTOHL(x) ((((x)>>24) & 0xffL) | (((x)>>8) & 0xff00L) | \
 		(((x)<<8) & 0xff0000L) | (((x)<<24) & 0xff000000L))
 
-#if _WORD_SIZE > 2
 #define htons(x) (_tmp=(x), ((_tmp>>8) & 0xff) | ((_tmp<<8) & 0xff00))
 #define ntohs(x) (_tmp=(x), ((_tmp>>8) & 0xff) | ((_tmp<<8) & 0xff00))
 #define htonl(x) (_tmp_l=(x), ((_tmp_l>>24) & 0xffL) | \
@@ -57,14 +54,6 @@ extern u32_t _tmp_l;
 #define ntohl(x) (_tmp_l=(x), ((_tmp_l>>24) & 0xffL) \
 		| ((_tmp_l>>8) & 0xff00L) | \
 		((_tmp_l<<8) & 0xff0000L) | ((_tmp_l<<24) & 0xff000000L))
-
-#else /* _WORD_SIZE == 2 */
-/* The above macros are too unwieldy for a 16-bit machine. */
-u16_t htons(u16_t x);
-u16_t ntohs(u16_t x);
-u32_t htonl(u32_t x);
-u32_t ntohl(u32_t x);
-#endif /* _WORD_SIZE == 2 */
 
 #endif /* LITTLE_ENDIAN */
 

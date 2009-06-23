@@ -28,7 +28,6 @@
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
 #include <nucleos/type.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>

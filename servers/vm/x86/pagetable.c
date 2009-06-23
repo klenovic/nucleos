@@ -14,7 +14,6 @@
 
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <server/ds/ds.h>
 #include <nucleos/endpoint.h>

@@ -11,7 +11,6 @@
 #ifndef __X86_ASM_KERNEL_TYPES_H
 #define __X86_ASM_KERNEL_TYPES_H
 
-#include <nucleos/config.h>
 #include <asm/kernel/const.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)

@@ -11,7 +11,6 @@
 #define _MINIX 1
 #define _SYSTEM 1
 
-#include <nucleos/config.h>
 #include <ansi.h> 
 #include <assert.h> 
 #include <sys/types.h>

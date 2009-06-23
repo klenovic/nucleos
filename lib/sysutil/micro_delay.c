@@ -14,7 +14,6 @@
 #include <sys/times.h>
 #include <sys/types.h>
 #include <nucleos/u64.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 
 #include "sysutil.h"

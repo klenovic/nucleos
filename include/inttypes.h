@@ -33,16 +33,11 @@
 #define PRI16		""
 #define PRILEAST16	""
 #define PRIFAST16	""
-#if _WORD_SIZE == 2
-#define PRI32		"l"
-#define PRILEAST32	"l"
-#define PRIFAST32	"l"
-#else
 #define PRI32		""
 #define PRILEAST32	""
 #define PRIFAST32	""
-#endif
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define PRI64		"l"
 #define PRILEAST64	"l"
 #define PRIFAST64	"l"
@@ -58,7 +53,7 @@
 #define PRId32		PRI32"d"
 #define PRIdLEAST32	PRILEAST32"d"
 #define PRIdFAST32	PRIFAST32"d"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRId64		PRI64"d"
 #define PRIdLEAST64	PRILEAST64"d"
 #define PRIdFAST64	PRIFAST64"d"
@@ -73,7 +68,7 @@
 #define PRIi32		PRI32"i"
 #define PRIiLEAST32	PRILEAST32"i"
 #define PRIiFAST32	PRIFAST32"i"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRIi64		PRI64"i"
 #define PRIiLEAST64	PRILEAST64"i"
 #define PRIiFAST64	PRIFAST64"i"
@@ -88,7 +83,7 @@
 #define PRIo32		PRI32"o"
 #define PRIoLEAST32	PRILEAST32"o"
 #define PRIoFAST32	PRIFAST32"o"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRIo64		PRI64"o"
 #define PRIoLEAST64	PRILEAST64"o"
 #define PRIoFAST64	PRIFAST64"o"
@@ -103,7 +98,7 @@
 #define PRIu32		PRI32"u"
 #define PRIuLEAST32	PRILEAST32"u"
 #define PRIuFAST32	PRIFAST32"u"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRIu64		PRI64"u"
 #define PRIuLEAST64	PRILEAST64"u"
 #define PRIuFAST64	PRIFAST64"u"
@@ -118,7 +113,7 @@
 #define PRIx32		PRI32"x"
 #define PRIxLEAST32	PRILEAST32"x"
 #define PRIxFAST32	PRIFAST32"x"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRIx64		PRI64"x"
 #define PRIxLEAST64	PRILEAST64"x"
 #define PRIxFAST64	PRIFAST64"x"
@@ -133,7 +128,7 @@
 #define PRIX32		PRI32"X"
 #define PRIXLEAST32	PRILEAST32"X"
 #define PRIXFAST32	PRIFAST32"X"
-#if _WORD_SIZE > 2 && __L64
+#ifdef __L64
 #define PRIX64		PRI64"X"
 #define PRIXLEAST64	PRILEAST64"X"
 #define PRIXFAST64	PRIFAST64"X"
@@ -146,16 +141,11 @@
 #define SCN16		"h"
 #define SCNLEAST16	"h"
 #define SCNFAST16	""
-#if _WORD_SIZE == 2
-#define SCN32		"l"
-#define SCNLEAST32	"l"
-#define SCNFAST32	"l"
-#else
 #define SCN32		""
 #define SCNLEAST32	""
 #define SCNFAST32	""
-#endif
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCN64		"l"
 #define SCNLEAST64	"l"
 #define SCNFAST64	"l"
@@ -171,7 +161,8 @@
 #define SCNd32		SCN32"d"
 #define SCNdLEAST32	SCNLEAST32"d"
 #define SCNdFAST32	SCNFAST32"d"
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCNd64		SCN64"d"
 #define SCNdLEAST64	SCNLEAST64"d"
 #define SCNdFAST64	SCNFAST64"d"
@@ -186,7 +177,8 @@
 #define SCNi32		SCN32"i"
 #define SCNiLEAST32	SCNLEAST32"i"
 #define SCNiFAST32	SCNFAST32"i"
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCNi64		SCN64"i"
 #define SCNiLEAST64	SCNLEAST64"i"
 #define SCNiFAST64	SCNFAST64"i"
@@ -201,7 +193,8 @@
 #define SCNo32		SCN32"o"
 #define SCNoLEAST32	SCNLEAST32"o"
 #define SCNoFAST32	SCNFAST32"o"
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCNo64		SCN64"o"
 #define SCNoLEAST64	SCNLEAST64"o"
 #define SCNoFAST64	SCNFAST64"o"
@@ -216,7 +209,8 @@
 #define SCNu32		SCN32"u"
 #define SCNuLEAST32	SCNLEAST32"u"
 #define SCNuFAST32	SCNFAST32"u"
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCNu64		SCN64"u"
 #define SCNuLEAST64	SCNLEAST64"u"
 #define SCNuFAST64	SCNFAST64"u"
@@ -231,7 +225,8 @@
 #define SCNx32		SCN32"x"
 #define SCNxLEAST32	SCNLEAST32"x"
 #define SCNxFAST32	SCNFAST32"x"
-#if _WORD_SIZE > 2 && __L64
+
+#ifdef __L64
 #define SCNx64		SCN64"x"
 #define SCNxLEAST64	SCNLEAST64"x"
 #define SCNxFAST64	SCNFAST64"x"

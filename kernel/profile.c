@@ -23,9 +23,6 @@
  * Changes:
  *   14 Aug, 2006   Created, (Rogier Meurs)
  */
-
-#include <nucleos/config.h>
-
 #include <nucleos/profile.h>
 #include <nucleos/portio.h>
 #include <kernel/kernel.h>

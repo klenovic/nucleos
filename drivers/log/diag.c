@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <nucleos/type.h>
 #include <nucleos/safecopies.h>
-#include <nucleos/config.h>
 
 #include "log.h"
 

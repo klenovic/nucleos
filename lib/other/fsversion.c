@@ -18,7 +18,6 @@
  */
 
 #include <sys/types.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>

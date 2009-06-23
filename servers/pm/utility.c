@@ -29,13 +29,11 @@
 #include "mproc.h"
 #include "param.h"
 
-#include <nucleos/config.h>
 #include <timers.h>
 #include <string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <kernel/const.h>
-#include <nucleos/config.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
 

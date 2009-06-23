@@ -22,7 +22,6 @@
 #include <string.h>
 #include <errno.h>
 #include <a.out.h>
-#include <nucleos/config.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
