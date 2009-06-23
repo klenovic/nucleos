@@ -24,7 +24,7 @@
 
 #include <kernel/system.h>
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
 /* user address to write info struct */
 PRIVATE vir_bytes sprof_info_addr_vir;
@@ -101,5 +101,5 @@ register message *m_ptr;    /* pointer to request message */
   }
 }
 
-#endif /* SPROFILE */
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 

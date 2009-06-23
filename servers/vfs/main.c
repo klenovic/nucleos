@@ -43,7 +43,7 @@
 #include "vmnt.h"
 #include "vnode.h"
 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 EXTERN unsigned long calls_stats[NCALLS];
 #endif
 
@@ -208,7 +208,7 @@ PUBLIC int main()
 		"FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
 				 who_e, call_nr, m_in.endpt1);
 		} else {
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
 			SANITYCHECK;

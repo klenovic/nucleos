@@ -32,7 +32,7 @@
 #include "proto.h"
 #include "util.h"
 
-#define SENDSLOTS _NR_PROCS
+#define SENDSLOTS NR_PROCS
 
 PRIVATE asynmsg_t msgtable[SENDSLOTS];
 PRIVATE size_t msgtable_n= SENDSLOTS;

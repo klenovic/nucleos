@@ -27,7 +27,7 @@
 #include "mproc.h"
 #include "param.h"
 
-#if SPROFILE || CPROFILE
+#if defined (CONFIG_DEBUG_SERVERS_STATS_PROFILE) || defined(CONFIG_DEBUG_SERVERS_CALL_PROFILE)
 FORWARD _PROTOTYPE( int check_addrs, (int info_size)               );
 #endif
 
@@ -36,7 +36,7 @@ FORWARD _PROTOTYPE( int check_addrs, (int info_size)               );
  *===========================================================================*/
 PUBLIC int do_sprofile(void)
 {
-#if SPROFILE
+#ifdef CONFIG_DEBUG_SERVERS_STATS_PROFILE
 
   int r;
 
@@ -67,7 +67,7 @@ PUBLIC int do_sprofile(void)
  *===========================================================================*/
 PUBLIC int do_cprofile(void)
 {
-#if CPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_CALL_PROFILE
 
   int r;
 
@@ -93,7 +93,7 @@ PUBLIC int do_cprofile(void)
 }
 
 
-#if SPROFILE || CPROFILE
+#if defined(CONFIG_DEBUG_SERVERS_STATS_PROFILE) || defined(CONFIG_DEBUG_KERNEL_CALL_PROFILE)
 
 /*===========================================================================*
  *				check_addrs				     *

@@ -212,7 +212,7 @@ PRIVATE void vm_init(void)
 	for (ip = &image[0]; ip < &image[NR_BOOT_PROCS]; ip++) {
 		struct vmproc *vmp;
 
-		if(ip->proc_nr >= _NR_PROCS) { vm_panic("proc", ip->proc_nr); }
+		if(ip->proc_nr >= NR_PROCS) { vm_panic("proc", ip->proc_nr); }
 		if(ip->proc_nr < 0 && ip->proc_nr != SYSTEM) continue;
 
 #define GETVMP(v, nr)						\

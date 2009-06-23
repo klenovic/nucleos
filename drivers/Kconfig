@@ -1,6 +1,6 @@
 menu "Device drivers"
 choice
-  prompt "Type of linkage of servers"
+  prompt "Type of linkage of drivers"
   default DRIVERS_LINKAGE_SEPID if ARCH_DRIVERS_LINKAGE_SEPID
 
 config DRIVERS_LINKAGE_COMID
@@ -22,6 +22,8 @@ config DRIVERS_LINKAGE_TYPE
   default "0x20" if DRIVERS_LINKAGE_SEPID=y
 
 source "drivers/memory/Kconfig"
+source "drivers/tty/Kconfig"
+
 endmenu
 
 

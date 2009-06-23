@@ -32,7 +32,6 @@
 #include <sys/ioctl.h>
 
 /* some minix specific stuffs */
-#include "include/config.h"
 #include "include/const.h"
 #include "include/a.out.h"
 #include "include/tools.h"

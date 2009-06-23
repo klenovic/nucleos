@@ -40,7 +40,7 @@
 			__FILE__, __LINE__); 		\
 		vm_panic("memory corruption", NO_NUM);	\
 	}  \
-	for(vmp = vmproc; vmp <= &vmproc[_NR_PROCS]; vmp++) { \
+	for(vmp = vmproc; vmp <= &vmproc[NR_PROCS]; vmp++) { \
 		if((vmp->vm_flags & (VMF_INUSE | VMF_HASPT)) == \
 			(VMF_INUSE | VMF_HASPT)) { \
 			pt_sanitycheck(&vmp->vm_pt, __FILE__, __LINE__); \

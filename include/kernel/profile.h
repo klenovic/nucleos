@@ -14,7 +14,7 @@
 
 #ifdef __KERNEL__
 
-#if SPROFILE	/* statistical profiling */
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE	/* statistical profiling */
 
 EXTERN int sprofiling;			/* whether profiling is running */
 EXTERN int sprof_mem_size;		/* available user memory for data */
@@ -22,7 +22,7 @@ EXTERN struct sprof_info_s sprof_info;	/* profiling info for user program */
 EXTERN vir_bytes sprof_data_addr_vir;	/* user address to write data */
 EXTERN endpoint_t sprof_ep;		/* user process */
 
-#endif /* SPROFILE */
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 
 
 EXTERN int cprof_mem_size;		/* available user memory for data */

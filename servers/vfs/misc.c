@@ -49,7 +49,7 @@
 #define CORE_NAME	"core"
 #define CORE_MODE	0777	/* mode to use on core image files */
 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 PUBLIC unsigned long calls_stats[NCALLS];
 #endif
 
@@ -98,7 +98,7 @@ PUBLIC int do_getsysinfo()
   	src_addr = (vir_bytes) dmap;
   	len = sizeof(struct dmap) * NR_DEVICES;
   	break; 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
   case SI_CALL_STATS:
   	src_addr = (vir_bytes) calls_stats;
   	len = sizeof(calls_stats);

@@ -101,7 +101,7 @@ kprintf("SYSTEM: request %d:0x%lx-0x%lx, wrflag %d, failed\n",
 		}
 #endif
 		return OK;
-#if VM_KERN_NOPAGEZERO
+#ifdef CONFIG_KERNEL_VM_NOPAGEZERO
 	case VMCTL_NOPAGEZERO:
 		return OK;
 #endif

@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_PM_PM_H
+#define __SERVERS_PM_PM_H
+
 /* This is the master header for PM.  It includes some other files
  * and defines the principal constants.
  */
@@ -33,3 +36,5 @@
 #include "type.h"
 #include "proto.h"
 #include "glo.h"
+
+#endif /*  __SERVERS_PM_PM_H */

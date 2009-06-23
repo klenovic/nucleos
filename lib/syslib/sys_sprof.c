@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
 /*===========================================================================*
  *                                sys_sprof				     *

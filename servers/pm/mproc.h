@@ -7,14 +7,19 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_PM_MPROC_H
+#define __SERVERS_PM_MPROC_H
+
 /* This table has one slot per process.  It contains all the process management
  * information for each process.  Among other things, it defines the text, data
  * and stack segments, uids and gids, and various flags.  The kernel and file
  * systems have tables that are also indexed by process, with the contents
  * of corresponding slots referring to the same process in all three.
  */
+
 #include <timers.h>
 #include <signal.h>
+#include <nucleos/com.h>
 
 EXTERN struct mproc {
   char mp_exitstatus;		/* storage for status when process exits */
@@ -89,3 +94,4 @@ EXTERN struct mproc {
 
 #define NIL_MPROC ((struct mproc *) 0)
 
+#endif /* __SERVERS_PM_MPROC_H */

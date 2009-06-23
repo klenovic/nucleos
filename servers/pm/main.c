@@ -44,7 +44,7 @@
 #include <nucleos/config.h>
 #include <kernel/proc.h>
 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 EXTERN unsigned long calls_stats[NCALLS];
 #endif
 
@@ -137,7 +137,7 @@ PUBLIC int main()
 		if ((unsigned) call_nr >= NCALLS) {
 		result = ENOSYS;
 	} else {
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
 

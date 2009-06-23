@@ -26,7 +26,6 @@
 
 #include "include/sys/types.h"
 #include "include/sys/stat.h"
-#include "include/config.h"
 #include "include/fs/const.h"
 #include "include/fs/type.h"
 #include "include/fs/buf.h"

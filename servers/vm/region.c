@@ -100,7 +100,7 @@ PUBLIC void map_sanitycheck(char *file, int line)
  * all processes.
  */
 #define ALLREGIONS(regioncode, physcode)			\
-	for(vmp = vmproc; vmp <= &vmproc[_NR_PROCS]; vmp++) {	\
+	for(vmp = vmproc; vmp <= &vmproc[NR_PROCS]; vmp++) {	\
 		struct vir_region *vr;				\
 		if(!(vmp->vm_flags & VMF_INUSE))		\
 			continue;				\

@@ -220,7 +220,7 @@ PRIVATE void ser_dump_stats()
 		kprintf("total: %u\n", ex64lo(sys_stats.total));
       }
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
 PUBLIC int arch_init_profile_clock(u32_t freq)
 {
@@ -257,7 +257,7 @@ PUBLIC void arch_ack_profile_clock(void)
   inb(RTC_IO);
 }
 
-#endif
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 
 #define COLOR_BASE	0xB8000L
 

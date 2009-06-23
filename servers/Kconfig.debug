@@ -1,0 +1,33 @@
+menu "Servers debugging/hacking"
+config DEBUG_SERVERS
+	bool "Servers debugging"
+	default y
+	---help---
+	  Say Y if you want to debug servers.
+
+config DEBUG_SERVERS_SYSCALL_STATS
+	bool "Enable the counting of system calls in PM and FS"
+	depends on DEBUG_SERVERS
+	default n
+	---help---
+	  Say Y here if you want to enable the counting of system calls 
+	  in PM and FS.
+
+config DEBUG_SERVERS_STATS_PROFILE
+	bool "Statistical profiling"
+	depends on DEBUG_SERVERS && DEBUG_KERNEL_STATS_PROFILE
+	default n
+	---help---
+	  Say Y if you want to enable statistical profiling.
+
+config DEBUG_SERVERS_CALL_PROFILE
+	bool "Statistical profiling"
+	depends on DEBUG_SERVERS && DEBUG_KERNEL_CALL_PROFILE
+	default n
+	---help---
+
+	  Say Y if you want to enable call profiling.
+
+	  WARNING: This options requires compiler support which is
+	           not available yet.
+endmenu

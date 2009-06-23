@@ -39,7 +39,7 @@ PRIVATE struct {
 
 PRIVATE int depth = 0;			/* current globals stack level */
 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 EXTERN unsigned long calls_stats[NCALLS];
 #endif
 
@@ -146,7 +146,7 @@ message *m;				/* request/reply message pointer */
 
 		r = ENOSYS;
 	} else {
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 		calls_stats[call_nr]++;
 #endif
 

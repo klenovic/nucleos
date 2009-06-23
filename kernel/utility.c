@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include <nucleos/sysutil.h>
-#include <nucleos/config.h>
+#include <nucleos/com.h>
 
 /*===========================================================================*
  *			panic                                        *

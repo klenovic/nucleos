@@ -1,3 +1,4 @@
+menu "Memory"
 config BUILTIN_INITRD
   bool "Initial ramdisk built into memory driver"
   default n
@@ -25,3 +26,4 @@ config INITRD_TARGET_PATH
   ---help---
     Specify the path to initial ramdisk image on target filesystem. Path
     must be absolute.
+endmenu

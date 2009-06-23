@@ -56,7 +56,7 @@ PRIVATE char *uts_tbl[] = {
   NULL,			/* No bus */			/* No bus */
 };
 
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 PUBLIC unsigned long calls_stats[NCALLS];
 #endif
 
@@ -249,7 +249,7 @@ PUBLIC int do_getsysinfo()
         src_addr = (vir_bytes) &loadinfo;
         len = sizeof(struct loadinfo);
         break;
-#if ENABLE_SYSCALL_STATS
+#ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
   case SI_CALL_STATS:
   	src_addr = (vir_bytes) calls_stats;
   	len = sizeof(calls_stats);

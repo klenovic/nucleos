@@ -18,21 +18,21 @@
 //       dl      = Boot-device.
 //       es:%si   = Partition table entry if hard disk.
 //
-.set BOOTOFF,		0x7C00	// 0x0000:BOOTOFF load a bootstrap here
-.set BUFFER,		0x0600	// First free memory
-.set PENTRYSIZE,	16	// Partition table entry size.
-.set K_I386,		0x0001	// Call Minix in 386 mode
-.set K_RET,		0x0020	// Returns to the monitor on reboot
-.set K_INT86,		0x0040	// Requires generic INT support
-.set K_MEML,		0x0080	// Pass a list of free memory
+	.set BOOTOFF,		0x7C00	// 0x0000:BOOTOFF load a bootstrap here
+	.set BUFFER,		0x0600	// First free memory
+	.set PENTRYSIZE,	16	// Partition table entry size.
+	.set K_I386,		0x0001	// Call Minix in 386 mode
+	.set K_RET,		0x0020	// Returns to the monitor on reboot
+	.set K_INT86,		0x0040	// Requires generic INT support
+	.set K_MEML,		0x0080	// Pass a list of free memory
 
-.set DS_SELECTOR,	3*8	// Kernel data selector
-.set ES_SELECTOR,	4*8	// Flat 4 Gb
-.set SS_SELECTOR,	5*8	// Monitor stack
-.set CS_SELECTOR,	6*8	// Kernel code
-.set MCS_SELECTOR,	7*8	// Monitor code
+	.set DS_SELECTOR,	3*8	// Kernel data selector
+	.set ES_SELECTOR,	4*8	// Flat 4 Gb
+	.set SS_SELECTOR,	5*8	// Monitor stack
+	.set CS_SELECTOR,	6*8	// Kernel code
+	.set MCS_SELECTOR,	7*8	// Monitor code
 
-.set ESC,		0x1B	// Escape character
+	.set ESC,		0x1B	// Escape character
 
 .section .text
 // void exit(int status)

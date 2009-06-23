@@ -238,7 +238,7 @@ csinit:
         push    $0                      // set flags to known good state
         popf                            // esp, clear nested task and int enable
 
-#if VM_KERN_NOPAGEZERO
+#ifdef CONFIG_KERNEL_VM_NOPAGEZERO
        jmp     laststep
 .p2align PAGE_SHIFT
 laststep:

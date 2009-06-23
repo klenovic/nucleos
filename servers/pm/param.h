@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_PM_PARAM_H
+#define __SERVERS_PM_PARAM_H
+
 /* The following names are synonyms for the variables in the input message. */
 #define addr            m1_p1
 #define exec_name	m1_p1
@@ -73,3 +76,4 @@
 #define tell_fs_arg2    m1_i2
 #define tell_fs_arg3    m1_i3
 
+#endif /*  __SERVERS_PM_PARAM_H */

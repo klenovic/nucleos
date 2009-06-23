@@ -32,7 +32,7 @@
 #include <kernel/profile.h>
 #include <kernel/proc.h>
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
 #include <string.h>
 
@@ -128,9 +128,9 @@ irq_hook_t *hook;
   return(1);                                    /* reenable interrupts */
 }
 
-#endif /* SPROFILE */
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 
-#if CPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_CALL_PROFILE
 /* 
  * The following variables and functions are used by the procentry/
  * procentry syslib functions when linked with kernelspace processes.
@@ -180,4 +180,4 @@ void *tbl_ptr;
   cprof_procs_no++;
 }
 
-#endif
+#endif /* CONFIG_DEBUG_KERNEL_CALL_PROFILE */

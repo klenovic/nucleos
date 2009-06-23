@@ -1,48 +1,63 @@
 config DEBUG_KERNEL
-  bool "Kernel debugging"
-  default y
-  ---help---
-    Say Y if want to debug kernel.
+	bool "Kernel debugging"
+	default y
+	---help---
+	  Say Y if want to debug kernel.
 
 config DEBUG_KERNEL_IPC_WARNINGS
-  bool "Kernel IPC warnings debugging"
-  depends on DEBUG_KERNEL
-  default y
-  ---help---
-    Say Y if want to debug kernel IPC warnings.
-    Enable prints such as:
-      . send/receive failed due to deadlock or dead source or dead destination
-      . trap not allowed
-      . bogus message pointer
-      . kernel call number not allowed by this process
+	bool "Kernel IPC warnings debugging"
+	depends on DEBUG_KERNEL
+	default y
+	---help---
+	  Say Y if want to debug kernel IPC warnings.
+	  Enable prints such as:
+	    . send/receive failed due to deadlock or dead source or dead destination
+	    . trap not allowed
+	    . bogus message pointer
+	    . kernel call number not allowed by this process
 
-    Of course the call still fails, but nothing is printed if these warnings
-    are disabled.
+	  Of course the call still fails, but nothing is printed if these warnings
+	  are disabled.
 
 config DEBUG_KERNEL_SCHED_CHECK
-  bool "Sanity check for scheduling queues"
-  depends on DEBUG_KERNEL
-  default n
-  ---help---
-    Say Y if you want a sanity check of scheduling queues.
+	bool "Sanity check for scheduling queues"
+	depends on DEBUG_KERNEL
+	default n
+	---help---
+	  Say Y if you want a sanity check of scheduling queues.
 
 config DEBUG_KERNEL_TIME_LOCKS
-  bool "Debug time spent in locks"
-  depends on DEBUG_KERNEL
-  default y
-  ---help---
-    Say Y if you want to measure time spent in locks.
+	bool "Debug time spent in locks"
+	depends on DEBUG_KERNEL
+	default y
+	---help---
+	  Say Y if you want to measure time spent in locks.
 
 config DEBUG_KERNEL_LOCK_CHECK
-  bool "Interrupt lock/unlock sanity checking"
-  depends on DEBUG_KERNEL
-  default y
-  ---help---
-    Say Y if you want interrupt lock/unlock sanity checking.
+	bool "Interrupt lock/unlock sanity checking"
+	depends on DEBUG_KERNEL
+	default y
+	---help---
+	  Say Y if you want interrupt lock/unlock sanity checking.
 
 config DEBUG_KERNEL_VMASSERT
-  bool "Sanity checking regarding virtual memory"
-  depends on DEBUG_KERNEL
-  default y
-  ---help---
-    Say Y if you want interrupt lock/unlock sanity checking.
+	bool "Sanity checking regarding virtual memory"
+	depends on DEBUG_KERNEL
+	default y
+	---help---
+	  Say Y if you want interrupt lock/unlock sanity checking.
+
+config DEBUG_KERNEL_STATS_PROFILE
+        bool "Statistical profiling"
+        default n
+        ---help---
+	  Say Y here if you want to enable statistical profiling.
+
+config DEBUG_KERNEL_CALL_PROFILE
+        bool "Call profiling"
+        default n
+        ---help---
+	  Say Y here if you want to enable call profiling.
+
+          WARNING: This options requires compiler support which is
+                   not available yet.

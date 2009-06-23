@@ -107,7 +107,7 @@ _PROTOTYPE( int verify_grant, (endpoint_t, endpoint_t, cp_grant_id_t, vir_bytes,
 /* system/do_sysctl.c */
 _PROTOTYPE( int do_sysctl, (message *m));
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 /* profile.c */
 _PROTOTYPE( void init_profile_clock, (u32_t)				);
 _PROTOTYPE( void stop_profile_clock, (void)				);

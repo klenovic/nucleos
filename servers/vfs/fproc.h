@@ -12,6 +12,7 @@
 
 #include <sys/select.h>
 #include <nucleos/safecopies.h>
+#include <nucleos/com.h>
 
 /* This is the per-process information.  A slot is reserved for each potential
  * process. Thus NR_PROCS must be the same as in the kernel. It is not 

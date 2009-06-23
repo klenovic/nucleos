@@ -14,6 +14,13 @@
 #undef lock
 #undef unlock
 
+/* NR_CONS, NR_RS_LINES, and NR_PTYS determine the number of terminals the
+ * system can handle.
+ */
+#define NR_CONS		CONFIG_NR_CONS		/* # system consoles (1 to 8) */
+#define NR_RS_LINES	CONFIG_NR_RS_LINES	/* # rs232 terminals (0 to 4) */
+#define NR_PTYS		CONFIG_NR_PTYS		/* # pseudo terminals (0 to 64) */
+
 #define TTY_REVIVE	6767
 
 /* First minor numbers for the various classes of TTY devices. */

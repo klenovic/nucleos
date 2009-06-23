@@ -17,10 +17,10 @@
  * statistical profiling and call profiling.
  */
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
-#  define PROF_START       0    /* start statistical profiling */
-#  define PROF_STOP        1    /* stop statistical profiling */
+#define PROF_START       0    /* start statistical profiling */
+#define PROF_STOP        1    /* stop statistical profiling */
 
 /* Info struct to be copied to from kernel to user program. */
 struct sprof_info_s {
@@ -37,7 +37,7 @@ struct {
   int pc;
 } sprof_sample;
 
-#endif /* SPROFILE */
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 
 
 #include <sys/types.h>

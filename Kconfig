@@ -1,50 +1,69 @@
 config ARCH
-  string
-  option env="ARCH"
+	string
+	option env="ARCH"
 
 config KERNELVERSION
-  string
-  option env="KERNELVERSION"
+	string
+	option env="KERNELVERSION"
 
 menu "General setup"
 config LOCALVERSION
-  string "Local version - append to kernel release"
-  default "-default"
-  ---help---
-    Append an extra string to the end of your kernel version.
-    This will show up when you type uname, for example.
-    The string you set here will be appended after the contents of
-    any files with a filename matching localversion* in your
-    object and source tree, in that order.  Your total string can
-    be a maximum of 64 characters.
+	string "Local version - append to kernel release"
+	default "-default"
+	---help---
+	  Append an extra string to the end of your kernel version.
+	  This will show up when you type uname, for example.
+	  The string you set here will be appended after the contents of
+	  any files with a filename matching localversion* in your
+	  object and source tree, in that order.  Your total string can
+	  be a maximum of 64 characters.
 
 config OPTIMIZE_FOR_SIZE
-  bool "Optimize for size (Look out for broken compilers!)"
-  default n
-  ---help---
-    Enabling this option will pass "-Os" instead of "-O2" to gcc
-    resulting in a smaller code.
+	bool "Optimize for size (Look out for broken compilers!)"
+	default n
+	---help---
+	  Enabling this option will pass "-Os" instead of "-O2" to gcc
+	  resulting in a smaller code.
 
-    WARNING: some versions of gcc may generate incorrect code with this
-    option.  If problems are observed, a gcc upgrade may be needed.
+	  WARNING: some versions of gcc may generate incorrect code with this
+	  option. If problems are observed, a gcc upgrade may be needed.
 
 config FRAME_POINTER
-  bool "Compile with frame pointers"
-  default n
-  ---help---
-    Enabling this will compile code with frame pointers (larger and slower code).
+	bool "Compile with frame pointers"
+	default n
+	---help---
+	  Enabling this will compile code with frame pointers (larger and slower code).
 
 config NULL_DEREFER
-  bool "Null pointer dereferencing"
-  default y
-  ---help---
-    Enable null pointer dereferencing (*NULL) in user-space code.
+	bool "Null pointer dereferencing"
+	default y
+	---help---
+	  Enable null pointer dereferencing (*NULL) in user-space code.
 
-    NOTE: This hack is neccessary because of legacy code which does null
-          pointer dereferencing an expects that *NULL==0. Should be removed
-          since it makes at least debugging more difficult.
-          Note that this option works only for separate I&D linkage type (for
-          servers or drivers). Null dereferncing in case of common I&D linkage
-          type can result in unpredictable behaviour.
+	  NOTE: This hack is neccessary because of legacy code which does null
+	        pointer dereferencing an expects that *NULL==0. Should be removed
+	        since it makes at least debugging more difficult.
+	        Note that this option works only for separate I&D linkage type (for
+	        servers or drivers). Null dereferncing in case of common I&D linkage
+	        type can result in unpredictable behaviour.
 
+config NR_PROCS
+	int "Number of slots in the table for non-kernel processes"
+	default 100
+	---help---
+	  Specify the number of slots in the table for non-kernel processes. User
+	  processes share the same properties and count for one.
+
+config NR_SYS_PROCS
+	int "Number of slots in the table with special privileges"
+	default 32
+	---help---
+	  Specify the number of slots in the table for non-kernel processes with
+	  special privileges.
+
+config NR_CTRLRS
+	int "Number of controller tasks (/dev/cN device classes)"
+	default 2
+	---help---
+	  Number of controller tasks (/dev/cN device classes).
 endmenu

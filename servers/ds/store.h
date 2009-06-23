@@ -17,7 +17,7 @@
 
 /* Constants for the Data Store Server. */
 #define NR_DS_KEYS               64	/* reserve space for so many items */
-#define NR_DS_SUBS   (4*_NR_SYS_PROCS)	/* .. and so many subscriptions */
+#define NR_DS_SUBS   (4*NR_SYS_PROCS)	/* .. and so many subscriptions */
 
 /* Types. */
 

@@ -173,9 +173,9 @@ PUBLIC void main()
 	alloc_segments(rp);
   }
 
-#if SPROFILE
+#ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
   sprofiling = 0;      /* we're not profiling until instructed to */
-#endif /* SPROFILE */
+#endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
   cprof_procs_no = 0;  /* init nr of hash table slots used */
 
   vm_running = 0;

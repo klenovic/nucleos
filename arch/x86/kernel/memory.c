@@ -86,7 +86,7 @@ PUBLIC void vm_init(void)
 			I386_VM_PRESENT;
 		if (phys_mem >= vm_mem_high)
 			entry= 0;
-#if VM_KERN_NOPAGEZERO
+#ifdef CONFIG_KERNEL_VM_NOPAGEZERO
 		if (phys_mem == (sys->p_memmap[T].mem_phys << CLICK_SHIFT) ||
 		    phys_mem == (sys->p_memmap[D].mem_phys << CLICK_SHIFT)) {
 			entry = 0;

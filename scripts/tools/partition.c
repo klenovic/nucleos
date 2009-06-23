@@ -18,7 +18,6 @@
 #include <fcntl.h>
 #include <linux/fs.h>
 #include <linux/hdreg.h>
-#include "include/config.h"
 #include "include/const.h"
 #include "include/nucleos/partition.h"
 #include "include/ibm/partition.h"

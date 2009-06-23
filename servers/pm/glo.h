@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVERS_PM_GLO_H
+#define __SERVERS_PM_GLO_H
+
 /* EXTERN should be extern except in table.c */
 #ifdef _TABLE
 #undef EXTERN
@@ -40,4 +43,6 @@ EXTERN int report_reboot;	/* During reboot to report to FS that we are
 				 * rebooting.
 				 */
 EXTERN int abort_flag;
-EXTERN char monitor_code[256];		
+EXTERN char monitor_code[256];
+		
+#endif /*  __SERVERS_PM_GLO_H */

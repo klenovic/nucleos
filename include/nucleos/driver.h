@@ -83,6 +83,9 @@ _PROTOTYPE( void init_buffer, (void) );
 #define SECTOR_SHIFT       9	/* for division */
 #define SECTOR_MASK      511	/* and remainder */
 
+/* DMA_SECTORS may be increased to speed up DMA based drivers. */
+#define DMA_SECTORS	1	/* DMA buffer size (must be >= 1) */
+
 /* Size of the DMA buffer buffer in bytes. */
 #define USE_EXTRA_DMA_BUF  0	/* usually not needed */
 #define DMA_BUF_SIZE	(DMA_SECTORS * SECTOR_SIZE)

@@ -192,7 +192,7 @@ _PROTOTYPE( int do_readbios, (message *m_ptr) );
 _PROTOTYPE( int do_mapdma, (message *m_ptr) );
 
 _PROTOTYPE( int do_sprofile, (message *m_ptr) );
-#if ! SPROFILE
+#ifndef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 #define do_sprofile do_unused
 #endif
 

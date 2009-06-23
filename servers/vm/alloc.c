@@ -65,7 +65,7 @@ struct hole {
 
 #define NIL_HOLE (struct hole *) 0
 
-#define _NR_HOLES (_NR_PROCS*2)  /* No. of memory holes maintained by VM */
+#define _NR_HOLES (NR_PROCS*2)  /* No. of memory holes maintained by VM */
 
 PRIVATE struct hole hole[_NR_HOLES];
 

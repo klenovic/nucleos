@@ -1,0 +1,22 @@
+menu "Serial devices and TTY"
+config NR_CONS
+	int "Number of system consoles"
+	range 1 8
+	default 4
+	---help---
+	  Specify the number (from 1 to 8) of system consoles.
+
+config NR_RS_LINES
+	int "Number of rs232 terminals"
+	range 0 4
+	default 4
+	---help---
+	  Specify the number (from 0 to 4) of RS232 terminals.
+
+config NR_PTYS
+	int "Number of pseudo terminals"
+	range 0 64
+	default 32
+	---help---
+	  Specify the number (from 0 to 64) of pseudo terminals.
+endmenu

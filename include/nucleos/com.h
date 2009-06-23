@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _MINIX_COM_H
-#define _MINIX_COM_H 
+#ifndef __NUCLEOS_COM_H
+#define __NUCLEOS_COM_H 
 
 /*===========================================================================*
  *          	    		Magic process numbers			     *
@@ -39,8 +39,18 @@
 #define KERNEL           -1	/* pseudo-process for IPC and scheduling */
 #define HARDWARE     KERNEL	/* for hardware interrupt handlers */
 
-/* Number of tasks. Note that NR_PROCS is defined in <nucleos/config.h>. */
-#define NR_TASKS	  4 
+/* Number of tasks. */
+#define NR_TASKS	4 
+
+/* Number of slots in the process table for non-kernel processes. The number
+ * of system processes defines how many processes with special privileges
+ * there can be. User processes share the same properties and count for one.
+ */
+#define NR_PROCS	CONFIG_NR_PROCS
+#define NR_SYS_PROCS	CONFIG_NR_SYS_PROCS
+
+/* Number of controller tasks (/dev/cN device classes). */
+#define NR_CTRLRS	CONFIG_NR_CTRLRS
 
 /* User-space processes, that is, device drivers, servers, and INIT. */
 #define PM_PROC_NR	  0	/* process manager */
@@ -57,6 +67,17 @@
 
 /* Number of processes contained in the system image. */
 #define NR_BOOT_PROCS 	(NR_TASKS + INIT_PROC_NR + 1)
+
+/* Which processes should receive diagnostics from the kernel and system?
+ * Directly sending it to TTY only displays the output. Sending it to the
+ * log driver will cause the diagnostics to be buffered and displayed.
+ * Messages are sent by src/lib/sysutil/kputc.c to these processes, in
+ * the order of this array, which must be terminated by NONE. This is used
+ * by drivers and servers that printf().
+ * The kernel does this for its own kprintf() in kernel/utility.c, also using
+ * this array, but a slightly different mechanism.
+ */
+#define OUTPUT_PROCS_ARRAY	{ TTY_PROC_NR, LOG_PROC_NR, NONE }
 
 /*===========================================================================*
  *                	   Kernel notification types                         *
@@ -872,4 +893,4 @@
 /* Total. */
 #define VM_NCALLS				33
 
-#endif /* _MINIX_COM_H */ 
+#endif /* __NUCLEOS_COM_H */ 

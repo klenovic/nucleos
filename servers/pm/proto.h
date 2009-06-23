@@ -7,8 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* Function prototypes. */
+#ifndef __SERVERS_PM_PROTO_H
+#define __SERVERS_PM_PROTO_H
 
+/* Function prototypes. */
 struct mproc;
 struct stat;
 struct mem_map;
@@ -116,3 +118,4 @@ _PROTOTYPE( char *find_param, (const char *key));
 _PROTOTYPE( int proc_from_pid, (pid_t p));
 _PROTOTYPE( int pm_isokendpt, (int ep, int *proc));
 
+#endif /*  __SERVERS_PM_PROTO_H */
