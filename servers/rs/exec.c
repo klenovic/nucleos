@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "inc.h"
-#include <a.out.h>
+#include <nucleos/a.out.h>
 
 #define BLOCK_SIZE	1024
 
@@ -322,7 +322,7 @@ int *hdrlenp;
   struct exec hdr;		/* a.out header is read in here */
 
   /* Read the header and check the magic number.  The standard MINIX header 
-   * is defined in <a.out.h>.  It consists of 8 chars followed by 6 longs.
+   * is defined in <nucleos/a.out.h>.  It consists of 8 chars followed by 6 longs.
    * Then come 4 more longs that are not used here.
    *	Byte 0: magic number 0x01
    *	Byte 1: magic number 0x03

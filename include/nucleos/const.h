@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __NUCLEOS_CONST_H
+#define __NUCLEOS_CONST_H
+
 #define EXTERN        extern	/* used in *.h files */
 #define PRIVATE       static	/* PRIVATE x limits the scope of x */
 #define PUBLIC			/* PUBLIC is the opposite of PRIVATE */
@@ -142,3 +145,4 @@
 #define CHECK_MEM       0x80    /* check if (VM) mem map request is allowed */
 #define PROC_FULLVM    0x100    /* VM sets and manages full pagetable */
 
+#endif /* __NUCLEOS_CONST_H */

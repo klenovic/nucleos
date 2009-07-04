@@ -15,7 +15,7 @@
 #include <asm/kernel/proto.h>
 #include <nucleos/safecopies.h>
 #include <asm/kernel/types.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 
 #ifdef __KERNEL__
 

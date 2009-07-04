@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>

@@ -18,7 +18,7 @@
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>
 #include <nucleos/sysutil.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 #include <asm/kernel/proto.h>
 #include <kernel/proc.h>
 
@@ -92,7 +92,7 @@ PUBLIC void arch_get_aout_headers(int i, struct exec *h)
 {
 	/* The bootstrap loader created an array of the a.out headers at
 	 * absolute address 'aout'. Get one element to h.
- */ 
+	 */
 	phys_copy(aout + i * A_MINHDR, vir2phys(h), (phys_bytes) A_MINHDR);
 }
 

@@ -63,4 +63,4 @@
   typedef _Bool bool;
 #endif
 
-#endif /* __NUCS_NUCLEOS_TYPES_H */
+#endif /* __NUCLEOS_TYPES_H */

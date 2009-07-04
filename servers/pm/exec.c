@@ -33,7 +33,7 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 #include <signal.h>
 #include <string.h>
 #include "mproc.h"
@@ -56,19 +56,19 @@ PUBLIC int do_exec()
 	mp->mp_exec_frame_len= m_in.stack_bytes;
 
 	/* Forward call to FS */
-	if (mp->mp_fs_call != PM_IDLE)
-{
+	if (mp->mp_fs_call != PM_IDLE) {
 		panic(__FILE__, "do_exec: not idle", mp->mp_fs_call);
-}
+	}
+
 	mp->mp_fs_call= PM_EXEC;
 	r= notify(FS_PROC_NR);
+
 	if (r != OK)
 		panic(__FILE__, "do_getset: unable to notify FS", r);
 
 	/* Do not reply */
 	return SUSPEND;
-  }
-
+}
 
 /*===========================================================================*
  *				exec_newmem				     *
@@ -86,19 +86,22 @@ PUBLIC int exec_newmem()
 		return EPERM;
 
 	proc_e= m_in.EXC_NM_PROC;
-	if (pm_isokendpt(proc_e, &proc_n) != OK)
-{
+
+	if (pm_isokendpt(proc_e, &proc_n) != OK) {
 		panic(__FILE__, "exec_newmem: got bad endpoint",
 			proc_e);
 	}
+
 	rmp= &mproc[proc_n];
 	ptr= m_in.EXC_NM_PTR;
+
 	r= sys_datacopy(who_e, (vir_bytes)ptr,
 		SELF, (vir_bytes)&args, sizeof(args));
+
 	if (r != OK)
 		panic(__FILE__, "exec_newmem: sys_datacopy failed", r);
 
-	if((r=vm_exec_newmem(proc_e, &args, sizeof(args), &stack_top, &flags)) == OK) {
+	if ((r=vm_exec_newmem(proc_e, &args, sizeof(args), &stack_top, &flags)) == OK) {
 		allow_setuid= 0;                /* Do not allow setuid execution */  
 
 		if ((rmp->mp_flags & TRACED) == 0) {
@@ -106,7 +109,7 @@ PUBLIC int exec_newmem()
 			allow_setuid= 1;
 			rmp->mp_effuid = args.new_uid;
 			rmp->mp_effgid = args.new_gid;
-  }
+  		}
 
 		/* System will save command line for debugging, ps(1) output, etc. */
 		strncpy(rmp->mp_name, args.progname, PROC_NAME_LEN-1);
@@ -120,9 +123,11 @@ PUBLIC int exec_newmem()
 
 		mp->mp_reply.reply_res2= (vir_bytes) stack_top;
 		mp->mp_reply.reply_res3= flags;
+
 		if (allow_setuid)
 			mp->mp_reply.reply_res3 |= EXC_NM_RF_ALLOW_SETUID;
-  }
+  	}
+
 	return r;
 }
 
@@ -138,11 +143,12 @@ PUBLIC int do_execrestart()
 		return EPERM;
 
 	proc_e= m_in.EXC_RS_PROC;
-	if (pm_isokendpt(proc_e, &proc_n) != OK)
-	{
+
+	if (pm_isokendpt(proc_e, &proc_n) != OK) {
 		panic(__FILE__, "do_execrestart: got bad endpoint",
 			proc_e);
-  }
+	}
+
 	rmp= &mproc[proc_n];
 	result= m_in.EXC_RS_RESULT;
 
@@ -172,9 +178,11 @@ int result;
 			/* Use SIGILL signal that something went wrong */
 			rmp->mp_sigstatus = SIGILL;
 			pm_exit(rmp, 0, FALSE /*!for_trace*/);
-	return;
+			return;
 		}
+
 		setreply(rmp-mproc, result);
+
 		return;
 	}
 
@@ -188,8 +196,8 @@ int result;
 			sigdelset(&rmp->mp_catch, sn);
 			rmp->mp_sigact[sn].sa_handler = SIG_DFL;
 			sigemptyset(&rmp->mp_sigact[sn].sa_mask);
-  }
-}
+		}
+	}
 
 
 	new_sp= (char *)rmp->mp_procargs;

@@ -20,7 +20,7 @@
 //
 
 	.set LOADSEG,	0x1000	// Where this code is loaded.
-	.set A_FLAGS,	2	// From a.out.h, struct exec
+	.set A_FLAGS,	2	// From nucleos/a.out.h, struct exec
 	.set A_TEXT,	8
 	.set A_DATA,	12
 	.set A_BSS,	16

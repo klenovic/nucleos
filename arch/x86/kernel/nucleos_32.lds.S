@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+
+/* Note: This is exactly like using `--oformat BFDNAME' on the command line. If
+	 both are used, the command line option takes precedence. */
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
@@ -23,7 +26,7 @@ SECTIONS
     . = ALIGN(PAGE_SIZE);
     __etext = SIZEOF(.text);
   }
-  
+
   .data 0 : AT (SIZEOF(.text)) {
     __data = .;
     /* kernel data starts with this magic number */
