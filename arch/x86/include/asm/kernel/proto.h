@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _I386_PROTO_H
-#define _I386_PROTO_H
+#ifndef __X86_ASM_KERNEL_PROTO_H
+#define __X86_ASM_KERNEL_PROTO_H
 
 #ifdef __KERNEL__
 
@@ -94,4 +94,4 @@ _PROTOTYPE( void init_dataseg, (struct segdesc_s *segdp, phys_bytes base,
                 vir_bytes size, int privilege)                          );
 _PROTOTYPE( void enable_iop, (struct proc *pp)                          );
 #endif /* __KERNEL__ */
-#endif
+#endif /* __X86_ASM_KERNEL_PROTO_H */

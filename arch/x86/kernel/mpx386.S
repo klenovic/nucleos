@@ -123,7 +123,7 @@
 .globl  p_s_call
 .globl  level0_call
 
-/* @devel: All these flags are used and defined by monitor. So this
+/* @klenovic: All these flags are used and defined by monitor. So this
            can lead into inconsistence if we change something there
            but forget to change also here! */
 
@@ -144,7 +144,7 @@
 //===========================================================================
 .globl nucleos_startup
 nucleos_startup:                // this is the entry point for the Nucleos kernel
-/* @devel: Do not put anything here otherwise boot will not find CLICK_SHIFT
+/* @klenovic: Do not put anything here otherwise boot will not find CLICK_SHIFT
            These "magic" numbers look a bit jerky and unflexible... passing
            kernel options/features via commad line or something similar would be
            cool. */
@@ -549,7 +549,7 @@ exception1:                           // Common for all exceptions.
         push    ex_number
         call    exception_handler      // (ex_number, trap_errno, old_eip,
                                        //      old_cs, old_eflags)
-                                       // @devel:defined inside C source
+                                       // @klenovic: defined inside C source
         add     $5*4, %esp
         ret
 

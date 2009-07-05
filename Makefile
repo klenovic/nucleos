@@ -434,7 +434,7 @@ export cc-install-dir cc-include-dir \
 
 ifeq ($(KBUILD_EXTMOD),)
 # Here we have setup in this Makefile plus expanded in arch Makefile
-# @devel: keep the libs as first for now
+# @klenovic: keep the libs as first for now
 nucleos-dirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y)
 nucleos-alldirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y) \
 		   $(libs-) $(drivers-) $(servers-) $(core-)

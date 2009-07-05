@@ -1,0 +1,29 @@
+menu "VFS debugging"
+config DEBUG_VFS
+	bool "VFS debugging"
+	default n
+	---help---
+	  Say Y if you want to debug VFS server.
+
+config DEBUG_VFS_BINFMT
+	bool "Debug binary formats processing"
+	default n
+	depends on DEBUG_VFS
+	---help---
+	  Say Y if want to debug processing of various binary formats.
+
+config DEBUG_VFS_ELF32
+	bool "ELF32 handling debbug"
+	depends on DEBUG_VFS_BINFMT
+	default n
+	---help---
+	  Say Y if you want to debug processing of ELF32 binaries.
+
+config DEBUG_VFS_AOUT
+	bool "AOUT handling debbug"
+	depends on DEBUG_VFS_BINFMT
+	default n
+	---help---
+	  Say Y if you want to debug processing of AOUT binaries.
+
+endmenu

@@ -27,14 +27,15 @@
 #include "vnode.h"
 #include "vmnt.h"
 
-#define STACKSIZE	0x20000 // 128KB
+/** @brief Default stack size */
+#define STACKSIZE	CONFIG_VFS_ELF32_STACKSIZE
 
 typedef Elf32_Ehdr elf32_ehdr_t;
 typedef Elf32_Phdr elf32_phdr_t;
 typedef Elf32_Shdr elf32_shdr_t;
 
-/* helper structure */
-typedef struct elf32_exec {
+/** @brief Exec info */
+typedef struct elf32_exec_info {
 	uint32_t offset_next;
 	uint32_t text_pstart;
 	uint32_t text_vstart;
@@ -49,27 +50,29 @@ typedef struct elf32_exec {
 	uint32_t symtab_size;
 	uint32_t strtab_size;
 	uint8_t sep_id;
-} elf32_exec_t;
+} elf32_exec_info_t;
 
 static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp);
 static int elf32_load_binary(struct nucleos_binprm *param);
 static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int proc_e, int seg,
 			  phys_bytes seg_bytes);
-static int elf32_map_exec(elf32_exec_t *exec, elf32_ehdr_t *ehdr, elf32_phdr_t *phdr,
+static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phdr_t *phdr,
 			  elf32_shdr_t *shdr);
-static int elf32_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stack_topp,
-			     int *load_textp, int *allow_setuidp);
+static int elf32_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_setuidp,
+			     int proc_e, struct exec_newmem *ex);
 
 int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp);
 int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp);
 int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp);
 
+#ifdef CONFIG_DEBUG_VFS_ELF32
 /* helper dump functions */
 static void elf32_dump_ehdr(elf32_ehdr_t* eh);
 static void elf32_dump_phdr(elf32_phdr_t* ph);
 static void elf32_dump_shdr(elf32_shdr_t* sh);
-static void elf32_dump_exec(elf32_exec_t* e);
+static void elf32_dump_exec(elf32_exec_info_t* e);
 static void elf32_dump_exec_newmem(struct exec_newmem *ex);
+#endif
 
 struct nucleos_binfmt binfmt_elf32 = {
 	.id = BINFMT_ELF,
@@ -79,6 +82,7 @@ struct nucleos_binfmt binfmt_elf32 = {
 
 /**
  * @brief Check whether it is aout format
+ * @param param[out]  pointer to binary parameter structure
  * @param vp[in]  pointer inode for reading exec file
  * @return 0 on success
  */
@@ -122,6 +126,7 @@ static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 		return -1;
 	}
 
+	/* Save the header for further use */
 	memcpy(param->buf, &hdr, sizeof(elf32_ehdr_t));
 	param->vp = vp;
 
@@ -134,17 +139,16 @@ static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 /**
  * @brief Load binary into the memory
  * @param param  parameters for binary format
- * @param ex  memory map structure
  * @return 0 on success
  */
 static int elf32_load_binary(struct nucleos_binprm *param)
 {
-	elf32_exec_t exec;
-	elf32_ehdr_t ehdr;
-	elf32_phdr_t *phdrs = 0;
-	elf32_shdr_t *shdrs = 0; 
 	int i = 0;
 	int err = 0;
+	elf32_exec_info_t exec;
+	elf32_ehdr_t ehdr;
+	elf32_phdr_t *phdrs = 0;
+	elf32_shdr_t *shdrs = 0;
 
 	/* Read in all headers. */
 	if (!param->checked) {
@@ -153,7 +157,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 	}
 
 	/* initialization */
-	memset(&exec, 0, sizeof(elf32_exec_t));
+	memset(&exec, 0, sizeof(elf32_exec_info_t));
 
 	/* The ehdr was read into buffer during check */
 	memcpy(&ehdr, param->buf, sizeof(elf32_ehdr_t));
@@ -170,7 +174,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 		return -1;
 	}
 
-#if 1
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("---[ELF header]---\n");
 	elf32_dump_ehdr(&ehdr);
 
@@ -186,7 +190,10 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 #endif
 	/* map on exec structure */
 	elf32_map_exec(&exec, &ehdr, phdrs, shdrs);
+
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	elf32_dump_exec(&exec);
+#endif
 
 	param->ex.sep_id = exec.sep_id;	/* separate I & D or not */
 
@@ -209,11 +216,13 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 	if (param->ex.tot_bytes == 0)
 		return -1;
 
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	elf32_dump_exec_newmem(&param->ex);
+#endif
 
-	/* allocates memory for the new process */
-	err = elf32_exec_newmem(param->proc_e, &param->ex, &param->stack_top, &param->load_text,
-			        &param->allow_setuid);
+	/* allocate memory for the new process */
+	err = elf32_exec_newmem(&param->stack_top, &param->load_text, &param->allow_setuid,
+				param->proc_e, &param->ex);
 
 	if (err) {
 		app_err("Can't allocate memory for process\n");
@@ -240,8 +249,9 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 
 				if (!exec.sep_id)
 					addr_off += sh->sh_size;
-
-				app_dbg("TEXT LOADED\n");
+#ifdef CONFIG_DEBUG_VFS_ELF32
+				app_dbg("text sections loaded\n");
+#endif
 			} else if ((sh->sh_flags & SHF_ALLOC) && (~sh->sh_flags & SHF_EXECINSTR)) {
 				/* data sections */
 				err = elf32_read_seg(param->vp, sh->sh_offset, addr_off,
@@ -253,13 +263,16 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 
 				if (!exec.sep_id)
 					addr_off += sh->sh_size;
-
-				app_dbg("DATA LOADED\n");
+#ifdef CONFIG_DEBUG_VFS_ELF32
+				app_dbg("sata sections loaded\n");
+#endif
 			}
 		}
 	}
 
-	app_dbg("%s LOADED\n",param->ex.progname);
+#ifdef CONFIG_DEBUG_VFS_ELF32
+	app_dbg("%s loaded\n",param->ex.progname);
+#endif
 
 	free(phdrs);
 	free(shdrs);
@@ -301,7 +314,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 
 			if (n > sizeof(buf))
 				n = sizeof(buf);
-#if 1
+#ifdef CONFIG_DEBUG_VFS_ELF32
 			printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 			proc_e, seg, buf, n, off+k);
 #endif
@@ -329,7 +342,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 		return 0;
 	}
 
-#if 1
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 	proc_e, seg, addr_off, seg_bytes, off);
 #endif
@@ -347,11 +360,16 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 	return err;
 }
 
-/*===========================================================================*
- *                              exec_newmem                                  *
- *===========================================================================*/
-static int elf32_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stack_topp,
-			     int *load_textp, int *allow_setuidp)
+/**
+ * @brief Exec new memory map for a process
+ * @param stack_topp[out]  top of the stack
+ * @param load_textp[out]  load text segment (otherwise present)
+ * @param allow_setuidp[out]  setuid execution is allowed (update uid and gid fields)
+ * @param proc_e[in]  process number (endpoint)
+ * @param ex[in]  pointer exec structure
+ */
+static int elf32_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_setuidp,
+			     int proc_e, struct exec_newmem *ex)
 {
 	int err;
 	message m;
@@ -364,13 +382,15 @@ static int elf32_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stac
 
 	if (err)
 		return err;
-#if 1
+
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
 #endif
 	*stack_topp= m.m1_i1;
 	*load_textp= !!(m.m1_i2 & EXC_NM_RF_LOAD_TEXT);
 	*allow_setuidp= !!(m.m1_i2 & EXC_NM_RF_ALLOW_SETUID);
-#if 1
+
+#ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("exec_newmem: stack_top = 0x%x\n", *stack_topp);
 	printf("exec_newmem: load_text = %d\n", *load_textp);
 #endif
@@ -378,11 +398,15 @@ static int elf32_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stac
 	return m.m_type;
 }
 
-
 /**
  * @brief Map headers to exec structure
+ * @param exec  pointer exec structure
+ * @param ehdr  pointer to ELF header
+ * @param phdrs  pointer to ELF program section headers
+ * @param shdrs  pointer to ELF sections hea
+ * @return 0 on success
  */
-static int elf32_map_exec(elf32_exec_t *exec, elf32_ehdr_t *ehdr, elf32_phdr_t *phdrs,
+static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phdr_t *phdrs,
 			  elf32_shdr_t *shdrs)
 {
 	int i = 0;
@@ -503,6 +527,9 @@ static int elf32_map_exec(elf32_exec_t *exec, elf32_ehdr_t *ehdr, elf32_phdr_t *
 
 /**
  * @brief Read in ELF header
+ * @param ehdr[out]  pointer to ELF header
+ * @param vp  poiner to inode descriptor to read from
+ * @return 0 on success
  */
 int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp)
 {
@@ -527,6 +554,9 @@ int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp)
 
 /**
  * @brief Read in ELF program headers
+ * @param ehdr[out]  pointer to ELF program headers
+ * @param vp  poiner to inode descriptor to read from
+ * @return 0 on success
  */
 int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 {
@@ -549,7 +579,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 		app_err("Can't allocate memory for program segment headers");
 		return ENOMEM;
 	}
-	printf("size=%d offset=0x%x\n",phdrs_sz, cvul64(ehdr->e_phoff));
+
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(ehdr->e_phoff), READING,
 			    FS_PROC_NR, (char*)*phdrs, phdrs_sz, &new_pos, &cum_io_incr);
@@ -564,6 +594,9 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 
 /**
  * @brief Read in ELF segment headers
+ * @param ehdr[out]  pointer to ELF program headers
+ * @param vp  poiner to inode descriptor to read from
+ * @return 0 on success
  */
 int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 {
@@ -599,7 +632,8 @@ int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 	return 0;
 }
 
-static void elf32_dump_exec(elf32_exec_t* e)
+#ifdef CONFIG_DEBUG_VFS_ELF32
+static void elf32_dump_exec(elf32_exec_info_t* e)
 {
 	printf("text_pstart=0x%x  ", e->text_pstart);
 	printf("text_vstart=0x%x  ", e->text_vstart);
@@ -633,7 +667,7 @@ static void elf32_dump_ehdr(elf32_ehdr_t* eh)
 	printf("phoff: 0x%x\n", eh->e_phoff);         /* Program header table file offset */
 	printf("shoff: 0x%x ", eh->e_shoff);          /* Section header table file offset */
 	printf("flags: 0x%x ", eh->e_flags);          /* Processor-specific flags */
-	printf("ehsize: 0x%x ", eh->e_ehsize);         /* ELF header size in bytes */
+	printf("ehsize: 0x%x ", eh->e_ehsize);        /* ELF header size in bytes */
 	printf("phentsize: 0x%x\n", eh->e_phentsize); /* Program header table entry size */
 	printf("phnum: 0x%x ", eh->e_phnum);          /* Program header table entry count */
 	printf("shentsize: 0x%x ", eh->e_shentsize);  /* Section header table entry size */
@@ -690,3 +724,4 @@ static void elf32_dump_exec_newmem(struct exec_newmem *ex)
 
 	return;
 }
+#endif /* CONFIG_DEBUG_VFS_ELF32 */

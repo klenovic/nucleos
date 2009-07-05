@@ -20,9 +20,6 @@
 
 #define BINFMT_BUFSIZE	128
 
-/** @brief Number of known binary formats */
-#define NUM_BINFMTS	2
-
 /* Returned by read_header for a #! script. */
 #define ESCRIPT		(-2000)
 
@@ -60,42 +57,66 @@ struct nucleos_binfmt {
 
 /**
  * @brief Array of known binary formats
- * @note This is planning to be a linked list.
+ * @note This is an zero ended array and planning to
+ *       be a linked list in the future.
  */
-extern struct nucleos_binfmt *__binfmts[NUM_BINFMTS];
+extern struct nucleos_binfmt *__binfmts[];
 
+/**
+ * @brief Number of registered binary formats
+ * @note The zero at the end of list is not considered.
+ */
+extern int num_binfmts;
+
+/**
+ * @brief Get list of known binary format handlers
+ * @return pointer to known format handlers
+ */
 static inline struct nucleos_binfmt **get_binfmts(void)
 {
 	return __binfmts;
 }
 
+/**
+ * @brief Get binary format handler
+ * @param id  binary format ID
+ * @retur pointer to handler on success otherwise 0
+ */
 static inline struct nucleos_binfmt *get_binfmt_handler(enum e_binfmt id)
 {
-	int i;
+	struct nucleos_binfmt **bf = 0;
 
-	for(i=0; i<NUM_BINFMTS; i++) {
-		if (__binfmts[i]->id == id)
+	/* Beware of gaps in the list binary formats otherwise it may
+	 * happens that no handler will found.
+	 */
+	for (bf = __binfmts; *bf != 0; bf++) {
+		if ((*bf)->id == id)
 			break;
 	}
 
-	if (i == NUM_BINFMTS)
-		return 0;
-
-	return __binfmts[i];
+	return *bf;
 }
 
+/**
+ * @brief Find format handler for executable file
+ * @param param[out]  binary format parameters
+ * @param vp  pointer to vnode
+ * @param binfmts  list of known formats
+ * @retur format ID on succes otherwise -1
+ */
 static inline int find_binfmt_handler(struct nucleos_binprm *param, struct vnode *vp,
 				      struct nucleos_binfmt **binfmts)
 {
-	int i;
 	int ret;
+	struct nucleos_binfmt **bf = 0;
 
-	for(i=0; i<NUM_BINFMTS; i++) {
-		if (binfmts[i]->check_binfmt) {
+	/* does not expect gaps in the list of structure */
+	for (bf = binfmts; *bf != 0; bf++) {
+		if ((*bf)->check_binfmt) {
 			/* this could return format id or ESCRIPT too */
-			ret = binfmts[i]->check_binfmt(param, vp);
+			ret = (*bf)->check_binfmt(param, vp);
 
-			if (ret == binfmts[i]->id || ret == ESCRIPT)
+			if (ret == (*bf)->id || ret == ESCRIPT)
 				return ret;
 		}
 	}
@@ -104,58 +125,26 @@ static inline int find_binfmt_handler(struct nucleos_binprm *param, struct vnode
 	return -1;
 }
 
-
+/* @klenovic: Once it's linked list then implement these methods */
+/**
+ * @brief Register new binary format handler
+ * @param binfmt  pointer to new binary format handler
+ * @return 0 on success
+ */
 static inline int register_binfmt(struct nucleos_binfmt *binfmt)
 {
-	int i;
-
-	/* find a free slot for binary format */
-	for (i=0; i<NUM_BINFMTS; i++) {
-		if (!__binfmts[i]) {
-			__binfmts[i] = binfmt;
-			break;
-		}
-	}
-
-	if (i == NUM_BINFMTS)
-		return -1;
-
 	return 0;
 }
 
-static inline int register_binfmts(void)
+/**
+ * @brief Unregister binary format handler
+ * @param binfmt  pointer to registered binary format handler
+ * @note This function will never fails even if not registered handler
+ *       is trying to be unregistered.
+ */
+static inline void unregister_binfmt(struct nucleos_binfmt *binfmt)
 {
-	int i;
-	int count_bfmts = 0;
-	struct nucleos_binfmt **bf = get_binfmts();
-
-	for (i=0; i<NUM_BINFMTS; i++, bf++) {
-		if (bf[i]) {
-			if (!register_binfmt(bf[i]))
-				count_bfmts++;
-		}
-	}
-	
-	/* any registered formats? */
-	if (!count_bfmts)
-		return -1;
-	
-	return 0;
-}
-
-static inline void unregister_binfmt(struct nucleos_binfmt *binfmt) 
-{
-	int i;
-
-	/* find a the binary format handler */
-	for (i=0; i<NUM_BINFMTS; i++) {
-		if (!__binfmts[i]) {
-			if (__binfmts[i]->id == binfmt->id) {
-				__binfmts[i] = 0;
-				break;
-			}
-		}
-	}
+	return;
 }
 
 #endif /* __NUCLEOS_BINFMTS_H */

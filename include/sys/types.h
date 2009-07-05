@@ -81,7 +81,7 @@ typedef long           i32_t;      /* 32 bit signed type */
 #ifdef __LONG_LONG_SUPPORTED
 typedef unsigned long long u64_t;
 #else
-/* @devel: NOT SUPPORTED
+/* @klenovic: NOT SUPPORTED
  typedef struct { u32_t _[2]; } u64_t;
  */
 #error LONG LONG NOT SUPPORTED 

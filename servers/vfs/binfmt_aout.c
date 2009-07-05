@@ -29,8 +29,8 @@
 static int aout_check_binfmt(struct nucleos_binprm *param, struct vnode *vp);
 static int aout_load_binary(struct nucleos_binprm *param);
 static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_bytes seg_bytes);
-static int aout_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stack_topp,
-			    int *load_textp, int *allow_setuidp);
+static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_setuidp,
+			    int proc_e, struct exec_newmem *ex);
 
 struct nucleos_binfmt binfmt_aout = {
 	.id = BINFMT_AOUT,
@@ -145,8 +145,8 @@ static int aout_load_binary(struct nucleos_binprm *param)
 		param->ex.text_bytes = 0;
 	}
 
-	err = aout_exec_newmem(param->proc_e, &param->ex, &param->stack_top, &param->load_text,
-			       &param->allow_setuid);
+	err = aout_exec_newmem(&param->stack_top, &param->load_text, &param->allow_setuid,
+			       param->proc_e, &param->ex);
 
 	if (err) {
 		app_err("exec failed!\n");
@@ -201,7 +201,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 			if (n > sizeof(buf))
 				n= sizeof(buf);
 
-#if 0
+#if CONFIG_DEBUG_VFS_AOUT
 			printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 			proc_e, seg, buf, n, off+k);
 #endif
@@ -246,11 +246,16 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 	return err;
 }
 
-/*===========================================================================*
- *                              exec_newmem                                  *
- *===========================================================================*/
-static int aout_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stack_topp,
-		       int *load_textp, int *allow_setuidp)
+/**
+ * @brief Exec new memory map for a process
+ * @param stack_topp[out]  top of the stack
+ * @param load_textp[out]  load text segment (otherwise present)
+ * @param allow_setuidp[out]  setuid execution is allowed (update uid and gid fields)
+ * @param proc_e[in]  process number (endpoint)
+ * @param ex[in]  pointer exec structure
+ */
+static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_setuidp,
+			    int proc_e, struct exec_newmem *ex)
 {
 	int err;
 	message m;
@@ -263,13 +268,13 @@ static int aout_exec_newmem(int proc_e, struct exec_newmem *ex, vir_bytes *stack
 
 	if (err)
 		return err;
-#if 0
+#if CONFIG_DEBUG_VFS_AOUT
 	printf("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
 #endif
 	*stack_topp= m.m1_i1;
 	*load_textp= !!(m.m1_i2 & EXC_NM_RF_LOAD_TEXT);
 	*allow_setuidp= !!(m.m1_i2 & EXC_NM_RF_ALLOW_SETUID);
-#if 0
+#if CONFIG_DEBUG_VFS_AOUT
 	printf("exec_newmem: stack_top = 0x%x\n", *stack_topp);
 	printf("exec_newmem: load_text = %d\n", *load_textp);
 #endif

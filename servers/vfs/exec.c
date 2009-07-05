@@ -149,19 +149,26 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 				bfmt_param.ex.new_gid = vp->v_gid;
 		}
 
+#ifdef CONFIG_DEBUG_VFS_BINFMT
 		app_dbg("Looking for format handler ...\n");
+#endif
 		/* go throught all registered binary formats and choose one which conforms */
 		r = find_binfmt_handler(&bfmt_param, vp, get_binfmts());
+#ifdef CONFIG_DEBUG_VFS_BINFMT
 		app_dbg("Found format handler ID=0x%x\n", r);
+#endif
 		if (r != ESCRIPT || round != 0) {
 			/* get the format handler according to found id */
 			bhandler = get_binfmt_handler(r);
+#ifdef CONFIG_DEBUG_VFS_BINFMT
 			app_dbg("handler ID=0%x\n",bhandler->id);
+#endif
 			r = OK;
 			break;
 		}
+#ifdef CONFIG_DEBUG_VFS_BINFMT
 		app_dbg("Continue processing...\n");
-
+#endif
 		/* Get fresh copy of the file name. */
 		r = fetch_name(path, path_len, 0);
 

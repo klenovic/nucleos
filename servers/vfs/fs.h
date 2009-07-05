@@ -14,9 +14,13 @@
 #define APPVERSION	__APPVERSION__
 #define APPTYPE		__APPTYPE__
 
+#ifdef CONFIG_DEBUG_VFS
 #define app_dbg(format, args...) \
 	printf("D:%s:%s:%s:%d:" format, MKSTR(APPTYPE), MKSTR(APPNAME), \
 					__FUNCTION__, __LINE__, ##args);
+#else
+#define app_dbg(format, args...)
+#endif
 
 #define app_info(format, args...) \
 	printf("I:%s:%s:" format, MKSTR(APPTYPE), MKSTR(APPNAME), ##args);

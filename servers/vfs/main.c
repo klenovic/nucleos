@@ -56,11 +56,22 @@ static void service_pm(void);
 /**
  * @brief Array of known binary formats
  * @note This is planning to be a linked list.
+ *       Keep the default format as the first. It speeds
+ *       up the things.
  */
-struct nucleos_binfmt *__binfmts[NUM_BINFMTS] = {
-	[0] = &binfmt_aout,
-	[1] = &binfmt_elf32,
+struct nucleos_binfmt *__binfmts[] = {
+#ifdef CONFIG_VFS_AOUT_BINFMT
+	&binfmt_aout,
+#endif
+
+#ifdef CONFIG_VFS_ELF32_BINFMT
+	&binfmt_elf32,
+#endif
+	0,
 };
+
+/* @brief Number of register binary formats */
+int num_binfmts = sizeof(__binfmts)/sizeof(struct nucleos_binfmt*) - 1;
 
 /*===========================================================================*
  *				main					     *
@@ -425,10 +436,6 @@ static void fs_init(void)
 	}
 
 	system_hz = sys_hz();
-
-	/* register all binary formats */
-	register_binfmts();
-	app_dbg("Binary formats registered\n");
 }
 
 /*===========================================================================*
