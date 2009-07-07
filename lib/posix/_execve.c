@@ -45,27 +45,23 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	string_off = 0;		/* Offset to start of the strings. */
 	argc = 0;		/* Argument count. */
 
-	if (argv) {
-		for (ap = argv; *ap != 0; ap++) {
-			n = sizeof(*ap) + strlen(*ap) + 1;
-			frame_size += n;
+	for (ap = argv; *ap != 0; ap++) {
+		n = sizeof(*ap) + strlen(*ap) + 1;
+		frame_size += n;
 
-			if (frame_size < n) ov = 1;
+		if (frame_size < n) ov = 1;
 
-			string_off += sizeof(*ap);
-			argc++;
-		}
+		string_off += sizeof(*ap);
+		argc++;
 	}
 
-	if (envp) {
-		for (ep = envp; *ep != 0; ep++) {
-			n = sizeof(*ep) + strlen(*ep) + 1;
-			frame_size += n;
+	for (ep = envp; *ep != 0; ep++) {
+		n = sizeof(*ep) + strlen(*ep) + 1;
+		frame_size += n;
 
-			if (frame_size < n) ov = 1;
+		if (frame_size < n) ov = 1;
 
-			string_off+= sizeof(*ap);
-		}
+		string_off+= sizeof(*ap);
 	}
 
 	/* Add an argument count and two terminating nulls. */
@@ -92,30 +88,26 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	vp = (char **) (frame + sizeof(argc));
 	sp = frame + string_off;
 
-	if (argv) {
-		/* Load the argument vector and strings. */
-		for (ap = argv; *ap != 0; ap++) {
-			*vp++ = (char *) (sp - frame);
-			n = strlen(*ap) + 1;
+	/* Load the argument vector and strings. */
+	for (ap = argv; *ap != 0; ap++) {
+		*vp++ = (char *) (sp - frame);
+		n = strlen(*ap) + 1;
 
-			memcpy(sp, *ap, n);
+		memcpy(sp, *ap, n);
 
-			sp += n;
-		}
+		sp += n;
 	}
 
 	*vp++ = 0;
 
-	if (envp) {
-		/* Load the environment vector and strings. */
-		for (ep = envp; *ep != 0; ep++) {
-			*vp++ = (char *) (sp - frame);
-			n = strlen(*ep) + 1;
+	/* Load the environment vector and strings. */
+	for (ep = envp; *ep != 0; ep++) {
+		*vp++ = (char *) (sp - frame);
+		n = strlen(*ep) + 1;
 
-			memcpy(sp, *ep, n);
+		memcpy(sp, *ep, n);
 
-			sp += n;
-		}
+		sp += n;
 	}
 
 	*vp++ = 0;
