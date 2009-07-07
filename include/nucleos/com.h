@@ -46,8 +46,8 @@
  * of system processes defines how many processes with special privileges
  * there can be. User processes share the same properties and count for one.
  */
-#define NR_PROCS	CONFIG_NR_PROCS
 #define NR_SYS_PROCS	CONFIG_NR_SYS_PROCS
+#define NR_PROCS	CONFIG_NR_PROCS
 
 /* Number of controller tasks (/dev/cN device classes). */
 #define NR_CTRLRS	CONFIG_NR_CTRLRS

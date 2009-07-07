@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* The object file of "table.c" contains most kernel data. Variables that 
+/* The object file of "table.c" contains most kernel data. Variables that
  * are declared in the *.h files appear with EXTERN in front of them, as in
  *
  *    EXTERN int x;
@@ -22,13 +22,13 @@
  * so they are declared extern when included normally.  However, it must be
  * declared for real somewhere.  That is done here, by redefining EXTERN as
  * the null string, so that inclusion of all *.h files in table.c actually
- * generates storage for them.  
+ * generates storage for them.
  *
  * Various variables could not be declared EXTERN, but are declared PUBLIC
- * or PRIVATE. The reason for this is that extern variables cannot have a  
+ * or PRIVATE. The reason for this is that extern variables cannot have a
  * default initialization. If such variables are shared, they must also be
- * declared in one of the *.h files without the initialization.  Examples 
- * include 'boot_image' (this file) and 'idt' and 'gdt' (protect.c). 
+ * declared in one of the *.h files without the initialization.  Examples
+ * include 'boot_image' (this file) and 'idt' and 'gdt' (protect.c).
  *
  * Changes:
  *    Aug 02, 2005   set privileges and minimal boot image (Jorrit N. Herder)
@@ -103,39 +103,38 @@ PRIVATE int
   ds_c[] = { SYS_ALL_CALLS },
   vm_c[] = { SYS_ALL_CALLS },
   drv_c[] = { DRV_C },
-  tty_c[] = { DRV_C, SYS_PHYSCOPY, SYS_ABORT, SYS_IOPENABLE,
-		SYS_READBIOS },
+  tty_c[] = { DRV_C, SYS_PHYSCOPY, SYS_ABORT, SYS_IOPENABLE, SYS_READBIOS },
   mem_c[] = { DRV_C, SYS_PHYSCOPY, SYS_PHYSVCOPY, SYS_IOPENABLE };
 
-/* The system image table lists all programs that are part of the boot image. 
+/* The system image table lists all programs that are part of the boot image.
  * The order of the entries here MUST agree with the order of the programs
  * in the boot image and all kernel tasks must come first.
  *
  * Each entry provides the process number, flags, quantum size, scheduling
- * queue, allowed traps, ipc mask, and a name for the process table. The 
+ * queue, allowed traps, ipc mask, and a name for the process table. The
  * initial program counter and stack size is also provided for kernel tasks.
  *
- * Note: the quantum size must be positive in all cases! 
+ * Note: the quantum size must be positive in all cases!
  */
 #define c(calls) calls, (sizeof(calls) / sizeof((calls)[0]))
 #define no_c  (int*)0, 0
 
 PUBLIC struct boot_image image[] = {
-/* process nr, pc,flags, qs,  queue, stack, traps, ipcto, call,  name */
-{IDLE,  idle_task,IDL_F,  8, IDLE_Q, IDL_S,     0,     0, no_c, "idle"     },
-{CLOCK,clock_task,TSK_F,  8, TASK_Q, TSK_S, TSK_T,     0, no_c, "clock"    },
-{SYSTEM, sys_task,TSK_F,  8, TASK_Q, TSK_S, TSK_T,     0, no_c, "system"   },
-{HARDWARE,      0,TSK_F,  8, TASK_Q, HRD_S,     0,     0, no_c, "kernel"   },
-{PM_PROC_NR,    0,SVM_F, 32,      4, 0,     SRV_T, SRV_M, c(pm_c), "pm"    },
-{FS_PROC_NR,    0,SVM_F, 32,      5, 0,     SRV_T, SRV_M, c(fs_c), "vfs"   },
-{RS_PROC_NR,    0,SVM_F,  4,      4, 0,     SRV_T, SYS_M, c(rs_c), "rs"    },
-{DS_PROC_NR,    0,SVM_F,  4,      4, 0,     SRV_T, SYS_M, c(ds_c), "ds"    },
-{TTY_PROC_NR,   0,SVM_F,  4,      1, 0,     SRV_T, SYS_M,c(tty_c), "tty"   },
-{MEM_PROC_NR,   0,SVM_F,  4,      3, 0,     SRV_T, SYS_M,c(mem_c), "memory"},
-{LOG_PROC_NR,   0,SVM_F,  4,      2, 0,     SRV_T, SYS_M,c(drv_c), "log"   },
-{MFS_PROC_NR,   0,SVM_F, 32,      5, 0,     SRV_T, SRV_M, c(fs_c), "mfs"   },
-{VM_PROC_NR,    0,SRV_F, 32,      2, 0,     SRV_T, SRV_M, c(vm_c), "vm"    },
-{INIT_PROC_NR,  0,USR_F,  8, USER_Q, 0,     USR_T, USR_M, no_c, "init"     },
+	/* process nr, pc,flags, qs,  queue, stack, traps, ipcto, call,  name */
+	{IDLE,          idle_task, IDL_F,  8, IDLE_Q, IDL_S,     0,     0,    no_c,   "idle" },
+	{CLOCK,        clock_task, TSK_F,  8, TASK_Q, TSK_S, TSK_T,     0,    no_c,  "clock" },
+	{SYSTEM,         sys_task, TSK_F,  8, TASK_Q, TSK_S, TSK_T,     0,    no_c, "system" },
+	{HARDWARE,              0, TSK_F,  8, TASK_Q, HRD_S,     0,     0,    no_c, "kernel" },
+	{PM_PROC_NR,            0, SVM_F, 32,      4,     0, SRV_T, SRV_M, c(pm_c),     "pm" },
+	{FS_PROC_NR,            0, SVM_F, 32,      5,     0, SRV_T, SRV_M, c(fs_c),    "vfs" },
+	{RS_PROC_NR,            0, SVM_F,  4,      4,     0, SRV_T, SYS_M, c(rs_c),     "rs" },
+	{DS_PROC_NR,            0, SVM_F,  4,      4,     0, SRV_T, SYS_M, c(ds_c),     "ds" },
+	{TTY_PROC_NR,           0, SVM_F,  4,      1,     0, SRV_T, SYS_M,c(tty_c),    "tty" },
+	{MEM_PROC_NR,           0, SVM_F,  4,      3,     0, SRV_T, SYS_M,c(mem_c), "memory" },
+	{LOG_PROC_NR,           0, SVM_F,  4,      2,     0, SRV_T, SYS_M,c(drv_c),    "log" },
+	{MFS_PROC_NR,           0, SVM_F, 32,      5,     0, SRV_T, SRV_M, c(fs_c),    "mfs" },
+	{VM_PROC_NR,            0, SRV_F, 32,      2,     0, SRV_T, SRV_M, c(vm_c),     "vm" },
+	{INIT_PROC_NR,          0, USR_F,  8, USER_Q,     0, USR_T, USR_M,    no_c,   "init" },
 };
 
 /* Verify the size of the system image table at compile time. Also verify that 

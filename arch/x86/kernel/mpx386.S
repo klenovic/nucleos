@@ -426,10 +426,6 @@ restart:
         mov     %eax, tss+TSS3_S_SP0   // to save state in process table
 restart1:
         decb    k_reenter
-//    o16 pop     %gs
-//    o16 pop     %fs
-//    o16 pop     %es
-//    o16 pop     %ds
         popw     %gs
         popw     %fs
         popw     %es

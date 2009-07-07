@@ -59,7 +59,7 @@ int nr;
   util_stacktrace();
 
   /* Abort MINIX. */
-  minix_shutdown(NULL);
+  nucleos_shutdown(NULL);
 }
 
 

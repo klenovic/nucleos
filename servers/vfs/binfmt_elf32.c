@@ -213,6 +213,9 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 		param->ex.text_bytes = 0;
 	}	
 
+	/* entry point of process */
+	param->ex.entry_point = exec.entry_point;
+
 	if (param->ex.tot_bytes == 0)
 		return -1;
 

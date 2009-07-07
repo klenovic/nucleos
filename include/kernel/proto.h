@@ -33,7 +33,7 @@ _PROTOTYPE( void ser_dump_proc, (void)					);
 /* main.c */
 _PROTOTYPE( void main, (void)						);
 _PROTOTYPE( void prepare_shutdown, (int how)				);
-_PROTOTYPE( void minix_shutdown, (struct timer *tp)			);
+_PROTOTYPE( void nucleos_shutdown, (struct timer *tp)			);
 _PROTOTYPE( void idle_task, (void)					);
 
 /* utility.c */
