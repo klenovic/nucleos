@@ -27,10 +27,10 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef __ELF_H
-#define	__ELF_H
+#ifndef __NUCLEOS_ELF_H
+#define __NUCLEOS_ELF_H
 
-#include <nucleos/types.h>
+#include <stdint.h>
 
 /* Type for a 16-bit quantity.  */
 typedef uint16_t Elf32_Half;
@@ -63,7 +63,6 @@ typedef uint16_t Elf64_Section;
 /* Type of symbol indices.  */
 typedef uint32_t Elf32_Symndx;
 typedef uint64_t Elf64_Symndx;
-
 
 /* The ELF file header.  This appears at the start of every ELF file.  */
 

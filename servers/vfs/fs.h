@@ -10,6 +10,28 @@
 #ifndef __SERVERS_VFS_FS_H
 #define __SERVERS_VFS_FS_H
 
+#define APPNAME		__APPNAME__
+#define APPVERSION	__APPVERSION__
+#define APPTYPE		__APPTYPE__
+
+#ifdef CONFIG_DEBUG_VFS
+#define app_dbg(format, args...) \
+	printf("D:%s:%s:%s:%d:" format, MKSTR(APPTYPE), MKSTR(APPNAME), \
+					__FUNCTION__, __LINE__, ##args);
+#else
+#define app_dbg(format, args...)
+#endif
+
+#define app_info(format, args...) \
+	printf("I:%s:%s:" format, MKSTR(APPTYPE), MKSTR(APPNAME), ##args);
+
+#define app_warn(format, args...) \
+	printf("W:%s:%s:" format, MKSTR(APPTYPE), MKSTR(APPNAME), ##args);
+
+#define app_err(format, args...) \
+	printf("E:%s:%s:%s:%d:" format, MKSTR(APPTYPE), MKSTR(APPNAME), \
+					__FUNCTION__, __LINE__, ##args);
+
 /* This is the master header for fs.  It includes some other files
  * and defines the principal constants.
  */
@@ -50,3 +72,4 @@
 #include "glo.h"
 
 #endif /* __SERVERS_VFS_FS_H */
+

@@ -346,8 +346,6 @@ int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shd
 {
 	int i = 0;
 
-	memset(exec, 0, sizeof(*exec));
-
 	// Initialize a local bootinfo record
 	memset ((void*) exec, 0, sizeof (*exec));
 

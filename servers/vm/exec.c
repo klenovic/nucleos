@@ -84,6 +84,7 @@ PUBLIC int do_exec_newmem(message *msg)
 	SANITYCHECK(SCL_FUNCTIONS);
 
 	proc_e= msg->VMEN_ENDPOINT;
+
 	if (vm_isokendpt(proc_e, &proc_n) != OK)
 	{
 		printf("VM:exec_newmem: bad endpoint %d from %d\n",
@@ -93,12 +94,13 @@ PUBLIC int do_exec_newmem(message *msg)
 	vmp= &vmproc[proc_n];
 	ptr= msg->VMEN_ARGSPTR;
 
-	if(msg->VMEN_ARGSSIZE != sizeof(args)) {
+	if (msg->VMEN_ARGSSIZE != sizeof(args)) {
 		printf("VM:exec_newmem: args size %d != %ld\n",
 			msg->VMEN_ARGSSIZE, sizeof(args));
 		return EINVAL;
 	}
-SANITYCHECK(SCL_DETAIL);
+
+	SANITYCHECK(SCL_DETAIL);
 
 	r= sys_datacopy(msg->m_source, (vir_bytes)ptr,
 		SELF, (vir_bytes)&args, sizeof(args));
@@ -110,11 +112,14 @@ SANITYCHECK(SCL_DETAIL);
 	dc = (args.data_bytes+args.bss_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 	totc = (args.tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 	sc = (args.args_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
+
 	if (dc >= totc) return(ENOEXEC); /* stack must be at least 1 click */
 
 	dvir = (args.sep_id ? 0 : tc);
 	s_vir = dvir + (totc - sc);
+
 	r = (dvir + dc > s_vir) ? ENOMEM : OK;
+
 	if (r != OK)
 		return r;
 
@@ -146,9 +151,9 @@ SANITYCHECK(SCL_DETAIL);
 	else
 		vmp->vm_flags &= ~VMF_SEPARATE;
 
-	
 	msg->VMEN_STACK_TOP = (void *) stack_top;
 	msg->VMEN_FLAGS = 0;
+
 	if (!sh_mp)			 /* Load text if sh_mp = NULL */
 		msg->VMEN_FLAGS |= EXC_NM_RF_LOAD_TEXT;
 

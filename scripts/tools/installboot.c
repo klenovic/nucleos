@@ -362,7 +362,7 @@ int read_iheader_aout(int talk, char *proc, FILE *procf, struct MNX(image_header
     strncpy(ihdr->name, basename(proc), IM_NAME_MAX);
 
     /* Read the header. 
-       @devel: FYI, this will move the pointer inside stream */
+       @klenovic: FYI, this will move the pointer inside stream */
     n = fread(phdr, sizeof(char), A_MINHDR, procf);
     if (ferror(procf))
       fatal(proc);
@@ -901,7 +901,7 @@ void make_bootable(enum howto how, char* device, char* bootblock,
 
   binfmt = RAW;
   /* Get the boot block (from device) and patch the pieces in. 
-     @devel: This does probably just an lseek (position set 0).
+     @klenovic: This does probably just an lseek (position set 0).
    */
   readblock(BOOTBLOCK, buf, BOOT_BLOCK_SIZE);
 
@@ -946,9 +946,9 @@ void make_bootable(enum howto how, char* device, char* bootblock,
 
   if (binfmt == AOUT) {
     /* All checks out right.  Read bootblock into the boot block!
-       @devel: FYI, since we did an fread on this stream (read the header)
-               the position pointer has moved thus the header is not read
-               again. */
+       @klenovic: FYI, since we did an fread on this stream (read the header)
+                  the position pointer has moved thus the header is not read
+                  again. */
     bread(bootf, bootblock, buf, bootx_exec_aout.a_text + bootx_exec_aout.a_data);
     (void) fclose(bootf);
   } else /* RAW */{

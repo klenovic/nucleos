@@ -15,7 +15,7 @@
 #include <asm/kernel/proto.h>
 #include <nucleos/safecopies.h>
 #include <asm/kernel/types.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 
 #ifdef __KERNEL__
 
@@ -33,7 +33,7 @@ _PROTOTYPE( void ser_dump_proc, (void)					);
 /* main.c */
 _PROTOTYPE( void main, (void)						);
 _PROTOTYPE( void prepare_shutdown, (int how)				);
-_PROTOTYPE( void minix_shutdown, (struct timer *tp)			);
+_PROTOTYPE( void nucleos_shutdown, (struct timer *tp)			);
 _PROTOTYPE( void idle_task, (void)					);
 
 /* utility.c */

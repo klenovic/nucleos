@@ -25,8 +25,8 @@
 #if defined (__KERNEL__) || defined (__UKERNEL__)
 struct proc {
 	struct stackframe_s p_reg;	/* process' registers saved in stack frame */
-	struct segframe p_seg;	/* segment descriptors */
-	proc_nr_t p_nr;		/* number of this process (for fast access) */
+	struct segframe p_seg;		/* segment descriptors */
+	proc_nr_t p_nr;			/* number of this process (for fast access) */
 	struct priv *p_priv;		/* system privileges structure */
 	short p_rts_flags;		/* process is runnable only if zero */
 	short p_misc_flags;		/* flags that do not suspend the process */
@@ -36,25 +36,25 @@ struct proc {
 	char p_ticks_left;		/* number of scheduling ticks left */
 	char p_quantum_size;		/* quantum size in ticks */
 
-	struct mem_map p_memmap[NR_LOCAL_SEGS];   /* memory map (T, D, S) */
-	struct pagefault p_pagefault;	/* valid if PAGEFAULT in p_rts_flags set */
-	struct proc *p_nextpagefault;	/* next on PAGEFAULT chain */
+	struct mem_map p_memmap[NR_LOCAL_SEGS];	/* memory map (T, D, S) */
+	struct pagefault p_pagefault;		/* valid if PAGEFAULT in p_rts_flags set */
+	struct proc *p_nextpagefault;		/* next on PAGEFAULT chain */
 
 	clock_t p_user_time;		/* user time in ticks */
 	clock_t p_sys_time;		/* sys time in ticks */
 
 	struct proc *p_nextready;	/* pointer to next ready process */
 	struct proc *p_caller_q;	/* head of list of procs wishing to send */
-	struct proc *p_q_link;	/* link to next proc wishing to send */
+	struct proc *p_q_link;		/* link to next proc wishing to send */
 	message *p_messbuf;		/* pointer to passed message buffer */
 	int p_getfrom_e;		/* from whom does process want to receive? */
-	int p_sendto_e;		/* to whom does process want to send? */
+	int p_sendto_e;			/* to whom does process want to send? */
 
 	sigset_t p_pending;		/* bit map for pending kernel signals */
 
 	char p_name[P_NAME_LEN];	/* name of the process, including \0 */
 
-	endpoint_t p_endpoint;	/* endpoint number, generation-aware */
+	endpoint_t p_endpoint;		/* endpoint number, generation-aware */
 
 	/* If handler functions detect a process wants to do something with
 	 * memory that isn't present, VM has to fix it. Until it has asked

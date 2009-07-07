@@ -21,6 +21,9 @@ config SERVERS_LINKAGE_TYPE
   default "0x00" if SERVERS_LINKAGE_COMID=y
   default "0x20" if SERVERS_LINKAGE_SEPID=y
 
+# VFS server
+source "servers/vfs/Kconfig"
+
 # Servers debugging/hacking
 source "servers/Kconfig.debug"
 

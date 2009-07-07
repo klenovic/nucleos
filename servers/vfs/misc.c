@@ -648,7 +648,3 @@ struct mem_map *seg_ptr;
         
 	return OK;
 }
-
-
-
-

@@ -749,6 +749,4 @@ message *m_ptr;
 			m_ptr->m_type);
 		break;
 	}
-
 }
-

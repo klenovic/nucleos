@@ -9,8 +9,8 @@
  */
 /* The <a.out> header file describes the format of executable files. */
 
-#ifndef _AOUT_H
-#define _AOUT_H
+#ifndef __NUCLEOS_AOUT_H
+#define __NUCLEOS_AOUT_H
 
 struct	exec {			/* a.out header */
   unsigned char	a_magic[2];	/* magic number */
@@ -124,4 +124,4 @@ struct nlist {			/* symbol table entry */
 
 _PROTOTYPE( int nlist, (char *_file, struct nlist *_nl)			);
 
-#endif /* _AOUT_H */
+#endif /* __NUCLEOS_AOUT_H */

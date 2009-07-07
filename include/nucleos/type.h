@@ -15,6 +15,7 @@
 #endif
 
 #include <kernel/const.h>
+#include <nucleos/const.h>
 
 /* Type definitions. */
 typedef unsigned int vir_clicks;	/* virtual addr/length in clicks */
@@ -147,13 +148,14 @@ struct exec_newmem
 	vir_bytes bss_bytes;
 	vir_bytes tot_bytes;
 	vir_bytes args_bytes;
+	vir_bytes entry_point;
 	int sep_id;
 	dev_t st_dev;
 	ino_t st_ino;
 	time_t st_ctime;
 	uid_t new_uid;
 	gid_t new_gid;
-	char progname[16];	/* Should be at least PROC_NAME_LEN */
+	char progname[PROC_NAME_LEN];	/* Should be at least PROC_NAME_LEN */
 };
 
 /* Memory chunks. */

@@ -9,7 +9,7 @@
  */
 
 #include <sys/stat.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 #include <tools.h>
 
 #include "vm.h"

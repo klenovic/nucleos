@@ -13,7 +13,6 @@
 
 #define _MINIX_SOURCE
 
-#define nil 0
 #define execve _execve
 #define sbrk _sbrk
 #include <lib.h>
@@ -41,63 +40,89 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	 * by the kernel to be used for the process to be executed.
 	 */
 
-	ov= 0;			/* No overflow yet. */
-	frame_size= 0;		/* Size of the new initial stack. */
-	string_off= 0;		/* Offset to start of the strings. */
-	argc= 0;		/* Argument count. */
+	ov = 0;			/* No overflow yet. */
+	frame_size = 0;		/* Size of the new initial stack. */
+	string_off = 0;		/* Offset to start of the strings. */
+	argc = 0;		/* Argument count. */
 
-	for (ap= argv; (*ap != 0) && (*ap != nil); ap++) {
-		n = sizeof(*ap) + strlen(*ap) + 1;
-		frame_size+= n;
-		if (frame_size < n) ov= 1;
-		string_off+= sizeof(*ap);
-		argc++;
+	if (argv) {
+		for (ap = argv; *ap != 0; ap++) {
+			n = sizeof(*ap) + strlen(*ap) + 1;
+			frame_size += n;
+
+			if (frame_size < n) ov = 1;
+
+			string_off += sizeof(*ap);
+			argc++;
+		}
 	}
 
-	for (ep= envp; (envp != 0) && (*ep != nil); ep++) {
-		n = sizeof(*ep) + strlen(*ep) + 1;
-		frame_size+= n;
-		if (frame_size < n) ov= 1;
-		string_off+= sizeof(*ap);
+	if (envp) {
+		for (ep = envp; *ep != 0; ep++) {
+			n = sizeof(*ep) + strlen(*ep) + 1;
+			frame_size += n;
+
+			if (frame_size < n) ov = 1;
+
+			string_off+= sizeof(*ap);
+		}
 	}
+
 	/* Add an argument count and two terminating nulls. */
-	frame_size+= sizeof(argc) + sizeof(*ap) + sizeof(*ep);
-	string_off+= sizeof(argc) + sizeof(*ap) + sizeof(*ep);
+	frame_size += sizeof(argc) + sizeof(*ap) + sizeof(*ep);
+	string_off += sizeof(argc) + sizeof(*ap) + sizeof(*ep);
+
 	/* Align. */
-	frame_size= (frame_size + sizeof(char *) - 1) & ~(sizeof(char *) - 1);
+	frame_size = (frame_size + sizeof(char *) - 1) & ~(sizeof(char *) - 1);
+
 	/* The party is off if there is an overflow. */
 	if (ov || frame_size < 3 * sizeof(char *)) {
 		errno= E2BIG;
 		return -1;
 	}
+
 	/* Allocate space for the stack frame. */
 	if ((frame = (char *) sbrk(frame_size)) == (char *) -1) {
 		errno = E2BIG;
 		return -1;
 	}
+
 	/* Set arg count, init pointers to vector and string tables. */
-	* (size_t *) frame = argc;
+	*(size_t*)frame = argc;
 	vp = (char **) (frame + sizeof(argc));
 	sp = frame + string_off;
 
-	/* Load the argument vector and strings. */
-	for (ap= argv; (*ap != 0) && (*ap != nil); ap++) {
-		*vp++= (char *) (sp - frame);
-		n= strlen(*ap) + 1;
-		memcpy(sp, *ap, n);
-		sp+= n;
+	if (argv) {
+		/* Load the argument vector and strings. */
+		for (ap = argv; *ap != 0; ap++) {
+			*vp++ = (char *) (sp - frame);
+			n = strlen(*ap) + 1;
+
+			memcpy(sp, *ap, n);
+
+			sp += n;
+		}
 	}
-	*vp++= nil;
-	/* Load the environment vector and strings. */
-	for (ep= envp; (envp != 0) && (*ep != nil); ep++) {
-		*vp++= (char *) (sp - frame);
-		n= strlen(*ep) + 1;
-		memcpy(sp, *ep, n);
-		sp+= n;
+
+	*vp++ = 0;
+
+	if (envp) {
+		/* Load the environment vector and strings. */
+		for (ep = envp; *ep != 0; ep++) {
+			*vp++ = (char *) (sp - frame);
+			n = strlen(*ep) + 1;
+
+			memcpy(sp, *ep, n);
+
+			sp += n;
+		}
 	}
-	*vp++= nil;
+
+	*vp++ = 0;
+
 	/* Padding. */
-	while (sp < frame + frame_size) *sp++= 0;
+	while (sp < frame + frame_size) *sp++ = 0;
+
 	/* We can finally make the system call. */
 	m.m1_i1 = strlen(path) + 1;
 	m.m1_i2 = frame_size;
@@ -111,5 +136,6 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	(void) _syscall(MM, EXEC, &m);
 	/* Failure, return the memory used for the frame and exit. */
 	(void) sbrk(-frame_size);
+
 	return -1;
 }

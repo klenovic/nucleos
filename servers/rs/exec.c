@@ -8,27 +8,24 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "inc.h"
-#include <a.out.h>
+#include <nucleos/a.out.h>
 
 #define BLOCK_SIZE	1024
 
-static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
-	char *frame, int frame_len);
-FORWARD _PROTOTYPE( int read_header, (char *exec, size_t exec_len, int *sep_id,
-	vir_bytes *text_bytes, vir_bytes *data_bytes,
-	vir_bytes *bss_bytes, phys_bytes *tot_bytes, vir_bytes *pc,
-	int *hdrlenp)							);
-FORWARD _PROTOTYPE( int exec_newmem, (int proc_e, vir_bytes text_bytes,
-	vir_bytes data_bytes, vir_bytes bss_bytes, vir_bytes tot_bytes,
-	vir_bytes frame_len, int sep_id,
-	Dev_t st_dev, ino_t st_ino, time_t st_ctime, char *progname,
-	int new_uid, int new_gid,
-	vir_bytes *stack_topp, int *load_textp, int *allow_setuidp)	);
-FORWARD _PROTOTYPE( int exec_restart, (int proc_e, int result)		);
-FORWARD _PROTOTYPE( void patch_ptr, (char stack[ARG_MAX],
-							vir_bytes base)	);
-FORWARD _PROTOTYPE( int read_seg, (char *exec, size_t exec_len, off_t off,
-	int proc_e, int seg, phys_bytes seg_bytes)			);
+static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname, char *frame,
+		    int frame_len);
+static int read_header(char *exec, size_t exec_len, int *sep_id, vir_bytes *text_bytes,
+		       vir_bytes *data_bytes, vir_bytes *bss_bytes, phys_bytes *tot_bytes,
+		       vir_bytes *pc, int *hdrlenp);
+static int exec_newmem(int proc_e, vir_bytes text_bytes, vir_bytes data_bytes,
+		       vir_bytes bss_bytes, vir_bytes tot_bytes, vir_bytes frame_len,
+		       int sep_id, Dev_t st_dev, ino_t st_ino, time_t st_ctime,
+		       char *progname, int new_uid, int new_gid, vir_bytes *stack_topp,
+		       int *load_textp, int *allow_setuidp, vir_bytes entry_point);
+static int exec_restart(int proc_e, int result);
+static void patch_ptr(char stack[ARG_MAX],vir_bytes base);
+static int read_seg(char *exec, size_t exec_len, off_t off, int proc_e, int seg,
+		    phys_bytes seg_bytes);
 
 static int self_e= NONE;
 
@@ -166,7 +163,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	r= exec_newmem(proc_e, text_bytes, data_bytes, bss_bytes, tot_bytes,
 		frame_len, sep_id, 0 /*dev*/, proc_e /*inum*/, 0 /*ctime*/, 
 		progname, new_uid, new_gid, &stack_top, &load_text,
-		&allow_setuid);
+		&allow_setuid, pc);
 	if (r != OK)
 	{
 		printf("do_exec: exec_newmap failed: %d\n", r);
@@ -223,9 +220,9 @@ fail:
 /*===========================================================================*
  *				exec_newmem				     *
  *===========================================================================*/
-PRIVATE int exec_newmem(proc_e, text_bytes, data_bytes, bss_bytes, tot_bytes,
+static int exec_newmem(proc_e, text_bytes, data_bytes, bss_bytes, tot_bytes,
 	frame_len, sep_id, st_dev, st_ino, st_ctime, progname,
-	new_uid, new_gid, stack_topp, load_textp, allow_setuidp)
+	new_uid, new_gid, stack_topp, load_textp, allow_setuidp, entry_point)
 int proc_e;
 vir_bytes text_bytes;
 vir_bytes data_bytes;
@@ -242,37 +239,39 @@ char *progname;
 vir_bytes *stack_topp;
 int *load_textp;
 int *allow_setuidp;
+vir_bytes entry_point;
 {
 	int r;
 	struct exec_newmem e;
 	message m;
 
-	e.text_bytes= text_bytes;
-	e.data_bytes= data_bytes;
-	e.bss_bytes= bss_bytes;
-	e.tot_bytes= tot_bytes;
-	e.args_bytes= frame_len;
-	e.sep_id= sep_id;
-	e.st_dev= st_dev;
-	e.st_ino= st_ino;
-	e.st_ctime= st_ctime;
-	e.new_uid= new_uid;
-	e.new_gid= new_gid;
+	e.text_bytes = text_bytes;
+	e.data_bytes = data_bytes;
+	e.bss_bytes = bss_bytes;
+	e.tot_bytes = tot_bytes;
+	e.args_bytes = frame_len;
+	e.sep_id = sep_id;
+	e.st_dev = st_dev;
+	e.st_ino = st_ino;
+	e.st_ctime = st_ctime;
+	e.new_uid = new_uid;
+	e.new_gid = new_gid;
 	strncpy(e.progname, progname, sizeof(e.progname)-1);
 	e.progname[sizeof(e.progname)-1]= '\0';
+	e.entry_point = entry_point;
 
-	m.m_type= EXEC_NEWMEM;
-	m.EXC_NM_PROC= proc_e;
-	m.EXC_NM_PTR= (char *)&e;
-	r= sendrec(PM_PROC_NR, &m);
+	m.m_type = EXEC_NEWMEM;
+	m.EXC_NM_PROC = proc_e;
+	m.EXC_NM_PTR = (char *)&e;
+	r = sendrec(PM_PROC_NR, &m);
 	if (r != OK)
 		return r;
 #if 0
 	printf("exec_newmem: r = %d, m_type = %d\n", r, m.m_type);
 #endif
-	*stack_topp= m.m1_i1;
-	*load_textp= !!(m.m1_i2 & EXC_NM_RF_LOAD_TEXT);
-	*allow_setuidp= !!(m.m1_i2 & EXC_NM_RF_ALLOW_SETUID);
+	*stack_topp = m.m1_i1;
+	*load_textp = !!(m.m1_i2 & EXC_NM_RF_LOAD_TEXT);
+	*allow_setuidp = !!(m.m1_i2 & EXC_NM_RF_ALLOW_SETUID);
 #if 0
 	printf("RS: exec_newmem: stack_top = 0x%x\n", *stack_topp);
 	printf("RS: exec_newmem: load_text = %d\n", *load_textp);
@@ -284,7 +283,7 @@ int *allow_setuidp;
 /*===========================================================================*
  *				exec_restart				     *
  *===========================================================================*/
-PRIVATE int exec_restart(proc_e, result)
+static int exec_restart(proc_e, result)
 int proc_e;
 int result;
 {
@@ -304,7 +303,7 @@ int result;
 /*===========================================================================*
  *				read_header				     *
  *===========================================================================*/
-PRIVATE int read_header(exec, exec_len, sep_id, text_bytes, data_bytes,
+static int read_header(exec, exec_len, sep_id, text_bytes, data_bytes,
 	bss_bytes, tot_bytes, pc, hdrlenp)
 char *exec;			/* executable image */
 size_t exec_len;		/* size of the image */
@@ -322,7 +321,7 @@ int *hdrlenp;
   struct exec hdr;		/* a.out header is read in here */
 
   /* Read the header and check the magic number.  The standard MINIX header 
-   * is defined in <a.out.h>.  It consists of 8 chars followed by 6 longs.
+   * is defined in <nucleos/a.out.h>.  It consists of 8 chars followed by 6 longs.
    * Then come 4 more longs that are not used here.
    *	Byte 0: magic number 0x01
    *	Byte 1: magic number 0x03
@@ -378,6 +377,7 @@ int *hdrlenp;
 	*data_bytes += *text_bytes;
 	*text_bytes = 0;
   }
+
   *pc = hdr.a_entry;	/* initial address to start execution */
   *hdrlenp = hdr.a_hdrlen & BYTE;		/* header length */
 
@@ -387,7 +387,7 @@ int *hdrlenp;
 /*===========================================================================*
  *				patch_ptr				     *
  *===========================================================================*/
-PRIVATE void patch_ptr(stack, base)
+static void patch_ptr(stack, base)
 char stack[ARG_MAX];		/* pointer to stack image within PM */
 vir_bytes base;			/* virtual address of stack base inside user */
 {
@@ -419,7 +419,7 @@ vir_bytes base;			/* virtual address of stack base inside user */
 /*===========================================================================*
  *				read_seg				     *
  *===========================================================================*/
-PRIVATE int read_seg(exec, exec_len, off, proc_e, seg, seg_bytes)
+static int read_seg(exec, exec_len, off, proc_e, seg, seg_bytes)
 char *exec;			/* executable image */
 size_t exec_len;		/* size of the image */
 off_t off;			/* offset in file */

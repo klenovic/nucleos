@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __X86_ASM_SERVER_VM_MEMORY_H
+#define __X86_ASM_SERVER_VM_MEMORY_H
+
 #include <sys/vm_i386.h>
 
 /* As visible from the user space process, where is the top of the
@@ -26,12 +29,12 @@
 /* Where do processes start in linear (i.e. page table) memory? */
 #define VM_PROCSTART	(I386_BIG_PAGE_SIZE*10)
 
-#define CLICKSPERPAGE (I386_PAGE_SIZE/CLICK_SIZE)
+#define CLICKSPERPAGE	(I386_PAGE_SIZE/CLICK_SIZE)
 
 /* Where is the kernel? */
-#define KERNEL_TEXT	CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[T].mem_phys)
-#define KERNEL_TEXT_LEN	CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[T].mem_len)
-#define KERNEL_DATA	CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_phys)
-#define KERNEL_DATA_LEN	CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_len \
-	+ vmproc[VMP_SYSTEM].vm_arch.vm_seg[S].mem_len)
-
+#define KERNEL_TEXT		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[T].mem_phys)
+#define KERNEL_TEXT_LEN		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[T].mem_len)
+#define KERNEL_DATA		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_phys)
+#define KERNEL_DATA_LEN		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_len \
+					  + vmproc[VMP_SYSTEM].vm_arch.vm_seg[S].mem_len)
+#endif /* __X86_ASM_SERVER_VM_MEMORY_H */

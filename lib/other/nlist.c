@@ -13,7 +13,7 @@
  
 #include <lib.h>
 #include <string.h>
-#include <a.out.h>
+#include <nucleos/a.out.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>

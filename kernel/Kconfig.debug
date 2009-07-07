@@ -48,16 +48,16 @@ config DEBUG_KERNEL_VMASSERT
 	  Say Y if you want interrupt lock/unlock sanity checking.
 
 config DEBUG_KERNEL_STATS_PROFILE
-        bool "Statistical profiling"
-        default n
-        ---help---
+	bool "Statistical profiling"
+	default n
+	---help---
 	  Say Y here if you want to enable statistical profiling.
 
 config DEBUG_KERNEL_CALL_PROFILE
-        bool "Call profiling"
-        default n
-        ---help---
+	bool "Call profiling"
+	default n
+	---help---
 	  Say Y here if you want to enable call profiling.
 
-          WARNING: This options requires compiler support which is
-                   not available yet.
+	  WARNING: This options requires compiler support which is
+	           not available yet.
