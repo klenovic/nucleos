@@ -53,12 +53,8 @@ EXTERN struct mproc {
 						 * PM_UNPAUSE request is delivered. */
 	struct timer mp_timer;			/* watchdog timer for alarm(2) */
 
-	/* Backwards compatibility for signals. */
-	sighandler_t mp_func;	/* all sigs vectored to a single user fcn */
-
 	unsigned mp_flags;	/* flag bits */
 	vir_bytes mp_procargs;	/* ptr to proc's initial stack arguments */
-	struct mproc *mp_swapq;	/* queue of procs waiting to be swapped in */
 	message mp_reply;	/* reply message to be sent to one */
 
 	/* Communication with FS */
@@ -79,7 +75,7 @@ EXTERN struct mproc {
 /* Flag values */
 #define IN_USE		0x001	/* set when 'mproc' slot in use */
 #define WAITING		0x002	/* set by WAIT system call */
-#define ZOMBIE		0x004	/* set by EXIT, cleared by WAIT */
+#define ZOMBIE		0x004	/* waiting for parent to issue WAIT call */
 #define PAUSED		0x008	/* set by PAUSE system call */
 #define ALARM_ON	0x010	/* set when SIGALRM timer started */
 #define	TRACED		0x040	/* set if process is to be traced */
@@ -90,6 +86,8 @@ EXTERN struct mproc {
 #define PM_SIG_PENDING	0x4000	/* process got a signal while waiting for FS */
 #define PARTIAL_EXEC	0x8000	/* Process got a new map but no content */
 #define TOLD_PARENT	0x10000	/* Parent wait() completed, ZOMBIE off */
+#define EXITING		0x20000	/* set by EXIT, process is now exiting */
+#define TRACE_EXIT	0x40000	/* tracer is forcing this process to exit */
 
 #define NIL_MPROC ((struct mproc *) 0)
 
