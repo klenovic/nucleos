@@ -72,7 +72,7 @@
 #include	<timers.h>
 #include 	<sys/ioc_memory.h>
 #include	<ibm/pci.h>
-#include 	<server/ds/ds.h>
+#include 	<servers/ds/ds.h>
 #include	"../../kernel/const.h"
 #include	"../../kernel/config.h"
 #include	"../../kernel/type.h"

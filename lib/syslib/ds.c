@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <string.h>
 
 #include "syslib.h"

@@ -14,7 +14,7 @@ main.c
 #include <nucleos/drivers.h>
 
 #include <ibm/pci.h>
-#include <server/rs/rs.h>
+#include <servers/rs/rs.h>
 
 #include "pci.h"
 

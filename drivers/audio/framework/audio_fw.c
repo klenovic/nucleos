@@ -53,7 +53,7 @@
 
 #include "audio_fw.h"
 #include <sys/vm.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <sys/vm_i386.h>
 
 

@@ -15,7 +15,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -29,21 +29,18 @@
 #include <env.h>
 #include <stdio.h>
 
-#include <asm/server/vm/memory.h>
-
 #define _MAIN 1
-#include "glo.h"
-#include "proto.h"
-#include "util.h"
-#include "vm.h"
-#include "sanitycheck.h"
-
-extern int missing_spares;
-
-#include <asm/kernel/types.h>
+#include <servers/vm/glo.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/sanitycheck.h>
 #include <kernel/const.h>
 #include <kernel/proc.h>
+#include <asm/servers/vm/memory.h>
+#include <asm/kernel/types.h>
 
+extern int missing_spares;
 typedef u32_t mask_t;
 #define MINEPM 0
 #define MAXMASK (sizeof(mask_t)*8)

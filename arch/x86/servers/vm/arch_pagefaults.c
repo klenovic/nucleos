@@ -13,7 +13,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -29,9 +29,9 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#include "../glo.h"
-#include "../proto.h"
-#include "../util.h"
+#include <servers/vm/glo.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
 
 /*===========================================================================*
  *				arch_handle_pagefaults	     		     *

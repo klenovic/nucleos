@@ -68,7 +68,7 @@
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
 #include <ibm/pci.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 
 #include <timers.h>
 

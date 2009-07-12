@@ -15,7 +15,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -34,13 +34,13 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-#include "../proto.h"
-#include "../glo.h"
-#include "../util.h"
-#include "../vm.h"
-#include "../sanitycheck.h"
+#include <servers/vm/proto.h>
+#include <servers/vm/glo.h>
+#include <servers/vm/util.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/sanitycheck.h>
 
-#include <asm/server/vm/memory.h>
+#include <asm/servers/vm/memory.h>
 
 int global_bit_ok = 0;
 int bigpage_ok = 0;

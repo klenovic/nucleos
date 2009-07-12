@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <nucleos/syslib.h>
-#include <server/rs/rs.h>
+#include <servers/rs/rs.h>
 #include <nucleos/paths.h>
 #define OK	0
 

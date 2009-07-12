@@ -19,7 +19,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <nucleos/com.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include "param.h"
 
 /* Some devices may or may not be there in the next table. */

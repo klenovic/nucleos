@@ -20,9 +20,9 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <nucleos/dmap.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
-#include <server/rs/rs.h>
+#include <servers/rs/rs.h>
 #include <lib.h>
 
 #include <timers.h>				/* For priv.h */

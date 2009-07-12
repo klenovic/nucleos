@@ -18,7 +18,7 @@
 #include "inode.h"
 #include "super.h"
 #include "drivers.h"
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/vfsif.h>
 
 

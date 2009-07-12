@@ -38,12 +38,12 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <asm/server/vm/memory.h>
 
-#include "vm.h"
-#include "proto.h"
-#include "util.h"
-#include "glo.h"
+#include <servers/vm/vm.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
+#include <servers/vm/glo.h>
+#include <asm/servers/vm/memory.h>
 
 /* Initially, no free pages are known. */
 PRIVATE phys_bytes free_pages_head = NO_MEM;	/* Physical address in bytes. */

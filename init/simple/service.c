@@ -26,7 +26,7 @@
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>
-#include <server/rs/rs.h>
+#include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysinfo.h>
 #include <sys/types.h>

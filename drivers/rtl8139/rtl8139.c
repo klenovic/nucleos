@@ -71,7 +71,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <nucleos/com.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/keymap.h>
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>

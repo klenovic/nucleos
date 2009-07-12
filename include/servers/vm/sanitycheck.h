@@ -7,11 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _SANITYCHECK_H
-#define _SANITYCHECK_H 1
+#ifndef __SERVER_VM_SANITYCHECK_H
+#define __SERVER_VM_SANITYCHECK_H
 
-#include "vm.h"
-#include "glo.h"
+#include <servers/vm/vm.h>
+#include <servers/vm/glo.h>
 
 #if SANITYCHECKS
 
@@ -52,4 +52,4 @@
 #define SANITYCHECK 
 #endif
 
-#endif
+#endif /* __SERVER_VM_SANITYCHECK_H */

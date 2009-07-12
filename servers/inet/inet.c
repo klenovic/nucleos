@@ -59,7 +59,7 @@ from DL_ETH:
 #include <time.h>
 #include <unistd.h>
 #include <sys/svrctl.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 
 #include "mq.h"
 #include "qp.h"

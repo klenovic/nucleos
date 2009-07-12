@@ -13,7 +13,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -28,8 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "proto.h"
-#include "util.h"
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
 
 #define SENDSLOTS NR_PROCS
 

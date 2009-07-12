@@ -16,7 +16,7 @@ Copyright 1995 Philip Homburg
 */
 
 #include "inet.h"
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/safecopies.h>
 #include "proto.h"
 #include "osdep_eth.h"

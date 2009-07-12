@@ -13,7 +13,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -25,12 +25,12 @@
 #include <errno.h>
 #include <env.h>
 
-#include "glo.h"
-#include "vm.h"
-#include "proto.h"
-#include "util.h"
-#include "sanitycheck.h"
-#include "region.h"
+#include <servers/vm/glo.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
+#include <servers/vm/sanitycheck.h>
+#include <servers/vm/region.h>
 
 /*===========================================================================*
  *				do_fork					     *

@@ -8,11 +8,11 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _UTIL_H
-#define _UTIL_H 1
+#ifndef __SERVER_VM_UTIL_H
+#define __SERVER_VM_UTIL_H
 
-#include "vm.h"
-#include "glo.h"
+#include <servers/vm/vm.h>
+#include <servers/vm/glo.h>
 
 #define ELEMENTS(a) (sizeof(a)/sizeof((a)[0]))
 
@@ -33,5 +33,4 @@
 	panic("VM", _pline, (n));					\
 	}
 
-#endif
-
+#endif /* __SERVER_VM_UTIL_H */

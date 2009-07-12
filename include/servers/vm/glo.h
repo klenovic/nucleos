@@ -7,13 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVER_VM_GLO_H
+#define __SERVER_VM_GLO_H
 
 #include <sys/stat.h>
 #include <nucleos/a.out.h>
 #include <tools.h>
 
-#include "vm.h"
-#include "vmproc.h"
+#include <servers/vm/vm.h>
+#include <servers/vm/vmproc.h>
 
 #if _MAIN
 #undef EXTERN
@@ -34,3 +36,5 @@ EXTERN long vm_sanitychecklevel;
 /* vm operation mode state and values */
 EXTERN long vm_paged;
 EXTERN phys_bytes kernel_top_bytes;
+
+#endif /*  __SERVER_VM_GLO_H */

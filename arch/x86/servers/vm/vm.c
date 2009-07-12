@@ -13,7 +13,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -27,14 +27,14 @@
 #include <errno.h>
 #include <env.h>
 
-#include "../proto.h"
-#include "../vm.h"
-#include "../util.h"
+#include <servers/vm/proto.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/util.h>
 
-#include <asm/server/vm/memory.h>
+#include <asm/servers/vm/memory.h>
 
 #define PAGE_SIZE	4096
-#define PAGE_DIR_SIZE	(1024*PAGE_SIZE)	
+#define PAGE_DIR_SIZE	(1024*PAGE_SIZE)
 #define PAGE_TABLE_COVER (1024*PAGE_SIZE)
 /*=========================================================================*
  *				arch_init_vm				   *

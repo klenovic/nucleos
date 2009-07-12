@@ -21,7 +21,7 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include <ibm/pci.h>
 #include <sys/vm_i386.h>
 #include <nucleos/com.h>
-#include <server/rs/rs.h>
+#include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
 
 #include "pci.h"

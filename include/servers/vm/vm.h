@@ -7,6 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVER_VM_VM_H
+#define __SERVER_VM_VM_H
 
 #define NO_MEM ((phys_clicks) 0)  /* returned by alloc_mem() with mem is up */
 
@@ -44,3 +46,5 @@
 
 /* Special value of 'what' to map_page_region meaning: unknown. */
 #define MAP_NONE	0xFFFFFFFE
+
+#endif /* __SERVER_VM_VM_H */

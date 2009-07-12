@@ -10,7 +10,7 @@
 /* Type definitions for the Data Store Server. */
 
 #include <sys/types.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/bitmap.h>
 #include <regex.h>
 

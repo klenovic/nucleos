@@ -27,7 +27,7 @@
 #include <nucleos/driver.h>
 #include <sys/ioc_memory.h>
 #include <env.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/vm.h>
 #include <sys/mman.h>
 #include <kernel/const.h>

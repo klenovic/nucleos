@@ -28,7 +28,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -40,10 +40,10 @@
 #include <errno.h>
 #include <env.h>
 
-#include "glo.h"
-#include "vm.h"
-#include "proto.h"
-#include "util.h"
+#include <servers/vm/glo.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
 
 #define DATA_CHANGED       1    /* flag value when data segment size changed */
 #define STACK_CHANGED      2    /* flag value when stack size changed */

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _REGION_H
-#define _REGION_H 1
+#ifndef __SERVER_VM_REGION_H
+#define __SERVER_VM_REGION_H
 
 struct phys_block {
 #if SANITYCHECKS
@@ -61,5 +61,4 @@ struct vir_region {
 #define MF_PREALLOC	0x01
 #define MF_CONTIG	0x02
 
-#endif
-
+#endif /* __SERVER_VM_REGION_H */

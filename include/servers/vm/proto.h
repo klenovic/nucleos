@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __SERVER_VM_PROTO_H
+#define __SERVER_VM_PROTO_H
+
 /* Function prototypes. */
 
 struct vmproc;
@@ -20,8 +23,8 @@ struct memory;
 #include <timers.h>
 #include <stdio.h>
 #include <asm/pagetable.h>
-#include "vmproc.h"
-#include "vm.h"
+#include <servers/vm/vmproc.h>
+#include <servers/vm/vm.h>
 
 /* alloc.c */
 _PROTOTYPE( phys_clicks alloc_mem_f, (phys_clicks clicks, u32_t flags)	);
@@ -158,3 +161,4 @@ _PROTOTYPE( void arch_init_vm, (struct memory mem_chunks[NR_MEMS]));
 _PROTOTYPE( vir_bytes, arch_map2vir(struct vmproc *vmp, vir_bytes addr));
 _PROTOTYPE( vir_bytes, arch_vir2map(struct vmproc *vmp, vir_bytes addr));
 
+#endif /*  __SERVER_VM_PROTO_H */

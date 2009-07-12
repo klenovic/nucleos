@@ -18,7 +18,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
@@ -31,15 +31,14 @@
 #include <env.h>
 #include <unistd.h>
 
-#include "proto.h"
-#include "glo.h"
-#include "util.h"
-
-#include <asm/kernel/const.h>
-#include <asm/kernel/types.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/glo.h>
+#include <servers/vm/util.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
+#include <asm/kernel/const.h>
+#include <asm/kernel/types.h>
 
 /*===========================================================================*
  *                              get_mem_map                                  *

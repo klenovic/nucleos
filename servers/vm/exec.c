@@ -13,7 +13,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <server/ds/ds.h>
+#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
@@ -25,16 +25,15 @@
 #include <errno.h>
 #include <assert.h>
 #include <env.h>
+
+#include <servers/vm/glo.h>
+#include <servers/vm/proto.h>
+#include <servers/vm/util.h>
+#include <servers/vm/vm.h>
+#include <servers/vm/region.h>
+#include <servers/vm/sanitycheck.h>
 #include <asm/pagetable.h>
-#include <asm/server/vm/memory.h>
-
-#include "glo.h"
-#include "proto.h"
-#include "util.h"
-#include "vm.h"
-#include "region.h"
-#include "sanitycheck.h"
-
+#include <asm/servers/vm/memory.h>
 
 
 FORWARD _PROTOTYPE( int new_mem, (struct vmproc *vmp, struct vmproc *sh_vmp,
