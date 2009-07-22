@@ -48,7 +48,7 @@
 /************************************************************************/
 
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -327,7 +327,7 @@ int read_register(int reg_addr)
 	printf("cmos: outb failed of %x\n", RTC_INDEX);
 	exit(1);
   }
-  if(sys_inb(RTC_IO, &r) != OK) {
+  if(sys_inb(RTC_IO, (unsigned long*)&r) != OK) {
 	printf("cmos: inb failed of %x (index %x) failed\n", RTC_IO, reg_addr);
 	exit(1);
   }

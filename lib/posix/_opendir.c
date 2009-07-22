@@ -18,7 +18,7 @@
 #define open	_open
 #define opendir	_opendir
 #define stat	_stat
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>

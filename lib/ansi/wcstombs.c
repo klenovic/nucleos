@@ -15,7 +15,7 @@
 
 #include	<stdlib.h>
 #include	<locale.h>
-#include	<limits.h>
+#include	<nucleos/limits.h>
 
 size_t
 wcstombs(register char *s, register const wchar_t *pwcs, size_t n)

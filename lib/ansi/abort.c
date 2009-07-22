@@ -13,8 +13,8 @@
  */
 /* $Header: /cvsup/minix/src/lib/ansi/abort.c,v 1.1.1.1 2005/04/21 14:56:04 beng Exp $ */
 
-#if	defined(_POSIX_SOURCE)
-#include	<sys/types.h>
+#ifdef _POSIX_SOURCE
+#include	<nucleos/types.h>
 #endif
 #include	<signal.h>
 #include	<stdlib.h>

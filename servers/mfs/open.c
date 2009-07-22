@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-
+#include <nucleos/nucleos.h>
 #include "fs.h"
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -716,7 +716,7 @@ PRIVATE struct inode *new_node_o(struct inode *ldirp,
 
   if (S_ISDIR(bits) && 
       (ldirp)->i_nlinks >= ((ldirp)->i_sp->s_version == V1 ?
-      CHAR_MAX : SHRT_MAX)) {
+      CHAR_MAX : SHORT_MAX)) {
         /* New entry is a directory, alas we can't give it a ".." */
         put_inode(rip);
         err_code = EMLINK;
@@ -787,7 +787,7 @@ PRIVATE struct inode *new_node_s(struct inode *ldirp,
 
   if (S_ISDIR(bits) && 
       (ldirp)->i_nlinks >= ((ldirp)->i_sp->s_version == V1 ?
-      CHAR_MAX : SHRT_MAX)) {
+      CHAR_MAX : SHORT_MAX)) {
         /* New entry is a directory, alas we can't give it a ".." */
         put_inode(rip);
         err_code = EMLINK;

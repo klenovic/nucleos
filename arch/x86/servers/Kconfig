@@ -1,0 +1,9 @@
+# common + arch. configs for servers
+menu "Servers"
+
+source "servers/Kconfig"
+
+# Hacking/debugging (generic + arch if any)
+source "arch/x86/servers/Kconfig.debug"
+
+endmenu

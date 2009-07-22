@@ -21,7 +21,7 @@
 #include <ansi.h>
 #endif
 
-#include <sys/time.h>
+#include <nucleos/time.h>
 
 typedef struct {
 	char	state;

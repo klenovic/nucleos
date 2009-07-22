@@ -11,7 +11,7 @@
 #ifndef _PAGEFAULTS_H
 #define _PAGEFAULTS_H 1
 
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 #define PFERR_NOPAGE(e)	(!((e) & I386_VM_PFE_P))
 #define PFERR_PROT(e)	(((e) & I386_VM_PFE_P))

@@ -20,9 +20,8 @@
  * Changes:
  *   14 Aug, 2006   Created (Rogier Meurs)
  */
-
+#include <nucleos/nucleos.h>
 #include <kernel/system.h>
-
 #include <string.h>
 
 /*===========================================================================*

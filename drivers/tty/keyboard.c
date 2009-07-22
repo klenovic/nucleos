@@ -18,8 +18,7 @@
 #include <nucleos/drivers.h>
 #include <sys/ioctl.h>
 #include <sys/kbdio.h>
-#include <sys/time.h>
-#include <sys/select.h>
+#include <nucleos/time.h>
 #include <termios.h>
 #include <signal.h>
 #include <unistd.h>

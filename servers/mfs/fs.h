@@ -18,12 +18,12 @@
 
 /* The following are so basic, all the *.c files get them automatically. */
 #include <ansi.h>		/* MUST be second */
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/dmap.h>
 
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 
 #include <nucleos/syslib.h>

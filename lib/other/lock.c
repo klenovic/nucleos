@@ -9,7 +9,7 @@
  */
 #include <lib.h>
 #include <errno.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>

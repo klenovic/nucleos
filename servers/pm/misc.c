@@ -22,7 +22,7 @@
  */
 
 #define brk _brk
-
+#include <nucleos/nucleos.h>
 #include "pm.h"
 #include <nucleos/callnr.h>
 #include <signal.h>

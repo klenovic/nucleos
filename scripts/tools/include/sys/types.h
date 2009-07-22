@@ -23,28 +23,28 @@
  * requires 17 bits to express, so size_t must be a long type.  The type 
  * ssize_t is the signed version of size_t.
  */
-#ifndef _SIZE_T
-#define _SIZE_T
+#ifndef _MNX_SIZE_T
+#define _MNX_SIZE_T
 typedef unsigned int MNX(size_t);
 #endif
 
-#ifndef _SSIZE_T
-#define _SSIZE_T
+#ifndef _MNX_SSIZE_T
+#define _MNX_SSIZE_T
 typedef int MNX(ssize_t);
 #endif
 
-#ifndef _TIME_T
-#define _TIME_T
+#ifndef _MNX_TIME_T
+#define _MNX_TIME_T
 typedef long MNX(time_t);    /* time in sec since 1 Jan 1970 0000 GMT */
 #endif
 
-#ifndef _CLOCK_T
-#define _CLOCK_T
+#ifndef _MNX_CLOCK_T
+#define _MNX_CLOCK_T
 typedef long MNX(clock_t);   /* unit for system accounting */
 #endif
 
-#ifndef _SIGSET_T
-#define _SIGSET_T
+#ifndef _MNX_SIGSET_T
+#define _MNX_SIGSET_T
 typedef unsigned long MNX(sigset_t);
 #endif
 

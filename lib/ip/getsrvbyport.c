@@ -30,7 +30,7 @@
 static char sccsid[] = "@(#)getservbyport.c	5.6 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <string.h>
 
 #ifdef _MINIX

@@ -10,7 +10,7 @@
 /*	inttypes.h - Format conversions of integer types.
  *							Author: Kees J. Bot
  *								4 Oct 2003
- * Assumptions and bugs the same as for <stdint.h>
+ * Assumptions and bugs the same as for <nucleos/types.h>
  * Bug: Wide character integer conversion functions missing.
  */
 
@@ -18,12 +18,12 @@
 #define _INTTYPES_H
 
 #ifndef _STDINT_H
-#include <stdint.h>
+#include <nucleos/types.h>
 #endif
 
 #if !__cplusplus || defined(__STDC_FORMAT_MACROS)
 
-/* Macros to print integers defined in <stdint.h>.  The first group should
+/* Macros to print integers defined in <nucleos/types.h>.  The first group should
  * not be used in code, they're merely here to build the second group.
  * (The standard really went overboard here, only the first group is needed.)
  */

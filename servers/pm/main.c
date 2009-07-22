@@ -17,7 +17,7 @@
  *   main:	starts PM running
  *   setreply:	set the reply to be sent to process making an PM system call
  */
-
+#include <nucleos/nucleos.h>
 #include "pm.h"
 #include <nucleos/keymap.h>
 #include <nucleos/callnr.h>

@@ -13,7 +13,7 @@
 
 #include <ansi.h> 
 #include <assert.h> 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 
@@ -22,7 +22,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 
 #define ASYN_NR	100

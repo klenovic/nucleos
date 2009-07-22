@@ -10,26 +10,28 @@
 #ifndef __SERVERS_VFS_FS_H
 #define __SERVERS_VFS_FS_H
 
+#include <nucleos/stringify.h>
+
 #define APPNAME		__APPNAME__
 #define APPVERSION	__APPVERSION__
 #define APPTYPE		__APPTYPE__
 
 #ifdef CONFIG_DEBUG_VFS
 #define app_dbg(format, args...) \
-	printf("D:%s:%s:%s:%d:" format, MKSTR(APPTYPE), MKSTR(APPNAME), \
+	printf("D:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
 					__FUNCTION__, __LINE__, ##args);
 #else
 #define app_dbg(format, args...)
 #endif
 
 #define app_info(format, args...) \
-	printf("I:%s:%s:" format, MKSTR(APPTYPE), MKSTR(APPNAME), ##args);
+	printf("I:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
 
 #define app_warn(format, args...) \
-	printf("W:%s:%s:" format, MKSTR(APPTYPE), MKSTR(APPNAME), ##args);
+	printf("W:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
 
 #define app_err(format, args...) \
-	printf("E:%s:%s:%s:%d:" format, MKSTR(APPTYPE), MKSTR(APPNAME), \
+	printf("E:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
 					__FUNCTION__, __LINE__, ##args);
 
 /* This is the master header for fs.  It includes some other files
@@ -55,12 +57,12 @@
 
 /* The following are so basic, all the *.c files get them automatically. */
 #include <ansi.h>		/* MUST be second */
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/dmap.h>
 
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 
 #include <nucleos/syslib.h>

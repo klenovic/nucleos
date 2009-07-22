@@ -12,10 +12,10 @@
  *								21 Apr 1994
  */
 #define nil 0
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 #include "queryparam.h"
 

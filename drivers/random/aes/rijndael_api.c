@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 #include "rijndael-alg.h"
 #include "rijndael-api.h"

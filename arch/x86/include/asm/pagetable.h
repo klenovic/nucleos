@@ -11,8 +11,8 @@
 #ifndef _PAGETABLE_H
 #define _PAGETABLE_H 1
 
-#include <stdint.h>
-#include <sys/vm_i386.h>
+#include <nucleos/types.h>
+#include <asm/servers/vm/vm.h>
 
 /* An i386 pagetable. */
 typedef struct {

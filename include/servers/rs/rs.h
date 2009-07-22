@@ -8,10 +8,11 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
-minix/rs.h
-
-Interface to the reincarnation server
-*/
+ * @file include/servers/rs/rs.h
+ * @brief Interface to the reincarnation server
+ */
+#ifndef __SERVERS_RS_RS_H
+#define __SERVERS_RS_RS_H
 
 #define RSS_NR_IRQ		16
 #define RSS_NR_IO		16
@@ -65,4 +66,4 @@ struct rs_pci
 	int rsp_nr_class;
 	struct { u32_t class; u32_t mask; } rsp_class[RSP_NR_CLASS];
 };
-
+#endif /* __SERVERS_RS_RS_H */

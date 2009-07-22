@@ -46,7 +46,7 @@
  */
 
 #include "hermes.h"
-#include <sys/vm.h>
+#include <servers/vm/vm.h>
 #include "assert.h"
 #include <ibm/pci.h>
 

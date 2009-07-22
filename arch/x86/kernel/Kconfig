@@ -32,6 +32,10 @@ config KERNEL_STACK_SIZE
 	---help---
 	  Specify the kernel stack size (in bytes).
 
+# common kernel configs
 source "kernel/Kconfig"
+
+# Hacking/debugging (include commong + x86 if any)
+source "arch/x86/kernel/Kconfig.debug"
 
 endmenu

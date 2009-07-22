@@ -11,11 +11,11 @@
  * vsprintf - print formatted output without ellipsis on an array
  */
 /* $Header: /cvsup/minix/src/lib/stdio/vsprintf.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
-#include	<stdio.h>
-#include	<stdarg.h>
-#include	<limits.h>
-#include	"loc_incl.h"
+#include <nucleos/nucleos.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <nucleos/limits.h>
+#include "loc_incl.h"
 
 int
 vsnprintf(char *s, size_t n, const char *format, va_list arg)

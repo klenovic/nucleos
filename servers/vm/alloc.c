@@ -34,7 +34,7 @@
 
 #include <sys/mman.h>
 
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>

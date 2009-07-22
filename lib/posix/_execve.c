@@ -18,7 +18,7 @@
 #include <lib.h>
 #include <unistd.h>
 #include <string.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 
 int execve(const char *path, char * const *argv, char * const *envp)
 {

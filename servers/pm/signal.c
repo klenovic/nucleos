@@ -28,6 +28,7 @@
  *   check_sig: check which processes to signal with sig_proc()
  *   check_pending:  check if a pending signal can now be delivered
  */
+#include <nucleos/nucleos.h>
 #include "pm.h"
 #include <sys/stat.h>
 #include <sys/ptrace.h>

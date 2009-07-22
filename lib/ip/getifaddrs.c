@@ -15,7 +15,7 @@
 #include <ifaddrs.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <netinet/in.h>
 
 #include <net/gen/in.h>

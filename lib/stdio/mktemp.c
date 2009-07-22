@@ -44,7 +44,7 @@
 static char sccsid[] = "@(#)mktemp.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>

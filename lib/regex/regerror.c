@@ -50,15 +50,11 @@
 static char sccsid[] = "@(#)regerror.c	8.4 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef __minix_vmd
-#include <bsd/asciictype.h>
-#else
 #include <ctype.h>
-#endif
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <stdlib.h>
 #include <regex.h>
 

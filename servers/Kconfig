@@ -1,4 +1,3 @@
-menu "Servers"
 choice
   prompt "Type of linkage of servers"
   default SERVERS_LINKAGE_SEPID if ARCH_SERVERS_LINKAGE_SEPID
@@ -23,8 +22,3 @@ config SERVERS_LINKAGE_TYPE
 
 # VFS server
 source "servers/vfs/Kconfig"
-
-# Servers debugging/hacking
-source "servers/Kconfig.debug"
-
-endmenu

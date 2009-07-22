@@ -11,7 +11,7 @@
 hton.c
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/hton.h>
 
 u16_t _tmp;

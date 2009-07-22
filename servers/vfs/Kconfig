@@ -20,4 +20,5 @@ config VFS_AOUT_BINFMT
 
 # VFS hacking and debugging
 source "servers/vfs/Kconfig.debug"
+
 endmenu

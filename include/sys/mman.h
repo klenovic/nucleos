@@ -11,9 +11,7 @@
 #ifndef _MMAN_H
 #define _MMAN_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 /* prot argument for mmap() */
 #define PROT_NONE       0x00    /* no permissions */

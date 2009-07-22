@@ -25,6 +25,7 @@
 
 #include "at_wini.h"
 
+#include <nucleos/nucleos.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/type.h>
@@ -968,7 +969,7 @@ PRIVATE int w_identify()
 		dma_base= wn->base_dma;
 		if (dma_base)
 		{
-			if (sys_inb(dma_base + DMA_STATUS, &dma_status) != OK)
+			if (sys_inb(dma_base + DMA_STATUS, (u32_t*)&dma_status) != OK)
 			{
 				panic(w_name(),
 					"unable to read DMA status register",
@@ -1374,7 +1375,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 		 * Reading the alternate status register is the suggested 
 		 * way to implement this wait.
 		 */
-		if (sys_inb((wn->base_ctl+REG_CTL_ALTSTAT), &w_status) != OK)
+		if (sys_inb((wn->base_ctl+REG_CTL_ALTSTAT), (u32_t*)&w_status) != OK)
 			panic(w_name(), "couldn't get status", NO_NUM);
 	}
 
@@ -1399,7 +1400,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 		/* Wait for DMA_ST_INT to get set */
 		w_waitfor_dma(DMA_ST_INT, DMA_ST_INT);
 
-		r= sys_inb(wn->base_dma + DMA_STATUS, &v);
+		r= sys_inb(wn->base_dma + DMA_STATUS, (u32_t*)&v);
 		if (r != 0) panic("at_wini", "w_transfer: sys_inb failed", r);
 
 #define BAD_DMA_CONTINUE(msg) {						\
@@ -1880,7 +1881,7 @@ int safe;
 	if (r != 0) panic("at_wini", "setup_dma: sys_outb failed", r);
 
 	/* Verify that the bus master is not active */
-	r= sys_inb(wn->base_dma + DMA_STATUS, &v);
+	r= sys_inb(wn->base_dma + DMA_STATUS, (u32_t*)&v);
 	if (r != 0) panic("at_wini", "setup_dma: sys_inb failed", r);
 	if (v & DMA_ST_BM_ACTIVE)
 		panic("at_wini", "Bus master IDE active", NO_NUM);
@@ -1905,7 +1906,7 @@ int safe;
 	if (r != 0) panic("at_wini", "setup_dma: sys_outb failed", r);
 
 #if 0
-	r= sys_inb(wn->base_dma + DMA_STATUS, &v);
+	r= sys_inb(wn->base_dma + DMA_STATUS, (u32_t*)&v);
 	if (r != 0) panic("at_wini", "setup_dma: sys_inb failed", r);
 	printf("dma status: 0x%x\n", v);
 #endif
@@ -2068,7 +2069,7 @@ PRIVATE void w_intr_wait()
 			break;
 		  case HARD_INT:
 			/* Interrupt. */
-			r= sys_inb(w_wn->base_cmd + REG_STATUS, &w_status);
+			r= sys_inb(w_wn->base_cmd + REG_STATUS, (u32_t*)&w_status);
 			if (r != 0)
 				panic("at_wini", "sys_inb failed", r);
 			w_wn->w_status= w_status;
@@ -2104,7 +2105,7 @@ PRIVATE int at_intr_wait()
   if ((w_wn->w_status & (STATUS_BSY | STATUS_WF | STATUS_ERR)) == 0) {
 	r = OK;
   } else {
-  	if ((s=sys_inb(w_wn->base_cmd + REG_ERROR, &inbval)) != OK)
+  	if ((s=sys_inb(w_wn->base_cmd + REG_ERROR, (u32_t*)&inbval)) != OK)
   		panic(w_name(),"Couldn't read register",s);
   	if ((w_wn->w_status & STATUS_ERR) && (inbval & ERROR_BB)) {
   		r = ERR_BAD_SECTOR;	/* sector marked bad, retries won't help */
@@ -2134,7 +2135,7 @@ int value;			/* required status */
 
   getuptime(&t0);
   do {
-	if ((s=sys_inb(w_wn->base_cmd + REG_STATUS, &w_status)) != OK)
+	if ((s=sys_inb(w_wn->base_cmd + REG_STATUS, (u32_t*)&w_status)) != OK)
 		panic(w_name(),"Couldn't read register",s);
 	w_wn->w_status= w_status;
 	if ((w_wn->w_status & mask) == value) {
@@ -2165,7 +2166,7 @@ int value;			/* required status */
 
   getuptime(&t0);
   do {
-	if ((s=sys_inb(w_wn->base_dma + DMA_STATUS, &w_status)) != OK)
+	if ((s=sys_inb(w_wn->base_dma + DMA_STATUS, (u32_t*)&w_status)) != OK)
 		panic(w_name(),"Couldn't read register",s);
 	if ((w_status & mask) == value) {
         	return 1;
@@ -2570,7 +2571,7 @@ PRIVATE void ack_irqs(unsigned int irqs)
   	if (!(wini[drive].state & IGNORING) && wini[drive].irq_need_ack &&
 		(wini[drive].irq_mask & irqs)) {
 		if (sys_inb((wini[drive].base_cmd + REG_STATUS),
-			&w_status) != OK)
+			(u32_t*)&w_status) != OK)
 		{
 		  	panic(w_name(), "couldn't ack irq on drive %d\n",
 				drive);
@@ -2742,7 +2743,7 @@ PRIVATE int at_in(int line, u32_t port, u32_t *value,
 	char *typename, int type)
 {
 	int s;
-	s = sys_in(port, value, type);
+	s = sys_in(port, (unsigned long*)value, type);
 	if(s == OK)
 		return OK;
 	printf("at_wini%d: line %d: %s failed: %d; port %x\n", 

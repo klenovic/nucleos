@@ -15,7 +15,7 @@ Convert an ASCII string with an ethernet address into a struct ether_addr.
 Created:	Nov 17, 1992 by Philip Homburg
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdlib.h>
 #include <net/netlib.h>
 #include <net/gen/ether.h>

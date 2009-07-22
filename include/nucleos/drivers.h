@@ -20,7 +20,7 @@
 #include <nucleos/com.h>
 #include <nucleos/dmap.h>
 #include <nucleos/callnr.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/devio.h>
 #include <nucleos/syslib.h>
@@ -34,8 +34,8 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <stddef.h>
+#include <nucleos/limits.h>
+#include <nucleos/stddef.h>
 #include <errno.h>
 #include <unistd.h>
 

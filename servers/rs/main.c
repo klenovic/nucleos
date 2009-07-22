@@ -16,6 +16,7 @@
  * Created:
  *   Jul 22, 2005	by Jorrit N. Herder
  */
+#include <nucleos/nucleos.h>
 #include "inc.h"
 #include <fcntl.h>
 #include <nucleos/endpoint.h>

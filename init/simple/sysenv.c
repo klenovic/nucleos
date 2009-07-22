@@ -12,7 +12,7 @@
  */
 #define nil ((void*)0)
 #include <nucleos/type.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/svrctl.h>
 #include <stdarg.h>
 #include <stdlib.h>

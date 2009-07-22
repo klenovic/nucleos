@@ -51,6 +51,8 @@ struct biosdev {
 struct termios termbuf;
 int istty;
 
+int run_trailer(void);
+
 void quit(int status)
 {
   if (istty) (void) tcsetattr(0, TCSANOW, &termbuf);
@@ -173,7 +175,7 @@ int getch(void)
 #define clear_screen()    printf("[clear]")
 #define boot_device(device)     printf("[boot %s]\n", device)
 #define ctty(line)        printf("[ctty %s]\n", line)
-#define bootminix()       (run_trailer() && printf("[boot]\n"))
+#define bootminix()       run_trailer(); printf("[boot]\n")
 #define off()       printf("[off]")
 
 char *readline(void)
@@ -816,6 +818,9 @@ void menu(void)
       case USERFUN:
       case SELECT:
         if (c == e->arg[0]) choice= e->value;
+        break;
+      default:
+        break;
       }
     }
   } while (choice == 0);

@@ -9,6 +9,7 @@
  */
 #include "fs.h"
 #include <sys/stat.h>
+#include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
@@ -17,6 +18,7 @@
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
 #include <nucleos/elf.h>
+
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>

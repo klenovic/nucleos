@@ -28,7 +28,7 @@
 #include <nucleos/drivers.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-#include <sys/vm.h>
+#include <servers/vm/vm.h>
 #include <sys/video.h>
 #include <sys/mman.h>
 #include <nucleos/tty.h>

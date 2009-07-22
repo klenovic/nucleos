@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <stdint.h>
+#include <nucleos/types.h>
 #include <nucleos/minlib.h>
 #include <asm/cpufeature.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 int _cpufeature(int cpufeature)
 {

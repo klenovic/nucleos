@@ -31,7 +31,6 @@
 #include <signal.h>
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
-#include <sys/select.h>
 #include "tty.h"
 
 #if NR_PTYS > 0

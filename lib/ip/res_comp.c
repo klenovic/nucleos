@@ -31,7 +31,7 @@ static char sccsid[] = "@(#)res_comp.c	6.18 (Berkeley) 6/27/90";
 #endif /* LIBC_SCCS and not lint */
 
 #if _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdlib.h>
 
 #include <net/gen/in.h>
@@ -47,7 +47,7 @@ int dn_skipname _ARGS(( const u_char *comp_dn, const u_char *eom ));
 #define putshort __putshort
 #define putlong __putlong
 #else
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <arpa/nameser.h>
 

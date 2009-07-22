@@ -31,7 +31,7 @@ static char sccsid[] = "@(#)res_mkquery.c	6.12 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
 #if _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +48,7 @@ static char sccsid[] = "@(#)res_mkquery.c	6.12 (Berkeley) 6/1/90";
 #define putlong __putlong
 #else
 #include <stdio.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <resolv.h>

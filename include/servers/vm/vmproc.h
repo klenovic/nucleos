@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#ifndef __SERVER_VM_VMPROC_H
-#define __SERVER_VM_VMPROC_H
+#ifndef __SERVERS_VM_VMPROC_H
+#define __SERVERS_VM_VMPROC_H
 
 #include <asm/pagetable.h>
 #include <asm/servers/vm/vmproc.h>
@@ -67,4 +66,4 @@ struct vmproc {
 				 * DMA buffers.
 				 */
 
-#endif /* __SERVER_VM_VMPROC_H */
+#endif /* __SERVERS_VM_VMPROC_H */

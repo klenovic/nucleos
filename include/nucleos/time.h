@@ -7,14 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-sys/time.h
-*/
+#ifndef __NUCLEOS_TIME_H
+#define __NUCLEOS_TIME_H
 
-#ifndef _SYS__TIME_H
-#define _SYS__TIME_H
-
-#include <ansi.h>
+#include <nucleos/types.h>
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 struct timeval
@@ -33,4 +29,12 @@ int gettimeofday(struct timeval *_RESTRICT tp, void *_RESTRICT tzp);
 /* Compatibility with other Unix systems */
 int settimeofday(const struct timeval *tp, const void *tzp);
 
-#endif /* _SYS__TIME_H */
+#define NFDBITS			__NFDBITS
+
+#define FD_SETSIZE		__FD_SETSIZE
+#define FD_SET(fd,fdsetp)	__FD_SET(fd,fdsetp)
+#define FD_CLR(fd,fdsetp)	__FD_CLR(fd,fdsetp)
+#define FD_ISSET(fd,fdsetp)	__FD_ISSET(fd,fdsetp)
+#define FD_ZERO(fdsetp)		__FD_ZERO(fdsetp)
+
+#endif /* __NUCLEOS_TIME_H */

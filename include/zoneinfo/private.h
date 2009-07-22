@@ -96,11 +96,11 @@ void logwtmp(char *, char *, char *);
 ** Nested includes
 */
 
-#include <sys/types.h>	/* for time_t */
+#include <nucleos/types.h>	/* for time_t */
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <limits.h>	/* for CHAR_BIT */
+#include <nucleos/limits.h>	/* for CHAR_BIT */
 #include <time.h>
 #include <stdlib.h>
 

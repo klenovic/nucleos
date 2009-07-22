@@ -9,6 +9,7 @@
  */
 #include "fs.h"
 #include <sys/stat.h>
+#include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>

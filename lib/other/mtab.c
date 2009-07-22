@@ -41,7 +41,7 @@
  * -1 instead of 0.  Also, rewrite_mtab returns -1 if it fails.
  */
  
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/minlib.h>
 #include <ctype.h>
 #include <fcntl.h>

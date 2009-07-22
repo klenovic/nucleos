@@ -13,7 +13,7 @@ ethern2h.c
 Created:	Nov 12, 1992 by Philip Homburg
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <net/gen/ether.h>

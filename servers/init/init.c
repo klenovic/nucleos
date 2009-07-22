@@ -23,14 +23,14 @@
  */
 
 #include <nucleos/type.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/svrctl.h>
 #include <ttyent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <signal.h>
 #include <string.h>
 #include <time.h>

@@ -14,10 +14,10 @@
 #define _POSIX_SOURCE   1
 #define _MINIX    1
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
@@ -34,7 +34,7 @@
 #define TRACE(msg) \
   printf("%s:%d:%s",__FUNCTION__,__LINE__,msg);
 
-void readblock(MNX(off_t) blockno, char *buf, int);
+void readblock(off_t blockno, char *buf, int);
 
 /* The following code handles two file system types: Version 1 with small
  * inodes and 16-bit disk addresses and Version 2 with big inodes and 32-bit
@@ -58,29 +58,24 @@ static int block_size;
 #include <sys/dir.h>
 #endif
 
-#if __minix_vmd
-static struct v12_super_block super; /* Superblock of file system */
-#define s_log_zone_size s_dummy      /* Zones are obsolete. */
-#else
-static struct MNX(super_block) super; /* Superblock of file system */
+static struct super_block super; /* Superblock of file system */
 #define SUPER_V1 SUPER_MAGIC          /* V1 magic has a weird name. */
-#endif
 
-static struct MNX(inode) curfil;      /* Inode of file under examination */
+static struct inode curfil;      /* Inode of file under examination */
 static char indir[_MAX_BLOCK_SIZE];   /* Single indirect block. */
 static char dindir[_MAX_BLOCK_SIZE];  /* Double indirect block. */
 static char dirbuf[_MAX_BLOCK_SIZE];  /* Scratch/Directory block. */
 #define scratch dirbuf
 
-static MNX(block_t) a_indir, a_dindir;  /* Addresses of the indirects. */
-static MNX(off_t) dirpos;                    /* Reading pos in a dir. */
+static block_t a_indir, a_dindir;  /* Addresses of the indirects. */
+static off_t dirpos;                    /* Reading pos in a dir. */
 
 #define fsbuf(b)  (*(union fsdata_u*) (b))
 
 
 #define zone_shift  (super.s_log_zone_size) /* zone to block ratio */
 
-MNX(off_t) r_super(int *bs)
+off_t r_super(int *bs)
 /* Initialize variables, return size of file system in blocks,
  * (zero on error).
  */
@@ -106,14 +101,14 @@ MNX(off_t) r_super(int *bs)
     nr_dzones= V2_NR_DZONES;
     nr_indirects= V2_INDIRECTS(block_size);
     inodes_per_block= V2_INODES_PER_BLOCK(block_size);
-    return (MNX(off_t)) super.s_zones << zone_shift;
+    return (off_t) super.s_zones << zone_shift;
   } else
   if (super.s_magic == SUPER_V1) {
     *bs = block_size = 1024;
     nr_dzones= V1_NR_DZONES;
     nr_indirects= V1_INDIRECTS;
     inodes_per_block= V1_INODES_PER_BLOCK;
-    return (MNX(off_t)) super.s_nzones << zone_shift;
+    return (off_t) super.s_nzones << zone_shift;
   } else {
     /* Filesystem not recognized as Minix. */
     return 0;
@@ -121,12 +116,12 @@ MNX(off_t) r_super(int *bs)
 
 }
 
-void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
+void r_stat(Ino_t inum, struct stat *stp)
 /* Return information about a file like stat(2) and remember it. */
 {
-  MNX(block_t) block;
-  MNX(block_t) ino_block;
-  MNX(ino_t) ino_offset;
+  block_t block;
+  block_t ino_block;
+  ino_t ino_offset;
   union fsdata_u *blockbuf;
 
   /* Calculate start of i-list */
@@ -142,7 +137,7 @@ void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
   readblock(block, (char*)blockbuf, block_size);
 
   if (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3) {
-    MNX(d2_inode) *dip;
+    d2_inode *dip;
     int i;
 
     dip= &blockbuf->b__v2_ino[ino_offset];
@@ -158,7 +153,7 @@ void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
     for (i= 0; i < V2_NR_TZONES; i++)
       curfil.i_zone[i]= dip->d2_zone[i];
   } else {
-    MNX(d1_inode) *dip;
+    d1_inode *dip;
     int i;
 
     dip= &blockbuf->b__v1_ino[ino_offset];
@@ -183,7 +178,7 @@ void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
   stp->st_nlink= curfil.i_nlinks;
   stp->st_uid= curfil.i_uid;
   stp->st_gid= curfil.i_gid;
-  stp->st_rdev= (MNX(dev_t)) curfil.i_zone[0];
+  stp->st_rdev= (dev_t) curfil.i_zone[0];
   stp->st_size= curfil.i_size;
   stp->st_atime= curfil.i_atime;
   stp->st_mtime= curfil.i_mtime;
@@ -193,12 +188,12 @@ void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
   dirpos= 0;
 }
 
-MNX(ino_t) r_readdir(char *name)
+ino_t r_readdir(char *name)
 /* Read next directory entry at "dirpos" from file "curfil". */
 {
-  MNX(ino_t) inum= 0;
+  ino_t inum= 0;
   int blkpos;
-  struct MNX(direct) *dp;
+  struct direct *dp;
 
   if (!S_ISDIR(curfil.i_mode)) { errno= ENOTDIR; return -1; }
 
@@ -222,7 +217,7 @@ MNX(ino_t) r_readdir(char *name)
     }
 #endif
     /* Let dp point to the next entry. */
-    dp= (struct MNX(direct) *) (dirbuf + blkpos);
+    dp= (struct direct *) (dirbuf + blkpos);
 
     if ((inum= dp->d_ino) != 0) {
       /* This entry is occupied, return name. */
@@ -234,14 +229,14 @@ MNX(ino_t) r_readdir(char *name)
   return inum;
 }
 
-MNX(off_t) r_vir2abs(MNX(off_t) virblk)
+off_t r_vir2abs(off_t virblk)
 /* Translate a block number in a file to an absolute disk block number.
  * Returns 0 for a hole and -1 if block is past end of file.
  */
 {
-  MNX(block_t) b= virblk;
-  MNX(zone_t) zone, ind_zone;
-  MNX(block_t) z, zone_index;
+  block_t b= virblk;
+  zone_t zone, ind_zone;
+  block_t z, zone_index;
   u32_t i;
 
   if(!block_size) return -1;
@@ -250,46 +245,46 @@ MNX(off_t) r_vir2abs(MNX(off_t) virblk)
   if (virblk * block_size >= curfil.i_size) return -1;
 
   /* Calculate zone in which the datablock number is contained */
-  zone = (MNX(zone_t)) (b >> zone_shift);
+  zone = (zone_t) (b >> zone_shift);
 
   /* Calculate index of the block number in the zone */
-  zone_index = b - ((MNX(block_t)) zone << zone_shift);
+  zone_index = b - ((block_t) zone << zone_shift);
 
   /* Go get the zone */
-  if (zone < (MNX(zone_t)) nr_dzones) {   /* direct block */
+  if (zone < (zone_t) nr_dzones) {   /* direct block */
     zone = curfil.i_zone[(int) zone];
-    z = ((MNX(block_t)) zone << zone_shift) + zone_index;
+    z = ((block_t) zone << zone_shift) + zone_index;
     return z;
   }
 
   /* The zone is not a direct one */
-  zone -= (MNX(zone_t)) nr_dzones;
+  zone -= (zone_t) nr_dzones;
 
   /* Is it single indirect ? */
-  if (zone < (MNX(zone_t)) nr_indirects) {  /* single indirect block */
+  if (zone < (zone_t) nr_indirects) {  /* single indirect block */
     ind_zone = curfil.i_zone[nr_dzones];
   } else {      /* double indirect block */
     /* Fetch the double indirect block */
     if ((ind_zone = curfil.i_zone[nr_dzones + 1]) == 0) return 0;
 
-    z = (MNX(block_t)) ind_zone << zone_shift;
+    z = (block_t) ind_zone << zone_shift;
     if (a_dindir != z) {
       readblock(z, dindir, block_size);
       a_dindir= z;
     }
     /* Extract the indirect zone number from it */
-    zone -= (MNX(zone_t)) nr_indirects;
+    zone -= (zone_t) nr_indirects;
 
-    i = zone / (MNX(zone_t)) nr_indirects;
+    i = zone / (zone_t) nr_indirects;
     ind_zone = (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3)
         ? fsbuf(dindir).b__v2_ind[i]
         : fsbuf(dindir).b__v1_ind[i];
-    zone %= (MNX(zone_t)) nr_indirects;
+    zone %= (zone_t) nr_indirects;
   }
   if (ind_zone == 0) return 0;
 
   /* Extract the datablock number from the indirect zone */
-  z = (MNX(block_t)) ind_zone << zone_shift;
+  z = (block_t) ind_zone << zone_shift;
   if (a_indir != z) {
     readblock(z, indir, block_size);
     a_indir= z;
@@ -299,11 +294,11 @@ MNX(off_t) r_vir2abs(MNX(off_t) virblk)
     : fsbuf(indir).b__v1_ind[(int) zone];
 
   /* Calculate absolute datablock number */
-  z = ((MNX(block_t)) zone << zone_shift) + zone_index;
+  z = ((block_t) zone << zone_shift) + zone_index;
   return z;
 }
 
-MNX(ino_t) r_lookup(MNX(Ino_t) cwd, char *path)
+ino_t r_lookup(Ino_t cwd, char *path)
 /* Translates a pathname to an inode number.  This is just a nice utility
  * function, it only needs r_stat and r_readdir.
  */
@@ -314,7 +309,7 @@ MNX(ino_t) r_lookup(MNX(Ino_t) cwd, char *path)
   /* here we compile for minix i.e. cross-compilation on linux */
   struct stat st;
 
-  MNX(ino_t) ino;
+  ino_t ino;
 
   ino = (path[0] == '/') ? ROOT_INO : cwd;
 
@@ -329,9 +324,9 @@ MNX(ino_t) r_lookup(MNX(Ino_t) cwd, char *path)
 
     if (*path == 0) return ino;
 
-    r_stat(ino, &MNX(st));
+    r_stat(ino, &st);
 
-    if (!S_ISDIR(MNX(st).st_mode)) {
+    if (!S_ISDIR(st.st_mode)) {
       errno = ENOTDIR;
       return 0;
     }

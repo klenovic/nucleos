@@ -15,7 +15,7 @@
  * those wrappers functions.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 /* Structure for response that contains inode details */
 typedef struct node_details {

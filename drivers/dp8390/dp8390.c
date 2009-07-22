@@ -68,8 +68,8 @@
 #include <net/hton.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
-#include <sys/vm_i386.h>
-#include <sys/vm.h>
+#include <asm/servers/vm/vm.h>
+#include <servers/vm/vm.h>
 #include "assert.h"
 
 #include "local.h"

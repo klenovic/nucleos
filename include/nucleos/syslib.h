@@ -12,9 +12,7 @@
 #ifndef _SYSLIB_H
 #define _SYSLIB_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 #ifndef _IPC_H
 #include <nucleos/ipc.h>

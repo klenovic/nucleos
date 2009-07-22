@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 #ifdef _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdlib.h>
 
 #include <net/gen/ether.h>

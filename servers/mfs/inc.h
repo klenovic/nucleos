@@ -14,8 +14,8 @@
 #define VERBOSE		   0	/* display diagnostics */
 
 #include <ansi.h>
-#include <sys/types.h>
-#include <limits.h>
+#include <nucleos/types.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 #include <signal.h>
 #include <unistd.h>

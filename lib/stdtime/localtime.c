@@ -24,7 +24,7 @@ static char	elsieid[] = "@(#)localtime.c	7.99";
 */
 
 /*LINTLIBRARY*/
-
+#include <nucleos/nucleos.h>
 #include <zoneinfo/private.h>
 #include <zoneinfo/tzfile.h>
 #include "fcntl.h"

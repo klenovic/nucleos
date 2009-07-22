@@ -16,8 +16,7 @@
  */
 
 #include "log.h"
-#include <sys/time.h>
-#include <sys/select.h>
+#include <nucleos/time.h>
 
 #define LOG_DEBUG		0	/* enable/ disable debugging */
 

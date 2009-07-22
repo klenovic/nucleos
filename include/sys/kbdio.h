@@ -10,7 +10,7 @@
 #ifndef _SYS__KBDIO_H
 #define _SYS__KBDIO_H
 
-#include <sys/time.h>
+#include <nucleos/time.h>
 
 typedef struct kio_bell
 {

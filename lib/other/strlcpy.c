@@ -48,7 +48,7 @@ static const char rcsid[] =
 
 #define _MINIX_SOURCE
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <string.h>
 
 /*

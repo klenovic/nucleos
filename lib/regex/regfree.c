@@ -50,7 +50,7 @@
 static char sccsid[] = "@(#)regfree.c	8.3 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <regex.h>

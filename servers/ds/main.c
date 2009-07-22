@@ -16,7 +16,7 @@
  * Created:
  *   Oct 19, 2005       by Jorrit N. Herder
  */
-
+#include <nucleos/nucleos.h>
 #include "inc.h"        /* include master header file */
 
 /* Allocate space for the global variables. */

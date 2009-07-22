@@ -19,9 +19,7 @@
 #ifndef _FCNTL_H
 #define _FCNTL_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 /* These values are used for cmd in fcntl().  POSIX Table 6-1.  */
 #define F_DUPFD            0	/* duplicate file descriptor */

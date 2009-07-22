@@ -11,7 +11,7 @@
 #ifndef _MINIX_TTY_H
 #define _MINIX_TTY_H
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 #define TTYMAGIC	0xb105
 

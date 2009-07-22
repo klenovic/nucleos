@@ -11,9 +11,9 @@
  *								1 Dec 2000
  */
 #define nil ((void*)0)
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/hton.h>
 #include <net/gen/in.h>
 #include <net/gen/dhcp.h>

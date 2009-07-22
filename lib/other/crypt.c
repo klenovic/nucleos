@@ -22,7 +22,7 @@
 #define _exit __exit
 #define write _write
 #define waitpid _waitpid
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>

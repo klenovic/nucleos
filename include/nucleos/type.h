@@ -10,10 +10,7 @@
 #ifndef _TYPE_H
 #define _TYPE_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
-
+#include <nucleos/types.h>
 #include <kernel/const.h>
 #include <nucleos/const.h>
 

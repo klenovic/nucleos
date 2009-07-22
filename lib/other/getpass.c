@@ -18,7 +18,7 @@
 #define write _write
 #define read _read
 #define close _close
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>

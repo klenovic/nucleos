@@ -19,7 +19,7 @@
  *   mounted:         tells if file inode is on mounted (or ROOT) file system
  *   read_super:      read a superblock
  */
-
+#include <nucleos/nucleos.h>
 #include "fs.h"
 #include <string.h>
 #include <nucleos/com.h>

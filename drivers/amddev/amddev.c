@@ -23,7 +23,7 @@ Driver for the AMD Device Exclusion Vector (DEV)
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <nucleos/ipc.h>

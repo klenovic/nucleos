@@ -16,7 +16,7 @@ static char	elsieid[] = "@(#)strftime.c	7.75";
 */
 #endif /* !defined NOID */
 #endif /* !defined lint */
-
+#include <nucleos/nucleos.h>
 #include <zoneinfo/private.h>
 
 /*

@@ -16,8 +16,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-typedef int bool;
-
 #ifndef TRUE
 #define TRUE 1
 #endif

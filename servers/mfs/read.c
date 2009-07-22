@@ -11,7 +11,8 @@
 
 #include "fs.h"
 #include <fcntl.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
+#include <nucleos/nucleos.h>
 #include <string.h>
 #include <unistd.h>
 #include <nucleos/com.h>

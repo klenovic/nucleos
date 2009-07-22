@@ -67,7 +67,7 @@ _PROTOTYPE( struct inode *find_inode, (Dev_t dev, int numb)		);
 
 _PROTOTYPE( struct inode *alloc_inode, (dev_t dev, mode_t bits)		);
 _PROTOTYPE( void dup_inode, (struct inode *ip)				);
-_PROTOTYPE( void free_inode, (Dev_t dev, Ino_t numb)			);
+_PROTOTYPE( void free_inode, (dev_t dev, ino_t numb)			);
 _PROTOTYPE( struct inode *get_inode, (Dev_t dev, int numb)		);
 _PROTOTYPE( void put_inode, (struct inode *rip)				);
 _PROTOTYPE( void update_times, (struct inode *rip)			);

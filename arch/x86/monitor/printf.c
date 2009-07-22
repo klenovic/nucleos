@@ -11,9 +11,11 @@
  *								15 Jan 1994
  */
 #define nil 0
+#include <nucleos/nucleos.h>
+#include <nucleos/types.h>
 #include <stdarg.h>
-#include <stddef.h>
-#include <limits.h>
+#include <nucleos/stddef.h>
+#include <nucleos/limits.h>
 
 #define isdigit(c)	((unsigned) ((c) - '0') <  (unsigned) 10)
 #define count_putch(c) do { charcount++; putch(c); } while(0)

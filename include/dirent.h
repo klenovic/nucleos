@@ -20,10 +20,7 @@
 #ifndef _DIRENT_H
 #define _DIRENT_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
-
+#include <nucleos/types.h>
 #include <sys/dir.h>
 
 /* _fl_direct is a flexible directory entry.  Actually it's a union of 8

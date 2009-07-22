@@ -13,7 +13,7 @@
 #include <nucleos/type.h>
 #include <nucleos/const.h>
 #include <nucleos/com.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/ipc.h>
 
 /* Constants and types. */

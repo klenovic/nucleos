@@ -14,11 +14,11 @@
  * bootstrap program, or for debugging.  Six times
  * slower than any good malloc.
  */
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #if !DEBUG
 #define NDEBUG  1
 #define debug(expr)   ((void) 0)

@@ -36,6 +36,8 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
 #include <sys/ptrace.h>
 #include <sys/svrctl.h>
 #include "file.h"

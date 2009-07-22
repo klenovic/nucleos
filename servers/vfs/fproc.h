@@ -10,7 +10,6 @@
 #ifndef __SERVERS_VFS_FPROC_H
 #define __SERVERS_VFS_FPROC_H
 
-#include <sys/select.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/com.h>
 

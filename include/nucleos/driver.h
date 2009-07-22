@@ -21,14 +21,14 @@
 #include <nucleos/ipc.h>
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 #include <string.h>
-#include <limits.h>
-#include <stddef.h>
+#include <nucleos/limits.h>
+#include <nucleos/stddef.h>
 #include <errno.h>
 
 #include <nucleos/partition.h>

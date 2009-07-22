@@ -14,7 +14,7 @@
 #include <lib.h>
 #include <string.h>
 #include <nucleos/a.out.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>

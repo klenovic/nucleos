@@ -14,7 +14,7 @@
  *  Author: Terrence W. Holm          Sep. 1988
  */
 
-#include <stddef.h>
+#include <nucleos/stddef.h>
 
 _PROTOTYPE( char *lsearch, (char *key, char *base,
 			    unsigned *count, unsigned width,

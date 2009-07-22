@@ -29,15 +29,15 @@ int source;
  */
   int r_next;
   unsigned long tsc_high, tsc_low;
- 
+
   source %= RANDOM_SOURCES;
-  r_next= rand->bin[source].r_next;  
-  read_tsc(&tsc_high, &tsc_low);  
-  rand->bin[source].r_buf[r_next] = tsc_low;  
-  if (rand->bin[source].r_size < RANDOM_ELEMENTS) {  
-        rand->bin[source].r_size ++;  
+  r_next= rand->bin[source].r_next;
+  read_tsc((u32_t*)&tsc_high, (u32_t*)&tsc_low);
+  rand->bin[source].r_buf[r_next] = tsc_low;
+  if (rand->bin[source].r_size < RANDOM_ELEMENTS) {
+        rand->bin[source].r_size ++;
   }
-  rand->bin[source].r_next = (r_next + 1 ) % RANDOM_ELEMENTS;  
-} 
-  
+  rand->bin[source].r_next = (r_next + 1 ) % RANDOM_ELEMENTS;
+}
+
 

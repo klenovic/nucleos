@@ -170,7 +170,7 @@ PUBLIC int do_mapdriver()
 
 	label[label_len]= '\0';
 
-	r= ds_retrieve_u32(label, &tasknr);
+	r= ds_retrieve_u32(label, (u32_t*)&tasknr);
 	if (r != OK)
 	{
 		printf("vfs:do_mapdriver: ds doesn't know '%s'\n", label);

@@ -37,10 +37,10 @@
  *  void readblock(off_t blockno, char *buf, int block_size);
  *    Read a block into the buffer.  Outside world handles errors.
  */
-#define ROOT_INO        ((MNX(ino_t)) 1)     /* Inode nr of root dir. */
+#define ROOT_INO        ((ino_t) 1)     /* Inode nr of root dir. */
 
-MNX(off_t) r_super(int *);
-void r_stat(MNX(Ino_t) file, struct MNX(stat) *stp);
-MNX(off_t) r_vir2abs(MNX(off_t) virblockno);
-MNX(ino_t) r_readdir(char *name);
-MNX(ino_t) r_lookup(MNX(Ino_t) cwd, char *path);
+off_t r_super(int *);
+void r_stat(Ino_t file, struct stat *stp);
+off_t r_vir2abs(off_t virblockno);
+ino_t r_readdir(char *name);
+ino_t r_lookup(Ino_t cwd, char *path);

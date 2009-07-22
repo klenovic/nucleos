@@ -17,7 +17,7 @@
 #define fcntl _fcntl
 #define read _read
 #define close _close
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <pwd.h>
 #include <string.h>
 #include <stdlib.h>

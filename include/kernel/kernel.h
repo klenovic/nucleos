@@ -19,7 +19,7 @@
 
 /* The following are so basic, all the *.c files get them automatically. */
 #include <ansi.h>		/* C style: ANSI or K&R, MUST be second */
-#include <sys/types.h>		/* general system types */
+#include <nucleos/types.h>		/* general system types */
 #include <nucleos/const.h>	/* MINIX specific constants */
 #include <nucleos/type.h>		/* MINIX specific types, e.g. message */
 #include <nucleos/ipc.h>		/* MINIX run-time system */

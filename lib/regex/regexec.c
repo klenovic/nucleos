@@ -57,16 +57,13 @@ static char sccsid[] = "@(#)regexec.c	8.3 (Berkeley) 3/20/94";
  * macros that code uses.  This lets the same code operate on two different
  * representations for state sets.
  */
-#include <sys/types.h>
+#include <nucleos/nucleos.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#ifdef __minix_vmd
-#include <bsd/asciictype.h>
-#else
+#include <nucleos/limits.h>
 #include <ctype.h>
-#endif
 #include <regex.h>
 
 #include "utils.h"

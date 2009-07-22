@@ -61,7 +61,7 @@ PUBLIC int fs_readsuper_s()
 	return EINVAL;
   }
 
-  r= ds_retrieve_u32(fs_dev_label, &tasknr);
+  r= ds_retrieve_u32(fs_dev_label, (u32_t*)&tasknr);
   if (r != OK)
   {
 	printf("mfs:fs_readsuper: ds_retrieve_u32 failed for '%s': %d\n",

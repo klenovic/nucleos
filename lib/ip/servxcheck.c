@@ -15,7 +15,7 @@
 #define open _open
 #define write _write
 #define close _close
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>

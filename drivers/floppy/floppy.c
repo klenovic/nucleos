@@ -30,7 +30,7 @@
  *   Nov 28, 1986   better resetting for 386  (Peter Kay)
  *   Oct 27, 1986   fdc_results fixed for 8 MHz  (Jakob Schripsema)
  */
-
+#include <nucleos/nucleos.h>
 #include "floppy.h"
 #include <timers.h>
 #include <assert.h>

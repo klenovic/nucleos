@@ -14,7 +14,7 @@
 
 #define _MINIX 1	/* To get the brk() prototype (as _brk()). */
 #define brk _brk	/* Our brk() must redefine _brk(). */
-
+#include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>

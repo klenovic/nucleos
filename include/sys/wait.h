@@ -25,9 +25,7 @@
 #ifndef _WAIT_H
 #define _WAIT_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 #define _LOW(v)		( (v) & 0377)
 #define _HIGH(v)	( ((v) >> 8) & 0377)

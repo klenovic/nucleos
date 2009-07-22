@@ -9,7 +9,7 @@
  */
 
 #ifdef CONFIG_BUILTIN_INITRD
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #endif
 
 /* Compile ramdisk translated to array of chars. */

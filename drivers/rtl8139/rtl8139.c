@@ -69,7 +69,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <nucleos/com.h>
 #include <servers/ds/ds.h>
 #include <nucleos/keymap.h>
@@ -82,7 +82,7 @@
 #include <net/gen/eth_io.h>
 #include <ibm/pci.h>
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <fcntl.h>
 #include <assert.h>
 #include <unistd.h>

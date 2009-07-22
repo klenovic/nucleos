@@ -14,10 +14,10 @@ sys/socket.h
 #ifndef SYS_SOCKET_H
 #define SYS_SOCKET_H
 
-/* Can we include <stdint.h> here or do we need an additional header that is
+/* Can we include <nucleos/types.h> here or do we need an additional header that is
  * safe to include?
  */
-#include <stdint.h>
+#include <nucleos/types.h>
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 #include <net/gen/socket.h>

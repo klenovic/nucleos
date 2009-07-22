@@ -20,7 +20,7 @@
  * Changes for VFS:
  *   Jul 2006 (Balazs Gerofi)
  */
-
+#include <nucleos/nucleos.h>
 #include "fs.h"
 #include <fcntl.h>
 #include <unistd.h>

@@ -16,10 +16,6 @@ Media Independent (Ethernet) Interface functions
 */
 
 #include "../drivers.h"
-#if __minix_vmd
-#include "config.h"
-#endif
-
 #include "mii.h"
 
 /*===========================================================================*

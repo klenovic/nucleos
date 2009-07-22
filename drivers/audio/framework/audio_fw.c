@@ -52,9 +52,9 @@
 
 
 #include "audio_fw.h"
-#include <sys/vm.h>
+#include <servers/vm/vm.h>
 #include <servers/ds/ds.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 
 FORWARD _PROTOTYPE( int msg_open, (int minor_dev_nr) );

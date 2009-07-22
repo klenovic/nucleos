@@ -42,21 +42,21 @@
 #define MONO_MODE	0x07	/* 80x25 monochrome. */
 #define COLOR_MODE	0x03	/* 80x25 color. */
 
-typedef struct MNX(vector) { /* 8086 vector */
-  MNX(u16_t) offset;
-  MNX(u16_t) segment;
+typedef struct vector { /* 8086 vector */
+  u16_t offset;
+  u16_t segment;
 } vector;
 
 vector rem_part;		/* Boot partition table entry. */
 
-MNX(u32_t) caddr, daddr; /* Code and data address of the boot program. */
-MNX(u32_t) runsize;   /* Size of this program. */
+u32_t caddr, daddr; /* Code and data address of the boot program. */
+u32_t runsize;   /* Size of this program. */
 
-MNX(u16_t) device;    /* Drive being booted from. */
+u16_t device;    /* Drive being booted from. */
 
 typedef struct {		/* One chunk of free memory. */
-	MNX(u32_t)	base;		/* Start byte. */
-	MNX(u32_t)	size;		/* Number of bytes. */
+	u32_t	base;		/* Start byte. */
+	u32_t	size;		/* Number of bytes. */
 } memory;
 
 memory mem[3];		/* List of available memory. */
@@ -64,10 +64,10 @@ int mon_return;		/* Monitor stays in memory? */
 
 typedef struct bios_env
 {
-  MNX(u16_t) ax;
-  MNX(u16_t) bx;
-  MNX(u16_t) cx;
-  MNX(u16_t) flags;
+  u16_t ax;
+  u16_t bx;
+  u16_t cx;
+  u16_t flags;
 } bios_env_t;
 
 #define FL_CARRY	0x0001	/* carry flag */
@@ -78,21 +78,21 @@ typedef struct bios_env
 void exit(int code);
 
 /* Local monitor address to absolute address. */
-MNX(u32_t) mon2abs(void *ptr);
+u32_t mon2abs(void *ptr);
 
 /* Vector to absolute address. */
-MNX(u32_t) vec2abs(vector *vec);
+u32_t vec2abs(vector *vec);
 
 /* Copy bytes from anywhere to anywhere (extended memory too) */
-void raw_copy(MNX(u32_t) dstaddr, MNX(u32_t) srcaddr, MNX(u32_t) count);
+void raw_copy(u32_t dstaddr, u32_t srcaddr, u32_t count);
 
 #define MAX_GETWORD_ADDR 0xfffff
 
 /* Get a word from somewhere in the first 1MB of memory */
-MNX(u16_t) get_word(MNX(u32_t) addr);
+u16_t get_word(u32_t addr);
 
 /* Put a word anywhere. */
-void put_word(MNX(u32_t) addr, MNX(U16_t) word);
+void put_word(u32_t addr, U16_t word);
 
 /* Switch to a copy of this program. */
 void relocate(void);
@@ -101,13 +101,13 @@ void relocate(void);
 int dev_open(void), dev_close(void);
 
  /* True if sector is on a track boundary. */
-int dev_boundary(MNX(u32_t) sector);
+int dev_boundary(u32_t sector);
 
 /* Read 1 or more sectors from "device". */
-int readsectors(MNX(u32_t) bufaddr, MNX(u32_t) sector, MNX(U8_t) count);
+int readsectors(u32_t bufaddr, u32_t sector, U8_t count);
 
 /* Write 1 or more sectors to "device". */
-int writesectors(MNX(u32_t) bufaddr, MNX(u32_t) sector, MNX(U8_t) count);
+int writesectors(u32_t bufaddr, u32_t sector, U8_t count);
 
 /* Read a keypress. */
 int getch(void);
@@ -137,20 +137,20 @@ void set_mode(unsigned mode);
 void clear_screen(void);
 
 /* System bus type, XT, AT, or MCA. */
-MNX(u16_t) get_bus(void);
+u16_t get_bus(void);
 
 /* Display type, MDA to VGA. */
-MNX(u16_t) get_video(void);
+u16_t get_video(void);
 
 /* Current value of the clock tick counter. */
-MNX(u32_t) get_tick(void);
+u32_t get_tick(void);
 
 /* Execute a bootstrap routine for a different O.S. */
 void bootstrap(int device, struct part_entry *entry);
 
 /* Start Minix. */
-void minix(MNX(u32_t) koff, MNX(u32_t) kcs, MNX(u32_t) kds,
-           char *bootparams, size_t paramsize, MNX(u32_t) aout);
+void minix(u32_t koff, u32_t kcs, u32_t kds,
+           char *bootparams, size_t paramsize, u32_t aout);
 
 void int15(bios_env_t *);
 
@@ -186,7 +186,7 @@ void b_unset(char *name);
 void parse_code(char *code);	/* Parse boot monitor commands. */
 
 extern int fsok;	/* True if the boot device contains an FS. */
-MNX(u32_t) lowsec;	/* Offset to the file system on the boot device. */
+u32_t lowsec;	/* Offset to the file system on the boot device. */
 
 /* Called by boot.c: */
 void bootminix(void);		/* Load and start a Minix image. */
@@ -195,8 +195,8 @@ void bootminix(void);		/* Load and start a Minix image. */
 /* Report a read error. */
 void readerr(off_t sec, int err);
 
-/* Transform MNX(u32_t) to ASCII at base b or base 10. */
-char *ul2a(MNX(u32_t) n, unsigned b), *ul2a10(MNX(u32_t) n);
+/* Transform u32_t to ASCII at base b or base 10. */
+char *ul2a(u32_t n, unsigned b), *ul2a10(u32_t n);
 
 /* Cheap atol(). */
 long a2l(char *a);

@@ -26,8 +26,8 @@
 #include "file.h"
 #include "vnode.h"
 
-#include <sys/time.h>
-#include <sys/select.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <string.h>
@@ -226,7 +226,7 @@ PRIVATE void copy_fdsets(struct selectentry *e)
                panic(__FILE__, "select copy_fdsets: e->nfds wrong", e->nfds);
 
        /* Only copy back as many bits as the user expects. */
-       fd_setsize = _FDSETWORDS(e->nfds)*_FDSETBITSPERWORD/8;
+       fd_setsize = _FDSETWORDS(e->nfds)*__NFDBITS/8;
 
         if (e->vir_readfds)
                sys_vircopy(SELF, D, (vir_bytes) &e->ready_readfds,
@@ -287,7 +287,7 @@ PUBLIC int do_select(void)
         * If nfds is too large, we have already returned above.
         */
 
-	fd_setsize = _FDSETWORDS(nfds)*_FDSETBITSPERWORD/8;
+	fd_setsize = _FDSETWORDS(nfds)*__NFDBITS/8;
 	if (selecttab[s].vir_readfds
 	 && (r=sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_READFDS,
 		SELF, D, (vir_bytes) &selecttab[s].readfds, fd_setsize)) != OK)

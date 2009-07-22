@@ -15,9 +15,7 @@
 #ifndef _STAT_H
 #define _STAT_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 struct stat {
   dev_t st_dev;			/* major/minor device number */

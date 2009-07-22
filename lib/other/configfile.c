@@ -12,25 +12,17 @@
  *								5 Jun 1999
  */
 #define nil ((void*)0)
-#if __minix_vmd
-#include <minix/stubs.h>
-#else
 #define fstat _fstat
 #define stat _stat
-#endif
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
-#if __minix_vmd
-#include <minix/asciictype.h>
-#else
 #include <ctype.h>
-#endif
 #define _c /* not const */
 #include <configfile.h>
 

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __X86_ASM_SERVER_VM_VMPROC_H
-#define __X86_ASM_SERVER_VM_VMPROC_H
+#ifndef __X86_ASM_SERVERS_VM_VMPROC_H
+#define __X86_ASM_SERVERS_VM_VMPROC_H
 
 #include <asm/kernel/types.h>
 

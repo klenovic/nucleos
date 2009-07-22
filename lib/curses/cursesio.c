@@ -9,7 +9,7 @@
  */
 #include <stdlib.h>
 #include <termcap.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/ioctl.h>
 #include <curses.h>
 #include "curspriv.h"

@@ -9,7 +9,7 @@
  */
 /*	genmap - output binary keymap			Author: Marcus Hampel
  */
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/keymap.h>
 #include <fcntl.h>
 #include <unistd.h>

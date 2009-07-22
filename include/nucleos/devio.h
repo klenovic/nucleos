@@ -18,7 +18,7 @@
 #ifndef _DEVIO_H
 #define _DEVIO_H
 
-#include <sys/types.h>        /* u8_t, u16_t, u32_t needed */
+#include <nucleos/types.h>        /* u8_t, u16_t, u32_t needed */
 
 typedef u16_t port_t;
 typedef U16_t Port_t;

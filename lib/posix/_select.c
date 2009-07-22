@@ -11,8 +11,7 @@
 #define select _select
 
 #include <lib.h>
-#include <sys/time.h>
-#include <sys/select.h>
+#include <nucleos/time.h>
 
 PUBLIC int select(int nfds,
 	fd_set *readfds, fd_set *writefds, fd_set *errorfds,

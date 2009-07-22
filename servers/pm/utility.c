@@ -16,7 +16,7 @@
  *   proc_from_pid:	return process pointer from pid number
  *   pm_isokendpt:	check the validity of an endpoint
  */
-
+#include <nucleos/nucleos.h>
 #include "pm.h"
 #include <sys/stat.h>
 #include <nucleos/callnr.h>

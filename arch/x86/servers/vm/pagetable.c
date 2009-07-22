@@ -263,7 +263,7 @@ PRIVATE void *vm_checkspares(void)
 	for(s = 0; s < SPAREPAGES && missing_spares > 0; s++)
 	    if(!sparepages[s].page) {
 		n++;
-		sparepages[s].page = vm_allocpages(&sparepages[s].phys, 1,
+		sparepages[s].page = vm_allocpages((phys_bytes*)&sparepages[s].phys, 1,
 			VMP_SPARE);
 		missing_spares--;
 		vm_assert(missing_spares >= 0 && missing_spares <= SPAREPAGES);
@@ -305,7 +305,7 @@ PUBLIC void *vm_allocpages(phys_bytes *phys, int pages, int reason)
 		int r;
 		void *s;
 		vm_assert(pages == 1);
-		s=vm_getsparepage(phys);
+		s=vm_getsparepage((u32_t*)phys);
 		level--;
 		return s;
 	}
@@ -365,7 +365,7 @@ PRIVATE int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 	PT_SANE(pt);
 
 	/* Get storage for the page table. */
-        if(!(pt->pt_pt[pde] = vm_allocpages(&pt_phys, 1, VMP_PAGETABLE)))
+        if(!(pt->pt_pt[pde] = vm_allocpages((phys_bytes*)&pt_phys, 1, VMP_PAGETABLE)))
 		return ENOMEM;
 
 	for(i = 0; i < I386_VM_PT_ENTRIES; i++)
@@ -496,7 +496,7 @@ PUBLIC int pt_new(pt_t *pt)
  */
 	int i;
 
-        if(!(pt->pt_dir = vm_allocpages(&pt->pt_dir_phys, 1, VMP_PAGEDIR))) {
+        if(!(pt->pt_dir = vm_allocpages((phys_bytes*)&pt->pt_dir_phys, 1, VMP_PAGEDIR))) {
 		return ENOMEM;
 	}
 
@@ -544,38 +544,38 @@ PUBLIC void pt_init(void)
                 if(!(sparepages[s].page = aalloc(I386_PAGE_SIZE)))
                         vm_panic("pt_init: aalloc for spare failed", NO_NUM);
                 if((r=sys_umap(SELF, VM_D, (vir_bytes) sparepages[s].page,
-                        I386_PAGE_SIZE, &sparepages[s].phys)) != OK)
+                        I386_PAGE_SIZE, (phys_bytes*)&sparepages[s].phys)) != OK)
                         vm_panic("pt_init: sys_umap failed", r);
         }
 
 	missing_spares = 0;
-        
+
         /* Make new page table for ourselves, partly copied
          * from the current one.
-         */     
+         */
         if(pt_new(newpt) != OK)
                 vm_panic("pt_init: pt_new failed", NO_NUM); 
-           
+
         /* Initial (current) range of our virtual address space. */
         lo = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);
         hi = CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_phys +
                 vmp->vm_arch.vm_seg[S].mem_len);
-                  
+
         vm_assert(!(lo % I386_PAGE_SIZE)); 
         vm_assert(!(hi % I386_PAGE_SIZE));
- 
+
         if(lo < VM_PROCSTART) {
                 moveup = VM_PROCSTART - lo;
                 vm_assert(!(VM_PROCSTART % I386_PAGE_SIZE));
                 vm_assert(!(lo % I386_PAGE_SIZE));
                 vm_assert(!(moveup % I386_PAGE_SIZE));
         }
-                
+
         /* Set up mappings for VM process. */
         for(v = lo; v < hi; v += I386_PAGE_SIZE)  {
                 phys_bytes addr;
                 u32_t flags; 
-        
+
                 /* We have to write the old and new position in the PT,
                  * so we can move our segments.
                  */ 
@@ -586,12 +586,12 @@ PUBLIC void pt_init(void)
                         I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != OK)
                         vm_panic("pt_init: pt_writemap failed", NO_NUM);
         }
-       
+
         /* Move segments up too. */
         vmp->vm_arch.vm_seg[T].mem_phys += ABS2CLICK(moveup);
         vmp->vm_arch.vm_seg[D].mem_phys += ABS2CLICK(moveup);
         vmp->vm_arch.vm_seg[S].mem_phys += ABS2CLICK(moveup);
-       
+
 #if 0
         /* Map in kernel. */
         if(pt_mapkernel(newpt) != OK)

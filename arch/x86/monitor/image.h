@@ -13,5 +13,5 @@
 
 struct image_header {
   char   name[IM_NAME_MAX + 1]; /* Null terminated. */
-  struct MNX(exec) process;
+  struct exec process;
 };

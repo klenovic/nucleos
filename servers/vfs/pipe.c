@@ -35,8 +35,7 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#include <nucleos/time.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"

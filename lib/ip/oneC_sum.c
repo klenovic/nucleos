@@ -12,7 +12,7 @@
  * See RFC 1071, "Computing the Internet checksum"
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/gen/oneCsum.h>
 
 u16_t oneC_sum(U16_t prev, void *data, size_t size)

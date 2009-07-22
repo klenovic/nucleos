@@ -49,9 +49,7 @@
 #ifndef _REGEX_H_
 #define	_REGEX_H_
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 /* types */
 typedef off_t regoff_t;

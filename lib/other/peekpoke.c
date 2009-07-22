@@ -16,7 +16,7 @@
  * consumes another file descriptor.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 

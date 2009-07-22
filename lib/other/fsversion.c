@@ -17,7 +17,7 @@
  * The second is the program name, which is used in error messages.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>

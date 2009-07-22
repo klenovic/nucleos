@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#ifndef __SERVER_VM_UTIL_H
-#define __SERVER_VM_UTIL_H
+#ifndef __SERVERS_VM_UTIL_H
+#define __SERVERS_VM_UTIL_H
 
 #include <servers/vm/vm.h>
 #include <servers/vm/glo.h>
@@ -33,4 +32,4 @@
 	panic("VM", _pline, (n));					\
 	}
 
-#endif /* __SERVER_VM_UTIL_H */
+#endif /* __SERVERS_VM_UTIL_H */

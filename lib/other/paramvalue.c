@@ -15,10 +15,10 @@
  * Paramvalue() decodes such a string.
  */
 #define nil 0
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/queryparam.h>
 
 size_t paramvalue(char **value, void *address, size_t size)

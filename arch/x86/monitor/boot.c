@@ -16,12 +16,14 @@ char version[]=   "2.20";
 #define nil 0
 #define _POSIX_SOURCE 1
 #define _MINIX  1
-#include <stddef.h>
+#include <nucleos/nucleos.h>
+#include <nucleos/stringify.h>
+#include <nucleos/stddef.h>
 #include <stdio.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 #include <errno.h>
 #include <ibm/partition.h>
@@ -129,7 +131,7 @@ void readblock(off_t blk, char *buf, int block_size)
 /* Read blocks for the rawfs package. */
 {
   int r;
-  MNX(u32_t) sec = lowsec + blk * RATIO(block_size);
+  u32_t sec = lowsec + blk * RATIO(block_size);
 
   if(!block_size) {
     printf("block_size 0\n");
@@ -318,7 +320,7 @@ struct biosdev {
   int device, primary, secondary;
 } bootdev, tmpdev;
 
-int get_master(char *master, struct part_entry **table, MNX(u32_t) pos)
+int get_master(char *master, struct part_entry **table, u32_t pos)
 /* Read a master boot sector and its partition table. */
 {
   int r, n;
@@ -354,17 +356,17 @@ void initialize(void)
   char master[SECTOR_SIZE];
   struct part_entry *table[NR_PARTITIONS];
   int r, p;
-  MNX(u32_t) masterpos;
+  u32_t masterpos;
 
   /* Copy the boot program to the far end of low memory, this must be
    * done to get out of the way of Minix, and to put the data area
    * cleanly inside a 64K chunk if using BIOS I/O (no DMA problems).
    */
-  MNX(u32_t) oldaddr = caddr;
-  MNX(u32_t) memend = mem[0].base + mem[0].size;
-  MNX(u32_t) newaddr = (memend - runsize) & ~0x0000FL;
+  u32_t oldaddr = caddr;
+  u32_t memend = mem[0].base + mem[0].size;
+  u32_t newaddr = (memend - runsize) & ~0x0000FL;
 
-  MNX(u32_t) dma64k = (memend - 1) & ~0x0FFFFL;
+  u32_t dma64k = (memend - 1) & ~0x0FFFFL;
 
   /* Check if data segment crosses a 64K boundary. */
   if (newaddr + (daddr - caddr) < dma64k) {
@@ -646,7 +648,7 @@ long a2l(char *a)
   return sign * n;
 }
 
-char *ul2a(MNX(u32_t) n, unsigned b)
+char *ul2a(u32_t n, unsigned b)
 /* Transform a long number to ascii at base b, (b >= 8). */
 {
   static char num[(CHAR_BIT * sizeof(n) + 2) / 3 + 1];
@@ -657,7 +659,7 @@ char *ul2a(MNX(u32_t) n, unsigned b)
   return a;
 }
 
-char *ul2a10(MNX(u32_t) n)
+char *ul2a10(u32_t n)
 /* Transform a long number to ascii at base 10. */
 {
   return ul2a(n, 10);
@@ -706,7 +708,7 @@ void get_parameters(void)
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "ram");
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "bootdev");
   b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
-  b_setvar(E_SPECIAL|E_VAR, "hz", MKSTR(DEFAULT_HZ));
+  b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(DEFAULT_HZ));
 
   processor = getprocessor();
 
@@ -879,7 +881,7 @@ dev_t name2dev(char *name)
   dev_t dev;
   ino_t ino;
 //  int drive;
-  struct MNX(stat) MNX(st);
+  struct stat st;
   char *n, *s;
 
   /* "boot *d0p2" means: make partition 2 active before you boot it. */
@@ -993,7 +995,7 @@ dev_t name2dev(char *name)
 }
 
 #if DEBUG
-static void apm_perror(char *label, MNX(u16_t) ax)
+static void apm_perror(char *label, u16_t ax)
 {
   unsigned ah;
   char *str;
@@ -1141,7 +1143,7 @@ int exec_bootstrap(void)
   int r=0, n, dirty= 0;
   char master[SECTOR_SIZE];
   struct part_entry *table[NR_PARTITIONS], dummy, *active= &dummy;
-  MNX(u32_t) masterpos=0;
+  u32_t masterpos=0;
 
   active->lowsec= 0;
 
@@ -1226,8 +1228,8 @@ void ctty(char *line)
 void ls(char *dir)
 /* List the contents of a directory. */
 {
-  MNX(ino_t) ino;
-  struct MNX(stat) MNX(st);
+  ino_t ino;
+  struct stat st;
   char name[NAME_MAX+1];
 
   if (fsok == -1) fsok= r_super(&block_size) != 0;
@@ -1245,19 +1247,19 @@ void ls(char *dir)
   while ((ino= r_readdir(name)) != 0) printf("%s/%s\n", dir, name);
 }
 
-MNX(u32_t) milli_time(void)
+u32_t milli_time(void)
 {
   return get_tick() * MSEC_PER_TICK;
 }
 
-MNX(u32_t) milli_since(MNX(u32_t) base)
+u32_t milli_since(u32_t base)
 {
   return (milli_time() + (TICKS_PER_DAY*MSEC_PER_TICK) - base)
       % (TICKS_PER_DAY*MSEC_PER_TICK);
 }
 
 static char *Thandler;
-static MNX(u32_t) Tbase, Tcount;
+static u32_t Tbase, Tcount;
 
 void unschedule(void)
 /* Invalidate a waiting command. */
@@ -1289,7 +1291,7 @@ int expired(void)
 void delay(char *msec)
 /* Delay for a given time. */
 {
-  MNX(u32_t) base, count;
+  u32_t base, count;
 
   if ((count= a2l(msec)) == 0) return;
   base= milli_time();

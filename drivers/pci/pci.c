@@ -19,7 +19,7 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include <nucleos/drivers.h>
 #include <assert.h>
 #include <ibm/pci.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 #include <nucleos/com.h>
 #include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
@@ -29,13 +29,8 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include "pci_intel.h"
 #include "pci_sis.h"
 #include "pci_via.h"
-#if __minix_vmd
-#include "config.h"
-#endif
 
-#if !__minix_vmd
 #define irq_mode_pci(irq) ((void)0)
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -167,21 +162,21 @@ FORWARD _PROTOTYPE( void print_hyper_cap, (int devind, U8_t capptr)	);
 PUBLIC unsigned pci_inb(U16_t port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inb(port, &value)) !=OK)
+	if ((s=sys_inb(port, (unsigned long*)&value)) !=OK)
 		printf("PCI: warning, sys_inb failed: %d\n", s);
 	return value;
 }
 PUBLIC unsigned pci_inw(U16_t port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inw(port, &value)) !=OK)
+	if ((s=sys_inw(port, (unsigned long*)&value)) !=OK)
 		printf("PCI: warning, sys_inw failed: %d\n", s);
 	return value;
 }
 PUBLIC unsigned pci_inl(U16_t port) {
 	U32_t value;
 	int s;
-	if ((s=sys_inl(port, &value)) !=OK)
+	if ((s=sys_inl(port, (unsigned long*)&value)) !=OK)
 		printf("PCI: warning, sys_inl failed: %d\n", s);
 	return value;
 }
@@ -1840,9 +1835,9 @@ int devind;
 	dev= pcidev[devind].pd_dev;
 	func= pcidev[devind].pd_func;
 #if USER_SPACE
-	if (OK != (s=sys_inb(PIIX_ELCR1, &elcr1)))
+	if (OK != (s=sys_inb(PIIX_ELCR1, (unsigned long*)&elcr1)))
 		printf("Warning, sys_inb failed: %d\n", s);
-	if (OK != (s=sys_inb(PIIX_ELCR2, &elcr2)))
+	if (OK != (s=sys_inb(PIIX_ELCR2, (unsigned long*)&elcr2)))
 		printf("Warning, sys_inb failed: %d\n", s);
 #else
 	elcr1= inb(PIIX_ELCR1);

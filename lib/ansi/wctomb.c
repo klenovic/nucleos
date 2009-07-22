@@ -14,7 +14,7 @@
 /* $Header: /cvsup/minix/src/lib/ansi/wctomb.c,v 1.1.1.1 2005/04/21 14:56:06 beng Exp $ */
 
 #include	<stdlib.h>
-#include	<limits.h>
+#include	<nucleos/limits.h>
 
 int
 /* was: wctomb(char *s, wchar_t wchar) 

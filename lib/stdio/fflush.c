@@ -12,7 +12,7 @@
  */
 /* $Header: /cvsup/minix/src/lib/stdio/fflush.c,v 1.3 2006/02/02 16:59:07 beng Exp $ */
 
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 #include	<stdio.h>
 #include	<errno.h>
 #include	"loc_incl.h"

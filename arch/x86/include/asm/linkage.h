@@ -8,9 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /**
- * @file arch/x86/include/asm/linkage.h
- * @brief Data definition
- * @details Basic types upon which most other types are built.
+ * @file arch/x86/include/asm/linkage_32.h
+ * @brief linkage
  */
 #ifndef __X86_ASM_LINKAGE_H
 #define __X86_ASM_LINKAGE_H
@@ -21,4 +20,57 @@
 #include <asm/linkage_32.h>
 #endif
 
+#ifndef __ASSEMBLY__
+
+/**
+ * @name Define a weak symbol by using assembly (inside C code).
+ */
+/*@{*/
+#define DEFWEAKALIAS(sweak,target) \
+  __asm__(".weak " sweak           "\n" \
+          ".set " sweak "," target "\n");
+/*@}*/
+
+/**
+ * @name Define a symbol by using assembly (inside C code).
+ */
+/*@{*/
+#define DEFSYM(symbol,target) \
+  __asm__(".set " symbol "," target "\n");
+/*@}*/
+
+#else /* __ASSEMBLY__ */
+
+/**
+ * @name Define a weak symbol by using assembly (inside assembly code).
+ */
+/*@{*/
+#define DEFWEAKALIAS(sweak,target) \
+  .weak sweak; \
+  .set sweak,target;
+/*@}*/
+
+/**
+ * @name Define a symbol by using assembly (assembly).
+ */
+/*@{*/
+#define DEFSYM(symbol,target) \
+  .set symbol, target;
+/*@}*/
+
+/**
+ * @brief Helper macro for function definition (assembly).
+ */
+#define BEGIN_FUNC(name,alig,pad) \
+  .p2align alig,pad;      \
+  .type name, @function;  \
+  .globl name;            \
+name:
+
+/**
+ * @brief Helper macro for function definition (assembly).
+ */
+#define END_FUNC(name) .size name, .-name;
+
+#endif /* !__ASSEMBLY__ */
 #endif /* !__X86_ASM_LINKAGE_H */

@@ -45,8 +45,8 @@
  *
  */
 
-#include <sys/types.h>
-/* #include <sys/time.h> */
+#include <nucleos/types.h>
+/* #include <nucleos/time.h> */
 /* #include <sys/systm.h> */
 /* #include <machine/endian.h> */
 #include "sha2.h"
@@ -99,7 +99,7 @@
  *   #define SHA2_BYTE_ORDER SHA2_BIG_ENDIAN
  *
  * The FreeBSD machine this was written on defines BYTE_ORDER
- * appropriately by including <sys/types.h> (which in turn includes
+ * appropriately by including <nucleos/types.h> (which in turn includes
  * <machine/endian.h> where the appropriate definitions are actually
  * made).
  */
