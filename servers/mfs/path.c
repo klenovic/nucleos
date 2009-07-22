@@ -836,7 +836,6 @@ char string[NAME_MAX];		/* component name to look for */
 		  }
 	  }
   }
-  if (rip == NIL_INODE) return(NIL_INODE);
 
   /* See if the inode is mounted on.  If so, switch to root directory of the
    * mounted file system.  The super_block provides the linkage between the
@@ -930,7 +929,6 @@ char string[NAME_MAX];		/* component name to look for */
 		  }
 	  }
   }
-  if (rip == NIL_INODE) return(NIL_INODE);
 
   /* See if the inode is mounted on.  If so, switch to root directory of the
    * mounted file system.  The super_block provides the linkage between the
