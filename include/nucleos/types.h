@@ -43,7 +43,7 @@ typedef __kernel_ino_t		ino_t; 		/* i-node number (V3 filesystem) */
 typedef __kernel_mode_t		mode_t;		/* file type and permissions bits */
 typedef __kernel_nlink_t	nlink_t;	/* number of links to a file */
 typedef __kernel_off_t		off_t;		/* offset within a file */
-
+typedef __kernel_daddr_t	daddr_t;
 #if defined(__GNUC__)
 typedef __kernel_loff_t		loff_t;
 #endif
@@ -162,7 +162,7 @@ typedef __kernel_sigset_t	sigset_t;
 
 #ifndef _CADDR_T
 #define _CADDR_T
-typedef __kernel_caddr_t	*caddr_t;
+typedef __kernel_caddr_t	caddr_t;
 #endif
 
 /* bsd */
