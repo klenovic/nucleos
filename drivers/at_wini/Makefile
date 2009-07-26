@@ -6,7 +6,6 @@ at_wini.elf32-obj-y := at_wini.o
 # arch. library path has precedence over generic
 LDFLAGS_at_wini.elf32 := -L$(lib-arch) -Llib/ \
 			 -lsys -ldriver -lnucc \
-			 -L$(cc-lib-dir) -lgcc \
 			 -Tdrivers/driver_32.lds
 
 $(src)/at_wini.elf32: drivers/driver_32.lds

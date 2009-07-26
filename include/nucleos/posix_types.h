@@ -23,14 +23,11 @@
 
 /* Default FD_SETSIZE is OPEN_MAX. */
 #undef __FD_SETSIZE	// FD_SETSIZE
-#define __FD_SETSIZE	30 /* @klenovic: the value of OPEN_MAX */
+#define __FD_SETSIZE	32 /* @klenovic: the value of OPEN_MAX */
 
 
-#undef __FDSET_LONGS	// _FDSETWORDS(b)
+#undef __FDSET_LONGS
 #define __FDSET_LONGS   (__FD_SETSIZE/__NFDBITS)
-
-/* We want to store FD_SETSIZE bits. */
-#define _FDSETWORDS(b)	(((b) + __NFDBITS - 1)/__NFDBITS)
 
 #undef __FDELT		//_FD_BITWORD
 #define __FDELT(d)      ((d) / __NFDBITS)
@@ -40,8 +37,7 @@
 #define __FDMASK(d)     (1UL << ((d) % __NFDBITS))
 
 typedef struct {
-//	unsigned long fds_bits[__FDSET_LONGS];
-	unsigned long fds_bits[_FDSETWORDS(__FD_SETSIZE)];
+	unsigned long fds_bits[__FDSET_LONGS];
 } __kernel_fd_set;
 
 #include <asm/posix_types.h>

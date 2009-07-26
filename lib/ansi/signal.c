@@ -39,6 +39,8 @@ sighandler_t disp;		/* signal handler, or SIG_DFL, or SIG_IGN */
 #endif
 
   sa.sa_handler = disp;
+
   if (sigaction(sig, &sa, &osa) < 0) return(SIG_ERR);
+
   return(osa.sa_handler);
 }

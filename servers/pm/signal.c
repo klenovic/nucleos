@@ -92,11 +92,15 @@ PUBLIC int do_sigaction()
 	sigaddset(&mp->mp_catch, m_in.sig_nr);
 	sigdelset(&mp->mp_sig2mess, m_in.sig_nr);
   }
+
   mp->mp_sigact[m_in.sig_nr].sa_handler = svec.sa_handler;
+
   sigdelset(&svec.sa_mask, SIGKILL);
+
   mp->mp_sigact[m_in.sig_nr].sa_mask = svec.sa_mask;
   mp->mp_sigact[m_in.sig_nr].sa_flags = svec.sa_flags;
   mp->mp_sigreturn = (vir_bytes) m_in.sig_ret;
+
   return(OK);
 }
 

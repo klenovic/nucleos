@@ -33,4 +33,9 @@
 #define LLONG_MIN	(-LLONG_MAX - 1)
 #define ULLONG_MAX	(~0ULL)
 
+#define abs(x) ({		\
+	int __x = (x);		\
+	(__x < 0) ? -__x : __x;	\
+ })
+
 #endif /* __NUCLEOS_NUCLEOS_H */

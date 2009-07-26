@@ -65,3 +65,9 @@ config X86_GENERIC
 
     This is really intended for distributors who need more
     generic optimizations.
+
+# this should be set for all -march=.. options where the compiler
+# generates cmov.
+config X86_CMOV
+	def_bool y
+	depends on (MK8 || MK7 || MCORE2 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MVIAC3_2 || MVIAC7 || MCRUSOE || MEFFICEON || X86_64)

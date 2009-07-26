@@ -5,7 +5,6 @@ tty.elf32-obj-y := tty.o console.o keyboard.o pty.o rs232.o
 
 LDFLAGS_tty.elf32 := -L$(lib-arch) -Llib \
 		     -lsys -ltimers -lnucc \
-		     -L$(cc-lib-dir) -lgcc \
 		     -Tdrivers/driver_32.lds
 
 $(src)/tty.elf32: drivers/driver_32.lds

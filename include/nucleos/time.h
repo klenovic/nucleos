@@ -32,9 +32,9 @@ int settimeofday(const struct timeval *tp, const void *tzp);
 #define NFDBITS			__NFDBITS
 
 #define FD_SETSIZE		__FD_SETSIZE
+#define FD_ZERO(fdsetp)		__FD_ZERO(fdsetp)
 #define FD_SET(fd,fdsetp)	__FD_SET(fd,fdsetp)
 #define FD_CLR(fd,fdsetp)	__FD_CLR(fd,fdsetp)
 #define FD_ISSET(fd,fdsetp)	__FD_ISSET(fd,fdsetp)
-#define FD_ZERO(fdsetp)		__FD_ZERO(fdsetp)
 
 #endif /* __NUCLEOS_TIME_H */

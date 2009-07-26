@@ -42,7 +42,7 @@
 #define NGROUPS_MAX          0	/* supplemental group IDs not available */
 #define ARG_MAX          262144 /* # bytes of args + environ for exec() */
 #define CHILD_MAX    _NO_LIMIT	/* MINIX does not limit children */
-#define OPEN_MAX            30	/* # open files a process may have */
+#define OPEN_MAX            32	/* # open files a process may have */
 #if 0			/* V1 file system */
 #define LINK_MAX      CHAR_MAX	/* # links a file may have */
 #else			/* V2 or better file system */
