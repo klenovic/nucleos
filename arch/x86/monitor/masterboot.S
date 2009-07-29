@@ -54,7 +54,7 @@ start:
 	mov	%sp, %si		// si = start of this code
 	push	%si			// Also where we will return to eventually
 	mov	$BUFFER, %di		// Buffer area
-	mov	$512/2, %cx		// One sector
+	mov	$[512>>1], %cx		// One sector
 	cld
 	rep	movsw
 	ljmp	$0, $BUFFER+migrate	// To safety
