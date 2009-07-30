@@ -20,12 +20,12 @@
  * be careful themselves.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <pwd.h>
 #include <net/hton.h>
 #include <net/gen/in.h>

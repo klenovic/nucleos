@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __X86_ASM_SERVER_VM_MEMORY_H
-#define __X86_ASM_SERVER_VM_MEMORY_H
+#ifndef __X86_ASM_SERVERS_VM_MEMORY_H
+#define __X86_ASM_SERVERS_VM_MEMORY_H
 
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 /* As visible from the user space process, where is the top of the
  * stack (first non-stack byte), when in paged mode?
@@ -37,4 +37,4 @@
 #define KERNEL_DATA		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_phys)
 #define KERNEL_DATA_LEN		CLICK2ABS(vmproc[VMP_SYSTEM].vm_arch.vm_seg[D].mem_len \
 					  + vmproc[VMP_SYSTEM].vm_arch.vm_seg[S].mem_len)
-#endif /* __X86_ASM_SERVER_VM_MEMORY_H */
+#endif /* __X86_ASM_SERVERS_VM_MEMORY_H */

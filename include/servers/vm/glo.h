@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVER_VM_GLO_H
-#define __SERVER_VM_GLO_H
+#ifndef __SERVERS_VM_GLO_H
+#define __SERVERS_VM_GLO_H
 
 #include <sys/stat.h>
 #include <nucleos/a.out.h>
@@ -37,4 +37,4 @@ EXTERN long vm_sanitychecklevel;
 EXTERN long vm_paged;
 EXTERN phys_bytes kernel_top_bytes;
 
-#endif /*  __SERVER_VM_GLO_H */
+#endif /* __SERVERS_VM_GLO_H */

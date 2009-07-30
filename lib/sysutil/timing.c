@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
+#include <nucleos/nucleos.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/const.h>
@@ -34,8 +34,8 @@ void util_timer_start(util_timingdata_t *timingdata, char *name)
 		return;
 	}
 
-	read_tsc(&timingdata->starttimes[HIGHCOUNT],
-		&timingdata->starttimes[LOWCOUNT]);
+	read_tsc((u32_t*)&timingdata->starttimes[HIGHCOUNT],
+		(u32_t*)&timingdata->starttimes[LOWCOUNT]);
 }
 
 void util_timer_end(util_timingdata_t *timingdata)
@@ -43,7 +43,7 @@ void util_timer_end(util_timingdata_t *timingdata)
 	unsigned long h, l, d = 0, binsize;
 	int bin;
 
-	read_tsc(&h, &l);
+	read_tsc((u32_t*)&h, (u32_t*)&l);
 	if (!timingdata->starttimes[HIGHCOUNT]) {
 		panic(__FILE__, "timer stopped but not started", NO_NUM);
 		return;

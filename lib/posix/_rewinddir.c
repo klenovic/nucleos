@@ -14,7 +14,7 @@
 #include <lib.h>
 #define rewinddir _rewinddir
 #define seekdir	_seekdir
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <dirent.h>
 
 void rewinddir(DIR *dp)

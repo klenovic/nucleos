@@ -21,7 +21,7 @@
 #define gethostbyaddr	_gethostbyaddr
 
 #define nil 0
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <net/gen/netdb.h>

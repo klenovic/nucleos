@@ -11,12 +11,12 @@
  * Changes:
  *   Jul 22, 2005:	Created  (Jorrit N. Herder)
  */
-
+#include <nucleos/nucleos.h>
 #include "inc.h"
 #include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <nucleos/dmap.h>

@@ -13,7 +13,6 @@ ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
 LDFLAGS_inet.elf32 := -L$(lib-arch) -Llib \
 		      -lsys -lnucc \
-		      -L$(cc-lib-dir) -lgcc \
 		      -Tservers/server_32.lds
 
 $(src)/inet.elf32: servers/server_32.lds

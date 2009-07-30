@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <sys/ioc_tty.h>
 

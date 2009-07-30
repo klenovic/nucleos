@@ -16,7 +16,7 @@
 #include	<stdlib.h>
 #include	"loc_incl.h"
 
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 
 off_t _lseek(int fildes, off_t offset, int whence);
 ssize_t _write(int d, const char *buf, int nbytes);

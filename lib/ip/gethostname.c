@@ -9,7 +9,7 @@
  */
 /* gethostname(2) system call emulation */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>

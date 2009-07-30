@@ -20,7 +20,7 @@ Created:	Oct 11, 1992 by Philip Homburg
 
 #define _MINIX_SOURCE
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ttyent.h>
 #include <string.h>
 #include <unistd.h>

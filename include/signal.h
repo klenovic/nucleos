@@ -18,10 +18,9 @@
 #ifndef _ANSI_H
 #include <ansi.h>
 #endif
+
 #ifdef _POSIX_SOURCE
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 #endif
 
 /* Here are types that are closely associated with signal handling. */

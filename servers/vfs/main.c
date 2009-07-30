@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <sys/ioc_memory.h>
 #include <sys/svrctl.h>
-#include <sys/select.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
@@ -37,6 +36,8 @@
 #include <nucleos/safecopies.h>
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
 
 #include "file.h"
 #include "fproc.h"

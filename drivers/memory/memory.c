@@ -22,6 +22,7 @@
  *	Jul 26, 2004	moved RAM driver to user-space  (Jorrit N. Herder)
  *	Apr 20, 1992	device dependent/independent split  (Kees J. Bot)
  */
+#include <nucleos/nucleos.h>
 #include <asm/bootparam.h>
 #include <nucleos/drivers.h>
 #include <nucleos/driver.h>
@@ -32,8 +33,8 @@
 #include <sys/mman.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
-#include <sys/vm.h>
-#include <sys/vm_i386.h>
+#include <servers/vm/vm.h>
+#include <asm/servers/vm/vm.h>
 #include <assert.h>
 
 #ifndef CONFIG_BUILTIN_INITRD

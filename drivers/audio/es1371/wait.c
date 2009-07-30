@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "../../drivers.h"
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <time.h>
 #include "pci_helper.h"
 

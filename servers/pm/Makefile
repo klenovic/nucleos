@@ -29,7 +29,6 @@ ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
 LDFLAGS_pm.elf32 := -L$(lib-arch) -Llib \
 		    -lsys -ltimers -lnucc \
-		    -L$(cc-lib-dir) -lgcc \
 		    -Tservers/server_32.lds
 
 $(src)/pm.elf32: servers/server_32.lds

@@ -50,7 +50,7 @@
  *
  * $Id: syslog.c 2015 2006-04-03 15:03:07Z beng $
  */
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

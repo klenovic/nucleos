@@ -31,7 +31,7 @@ static char sccsid[] = "@(#)gethostnamadr.c	6.41 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
 #ifdef _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>

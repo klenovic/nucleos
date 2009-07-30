@@ -11,7 +11,7 @@
 #define _SYSTEM 1
 
 #define VERBOSE 0
-
+#include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>

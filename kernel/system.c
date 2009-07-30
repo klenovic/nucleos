@@ -50,7 +50,7 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/u64.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 /* Declaration of the call vector that defines the mapping of system calls 
  * to handler functions. The vector is initialized in sys_init() with map(), 

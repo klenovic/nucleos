@@ -30,13 +30,13 @@
 static char sccsid[] = "@(#)rcmd.c	5.22 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>

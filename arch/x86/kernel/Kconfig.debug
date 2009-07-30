@@ -1,4 +1,7 @@
-# Kernel hacking/debugging
+# Kernel hacking/debugging (kernel generic + arch.specific)
 menu "Kernel hacking"
+
+# common kernel debug options
 source "kernel/Kconfig.debug"
+
 endmenu

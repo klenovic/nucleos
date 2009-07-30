@@ -45,6 +45,8 @@
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
+#include <net/gen/in.h>
+
 #define	_PATH_HEQUIV	"/etc/hosts.equiv"
 #define	_PATH_HOSTS	"/etc/hosts"
 #define	_PATH_NETWORKS	"/etc/networks"
@@ -129,7 +131,7 @@ void		setnetent _ARGS((int));
 void		setprotoent _ARGS((int));
 void		setservent _ARGS((int));
 #ifdef _MINIX
-int		servxcheck _ARGS((unsigned long _peer, const char *_service,
+int		servxcheck _ARGS((ipaddr_t _peer, const char *_service,
 			void (*_logf) _ARGS((int _pass, const char *_name))));
 char		*servxfile _ARGS((const char *_file));
 #endif

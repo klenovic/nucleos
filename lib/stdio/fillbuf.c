@@ -13,7 +13,7 @@
 /* $Header: /cvsup/minix/src/lib/stdio/fillbuf.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
 
 #if	defined(_POSIX_SOURCE)
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 #endif
 #include	<stdio.h>
 #include	<stdlib.h>

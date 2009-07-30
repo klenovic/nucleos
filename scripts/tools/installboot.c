@@ -15,7 +15,6 @@
 #define _POSIX_SOURCE  1
 #define _MINIX  1
 
-#include INC_NUCS(nucleos/macros.h)
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -415,6 +414,8 @@ int read_iheader_aout(int talk, char *proc, FILE *procf, struct MNX(image_header
                                                     (big & 2) ? "data" : "",
                                                     (big == 3) ? "s are" : " is");
   }
+
+  return 0;
 }
 
 void padimage(char *image, FILE *imagef, int n)
@@ -467,7 +468,7 @@ void make_image_aout(char *image, char **procv)
  */
 {
   NUCS_TRACE(DO_TRACE,"\n");
-  FILE *imagef, *procf;
+  FILE *imagef, *procf = 0;
   char *proc, *file;
   int procn;
   struct MNX(image_header_aout) ihdr;
@@ -618,7 +619,7 @@ void readblock(off_t blk, char *buf, int block_size)
 /* For rawfs, so that it can read blocks. */
 {
   NUCS_TRACE(DO_TRACE,"\n");
-  int n;
+  int n = 0;
 
   if (lseek(rawfd, blk * block_size, SEEK_SET) < 0 ||
       (n = read(rawfd, buf, block_size)) < 0) {
@@ -635,7 +636,7 @@ void writeblock(MNX(off_t) blk, char *buf, int block_size)
 /* Add a function to write blocks for local use. */
 {
   NUCS_TRACE(DO_TRACE,"\n");
-  int a,b;
+
   if (lseek(rawfd, blk * block_size, SEEK_SET) < 0 ||
       write(rawfd, buf, block_size) < 0) {
     NUCS_TRACE(DO_TRACE,"blk=%d block_size=%d\n",(unsigned int)blk,block_size);
@@ -1253,7 +1254,7 @@ int isoption(char *option, char *test)
 /* possible actions for now */
 enum actions {CREATE_IMAGE, EXTRACT_IMAGE, INSTALL, INSTALL_MBR};
 
-int main(int argc, const char* argv[])
+int main(int argc, char *argv[])
 {
   NUCS_TRACE(DO_TRACE,"\n");
   int opt;
@@ -1273,12 +1274,12 @@ int main(int argc, const char* argv[])
 
   int opt_install_master = 0;
   extern char* optarg;
-  extern char* optind;
+  extern int optind;
 
   if (argc < 2)
     usage();
 
-  while ((opt = getopt(argc, argv,"b:cB:d:i:hl:mp:t:x")) != -1) {
+  while ((opt = getopt(argc, argv, "b:cB:d:i:hl:mp:t:x")) != -1) {
     switch (opt) {
       case 'b': /* specifies boot code */
         bootcode = optarg;
@@ -1393,27 +1394,4 @@ int main(int argc, const char* argv[])
   usage();
 
   exit(1);
-
-#if 0
-  if (argc >= 4 && isoption(argv[1], "-image")) {
-    /* image, procv */
-    make_image(argv[2], argv + 3);
-
-  } else if (argc == 3 && isoption(argv[1], "-extract")) {
-    extract_image(argv[2]);
-
-  } else if (argc >= 5 && isoption(argv[1], "-device")) {
-    /* {how, device, bootblock, bootcode, imagev} */
-    make_bootable(FS, argv[2], argv[3], argv[4], argv + 5);
-
-  } else if (argc >= 6 && isoption(argv[1], "-boot")) {
-    make_bootable(BOOT, argv[2], argv[3], argv[4], argv + 5);
-
-  } else if ((argc >= 4 && argc <= 6) && isoption(argv[1], "-master")) {
-    install_master(argv[2], argv[3], argv + 4);
-
-  } else {
-    usage();
-  }
-#endif
 }

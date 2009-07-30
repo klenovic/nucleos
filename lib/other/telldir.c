@@ -12,7 +12,7 @@
  */
 #define nil 0
 #include <lib.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>

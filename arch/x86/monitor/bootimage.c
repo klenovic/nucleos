@@ -13,12 +13,12 @@
 #define BIOS      1       /* Can only be used under the BIOS. */
 #define _POSIX_SOURCE   1
 #define _MINIX    1
-#include <stddef.h>
-#include <sys/types.h>
+#include <nucleos/stddef.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 #include <errno.h>
 #include <nucleos/a.out.h>

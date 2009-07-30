@@ -35,7 +35,7 @@ static char sccsid[] = "@(#)inet_ntoa.c	5.5 (Berkeley) 6/1/90";
  * to base 256 d.d.d.d representation.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 
 #include <net/gen/in.h>

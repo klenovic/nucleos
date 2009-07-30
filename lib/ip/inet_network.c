@@ -44,7 +44,7 @@
 static char sccsid[] = "@(#)inet_network.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ctype.h>
 #include <net/gen/in.h>
 #include <net/gen/inet.h>

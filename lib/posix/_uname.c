@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/utsname.h>
 
 #define uts_get(field, string) \

@@ -15,9 +15,7 @@
 #ifndef _MINIX__PARTITION_H
 #define _MINIX__PARTITION_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 struct partition {
   u64_t base;		/* byte offset to the partition start */

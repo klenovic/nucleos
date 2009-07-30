@@ -12,7 +12,7 @@
 #ifndef _DIR_H
 #define _DIR_H
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 #define	DIRBLKSIZ	512	/* size of directory block */
 

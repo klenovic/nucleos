@@ -63,7 +63,7 @@ PUBLIC void do_pagefaults(void)
 	struct vmproc *vmp;
 	int r, s;
 
-	while((r=arch_get_pagefault(&ep, &addr, &err)) == OK) {
+	while((r=arch_get_pagefault(&ep, (vir_bytes*)&addr, &err)) == OK) {
 		struct vir_region *region;
 		vir_bytes offset;
 		int p, wr = PFERR_WRITE(err);

@@ -13,7 +13,7 @@
 /* $Header: /cvsup/minix/src/lib/stdio/fopen.c,v 1.4 2006/02/02 16:59:07 beng Exp $ */
 
 #if	defined(_POSIX_SOURCE)
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 #endif
 #include	<stdio.h>
 #include	<stdlib.h>

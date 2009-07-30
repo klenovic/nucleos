@@ -320,9 +320,7 @@ typedef struct dpeth
 #define DEM_SINK	0x1
 #define DEM_ENABLED	0x2
 
-#if !__minix_vmd
 #define debug		0	/* Standard Minix lacks debug variable */
-#endif
 
 /*
  * $PchId: dp8390.h,v 1.10 2005/02/10 17:26:06 philip Exp $

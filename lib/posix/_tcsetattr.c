@@ -18,7 +18,7 @@ Created:	June 11, 1993 by Philip Homburg
 #include <errno.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 int tcsetattr(fd, opt_actions, termios_p)
 int fd;

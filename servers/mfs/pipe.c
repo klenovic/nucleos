@@ -14,8 +14,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#include <nucleos/time.h>
 #include "inode.h"
 #include "super.h"
 

@@ -29,7 +29,7 @@
 #include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysinfo.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <configfile.h>
 

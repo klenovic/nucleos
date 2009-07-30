@@ -7,6 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#include <nucleos/nucleos.h>
 #include "fs.h"
 #include <sys/stat.h>
 #include <nucleos/callnr.h>
@@ -17,6 +18,9 @@
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
 #include <nucleos/a.out.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
+
 #include <signal.h>
 #include <string.h>
 #include <dirent.h>

@@ -14,10 +14,10 @@ netinet/in.h
 #ifndef _NETINET__IN_H
 #define _NETINET__IN_H
 
-/* Can we include <stdint.h> here or do we need an additional header that is
+/* Can we include <nucleos/types.h> here or do we need an additional header that is
  * safe to include?
  */
-#include <stdint.h>
+#include <nucleos/types.h>
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 #define    INADDR_ANY              (uint32_t)0x00000000

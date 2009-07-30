@@ -23,7 +23,7 @@
 **	Adapted to MINIX: Philip Homburg, May 1992
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <net/gen/ether.h>

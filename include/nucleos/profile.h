@@ -40,7 +40,7 @@ struct {
 #endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
 
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 #  define PROF_GET         2    /* get call profiling tables */
 #  define PROF_RESET       3    /* reset call profiling tables */

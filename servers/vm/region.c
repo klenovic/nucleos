@@ -19,11 +19,11 @@
 
 #include <sys/mman.h>
 
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <stdint.h>
+#include <nucleos/types.h>
 
 #include <servers/vm/vm.h>
 #include <servers/vm/proto.h>

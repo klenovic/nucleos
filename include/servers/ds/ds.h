@@ -7,12 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* Prototypes and definitions for DS interface. */
+/* @file include/servers/ds/ds.h
+ * @brief Prototypes and definitions for DS interface.
+ */
+#ifndef __SERVERS_DS_DS_H
+#define __SERVERS_DS_DS_H
 
-#ifndef _MINIX_DS_H
-#define _MINIX_DS_H
-
-#include <sys/types.h>
+#include <nucleos/types.h>
 
 /* DS Flag values. */
 #define DS_IN_USE       0x0001	/* Internal use only. */
@@ -43,5 +44,4 @@ _PROTOTYPE( int ds_retrieve_str, (char *name, char *val, size_t len));
 _PROTOTYPE( int ds_check_u32, (char *n, size_t namelen, u32_t *val));
 _PROTOTYPE( int ds_check_str, (char *n, size_t namelen, char *v, size_t vlen));
 
-#endif /* _MINIX_DS_H */
-
+#endif /* __SERVERS_DS_DS_H */

@@ -14,7 +14,7 @@
 /* $Header: /cvsup/minix/src/lib/ansi/mbtowc.c,v 1.1.1.1 2005/04/21 14:56:05 beng Exp $ */
 
 #include	<stdlib.h>
-#include	<limits.h>
+#include	<nucleos/limits.h>
 
 int
 mbtowc(wchar_t *pwc, register const char *s, size_t n)

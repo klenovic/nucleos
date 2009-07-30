@@ -19,12 +19,12 @@
 #define readdir _readdir
 #define rewinddir _rewinddir
 #define stat _stat
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <string.h>
 
 static int addpath(const char *path, char **ap, const char *entry)

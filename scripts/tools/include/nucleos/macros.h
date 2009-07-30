@@ -7,21 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_MACROS_H
-#define __NUCLEOS_MACROS_H
-
-#if !defined(__HOST__)
-
-#include <asm/macros.h>
-#define MNX(x)  x
-#define INC_NUCS(x)  <x>
-
-#else /* host's application */
+#ifndef __TOOLS_NUCLEOS_MACROS_H
+#define __TOOLS_NUCLEOS_MACROS_H
 
 // adds prefix to input
 #define MNX(x)  mnx_ ## x
 #define EXTERN
-#define INC_NUCS(x)  <__SRCROOT__/include/x>
 
 #define NUCS_LEVEL_TRACE  1
 
@@ -31,12 +22,10 @@
     fprintf(stderr, msg, ##args );                                \
   }
 
-#endif
+/** @brief Helper macro for __stringify */
+#define __stringify2(sym) #sym
 
 /** @brief Turn preprocessor symbol definition \a sym into string. */
-#define MKSTR(sym)  __MKSTR2(sym)
-
-/** @brief Helper macro for MKSTR */
-#define __MKSTR2(sym) #sym
+#define stringify(sym)  __stringify2(sym)
 
 #endif /* __NUCLEOS_MACROS_H */

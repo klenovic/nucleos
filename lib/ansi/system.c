@@ -14,11 +14,11 @@
 /* $Header: /cvsup/minix/src/lib/ansi/system.c,v 1.1.1.1 2005/04/21 14:56:06 beng Exp $ */
 
 #if	defined(_POSIX_SOURCE)
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 #endif
 #include	<stdlib.h>
 #include	<signal.h>
-#include  <limits.h>
+#include  <nucleos/limits.h>
 
 extern pid_t _fork(void);
 extern pid_t _wait(int *);

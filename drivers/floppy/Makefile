@@ -5,7 +5,6 @@ floppy.elf32-obj-y := floppy.o
 
 LDFLAGS_floppy.elf32 := -L$(lib-arch) -Llib \
 			-ldriver -lsys -ltimers -lnucc \
-			-L$(cc-lib-dir) -lgcc \
 			-Tdrivers/driver_32.lds
 
 $(src)/floppy.elf32: drivers/driver_32.lds

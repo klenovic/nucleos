@@ -1,4 +1,4 @@
-menu "Servers debugging/hacking"
+# Common for all servers
 config DEBUG_SERVERS
 	bool "Servers debugging"
 	default y
@@ -30,4 +30,3 @@ config DEBUG_SERVERS_CALL_PROFILE
 
 	  WARNING: This options requires compiler support which is
 	           not available yet.
-endmenu

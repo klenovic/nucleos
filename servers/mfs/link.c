@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-
+#include <nucleos/nucleos.h>
 #include "fs.h"
 #include <sys/stat.h>
 #include <string.h>
@@ -71,7 +71,7 @@ printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
   
   /* Check to see if the file has maximum number of links already. */
   r = OK;
-  if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHRT_MAX))
+  if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX))
 	r = EMLINK;
 
   /* Only super_user may link to directories. */
@@ -154,7 +154,7 @@ printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
   
   /* Check to see if the file has maximum number of links already. */
   r = OK;
-  if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHRT_MAX))
+  if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX))
 	r = EMLINK;
 
   /* Only super_user may link to directories. */
@@ -692,7 +692,7 @@ PUBLIC int fs_rename_o()
 		/* don't rename a file with a file system mounted on it. 
 		if (old_ip->i_dev != old_dirp->i_dev) r = EXDEV;*/
 		if (odir && new_dirp->i_nlinks >=
-		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHRT_MAX) &&
+		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX) &&
 		    !same_pdir && r == OK) { 
 			r = EMLINK;
 		}
@@ -899,7 +899,7 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 		/* don't rename a file with a file system mounted on it. 
 		if (old_ip->i_dev != old_dirp->i_dev) r = EXDEV;*/
 		if (odir && new_dirp->i_nlinks >=
-		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHRT_MAX) &&
+		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX) &&
 		    !same_pdir && r == OK) { 
 			r = EMLINK;
 		}

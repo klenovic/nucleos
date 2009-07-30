@@ -16,7 +16,7 @@
 #define fcntl _fcntl
 #define read _read
 #include <string.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ttyent.h>
 #include <unistd.h>
 #include <fcntl.h>

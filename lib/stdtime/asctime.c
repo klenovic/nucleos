@@ -25,7 +25,7 @@ static char	elsieid[] = "@(#)asctime.c	7.32";
 #endif /* !defined lint */
 
 /*LINTLIBRARY*/
-
+#include <nucleos/nucleos.h>
 #include <zoneinfo/private.h>
 #include <zoneinfo/tzfile.h>
 

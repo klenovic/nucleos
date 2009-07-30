@@ -34,6 +34,8 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/ioctl.h>
 #include <nucleos/u64.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
 #include "file.h"
 #include "fproc.h"
 

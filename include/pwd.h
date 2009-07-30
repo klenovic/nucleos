@@ -12,9 +12,7 @@
 #ifndef _PWD_H
 #define _PWD_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 struct passwd {
   char *pw_name;		/* login name */

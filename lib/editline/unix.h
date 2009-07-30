@@ -15,7 +15,7 @@
 #define CRLF		"\r\n"
 #define FORWARD		STATIC
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 
 #if	defined(USE_DIRENT)

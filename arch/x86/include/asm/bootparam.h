@@ -18,8 +18,8 @@
 #include <asm/types.h>
 
 struct boot_param {
-	__uint32_t initrd_base; /* physical address of initial ramdisk */
-	__uint32_t initrd_size; /* size of initial ramdisk in bytes */
+	__u32 initrd_base; /* physical address of initial ramdisk */
+	__u32 initrd_size; /* size of initial ramdisk in bytes */
 };
 
 #endif /* !__X86_ASM_BOOTPARAM_H */

@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Debugging dump procedures for the kernel. */
-
+#include <nucleos/nucleos.h>
 #include "inc.h"
 #include <timers.h>
 #include <ibm/interrupt.h>

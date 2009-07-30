@@ -26,7 +26,7 @@
 #ifndef _MATH_PRIVATE_H_
 #define	_MATH_PRIVATE_H_
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/hton.h>
 
 /*

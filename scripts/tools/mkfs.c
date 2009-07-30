@@ -95,7 +95,7 @@ void add_z_2(MNX(Ino_t) n, MNX(zone_t) z, long bytes, long cur_time);
 void incr_link(MNX(Ino_t) n);
 void insert_bit(MNX(block_t) block, int bit);
 int mode_con(char *p);
-void getline(char line[LINE_LEN], char *parse[MAX_TOKENS]);
+static void get_line(char line[LINE_LEN], char *parse[MAX_TOKENS]);
 long file_time(int f);
 void pexit(char *s);
 void copy(char *from, char *to, int count);
@@ -252,15 +252,15 @@ int main(int argc, char *argv[])
   if (optind < argc && (proto = fopen(optarg, "r")) != NULL) {
   /* Prototype file is readable. */
   lct = 1;
-    getline(line, token);   /* skip boot block info */
+    get_line(line, token);   /* skip boot block info */
 
     /* Read the line with the block and inode counts. */
-    getline(line, token);
+    get_line(line, token);
     blocks = atol(token[0]);
     inodes = atoi(token[1]);
 
     /* Process mode line for root directory. */
-    getline(line, token);
+    get_line(line, token);
     mode = mode_con(token[0]);
     usrid = atoi(token[1]);
     grpid = atoi(token[2]);
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
     /* Try writing the last block of partition or diskette. */
 //    if(lseek64(fd, /*(off64_t)*/((blocks - 1) * block_size), SEEK_SET) < 0) {
     if(lseek(fd, (off_t)((blocks - 1) * block_size), SEEK_SET) < 0) {
-        TRACE("blocks=%d,block_size=%d\n",blocks,block_size);
+        TRACE("blocks=%ld,block_size=%d\n",blocks,block_size);
         pexit("couldn't seek to last block to test size (1)");
     }
     testb[0] = 0x3245;
@@ -563,7 +563,7 @@ MNX(ino_t) parent;
   long size;
 
   while (1) {
-    getline(line, token);
+    get_line(line, token);
     p = token[0];
     if (*p == '$') return;
     p = token[1];
@@ -624,8 +624,8 @@ void eat_file(inode, f)
 MNX(ino_t) inode;
 int f;
 {
-  int ct, i, j, k;
-  MNX(zone_t) z;
+  int ct = 0, i, j, k;
+  MNX(zone_t) z = 0;
   char *buf;
   long timeval;
 
@@ -726,7 +726,7 @@ char *name;
     }
   }
 
-  printf("Directory-inode %d beyond direct blocks.  Could not enter %s\n",
+  printf("Directory-inode %ld beyond direct blocks.  Could not enter %s\n",
      parent, name);
   pexit("Halt");
 }
@@ -1052,9 +1052,7 @@ char *p;
   return(mode);
 }
 
-void getline(line, parse)
-char *parse[MAX_TOKENS];
-char line[LINE_LEN];
+static void get_line(char line[LINE_LEN], char *parse[MAX_TOKENS])
 {
   /* Read a line and break it up in tokens */
   int k;
@@ -1260,7 +1258,7 @@ void print_fs()
 
         if (fs_version == 1) {
             if (inode1[i].d1_mode != 0) {
-                printf("Inode %2d:  mode=", k);
+                printf("Inode %2ld:  mode=", k);
                 printf("%06o", inode1[i].d1_mode);
                 printf("  uid=%2d  gid=%2d  size=",
                 inode1[i].d1_uid, inode1[i].d1_gid);
@@ -1273,11 +1271,11 @@ void print_fs()
                 get_block(inode1[i].d1_zone[0], (char *) dir);
                 for (j = 0; j < NR_DIR_ENTRIES(block_size); j++)
                     if (dir[j].d_ino)
-                        printf("\tInode %2d: %s\n", dir[j].d_ino, dir[j].d_name);
+                        printf("\tInode %2ld: %s\n", dir[j].d_ino, dir[j].d_name);
             }
         } else {
             if (inode2[i].d2_mode != 0) {
-                printf("Inode %2d:  mode=", k);
+                printf("Inode %2ld:  mode=", k);
                 printf("%06o", inode2[i].d2_mode);
                 printf("  uid=%2d  gid=%2d  size=",
                 inode2[i].d2_uid, inode2[i].d2_gid);
@@ -1290,7 +1288,7 @@ void print_fs()
                 get_block(inode2[i].d2_zone[0], (char *) dir);
                 for (j = 0; j < NR_DIR_ENTRIES(block_size); j++)
                     if (dir[j].d_ino)
-                        printf("\tInode %2d: %s\n", dir[j].d_ino, dir[j].d_name);
+                        printf("\tInode %2ld: %s\n", dir[j].d_ino, dir[j].d_name);
             }
         }
     }

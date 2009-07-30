@@ -10,9 +10,9 @@
 /* fslib.c - routines needed by fs and fs utilities */
 
 #include <ansi.h>
-#include <limits.h>
+#include <nucleos/nucleos.h>
 #include <dirent.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>		/* for unshort :-( */
 #include "mfs/const.h"		/* depends of -I flag in Makefile */

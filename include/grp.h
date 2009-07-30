@@ -12,9 +12,7 @@
 #ifndef _GRP_H
 #define _GRP_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 struct	group { 
   char *gr_name;		/* the name of the group */

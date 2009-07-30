@@ -49,7 +49,7 @@
 // will be at the start of the data segment of the kernel and will be read
 // and modified by the boot monitor before the kernel starts.
 
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 
 #include <nucleos/const.h>
 #include <nucleos/com.h>

@@ -15,7 +15,7 @@
 
 #include	<ctype.h>
 #include	<errno.h>
-#include	<limits.h>
+#include	<nucleos/nucleos.h>
 #include	<stdlib.h>
 
 static unsigned long

@@ -11,7 +11,7 @@
 #define ES1370_H
 /* best viewed with tabsize=4 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include "../../drivers.h"
 #include <sys/ioc_sound.h>
 

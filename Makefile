@@ -134,7 +134,9 @@ KBUILD_CPPFLAGS := -D__ARCH__=$(SRCARCH) -D__KERNELVERSION__=$(KERNELVERSION) \
 	           -D__SRCROOT__=$(srctree)
 
 # general build options for asm
-KBUILD_AFLAGS :=
+# Note: Even if there is __ASSEMBLER__ symbol defined by gcc with define our own.
+#	The __ASSEMBLY__ is prefered for now.
+KBUILD_AFLAGS := -D__ASSEMBLY__
 
 # general build options for c
 KBUILD_CFLAGS := -Wall -Wstrict-prototypes -fno-builtin -nostdinc -fno-exceptions \
@@ -152,7 +154,6 @@ KBUILD_ARFLAGS := rcs
 #  specific architecture headers are done by macros
 NUCLEOSINCLUDE := -Iinclude \
 	          -Iarch/$(SRCARCH)/include \
-	          -imacros include/nucleos/macros.h \
 	          -include include/nucleos/autoconf.h
 
 # shell used by build system
@@ -177,7 +178,6 @@ export UTS_MACHINE
 
 HOST_CFLAGS := -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOST_PPFLAGS := -D__HOST__ -D__SRCROOT__=$(srctree)
-HOST_PPFLAGS += -imacros include/nucleos/macros.h
 
 export HOST_CFLAGS HOST_PPFLAGS
 

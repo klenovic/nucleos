@@ -40,7 +40,7 @@
  * SUCH DAMAGE.
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ansi.h>
 #include <strings.h>
 #include <ctype.h>

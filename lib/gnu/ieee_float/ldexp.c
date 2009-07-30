@@ -16,7 +16,7 @@ Implementation of ldexp that directly manipulates the exponent bits in an
 ieee float
 */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <errno.h>
 #include <math.h>
 

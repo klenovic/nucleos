@@ -21,10 +21,10 @@ PUBLIC long pathconf(path, name)
 _CONST char *path;		/* name of file being interrogated */
 int name;			/* property being inspected */
 {
-/* POSIX allows some of the values in <limits.h> to be increased at
+/* POSIX allows some of the values in <nucleos/limits.h> to be increased at
  * run time.  The pathconf and fpathconf functions allow these values
  * to be checked at run time.  MINIX does not use this facility.
- * The run-time limits are those given in <limits.h>.
+ * The run-time limits are those given in <nucleos/limits.h>.
  */
 
   int fd;

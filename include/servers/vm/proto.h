@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVER_VM_PROTO_H
-#define __SERVER_VM_PROTO_H
+#ifndef __SERVERS_VM_PROTO_H
+#define __SERVERS_VM_PROTO_H
 
 /* Function prototypes. */
 
@@ -60,7 +60,7 @@ _PROTOTYPE( void free_proc, (struct vmproc *vmp)			);
 _PROTOTYPE( int do_fork, (message *msg)					);
 
 /* exec.c */
-_PROTOTYPE( struct vmproc *find_share, (struct vmproc *vmp_ign, Ino_t ino,
+_PROTOTYPE( struct vmproc *find_share, (struct vmproc *vmp_ign, ino_t ino,
                         Dev_t dev, time_t ctime)                        );
 _PROTOTYPE( int do_exec_newmem, (message *msg)				);
 _PROTOTYPE( int proc_new, (struct vmproc *vmp, phys_bytes start,
@@ -161,4 +161,4 @@ _PROTOTYPE( void arch_init_vm, (struct memory mem_chunks[NR_MEMS]));
 _PROTOTYPE( vir_bytes, arch_map2vir(struct vmproc *vmp, vir_bytes addr));
 _PROTOTYPE( vir_bytes, arch_vir2map(struct vmproc *vmp, vir_bytes addr));
 
-#endif /*  __SERVER_VM_PROTO_H */
+#endif /* __SERVERS_VM_PROTO_H */

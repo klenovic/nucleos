@@ -20,7 +20,7 @@
 
 #include	"loc_incl.h"
 
-#include	<sys/types.h>
+#include	<nucleos/types.h>
 
 off_t _lseek(int fildes, off_t offset, int whence);
 

@@ -14,7 +14,7 @@ arpa/inet.h
 #ifndef _ARPA__INET_H
 #define _ARPA__INET_H
 
-#include <stdint.h>
+#include <nucleos/types.h>
 
 /* Open Group Base Specifications Issue 6 (not complete): */
 

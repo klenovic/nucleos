@@ -10,6 +10,8 @@
 #ifndef _BITMAP_H
 #define _BITMAP_H
 
+#include <nucleos/nucleos.h>
+
 /* Bit map operations to manipulate bits of a simple mask variable. */
 #define bit_set(mask, n)	((mask) |= (1 << (n)))
 #define bit_unset(mask, n)	((mask) &= ~(1 << (n)))

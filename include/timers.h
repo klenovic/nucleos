@@ -24,8 +24,8 @@
 #ifndef _TIMERS_H
 #define _TIMERS_H
 
-#include <limits.h>
-#include <sys/types.h>
+#include <nucleos/limits.h>
+#include <nucleos/types.h>
 
 struct timer;
 typedef void (*tmr_func_t)(struct timer *tp);

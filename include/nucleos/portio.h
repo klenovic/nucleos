@@ -16,9 +16,7 @@ Created:	Jan 15, 1992 by Philip Homburg
 #ifndef _PORTIO_H_
 #define _PORTIO_H_
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 unsigned inb(U16_t _port);
 unsigned inw(U16_t _port);

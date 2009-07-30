@@ -15,7 +15,7 @@
 #define lseek	_lseek
 #define readdir	_readdir
 #define seekdir	_seekdir
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>

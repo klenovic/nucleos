@@ -11,7 +11,7 @@
 gettimeofday.c
 */
 
-#include <sys/time.h>
+#include <nucleos/time.h>
 #include <lib.h>
 #include <time.h>
 

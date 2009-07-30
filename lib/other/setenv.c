@@ -45,7 +45,7 @@ static char sccsid[] = "@(#)setenv.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 
 #include <errno.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include	<stdlib.h>
 #include	<string.h>
 

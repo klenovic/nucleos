@@ -17,8 +17,8 @@
 #define _MINIX             1	/* tell headers to include MINIX stuff */
 
 #include <ansi.h>
-#include <sys/types.h>
-#include <limits.h>
+#include <nucleos/types.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 
 #include <nucleos/callnr.h>

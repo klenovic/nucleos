@@ -12,12 +12,12 @@ priority.c
 */
 
 #include <errno.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/resource.h>
 #include <lib.h>
 #include <unistd.h>
 #include <string.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 
 
 int getpriority(int which, int who)

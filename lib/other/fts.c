@@ -60,7 +60,8 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #include <sys/stat.h>
 
 #include <dirent.h>
-#include <limits.h>
+#include <nucleos/nucleos.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <fts.h>
@@ -794,7 +795,7 @@ mem1:				saved_errno = errno;
 			maxlen = sp->fts_pathlen - len;
 		}
 
-		if (len + dnamlen >= USHRT_MAX) {
+		if (len + dnamlen >= USHORT_MAX) {
 			/*
 			 * In an FTSENT, fts_pathlen is a u_short so it is
 			 * possible to wraparound here.  If we do, free up
@@ -1118,9 +1119,9 @@ fts_palloc(sp, more)
 	/*
 	 * Check for possible wraparound.  In an FTS, fts_pathlen is
 	 * a signed int but in an FTSENT it is an unsigned short.
-	 * We limit fts_pathlen to USHRT_MAX to be safe in both cases.
+	 * We limit fts_pathlen to USHORT_MAX to be safe in both cases.
 	 */
-	if (sp->fts_pathlen < 0 || sp->fts_pathlen >= USHRT_MAX) {
+	if (sp->fts_pathlen < 0 || sp->fts_pathlen >= USHORT_MAX) {
 		if (sp->fts_path)
 			free(sp->fts_path);
 		sp->fts_path = NULL;

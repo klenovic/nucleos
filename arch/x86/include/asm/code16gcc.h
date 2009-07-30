@@ -18,7 +18,7 @@
 #ifndef __X86_ASM_CODE16GCC_H
 #define __X86_ASM_CODE16GCC_H
 
-#ifndef __ASSEMBLER__
+#ifndef __ASSEMBLY__
   __asm__(".code16gcc");
 #else	/* from assembler source */
 
@@ -28,6 +28,6 @@
     .code16
   #endif /* __NOAUTO_OP16_PREFIX__ */
 
-#endif /* __ASSEMBLER__ */
+#endif /* __ASSEMBLY__ */
 
 #endif /* !__X86_ASM_CODE16GCC_H */

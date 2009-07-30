@@ -9,8 +9,7 @@
  */
 /**
  * @file arch/x86/include/asm/linkage_32.h
- * @brief Data definition
- * @details Basic types upon which most other types are built.
+ * @brief linkage
  */
 #ifndef __X86_ASM_LINKAGE_32_H
 #define __X86_ASM_LINKAGE_32_H
@@ -20,4 +19,5 @@
 #define P2ALIGN CONFIG_X86_P2ALIGN
 #endif
 
+#endif /* !__ASSEMBLY__ */
 #endif /* !__X86_ASM_LINKAGE_32_H */

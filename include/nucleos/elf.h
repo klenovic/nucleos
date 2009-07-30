@@ -30,7 +30,7 @@
 #ifndef __NUCLEOS_ELF_H
 #define __NUCLEOS_ELF_H
 
-#include <stdint.h>
+#include <nucleos/types.h>
 
 /* Type for a 16-bit quantity.  */
 typedef uint16_t Elf32_Half;

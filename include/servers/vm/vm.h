@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVER_VM_VM_H
-#define __SERVER_VM_VM_H
+#ifndef __SERVERS_VM_VM_H
+#define __SERVERS_VM_VM_H
 
 #define NO_MEM ((phys_clicks) 0)  /* returned by alloc_mem() with mem is up */
 
@@ -47,4 +47,25 @@
 /* Special value of 'what' to map_page_region meaning: unknown. */
 #define MAP_NONE	0xFFFFFFFE
 
-#endif /* __SERVER_VM_VM_H */
+/* MIOCMAP */
+struct mapreq
+{
+	void *base;
+	size_t size;
+	off_t offset;
+	int readonly;
+};
+
+/* used in ioctl to tty for mapvm map and unmap request. */
+struct mapreqvm
+{
+	int	flags;		/* reserved, must be 0 */
+	off_t	phys_offset;	
+	size_t	size;
+	int	readonly;
+	char	reserved[36];	/* reserved, must be 0 */
+	void	*vaddr;		
+	void	*vaddr_ret;	
+};
+
+#endif /* __SERVERS_VM_VM_H */

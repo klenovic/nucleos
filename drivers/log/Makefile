@@ -5,7 +5,6 @@ log.elf32-obj-y := log.o diag.o
 
 LDFLAGS_log.elf32 := -L$(lib-arch) -Llib \
 		     -ldriver_asyn -lsys -lnucc \
-		     -L$(cc-lib-dir) -lgcc \
 		     -Tdrivers/driver_32.lds
 
 $(src)/log.elf32: drivers/driver_32.lds

@@ -50,9 +50,6 @@
 
 #include "inet.h"
 
-#ifndef __minix_vmd /* Minix 3 */
-#include <sys/select.h>
-#endif
 #include <sys/svrctl.h>
 #include <nucleos/callnr.h>
 
@@ -67,7 +64,6 @@
 #include "generic/sr.h"
 #include "sr_int.h"
 
-#ifndef __minix_vmd /* Minix 3 */
 #define DEV_CANCEL NW_CANCEL
 #define DEVICE_REPLY TASK_REPLY
 #define DEV_IOCTL3 DEV_IOCTL
@@ -76,19 +72,14 @@
 #define NDEV_IOCTL REQUEST
 #define NDEV_MINOR DEVICE
 #define NDEV_PROC IO_ENDPT
-#endif
 
 THIS_FILE
 
 PUBLIC sr_fd_t sr_fd_table[FD_NR];
 
 PRIVATE mq_t *repl_queue, *repl_queue_tail;
-#ifdef __minix_vmd
-PRIVATE cpvec_t cpvec[CPVEC_NR];
-#else /* Minix 3 */
 PRIVATE struct vir_cp_req vir_cp_req[CPVEC_NR];
 PRIVATE struct vscp_vec s_cp_req[CPVEC_NR];
-#endif
 
 FORWARD _PROTOTYPE ( int sr_open, (message *m) );
 FORWARD _PROTOTYPE ( void sr_close, (message *m) );
@@ -98,21 +89,15 @@ FORWARD _PROTOTYPE ( int sr_restart_read, (sr_fd_t *fdp) );
 FORWARD _PROTOTYPE ( int sr_restart_write, (sr_fd_t *fdp) );
 FORWARD _PROTOTYPE ( int sr_restart_ioctl, (sr_fd_t *fdp) );
 FORWARD _PROTOTYPE ( int sr_cancel, (message *m) );
-#ifndef __minix_vmd /* Minix 3 */
 FORWARD _PROTOTYPE ( int sr_select, (message *m) );
 FORWARD _PROTOTYPE ( void sr_status, (message *m) );
-#endif
 FORWARD _PROTOTYPE ( void sr_reply_, (mq_t *m, int reply, int is_revive) );
 FORWARD _PROTOTYPE ( sr_fd_t *sr_getchannel, (int minor));
 FORWARD _PROTOTYPE ( acc_t *sr_get_userdata, (int fd, vir_bytes offset,
 					vir_bytes count, int for_ioctl) );
 FORWARD _PROTOTYPE ( int sr_put_userdata, (int fd, vir_bytes offset,
 						acc_t *data, int for_ioctl) );
-#ifdef __minix_vmd 
-#define sr_select_res 0
-#else /* Minix 3 */
 FORWARD _PROTOTYPE (void sr_select_res, (int fd, unsigned ops) );
-#endif
 FORWARD _PROTOTYPE ( int sr_repl_queue, (int proc, int ref, int operation) );
 FORWARD _PROTOTYPE ( int walk_queue, (sr_fd_t *sr_fd, mq_t **q_head_ptr, 
 	mq_t **q_tail_ptr, int type, int proc_nr, int ref, int first_flag) );
@@ -151,14 +136,8 @@ mq_t *m;
 	{
 		if (m->mq_mess.m_type == DEV_CANCEL)
 		{
-#ifdef __minix_vmd
-			result= sr_repl_queue(m->mq_mess.NDEV_PROC,
-				m->mq_mess.NDEV_REF, 
-				m->mq_mess.NDEV_OPERATION);
-#else /* Minix 3 */
 			result= sr_repl_queue(m->mq_mess.IO_ENDPT, 
 				(int)m->mq_mess.IO_GRANT, 0);
-#endif
 			if (result)
 			{
 				mq_free(m);
@@ -207,13 +186,8 @@ mq_t *m;
 		assert(result == OK || result == EINTR);
 		send_reply= (result == EINTR);
 		free_mess= 1;
-#ifdef __minix_vmd
-		m->mq_mess.m_type= m->mq_mess.NDEV_OPERATION;
-#else /* Minix 3 */
 		m->mq_mess.m_type= 0;
-#endif
 		break;
-#ifndef __minix_vmd /* Minix 3 */
 	case DEV_SELECT:
 		result= sr_select(&m->mq_mess);
 		send_reply= 1;
@@ -224,7 +198,6 @@ mq_t *m;
 		send_reply= 0;
 		free_mess= 1;
 		break;
-#endif
 	default:
 		ip_panic(("unknown message, from %d, type %d",
 				m->mq_mess.m_source, m->mq_mess.m_type));
@@ -610,19 +583,11 @@ message *m;
 
         result=EINTR;
 	proc_nr=  m->NDEV_PROC;
-#ifdef __minix_vmd
-	ref=  m->NDEV_REF;
-	operation= m->NDEV_OPERATION;
-#else /* Minix 3 */
 	ref=  (int)m->IO_GRANT;
 	operation= 0;
-#endif
 	sr_fd= sr_getchannel(m->NDEV_MINOR);
 	assert (sr_fd);
 
-#ifdef __minix_vmd
-	if (operation == CANCEL_ANY || operation == DEV_IOCTL3)
-#endif
 	{
 		result= walk_queue(sr_fd, &sr_fd->srf_ioctl_q, 
 			&sr_fd->srf_ioctl_q_tail, SR_CANCEL_IOCTL,
@@ -630,9 +595,6 @@ message *m;
 		if (result != EAGAIN)
 			return result;
 	}
-#ifdef __minix_vmd
-	if (operation == CANCEL_ANY || operation == DEV_READ)
-#endif
 	{
 		result= walk_queue(sr_fd, &sr_fd->srf_read_q, 
 			&sr_fd->srf_read_q_tail, SR_CANCEL_READ,
@@ -640,9 +602,6 @@ message *m;
 		if (result != EAGAIN)
 			return result;
 	}
-#ifdef __minix_vmd
-	if (operation == CANCEL_ANY || operation == DEV_WRITE)
-#endif
 	{
 		result= walk_queue(sr_fd, &sr_fd->srf_write_q, 
 			&sr_fd->srf_write_q_tail, SR_CANCEL_WRITE,
@@ -650,20 +609,12 @@ message *m;
 		if (result != EAGAIN)
 			return result;
 	}
-#ifdef __minix_vmd
-	ip_panic((
-"request not found: from %d, type %d, MINOR= %d, PROC= %d, REF= %d OPERATION= %ld",
-		m->m_source, m->m_type, m->NDEV_MINOR,
-		m->NDEV_PROC, m->NDEV_REF, m->NDEV_OPERATION));
-#else /* Minix 3 */
 	ip_panic((
 "request not found: from %d, type %d, MINOR= %d, PROC= %d, REF= %d",
 		m->m_source, m->m_type, m->NDEV_MINOR,
 		m->NDEV_PROC, m->IO_GRANT));
-#endif
 }
 
-#ifndef __minix_vmd /* Minix 3 */
 PRIVATE int sr_select(m)
 message *m;
 {
@@ -756,7 +707,6 @@ message *m;
 	if (result != OK)
 		ip_panic(("unable to send"));
 }
-#endif
 
 PRIVATE int walk_queue(sr_fd, q_head_ptr, q_tail_ptr, type, proc_nr, ref,
 	first_flag)
@@ -776,13 +726,8 @@ int first_flag;
 	{
 		if (q_ptr->mq_mess.NDEV_PROC != proc_nr)
 			continue;
-#ifdef __minix_vmd
-		if (q_ptr->mq_mess.NDEV_REF != ref)
-			continue;
-#else
 		if ((int)q_ptr->mq_mess.IO_GRANT != ref)
 			continue;
-#endif
 		if (!q_ptr_prv)
 		{
 			assert(!(sr_fd->srf_flags & first_flag));
@@ -833,15 +778,8 @@ int is_revive;
 	message reply, *mp;
 
 	proc= mq->mq_mess.NDEV_PROC;
-#ifdef __minix_vmd
-	ref= mq->mq_mess.NDEV_REF;
-#else /* Minix 3 */
 	ref= (int)mq->mq_mess.IO_GRANT;
-#endif
 	operation= mq->mq_mess.m_type;
-#ifdef __minix_vmd
-	assert(operation != DEV_CANCEL);
-#endif
 
 	if (is_revive)
 		mp= &mq->mq_mess;
@@ -851,12 +789,7 @@ int is_revive;
 	mp->m_type= DEVICE_REPLY;
 	mp->REP_ENDPT= proc;
 	mp->REP_STATUS= status;
-#ifdef __minix_vmd
-	mp->REP_REF= ref;
-	mp->REP_OPERATION= operation;
-#else
 	mp->REP_IO_GRANT= ref;
-#endif
 	if (is_revive)
 	{
 		notify(mq->mq_mess.m_source);
@@ -1058,7 +991,6 @@ int for_ioctl;
 }
 }
 
-#ifndef __minix_vmd /* Minix 3 */
 PRIVATE void sr_select_res(fd, ops)
 int fd;
 unsigned ops;
@@ -1073,7 +1005,6 @@ unsigned ops;
 
 	notify(sr_fd->srf_select_proc);
 }
-#endif
 
 PRIVATE void process_req_q(mq, tail, tail_ptr)
 mq_t *mq, *tail, **tail_ptr;
@@ -1160,11 +1091,6 @@ int size;
 	{
 		size= (vir_bytes)acc->acc_length;
 
-#ifdef __minix_vmd
-		cpvec[i].cpv_src= (vir_bytes)src;
-		cpvec[i].cpv_dst= (vir_bytes)ptr2acc_data(acc);
-		cpvec[i].cpv_size= size;
-#else /* Minix 3 */
 		vir_cp_req[i].count= size;
 		vir_cp_req[i].src.proc_nr_e = proc;
 		vir_cp_req[i].src.segment = D;
@@ -1172,7 +1098,6 @@ int size;
 		vir_cp_req[i].dst.proc_nr_e = this_proc;
 		vir_cp_req[i].dst.segment = D;
 		vir_cp_req[i].dst.offset = (vir_bytes) ptr2acc_data(acc);
-#endif
 
 		src += size;
 		acc= acc->acc_next;
@@ -1180,17 +1105,10 @@ int size;
 
 		if (i == CPVEC_NR || acc == NULL)
 		{
-#ifdef __minix_vmd
-			mess.m_type= SYS_VCOPY;
-			mess.m1_i1= proc;
-			mess.m1_i2= this_proc;
-			mess.m1_i3= i;
-			mess.m1_p1= (char *)cpvec;
-#else /* Minix 3 */
 			mess.m_type= SYS_VIRVCOPY;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *)vir_cp_req;
-#endif
+
 			if (sendrec(SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
@@ -1223,11 +1141,6 @@ char *dest;
 
 		if (size)
 		{
-#ifdef __minix_vmd
-			cpvec[i].cpv_src= (vir_bytes)ptr2acc_data(acc);
-			cpvec[i].cpv_dst= (vir_bytes)dest;
-			cpvec[i].cpv_size= size;
-#else /* Minix 3 */
 			vir_cp_req[i].src.proc_nr_e = this_proc;
 			vir_cp_req[i].src.segment = D;
 			vir_cp_req[i].src.offset= (vir_bytes)ptr2acc_data(acc);
@@ -1235,7 +1148,6 @@ char *dest;
 			vir_cp_req[i].dst.segment = D;
 			vir_cp_req[i].dst.offset= (vir_bytes)dest;
 			vir_cp_req[i].count= size;
-#endif
 			i++;
 		}
 
@@ -1244,17 +1156,10 @@ char *dest;
 
 		if (i == CPVEC_NR || acc == NULL)
 		{
-#ifdef __minix_vmd
-			mess.m_type= SYS_VCOPY;
-			mess.m1_i1= this_proc;
-			mess.m1_i2= proc;
-			mess.m1_i3= i;
-			mess.m1_p1= (char *)cpvec;
-#else /* Minix 3 */
 			mess.m_type= SYS_VIRVCOPY;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *) vir_cp_req;
-#endif
+
 			if (sendrec(SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
@@ -1401,9 +1306,7 @@ int ref;
 int operation;
 {
 	mq_t *m, *m_cancel, *m_tmp;
-#ifndef __minix_vmd
 	mq_t *new_queue;
-#endif
 	int result;
 
 	m_cancel= NULL;
@@ -1411,39 +1314,23 @@ int operation;
 
 	for (m= repl_queue; m;)
 	{
-#ifdef __minix_vmd
-		if (m->mq_mess.REP_ENDPT == proc && 
-			m->mq_mess.REP_REF ==ref &&
-			(m->mq_mess.REP_OPERATION == operation ||
-				operation == CANCEL_ANY))
-#else /* Minix 3 */
 		if (m->mq_mess.REP_ENDPT == proc &&
 			m->mq_mess.REP_IO_GRANT == ref)
-#endif
+
 		{
-assert(!m_cancel);
+			assert(!m_cancel);
 			m_cancel= m;
 			m= m->mq_next;
 			continue;
 		}
-#ifdef __minix_vmd
-		result= send(m->mq_mess.m_source, &m->mq_mess);
-		if (result != OK)
-			ip_panic(("unable to send: %d", result));
-		m_tmp= m;
-		m= m->mq_next;
-		mq_free(m_tmp);
-#else /* Minix 3 */
 		m_tmp= m;
 		m= m->mq_next;
 		m_tmp->mq_next= new_queue;
 		new_queue= m_tmp;
-#endif
 	}
 	repl_queue= NULL;
-#ifndef __minix_vmd /* Minix 3 */
 	repl_queue= new_queue;
-#endif
+
 	if (m_cancel)
 	{
 		result= send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess);

@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-sys/vm_i386.h
-*/
+#ifndef __X86_ASM_SERVERS_VM_VM_H
+#define __X86_ASM_SERVERS_VM_VM_H
 
 #define I386_PAGE_SIZE		4096
 #define I386_BIG_PAGE_SIZE	(I386_PAGE_SIZE*I386_VM_PT_ENTRIES)
@@ -72,3 +71,5 @@ sys/vm_i386.h
 /* CPUID flags */
 #define CPUID1_EDX_PSE (1L <<  3)	/* Page Size Extension */
 #define CPUID1_EDX_PGE (1L << 13)	/* Page Global (bit) Enable */
+
+#endif /* __X86_ASM_SERVERS_VM_VM_H */

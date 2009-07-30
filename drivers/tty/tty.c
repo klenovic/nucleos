@@ -64,7 +64,7 @@
  *   Sep 20, 2004   local timer management/ sync alarms  (Jorrit N. Herder)
  *   Jul 13, 2004   support for function key observers  (Jorrit N. Herder)  
  */
-
+#include <nucleos/nucleos.h>
 #include <nucleos/drivers.h>
 #include <termios.h>
 #include <sys/ioc_tty.h>
@@ -74,8 +74,7 @@
 #include <nucleos/keymap.h>
 #include "tty.h"
 
-#include <sys/time.h>
-#include <sys/select.h>
+#include <nucleos/time.h>
 
 extern int irq_hook_id;
 

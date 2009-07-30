@@ -48,7 +48,7 @@
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
 #include <nucleos/endpoint.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <signal.h>
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>

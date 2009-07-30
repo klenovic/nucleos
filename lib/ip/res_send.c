@@ -50,7 +50,7 @@ static char sccsid[] = "@(#)res_send.c	6.27 (Berkeley) 2/24/91";
 
 #if !_MINIX
 #include <sys/param.h>
-#include <sys/time.h>
+#include <nucleos/time.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
 #include <netinet/in.h>
@@ -63,7 +63,7 @@ static char sccsid[] = "@(#)res_send.c	6.27 (Berkeley) 2/24/91";
 
 #else /* _MINIX */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <assert.h>

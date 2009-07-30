@@ -31,7 +31,7 @@ static char sccsid[] = "@(#)res_init.c	6.14 (Berkeley) 6/27/90";
 #endif /* LIBC_SCCS and not lint */
 
 #if _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +47,7 @@ static char sccsid[] = "@(#)res_init.c	6.14 (Berkeley) 6/27/90";
 
 #define index(s,c) strchr(s,c)
 #else
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>

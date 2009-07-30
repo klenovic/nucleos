@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/sysinfo.h>
 #include <stdlib.h>
 #include <unistd.h>

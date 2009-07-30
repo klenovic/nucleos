@@ -15,7 +15,7 @@
  */
 
 #include <ansi.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 
 _PROTOTYPE( void *memccpy, (void *dst, const void *src,
 			    int ucharstop, size_t size));

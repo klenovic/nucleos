@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <lib.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <unistd.h>
 
 _PROTOTYPE( void std_err, (char *s));

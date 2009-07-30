@@ -11,7 +11,7 @@
 #ifndef __VM_H
 #define __VM_H
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <nucleos/endpoint.h>
 
 _PROTOTYPE( int vm_exit, (endpoint_t ep));

@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#ifndef __SERVER_VM_REGION_H
-#define __SERVER_VM_REGION_H
+#ifndef __SERVERS_VM_REGION_H
+#define __SERVERS_VM_REGION_H
 
 struct phys_block {
 #if SANITYCHECKS
@@ -61,4 +60,4 @@ struct vir_region {
 #define MF_PREALLOC	0x01
 #define MF_CONTIG	0x02
 
-#endif /* __SERVER_VM_REGION_H */
+#endif /* __SERVERS_VM_REGION_H */

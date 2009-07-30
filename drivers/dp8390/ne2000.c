@@ -20,9 +20,6 @@ Created:	March 15, 1994 by Philip Homburg <philip@f-mnx.phicoh.com>
 
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
-#if __minix_vmd
-#include "config.h"
-#endif
 
 #include "local.h"
 #include "dp8390.h"

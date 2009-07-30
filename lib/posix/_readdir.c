@@ -13,14 +13,14 @@
 #define nil 0
 #define readdir	_readdir
 #define getdents _getdents
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 #include <errno.h>
 #include <string.h>
 

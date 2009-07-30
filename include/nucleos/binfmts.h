@@ -15,7 +15,7 @@
 #define __NUCLEOS_BINFMTS_H
 
 #include <string.h>
-#include <stdint.h>
+#include <nucleos/types.h>
 #include <errno.h>
 
 #define BINFMT_BUFSIZE	128

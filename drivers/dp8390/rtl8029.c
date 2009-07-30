@@ -18,7 +18,7 @@ Created:	April 2000 by Philip Homburg <philip@f-mnx.phicoh.com>
 #include "../drivers.h"
 
 #include <stdlib.h>
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
 #include <ibm/pci.h>

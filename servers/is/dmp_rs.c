@@ -15,7 +15,7 @@
  * Created:
  *   Oct 03, 2005:	by Jorrit N. Herder
  */
-
+#include <nucleos/nucleos.h>
 #include "inc.h"
 #include <timers.h>
 #include <kernel/priv.h>

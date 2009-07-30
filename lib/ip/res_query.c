@@ -31,7 +31,7 @@ static char sccsid[] = "@(#)res_query.c	5.7 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
 #if _MINIX
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>

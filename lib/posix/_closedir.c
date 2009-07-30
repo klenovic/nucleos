@@ -14,7 +14,7 @@
 #include <lib.h>
 #define close	_close
 #define closedir _closedir
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>

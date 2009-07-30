@@ -52,14 +52,14 @@ static char rcsid[] = "$OpenBSD: sethostent.c,v 1.1 1997/03/12 10:42:11 downsj E
 #endif /* LIBC_SCCS and not lint */
 
 #ifdef notyet
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <netdb.h>
 #include <resolv.h>
 #else
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <net/gen/in.h>
 #include <net/gen/nameser.h>
 #include <net/gen/netdb.h>
@@ -75,9 +75,6 @@ sethostent(stayopen)
 	if (stayopen)
 	{
 		_res.options |= RES_STAYOPEN;
-#ifdef __minix_vmd
-		_res.options |= RES_USEVC;
-#endif
 	}
 }
 

@@ -64,7 +64,7 @@
 
 #include 	"../drivers.h" 
 #include	<string.h>
-#include 	<stddef.h>
+#include 	<nucleos/stddef.h>
 #include	<nucleos/keymap.h>
 #include	<nucleos/syslib.h>
 #include	<nucleos/type.h>
@@ -102,8 +102,8 @@ static tmra_ut or_watchdog;
 #include	<net/hton.h>
 #include	<net/gen/ether.h>
 #include	<net/gen/eth_io.h>
-#include	<sys/vm_i386.h>
-#include	<sys/types.h>
+#include	<asm/servers/vm/vm.h>
+#include	<nucleos/types.h>
 #include	<fcntl.h>
 #include 	<unistd.h>
 #include	<errno.h>

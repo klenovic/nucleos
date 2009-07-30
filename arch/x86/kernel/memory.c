@@ -16,7 +16,7 @@
 #include <nucleos/sysutil.h>
 #include <asm/cpufeature.h>
 #include <string.h>
-#include <sys/vm_i386.h>
+#include <asm/servers/vm/vm.h>
 #include <nucleos/portio.h>
 #include <asm/kernel/proto.h>
 #include <kernel/proto.h>
@@ -288,7 +288,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 			kprintf("SYSTEM:umap_virtual: umap_local failed\n");
 			phys = 0;
 		} else {
-			if(vm_lookup(rp, linear, &phys, NULL) != OK) {
+			if(vm_lookup(rp, linear, (vir_bytes*)&phys, NULL) != OK) {
 				kprintf("SYSTEM:umap_virtual: vm_lookup of %s: seg 0x%lx: 0x%lx failed\n", rp->p_name, seg, vir_addr);
 				phys = 0;
 			}
@@ -471,7 +471,7 @@ PUBLIC int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
 	while(bytes > 0) {
 		u32_t phys;
 
-		if((r=vm_lookup(targetproc, vir_buf, &phys, NULL)) != OK) {
+		if((r=vm_lookup(targetproc, vir_buf, (vir_bytes*)&phys, NULL)) != OK) {
 			kprintf("vm_contiguous: vm_lookup failed, %d\n", r);
 			kprintf("kernel stack: ");
 			util_stacktrace();
@@ -553,7 +553,7 @@ PUBLIC int vm_checkrange(struct proc *caller, struct proc *target,
 		/* If page exists and it's writable if desired, we're OK
 		 * for this page.
 		 */
-		if(vm_lookup(target, v, &phys, &flags) == OK &&
+		if(vm_lookup(target, v, (vir_bytes*)&phys, &flags) == OK &&
 			!(wrfl && !(flags & I386_VM_WRITE))) {
 			if(vm_checkrange_verbose) {
 #if 0

@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <string.h>
 #include <unistd.h>
 

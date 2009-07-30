@@ -12,9 +12,7 @@
 #ifndef _UTIME_H
 #define _UTIME_H
 
-#ifndef _TYPES_H
-#include <sys/types.h>
-#endif
+#include <nucleos/types.h>
 
 struct utimbuf {
   time_t actime;		/* access time */

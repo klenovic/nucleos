@@ -11,8 +11,8 @@
 #ifndef _MINIX_SAFECOPIES_H
 #define _MINIX_SAFECOPIES_H 1
 
-#include <sys/types.h>
-#include <stdint.h>
+#include <nucleos/types.h>
+#include <nucleos/types.h>
 
 typedef int32_t cp_grant_id_t;
 

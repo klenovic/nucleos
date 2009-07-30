@@ -11,7 +11,7 @@
 #define _MINIX_ENDPOINT_H 1
 
 #include <nucleos/com.h>
-#include <limits.h>
+#include <nucleos/limits.h>
 
 /* The point of the padding in 'generation size' is to 
  * allow for certain bogus endpoint numbers such as NONE, ANY, etc.

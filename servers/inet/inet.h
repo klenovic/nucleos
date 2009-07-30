@@ -20,30 +20,20 @@ Copyright 1995 Philip Homburg
 
 #define _SYSTEM	1	/* get OK and negative error codes */
 
-#include <sys/types.h>
+#include <nucleos/types.h>
 #include <errno.h>
-#include <stddef.h>
+#include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __minix_vmd
-
-#include <minix/ansi.h>
-#include <minix/cfg_public.h>
-#include <nucleos/type.h>
-
-#else /* Assume at least Minix 3.x */
-
 #include <unistd.h>
 #include <sys/ioc_file.h>
-#include <sys/time.h>
+#include <nucleos/time.h>
 #include <nucleos/type.h>
 
 #define _NORETURN	/* Should be non empty for GCC */
 
 typedef int ioreq_t;
-
-#endif
 
 #include <nucleos/const.h>
 #include <nucleos/com.h>

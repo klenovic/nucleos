@@ -158,7 +158,7 @@ _PROTOTYPE( void arch_shutdown, (int)					);
 _PROTOTYPE( void arch_get_aout_headers, (int i, struct exec *h)		);
 _PROTOTYPE( void restart, (void)                                        );
 _PROTOTYPE( void idle_task, (void)                                     );
-_PROTOTYPE( void read_tsc, (unsigned long *high, unsigned long *low)    );
+_PROTOTYPE( void read_tsc, (u32_t *high, u32_t *low)    );
 _PROTOTYPE( int arch_init_profile_clock, (u32_t freq)			);
 _PROTOTYPE( void arch_stop_profile_clock, (void)			);
 _PROTOTYPE( void arch_ack_profile_clock, (void)				);

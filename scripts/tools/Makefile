@@ -1,5 +1,7 @@
 hostprogs-y := bintoc ehdr2ahdr edparams installboot mkfs mkinitrd partition
 
+HOST_PPFLAGS += -imacros scripts/tools/include/nucleos/macros.h
+
 bintoc-obj-y := bintoc.o
 
 edparams-obj-y := edparams.o

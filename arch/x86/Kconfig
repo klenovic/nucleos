@@ -8,14 +8,20 @@ config X86_32
 config ARCH_SELECT_MEMORY_MODEL
 	def_bool y
 
+config ARCH_SUPPORTS_OPTIMIZED_INLINING
+	def_bool y
+
 source "Kconfig"
 
 # Kernel options
 source "arch/x86/kernel/Kconfig"
 
 menu "Processor type and features"
+
 source "arch/x86/Kconfig.cpu"
+
 source "mm/Kconfig"
+
 endmenu
 
 # Link kernel with separate I&D
@@ -30,14 +36,11 @@ config ARCH_SERVERS_LINKAGE_SEPID
 config ARCH_DRIVERS_LINKAGE_SEPID
 	def_bool y
 
-# Servers
-source "servers/Kconfig"
+# Servers (includes also debug options if any)
+source "arch/x86/servers/Kconfig"
 
-# Drivers
+# Drivers (includes also debug options if any)
 source "drivers/Kconfig"
-
-# Kernel hacking/debugging
-source "arch/x86/kernel/Kconfig.debug"
 
 # Legacy boot monitor
 source "arch/x86/monitor/Kconfig"
@@ -57,3 +60,6 @@ config X86_P2ALIGN
 	  Specify 32-bit code alignment. Only exponent value must
 	  be specified thus alignment is 2^exp.
 endmenu
+
+# Hacking/debugging (common for all components, generic + arch if any)
+source "arch/x86/Kconfig.debug"

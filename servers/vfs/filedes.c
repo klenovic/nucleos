@@ -17,7 +17,8 @@
  *               happen on it
  */
 
-#include <sys/select.h>
+#include <nucleos/time.h>
+#include <nucleos/types.h>
 #include <nucleos/u64.h>
 #include <assert.h>
 

@@ -17,8 +17,7 @@
  * way.
  */
 .section .text.init
-	.p2align 12
-.section .text
+
 .globl _start
 _start:
 	xor	%ebp, %ebp		// clear for backtrace of core files

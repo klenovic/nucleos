@@ -59,13 +59,8 @@ static int block_size;
 #include <sys/dir.h>
 #endif
 
-#if __minix_vmd
-static struct v12_super_block super; /* Superblock of file system */
-#define s_log_zone_size s_dummy      /* Zones are obsolete. */
-#else
 static struct MNX(super_block) super; /* Superblock of file system */
 #define SUPER_V1 SUPER_MAGIC          /* V1 magic has a weird name. */
-#endif
 
 static struct MNX(inode) curfil;      /* Inode of file under examination */
 static char indir[_MAX_BLOCK_SIZE];   /* Single indirect block. */
