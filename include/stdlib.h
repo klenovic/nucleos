@@ -40,7 +40,6 @@ typedef char wchar_t;		/* type expanded character set */
 
 /* Function Prototypes. */
 _PROTOTYPE( void abort, (void)						);
-_PROTOTYPE( int abs, (int _j)						);
 _PROTOTYPE( int atexit, (void (*_func)(void))				);
 _PROTOTYPE( double atof, (const char *_nptr)				);
 _PROTOTYPE( int atoi, (const char *_nptr)				);

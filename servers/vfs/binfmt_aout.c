@@ -146,14 +146,14 @@ static int aout_load_binary(struct nucleos_binprm *param)
 		param->ex.text_bytes = 0;
 	}
 
-	/* entry point of process (should be 0 for now) */
+	/* entry point of process */
 	param->ex.entry_point = hdr->a_entry;
 
 	err = aout_exec_newmem(&param->stack_top, &param->load_text, &param->allow_setuid,
 			       param->proc_e, &param->ex);
 
 	if (err) {
-		app_err("exec failed!\n");
+		app_err("exec failed (err=%d)!\n", err);
 		return err;
 	}
 

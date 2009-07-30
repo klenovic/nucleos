@@ -8,13 +8,14 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/types.h>
+#include <nucleos/math64.h>
 
 /**
  * @brief 64 bit divided by unsigned giving unsigned long.
  */
 unsigned long div64u(uint64_t i, unsigned j)
 {
-  return (unsigned long)(i/j);
+	return (unsigned long)div_u64(i, j);
 }
 
 /**
@@ -22,5 +23,9 @@ unsigned long div64u(uint64_t i, unsigned j)
  */
 unsigned rem64u(uint64_t i, unsigned j)
 {
-  return (unsigned)(i%j);
+	u32 rem;
+
+	div_u64_rem(i, j, &rem);
+
+	return (unsigned)rem;
 }

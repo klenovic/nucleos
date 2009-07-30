@@ -19,7 +19,6 @@ ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
 LDFLAGS_$(appname).elf32 := -L$(lib-arch) -Llib \
 			    -lsys -ltimers -lnucc \
-			    -L$(cc-lib-dir) -lgcc \
 			    -Tservers/server_32.lds
 
 $(src)/$(appname).elf32: servers/server_32.lds

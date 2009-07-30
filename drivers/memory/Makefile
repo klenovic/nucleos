@@ -8,7 +8,6 @@ memory.elf32-obj-$(CONFIG_BUILTIN_INITRD) += initrd.o
 
 LDFLAGS_memory.elf32 := -L$(lib-arch) -Llib \
 			-ldriver -lsys -lnucc \
-			-L$(cc-lib-dir) -lgcc \
 			-Tdrivers/driver_32.lds
 
 $(src)/memory.elf32: drivers/driver_32.lds
