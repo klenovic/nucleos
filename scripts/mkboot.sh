@@ -36,7 +36,7 @@ tmp_dir=.$$_mnt
 
 usage()
 {
-  echo "Usage: `basename $0` [-h] [-a action] [-b boot] [-B bootblock] [-m masterboot] [-o offset] [-i sysimg] diskimg" >&2
+  echo "Usage: `basename $0` [-h] [-a action] [-b boot] [-B bootblock] [-m masterboot] [-o offset] [-i sysimg] diskimg"
   echo "[-a action]: action to do (bootable,cdfdboot,fdboot,hddboot,install,installmbr)"
   echo "[-b boot]: install boot utility on floppy/disk image"
   echo "[-B bootblock]: install bootblock on floppy/disk image"
@@ -48,7 +48,7 @@ usage()
 
 setup_loop_device()
 {
-  if [[ -z $diskimg || ! -a $diskimg ]]; then
+  if ( [ -z $diskimg ] || [ ! -e $diskimg ] ); then
     echo "Disk image '$diskimg' doesn't exist!"
     exit 1
   fi
@@ -60,7 +60,7 @@ setup_loop_device()
   sudo /sbin/losetup $loop_device $diskimg -o $loop_offset
   exitcode=$?
 
-  if [[ $exitcode != 0 ]]; then
+  if [ ! $exitcode = 0 ]; then
     echo "Can't setup loop device!"
     cleanup_exit 1
   fi
@@ -137,7 +137,7 @@ do
        need_loop_device="y"
        bin_boot=$OPTARG
 
-       if [[ -z $bin_boot || ! -a $bin_boot ]]; then
+       if ([ -z $bin_boot ] || [ ! -e $bin_boot ]); then
          echo "No such file '$bin_boot'!"
          exit 1
        fi
@@ -147,7 +147,7 @@ do
        need_loop_device="y"
        bin_bootblock=$OPTARG
 
-       if [[ -z $bin_bootblock || ! -a $bin_bootblock ]]; then
+       if ([ -z $bin_bootblock ] || [ ! -e $bin_bootblock ]); then
          echo "No such file '$bin_bootblock'!"
          exit 1
        fi
@@ -157,7 +157,7 @@ do
        need_loop_device="y"
        bin_image=$OPTARG
 
-       if [[ -z $bin_image || ! -a $bin_image ]]; then
+       if ([ -z $bin_image ] || [ ! -e $bin_image ]); then
          echo "No such file '$bin_image'!"
          exit 1
        fi
@@ -167,7 +167,7 @@ do
        need_loop_device="y"
        bin_masterboot=$OPTARG
 
-       if [[ -z $bin_masterboot || ! -a $bin_masterboot ]]; then
+       if ([ -z $bin_masterboot ] || [ ! -e $bin_masterboot ]); then
          echo "No such file '$bin_masterboot'!"
          exit 1
        fi
@@ -208,7 +208,7 @@ fi
 shift `echo $OPTIND-1 | bc`
 diskimg="$1"
 
-if [[ -z $diskimg || ! -a $diskimg ]]; then
+if ([ -z $diskimg ] || [ ! -e $diskimg ]); then
   echo "Disk image not specified!"
   exit 1
 fi
@@ -228,12 +228,12 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_boot || ! -a $bin_boot ]]; then
+    if ([ -z $bin_boot ] || [ ! -e $bin_boot ]); then
       echo "No such file '$bin_boot'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_bootblock || ! -a $bin_bootblock ]]; then
+    if ([ -z $bin_bootblock ] || ! [ -e $bin_bootblock ]); then
       echo "No such file '$bin_bootblock'!"
       cleanup_exit 1
     fi
@@ -260,17 +260,17 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_image || ! -a $bin_image ]]; then
+    if ([ -z $bin_image ] || [ ! -e $bin_image ]); then
       echo "No such file '$bin_image'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_boot || ! -a $bin_boot ]]; then
+    if ([ -z $bin_boot ] || [ ! -e $bin_boot ]); then
       echo "No such file '$bin_boot'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_bootblock || ! -a $bin_bootblock ]]; then
+    if ([ -z $bin_bootblock ] || [ ! -e $bin_bootblock ]); then
       echo "No such file '$bin_bootblock'!"
       cleanup_exit 1
     fi
@@ -303,7 +303,7 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_masterboot || ! -a $bin_masterboot ]]; then
+    if ([ -z $bin_masterboot ] || [ ! -e $bin_masterboot ]); then
       echo "No such file '$bin_masterboot'!"
       cleanup_exit 1
     fi
@@ -321,7 +321,7 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_image || ! -a $bin_image ]]; then
+    if ([ -z $bin_image ] || [ ! -e $bin_image ]); then
       echo "No such file '$bin_image'!"
       cleanup_exit 1
     fi
@@ -347,17 +347,17 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_image || ! -a $bin_image ]]; then
+    if ([ -z $bin_image ] || [ ! -e $bin_image ]); then
       echo "No such file '$bin_image'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_boot || ! -a $bin_boot ]]; then
+    if ([ -z $bin_boot ] || [ ! -e $bin_boot ]); then
       echo "No such file '$bin_boot'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_bootblock || ! -a $bin_bootblock ]]; then
+    if ([ -z $bin_bootblock ] || [ ! -e $bin_bootblock ]); then
       echo "No such file '$bin_bootblock'!"
       cleanup_exit 1
     fi
@@ -375,7 +375,7 @@ case $action in
     sudo mkdir $tmp_dir/boot/image
 
     echo "==> Installing /dev"
-    sudo tar -C $tmp_dir/dev -xjf $scipts/dev.tar.bz2 1>&/dev/null || cleanup_exit 1
+    sudo tar -C $tmp_dir/dev -xjf $scipts/dev.tar.bz2 || cleanup_exit 1
 
     sudo cp -p $bin_boot $tmp_dir/boot/boot || cleanup_exit 1
 
@@ -397,17 +397,17 @@ case $action in
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_image || ! -a $bin_image ]]; then
+    if ([ -z $bin_image ]|| [ ! -e $bin_image ]); then
       echo "No such file '$bin_image'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_boot || ! -a $bin_boot ]]; then
+    if ([ -z $bin_boot ] || [ ! -e $bin_boot ]); then
       echo "No such file '$bin_boot'!"
       cleanup_exit 1
     fi
 
-    if [[ -z $bin_bootblock || ! -a $bin_bootblock ]]; then
+    if ([ -z $bin_bootblock ] || [ ! -e $bin_bootblock ]); then
       echo "No such file '$bin_bootblock'!"
       cleanup_exit 1
     fi

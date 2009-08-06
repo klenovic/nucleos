@@ -53,7 +53,7 @@ $(1)-libs += $$(filter %.a,$(2))
 # defining your own.
 # ----------------------------------------------------------------------------
 quiet_cmd_create_$(1)_mri ?= GEN     $$@
-      cmd_create_$(1)_mri ?= echo -e 'OPEN $$(src)/$(1)\n $$(foreach l,$$(filter %.a,$$^),ADDLIB $$(l)\n)SAVE\nEND' > $$@
+      cmd_create_$(1)_mri ?= printf 'OPEN $$(src)/$(1)\n $$(foreach l,$$(filter %.a,$$^),ADDLIB $$(l)\n)SAVE\nEND' > $$@
 
 $$(src)/$(1).mri: $$($(1)-libs) FORCE
 	$$(call if_changed,create_$(1)_mri)
