@@ -1706,7 +1706,3 @@ register struct re_guts *g;
 		g->iflags |= BAD;
 	return(maxnest);
 }
-
-/*
- * $PchId: regcomp.c,v 1.2 1996/03/12 19:10:15 philip Exp $
- */

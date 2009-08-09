@@ -27,13 +27,13 @@
 #include "param.h"
 
 #if defined (CONFIG_DEBUG_SERVERS_STATS_PROFILE) || defined(CONFIG_DEBUG_SERVERS_CALL_PROFILE)
-FORWARD _PROTOTYPE( int check_addrs, (int info_size)               );
+static int check_addrs(int info_size);
 #endif
 
 /*===========================================================================*
  *				do_sprofile				     *
  *===========================================================================*/
-PUBLIC int do_sprofile(void)
+int do_sprofile(void)
 {
 #ifdef CONFIG_DEBUG_SERVERS_STATS_PROFILE
 
@@ -64,7 +64,7 @@ PUBLIC int do_sprofile(void)
 /*===========================================================================*
  *				do_cprofile				     *
  *===========================================================================*/
-PUBLIC int do_cprofile(void)
+int do_cprofile(void)
 {
 #ifdef CONFIG_DEBUG_KERNEL_CALL_PROFILE
 
@@ -97,7 +97,7 @@ PUBLIC int do_cprofile(void)
 /*===========================================================================*
  *				check_addrs				     *
  *===========================================================================*/
-PRIVATE int check_addrs(info_size)
+static int check_addrs(info_size)
 int info_size;
 {
   int r;

@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_sigreturn				     *
  *===========================================================================*/
-PUBLIC int sys_sigreturn(proc_nr, sig_ctxt)
+int sys_sigreturn(proc_nr, sig_ctxt)
 int proc_nr;				/* for which process */
 struct sigmsg *sig_ctxt;		/* POSIX style handling */
 {

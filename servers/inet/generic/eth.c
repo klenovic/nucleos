@@ -70,35 +70,33 @@ typedef struct
 	u16_t vh_vlan;
 } vlan_hdr_t;
 
-FORWARD int eth_checkopt ARGS(( eth_fd_t *eth_fd ));
-FORWARD void hash_fd ARGS(( eth_fd_t *eth_fd ));
-FORWARD void unhash_fd ARGS(( eth_fd_t *eth_fd ));
-FORWARD void eth_buffree ARGS(( int priority ));
+static int eth_checkopt(eth_fd_t *eth_fd);
+static void hash_fd(eth_fd_t *eth_fd);
+static void unhash_fd(eth_fd_t *eth_fd);
+static void eth_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK
-FORWARD void eth_bufcheck ARGS(( void ));
+static void eth_bufcheck(void);
 #endif
-FORWARD int eth_sel_read ARGS(( eth_fd_t * ));
-FORWARD void packet2user ARGS(( eth_fd_t *fd, acc_t *pack, time_t exp_time ));
-FORWARD void reply_thr_get ARGS(( eth_fd_t *eth_fd,
-	size_t result, int for_ioctl ));
-FORWARD void reply_thr_put ARGS(( eth_fd_t *eth_fd,
-	size_t result, int for_ioctl ));
-FORWARD void do_rec_conf ARGS(( eth_port_t *eth_port ));
-FORWARD u32_t compute_rec_conf ARGS(( eth_port_t *eth_port ));
-FORWARD acc_t *insert_vlan_hdr ARGS(( eth_port_t *eth_port, acc_t *pack ));
+static int eth_sel_read(eth_fd_t *);
+static void packet2user(eth_fd_t *fd, acc_t *pack, time_t exp_time);
+static void reply_thr_get(eth_fd_t *eth_fd, size_t result, int for_ioctl);
+static void reply_thr_put(eth_fd_t *eth_fd, size_t result, int for_ioctl);
+static void do_rec_conf(eth_port_t *eth_port);
+static u32_t compute_rec_conf(eth_port_t *eth_port);
+static acc_t *insert_vlan_hdr(eth_port_t *eth_port, acc_t *pack);
 
-PUBLIC eth_port_t *eth_port_table;
-PUBLIC int no_ethWritePort= 0;
+eth_port_t *eth_port_table;
+int no_ethWritePort= 0;
 
-PRIVATE eth_fd_t eth_fd_table[ETH_FD_NR];
-PRIVATE ether_addr_t broadcast= { { 255, 255, 255, 255, 255, 255 } };
+static eth_fd_t eth_fd_table[ETH_FD_NR];
+static ether_addr_t broadcast= { { 255, 255, 255, 255, 255, 255 } };
 
-PUBLIC void eth_prep()
+void eth_prep()
 {
 	eth_port_table= alloc(eth_conf_nr * sizeof(eth_port_table[0]));
 }
 
-PUBLIC void eth_init()
+void eth_init()
 {
 	int i, j;
 
@@ -133,7 +131,7 @@ PUBLIC void eth_init()
 	osdep_eth_init();
 }
 
-PUBLIC int eth_open(port, srfd, get_userdata, put_userdata, put_pkt,
+int eth_open(port, srfd, get_userdata, put_userdata, put_pkt,
 	select_res)
 int port, srfd;
 get_userdata_t get_userdata;
@@ -175,7 +173,7 @@ select_res_t select_res;
 	return i;
 }
 
-PUBLIC int eth_ioctl(fd, req)
+int eth_ioctl(fd, req)
 int fd;
 ioreq_t req;
 {
@@ -426,7 +424,7 @@ printf("eth_ioctl: setting etp_getstat in port %d to %p\n",
 	return NW_OK;
 }
 
-PUBLIC int eth_write(fd, count)
+int eth_write(fd, count)
 int fd;
 size_t count;
 {
@@ -489,7 +487,7 @@ size_t count;
 	return NW_OK;
 }
 
-PUBLIC int eth_send(fd, data, data_len)
+int eth_send(fd, data, data_len)
 int fd;
 acc_t *data;
 size_t data_len;
@@ -574,7 +572,7 @@ size_t data_len;
 	return NW_OK;
 }
 
-PUBLIC int eth_read (fd, count)
+int eth_read (fd, count)
 int fd;
 size_t count;
 {
@@ -612,7 +610,7 @@ size_t count;
 	return NW_SUSPEND;
 }
 
-PUBLIC int eth_cancel(fd, which_operation)
+int eth_cancel(fd, which_operation)
 int fd;
 int which_operation;
 {
@@ -664,7 +662,7 @@ int which_operation;
 	return NW_OK;
 }
 
-PUBLIC int eth_select(fd, operations)
+int eth_select(fd, operations)
 int fd;
 unsigned operations;
 {
@@ -696,7 +694,7 @@ unsigned operations;
 	return resops;
 }
 
-PUBLIC void eth_close(fd)
+void eth_close(fd)
 int fd;
 {
 	eth_fd_t *eth_fd;
@@ -722,7 +720,7 @@ int fd;
 	do_rec_conf(eth_port);
 }
 
-PUBLIC void eth_loop_ev(ev, ev_arg)
+void eth_loop_ev(ev, ev_arg)
 event_t *ev;
 ev_arg_t ev_arg;
 {
@@ -744,7 +742,7 @@ ev_arg_t ev_arg;
 	eth_restart_write(eth_port);
 }
 
-PRIVATE int eth_checkopt (eth_fd)
+static int eth_checkopt (eth_fd)
 eth_fd_t *eth_fd;
 {
 /* bug: we don't check access modes yet */
@@ -782,7 +780,7 @@ eth_fd_t *eth_fd;
 	return NW_OK;
 }
 
-PRIVATE void hash_fd(eth_fd)
+static void hash_fd(eth_fd)
 eth_fd_t *eth_fd;
 {
 	eth_port_t *eth_port;
@@ -805,7 +803,7 @@ eth_fd_t *eth_fd;
 	}
 }
 
-PRIVATE void unhash_fd(eth_fd)
+static void unhash_fd(eth_fd)
 eth_fd_t *eth_fd;
 {
 	eth_port_t *eth_port;
@@ -838,7 +836,7 @@ eth_fd_t *eth_fd;
 		*eth_fd_p= curr->ef_type_next;
 }
 
-PUBLIC void eth_restart_write(eth_port)
+void eth_restart_write(eth_port)
 eth_port_t *eth_port;
 {
 	eth_fd_t *eth_fd;
@@ -858,7 +856,7 @@ eth_port_t *eth_port;
 	}
 }
 
-PUBLIC void eth_arrive (eth_port, pack, pack_size)
+void eth_arrive (eth_port, pack, pack_size)
 eth_port_t *eth_port;
 acc_t *pack;
 size_t pack_size;
@@ -1044,7 +1042,7 @@ size_t pack_size;
 	}
 }
 
-PUBLIC void eth_reg_vlan(eth_port, vlan_port)
+void eth_reg_vlan(eth_port, vlan_port)
 eth_port_t *eth_port;
 eth_port_t *vlan_port;
 {
@@ -1057,7 +1055,7 @@ eth_port_t *vlan_port;
 	eth_port->etp_vlan_tab[h]= vlan_port;
 }
 
-PUBLIC void eth_restart_ioctl(eth_port)
+void eth_restart_ioctl(eth_port)
 eth_port_t *eth_port;
 {
 	int i, r;
@@ -1124,7 +1122,7 @@ printf("eth_restart_ioctl: clearing etp_getstat in port %d\n",
 	}
 }
 
-PRIVATE int eth_sel_read (eth_fd)
+static int eth_sel_read (eth_fd)
 eth_fd_t *eth_fd;
 {
 	acc_t *pack, *tmp_acc, *next_acc;
@@ -1150,7 +1148,7 @@ eth_fd_t *eth_fd;
 	return 0;
 }
 
-PRIVATE void packet2user (eth_fd, pack, exp_time)
+static void packet2user (eth_fd, pack, exp_time)
 eth_fd_t *eth_fd;
 acc_t *pack;
 time_t exp_time;
@@ -1210,7 +1208,7 @@ time_t exp_time;
 		reply_thr_put(eth_fd, result, FALSE);
 }
 
-PRIVATE void eth_buffree (priority)
+static void eth_buffree (priority)
 int priority;
 {
 	int i;
@@ -1245,7 +1243,7 @@ int priority;
 }
 
 #ifdef BUF_CONSISTENCY_CHECK
-PRIVATE void eth_bufcheck()
+static void eth_bufcheck()
 {
 	int i;
 	eth_fd_t *eth_fd;
@@ -1267,7 +1265,7 @@ PRIVATE void eth_bufcheck()
 }
 #endif
 
-PRIVATE void do_rec_conf(eth_port)
+static void do_rec_conf(eth_port)
 eth_port_t *eth_port;
 {
 	int i;
@@ -1290,7 +1288,7 @@ eth_port_t *eth_port;
 	eth_set_rec_conf(eth_port, flags);
 }
 
-PRIVATE u32_t compute_rec_conf(eth_port)
+static u32_t compute_rec_conf(eth_port)
 eth_port_t *eth_port;
 {
 	eth_fd_t *eth_fd;
@@ -1312,7 +1310,7 @@ eth_port_t *eth_port;
 	return flags;
 }
 
-PRIVATE void reply_thr_get (eth_fd, result, for_ioctl)
+static void reply_thr_get (eth_fd, result, for_ioctl)
 eth_fd_t *eth_fd;
 size_t result;
 int for_ioctl;
@@ -1323,7 +1321,7 @@ int for_ioctl;
 	assert (!data);	
 }
 
-PRIVATE void reply_thr_put (eth_fd, result, for_ioctl)
+static void reply_thr_put (eth_fd, result, for_ioctl)
 eth_fd_t *eth_fd;
 size_t result;
 int for_ioctl;
@@ -1335,7 +1333,7 @@ int for_ioctl;
 	assert(error == NW_OK);
 }
 
-PRIVATE acc_t *insert_vlan_hdr(eth_port, pack)
+static acc_t *insert_vlan_hdr(eth_port, pack)
 eth_port_t *eth_port;
 acc_t *pack;
 {
@@ -1369,7 +1367,3 @@ acc_t *pack;
 	pack= head_acc; head_acc= NULL;
 	return pack;
 }
-
-/*
- * $PchId: eth.c,v 1.23 2005/06/28 14:15:58 philip Exp $
- */

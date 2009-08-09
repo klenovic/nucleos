@@ -46,7 +46,7 @@
 /*===========================================================================*
  *				get_free_vnode				     *
  *===========================================================================*/
-PUBLIC struct vnode *get_free_vnode(file, line)
+struct vnode *get_free_vnode(file, line)
 char *file;
 int line;
 {
@@ -73,7 +73,7 @@ int line;
 /*===========================================================================*
  *				find_vnode				     *
  *===========================================================================*/
-PUBLIC struct vnode *find_vnode(int fs_e, int numb)
+struct vnode *find_vnode(int fs_e, int numb)
 {
 /* Find a specified (FS endpoint and inode number) vnode in the
  * vnode table */
@@ -90,7 +90,7 @@ PUBLIC struct vnode *find_vnode(int fs_e, int numb)
 /*===========================================================================*
  *				dup_vnode				     *
  *===========================================================================*/
-PUBLIC void dup_vnode(struct vnode *vp)
+void dup_vnode(struct vnode *vp)
 {
 /* dup_vnode() is called to increment the vnode and therefore the
  * referred inode's counter.
@@ -103,7 +103,7 @@ PUBLIC void dup_vnode(struct vnode *vp)
 /*===========================================================================*
  *				put_vnode				     *
  *===========================================================================*/
-PUBLIC void put_vnode(struct vnode *vp)
+void put_vnode(struct vnode *vp)
 {
 /* Decrease vnode's usage counter and decrease inode's usage counter in the 
  * corresponding FS process.
@@ -145,7 +145,7 @@ PUBLIC void put_vnode(struct vnode *vp)
 /*===========================================================================*
  *				vnode_clean_refs			     *
  *===========================================================================*/
-PUBLIC void vnode_clean_refs(struct vnode *vp)
+void vnode_clean_refs(struct vnode *vp)
 {
 /* Tell the underlying FS to drop all reference but one. */
   if (vp == NIL_VNODE) {
@@ -164,7 +164,7 @@ PUBLIC void vnode_clean_refs(struct vnode *vp)
 /*===========================================================================*
  *				mark_vn					     *
  *===========================================================================*/
-PUBLIC void mark_vn(vp, file, line)
+void mark_vn(vp, file, line)
 struct vnode *vp;
 char *file;
 int line;
@@ -182,7 +182,7 @@ int line;
 /*===========================================================================*
  *				check_vrefs				     *
  *===========================================================================*/
-PUBLIC int check_vrefs()
+int check_vrefs()
 {
 	int i, bad;
 	int ispipe_flag, ispipe_mode;

@@ -28,12 +28,12 @@
 #include <nucleos/syslib.h>
 #include <nucleos/com.h>
 
-PRIVATE timer_t *pm_timers = NULL;
+static timer_t *pm_timers = NULL;
 
 /*===========================================================================*
  *				pm_set_timer				     *
  *===========================================================================*/
-PUBLIC void pm_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
+void pm_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 {
 	int r;
 	clock_t now, prev_time = 0, next_time;
@@ -57,7 +57,7 @@ PUBLIC void pm_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 /*===========================================================================*
  *				pm_expire_timers			     *
  *===========================================================================*/
-PUBLIC void pm_expire_timers(clock_t now)
+void pm_expire_timers(clock_t now)
 {
 	clock_t next_time;
 
@@ -72,7 +72,7 @@ PUBLIC void pm_expire_timers(clock_t now)
 /*===========================================================================*
  *				pm_cancel_timer				     *
  *===========================================================================*/
-PUBLIC void pm_cancel_timer(timer_t *tp)
+void pm_cancel_timer(timer_t *tp)
 {
 	clock_t next_time, prev_time;
 	prev_time = tmrs_clrtimer(&pm_timers, tp, &next_time);

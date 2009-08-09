@@ -52,7 +52,3 @@ typedef struct tcp_hdropt
 #define TCP_OPT_CCNEW	12	/* RFC-1644, new connection count */
 
 #endif /* __SERVER__IP__GEN__TCP_HDR_H__ */
-
-/*
- * $PchId: tcp_hdr.h,v 1.4 2002/06/10 07:12:22 philip Exp $
- */

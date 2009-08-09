@@ -12,8 +12,8 @@
 #include <sys/stat.h>
 #include <string.h>
 
-PUBLIC int stat(name, buffer)
-_CONST char *name;
+int stat(name, buffer)
+const char *name;
 struct stat *buffer;
 {
   message m;

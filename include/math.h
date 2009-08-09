@@ -19,33 +19,33 @@
 #define HUGE_VAL	(__huge_val())		/* may be infinity */
 
 /* Function Prototypes. */
-_PROTOTYPE( double __huge_val,	(void)					);
-_PROTOTYPE( int __IsNan,	(double _x)				);
+double __huge_val(void);
+int __IsNan(double _x);
 
-_PROTOTYPE( double acos,  (double _x)					);
-_PROTOTYPE( double asin,  (double _x)					);
-_PROTOTYPE( double atan,  (double _x)					);
-_PROTOTYPE( double atan2, (double _y, double _x)			);
-_PROTOTYPE( double ceil,  (double _x)					);
-_PROTOTYPE( double cos,   (double _x)					);
-_PROTOTYPE( double cosh,  (double _x)					);
-_PROTOTYPE( double exp,   (double _x)					);
-_PROTOTYPE( double fabs,  (double _x)					);
-_PROTOTYPE( double floor, (double _x)					);
-_PROTOTYPE( double fmod,  (double _x, double _y)			);
-_PROTOTYPE( double frexp, (double _x, int *_exp)			);
-_PROTOTYPE( double ldexp, (double _x, int _exp)				);
-_PROTOTYPE( double log,   (double _x)					);
-_PROTOTYPE( double log10, (double _x)					);
-_PROTOTYPE( double modf,  (double _x, double *_iptr)			);
-_PROTOTYPE( double pow,   (double _x, double _y)			);
-_PROTOTYPE( double rint,  (double _x)					);
-_PROTOTYPE( double sin,   (double _x)					);
-_PROTOTYPE( double sinh,  (double _x)					);
-_PROTOTYPE( double sqrt,  (double _x)					);
-_PROTOTYPE( double tan,   (double _x)					);
-_PROTOTYPE( double tanh,  (double _x)					);
-_PROTOTYPE( double hypot, (double _x, double _y)			);
+double acos(double _x);
+double asin(double _x);
+double atan(double _x);
+double atan2(double _y, double _x);
+double ceil(double _x);
+double cos(double _x);
+double cosh(double _x);
+double exp(double _x);
+double fabs(double _x);
+double floor(double _x);
+double fmod(double _x, double _y);
+double frexp(double _x, int *_exp);
+double ldexp(double _x, int _exp);
+double log(double _x);
+double log10(double _x);
+double modf(double _x, double *_iptr);
+double pow(double _x, double _y);
+double rint(double _x);
+double sin(double _x);
+double sinh(double _x);
+double sqrt(double _x);
+double tan(double _x);
+double tanh(double _x);
+double hypot(double _x, double _y);
 
 #ifdef _POSIX_SOURCE	/* STD-C? */
 #include <mathconst.h>

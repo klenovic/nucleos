@@ -23,7 +23,7 @@
 //===========================================================================
 //                             monitor
 //===========================================================================
-// PUBLIC void monitor();
+// void monitor();
 // Return to the monitor.
 .globl monitor        // exit Minix and return to the monitor
 monitor:
@@ -43,7 +43,7 @@ monitor:
 //===========================================================================
 //                             int86
 //===========================================================================
-// PUBLIC void int86();
+// void int86();
 .globl int86          // let the monitor make an 8086 interrupt call
 int86:
         cmpb    $0,mon_return  // is the monitor there?
@@ -134,7 +134,7 @@ csinit:
 //===========================================================================
 //                             phys_insw
 //===========================================================================
-// PUBLIC void phys_insw(Port_t port, phys_bytes buf, size_t count);
+// void phys_insw(Port_t port, phys_bytes buf, size_t count);
 // Input an array from an I/O port.  Absolute address version of insw().
 .globl phys_insw      // transfer data from (disk controller) port to memory
 phys_insw:
@@ -162,7 +162,7 @@ phys_insw:
 //===========================================================================
 //                             phys_insb
 //===========================================================================
-// PUBLIC void phys_insb(Port_t port, phys_bytes buf, size_t count);
+// void phys_insb(Port_t port, phys_bytes buf, size_t count);
 // Input an array from an I/O port.  Absolute address version of insb().
 .globl phys_insb      // likewise byte by byte
 phys_insb:
@@ -189,7 +189,7 @@ phys_insb:
 //===========================================================================
 //                             phys_outsw
 //===========================================================================
-// PUBLIC void phys_outsw(Port_t port, phys_bytes buf, size_t count);
+// void phys_outsw(Port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsw().
         .p2align 4
 .globl phys_outsw     // transfer data from memory to (disk controller) port
@@ -218,7 +218,7 @@ phys_outsw:
 //===========================================================================
 //                             phys_outsb
 //===========================================================================
-// PUBLIC void phys_outsb(Port_t port, phys_bytes buf, size_t count);
+// void phys_outsb(Port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsb().
         .p2align 4
 .globl phys_outsb     // likewise byte by byte
@@ -245,7 +245,7 @@ phys_outsb:
 //==========================================================================
 //                             enable_irq
 //==========================================================================
-// PUBLIC void enable_irq(irq_hook_t *hook)
+// void enable_irq(irq_hook_t *hook)
 // Enable an interrupt request line by clearing an 8259 bit.
 // Equivalent C code for hook->irq < 8:
 //   if ((irq_actids[hook->irq] &= ~hook->id) == 0)
@@ -282,7 +282,7 @@ en_done:
 //==========================================================================
 //                          disable_irq
 //==========================================================================
-// PUBLIC int disable_irq(irq_hook_t *hook)
+// int disable_irq(irq_hook_t *hook)
 // Disable an interrupt request line by setting an 8259 bit.
 // Equivalent C code for irq < 8:
 //   irq_actids[hook->irq] |= hook->id;
@@ -324,7 +324,7 @@ dis_already:
 //===========================================================================
 //                             phys_copy
 //===========================================================================
-// PUBLIC void phys_copy(phys_bytes source, phys_bytes destination,
+// void phys_copy(phys_bytes source, phys_bytes destination,
 //                      phys_bytes bytecount);
 // Copy a block of physical memory.
 
@@ -373,7 +373,7 @@ pc_small:
 //===========================================================================
 //                             phys_memset
 //===========================================================================
-// PUBLIC void phys_memset(phys_bytes source, unsigned long pattern,
+// void phys_memset(phys_bytes source, unsigned long pattern,
 //      phys_bytes bytecount);
 // Fill a block of physical memory with pattern.
         .p2align 4
@@ -420,7 +420,7 @@ fill_done:
 //===========================================================================
 //                             mem_rdw
 //===========================================================================
-// PUBLIC u16_t mem_rdw(U16_t segment, u16_t *offset);
+// u16_t mem_rdw(U16_t segment, u16_t *offset);
 // Load and return word at far pointer segment:offset.
         .p2align 4
 .globl mem_rdw        // copy one word from [segment:offset]
@@ -437,7 +437,7 @@ mem_rdw:
 //===========================================================================
 //                             reset
 //===========================================================================
-// PUBLIC void reset();
+// void reset();
 // Reset the system by loading IDT with offset 0 and interrupting.
 .globl reset          // reset the system
 reset:
@@ -464,7 +464,7 @@ halt:
 //===========================================================================
 //                           level0
 //===========================================================================
-// PUBLIC void level0(void (*func)(void))
+// void level0(void (*func)(void))
 // Call a function at permission level 0.  This allows kernel tasks to do
 // things that are only possible at the most privileged CPU level.
 //
@@ -478,7 +478,7 @@ level0:
 //===========================================================================
 //                           read_flags
 //===========================================================================
-// PUBLIC unsigned long read_cpu_flags(void);
+// unsigned long read_cpu_flags(void);
 // Read CPU status flags from C.
         .p2align 4
 .globl read_cpu_flags // read the cpu flags
@@ -492,7 +492,7 @@ read_cpu_flags:
 //===========================================================================
 //                           read_cr0
 //===========================================================================
-// PUBLIC unsigned long read_cr0(void);
+// unsigned long read_cr0(void);
 .globl read_cr0       // read cr0
 read_cr0:
         push    %ebp
@@ -504,7 +504,7 @@ read_cr0:
 //===========================================================================
 //                           write_cr0                                      
 //===========================================================================
-// PUBLIC void write_cr0(unsigned long value);
+// void write_cr0(unsigned long value);
 .globl write_cr0      // write a value in cr0
 write_cr0:
         push    %ebp
@@ -519,7 +519,7 @@ write_cr0:
 //===========================================================================*
 //                            read_cr4                                       *
 //===========================================================================*
-// PUBLIC unsigned long read_cr4(void);
+// unsigned long read_cr4(void);
 .globl read_cr4
 read_cr4:
         push    %ebp
@@ -531,7 +531,7 @@ read_cr4:
 //===========================================================================*
 //                            write_cr4                                      *
 //===========================================================================*
-//PUBLIC void write_cr4(unsigned long value);
+//void write_cr4(unsigned long value);
 .globl write_cr4
 write_cr4:
         push    %ebp
@@ -546,7 +546,7 @@ write_cr4:
 //===========================================================================
 //                           write_cr3                                      
 //===========================================================================
-// PUBLIC void write_cr3(unsigned long value);
+// void write_cr3(unsigned long value);
 .globl write_cr3      // write a value in cr3 (root of the page table)
 write_cr3:
         push    %ebp

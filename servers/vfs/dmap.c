@@ -41,7 +41,7 @@
   --------------     --------  ------  -----------  ----- ------  ----       
  */
 struct dmap dmap[NR_DEVICES];				/* actual map */ 
-PRIVATE struct dmap init_dmap[] = {
+static struct dmap init_dmap[] = {
   DT(1, no_dev,   0,       0,       	0, "") 	  	/* 0 = not used   */
   DT(1, gen_opcl, gen_io,  MEM_PROC_NR, 0, "memory")        /* 1 = /dev/mem   */
   DT(0, no_dev,   0,       0,           DMAP_MUTABLE, "")   /* 2 = /dev/fd0   */
@@ -65,13 +65,12 @@ PRIVATE struct dmap init_dmap[] = {
 #endif /* CONFIG_X86_32 */
 };
 
-FORWARD _PROTOTYPE( int map_driverX, (char *label, int major,
-			endpoint_t proc_nr_e, int style, int force)	);
+static int map_driverX(char *label, int major, endpoint_t proc_nr_e, int style, int force);
 
 /*===========================================================================*
  *				do_devctl		 		     *
  *===========================================================================*/
-PUBLIC int do_devctl()
+int do_devctl()
 {
 	if (!super_user)
 	{
@@ -88,7 +87,7 @@ PUBLIC int do_devctl()
 /*===========================================================================*
  *				fs_devctl		 		     *
  *===========================================================================*/
-PUBLIC int fs_devctl(req, dev, proc_nr_e, style, force)
+int fs_devctl(req, dev, proc_nr_e, style, force)
 int req;
 int dev;
 int proc_nr_e;
@@ -133,7 +132,7 @@ int force;
 /*===========================================================================*
  *				do_mapdriver		 		     *
  *===========================================================================*/
-PUBLIC int do_mapdriver()
+int do_mapdriver()
 {
 	int r, force, major, proc_nr_n;
 	unsigned long tasknr;
@@ -206,7 +205,7 @@ PUBLIC int do_mapdriver()
 /*===========================================================================*
  *				map_driver		 		     *
  *===========================================================================*/
-PUBLIC int map_driver(major, proc_nr_e, style, force)
+int map_driver(major, proc_nr_e, style, force)
 int major;			/* major number of the device */
 int proc_nr_e;			/* process number of the driver */
 int style;			/* style of the device */
@@ -267,7 +266,7 @@ int force;
 /*===========================================================================*
  *				map_driverX		 		     *
  *===========================================================================*/
-PRIVATE int map_driverX(label, major, proc_nr_e, style, force)
+static int map_driverX(label, major, proc_nr_e, style, force)
 char *label;			/* name of the driver */
 int major;			/* major number of the device */
 endpoint_t proc_nr_e;		/* process number of the driver */
@@ -337,7 +336,7 @@ int force;
 /*===========================================================================*
  *				dmap_unmap_by_endpt	 		     *
  *===========================================================================*/
-PUBLIC void dmap_unmap_by_endpt(int proc_nr_e)
+void dmap_unmap_by_endpt(int proc_nr_e)
 {
 	int i, r;
 	for (i=0; i<NR_DEVICES; i++)
@@ -352,7 +351,7 @@ PUBLIC void dmap_unmap_by_endpt(int proc_nr_e)
 /*===========================================================================*
  *				build_dmap		 		     *
  *===========================================================================*/
-PUBLIC void build_dmap()
+void build_dmap()
 {
 /* Initialize the table with all device <-> driver mappings. Then, map  
  * the boot driver to a controller and update the dmap table to that
@@ -391,7 +390,7 @@ PUBLIC void build_dmap()
 /*===========================================================================*
  *				dmap_driver_match	 		     *
  *===========================================================================*/ 
-PUBLIC int dmap_driver_match(int proc, int major)
+int dmap_driver_match(int proc, int major)
 {
 	if (major < 0 || major >= NR_DEVICES) return(0);
 	if(dmap[major].dmap_driver != NONE && dmap[major].dmap_driver == proc)
@@ -402,7 +401,7 @@ PUBLIC int dmap_driver_match(int proc, int major)
 /*===========================================================================*
  *				dmap_endpt_up		 		     *
  *===========================================================================*/ 
-PUBLIC void dmap_endpt_up(int proc_e)
+void dmap_endpt_up(int proc_e)
 {
 	int i;
 	for (i=0; i<NR_DEVICES; i++) {

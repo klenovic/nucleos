@@ -15,7 +15,7 @@
 //===========================================================================
 //                              i386_invlpg
 //===========================================================================
-// PUBLIC void i386_invlpg(u32_t addr)
+// void i386_invlpg(u32_t addr)
 // Tell the processor to invalidate a tlb entry at virtual address addr.
 i386_invlpg:
 	push	%ebp

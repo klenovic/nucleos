@@ -29,7 +29,6 @@
 #include <env.h>
 #include <stdio.h>
 
-#define _MAIN 1
 #include <servers/vm/glo.h>
 #include <servers/vm/proto.h>
 #include <servers/vm/util.h>
@@ -41,7 +40,21 @@
 #include <asm/kernel/types.h>
 
 extern int missing_spares;
+
+struct vmproc vmproc[NR_PROCS+1];
+
+#if SANITYCHECKS
+int nocheck;
+#define CHECKADDR 0
+long vm_sanitychecklevel;
+#endif
+
+/* vm operation mode state and values */
+long vm_paged;
+phys_bytes kernel_top_bytes;
+
 typedef u32_t mask_t;
+
 #define MINEPM 0
 #define MAXMASK (sizeof(mask_t)*8)
 #define ANYEPM (MINEPM+MAXMASK-1)
@@ -64,7 +77,7 @@ struct {
 			(c) < VM_RQ_BASE + ELEMENTS(vm_calls)) ?	\
 			((c) - VM_RQ_BASE) : -1)
 
-FORWARD _PROTOTYPE(void vm_init, (void));
+static void vm_init(void);
 
 #if SANITYCHECKS
 extern int kputc_use_private_grants;
@@ -73,7 +86,7 @@ extern int kputc_use_private_grants;
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
-PUBLIC int main(void)
+int main(void)
 {
   message msg;
   int result, who_e;
@@ -177,7 +190,7 @@ PUBLIC int main(void)
 /*===========================================================================*
  *				vm_init					     *
  *===========================================================================*/
-PRIVATE void vm_init(void)
+static void vm_init(void)
 {
 	int s, i;
 	struct memory mem_chunks[NR_MEMS];

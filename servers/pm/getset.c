@@ -23,7 +23,7 @@
 /*===========================================================================*
  *				do_getset				     *
  *===========================================================================*/
-PUBLIC int do_getset()
+int do_getset()
 {
 /* Handle GETUID, GETGID, GETPID, GETPGRP, SETUID, SETGID, SETSID.  The four
  * GETs and SETSID return their primary results in 'r'.  GETUID, GETGID, and

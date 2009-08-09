@@ -46,10 +46,10 @@
 	}							\
    }
 
-PRIVATE cp_grant_t *grants = NULL;
-PRIVATE int ngrants = 0;
+static cp_grant_t *grants = NULL;
+static int ngrants = 0;
 
-PRIVATE void
+static void
 cpf_grow(void)
 {
 /* Grow the grants table if possible. */
@@ -85,7 +85,7 @@ cpf_grow(void)
 	ngrants = new_size;
 }
 
-PRIVATE cp_grant_id_t
+static cp_grant_id_t
 cpf_new_grantslot(void)
 {
 /* Find a new, free grant slot in the grant table, grow it if
@@ -122,7 +122,7 @@ cpf_new_grantslot(void)
 	return g;
 }
 
-PUBLIC cp_grant_id_t
+cp_grant_id_t
 cpf_grant_direct(endpoint_t who_to, vir_bytes addr, size_t bytes, int access)
 {
 	cp_grant_id_t g;
@@ -145,7 +145,7 @@ cpf_grant_direct(endpoint_t who_to, vir_bytes addr, size_t bytes, int access)
 	return g;
 }
 
-PUBLIC cp_grant_id_t
+cp_grant_id_t
 cpf_grant_indirect(endpoint_t who_to, endpoint_t who_from, cp_grant_id_t gr)
 {
 /* Grant process A access into process B. B has granted us access as grant
@@ -173,7 +173,7 @@ cpf_grant_indirect(endpoint_t who_to, endpoint_t who_from, cp_grant_id_t gr)
 	return g;
 }
 
-PUBLIC cp_grant_id_t
+cp_grant_id_t
 cpf_grant_magic(endpoint_t who_to, endpoint_t who_from,
 	vir_bytes addr, size_t bytes, int access)
 {
@@ -202,7 +202,7 @@ cpf_grant_magic(endpoint_t who_to, endpoint_t who_from,
 	return g;
 }
 
-PUBLIC int
+int
 cpf_revoke(cp_grant_id_t g)
 {
 /* Revoke previously granted access, identified by grant id. */
@@ -216,7 +216,7 @@ cpf_revoke(cp_grant_id_t g)
 	return 0;
 }
 
-PUBLIC int
+int
 cpf_lookup(cp_grant_id_t g, endpoint_t *granter, endpoint_t *grantee)
 {
 	/* First check slot validity, and if it's in use currently. */
@@ -233,7 +233,7 @@ cpf_lookup(cp_grant_id_t g, endpoint_t *granter, endpoint_t *grantee)
 	return 0;
 }
 
-PUBLIC int
+int
 cpf_getgrants(grant_ids, n)
 cp_grant_id_t *grant_ids;
 int n;
@@ -251,7 +251,7 @@ int n;
 	return i;
 }
 
-PUBLIC int
+int
 cpf_setgrant_direct(gid, who, addr, bytes, access)
 cp_grant_id_t gid;
 endpoint_t who;
@@ -270,7 +270,7 @@ int access;
 	return 0;
 }
 
-PUBLIC int
+int
 cpf_setgrant_indirect(gid, who_to, who_from, his_gid)
 cp_grant_id_t gid;
 endpoint_t who_to, who_from;
@@ -287,7 +287,7 @@ cp_grant_id_t his_gid;
 	return 0;
 }
 
-PUBLIC int
+int
 cpf_setgrant_magic(gid, who_to, who_from, addr, bytes, access)
 cp_grant_id_t gid;
 endpoint_t who_to, who_from;
@@ -308,7 +308,7 @@ int access;
 	return 0;
 }
 
-PUBLIC int
+int
 cpf_setgrant_disable(gid)
 cp_grant_id_t gid;
 {
@@ -320,7 +320,7 @@ cp_grant_id_t gid;
 	return 0;
 }
 
-PUBLIC void
+void
 cpf_reload(void)
 {
 /* Inform the kernel about the location of the grant table. This is needed

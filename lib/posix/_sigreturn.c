@@ -14,7 +14,7 @@
 #include <sys/sigcontext.h>
 #include <signal.h>
 
-PUBLIC int sigreturn(scp)
+int sigreturn(scp)
 register struct sigcontext *scp;
 {
   sigset_t set;

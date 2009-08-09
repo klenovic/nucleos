@@ -26,13 +26,13 @@
 
 #define DEBUG 0
 
-static ssize_t _udp_recvfrom(int socket, void *_RESTRICT buffer, size_t length,
-	int flags, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len, nwio_udpopt_t *udpoptp);
+static ssize_t _udp_recvfrom(int socket, void *__restrict buffer, size_t length,
+	int flags, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len, nwio_udpopt_t *udpoptp);
 
-ssize_t recvfrom(int socket, void *_RESTRICT buffer, size_t length,
-	int flags, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len)
+ssize_t recvfrom(int socket, void *__restrict buffer, size_t length,
+	int flags, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len)
 {
 	int r;
 	nwio_udpopt_t udpopt;
@@ -58,9 +58,9 @@ ssize_t recvfrom(int socket, void *_RESTRICT buffer, size_t length,
 	return -1;
 }
 
-static ssize_t _udp_recvfrom(int socket, void *_RESTRICT buffer, size_t length,
-	int flags, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len, nwio_udpopt_t *udpoptp)
+static ssize_t _udp_recvfrom(int socket, void *__restrict buffer, size_t length,
+	int flags, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len, nwio_udpopt_t *udpoptp)
 {
 	int r, t_errno;
 	size_t buflen, len;

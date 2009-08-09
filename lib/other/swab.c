@@ -12,7 +12,7 @@
  *
  *  Author: Terrence W. Holm          Sep. 1988
  */
-_PROTOTYPE( void swab, (char *from, char *to, int count));
+void swab(char *from, char *to, int count);
 
 void swab(from, to, count)
 char *from;

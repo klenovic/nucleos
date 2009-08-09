@@ -14,9 +14,8 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/type.h>
 
-_PROTOTYPE( int getsysinfo, (endpoint_t who, int what, void *where)       );
-_PROTOTYPE( ssize_t getsysinfo_up, (endpoint_t who, int what, size_t size,
-	void *where));
+int getsysinfo(endpoint_t who, int what, void *where);
+ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where);
 
 #define SIU_LOADINFO	1	/* retrieve load info data */
 #define SIU_SYSTEMHZ	2	/* retrieve system clock frequency */

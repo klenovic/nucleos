@@ -11,7 +11,7 @@
 #define kill	_kill
 #include <signal.h>
 
-PUBLIC int kill(proc, sig)
+int kill(proc, sig)
 int proc;			/* which process is to be sent the signal */
 int sig;			/* signal number */
 {

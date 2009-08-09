@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_fork(parent, child, child_endpoint, map_ptr, flags)
+int sys_fork(parent, child, child_endpoint, map_ptr, flags)
 endpoint_t parent;		/* process doing the fork */
 endpoint_t child;		/* which proc has been created by the fork */
 int *child_endpoint;

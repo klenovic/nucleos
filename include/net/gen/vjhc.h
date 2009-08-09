@@ -88,7 +88,3 @@ Created:	Nov 15, 1993 by Philip Homburg <philip@cs.vu.nl>
 }
 
 #endif /* __NET__GEN__VJHC_H__ */
-
-/*
- * $PchId: vjhc.h,v 1.2 1995/11/17 22:14:46 philip Exp $
- */

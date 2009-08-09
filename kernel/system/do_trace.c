@@ -27,7 +27,7 @@
  *==========================================================================*/
 #define TR_VLSIZE	((vir_bytes) sizeof(long))
 
-PUBLIC int do_trace(m_ptr)
+int do_trace(m_ptr)
 register message *m_ptr;
 {
 /* Handle the debugging commands supported by the ptrace system call

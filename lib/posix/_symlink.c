@@ -12,8 +12,8 @@
 #include <string.h>
 #include <unistd.h>
 
-PUBLIC int symlink(name, name2)
-_CONST char *name, *name2;
+int symlink(name, name2)
+const char *name, *name2;
 {
   message m;
 

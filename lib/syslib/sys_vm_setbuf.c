@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_vm_setbuf				     *
  *===========================================================================*/
-PUBLIC int sys_vm_setbuf(base, size, high)
+int sys_vm_setbuf(base, size, high)
 phys_bytes base;
 phys_bytes size;
 phys_bytes high;

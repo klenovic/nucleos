@@ -47,17 +47,15 @@
 #define offset_lo	m2_l1
 #define offset_high	m2_l2
  
-FORWARD _PROTOTYPE( int common_open, (int oflags, mode_t omode)		);
-FORWARD _PROTOTYPE( int create_open, (_mnx_Mode_t omode, int excl,
-				struct vnode **vpp, int *created)	);
-FORWARD _PROTOTYPE( int exists_open, (struct vnode *vp, _mnx_Mode_t bits,
-	int oflags));
-FORWARD _PROTOTYPE( int pipe_open, (struct vnode *vp,mode_t bits,int oflags));
+static int common_open(int oflags, mode_t omode);
+static int create_open(_mnx_Mode_t omode, int excl, struct vnode **vpp, int *created);
+static int exists_open(struct vnode *vp, _mnx_Mode_t bits, int oflags);
+static int pipe_open(struct vnode *vp,mode_t bits,int oflags);
 
 /*===========================================================================*
  *				do_creat				     *
  *===========================================================================*/
-PUBLIC int do_creat()
+int do_creat()
 {
 /* Perform the creat(name, mode) system call. */
   int r;
@@ -70,7 +68,7 @@ PUBLIC int do_creat()
 /*===========================================================================*
  *				do_open					     *
  *===========================================================================*/
-PUBLIC int do_open()
+int do_open()
 {
 /* Perform the open(name, flags,...) system call. */
   int create_mode = 0;		/* is really mode_t but this gives problems */
@@ -94,7 +92,7 @@ PUBLIC int do_open()
 /*===========================================================================*
  *				common_open				     *
  *===========================================================================*/
-PRIVATE int common_open(register int oflags, mode_t omode)
+static int common_open(register int oflags, mode_t omode)
 {
 /* Common code from do_creat and do_open. */
   int b, m, r, created, found;
@@ -250,7 +248,7 @@ PRIVATE int common_open(register int oflags, mode_t omode)
 /*===========================================================================*
  *				create_open				     *
  *===========================================================================*/
-PRIVATE int create_open(omode, excl, vpp, created)
+static int create_open(omode, excl, vpp, created)
 mode_t omode;
 int excl;
 struct vnode **vpp;
@@ -445,7 +443,7 @@ int *created;
 /*===========================================================================*
  *				exists_open 				     *
  *===========================================================================*/
-PRIVATE int exists_open(vp, bits, oflags /*, omode, lastc, vpp */)
+static int exists_open(vp, bits, oflags /*, omode, lastc, vpp */)
 struct vnode *vp;
 mode_t bits;
 int oflags;
@@ -499,7 +497,7 @@ int oflags;
 /*===========================================================================*
  *				pipe_open				     *
  *===========================================================================*/
-PRIVATE int pipe_open(register struct vnode *vp, register mode_t bits,
+static int pipe_open(register struct vnode *vp, register mode_t bits,
 	register int oflags)
 {
 /*  This function is called from common_open. It checks if
@@ -533,7 +531,7 @@ PRIVATE int pipe_open(register struct vnode *vp, register mode_t bits,
 /*===========================================================================*
  *				do_mknod				     *
  *===========================================================================*/
-PUBLIC int do_mknod()
+int do_mknod()
 {
 /* Perform the mknod(name, mode, addr) system call. */
   register mode_t bits, mode_bits;
@@ -574,7 +572,7 @@ PUBLIC int do_mknod()
 /*===========================================================================*
  *				do_mkdir				     *
  *===========================================================================*/
-PUBLIC int do_mkdir()
+int do_mkdir()
 {
 /* Perform the mkdir(name, mode) system call. */
   mode_t bits;			/* mode bits for the new inode */
@@ -615,7 +613,7 @@ PUBLIC int do_mkdir()
 /*===========================================================================*
  *				do_lseek				     *
  *===========================================================================*/
-PUBLIC int do_lseek()
+int do_lseek()
 {
 /* Perform the lseek(ls_fd, offset, whence) system call. */
   register struct filp *rfilp;
@@ -664,7 +662,7 @@ PUBLIC int do_lseek()
 /*===========================================================================*
  *				do_llseek				     *
  *===========================================================================*/
-PUBLIC int do_llseek()
+int do_llseek()
 {
 /* Perform the llseek(ls_fd, offset, whence) system call. */
   register struct filp *rfilp;
@@ -708,7 +706,7 @@ PUBLIC int do_llseek()
 /*===========================================================================*
  *				do_close				     *
  *===========================================================================*/
-PUBLIC int do_close()
+int do_close()
 {
 /* Perform the close(fd) system call. */
   return close_fd(fp, m_in.fd);
@@ -718,7 +716,7 @@ PUBLIC int do_close()
 /*===========================================================================*
  *				close_fd				     *
  *===========================================================================*/
-PUBLIC int close_fd(rfp, fd_nr)
+int close_fd(rfp, fd_nr)
 struct fproc *rfp;
 int fd_nr;
 {
@@ -755,7 +753,7 @@ int fd_nr;
 /*===========================================================================*
  *				close_filp				     *
  *===========================================================================*/
-PUBLIC void close_filp(fp)
+void close_filp(fp)
 struct filp *fp;
 {
   int mode_word, rw;
@@ -808,7 +806,7 @@ struct filp *fp;
 /*===========================================================================*
  *				close_reply				     *
  *===========================================================================*/
-PUBLIC void close_reply()
+void close_reply()
 {
 	/* No need to do anything */
 }
@@ -817,7 +815,7 @@ PUBLIC void close_reply()
 /*===========================================================================*
  *				do_vm_open				     *
  *===========================================================================*/
-PUBLIC int do_vm_open()
+int do_vm_open()
 {
 	int len, r, n;
 	endpoint_t ep;
@@ -868,7 +866,7 @@ PUBLIC int do_vm_open()
 /*===========================================================================*
  *				do_vm_close				     *
  *===========================================================================*/
-PUBLIC int do_vm_close()
+int do_vm_close()
 {
 	int len, r, n;
 	endpoint_t ep;

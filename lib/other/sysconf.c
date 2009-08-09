@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <time.h>
 
-PUBLIC long int sysconf(name)
+long int sysconf(name)
 int name;			/* property being inspected */
 {
   switch(name) {

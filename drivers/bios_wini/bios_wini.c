@@ -51,10 +51,10 @@
 #define SUB_PER_DRIVE	(NR_PARTITIONS * NR_PARTITIONS)
 #define NR_SUBDEVS	(MAX_DRIVES * SUB_PER_DRIVE)
 
-PRIVATE int pc_at = 1;	/* What about PC XTs? */
+static int pc_at = 1;	/* What about PC XTs? */
 
 /* Variables. */
-PRIVATE struct wini {		/* main drive struct, one entry per drive */
+static struct wini {		/* main drive struct, one entry per drive */
   unsigned cylinders;		/* number of cylinders */
   unsigned heads;		/* number of heads */
   unsigned sectors;		/* number of sectors per track */
@@ -66,29 +66,28 @@ PRIVATE struct wini {		/* main drive struct, one entry per drive */
   struct device subpart[SUB_PER_DRIVE]; /* subpartitions */
 } wini[MAX_DRIVES], *w_wn;
 
-PRIVATE int w_drive;			/* selected drive */
-PRIVATE struct device *w_dv;		/* device's base and size */
-PRIVATE vir_bytes bios_buf_vir, bios_buf_size;
-PRIVATE phys_bytes bios_buf_phys;
-PRIVATE int remap_first = 0;		/* Remap drives for CD HD emulation */
-PRIVATE char my_bios_buf[16384];
-PRIVATE cp_grant_id_t my_bios_grant_id;
+static int w_drive;			/* selected drive */
+static struct device *w_dv;		/* device's base and size */
+static vir_bytes bios_buf_vir, bios_buf_size;
+static phys_bytes bios_buf_phys;
+static int remap_first = 0;		/* Remap drives for CD HD emulation */
+static char my_bios_buf[16384];
+static cp_grant_id_t my_bios_grant_id;
 
-_PROTOTYPE(int main, (void) );
-FORWARD _PROTOTYPE( struct device *w_prepare, (int device) );
-FORWARD _PROTOTYPE( char *w_name, (void) );
-FORWARD _PROTOTYPE( int w_transfer, (int proc_nr, int opcode, u64_t position,
-				iovec_t *iov, unsigned nr_req, int safe) );
-FORWARD _PROTOTYPE( int w_do_open, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( int w_do_close, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( void w_init, (void) );
-FORWARD _PROTOTYPE( void w_geometry, (struct partition *entry));
-FORWARD _PROTOTYPE( int w_other, (struct driver *dp, message *m_ptr, int)    );
-FORWARD _PROTOTYPE( int my_vircopy, (endpoint_t, int, vir_bytes, endpoint_t,
-	int, vir_bytes, size_t, size_t));
+int main(void);
+static struct device *w_prepare(int device);
+static char *w_name(void);
+static int w_transfer(int proc_nr, int opcode, u64_t position,iovec_t *iov,
+		      unsigned nr_req, int safe);
+static int w_do_open(struct driver *dp, message *m_ptr);
+static int w_do_close(struct driver *dp, message *m_ptr);
+static void w_init(void);
+static void w_geometry(struct partition *entry);
+static int w_other(struct driver *dp, message *m_ptr, int);
+static int my_vircopy(endpoint_t, int, vir_bytes, endpoint_t, int, vir_bytes, size_t, size_t);
 
 /* Entry points to this driver. */
-PRIVATE struct driver w_dtab = {
+static struct driver w_dtab = {
   w_name,	/* current device's name */
   w_do_open,	/* open or mount request, initialize device */
   w_do_close,	/* release device */
@@ -108,7 +107,7 @@ PRIVATE struct driver w_dtab = {
 /*===========================================================================*
  *				bios_winchester_task			     *
  *===========================================================================*/
-PUBLIC int main()
+int main(void)
 {
   long v;
   struct sigaction sa;
@@ -130,7 +129,7 @@ PUBLIC int main()
 /*===========================================================================*
  *				w_prepare				     *
  *===========================================================================*/
-PRIVATE struct device *w_prepare(device)
+static struct device *w_prepare(device)
 int device;
 {
 /* Prepare for I/O on a device. */
@@ -155,7 +154,7 @@ int device;
 /*===========================================================================*
  *				w_name					     *
  *===========================================================================*/
-PRIVATE char *w_name()
+static char *w_name()
 {
 /* Return a name for the current device. */
   static char name[] = "bios-d0";
@@ -167,7 +166,7 @@ PRIVATE char *w_name()
 /*===========================================================================*
  *				w_transfer				     *
  *===========================================================================*/
-PRIVATE int my_vircopy(from_proc, from_seg, from_vir, to_proc, to_seg,
+static int my_vircopy(from_proc, from_seg, from_vir, to_proc, to_seg,
   to_vir, grant_offset, size)
 endpoint_t from_proc;
 int from_seg;
@@ -208,7 +207,7 @@ size_t size;
 /*===========================================================================*
  *				w_transfer				     *
  *===========================================================================*/
-PRIVATE int w_transfer(proc_nr, opcode, pos64, iov, nr_req, safe)
+static int w_transfer(proc_nr, opcode, pos64, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER or DEV_SCATTER */
 u64_t pos64;			/* offset on device to read or write */
@@ -378,7 +377,7 @@ int safe;			/* use safecopies? */
 /*============================================================================*
  *				w_do_open				      *
  *============================================================================*/
-PRIVATE int w_do_open(dp, m_ptr)
+static int w_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -400,7 +399,7 @@ message *m_ptr;
 /*============================================================================*
  *				w_do_close				      *
  *============================================================================*/
-PRIVATE int w_do_close(dp, m_ptr)
+static int w_do_close(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -414,7 +413,7 @@ message *m_ptr;
 /*===========================================================================*
  *				w_init					     *
  *===========================================================================*/
-PRIVATE void w_init()
+static void w_init()
 {
 /* This routine is called at startup to initialize the drive parameters. */
 
@@ -544,7 +543,7 @@ PRIVATE void w_init()
 /*============================================================================*
  *				w_geometry				      *
  *============================================================================*/
-PRIVATE void w_geometry(entry)
+static void w_geometry(entry)
 struct partition *entry;
 {
   entry->cylinders = w_wn->cylinders;
@@ -555,7 +554,7 @@ struct partition *entry;
 /*============================================================================*
  *				w_other				      *
  *============================================================================*/
-PRIVATE int w_other(dr, m, safe)
+static int w_other(dr, m, safe)
 struct driver *dr;
 message *m;
 int safe;

@@ -30,25 +30,21 @@
 #include <nucleos/vfsif.h>
 
 
-PUBLIC char dot1[2] = ".";	/* used for search_dir to bypass the access */
-PUBLIC char dot2[3] = "..";	/* permissions for . and ..		    */
+char dot1[2] = ".";	/* used for search_dir to bypass the access */
+char dot2[3] = "..";	/* permissions for . and ..		    */
 
-FORWARD _PROTOTYPE( char *get_name, (char *old_name, char string [NAME_MAX]) );
-FORWARD _PROTOTYPE( char *get_name_s, (char *name, char string[NAME_MAX+1]) );
-FORWARD _PROTOTYPE( int ltraverse, (struct inode *rip, char *path, 
-                    char *suffix, int pathlen)                         );
-FORWARD _PROTOTYPE( int ltraverse_s, (struct inode *rip, char *suffix)	);
-FORWARD _PROTOTYPE( int advance_s1, (struct inode *dirp,
-			char string[NAME_MAX], struct inode **resp)	);
-FORWARD _PROTOTYPE( int parse_path_s, (ino_t dir_ino, ino_t root_ino,
-					int flags, struct inode **res_inop,
-					size_t *offsetp, int *symlinkp)	);
-
+static char *get_name(char *old_name, char string [NAME_MAX]);
+static char *get_name_s(char *name, char string[NAME_MAX+1]);
+static int ltraverse(struct inode *rip, char *path, char *suffix, int pathlen);
+static int ltraverse_s(struct inode *rip, char *suffix);
+static int advance_s1(struct inode *dirp, char string[NAME_MAX], struct inode **resp);
+static int parse_path_s(ino_t dir_ino, ino_t root_ino, int flags, struct inode **res_inop,
+			size_t *offsetp, int *symlinkp);
 
 /*===========================================================================*
  *                             lookup_o					     *
  *===========================================================================*/
-PUBLIC int lookup_o()
+int lookup_o()
 {
   char string[PATH_MAX];
   struct inode *rip;
@@ -123,7 +119,7 @@ PUBLIC int lookup_o()
 /*===========================================================================*
  *                             fs_lookup_s				     *
  *===========================================================================*/
-PUBLIC int fs_lookup_s()
+int fs_lookup_s()
 {
   cp_grant_id_t grant;
   int r, r1, len, flags, symlinks;
@@ -232,7 +228,7 @@ PUBLIC int fs_lookup_s()
 /*===========================================================================*
  *                             parse_path_o				     *
  *===========================================================================*/
-PUBLIC struct inode *parse_path_o(path, string, action)
+struct inode *parse_path_o(path, string, action)
 char *path;                    /* the path name to be parsed */
 char string[NAME_MAX];         /* the final component is returned here */
 int action;                    /* action on last part of path */
@@ -426,7 +422,7 @@ int action;                    /* action on last part of path */
 /*===========================================================================*
  *                             parse_path_s				     *
  *===========================================================================*/
-PRIVATE int parse_path_s(dir_ino, root_ino, flags, res_inop, offsetp, symlinkp)
+static int parse_path_s(dir_ino, root_ino, flags, res_inop, offsetp, symlinkp)
 ino_t dir_ino;
 ino_t root_ino;
 int flags;
@@ -634,7 +630,7 @@ int *symlinkp;
 /*===========================================================================*
  *                             ltraverse				     *
  *===========================================================================*/
-PRIVATE int ltraverse(rip, path, suffix, pathlen)
+static int ltraverse(rip, path, suffix, pathlen)
 register struct inode *rip;    /* symbolic link */
 char *path;                    /* path containing link */
 char *suffix;                  /* suffix following link within path */
@@ -696,7 +692,7 @@ int pathlen;
 /*===========================================================================*
  *                             ltraverse_s				     *
  *===========================================================================*/
-PRIVATE int ltraverse_s(rip, suffix)
+static int ltraverse_s(rip, suffix)
 register struct inode *rip;	/* symbolic link */
 char *suffix;			/* current remaining path. Has to point in the
 				 * user_path buffer
@@ -762,7 +758,7 @@ char *suffix;			/* current remaining path. Has to point in the
 /*===========================================================================*
  *				advance_nocheck				     *
  *===========================================================================*/
-PUBLIC struct inode *advance_nocheck(pdirp, string)
+struct inode *advance_nocheck(pdirp, string)
 struct inode **pdirp;		/* inode for directory to be searched */
 char string[NAME_MAX];		/* component name to look for */
 {
@@ -858,7 +854,7 @@ char string[NAME_MAX];		/* component name to look for */
 /*===========================================================================*
  *				advance_o				     *
  *===========================================================================*/
-PUBLIC struct inode *advance_o(pdirp, string)
+struct inode *advance_o(pdirp, string)
 struct inode **pdirp;		/* inode for directory to be searched */
 char string[NAME_MAX];		/* component name to look for */
 {
@@ -951,7 +947,7 @@ char string[NAME_MAX];		/* component name to look for */
 /*===========================================================================*
  *				advance_s1				     *
  *===========================================================================*/
-PRIVATE int advance_s1(dirp, string, resp)
+static int advance_s1(dirp, string, resp)
 struct inode *dirp;		/* inode for directory to be searched */
 char string[NAME_MAX];		/* component name to look for */
 struct inode **resp;		/* resulting inode */
@@ -988,7 +984,7 @@ struct inode **resp;		/* resulting inode */
 /*===========================================================================*
  *				get_name				     *
  *===========================================================================*/
-PRIVATE char *get_name(old_name, string)
+static char *get_name(old_name, string)
 char *old_name;			/* path name to parse */
 char string[NAME_MAX];		/* component extracted from 'old_name' */
 {
@@ -1034,7 +1030,7 @@ char string[NAME_MAX];		/* component extracted from 'old_name' */
 /*===========================================================================*
  *				get_name_s				     *
  *===========================================================================*/
-PRIVATE char *get_name_s(path_name, string)
+static char *get_name_s(path_name, string)
 char *path_name;		/* path name to parse */
 char string[NAME_MAX+1];	/* component extracted from 'old_name' */
 {
@@ -1085,7 +1081,7 @@ char string[NAME_MAX+1];	/* component extracted from 'old_name' */
 /*===========================================================================*
  *				search_dir				     *
  *===========================================================================*/
-PUBLIC int search_dir(ldir_ptr, string, numb, flag)
+int search_dir(ldir_ptr, string, numb, flag)
 register struct inode *ldir_ptr; /* ptr to inode for dir to search */
 char string[NAME_MAX];		 /* component to search for */
 ino_t *numb;			 /* pointer to inode number */
@@ -1235,7 +1231,7 @@ int flag;			 /* LOOK_UP, ENTER, DELETE or IS_EMPTY */
 /*===========================================================================*
  *				search_dir_nocheck			     *
  *===========================================================================*/
-PUBLIC int search_dir_nocheck(ldir_ptr, string, numb, flag)
+int search_dir_nocheck(ldir_ptr, string, numb, flag)
 register struct inode *ldir_ptr; /* ptr to inode for dir to search */
 char string[NAME_MAX];		 /* component to search for */
 ino_t *numb;			 /* pointer to inode number */
@@ -1384,7 +1380,7 @@ int flag;			 /* LOOK_UP, ENTER, DELETE or IS_EMPTY */
 /*===========================================================================*
  *                             eat_path_o				     *
  *===========================================================================*/
-PUBLIC struct inode *eat_path_o(path)
+struct inode *eat_path_o(path)
 char *path;                    /* the path name to be parsed */
 {
  /* Parse the path 'path' and put its inode in the inode table. If not possible,
@@ -1397,7 +1393,7 @@ char *path;                    /* the path name to be parsed */
 /*===========================================================================*
  *                             last_dir_o				     *
  *===========================================================================*/
-PUBLIC struct inode *last_dir_o(path, string)
+struct inode *last_dir_o(path, string)
 char *path;                    /* the path name to be parsed */
 char string[NAME_MAX];         /* the final component is returned here */
 {

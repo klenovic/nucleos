@@ -16,7 +16,7 @@
 /* Actual lines themselves.					*/
 /****************************************************************/
 
-_PROTOTYPE(static WINDOW *makenew, (int nlines, int ncols, int begy,int begx));
+static WINDOW *makenew(int nlines, int ncols, int begy,int begx);
 
 static WINDOW *makenew(num_lines, num_columns, begy, begx)
 int num_lines, num_columns, begy, begx;

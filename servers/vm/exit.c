@@ -30,7 +30,7 @@
 #include <servers/vm/util.h>
 #include <servers/vm/sanitycheck.h>
 
-PUBLIC void free_proc(struct vmproc *vmp)
+void free_proc(struct vmproc *vmp)
 {
 	vmp->vm_flags &= ~VMF_HASPT;
 	pt_free(&vmp->vm_pt);
@@ -41,7 +41,7 @@ PUBLIC void free_proc(struct vmproc *vmp)
 #endif
 }
 
-PUBLIC void clear_proc(struct vmproc *vmp)
+void clear_proc(struct vmproc *vmp)
 {
 	vmp->vm_regions = NULL;
 	vmp->vm_callback = NULL;	/* No pending vfs callback. */
@@ -56,7 +56,7 @@ PUBLIC void clear_proc(struct vmproc *vmp)
 /*===========================================================================*
  *				do_exit					     *
  *===========================================================================*/
-PUBLIC int do_exit(message *msg)
+int do_exit(message *msg)
 {
 	int proc;
 	struct vmproc *vmp;
@@ -107,7 +107,7 @@ SANITYCHECK(SCL_FUNCTIONS);
 /*===========================================================================*
  *				do_willexit				     *
  *===========================================================================*/
-PUBLIC int do_willexit(message *msg)
+int do_willexit(message *msg)
 {
 	int proc;
 	struct vmproc *vmp;
@@ -124,12 +124,12 @@ PUBLIC int do_willexit(message *msg)
 	return OK;
 }
 
-PUBLIC void _exit(int code)
+void _exit(int code)
 {
   sys_exit(SELF);
 }
 
-PUBLIC void __exit(int code)
+void __exit(int code)
 {
   sys_exit(SELF);
 }

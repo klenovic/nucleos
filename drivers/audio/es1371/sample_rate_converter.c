@@ -40,14 +40,8 @@
 #define SRC_DACFREEZE       (1UL << 20)
 #define SRC_ADCFREEZE       (1UL << 19)
 
-
-
-
-FORWARD _PROTOTYPE( int src_reg_read, (DEV_STRUCT * DSP, 
-			u16_t reg, u16_t *data) );
-FORWARD _PROTOTYPE( int src_reg_write, (DEV_STRUCT * DSP, 
-			u16_t reg, u16_t val) );
-
+static int src_reg_read(DEV_STRUCT * DSP, u16_t reg, u16_t *data);
+static int src_reg_write(DEV_STRUCT * DSP, u16_t reg, u16_t val);
 
 int src_init ( DEV_STRUCT * DSP ) {
 	u32_t   i;
@@ -113,7 +107,7 @@ int src_init ( DEV_STRUCT * DSP ) {
 }
 
 
-PRIVATE int src_reg_read(DEV_STRUCT * DSP, u16_t reg, u16_t *data) {
+static int src_reg_read(DEV_STRUCT * DSP, u16_t reg, u16_t *data) {
 	u32_t dtemp;
 
 	/* wait for ready */
@@ -139,7 +133,7 @@ PRIVATE int src_reg_read(DEV_STRUCT * DSP, u16_t reg, u16_t *data) {
 }
 
 
-PRIVATE int src_reg_write(DEV_STRUCT * DSP, u16_t reg, u16_t val) {
+static int src_reg_write(DEV_STRUCT * DSP, u16_t reg, u16_t val) {
 	u32_t dtemp;
 
 	/* wait for ready */

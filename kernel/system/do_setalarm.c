@@ -22,12 +22,12 @@
 
 #if USE_SETALARM
 
-FORWARD _PROTOTYPE( void cause_alarm, (timer_t *tp) );
+static void cause_alarm(timer_t *tp);
 
 /*===========================================================================*
  *				do_setalarm				     *
  *===========================================================================*/
-PUBLIC int do_setalarm(m_ptr)
+int do_setalarm(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* A process requests a synchronous alarm, or wants to cancel its alarm. */
@@ -69,7 +69,7 @@ message *m_ptr;			/* pointer to request message */
 /*===========================================================================*
  *				cause_alarm				     *
  *===========================================================================*/
-PRIVATE void cause_alarm(tp)
+static void cause_alarm(tp)
 timer_t *tp;
 {
 /* Routine called if a timer goes off and the process requested a synchronous

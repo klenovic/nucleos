@@ -27,7 +27,7 @@
 /*===========================================================================*
  *			      do_sigreturn				     *
  *===========================================================================*/
-PUBLIC int do_sigreturn(m_ptr)
+int do_sigreturn(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* POSIX style signals require sys_sigreturn to put things in order before 

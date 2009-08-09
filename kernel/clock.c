@@ -45,12 +45,12 @@
 #include <nucleos/com.h>
 #include <nucleos/portio.h>
 
-/* Function prototype for PRIVATE functions.
+/* Function prototype for static functions.
  */ 
-FORWARD _PROTOTYPE( void init_clock, (void) );
-FORWARD _PROTOTYPE( int clock_handler, (irq_hook_t *hook) );
-FORWARD _PROTOTYPE( void do_clocktick, (message *m_ptr) );
-FORWARD _PROTOTYPE( void load_update, (void));
+static void init_clock(void);
+static int clock_handler(irq_hook_t *hook);
+static void do_clocktick(message *m_ptr);
+static void load_update(void);
 
 /* The CLOCK's timers queue. The functions in <timers.h> operate on this. 
  * Each system process possesses a single synchronous alarm timer. If other 
@@ -59,18 +59,18 @@ FORWARD _PROTOTYPE( void load_update, (void));
  * via (re)set_timer().
  * When a timer expires its watchdog function is run by the CLOCK task. 
  */
-PRIVATE timer_t *clock_timers;	/* queue of CLOCK timers */
-PRIVATE clock_t next_timeout;	/* realtime that next timer expires */
+static timer_t *clock_timers;	/* queue of CLOCK timers */
+static clock_t next_timeout;	/* realtime that next timer expires */
 
 /* The time is incremented by the interrupt handler on each clock tick.
  */
-PRIVATE clock_t realtime = 0;		      /* real time clock */
-PRIVATE irq_hook_t clock_hook;		/* interrupt handler hook */
+static clock_t realtime = 0;		      /* real time clock */
+static irq_hook_t clock_hook;		/* interrupt handler hook */
 
 /*===========================================================================*
  *				clock_task				     *
  *===========================================================================*/
-PUBLIC void clock_task()
+void clock_task()
 {
 /* Main program of clock task. If the call is not HARD_INT it is an error.
  */
@@ -102,7 +102,7 @@ PUBLIC void clock_task()
 /*===========================================================================*
  *				do_clocktick				     *
  *===========================================================================*/
-PRIVATE void do_clocktick(m_ptr)
+static void do_clocktick(m_ptr)
 message *m_ptr;				/* pointer to request message */
 {
 /* Despite its name, this routine is not called on every clock tick. It
@@ -142,7 +142,7 @@ message *m_ptr;				/* pointer to request message */
 /*===========================================================================*
  *				init_clock				     *
  *===========================================================================*/
-PRIVATE void init_clock()
+static void init_clock()
 {
   /* First of all init the clock system.
    *
@@ -166,7 +166,7 @@ PRIVATE void init_clock()
 /*===========================================================================*
  *				clock_handler				     *
  *===========================================================================*/
-PRIVATE int clock_handler(hook)
+static int clock_handler(hook)
 irq_hook_t *hook;
 {
 /* This executes on each clock tick (i.e., every time the timer chip generates 
@@ -239,7 +239,7 @@ irq_hook_t *hook;
 /*===========================================================================*
  *				get_uptime				     *
  *===========================================================================*/
-PUBLIC clock_t get_uptime(void)
+clock_t get_uptime(void)
 {
   /* Get and return the current clock uptime in ticks. */
   return(realtime);
@@ -248,7 +248,7 @@ PUBLIC clock_t get_uptime(void)
 /*===========================================================================*
  *				set_timer				     *
  *===========================================================================*/
-PUBLIC void set_timer(tp, exp_time, watchdog)
+void set_timer(tp, exp_time, watchdog)
 struct timer *tp;		/* pointer to timer structure */
 clock_t exp_time;		/* expiration realtime */
 tmr_func_t watchdog;		/* watchdog to be called */
@@ -263,7 +263,7 @@ tmr_func_t watchdog;		/* watchdog to be called */
 /*===========================================================================*
  *				reset_timer				     *
  *===========================================================================*/
-PUBLIC void reset_timer(tp)
+void reset_timer(tp)
 struct timer *tp;		/* pointer to timer structure */
 {
 /* The timer pointed to by 'tp' is no longer needed. Remove it from both the
@@ -278,7 +278,7 @@ struct timer *tp;		/* pointer to timer structure */
 /*===========================================================================*
  *				load_update				     * 
  *===========================================================================*/
-PRIVATE void load_update(void)
+static void load_update(void)
 {
 	u16_t slot;
 	int enqueued = -1, q;	/* -1: special compensation for IDLE. */

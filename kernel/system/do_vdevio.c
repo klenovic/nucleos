@@ -26,15 +26,15 @@
 #if USE_VDEVIO
 
 /* Buffer for SYS_VDEVIO to copy (port,value)-pairs from/ to user. */
-PRIVATE char vdevio_buf[VDEVIO_BUF_SIZE];      
-PRIVATE pvb_pair_t *pvb = (pvb_pair_t *) vdevio_buf;           
-PRIVATE pvw_pair_t *pvw = (pvw_pair_t *) vdevio_buf;      
-PRIVATE pvl_pair_t *pvl = (pvl_pair_t *) vdevio_buf;     
+static char vdevio_buf[VDEVIO_BUF_SIZE];      
+static pvb_pair_t *pvb = (pvb_pair_t *) vdevio_buf;           
+static pvw_pair_t *pvw = (pvw_pair_t *) vdevio_buf;      
+static pvl_pair_t *pvl = (pvl_pair_t *) vdevio_buf;     
 
 /*===========================================================================*
  *			        do_vdevio                                    *
  *===========================================================================*/
-PUBLIC int do_vdevio(m_ptr)
+int do_vdevio(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Perform a series of device I/O on behalf of a non-kernel process. The 

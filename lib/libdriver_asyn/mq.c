@@ -25,8 +25,8 @@ Copyright 1995 Philip Homburg
 
 #define MQ_SIZE		128
 
-PRIVATE mq_t mq_list[MQ_SIZE];
-PRIVATE mq_t *mq_freelist;
+static mq_t mq_list[MQ_SIZE];
+static mq_t *mq_freelist;
 
 void mq_init()
 {
@@ -63,7 +63,3 @@ mq_t *mq;
 	assert(mq->mq_allocated == 1);
 	mq->mq_allocated= 0;
 }
-
-/*
- * $PchId: mq.c,v 1.7 1998/10/23 20:10:47 philip Exp $
- */

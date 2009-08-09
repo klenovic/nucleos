@@ -155,22 +155,22 @@ typedef struct asynmsg
 #define sendnb		_sendnb
 #define senda		_senda
 
-_PROTOTYPE( int echo, (message *m_ptr)					);
-_PROTOTYPE( int notify, (endpoint_t dest)				);
-_PROTOTYPE( int sendrec, (endpoint_t src_dest, message *m_ptr)		);
-_PROTOTYPE( int receive, (endpoint_t src, message *m_ptr)	        );
-_PROTOTYPE( int send, (endpoint_t dest, message *m_ptr)			);
-_PROTOTYPE( int sendnb, (endpoint_t dest, message *m_ptr)		);
-_PROTOTYPE( int senda, (asynmsg_t *table, size_t count)			);
+int echo(message *m_ptr);
+int notify(endpoint_t dest);
+int sendrec(endpoint_t src_dest, message *m_ptr);
+int receive(endpoint_t src, message *m_ptr);
+int send(endpoint_t dest, message *m_ptr);
+int sendnb(endpoint_t dest, message *m_ptr);
+int senda(asynmsg_t *table, size_t count);
 
 #define ipc_request	_ipc_request
 #define ipc_reply	_ipc_reply
 #define ipc_notify	_ipc_notify
 #define ipc_select	_ipc_select
 
-_PROTOTYPE( int ipc_request, (int dst, message *m_ptr)			);
-_PROTOTYPE( int ipc_reply, (int dst, message *m_ptr)			);
-_PROTOTYPE( int ipc_notify, (int dst, long event_set)			);
-_PROTOTYPE( int ipc_receive, (int src, long events, message *m_ptr)	);
+int ipc_request(int dst, message *m_ptr);
+int ipc_reply(int dst, message *m_ptr);
+int ipc_notify(int dst, long event_set);
+int ipc_receive(int src, long events, message *m_ptr);
 
 #endif /* __IPC_H */

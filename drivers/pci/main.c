@@ -20,32 +20,32 @@ main.c
 
 #define NR_DRIVERS	16
 
-PRIVATE struct acl
+static struct acl
 {
 	int inuse;
 	struct rs_pci acl;
 } acl[NR_DRIVERS];
 
-FORWARD _PROTOTYPE( void do_init, (message *mp)				);
-FORWARD _PROTOTYPE( void do_first_dev, (message *mp)			);
-FORWARD _PROTOTYPE( void do_next_dev, (message *mp)			);
-FORWARD _PROTOTYPE( void do_find_dev, (message *mp)			);
-FORWARD _PROTOTYPE( void do_ids, (message *mp)				);
-FORWARD _PROTOTYPE( void do_dev_name, (message *mp)			);
-FORWARD _PROTOTYPE( void do_dev_name_s, (message *mp)			);
-FORWARD _PROTOTYPE( void do_slot_name_s, (message *mp)			);
-FORWARD _PROTOTYPE( void do_set_acl, (message *mp)			);
-FORWARD _PROTOTYPE( void do_del_acl, (message *mp)			);
-FORWARD _PROTOTYPE( void do_reserve, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_r8, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_r16, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_r32, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_w8, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_w16, (message *mp)			);
-FORWARD _PROTOTYPE( void do_attr_w32, (message *mp)			);
-FORWARD _PROTOTYPE( void do_rescan_bus, (message *mp)			);
-FORWARD _PROTOTYPE( void reply, (message *mp, int result)		);
-FORWARD _PROTOTYPE( struct rs_pci *find_acl, (int endpoint)		);
+static void do_init(message *mp);
+static void do_first_dev(message *mp);
+static void do_next_dev(message *mp);
+static void do_find_dev(message *mp);
+static void do_ids(message *mp);
+static void do_dev_name(message *mp);
+static void do_dev_name_s(message *mp);
+static void do_slot_name_s(message *mp);
+static void do_set_acl(message *mp);
+static void do_del_acl(message *mp);
+static void do_reserve(message *mp);
+static void do_attr_r8(message *mp);
+static void do_attr_r16(message *mp);
+static void do_attr_r32(message *mp);
+static void do_attr_w8(message *mp);
+static void do_attr_w16(message *mp);
+static void do_attr_w32(message *mp);
+static void do_rescan_bus(message *mp);
+static void reply(message *mp, int result);
+static struct rs_pci *find_acl(int endpoint);
 
 extern int debug;
 
@@ -95,7 +95,7 @@ int main(void)
 	return 0;
 }
 
-PRIVATE void do_init(mp)
+static void do_init(mp)
 message *mp;
 {
 	int r;
@@ -111,7 +111,7 @@ message *mp;
 			mp->m_source, r);
 }
 
-PRIVATE void do_first_dev(mp)
+static void do_first_dev(mp)
 message *mp;
 {
 	int i, r, devind;
@@ -140,7 +140,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_next_dev(mp)
+static void do_next_dev(mp)
 message *mp;
 {
 	int r, devind;
@@ -166,7 +166,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_find_dev(mp)
+static void do_find_dev(mp)
 message *mp;
 {
 	int r, devind;
@@ -188,7 +188,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_ids(mp)
+static void do_ids(mp)
 message *mp;
 {
 	int r, devind;
@@ -214,7 +214,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_dev_name(mp)
+static void do_dev_name(mp)
 message *mp;
 {
 	int r, name_len, len;
@@ -251,7 +251,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_dev_name_s(mp)
+static void do_dev_name_s(mp)
 message *mp;
 {
 	int r, name_len, len;
@@ -288,7 +288,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_slot_name_s(mp)
+static void do_slot_name_s(mp)
 message *mp;
 {
 	int r, devind, name_len, len;
@@ -324,7 +324,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_set_acl(mp)
+static void do_set_acl(mp)
 message *mp;
 {
 	int i, r, gid;
@@ -367,7 +367,7 @@ message *mp;
 	reply(mp, OK);
 }
 
-PRIVATE void do_del_acl(mp)
+static void do_del_acl(mp)
 message *mp;
 {
 	int i, r, proc_nr;
@@ -408,7 +408,7 @@ message *mp;
 	reply(mp, OK);
 }
 
-PRIVATE void do_reserve(mp)
+static void do_reserve(mp)
 message *mp;
 {
 	int i, r, devind;
@@ -424,7 +424,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_r8(mp)
+static void do_attr_r8(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -450,7 +450,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_r16(mp)
+static void do_attr_r16(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -470,7 +470,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_r32(mp)
+static void do_attr_r32(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -496,7 +496,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_w8(mp)
+static void do_attr_w8(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -516,7 +516,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_w16(mp)
+static void do_attr_w16(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -536,7 +536,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_attr_w32(mp)
+static void do_attr_w32(mp)
 message *mp;
 {
 	int r, devind, port;
@@ -556,7 +556,7 @@ message *mp;
 	}
 }
 
-PRIVATE void do_rescan_bus(mp)
+static void do_rescan_bus(mp)
 message *mp;
 {
 	int r, busnr;
@@ -574,7 +574,7 @@ message *mp;
 }
 
 
-PRIVATE void reply(mp, result)
+static void reply(mp, result)
 message *mp;
 int result;
 {
@@ -588,7 +588,7 @@ int result;
 }
 
 
-PRIVATE struct rs_pci *find_acl(endpoint)
+static struct rs_pci *find_acl(endpoint)
 int endpoint;
 {
 	int i;

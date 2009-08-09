@@ -28,7 +28,7 @@ typedef union ev_arg
 	void *ev_ptr;
 } ev_arg_t;
 
-typedef void (*ev_func_t) ARGS(( struct event *ev, union ev_arg eva ));
+typedef void (*ev_func_t)(struct event *ev, union ev_arg eva);
 
 typedef struct event
 {
@@ -39,13 +39,9 @@ typedef struct event
 
 extern event_t *ev_head;
 
-void ev_init ARGS(( event_t *ev ));
-void ev_enqueue ARGS(( event_t *ev, ev_func_t func, ev_arg_t ev_arg ));
-void ev_process ARGS(( void ));
-int ev_in_queue ARGS(( event_t *ev ));
+void ev_init(event_t *ev);
+void ev_enqueue(event_t *ev, ev_func_t func, ev_arg_t ev_arg);
+void ev_process(void);
+int ev_in_queue(event_t *ev);
 
 #endif /* INET__GENERIC__EVENT_H */
-
-/*
- * $PchId: event.h,v 1.5 2004/08/03 16:23:49 philip Exp $
- */

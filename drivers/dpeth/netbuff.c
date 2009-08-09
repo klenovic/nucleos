@@ -32,7 +32,7 @@ static char tx_rx_buff[8192];
 **  Name:	void *alloc_buff(dpeth_t *dep, int size)
 **  Function:	Allocates a buffer from the common pool.
 */
-PUBLIC void *alloc_buff(dpeth_t *dep, int size)
+void *alloc_buff(dpeth_t *dep, int size)
 {
   m_hdr_t *ptr, *wrk = allocptr;
   int units = ((size + sizeof(m_hdr_t) - 1) / sizeof(m_hdr_t)) + 1;
@@ -63,7 +63,7 @@ PUBLIC void *alloc_buff(dpeth_t *dep, int size)
 **  Name:	void free_buff(dpeth_t *dep, void *blk)
 **  Function:	Returns a buffer to the common pool.
 */
-PUBLIC void free_buff(dpeth_t *dep, void *blk)
+void free_buff(dpeth_t *dep, void *blk)
 {
   m_hdr_t *wrk, *ptr = (m_hdr_t *) blk - 1;
 
@@ -91,7 +91,7 @@ PUBLIC void free_buff(dpeth_t *dep, void *blk)
 **  Name:	void init_buff(dpeth_t *dep, buff_t **tx_buff)
 **  Function:	Initalizes driver data structures.
 */
-PUBLIC void init_buff(dpeth_t *dep, buff_t **tx_buff)
+void init_buff(dpeth_t *dep, buff_t **tx_buff)
 {
 
   /* Initializes buffer pool */
@@ -116,7 +116,7 @@ PUBLIC void init_buff(dpeth_t *dep, buff_t **tx_buff)
 **  Name:	void mem2user(dpeth_t *dep, buff_t *rxbuff);
 **  Function:	Copies a packet from local buffer to user area.
 */
-PUBLIC void mem2user(dpeth_t *dep, buff_t *rxbuff)
+void mem2user(dpeth_t *dep, buff_t *rxbuff)
 {
   phys_bytes phys_user;
   int bytes, ix = 0;
@@ -149,7 +149,7 @@ PUBLIC void mem2user(dpeth_t *dep, buff_t *rxbuff)
 **  Name:	void user2mem(dpeth_t *dep, buff_t *txbuff)
 **  Function:	Copies a packet from user area to local buffer.
 */
-PUBLIC void user2mem(dpeth_t *dep, buff_t *txbuff)
+void user2mem(dpeth_t *dep, buff_t *txbuff)
 {
   phys_bytes phys_user;
   int bytes, ix = 0;

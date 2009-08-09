@@ -11,7 +11,7 @@
 #define getegid	_getegid
 #include <unistd.h>
 
-PUBLIC gid_t getegid()
+gid_t getegid()
 {
   message m;
 

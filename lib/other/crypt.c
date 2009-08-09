@@ -118,7 +118,3 @@ fail:
 	pwdata[1] = 0;
 	return pwdata;
 }
-
-/*
- * $PchId: crypt.c,v 1.5 1996/04/11 07:46:11 philip Exp $
- */

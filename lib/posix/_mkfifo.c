@@ -13,8 +13,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-PUBLIC int mkfifo(name, mode)
-_CONST char *name;
+int mkfifo(name, mode)
+const char *name;
 _mnx_Mode_t mode;
 {
   return mknod(name, mode | S_IFIFO, (Dev_t) 0);

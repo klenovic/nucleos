@@ -22,17 +22,15 @@
 
 #include <nucleos/vfsif.h>
 
-PRIVATE char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
-FORWARD _PROTOTYPE( struct inode *new_node_o, (struct inode *ldirp, 
-	char *string, mode_t bits, zone_t z0));
-FORWARD _PROTOTYPE( struct inode *new_node_s, (struct inode *ldirp, 
-	char *string, mode_t bits, zone_t z0));
+static char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
+static struct inode *new_node_o(struct inode *ldirp, char *string, mode_t bits, zone_t z0);
+static struct inode *new_node_s(struct inode *ldirp, char *string, mode_t bits, zone_t z0);
 
 #if 0
 /*===========================================================================*
  *				fs_open 				     *
  *===========================================================================*/
-PUBLIC int fs_open()
+int fs_open()
 {
   int r, b, exist = TRUE;
   struct inode *ldirp;
@@ -164,7 +162,7 @@ printf("MFS(%d) get_inode by open() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_create_o				     *
  *===========================================================================*/
-PUBLIC int fs_create_o()
+int fs_create_o()
 {
   phys_bytes len;
   int r, b;
@@ -227,7 +225,7 @@ printf("MFS(%d) get_inode for parent dir by creat() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_create_s				     *
  *===========================================================================*/
-PUBLIC int fs_create_s()
+int fs_create_s()
 {
   phys_bytes len;
   int r, b;
@@ -290,7 +288,7 @@ printf("MFS(%d) get_inode for parent dir by creat() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_mknod_o				     *
  *===========================================================================*/
-PUBLIC int fs_mknod_o()
+int fs_mknod_o()
 {
   struct inode *ip, *ldirp;
   char lastc[NAME_MAX];
@@ -324,7 +322,7 @@ printf("MFS(%d) get_inode for parent dir by mknod() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_mknod_s				     *
  *===========================================================================*/
-PUBLIC int fs_mknod_s()
+int fs_mknod_s()
 {
   struct inode *ip, *ldirp;
   char lastc[NAME_MAX];
@@ -358,7 +356,7 @@ printf("MFS(%d) get_inode for parent dir by mknod() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_mkdir_o				     *
  *===========================================================================*/
-PUBLIC int fs_mkdir_o()
+int fs_mkdir_o()
 {
   int r1, r2;			/* status codes */
   ino_t dot, dotdot;		/* inode numbers for . and .. */
@@ -426,7 +424,7 @@ printf("MFS(%d) get_inode for parent dir by mkdir() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_mkdir_s				     *
  *===========================================================================*/
-PUBLIC int fs_mkdir_s()
+int fs_mkdir_s()
 {
   int r1, r2;			/* status codes */
   ino_t dot, dotdot;		/* inode numbers for . and .. */
@@ -495,7 +493,7 @@ printf("MFS(%d) get_inode for parent dir by mkdir() failed\n", SELF_E);
 /*===========================================================================*
  *                             fs_slink_o				     *
  *===========================================================================*/
-PUBLIC int fs_slink_o()
+int fs_slink_o()
 {
   phys_bytes len;
   struct inode *sip;           /* inode containing symbolic link */
@@ -570,7 +568,7 @@ PUBLIC int fs_slink_o()
 /*===========================================================================*
  *                             fs_slink_s				     *
  *===========================================================================*/
-PUBLIC int fs_slink_s()
+int fs_slink_s()
 {
   phys_bytes len;
   struct inode *sip;           /* inode containing symbolic link */
@@ -647,7 +645,7 @@ PUBLIC int fs_slink_s()
 /*===========================================================================*
  *				fs_newnode				     *
  *===========================================================================*/
-PUBLIC int fs_newnode()
+int fs_newnode()
 {
   register int r;
   mode_t bits;
@@ -694,7 +692,7 @@ PUBLIC int fs_newnode()
 /*===========================================================================*
  *				new_node_o				     *
  *===========================================================================*/
-PRIVATE struct inode *new_node_o(struct inode *ldirp,
+static struct inode *new_node_o(struct inode *ldirp,
 	char *string, mode_t bits, zone_t z0)
 {
 /* New_node() is called by fs_open(), fs_mknod(), and fs_mkdir().  
@@ -765,7 +763,7 @@ PRIVATE struct inode *new_node_o(struct inode *ldirp,
 /*===========================================================================*
  *				new_node_s				     *
  *===========================================================================*/
-PRIVATE struct inode *new_node_s(struct inode *ldirp,
+static struct inode *new_node_s(struct inode *ldirp,
 	char *string, mode_t bits, zone_t z0)
 {
 /* New_node() is called by fs_open(), fs_mknod(), and fs_mkdir().  
@@ -836,7 +834,7 @@ PRIVATE struct inode *new_node_s(struct inode *ldirp,
 /*===========================================================================*
  *				fs_inhibread				     *
  *===========================================================================*/
-PUBLIC int fs_inhibread()
+int fs_inhibread()
 {
   struct inode *rip;
   

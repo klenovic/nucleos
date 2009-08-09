@@ -56,7 +56,7 @@ char *pf_errstr(u32_t err)
 /*===========================================================================*
  *				do_pagefaults	     		     *
  *===========================================================================*/
-PUBLIC void do_pagefaults(void)
+void do_pagefaults(void)
 {
 	endpoint_t ep;
 	u32_t addr, err;
@@ -124,7 +124,7 @@ PUBLIC void do_pagefaults(void)
 /*===========================================================================*
  *				do_memory	     		     *
  *===========================================================================*/
-PUBLIC void do_memory(void)
+void do_memory(void)
 {
 	int r, s;
 	endpoint_t who;

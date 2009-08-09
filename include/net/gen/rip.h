@@ -80,7 +80,3 @@ typedef struct rip_entry
 #endif /* __RIP_DEBUG */
 
 #endif /* NET__GEN__RIP_H */
-
-/*
- * $PchId: rip.h,v 1.3 1995/11/17 22:21:16 philip Exp $
- */

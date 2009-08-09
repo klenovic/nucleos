@@ -11,7 +11,7 @@
 #define getnpid	_getnpid
 #include <unistd.h>
 
-PUBLIC pid_t getnpid(int proc_nr)
+pid_t getnpid(int proc_nr)
 {
   message m;
   m.m1_i1 = proc_nr;		/* search pid for this process */

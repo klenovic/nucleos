@@ -12,7 +12,7 @@
 #include <nucleos/minlib.h>
 #include <time.h>
 
-PUBLIC int stime(top)
+int stime(top)
 long *top;
 {
   message m;

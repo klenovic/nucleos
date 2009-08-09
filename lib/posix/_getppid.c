@@ -11,7 +11,7 @@
 #define getppid	_getppid
 #include <unistd.h>
 
-PUBLIC pid_t getppid()
+pid_t getppid()
 {
   message m;
 

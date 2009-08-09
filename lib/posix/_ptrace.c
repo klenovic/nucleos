@@ -11,7 +11,7 @@
 #define ptrace	_ptrace
 #include <unistd.h>
 
-PUBLIC long ptrace(req, pid, addr, data)
+long ptrace(req, pid, addr, data)
 int req;
 pid_t pid;
 long addr;

@@ -33,15 +33,15 @@ struct in_addr
 };
 #endif
 
-_PROTOTYPE( uint32_t htonl, (uint32_t _hostval)				);
-_PROTOTYPE( uint16_t htons, (uint16_t _hostval)				);
-_PROTOTYPE( char *inet_ntoa, (struct in_addr _in)			);
-_PROTOTYPE( uint32_t ntohl, (uint32_t _netval)				);
-_PROTOTYPE( uint16_t ntohs, (uint16_t _netval)				);
+uint32_t htonl(uint32_t _hostval);
+uint16_t htons(uint16_t _hostval);
+char *inet_ntoa(struct in_addr _in);
+uint32_t ntohl(uint32_t _netval);
+uint16_t ntohs(uint16_t _netval);
 
 #ifdef _MINIX
 /* Additional functions */
-_PROTOTYPE( int inet_aton, (const char *_cp, struct in_addr *_pin)	);
+int inet_aton(const char *_cp, struct in_addr *_pin);
 #endif
 
 #endif /* _ARPA__INET_H */

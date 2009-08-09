@@ -26,7 +26,7 @@
 /*===========================================================================*
  *			        do_devio                                     *
  *===========================================================================*/
-PUBLIC int do_devio(m_ptr)
+int do_devio(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
     struct proc *rp;

@@ -10,7 +10,7 @@
 #include <lib.h>
 #include <unistd.h>
 
-PUBLIC uid_t getpeuid(ep)
+uid_t getpeuid(ep)
 endpoint_t ep;
 {
   message m;

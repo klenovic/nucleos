@@ -85,7 +85,3 @@ typedef struct tcp_cookie
 } tcp_cookie_t;
 
 #endif /* __SERVER__IP__GEN__TCP_IO_H__ */
-
-/*
- * $PchId: tcp_io.h,v 1.5 2001/02/19 07:36:55 philip Exp $
- */

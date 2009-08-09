@@ -18,7 +18,7 @@ pci_attr_w32.c
 /*===========================================================================*
  *				pci_attr_w32				     *
  *===========================================================================*/
-PUBLIC void pci_attr_w32(devind, port, value)
+void pci_attr_w32(devind, port, value)
 int devind;
 int port;
 u32_t value;

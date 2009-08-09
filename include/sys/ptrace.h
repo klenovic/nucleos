@@ -38,6 +38,6 @@
 #include <ansi.h>
 #endif
 
-_PROTOTYPE( long ptrace, (int _req, pid_t _pid, long _addr, long _data) );
+long ptrace(int _req, pid_t _pid, long _addr, long _data);
 
 #endif /* _PTRACE_H */

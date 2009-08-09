@@ -26,7 +26,3 @@ typedef struct psip_io_hdr
 #define PF_REM2LOC		1
 
 #endif /* __SERVER__IP__GEN__PSIP_HDR_H__ */
-
-/*
- * $PchId: psip_hdr.h,v 1.3 2001/02/19 07:35:38 philip Exp $
- */

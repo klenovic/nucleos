@@ -19,13 +19,13 @@
 #define	ENTRY_INC	10
 #define	rounded(x)	(((x / ENTRY_INC) + 1) * ENTRY_INC)
 
-extern _CONST char ***_penviron;
+extern const char ***_penviron;
 
 int
 putenv(name)
 char *name;
 {
-	register _CONST char **v = *_penviron;
+	register const char **v = *_penviron;
 	register char *r;
 	static int size = 0;
 	/* When size != 0, it contains the number of entries in the
@@ -36,7 +36,7 @@ char *name;
 	if (!name) return 0;
 	if (*_penviron == NULL) return 1;
 	if (r = strchr(name, '=')) {
-		register _CONST char *p, *q;
+		register const char *p, *q;
 
 		*r = '\0';
 
@@ -62,7 +62,7 @@ char *name;
 	}
 
 	if (!size) {
-		register _CONST char **p;
+		register const char **p;
 		register int i = 0;
 
 		if (v)

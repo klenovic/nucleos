@@ -122,7 +122,7 @@ ec_conf_t ec_conf[]=    /* Card addresses */
 };
 
 /* Actually, we use PCI-BIOS info. */
-PRIVATE struct pcitab
+static struct pcitab
 {
 	u16_t vid;
 	u16_t did;
@@ -144,51 +144,41 @@ struct pci_device pci_dev_list[] = {
 */
 
 /* General */
-_PROTOTYPE( static void do_init, (message *mp)                          );
-_PROTOTYPE( static void ec_init, (ether_card_t *ec)                     );
-_PROTOTYPE( static void ec_confaddr, (ether_card_t *ec)                 );
-_PROTOTYPE( static void ec_reinit, (ether_card_t *ec)                   );
-_PROTOTYPE( static void ec_check_ints, (ether_card_t *ec)               );
-_PROTOTYPE( static void conf_hw, (ether_card_t *ec)                     );
-/*_PROTOTYPE( static int ec_handler, (irq_hook_t *hook)                   );*/
-_PROTOTYPE( static void update_conf, (ether_card_t *ec, ec_conf_t *ecp) );
-_PROTOTYPE( static void mess_reply, (message *req, message *reply)      );
-_PROTOTYPE( static void do_int, (ether_card_t *ec)                      );
-_PROTOTYPE( static void reply, 
-	    (ether_card_t *ec, int err, int may_block)                  );
-_PROTOTYPE( static void ec_reset, (ether_card_t *ec)                    );
-_PROTOTYPE( static void ec_send, (ether_card_t *ec)                     );
-_PROTOTYPE( static void ec_recv, (ether_card_t *ec)                     );
-_PROTOTYPE( static void do_vwrite_s, 
-	    (message *mp, int from_int)		                        );
-_PROTOTYPE( static void do_vread_s, (message *mp)	                );
-_PROTOTYPE( static void get_userdata_s, 
-	    (int user_proc, cp_grant_id_t grant, vir_bytes offset,
-	     vir_bytes count, void *loc_addr)                           );
-_PROTOTYPE( static void ec_user2nic, 
-	    (ether_card_t *dep, iovec_dat_t *iovp, 
-	     vir_bytes offset, int nic_addr, 
-	     vir_bytes count)                                           );
-_PROTOTYPE( static void ec_nic2user, 
-	    (ether_card_t *ec, int nic_addr, 
-	     iovec_dat_t *iovp, vir_bytes offset, 
-	     vir_bytes count)                                           );
-_PROTOTYPE( static int calc_iovec_size, (iovec_dat_t *iovp)             );
-_PROTOTYPE( static void ec_next_iovec, (iovec_dat_t *iovp)              );
-_PROTOTYPE( static void do_getstat_s, (message *mp)                     );
-_PROTOTYPE( static void put_userdata_s, 
-	    (int user_proc, cp_grant_id_t grant,
-	     void *loc_addr, vir_bytes count)                           );
-_PROTOTYPE( static void do_stop, (message *mp)                          );
-_PROTOTYPE( static void do_getname, (message *mp)                       );
+static void do_init(message *mp);
+static void ec_init(ether_card_t *ec);
+static void ec_confaddr(ether_card_t *ec);
+static void ec_reinit(ether_card_t *ec);
+static void ec_check_ints(ether_card_t *ec);
+static void conf_hw(ether_card_t *ec);
+static void update_conf(ether_card_t *ec, ec_conf_t *ecp);
+static void mess_reply(message *req, message *reply);
+static void do_int(ether_card_t *ec);
+static void reply(ether_card_t *ec, int err, int may_block);
+static void ec_reset(ether_card_t *ec);
+static void ec_send(ether_card_t *ec);
+static void ec_recv(ether_card_t *ec);
+static void do_vwrite_s(message *mp, int from_int);
+static void do_vread_s(message *mp);
+static void get_userdata_s(int user_proc, cp_grant_id_t grant, vir_bytes offset,
+			   vir_bytes count, void *loc_addr);
+static void ec_user2nic(ether_card_t *dep, iovec_dat_t *iovp, vir_bytes offset, int nic_addr,
+	 		vir_bytes count);
+static void ec_nic2user(ether_card_t *ec, int nic_addr, iovec_dat_t *iovp, vir_bytes offset,
+			vir_bytes count);
+static int calc_iovec_size(iovec_dat_t *iovp);
+static void ec_next_iovec(iovec_dat_t *iovp);
+static void do_getstat_s(message *mp);
+static void put_userdata_s(int user_proc, cp_grant_id_t grant, void *loc_addr, vir_bytes count);
+static void do_stop(message *mp);
+static void do_getname(message *mp);
 
-_PROTOTYPE( static void lance_dump, (void)				);
-_PROTOTYPE( static void lance_stop, (void)				);
-_PROTOTYPE( static void getAddressing, (int devind, ether_card_t *ec)	);
+static void lance_dump(void);
+static void lance_stop(void);
+static void getAddressing(int devind, ether_card_t *ec);
 
 /* probe+init LANCE cards */
-_PROTOTYPE( static int lance_probe, (ether_card_t *ec)                  );
-_PROTOTYPE( static void lance_init_card, (ether_card_t *ec)             );
+static int lance_probe(ether_card_t *ec);
+static void lance_init_card(ether_card_t *ec);
 
 /* --- LANCE --- */
 /* General */

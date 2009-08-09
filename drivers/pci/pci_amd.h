@@ -24,7 +24,3 @@ Created:	Nov 2001 by Philip Homburg <philip@cs.vu.nl>
 #define			AMD_PCIIRQ_INTB_MASK	0x00F0
 #define			AMD_PCIIRQ_INTC_MASK	0x0F00
 #define			AMD_PCIIRQ_INTD_MASK	0xF000
-
-/*
- * $PchId: pci_amd.h,v 1.1 2001/11/09 19:57:37 philip Exp $
- */

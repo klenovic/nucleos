@@ -14,7 +14,7 @@
 
 #include	<stdio.h>
 
-_PROTOTYPE(int getw, (FILE *stream ));
+int getw(FILE *stream);
 
 int getw(stream)
 register FILE *stream;

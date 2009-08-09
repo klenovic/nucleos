@@ -20,7 +20,7 @@
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
 
-/* Prototype declarations for PRIVATE functions. */
+/* Prototype declarations for static functions. */
 static void announce(void);
 
 /*===========================================================================*

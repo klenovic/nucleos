@@ -32,6 +32,9 @@ char version[]=   "2.20";
 #include "include/fs/rawfs.h"
 #include "edparams.h"
 
+environment *env;        /* Lists the environment. */
+MNX(u32_t) lowsec;       /* Offset to the file system on the boot device. */
+
 #define arraysize(a)      (sizeof(a) / sizeof((a)[0]))
 #define arraylimit(a)     ((a) + arraysize(a))
 #define between(a, c, z)  ((unsigned) ((c) - (a)) <= ((z) - (a)))

@@ -1078,7 +1078,3 @@ char *op;
 }
 
 #endif
-
-/*
- * $PchId: regexp.c,v 1.4 1996/02/22 09:03:07 philip Exp $
- */

@@ -71,7 +71,3 @@ typedef struct nwio_ipopt
 #	define NWIO_RWDATALL	0x10000000l
 
 #endif /* __SERVER__IP__GEN__IP_IO_H__ */
-
-/*
- * $PchId: ip_io.h,v 1.5 2001/03/12 22:17:25 philip Exp $
- */

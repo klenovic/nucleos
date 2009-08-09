@@ -164,7 +164,3 @@ char* SHA512_Data __P((const u_int8_t*, size_t, char[SHA512_DIGEST_STRING_LENGTH
 #endif /* __cplusplus */
 
 #endif /* __SHA2_H__ */
-
-/*
- * $PchId: sha2.h,v 1.1 2005/06/28 14:29:33 philip Exp $
- */

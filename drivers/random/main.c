@@ -25,24 +25,24 @@
 
 #define KRANDOM_PERIOD    1 		/* ticks between krandom calls */
 
-PRIVATE struct device m_geom[NR_DEVS];  /* base and size of each device */
-PRIVATE int m_device;			/* current device */
+static struct device m_geom[NR_DEVS];  /* base and size of each device */
+static int m_device;			/* current device */
 
 extern int errno;			/* error number for PM calls */
 
-FORWARD _PROTOTYPE( char *r_name, (void) );
-FORWARD _PROTOTYPE( struct device *r_prepare, (int device) );
-FORWARD _PROTOTYPE( int r_transfer, (int proc_nr, int opcode, u64_t position,
-				iovec_t *iov, unsigned nr_req, int safe) );
-FORWARD _PROTOTYPE( int r_do_open, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( void r_init, (void) );
-FORWARD _PROTOTYPE( int r_ioctl, (struct driver *dp, message *m_ptr, int safe) );
-FORWARD _PROTOTYPE( void r_geometry, (struct partition *entry) );
-FORWARD _PROTOTYPE( void r_random, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( void r_updatebin, (int source, struct k_randomness_bin *rb));
+static char *r_name(void);
+static struct device *r_prepare(int device);
+static int r_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov,
+		      unsigned nr_req, int safe);
+static int r_do_open(struct driver *dp, message *m_ptr);
+static void r_init(void);
+static int r_ioctl(struct driver *dp, message *m_ptr, int safe);
+static void r_geometry(struct partition *entry);
+static void r_random(struct driver *dp, message *m_ptr);
+static void r_updatebin(int source, struct k_randomness_bin *rb);
 
 /* Entry points to this driver. */
-PRIVATE struct driver r_dtab = {
+static struct driver r_dtab = {
   r_name,	/* current device's name */
   r_do_open,	/* open or mount */
   do_nop,	/* nothing on a close */
@@ -61,12 +61,12 @@ PRIVATE struct driver r_dtab = {
 
 /* Buffer for the /dev/random number generator. */
 #define RANDOM_BUF_SIZE 		1024
-PRIVATE char random_buf[RANDOM_BUF_SIZE];
+static char random_buf[RANDOM_BUF_SIZE];
 
 /*===========================================================================*
  *				   main 				     *
  *===========================================================================*/
-PUBLIC int main(void)
+int main(void)
 {
   r_init();			/* initialize the memory driver */
   driver_task(&r_dtab);		/* start driver's main loop */
@@ -76,7 +76,7 @@ PUBLIC int main(void)
 /*===========================================================================*
  *				 r_name					     *
  *===========================================================================*/
-PRIVATE char *r_name()
+static char *r_name()
 {
 /* Return a name for the current device. */
   static char name[] = "random";
@@ -86,7 +86,7 @@ PRIVATE char *r_name()
 /*===========================================================================*
  *				r_prepare				     *
  *===========================================================================*/
-PRIVATE struct device *r_prepare(device)
+static struct device *r_prepare(device)
 int device;
 {
 /* Prepare for I/O on a device: check if the minor device number is ok. */
@@ -100,7 +100,7 @@ int device;
 /*===========================================================================*
  *				r_transfer				     *
  *===========================================================================*/
-PRIVATE int r_transfer(proc_nr, opcode, position, iov, nr_req, safe)
+static int r_transfer(proc_nr, opcode, position, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER or DEV_SCATTER */
 u64_t position;			/* offset on device to read or write */
@@ -189,7 +189,7 @@ int safe;			/* safe copies? */
 /*============================================================================*
  *				r_do_open				      *
  *============================================================================*/
-PRIVATE int r_do_open(dp, m_ptr)
+static int r_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -203,7 +203,7 @@ message *m_ptr;
 /*===========================================================================*
  *				r_init					     *
  *===========================================================================*/
-PRIVATE void r_init()
+static void r_init()
 {
   static struct k_randomness krandom;
   int i, s;
@@ -234,7 +234,7 @@ PRIVATE void r_init()
 /*===========================================================================*
  *				r_ioctl					     *
  *===========================================================================*/
-PRIVATE int r_ioctl(dp, m_ptr, safe)
+static int r_ioctl(dp, m_ptr, safe)
 struct driver *dp;			/* pointer to driver structure */
 message *m_ptr;				/* pointer to control message */
 int safe;				/* safe i/o? */
@@ -266,7 +266,7 @@ int safe;				/* safe i/o? */
 		}							\
 }
 
-PRIVATE void r_updatebin(int source, struct k_randomness_bin *rb)
+static void r_updatebin(int source, struct k_randomness_bin *rb)
 {
   	int r_next, r_size, r_high;
 
@@ -292,7 +292,7 @@ PRIVATE void r_updatebin(int source, struct k_randomness_bin *rb)
 /*============================================================================*
  *				r_random				      *
  *============================================================================*/
-PRIVATE void r_random(dp, m_ptr)
+static void r_random(dp, m_ptr)
 struct driver *dp;			/* pointer to driver structure */
 message *m_ptr;				/* pointer to alarm message */
 {
@@ -321,7 +321,7 @@ message *m_ptr;				/* pointer to alarm message */
 /*============================================================================*
  *				r_geometry				      *
  *============================================================================*/
-PRIVATE void r_geometry(entry)
+static void r_geometry(entry)
 struct partition *entry;
 {
   /* Memory devices don't have a geometry, but the outside world insists. */

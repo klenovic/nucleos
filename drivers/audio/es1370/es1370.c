@@ -35,36 +35,30 @@
 /* reg(n) will be the device specific addresses */
 #define reg(n) dev.base + n
 
-
 /* prototypes of private functions */
-FORWARD _PROTOTYPE( int detect_hw, (void) );  
-FORWARD _PROTOTYPE( int disable_int, (int sub_dev) );
-FORWARD _PROTOTYPE( int set_stereo, (u32_t stereo, int sub_dev) );
-FORWARD _PROTOTYPE( int set_bits, (u32_t nr_of_bits, int sub_dev) );
-FORWARD _PROTOTYPE( int set_sample_rate, (u32_t rate, int sub_dev) );
-FORWARD _PROTOTYPE( int set_sign, (u32_t val, int sub_dev) );
-FORWARD _PROTOTYPE( int get_max_frag_size, 
-		(u32_t * val, int *len, int sub_dev) );
-FORWARD _PROTOTYPE( int set_frag_size, (u32_t fragment_size, int sub_dev) );
-FORWARD _PROTOTYPE( int set_int_cnt, (int sub_dev) );
-FORWARD _PROTOTYPE( int free_buf, (u32_t *val, int *len, int sub_dev) );
-FORWARD _PROTOTYPE( int get_samples_in_buf, 
-		(u32_t *val, int *len, int sub_dev) );
-FORWARD _PROTOTYPE( int get_set_volume, (struct volume_level *level, int *len, 
-		int sub_dev, int flag) );
-FORWARD _PROTOTYPE( int reset, (int sub_dev) );
-
+static int detect_hw(void);
+static int disable_int(int sub_dev);
+static int set_stereo(u32_t stereo, int sub_dev);
+static int set_bits(u32_t nr_of_bits, int sub_dev);
+static int set_sample_rate(u32_t rate, int sub_dev);
+static int set_sign(u32_t val, int sub_dev);
+static int get_max_frag_size(u32_t * val, int *len, int sub_dev);
+static int set_frag_size(u32_t fragment_size, int sub_dev);
+static int set_int_cnt(int sub_dev);
+static int free_buf(u32_t *val, int *len, int sub_dev);
+static int get_samples_in_buf(u32_t *val, int *len, int sub_dev);
+static int get_set_volume(struct volume_level *level, int *len, int sub_dev, int flag);
+static int reset(int sub_dev);
 
 DEV_STRUCT dev;
 aud_sub_dev_conf_t aud_conf[4];
 
+sub_dev_t sub_dev[4];
+special_file_t special_file[4];
+drv_t drv;
 
-PUBLIC sub_dev_t sub_dev[4];
-PUBLIC special_file_t special_file[4];
-PUBLIC drv_t drv;
 
-
-PUBLIC int drv_init(void) {
+int drv_init(void) {
 	drv.DriverName = DRIVER_NAME;
 	drv.NrOfSubDevices = 4;
 	drv.NrOfSpecialFiles = 4;
@@ -115,7 +109,7 @@ PUBLIC int drv_init(void) {
 }
 
 
-PUBLIC int drv_init_hw (void) {
+int drv_init_hw (void) {
 	u16_t i, j;
 	u16_t chip_sel_ctrl_reg;
 
@@ -176,7 +170,7 @@ PUBLIC int drv_init_hw (void) {
 }
 
 
-PRIVATE int detect_hw(void) {
+static int detect_hw(void) {
 	u32_t device;
 	int devind;
 	u16_t v_id, d_id;
@@ -219,7 +213,7 @@ PRIVATE int detect_hw(void) {
 }
 
 
-PRIVATE int reset(int chan) {
+static int reset(int chan) {
 	drv_stop(chan);
 	sub_dev[chan].OutOfData = 1;
 
@@ -464,7 +458,7 @@ int drv_resume(int sub_dev) {
 }
 
 
-PRIVATE int set_bits(u32_t nr_of_bits, int sub_dev) {
+static int set_bits(u32_t nr_of_bits, int sub_dev) {
 	/* set format bits for specified channel. */
 	u16_t size_16_bit, ser_interface;
 
@@ -488,7 +482,7 @@ PRIVATE int set_bits(u32_t nr_of_bits, int sub_dev) {
 }
 
 
-PRIVATE int set_stereo(u32_t stereo, int sub_dev) {
+static int set_stereo(u32_t stereo, int sub_dev) {
 	/* set format bits for specified channel. */
 	u16_t stereo_bit, ser_interface;
 
@@ -510,12 +504,12 @@ PRIVATE int set_stereo(u32_t stereo, int sub_dev) {
 }
 
 
-PRIVATE int set_sign(u32_t val, int sub_dev) {
+static int set_sign(u32_t val, int sub_dev) {
 	return OK;
 }
 
 
-PRIVATE int set_frag_size(u32_t fragment_size, int sub_dev_nr) {
+static int set_frag_size(u32_t fragment_size, int sub_dev_nr) {
 	if (fragment_size > (sub_dev[sub_dev_nr].DmaSize / 
 				sub_dev[sub_dev_nr].NrOfDmaFragments) || 
 			fragment_size < sub_dev[sub_dev_nr].MinFragmentSize) {
@@ -527,7 +521,7 @@ PRIVATE int set_frag_size(u32_t fragment_size, int sub_dev_nr) {
 }
 
 
-PRIVATE int set_sample_rate(u32_t rate, int sub_dev) {
+static int set_sample_rate(u32_t rate, int sub_dev) {
 	/* currently only 44.1kHz */
 	u32_t controlRegister;
 
@@ -545,7 +539,7 @@ PRIVATE int set_sample_rate(u32_t rate, int sub_dev) {
 }
 
 
-PRIVATE int set_int_cnt(int chan) {
+static int set_int_cnt(int chan) {
 	/* Write interrupt count for specified channel. 
 	   After <DspFragmentSize> bytes, an interrupt will be generated  */
 
@@ -582,7 +576,7 @@ PRIVATE int set_int_cnt(int chan) {
 }
 
 
-PRIVATE int get_max_frag_size(u32_t * val, int * len, int sub_dev_nr) {
+static int get_max_frag_size(u32_t * val, int * len, int sub_dev_nr) {
 	*len = sizeof(*val);
 	*val = (sub_dev[sub_dev_nr].DmaSize / 
 			sub_dev[sub_dev_nr].NrOfDmaFragments);
@@ -590,7 +584,7 @@ PRIVATE int get_max_frag_size(u32_t * val, int * len, int sub_dev_nr) {
 }
 
 
-PRIVATE int disable_int(int chan) {
+static int disable_int(int chan) {
 	u16_t ser_interface, int_en_bit;
 
 	switch(chan) {
@@ -605,7 +599,7 @@ PRIVATE int disable_int(int chan) {
 }
 
 
-PRIVATE int get_samples_in_buf (u32_t *samples_in_buf, int *len, int chan) {
+static int get_samples_in_buf (u32_t *samples_in_buf, int *len, int chan) {
 	u16_t samp_ct_reg; 
 	u16_t curr_samp_ct_reg;
 	u16_t samp_ct;  /* nr of samples - 1 that will be played back */
@@ -637,7 +631,7 @@ PRIVATE int get_samples_in_buf (u32_t *samples_in_buf, int *len, int chan) {
 
 
 /* returns 1 if there are free buffers */
-PRIVATE int free_buf (u32_t *val, int *len, int sub_dev_nr) {
+static int free_buf (u32_t *val, int *len, int sub_dev_nr) {
 	*len = sizeof(*val);
 	if (sub_dev[sub_dev_nr].BufLength ==
 			sub_dev[sub_dev_nr].NrOfExtraBuffers) {
@@ -650,7 +644,7 @@ PRIVATE int free_buf (u32_t *val, int *len, int sub_dev_nr) {
 }
 
 
-PRIVATE int get_set_volume(struct volume_level *level, int *len, int sub_dev, 
+static int get_set_volume(struct volume_level *level, int *len, int sub_dev, 
 		int flag) {
 	*len = sizeof(struct volume_level);
 	if (sub_dev == MIXER) {

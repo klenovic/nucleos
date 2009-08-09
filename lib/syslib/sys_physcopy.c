@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_physcopy(src_proc, src_seg, src_vir, 
+int sys_physcopy(src_proc, src_seg, src_vir, 
 	dst_proc, dst_seg, dst_vir, bytes)
 int src_proc;			/* source process */
 int src_seg;			/* source memory segment */

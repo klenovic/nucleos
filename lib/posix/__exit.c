@@ -11,7 +11,7 @@
 #include <lib.h>
 #include <unistd.h>
 
-PUBLIC void _exit(status)
+void _exit(status)
 int status;
 {
   void (*suicide)(void);

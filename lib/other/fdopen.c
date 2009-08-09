@@ -20,7 +20,7 @@
 FILE *
 fdopen(fd, mode)
 int fd;
-_CONST char *mode;
+const char *mode;
 {
 	register int i;
 	struct stat st;

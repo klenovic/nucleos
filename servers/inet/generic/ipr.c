@@ -44,10 +44,10 @@ typedef struct oroute_hash
 	oroute_t *orh_route;
 } oroute_hash_t;
 
-PRIVATE oroute_t oroute_table[OROUTE_NR];
-PRIVATE oroute_t *oroute_head;
-PRIVATE int static_oroute_nr;
-PRIVATE oroute_hash_t oroute_hash_table[OROUTE_HASH_NR][OROUTE_HASH_ASS_NR];
+static oroute_t oroute_table[OROUTE_NR];
+static oroute_t *oroute_head;
+static int static_oroute_nr;
+static oroute_hash_t oroute_hash_table[OROUTE_HASH_NR][OROUTE_HASH_ASS_NR];
 
 #define IROUTE_NR		512
 #define IROUTE_HASH_ASS_NR	 4
@@ -66,17 +66,17 @@ typedef struct iroute_hash
 	iroute_t *irh_route;
 } iroute_hash_t;
 
-PRIVATE iroute_t iroute_table[IROUTE_NR];
-PRIVATE iroute_hash_t iroute_hash_table[IROUTE_HASH_NR][IROUTE_HASH_ASS_NR];
+static iroute_t iroute_table[IROUTE_NR];
+static iroute_hash_t iroute_hash_table[IROUTE_HASH_NR][IROUTE_HASH_ASS_NR];
 
-FORWARD oroute_t *oroute_find_ent ARGS(( int port_nr, ipaddr_t dest ));
-FORWARD void oroute_del ARGS(( oroute_t *oroute ));
-FORWARD oroute_t *sort_dists ARGS(( oroute_t *oroute ));
-FORWARD oroute_t *sort_gws ARGS(( oroute_t *oroute ));
-FORWARD	void oroute_uncache_nw ARGS(( ipaddr_t dest, ipaddr_t netmask ));
-FORWARD	void iroute_uncache_nw ARGS(( ipaddr_t dest, ipaddr_t netmask ));
+static oroute_t *oroute_find_ent(int port_nr, ipaddr_t dest);
+static void oroute_del(oroute_t *oroute);
+static oroute_t *sort_dists(oroute_t *oroute);
+static oroute_t *sort_gws(oroute_t *oroute);
+static void oroute_uncache_nw(ipaddr_t dest, ipaddr_t netmask);
+static void iroute_uncache_nw(ipaddr_t dest, ipaddr_t netmask);
 
-PUBLIC void ipr_init()
+void ipr_init()
 {
 	int i;
 	oroute_t *oroute;
@@ -93,7 +93,7 @@ PUBLIC void ipr_init()
 }
 
 
-PUBLIC iroute_t *iroute_frag(port_nr, dest)
+iroute_t *iroute_frag(port_nr, dest)
 int port_nr;
 ipaddr_t dest;
 {
@@ -193,7 +193,7 @@ ipaddr_t dest;
 	return bestroute;
 }
 
-PUBLIC int oroute_frag(port_nr, dest, ttl, msgsize, nexthop)
+int oroute_frag(port_nr, dest, ttl, msgsize, nexthop)
 int port_nr;
 ipaddr_t dest;
 int ttl;
@@ -216,7 +216,7 @@ ipaddr_t *nexthop;
 }
 
 
-PUBLIC int ipr_add_oroute(port_nr, dest, subnetmask, gateway, 
+int ipr_add_oroute(port_nr, dest, subnetmask, gateway, 
 	timeout, dist, mtu, static_route, preference, oroute_p)
 int port_nr;
 ipaddr_t dest;
@@ -417,7 +417,7 @@ oroute_t **oroute_p;
 	return NW_OK;
 }
 
-PUBLIC int ipr_del_oroute(port_nr, dest, subnetmask, gateway, static_route)
+int ipr_del_oroute(port_nr, dest, subnetmask, gateway, static_route)
 int port_nr;
 ipaddr_t dest;
 ipaddr_t subnetmask;
@@ -456,7 +456,7 @@ int static_route;
 
 
 
-PUBLIC void ipr_chk_otab(port_nr, addr, mask)
+void ipr_chk_otab(port_nr, addr, mask)
 int port_nr;
 ipaddr_t addr;
 ipaddr_t mask;
@@ -504,7 +504,7 @@ ipaddr_t mask;
 }
 
 
-PUBLIC void ipr_gateway_down(port_nr, gateway, timeout)
+void ipr_gateway_down(port_nr, gateway, timeout)
 int port_nr;
 ipaddr_t gateway;
 time_t timeout;
@@ -532,7 +532,7 @@ time_t timeout;
 }
 
 
-PUBLIC void ipr_destunrch(port_nr, dest, netmask, timeout)
+void ipr_destunrch(port_nr, dest, netmask, timeout)
 int port_nr;
 ipaddr_t dest;
 ipaddr_t netmask;
@@ -557,7 +557,7 @@ time_t timeout;
 }
 
 
-PUBLIC void ipr_redirect(port_nr, dest, netmask, old_gateway, new_gateway, 
+void ipr_redirect(port_nr, dest, netmask, old_gateway, new_gateway, 
 	timeout)
 int port_nr;
 ipaddr_t dest;
@@ -620,7 +620,7 @@ time_t timeout;
 }
 
 
-PUBLIC void ipr_ttl_exc(port_nr, dest, netmask, timeout)
+void ipr_ttl_exc(port_nr, dest, netmask, timeout)
 int port_nr;
 ipaddr_t dest;
 ipaddr_t netmask;
@@ -660,7 +660,7 @@ time_t timeout;
 	assert(result == NW_OK);
 }
 
-PUBLIC void ipr_mtu(port_nr, dest, mtu, timeout)
+void ipr_mtu(port_nr, dest, mtu, timeout)
 int port_nr;
 ipaddr_t dest;
 u16_t mtu;
@@ -691,7 +691,7 @@ time_t timeout;
 }
 
 
-PUBLIC int ipr_get_oroute(ent_no, route_ent)
+int ipr_get_oroute(ent_no, route_ent)
 int ent_no;
 nwio_route_t *route_ent;
 {
@@ -728,7 +728,7 @@ nwio_route_t *route_ent;
 }
 
 
-PRIVATE oroute_t *oroute_find_ent(port_nr, dest)
+static oroute_t *oroute_find_ent(port_nr, dest)
 int port_nr;
 ipaddr_t dest;
 {
@@ -820,7 +820,7 @@ ipaddr_t dest;
 }
 
 
-PRIVATE void oroute_del(oroute)
+static void oroute_del(oroute)
 oroute_t *oroute;
 {
 	oroute_t *prev, *nw_route, *gw_route, *dist_route, *prev_route;
@@ -896,7 +896,7 @@ oroute_t *oroute;
 }
 
 
-PRIVATE oroute_t *sort_dists(oroute)
+static oroute_t *sort_dists(oroute)
 oroute_t *oroute;
 {
 	oroute_t *r, *prev, *best, *best_prev;
@@ -940,7 +940,7 @@ oroute_t *oroute;
 }
 
 
-PRIVATE oroute_t *sort_gws(oroute)
+static oroute_t *sort_gws(oroute)
 oroute_t *oroute;
 {
 	oroute_t *r, *prev, *best, *best_prev;
@@ -984,7 +984,7 @@ oroute_t *oroute;
 }
 
 
-PRIVATE	void oroute_uncache_nw(dest, netmask)
+static void oroute_uncache_nw(dest, netmask)
 ipaddr_t dest;
 ipaddr_t netmask;
 {
@@ -1010,7 +1010,7 @@ ipaddr_t netmask;
  * Input routing
  */
 
-PUBLIC int ipr_get_iroute(ent_no, route_ent)
+int ipr_get_iroute(ent_no, route_ent)
 int ent_no;
 nwio_route_t *route_ent;
 {
@@ -1043,7 +1043,7 @@ nwio_route_t *route_ent;
 }
 
 
-PUBLIC int ipr_add_iroute(port_nr, dest, subnetmask, gateway, 
+int ipr_add_iroute(port_nr, dest, subnetmask, gateway, 
 	dist, mtu, static_route, iroute_p)
 int port_nr;
 ipaddr_t dest;
@@ -1132,7 +1132,7 @@ iroute_t **iroute_p;
 }
 
 
-PUBLIC int ipr_del_iroute(port_nr, dest, subnetmask, gateway, static_route)
+int ipr_del_iroute(port_nr, dest, subnetmask, gateway, static_route)
 int port_nr;
 ipaddr_t dest;
 ipaddr_t subnetmask;
@@ -1170,7 +1170,7 @@ int static_route;
 }
 
 
-PUBLIC void ipr_chk_itab(port_nr, addr, mask)
+void ipr_chk_itab(port_nr, addr, mask)
 int port_nr;
 ipaddr_t addr;
 ipaddr_t mask;
@@ -1226,7 +1226,7 @@ ipaddr_t mask;
 }
 
 
-PRIVATE	void iroute_uncache_nw(dest, netmask)
+static void iroute_uncache_nw(dest, netmask)
 ipaddr_t dest;
 ipaddr_t netmask;
 {
@@ -1247,9 +1247,3 @@ ipaddr_t netmask;
 		}
 	}
 }
-
-
-
-/*
- * $PchId: ipr.c,v 1.23 2003/01/22 11:49:58 philip Exp $
- */

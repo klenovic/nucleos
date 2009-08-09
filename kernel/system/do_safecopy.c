@@ -31,7 +31,7 @@
 
 #define MEM_TOP 0xFFFFFFFFUL
 
-FORWARD _PROTOTYPE(int safecopy, (endpoint_t, endpoint_t, cp_grant_id_t, int, int, size_t, vir_bytes, vir_bytes, int));
+static int safecopy(endpoint_t, endpoint_t, cp_grant_id_t, int, int, size_t, vir_bytes, vir_bytes, int);
 
 #define HASGRANTTABLE(gr) \
 	(!RTS_ISSET(gr, NO_PRIV) && priv(gr) && priv(gr)->s_grant_table > 0)
@@ -39,7 +39,7 @@ FORWARD _PROTOTYPE(int safecopy, (endpoint_t, endpoint_t, cp_grant_id_t, int, in
 /*===========================================================================*
  *				verify_grant				     *
  *===========================================================================*/
-PUBLIC int verify_grant(granter, grantee, grant, bytes, access,
+int verify_grant(granter, grantee, grant, bytes, access,
 	offset_in, offset_result, e_granter)
 endpoint_t granter, grantee;	/* copyee, copyer */
 cp_grant_id_t grant;		/* grant id */
@@ -195,7 +195,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 /*===========================================================================*
  *				safecopy				     *
  *===========================================================================*/
-PRIVATE int safecopy(granter, grantee, grantid, src_seg, dst_seg, bytes,
+static int safecopy(granter, grantee, grantid, src_seg, dst_seg, bytes,
 	g_offset, addr, access)
 endpoint_t granter, grantee;
 cp_grant_id_t grantid;
@@ -279,7 +279,7 @@ int access;			/* CPF_READ for a copy from granter to grantee, CPF_WRITE
 /*===========================================================================*
  *				do_safecopy				     *
  *===========================================================================*/
-PUBLIC int do_safecopy(m_ptr)
+int do_safecopy(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 	static int access, src_seg, dst_seg;
@@ -305,7 +305,7 @@ register message *m_ptr;	/* pointer to request message */
 /*===========================================================================*
  *				do_vsafecopy				     *
  *===========================================================================*/
-PUBLIC int do_vsafecopy(m_ptr)
+int do_vsafecopy(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 	static struct vscp_vec vec[SCPVEC_NR];

@@ -38,12 +38,12 @@
 
 #define NIL_MPROC	((struct mproc *) 0)
 
-FORWARD _PROTOTYPE( struct mproc *find_proc, (pid_t lpid) );
+static struct mproc *find_proc(pid_t lpid);
 
 /*===========================================================================*
  *				do_trace  				     *
  *===========================================================================*/
-PUBLIC int do_trace()
+int do_trace()
 {
   register struct mproc *child;
   int r;
@@ -154,7 +154,7 @@ PUBLIC int do_trace()
 /*===========================================================================*
  *				find_proc  				     *
  *===========================================================================*/
-PRIVATE struct mproc *find_proc(lpid)
+static struct mproc *find_proc(lpid)
 pid_t lpid;
 {
   register struct mproc *rmp;
@@ -170,7 +170,7 @@ pid_t lpid;
 /*===========================================================================*
  *				stop_proc				     *
  *===========================================================================*/
-PUBLIC void stop_proc(rmp, signo)
+void stop_proc(rmp, signo)
 register struct mproc *rmp;
 int signo;
 {

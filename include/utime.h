@@ -20,6 +20,6 @@ struct utimbuf {
 };
 
 /* Function Prototypes. */
-_PROTOTYPE( int utime, (const char *_path, const struct utimbuf *_times)     );
+int utime(const char *_path, const struct utimbuf *_times);
 
 #endif /* _UTIME_H */

@@ -13,7 +13,7 @@
 #include <string.h>
 
 char *index(s, charwanted)	/* found char, or NULL if none */
-_CONST char *s;
+const char *s;
 char charwanted;
 {
   return(strchr(s, charwanted));

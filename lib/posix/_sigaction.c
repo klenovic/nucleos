@@ -12,11 +12,11 @@
 #include <sys/sigcontext.h>
 #include <signal.h>
 
-_PROTOTYPE(int __sigreturn, (void));
+int __sigreturn(void);
 
-PUBLIC int sigaction(sig, act, oact)
+int sigaction(sig, act, oact)
 int sig;
-_CONST struct sigaction *act;
+const struct sigaction *act;
 struct sigaction *oact;
 {
   message m;

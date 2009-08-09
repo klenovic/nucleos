@@ -89,8 +89,8 @@ STATIC int		Point;
 STATIC int		PushBack;
 STATIC int		Pushed;
 STATIC int		Signal;
-FORWARD KEYMAP		Map[33];
-FORWARD KEYMAP		MetaMap[17];
+static KEYMAP		Map[33];
+static KEYMAP		MetaMap[17];
 STATIC SIZE_T		Length;
 STATIC SIZE_T		ScreenCount;
 STATIC SIZE_T		ScreenSize;
@@ -1474,7 +1474,3 @@ STATIC KEYMAP	MetaMap[17]= {
     {	'w',		copy_region	},
     {	0,		NULL		}
 };
-
-/*
- * $PchId: editline.c,v 1.4 1996/02/22 21:16:56 philip Exp $
- */

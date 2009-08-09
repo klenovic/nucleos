@@ -11,8 +11,8 @@
 #define chroot	_chroot
 #include <unistd.h>
 
-PUBLIC int chroot(name)
-_CONST char *name;
+int chroot(name)
+const char *name;
 {
   message m;
 

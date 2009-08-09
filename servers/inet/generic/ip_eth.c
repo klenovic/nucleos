@@ -38,34 +38,28 @@ typedef struct xmit_hdr
 	ipaddr_t xh_ipaddr;
 } xmit_hdr_t;
 
-PRIVATE ether_addr_t broadcast_ethaddr=
+static ether_addr_t broadcast_ethaddr=
 {
 	{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
 };
-PRIVATE ether_addr_t ipmulticast_ethaddr=
+static ether_addr_t ipmulticast_ethaddr=
 {
 	{ 0x01, 0x00, 0x5e, 0x00, 0x00, 0x00 }
 };
 
-FORWARD void do_eth_read ARGS(( ip_port_t *port ));
-FORWARD acc_t *get_eth_data ARGS(( int fd, size_t offset,
-	size_t count, int for_ioctl ));
-FORWARD int put_eth_data ARGS(( int fd, size_t offset,
-	acc_t *data, int for_ioctl ));
-FORWARD void ipeth_main ARGS(( ip_port_t *port ));
-FORWARD void ipeth_set_ipaddr ARGS(( ip_port_t *port ));
-FORWARD void ipeth_restart_send ARGS(( ip_port_t *ip_port ));
-FORWARD int ipeth_send ARGS(( struct ip_port *ip_port, ipaddr_t dest, 
-	acc_t *pack, int type ));
-FORWARD void ipeth_arp_reply ARGS(( int ip_port_nr, ipaddr_t ipaddr,
-	ether_addr_t *dst_ether_ptr ));
-FORWARD int ipeth_update_ttl ARGS(( time_t enq_time, time_t now,
-	acc_t *eth_pack ));
-FORWARD void ip_eth_arrived ARGS(( int port, acc_t *pack,
-	size_t pack_size ));
+static void do_eth_read(ip_port_t *port);
+static acc_t *get_eth_data(int fd, size_t offset, size_t count, int for_ioctl);
+static int put_eth_data(int fd, size_t offset, acc_t *data, int for_ioctl);
+static void ipeth_main(ip_port_t *port);
+static void ipeth_set_ipaddr(ip_port_t *port);
+static void ipeth_restart_send(ip_port_t *ip_port);
+static int ipeth_send(struct ip_port *ip_port, ipaddr_t dest, acc_t *pack, int type);
+static void ipeth_arp_reply(int ip_port_nr, ipaddr_t ipaddr, ether_addr_t *dst_ether_ptr);
+static int ipeth_update_ttl(time_t enq_time, time_t now, acc_t *eth_pack);
+static void ip_eth_arrived(int port, acc_t *pack, size_t pack_size);
 
 
-PUBLIC int ipeth_init(ip_port)
+int ipeth_init(ip_port)
 ip_port_t *ip_port;
 {
 	assert(BUF_S >= sizeof(xmit_hdr_t));
@@ -94,7 +88,7 @@ ip_port_t *ip_port;
 	return 0;
 }
 
-PRIVATE void ipeth_main(ip_port)
+static void ipeth_main(ip_port)
 ip_port_t *ip_port;
 {
 	int result;
@@ -146,7 +140,7 @@ ip_port_t *ip_port;
 	}
 }
 
-PRIVATE acc_t *get_eth_data (fd, offset, count, for_ioctl)
+static acc_t *get_eth_data (fd, offset, count, for_ioctl)
 int fd;
 size_t offset;
 size_t count;
@@ -215,7 +209,7 @@ int for_ioctl;
 	return 0;
 }
 
-PRIVATE int put_eth_data (port, offset, data, for_ioctl)
+static int put_eth_data (port, offset, data, for_ioctl)
 int port;
 size_t offset;
 acc_t *data;
@@ -262,7 +256,7 @@ int for_ioctl;
 	ip_panic (( "strange status" ));
 }
 
-PRIVATE void ipeth_set_ipaddr(ip_port)
+static void ipeth_set_ipaddr(ip_port)
 ip_port_t *ip_port;
 {
 	arp_set_ipaddr (ip_port->ip_dl.dl_eth.de_port, ip_port->ip_ipaddr);
@@ -270,7 +264,7 @@ ip_port_t *ip_port;
 		ipeth_main(ip_port);
 }
 
-PRIVATE int ipeth_send(ip_port, dest, pack, type)
+static int ipeth_send(ip_port, dest, pack, type)
 struct ip_port *ip_port;
 ipaddr_t dest;
 acc_t *pack;
@@ -412,7 +406,7 @@ int type;
 	return NW_OK;
 }
 
-PRIVATE void ipeth_restart_send(ip_port)
+static void ipeth_restart_send(ip_port)
 ip_port_t *ip_port;
 {
 	time_t now, enq_time;
@@ -523,7 +517,7 @@ ip_port_t *ip_port;
 }
 
 
-PRIVATE void ipeth_arp_reply(ip_port_nr, ipaddr, eth_addr)
+static void ipeth_arp_reply(ip_port_nr, ipaddr, eth_addr)
 int ip_port_nr;
 ipaddr_t ipaddr;
 ether_addr_t *eth_addr;
@@ -639,7 +633,7 @@ ether_addr_t *eth_addr;
 		ipeth_restart_send(ip_port);
 }
 
-PRIVATE int ipeth_update_ttl(enq_time, now, eth_pack)
+static int ipeth_update_ttl(enq_time, now, eth_pack)
 time_t enq_time;
 time_t now;
 acc_t *eth_pack;
@@ -679,7 +673,7 @@ acc_t *eth_pack;
 	return NW_OK;
 }
 
-PRIVATE void do_eth_read(ip_port)
+static void do_eth_read(ip_port)
 ip_port_t *ip_port;
 {
 	int result;
@@ -707,7 +701,7 @@ ip_port_t *ip_port;
 	}
 }
 
-PRIVATE void ip_eth_arrived(port, pack, pack_size)
+static void ip_eth_arrived(port, pack, pack_size)
 int port;
 acc_t *pack;
 size_t pack_size;
@@ -725,7 +719,3 @@ size_t pack_size;
 	else
 		ip_arrived(ip_port, pack);
 }
-
-/*
- * $PchId: ip_eth.c,v 1.25 2005/06/28 14:18:10 philip Exp $
- */

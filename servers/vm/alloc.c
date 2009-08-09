@@ -46,10 +46,10 @@
 #include <asm/servers/vm/memory.h>
 
 /* Initially, no free pages are known. */
-PRIVATE phys_bytes free_pages_head = NO_MEM;	/* Physical address in bytes. */
+static phys_bytes free_pages_head = NO_MEM;	/* Physical address in bytes. */
 
 /* Used for sanity check. */
-PRIVATE phys_bytes mem_low, mem_high;
+static phys_bytes mem_low, mem_high;
 #define vm_assert_range(addr, len)  			\
 	vm_assert((addr) >= mem_low);			\
 	vm_assert((addr) + (len) - 1 <= mem_high);
@@ -66,18 +66,18 @@ struct hole {
 
 #define _NR_HOLES (NR_PROCS*2)  /* No. of memory holes maintained by VM */
 
-PRIVATE struct hole hole[_NR_HOLES];
+static struct hole hole[_NR_HOLES];
 
-PRIVATE struct hole *hole_head;	/* pointer to first hole */
-PRIVATE struct hole *free_slots;/* ptr to list of unused table slots */
+static struct hole *hole_head;	/* pointer to first hole */
+static struct hole *free_slots;/* ptr to list of unused table slots */
 
-FORWARD _PROTOTYPE( void del_slot, (struct hole *prev_ptr, struct hole *hp) );
-FORWARD _PROTOTYPE( void merge, (struct hole *hp)			    );
-FORWARD _PROTOTYPE( void free_pages, (phys_bytes addr, int pages)	    );
-FORWARD _PROTOTYPE( phys_bytes alloc_pages, (int pages, int flags)	    );
+static void del_slot(struct hole *prev_ptr, struct hole *hp);
+static void merge(struct hole *hp);
+static void free_pages(phys_bytes addr, int pages);
+static phys_bytes alloc_pages(int pages, int flags);
 
 #if SANITYCHECKS
-FORWARD _PROTOTYPE( void holes_sanity_f, (char *fn, int line)		    );
+static void holes_sanity_f(char *fn, int line);
 #define CHECKHOLES holes_sanity_f(__FILE__, __LINE__)
 #else
 #define CHECKHOLES 
@@ -135,7 +135,7 @@ void availbytes(vir_bytes *bytes, vir_bytes *chunks)
 /*===========================================================================*
  *				holes_sanity_f				     *
  *===========================================================================*/
-PRIVATE void holes_sanity_f(file, line)
+static void holes_sanity_f(file, line)
 char *file;
 int line;
 {
@@ -205,7 +205,7 @@ int line;
 /*===========================================================================*
  *				alloc_mem_f				     *
  *===========================================================================*/
-PUBLIC phys_clicks alloc_mem_f(phys_clicks clicks, u32_t memflags)
+phys_clicks alloc_mem_f(phys_clicks clicks, u32_t memflags)
 {
 /* Allocate a block of memory from the free list using first fit. The block
  * consists of a sequence of contiguous bytes, whose length in clicks is
@@ -281,7 +281,7 @@ CHECKHOLES;
 /*===========================================================================*
  *				free_mem_f				     *
  *===========================================================================*/
-PUBLIC void free_mem_f(phys_clicks base, phys_clicks clicks)
+void free_mem_f(phys_clicks base, phys_clicks clicks)
 {
 /* Return a block of free memory to the hole list.  The parameters tell where
  * the block starts in physical memory and how big it is.  The block is added
@@ -336,7 +336,7 @@ CHECKHOLES;
 /*===========================================================================*
  *				del_slot				     *
  *===========================================================================*/
-PRIVATE void del_slot(prev_ptr, hp)
+static void del_slot(prev_ptr, hp)
 /* pointer to hole entry just ahead of 'hp' */
 register struct hole *prev_ptr;
 /* pointer to hole entry to be removed */
@@ -360,7 +360,7 @@ register struct hole *hp;
 /*===========================================================================*
  *				merge					     *
  *===========================================================================*/
-PRIVATE void merge(hp)
+static void merge(hp)
 register struct hole *hp;	/* ptr to hole to merge with its successors */
 {
 /* Check for contiguous holes and merge any found.  Contiguous holes can occur
@@ -394,7 +394,7 @@ register struct hole *hp;	/* ptr to hole to merge with its successors */
 /*===========================================================================*
  *				mem_init				     *
  *===========================================================================*/
-PUBLIC void mem_init(chunks)
+void mem_init(chunks)
 struct memory *chunks;		/* list of free memory chunks */
 {
 /* Initialize hole lists.  There are two lists: 'hole_head' points to a linked
@@ -436,7 +436,7 @@ struct memory *chunks;		/* list of free memory chunks */
 /*===========================================================================*
  *				alloc_pages				     *
  *===========================================================================*/
-PRIVATE PUBLIC phys_bytes alloc_pages(int pages, int memflags)
+static phys_bytes alloc_pages(int pages, int memflags)
 {
 	phys_bytes bytes, p, nextp, prevp = NO_MEM;
 	phys_bytes prevsize = 0;
@@ -507,7 +507,7 @@ PRIVATE PUBLIC phys_bytes alloc_pages(int pages, int memflags)
 /*===========================================================================*
  *				free_pages				     *
  *===========================================================================*/
-PRIVATE PUBLIC void free_pages(phys_bytes pageno, int npages)
+static void free_pages(phys_bytes pageno, int npages)
 {
 	phys_bytes p, origsize,
 		size, nextaddr, thissize, prevp = NO_MEM, pageaddr;
@@ -643,7 +643,7 @@ PRIVATE PUBLIC void free_pages(phys_bytes pageno, int npages)
 
 #define NR_DMA	16
 
-PRIVATE struct dmatab
+static struct dmatab
 {
 	int dt_flags;
 	endpoint_t dt_proc;
@@ -660,7 +660,7 @@ PRIVATE struct dmatab
 /*===========================================================================*
  *				do_adddma				     *
  *===========================================================================*/
-PUBLIC int do_adddma(message *msg)
+int do_adddma(message *msg)
 {
 	endpoint_t req_proc_e, target_proc_e;
 	int i, proc_n;
@@ -713,7 +713,7 @@ PUBLIC int do_adddma(message *msg)
 /*===========================================================================*
  *				do_deldma				     *
  *===========================================================================*/
-PUBLIC int do_deldma(message *msg)
+int do_deldma(message *msg)
 {
 	endpoint_t req_proc_e, target_proc_e;
 	int i, j, proc_n;
@@ -773,7 +773,7 @@ PUBLIC int do_deldma(message *msg)
 /*===========================================================================*
  *				do_getdma				     *
  *===========================================================================*/
-PUBLIC int do_getdma(message *msg)
+int do_getdma(message *msg)
 {
 	endpoint_t target_proc_e;
 	int i, proc_n;
@@ -807,7 +807,7 @@ PUBLIC int do_getdma(message *msg)
 /*===========================================================================*
  *				release_dma				     *
  *===========================================================================*/
-PUBLIC void release_dma(struct vmproc *vmp)
+void release_dma(struct vmproc *vmp)
 {
 	int i, found_one;
 
@@ -839,7 +839,7 @@ PUBLIC void release_dma(struct vmproc *vmp)
 /*===========================================================================*
  *				do_allocmem				     *
  *===========================================================================*/
-PUBLIC int do_allocmem(message *m)
+int do_allocmem(message *m)
 {
 	phys_clicks mem, clicks;
 

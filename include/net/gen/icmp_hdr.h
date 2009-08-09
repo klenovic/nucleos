@@ -65,7 +65,3 @@ typedef struct icmp_hdr
 } icmp_hdr_t;
 
 #endif /* __SERVER__IP__GEN__ICMP_HDR_H__ */
-
-/*
- * $PchId: icmp_hdr.h,v 1.5 2002/06/10 07:10:48 philip Exp $
- */

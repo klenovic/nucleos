@@ -71,8 +71,3 @@ event_t *ev;
 {
 	return ev->ev_func != 0;
 }
-
-
-/*
- * $PchId: event.c,v 1.6 2004/08/03 16:23:32 philip Exp $
- */

@@ -19,14 +19,14 @@
 #include "inc.h"
 #include "../ds/store.h"
 
-PUBLIC struct data_store store[NR_DS_KEYS];
+struct data_store store[NR_DS_KEYS];
 
-FORWARD _PROTOTYPE( char *s_flags_str, (int flags)		);
+static  char *s_flags_str(int flags);
 
 /*===========================================================================*
  *				data_store_dmp				     *
  *===========================================================================*/
-PUBLIC void data_store_dmp()
+void data_store_dmp()
 {
   struct data_store *dsp;
   int i,j, n=0, s;
@@ -62,7 +62,7 @@ PUBLIC void data_store_dmp()
 }
 
 
-PRIVATE char *s_flags_str(int flags)
+static char *s_flags_str(int flags)
 {
 	static char str[5];
 	str[0] = (flags & DS_IN_USE) ? 'U' : '-';

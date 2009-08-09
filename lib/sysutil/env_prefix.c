@@ -14,7 +14,7 @@
 /*=========================================================================*
  *				env_prefix				   *
  *=========================================================================*/
-PUBLIC int env_prefix(env, prefix)
+int env_prefix(env, prefix)
 char *env;		/* environment variable to inspect */
 char *prefix;		/* prefix to test for */
 {

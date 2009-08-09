@@ -24,7 +24,7 @@
 /*===========================================================================*
  *				do_adddma				     *
  *===========================================================================*/
-PUBLIC int do_adddma()
+int do_adddma()
 {
 	endpoint_t req_proc_e, target_proc_e;
 	int proc_n, r;
@@ -56,7 +56,7 @@ PUBLIC int do_adddma()
 /*===========================================================================*
  *				do_deldma				     *
  *===========================================================================*/
-PUBLIC int do_deldma()
+int do_deldma()
 {
 	endpoint_t req_proc_e, target_proc_e;
 	phys_bytes base, size;
@@ -75,7 +75,7 @@ PUBLIC int do_deldma()
 /*===========================================================================*
  *				do_getdma				     *
  *===========================================================================*/
-PUBLIC int do_getdma()
+int do_getdma()
 {
 	endpoint_t req_proc_e, proc;
 	int r;

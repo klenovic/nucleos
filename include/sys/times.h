@@ -29,6 +29,6 @@ struct tms {
 #include <ansi.h>
 #endif
 
-_PROTOTYPE( clock_t times, (struct tms *_buffer)			);
+clock_t times(struct tms *_buffer);
 
 #endif /* _TIMES_H */

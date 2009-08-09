@@ -23,7 +23,7 @@
 /*===========================================================================*
  *				do_vmctl				     *
  *===========================================================================*/
-PUBLIC int do_vmctl(m_ptr)
+int do_vmctl(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   int proc_nr, i;

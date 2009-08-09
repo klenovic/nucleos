@@ -15,7 +15,7 @@ gettimeofday.c
 #include <lib.h>
 #include <time.h>
 
-int gettimeofday(struct timeval *_RESTRICT tp, void *_RESTRICT tzp)
+int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp)
 {
   message m;
 

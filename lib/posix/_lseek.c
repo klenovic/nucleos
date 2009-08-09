@@ -11,7 +11,7 @@
 #define lseek	_lseek
 #include <unistd.h>
 
-PUBLIC off_t lseek(fd, offset, whence)
+off_t lseek(fd, offset, whence)
 int fd;
 off_t offset;
 int whence;

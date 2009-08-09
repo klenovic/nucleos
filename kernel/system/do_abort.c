@@ -25,7 +25,7 @@
 /*===========================================================================*
  *				do_abort				     *
  *===========================================================================*/
-PUBLIC int do_abort(m_ptr)
+int do_abort(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_abort. MINIX is unable to continue. This can originate e.g.

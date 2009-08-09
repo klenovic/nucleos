@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-PUBLIC int dup2(fd, fd2)
+int dup2(fd, fd2)
 int fd, fd2;
 {
 /* The behavior of dup2 is defined by POSIX in 6.2.1.2 as almost, but not

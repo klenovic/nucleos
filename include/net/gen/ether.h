@@ -38,7 +38,3 @@ typedef U16_t Ether_type_t;
 #define ETH_TCI_VLAN_MASK	0x0fff	/* 12-bit vlan number */
 
 #endif /* __SERVER__IP__GEN__ETHER_H__ */
-
-/*
- * $PchId: ether.h,v 1.6 2005/01/27 17:33:35 philip Exp $
- */

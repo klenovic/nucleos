@@ -40,13 +40,12 @@
  */
 #define DO_POSIX_PATHNAME_RES	0
 
-FORWARD _PROTOTYPE( int lookup_rel, (struct vnode *start_node,
-		int flags, int use_realuid, node_details_t *node)	);
+static int lookup_rel(struct vnode *start_node, int flags, int use_realuid, node_details_t *node);
 
 /*===========================================================================*
  *				lookup_rel_vp				     *
  *===========================================================================*/
-PUBLIC int lookup_rel_vp(start_node, flags, use_realuid, vpp)
+int lookup_rel_vp(start_node, flags, use_realuid, vpp)
 struct vnode *start_node;
 int flags;
 int use_realuid;
@@ -108,7 +107,7 @@ struct vnode **vpp;
 /*===========================================================================*
  *				lookup_vp				     *
  *===========================================================================*/
-PUBLIC int lookup_vp(flags, use_realuid, vpp)
+int lookup_vp(flags, use_realuid, vpp)
 int flags;
 int use_realuid;
 struct vnode **vpp;
@@ -132,7 +131,7 @@ struct vnode **vpp;
 /*===========================================================================*
  *				lookup_lastdir_rel			     *
  *===========================================================================*/
-PUBLIC int lookup_lastdir_rel(start_node, use_realuid, vpp)
+int lookup_lastdir_rel(start_node, use_realuid, vpp)
 struct vnode *start_node;
 int use_realuid;
 struct vnode **vpp;
@@ -208,7 +207,7 @@ struct vnode **vpp;
 /*===========================================================================*
  *				lookup_lastdir				     *
  *===========================================================================*/
-PUBLIC int lookup_lastdir(use_realuid, vpp)
+int lookup_lastdir(use_realuid, vpp)
 int use_realuid;
 struct vnode **vpp;
 {
@@ -234,7 +233,7 @@ struct vnode **vpp;
 /*===========================================================================*
  *				lookup_rel				     *
  *===========================================================================*/
-PRIVATE int lookup_rel(start_node, flags, use_realuid, node)
+static int lookup_rel(start_node, flags, use_realuid, node)
 struct vnode *start_node;
 int flags;
 int use_realuid;

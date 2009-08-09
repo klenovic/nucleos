@@ -381,7 +381,3 @@ void *alloc(size_t size)
 
 	return malloc(size);
 }
-
-/*
- * $PchId: inet_config.c,v 1.10 2003/08/21 09:26:02 philip Exp $
- */

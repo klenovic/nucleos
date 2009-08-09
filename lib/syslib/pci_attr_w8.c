@@ -18,7 +18,7 @@ pci_attr_w8.c
 /*===========================================================================*
  *				pci_attr_w8				     *
  *===========================================================================*/
-PUBLIC void pci_attr_w8(devind, port, value)
+void pci_attr_w8(devind, port, value)
 int devind;
 int port;
 u8_t value;

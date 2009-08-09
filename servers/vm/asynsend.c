@@ -33,10 +33,10 @@
 
 #define SENDSLOTS NR_PROCS
 
-PRIVATE asynmsg_t msgtable[SENDSLOTS];
-PRIVATE size_t msgtable_n= SENDSLOTS;
+static asynmsg_t msgtable[SENDSLOTS];
+static size_t msgtable_n= SENDSLOTS;
 
-PUBLIC int asynsend(dst, mp)
+int asynsend(dst, mp)
 endpoint_t dst;
 message *mp;
 {

@@ -95,8 +95,8 @@ struct priv {
  * indexing the psys_addr array, while accessing an element i requires a 
  * multiplication with sizeof(struct sys) to determine the address. 
  */
-EXTERN struct priv priv[NR_SYS_PROCS];		/* system properties table */
-EXTERN struct priv *ppriv_addr[NR_SYS_PROCS];	/* direct slot pointers */
+extern struct priv priv[];		/* system properties table */
+extern struct priv *ppriv_addr[];	/* direct slot pointers */
 
 /* Unprivileged user processes all share the same privilege structure.
  * This id must be fixed because it is used to check send mask entries.

@@ -21,15 +21,14 @@
 
 
 /* Declare some local functions. */
-FORWARD _PROTOTYPE(void init_server, (void)				);
-FORWARD _PROTOTYPE(void get_work, (message *m_in)			);
-
-FORWARD _PROTOTYPE(void cch_check, (void)				);
+static void init_server(void);
+static void get_work(message *m_in);
+static void cch_check(void);
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 /* This is the main routine of this service. The main loop consists of 
  * three major activities: getting new work, processing the work, and
@@ -99,7 +98,7 @@ PUBLIC int main(int argc, char *argv[])
 /*===========================================================================*
  *				init_server                                  *
  *===========================================================================*/
-PRIVATE void init_server(void)
+static void init_server(void)
 {
    int i;
 
@@ -123,7 +122,7 @@ PRIVATE void init_server(void)
 /*===========================================================================*
  *				get_work				     *
  *===========================================================================*/
-PRIVATE void get_work(m_in)
+static void get_work(m_in)
 message *m_in;				/* pointer to message */
 {
     int srcok = 0;
@@ -161,7 +160,7 @@ message *m_in;				/* pointer to message */
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PUBLIC void reply(who, m_out)
+void reply(who, m_out)
 int who;	
 message *m_out;                       	/* report result */
 {
@@ -169,7 +168,7 @@ message *m_out;                       	/* report result */
         printf("MFS(%d) was unable to send reply\n", SELF_E);
 }
 
-PRIVATE void cch_check(void) 
+static void cch_check(void) 
 {
   int i;
 

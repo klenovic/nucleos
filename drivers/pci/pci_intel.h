@@ -61,7 +61,3 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 /* PIIX extensions to the PIC */
 #define PIIX_ELCR1	0x4D0
 #define PIIX_ELCR2	0x4D1
-
-/*
- * $PchId: pci_intel.h,v 1.1 2000/08/12 11:20:17 philip Exp $
- */

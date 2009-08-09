@@ -22,7 +22,7 @@
 
 #include "queue.h"
 
-EXTERN struct MNX(inode) {
+extern struct MNX(inode) {
   MNX(mode_t) i_mode;    /* file type, protection, etc. */
   MNX(nlink_t) i_nlinks; /* how many links to this file */
   MNX(uid_t) i_uid;      /* user id of the file's owner */
@@ -55,13 +55,13 @@ EXTERN struct MNX(inode) {
 } MNX(inode)[NR_INODES];
 
 /* list of unused/free inodes */ 
-EXTERN TAILQ_HEAD(MNX(unused_inodes_t), MNX(inode))  unused_inodes;
+extern TAILQ_HEAD(MNX(unused_inodes_t), MNX(inode))  unused_inodes;
 
 /* inode hashtable */
-EXTERN LIST_HEAD(MNX(inodelist), MNX(inode))         hash_inodes[INODE_HASH_SIZE];
+extern LIST_HEAD(MNX(inodelist), MNX(inode))         hash_inodes[INODE_HASH_SIZE];
 
-EXTERN unsigned int inode_cache_hit;
-EXTERN unsigned int inode_cache_miss;
+extern unsigned int inode_cache_hit;
+extern unsigned int inode_cache_miss;
 
 #define NIL_INODE (struct MNX(inode) *) 0 /* indicates absence of inode slot */
 

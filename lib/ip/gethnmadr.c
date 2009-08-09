@@ -69,10 +69,9 @@ struct in_addr
 };
 union querybuf;
 
-extern int dn_skipname _ARGS(( const u_char *comp_dn, const u_char *eom ));
+extern int dn_skipname(const u_char *comp_dn, const u_char *eom);
 #define getshort _getshort
-static struct hostent *getanswer _ARGS(( union querybuf *answer, int anslen, 
-	int iquery ));
+static struct hostent *getanswer(union querybuf *answer, int anslen, int iquery);
 #define bcmp memcmp
 #define bcopy(s, d, l) memcpy(d, s, l)
 #endif /* _MINIX */
@@ -250,10 +249,10 @@ getanswer(answer, anslen, iquery)
 
 struct hostent *
 gethostbyname(name)
-	_CONST char *name;
+	const char *name;
 {
 	querybuf_t buf;
-	register _CONST char *cp;
+	register const char *cp;
 	int n;
 
 	/*

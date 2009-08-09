@@ -21,7 +21,7 @@
 #include <signal.h>
 #include <nucleos/com.h>
 
-EXTERN struct mproc {
+struct mproc {
 	char mp_exitstatus;	/* storage for status when process exits */
 	char mp_sigstatus;	/* storage for signal # for killed procs */
 	pid_t mp_pid;		/* process id */
@@ -70,7 +70,9 @@ EXTERN struct mproc {
 	signed int mp_nice;		/* nice is PRIO_MIN..PRIO_MAX, standard 0. */
 
 	char mp_name[PROC_NAME_LEN];	/* process name */
-} mproc[NR_PROCS];
+};
+
+extern struct mproc mproc[];
 
 /* Flag values */
 #define IN_USE		0x001	/* set when 'mproc' slot in use */

@@ -14,10 +14,10 @@
 #include <string.h>
 
 #if _ANSI
-PUBLIC int open(const char *name, int flags, ...)
+int open(const char *name, int flags, ...)
 #else
-PUBLIC int open(name, flags)
-_CONST char *name;
+int open(name, flags)
+const char *name;
 int flags;
 #endif
 {

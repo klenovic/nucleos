@@ -36,21 +36,21 @@
 
 /* Info about and entry points into the device dependent code. */
 struct driver {
-  _PROTOTYPE( char *(*dr_name), (void) );
-  _PROTOTYPE( int (*dr_open), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( int (*dr_close), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( int (*dr_ioctl), (struct driver *dp, message *m_ptr, int safe) );
-  _PROTOTYPE( struct device *(*dr_prepare), (int device) );
-  _PROTOTYPE( int (*dr_transfer), (int proc_nr, int opcode, u64_t position,
-				iovec_t *iov, unsigned nr_req, int safe) );
-  _PROTOTYPE( void (*dr_cleanup), (void) );
-  _PROTOTYPE( void (*dr_geometry), (struct partition *entry) );
-  _PROTOTYPE( void (*dr_signal), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( void (*dr_alarm), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( int (*dr_cancel), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( int (*dr_select), (struct driver *dp, message *m_ptr) );
-  _PROTOTYPE( int (*dr_other), (struct driver *dp, message *m_ptr, int safe) );
-  _PROTOTYPE( int (*dr_hw_int), (struct driver *dp, message *m_ptr) );
+  char *(*dr_name)(void);
+  int (*dr_open)(struct driver *dp, message *m_ptr);
+  int (*dr_close)(struct driver *dp, message *m_ptr);
+  int (*dr_ioctl)(struct driver *dp, message *m_ptr, int safe);
+  struct device *(*dr_prepare)(int device);
+  int (*dr_transfer)(int proc_nr, int opcode, u64_t position, iovec_t *iov, unsigned nr_req,
+		     int safe);
+  void (*dr_cleanup)(void);
+  void (*dr_geometry)(struct partition *entry);
+  void (*dr_signal)(struct driver *dp, message *m_ptr);
+  void (*dr_alarm)(struct driver *dp, message *m_ptr);
+  int (*dr_cancel)(struct driver *dp, message *m_ptr);
+  int (*dr_select)(struct driver *dp, message *m_ptr);
+  int (*dr_other)(struct driver *dp, message *m_ptr, int safe);
+  int (*dr_hw_int)(struct driver *dp, message *m_ptr);
 };
 
 /* Base and size of a partition in bytes. */
@@ -62,20 +62,20 @@ struct device {
 #define NIL_DEV		((struct device *) 0)
 
 /* Functions defined by driver.c: */
-_PROTOTYPE( void driver_task, (struct driver *dr) );
-_PROTOTYPE( char *no_name, (void) );
-_PROTOTYPE( int do_nop, (struct driver *dp, message *m_ptr) );
-_PROTOTYPE( struct device *nop_prepare, (int device) );
-_PROTOTYPE( void nop_cleanup, (void) );
-_PROTOTYPE( void nop_task, (void) );
-_PROTOTYPE( void nop_signal, (struct driver *dp, message *m_ptr) );
-_PROTOTYPE( void nop_alarm, (struct driver *dp, message *m_ptr) );
-_PROTOTYPE( int nop_cancel, (struct driver *dp, message *m_ptr) );
-_PROTOTYPE( int nop_select, (struct driver *dp, message *m_ptr) );
-_PROTOTYPE( int do_diocntl, (struct driver *dp, message *m_ptr, int safe) );
-_PROTOTYPE( int nop_ioctl, (struct driver *dp, message *m_ptr, int safe) );
-_PROTOTYPE( int mq_queue, (message *m_ptr) );
-_PROTOTYPE( void init_buffer, (void) );
+void driver_task(struct driver *dr);
+char *no_name(void);
+int do_nop(struct driver *dp, message *m_ptr);
+struct device *nop_prepare(int device);
+void nop_cleanup(void);
+void nop_task(void);
+void nop_signal(struct driver *dp, message *m_ptr);
+void nop_alarm(struct driver *dp, message *m_ptr);
+int nop_cancel(struct driver *dp, message *m_ptr);
+int nop_select(struct driver *dp, message *m_ptr);
+int do_diocntl(struct driver *dp, message *m_ptr, int safe);
+int nop_ioctl(struct driver *dp, message *m_ptr, int safe);
+int mq_queue(message *m_ptr);
+void init_buffer(void);
 
 /* Parameters for the disk drive. */
 #define SECTOR_SIZE      512	/* physical sector size in bytes */

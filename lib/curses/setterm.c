@@ -10,7 +10,7 @@
 #include <curses.h>
 #include "curspriv.h"
 
-_PROTOTYPE( static void ttysetflags, (void) );
+static void ttysetflags(void);
 
 static void ttysetflags()
 {

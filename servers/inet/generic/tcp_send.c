@@ -28,11 +28,11 @@ Copyright 1995 Philip Homburg
 
 THIS_FILE
 
-FORWARD acc_t *make_pack ARGS(( tcp_conn_t *tcp_conn ));
-FORWARD void tcp_send_timeout ARGS(( int conn, struct timer *timer ));
-FORWARD void do_snd_event ARGS(( event_t *ev, ev_arg_t arg ));
+static acc_t *make_pack(tcp_conn_t *tcp_conn);
+static void tcp_send_timeout(int conn, struct timer *timer);
+static void do_snd_event(event_t *ev, ev_arg_t arg);
 
-PUBLIC void tcp_conn_write (tcp_conn, enq)
+void tcp_conn_write (tcp_conn, enq)
 tcp_conn_t *tcp_conn;
 int enq;				/* Writes need to be enqueued. */
 {
@@ -78,7 +78,7 @@ int enq;				/* Writes need to be enqueued. */
 	}
 }
 
-PRIVATE void do_snd_event(ev, arg)
+static void do_snd_event(ev, arg)
 event_t *ev;
 ev_arg_t arg;
 {
@@ -90,7 +90,7 @@ ev_arg_t arg;
 	tcp_port_write(tcp_port);
 }
 
-PUBLIC void tcp_port_write(tcp_port)
+void tcp_port_write(tcp_port)
 tcp_port_t *tcp_port;
 {
 	tcp_conn_t *tcp_conn;
@@ -166,7 +166,7 @@ tcp_port_t *tcp_port;
 	}
 }
 
-PRIVATE acc_t *make_pack(tcp_conn)
+static acc_t *make_pack(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	acc_t *pack2write, *tmp_pack, *tcp_pack;
@@ -536,7 +536,7 @@ after_data:
 tcp_release_retrans
 */
 
-PUBLIC void tcp_release_retrans(tcp_conn, seg_ack, new_win)
+void tcp_release_retrans(tcp_conn, seg_ack, new_win)
 tcp_conn_t *tcp_conn;
 u32_t seg_ack;
 u16_t new_win;
@@ -769,7 +769,7 @@ u16_t new_win;
 tcp_fast_retrans
 */
 
-PUBLIC void tcp_fast_retrans(tcp_conn)
+void tcp_fast_retrans(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	u16_t mss, mss2;
@@ -800,7 +800,7 @@ tcp_conn_t *tcp_conn;
 }
 
 #if 0
-PUBLIC void do_tcp_timeout(tcp_conn)
+void do_tcp_timeout(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	tcp_send_timeout(tcp_conn-tcp_conn_table,
@@ -812,7 +812,7 @@ tcp_conn_t *tcp_conn;
 tcp_send_timeout
 */
 
-PRIVATE void tcp_send_timeout(conn, timer)
+static void tcp_send_timeout(conn, timer)
 int conn;
 struct timer *timer;
 {
@@ -1063,7 +1063,7 @@ struct timer *timer;
 }
 
 
-PUBLIC void tcp_fd_write(tcp_conn)
+void tcp_fd_write(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	tcp_fd_t *tcp_fd;
@@ -1185,7 +1185,7 @@ tcp_conn_t *tcp_conn;
 	}
 }
 
-PUBLIC unsigned tcp_sel_write(tcp_conn)
+unsigned tcp_sel_write(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	tcp_fd_t *tcp_fd;
@@ -1225,7 +1225,7 @@ tcp_conn_t *tcp_conn;
 	return 0;
 }
 
-PUBLIC void
+void
 tcp_rsel_write(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
@@ -1246,7 +1246,7 @@ tcp_conn_t *tcp_conn;
 tcp_shutdown
 */
 
-PUBLIC void tcp_shutdown(tcp_conn)
+void tcp_shutdown(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	switch (tcp_conn->tc_state)
@@ -1275,7 +1275,7 @@ tcp_conn_t *tcp_conn;
 	tcp_set_send_timer(tcp_conn);
 }
 
-PUBLIC void tcp_set_send_timer(tcp_conn)
+void tcp_set_send_timer(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	clock_t curr_time;
@@ -1303,7 +1303,7 @@ tcp_close_connection
 
 */
 
-PUBLIC void tcp_close_connection(tcp_conn, error)
+void tcp_close_connection(tcp_conn, error)
 tcp_conn_t *tcp_conn;
 int error;
 {
@@ -1446,7 +1446,3 @@ int error;
 	tcp_conn->tc_flags &= TCF_INUSE;
 	assert (tcp_check_conn(tcp_conn));
 }
-
-/*
- * $PchId: tcp_send.c,v 1.32 2005/06/28 14:21:52 philip Exp $
- */

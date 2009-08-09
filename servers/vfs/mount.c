@@ -37,16 +37,18 @@
 #include "vnode.h"
 #include "vmnt.h"
 
-/* Allow the root to be replaced before the first 'real' mount. */
-PRIVATE int allow_newroot = 1;
+struct vnode vnode[NR_VNODES];
 
-FORWARD _PROTOTYPE( dev_t name_to_dev, (void)                           );
-FORWARD _PROTOTYPE( int mount_fs, (endpoint_t fs_e)                     );
+/* Allow the root to be replaced before the first 'real' mount. */
+static int allow_newroot = 1;
+
+static dev_t name_to_dev(void);
+static int mount_fs(endpoint_t fs_e);
 
 /*===========================================================================*
  *                              do_fslogin                                   *
  *===========================================================================*/
-PUBLIC int do_fslogin()
+int do_fslogin()
 {
   /* Login before mount request */
   if ((unsigned long)mount_m_in.m1_p3 != who_e) {
@@ -76,7 +78,7 @@ PUBLIC int do_fslogin()
 /*===========================================================================*
  *                              do_mount                                     *
  *===========================================================================*/
-PUBLIC int do_mount()
+int do_mount()
 {
   endpoint_t fs_e; 
 
@@ -102,7 +104,7 @@ PUBLIC int do_mount()
 /*===========================================================================*
  *                              mount                                        *
  *===========================================================================*/
-PRIVATE int mount_fs(endpoint_t fs_e)
+static int mount_fs(endpoint_t fs_e)
 {
 /* Perform the mount(name, mfile, rd_only) system call. */
   int rdir, mdir;               /* TRUE iff {root|mount} file is dir */
@@ -387,7 +389,7 @@ PRIVATE int mount_fs(endpoint_t fs_e)
 /*===========================================================================*
  *                              do_umount                                    *
  *===========================================================================*/
-PUBLIC int do_umount()
+int do_umount()
 {
 /* Perform the umount(name) system call. */
   dev_t dev;
@@ -410,7 +412,7 @@ PUBLIC int do_umount()
 /*===========================================================================*
  *                              unmount                                      *
  *===========================================================================*/
-PUBLIC int unmount(dev)
+int unmount(dev)
 Dev_t dev;
 {
   struct vnode *vp, *vi;
@@ -548,7 +550,7 @@ Dev_t dev;
 /*===========================================================================*
  *                              name_to_dev                                  *
  *===========================================================================*/
-PRIVATE dev_t name_to_dev()
+static dev_t name_to_dev()
 {
 /* Convert the block special file 'path' to a device number.  If 'path'
  * is not a block special file, return error code in 'err_code'. */

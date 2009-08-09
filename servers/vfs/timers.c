@@ -15,9 +15,9 @@
 #include <nucleos/syslib.h>
 #include <nucleos/com.h>
 
-PRIVATE timer_t *fs_timers = NULL;
+static timer_t *fs_timers = NULL;
 
-PUBLIC void fs_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
+void fs_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 {
 	int r;
 	clock_t now, old_head = 0, new_head;
@@ -39,7 +39,7 @@ PUBLIC void fs_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 	return;
 }
 
-PUBLIC void fs_expire_timers(clock_t now)
+void fs_expire_timers(clock_t now)
 {
 	clock_t new_head;
 	tmrs_exptimers(&fs_timers, now, &new_head);
@@ -50,12 +50,12 @@ PUBLIC void fs_expire_timers(clock_t now)
 	}
 }
 
-PUBLIC void fs_init_timer(timer_t *tp)
+void fs_init_timer(timer_t *tp)
 {
 	tmr_inittimer(tp);
 }
 
-PUBLIC void fs_cancel_timer(timer_t *tp)
+void fs_cancel_timer(timer_t *tp)
 {
 	clock_t new_head, old_head;
 	old_head = tmrs_clrtimer(&fs_timers, tp, &new_head);

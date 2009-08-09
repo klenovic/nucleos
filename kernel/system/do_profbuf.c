@@ -23,7 +23,7 @@
 /*===========================================================================*
  *				do_profbuf				     *
  *===========================================================================*/
-PUBLIC int do_profbuf(m_ptr)
+int do_profbuf(m_ptr)
 register message *m_ptr;    /* pointer to request message */
 {
 /* This kernel call is used by profiled system processes when Call

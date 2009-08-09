@@ -20,12 +20,12 @@
 
 #if USE_EXIT
 
-FORWARD _PROTOTYPE( void clear_proc, (register struct proc *rc));
+static void clear_proc(register struct proc *rc);
 
 /*===========================================================================*
  *				do_exit					     *
  *===========================================================================*/
-PUBLIC int do_exit(m_ptr)
+int do_exit(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_exit. A user process has exited or a system process requests 
@@ -54,7 +54,7 @@ message *m_ptr;			/* pointer to request message */
 /*===========================================================================*
  *			         clear_proc				     *
  *===========================================================================*/
-PRIVATE void clear_proc(rc)
+static void clear_proc(rc)
 register struct proc *rc;		/* slot of process to clean up */
 {
   register struct proc *rp;		/* iterate over process table */

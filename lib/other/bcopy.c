@@ -13,7 +13,7 @@
 #include <string.h>
 
 void bcopy(src, dst, length)
-_CONST void *src;
+const void *src;
 void *dst;
 size_t length;
 {

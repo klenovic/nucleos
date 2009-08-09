@@ -84,7 +84,3 @@ endhostent()
 	_res.options &= ~(RES_STAYOPEN | RES_USEVC);
 	_res_close();
 }
-
-/*
- * $PchId: sethostent.c,v 1.2 2000/04/01 18:27:16 philip Exp $
- */

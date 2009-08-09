@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_cprof				     *
  *===========================================================================*/
-PUBLIC int sys_cprof(action, size, endpt, ctl_ptr, mem_ptr)
+int sys_cprof(action, size, endpt, ctl_ptr, mem_ptr)
 int action; 				/* get/reset profiling tables */
 int size;				/* size of allocated memory */
 int endpt;				/* caller endpoint */

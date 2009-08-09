@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <time.h>
 
-PUBLIC int getgroups(gidsetsize, grouplist)
+int getgroups(gidsetsize, grouplist)
 int gidsetsize;
 gid_t grouplist[];
 {

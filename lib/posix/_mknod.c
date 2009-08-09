@@ -13,8 +13,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-PUBLIC int mknod(name, mode, dev)
-_CONST char *name;
+int mknod(name, mode, dev)
+const char *name;
 _mnx_Mode_t mode;
 Dev_t dev;
 {

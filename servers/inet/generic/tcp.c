@@ -31,53 +31,46 @@ THIS_FILE
 
 #define NOT_IMPLEMENTED 0
 
-PUBLIC tcp_port_t *tcp_port_table;
-PUBLIC tcp_fd_t tcp_fd_table[TCP_FD_NR];
-PUBLIC tcp_conn_t tcp_conn_table[TCP_CONN_NR];
-PUBLIC sr_cancel_t tcp_cancel_f;
+tcp_port_t *tcp_port_table;
+tcp_fd_t tcp_fd_table[TCP_FD_NR];
+tcp_conn_t tcp_conn_table[TCP_CONN_NR];
+sr_cancel_t tcp_cancel_f;
 
-FORWARD void tcp_main ARGS(( tcp_port_t *port ));
-FORWARD int tcp_select ARGS(( int fd, unsigned operations ));
-FORWARD acc_t *tcp_get_data ARGS(( int fd, size_t offset,
-	size_t count, int for_ioctl ));
-FORWARD int tcp_put_data ARGS(( int fd, size_t offset,
-	acc_t *data, int for_ioctl ));
-FORWARD void tcp_put_pkt ARGS(( int fd, acc_t *data, size_t datalen ));
-FORWARD void read_ip_packets ARGS(( tcp_port_t *port ));
-FORWARD int tcp_setconf ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD int tcp_setopt ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD int tcp_connect ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD int tcp_listen ARGS(( tcp_fd_t *tcp_fd, int do_listenq ));
-FORWARD int tcp_acceptto ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD tcpport_t find_unused_port ARGS(( int fd ));
-FORWARD int is_unused_port ARGS(( Tcpport_t port ));
-FORWARD int reply_thr_put ARGS(( tcp_fd_t *tcp_fd, int reply,
-	int for_ioctl ));
-FORWARD void reply_thr_get ARGS(( tcp_fd_t *tcp_fd, int reply,
-	int for_ioctl ));
-FORWARD tcp_conn_t *find_conn_entry ARGS(( Tcpport_t locport,
-	ipaddr_t locaddr, Tcpport_t remport, ipaddr_t readaddr ));
-FORWARD tcp_conn_t *find_empty_conn ARGS(( void ));
-FORWARD tcp_conn_t *find_best_conn ARGS(( ip_hdr_t *ip_hdr, 
-	tcp_hdr_t *tcp_hdr ));
-FORWARD tcp_conn_t *new_conn_for_queue ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD int maybe_listen ARGS(( ipaddr_t locaddr, Tcpport_t locport,
-				ipaddr_t remaddr, Tcpport_t remport ));
-FORWARD int tcp_su4connect ARGS(( tcp_fd_t *tcp_fd ));
-FORWARD void tcp_buffree ARGS(( int priority ));
+static void tcp_main(tcp_port_t *port);
+static int tcp_select(int fd, unsigned operations);
+static acc_t *tcp_get_data(int fd, size_t offset, size_t count, int for_ioctl);
+static int tcp_put_data(int fd, size_t offset, acc_t *data, int for_ioctl);
+static void tcp_put_pkt(int fd, acc_t *data, size_t datalen);
+static void read_ip_packets(tcp_port_t *port);
+static int tcp_setconf(tcp_fd_t *tcp_fd);
+static int tcp_setopt(tcp_fd_t *tcp_fd);
+static int tcp_connect(tcp_fd_t *tcp_fd);
+static int tcp_listen(tcp_fd_t *tcp_fd, int do_listenq);
+static int tcp_acceptto(tcp_fd_t *tcp_fd);
+static tcpport_t find_unused_port(int fd);
+static int is_unused_port(Tcpport_t port);
+static int reply_thr_put(tcp_fd_t *tcp_fd, int reply, int for_ioctl);
+static void reply_thr_get(tcp_fd_t *tcp_fd, int reply, int for_ioctl);
+static tcp_conn_t *find_conn_entry(Tcpport_t locport, ipaddr_t locaddr, Tcpport_t remport,
+				   ipaddr_t readaddr);
+static tcp_conn_t *find_empty_conn(void);
+static tcp_conn_t *find_best_conn(ip_hdr_t *ip_hdr, tcp_hdr_t *tcp_hdr);
+static tcp_conn_t *new_conn_for_queue(tcp_fd_t *tcp_fd);
+static int maybe_listen(ipaddr_t locaddr, Tcpport_t locport, ipaddr_t remaddr, Tcpport_t remport);
+static int tcp_su4connect(tcp_fd_t *tcp_fd);
+static void tcp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK
-FORWARD void tcp_bufcheck ARGS(( void ));
+static void tcp_bufcheck(void);
 #endif
-FORWARD void tcp_setup_conn ARGS(( tcp_port_t *tcp_port,
-					tcp_conn_t *tcp_conn ));
-FORWARD u32_t tcp_rand32 ARGS(( void ));
+static void tcp_setup_conn(tcp_port_t *tcp_port, tcp_conn_t *tcp_conn);
+static u32_t tcp_rand32(void);
 
-PUBLIC void tcp_prep()
+void tcp_prep()
 {
 	tcp_port_table= alloc(tcp_conf_nr * sizeof(tcp_port_table[0]));
 }
 
-PUBLIC void tcp_init()
+void tcp_init()
 {
 	int i, j, k, ifno;
 	tcp_fd_t *tcp_fd;
@@ -135,7 +128,7 @@ PUBLIC void tcp_init()
 	tcp_cancel_f= tcp_cancel;
 }
 
-PRIVATE void tcp_main(tcp_port)
+static void tcp_main(tcp_port)
 tcp_port_t *tcp_port;
 {
 	int result, i;
@@ -256,7 +249,7 @@ tcp_port_t *tcp_port;
 	}
 }
 
-PRIVATE int tcp_select(fd, operations)
+static int tcp_select(fd, operations)
 int fd;
 unsigned operations;
 {
@@ -352,7 +345,7 @@ unsigned operations;
 	return resops;
 }
 
-PRIVATE acc_t *tcp_get_data (port, offset, count, for_ioctl)
+static acc_t *tcp_get_data (port, offset, count, for_ioctl)
 int port;
 size_t offset;
 size_t count;
@@ -444,7 +437,7 @@ assert (count == sizeof(struct nwio_ipopt));
 	return NW_OK;
 }
 
-PRIVATE int tcp_put_data (fd, offset, data, for_ioctl)
+static int tcp_put_data (fd, offset, data, for_ioctl)
 int fd;
 size_t offset;
 acc_t *data;
@@ -521,7 +514,7 @@ assert (ipconf->nwic_flags & NWIC_IPADDR_SET);
 tcp_put_pkt
 */
 
-PRIVATE void tcp_put_pkt(fd, data, datalen)
+static void tcp_put_pkt(fd, data, datalen)
 int fd;
 acc_t *data;
 size_t datalen;
@@ -719,7 +712,7 @@ size_t datalen;
 }
 
 
-PUBLIC int tcp_open (port, srfd, get_userdata, put_userdata, put_pkt,
+int tcp_open (port, srfd, get_userdata, put_userdata, put_pkt,
 	select_res)
 int port;
 int srfd;
@@ -763,7 +756,7 @@ select_res_t select_res;
 /*
 tcp_ioctl
 */
-PUBLIC int tcp_ioctl (fd, req)
+int tcp_ioctl (fd, req)
 int fd;
 ioreq_t req;
 {
@@ -978,7 +971,7 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 tcp_setconf
 */
 
-PRIVATE int tcp_setconf(tcp_fd)
+static int tcp_setconf(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	nwio_tcpconf_t *tcpconf;
@@ -1169,7 +1162,7 @@ assert (new_di_flags & NWTC_REMPORT_MASK);
 tcp_setopt
 */
 
-PRIVATE int tcp_setopt(tcp_fd)
+static int tcp_setopt(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	nwio_tcpopt_t *tcpopt;
@@ -1285,7 +1278,7 @@ assert (data->acc_length == sizeof(nwio_tcpopt_t));
 }
 
 
-PRIVATE tcpport_t find_unused_port(fd)
+static tcpport_t find_unused_port(fd)
 int fd;
 {
 	tcpport_t port, nw_port;
@@ -1306,7 +1299,7 @@ int fd;
 	return 0;
 }
 
-PRIVATE int is_unused_port(port)
+static int is_unused_port(port)
 tcpport_t port;
 {
 	int i;
@@ -1333,7 +1326,7 @@ tcpport_t port;
 	return TRUE;
 }
 
-PRIVATE int reply_thr_put(tcp_fd, reply, for_ioctl)
+static int reply_thr_put(tcp_fd, reply, for_ioctl)
 tcp_fd_t *tcp_fd;
 int reply;
 int for_ioctl;
@@ -1344,7 +1337,7 @@ int for_ioctl;
 		(acc_t *)0, for_ioctl);
 }
 
-PRIVATE void reply_thr_get(tcp_fd, reply, for_ioctl)
+static void reply_thr_get(tcp_fd, reply, for_ioctl)
 tcp_fd_t *tcp_fd;
 int reply;
 int for_ioctl;
@@ -1356,7 +1349,7 @@ int for_ioctl;
 	assert (!result);
 }
 
-PUBLIC int tcp_su4listen(tcp_fd, tcp_conn, do_listenq)
+int tcp_su4listen(tcp_fd, tcp_conn, do_listenq)
 tcp_fd_t *tcp_fd;
 tcp_conn_t *tcp_conn;
 int do_listenq;
@@ -1395,7 +1388,7 @@ This includes connections that are never used, and connections without a
 user that are not used for a while.
 */
 
-PRIVATE tcp_conn_t *find_empty_conn()
+static tcp_conn_t *find_empty_conn()
 {
 	int i;
 	tcp_conn_t *tcp_conn;
@@ -1435,7 +1428,7 @@ If no such connection exists NULL is returned.
 If a connection exists without mainuser it is closed.
 */
 
-PRIVATE tcp_conn_t *find_conn_entry(locport, locaddr, remport, remaddr)
+static tcp_conn_t *find_conn_entry(locport, locaddr, remport, remaddr)
 tcpport_t locport;
 ipaddr_t locaddr;
 tcpport_t remport;
@@ -1470,7 +1463,7 @@ ipaddr_t remaddr;
 	return NULL;
 }
 
-PRIVATE void read_ip_packets(tcp_port)
+static void read_ip_packets(tcp_port)
 tcp_port_t *tcp_port;
 {
 	int result;
@@ -1493,7 +1486,7 @@ tcp_port_t *tcp_port;
 find_best_conn
 */
 
-PRIVATE tcp_conn_t *find_best_conn(ip_hdr, tcp_hdr)
+static tcp_conn_t *find_best_conn(ip_hdr, tcp_hdr)
 ip_hdr_t *ip_hdr;
 tcp_hdr_t *tcp_hdr;
 {
@@ -1661,7 +1654,7 @@ tcp_hdr_t *tcp_hdr;
 /*
 new_conn_for_queue
 */
-PRIVATE tcp_conn_t *new_conn_for_queue(tcp_fd)
+static tcp_conn_t *new_conn_for_queue(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	int i;
@@ -1688,7 +1681,7 @@ tcp_fd_t *tcp_fd;
 /*
 maybe_listen
 */
-PRIVATE int maybe_listen(locaddr, locport, remaddr, remport)
+static int maybe_listen(locaddr, locport, remaddr, remport)
 ipaddr_t locaddr;
 tcpport_t locport;
 ipaddr_t remaddr;
@@ -1736,7 +1729,7 @@ tcpport_t remport;
 }
 
 
-PUBLIC void tcp_reply_ioctl(tcp_fd, reply)
+void tcp_reply_ioctl(tcp_fd, reply)
 tcp_fd_t *tcp_fd;
 int reply;
 {
@@ -1751,7 +1744,7 @@ int reply;
 	reply_thr_get (tcp_fd, reply, TRUE);
 }
 
-PUBLIC void tcp_reply_write(tcp_fd, reply)
+void tcp_reply_write(tcp_fd, reply)
 tcp_fd_t *tcp_fd;
 size_t reply;
 {
@@ -1761,7 +1754,7 @@ size_t reply;
 	reply_thr_get (tcp_fd, reply, FALSE);
 }
 
-PUBLIC void tcp_reply_read(tcp_fd, reply)
+void tcp_reply_read(tcp_fd, reply)
 tcp_fd_t *tcp_fd;
 size_t reply;
 {
@@ -1771,7 +1764,7 @@ size_t reply;
 	reply_thr_put (tcp_fd, reply, FALSE);
 }
 
-PUBLIC int tcp_write(fd, count)
+int tcp_write(fd, count)
 int fd;
 size_t count;
 {
@@ -1824,7 +1817,7 @@ size_t count;
 		return NW_SUSPEND;
 }
 
-PUBLIC int
+int
 tcp_read(fd, count)
 int fd;
 size_t count;
@@ -1864,7 +1857,7 @@ reply the success or failure of a connect to the user.
 */
 
 
-PUBLIC void tcp_restart_connect(tcp_conn)
+void tcp_restart_connect(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	tcp_fd_t *tcp_fd;
@@ -1938,7 +1931,7 @@ tcp_conn_t *tcp_conn;
 tcp_close
 */
 
-PUBLIC void tcp_close(fd)
+void tcp_close(fd)
 int fd;
 {
 	int i;
@@ -2035,7 +2028,7 @@ int fd;
 		tcp_close_connection(tcp_conn, ENOTCONN);
 }
 
-PUBLIC int tcp_cancel(fd, which_operation)
+int tcp_cancel(fd, which_operation)
 int fd;
 int which_operation;
 {
@@ -2114,7 +2107,7 @@ assert (tcp_fd->tf_flags & TFF_IOCTL_IP);
 tcp_connect
 */
 
-PRIVATE int tcp_connect(tcp_fd)
+static int tcp_connect(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	tcp_conn_t *tcp_conn;
@@ -2198,7 +2191,7 @@ tcp_fd_t *tcp_fd;
 tcp_su4connect
 */
 
-PRIVATE int tcp_su4connect(tcp_fd)
+static int tcp_su4connect(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	tcp_conn_t *tcp_conn;
@@ -2237,7 +2230,7 @@ tcp_fd_t *tcp_fd;
 tcp_listen
 */
 
-PRIVATE int tcp_listen(tcp_fd, do_listenq)
+static int tcp_listen(tcp_fd, do_listenq)
 tcp_fd_t *tcp_fd;
 int do_listenq;
 {
@@ -2290,7 +2283,7 @@ int do_listenq;
 tcp_acceptto
 */
 
-PRIVATE int tcp_acceptto(tcp_fd)
+static int tcp_acceptto(tcp_fd)
 tcp_fd_t *tcp_fd;
 {
 	int i, dst_nr;
@@ -2363,7 +2356,7 @@ tcp_fd_t *tcp_fd;
 }
 
 
-PRIVATE void tcp_buffree (priority)
+static void tcp_buffree (priority)
 int priority;
 {
 	int i;
@@ -2446,7 +2439,7 @@ int priority;
 }
 
 #ifdef BUF_CONSISTENCY_CHECK
-PRIVATE void tcp_bufcheck()
+static void tcp_bufcheck()
 {
 	int i;
 	tcp_conn_t *tcp_conn;
@@ -2476,7 +2469,7 @@ PRIVATE void tcp_bufcheck()
 }
 #endif
 
-PUBLIC void tcp_notreach(tcp_conn)
+void tcp_notreach(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	int new_ttl;
@@ -2502,7 +2495,7 @@ tcp_conn_t *tcp_conn;
 	tcp_conn_write(tcp_conn, 1);
 }
 
-FORWARD u32_t mtu_table[]=
+static u32_t mtu_table[]=
 {	/* From RFC-1191 */
 /*	Plateau    MTU    Comments                      Reference	*/
 /*	------     ---    --------                      ---------	*/
@@ -2540,7 +2533,7 @@ FORWARD u32_t mtu_table[]=
 	0,        /*     End of list					*/
 };
 
-PUBLIC void tcp_mtu_exceeded(tcp_conn)
+void tcp_mtu_exceeded(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	u16_t mtu;
@@ -2605,7 +2598,7 @@ tcp_conn_t *tcp_conn;
 	tcp_conn_write(tcp_conn, 1);
 }
 
-PUBLIC void tcp_mtu_incr(tcp_conn)
+void tcp_mtu_incr(tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 	clock_t curr_time;
@@ -2642,7 +2635,7 @@ tcp_conn_t *tcp_conn;
 tcp_setup_conn
 */
 
-PRIVATE void tcp_setup_conn(tcp_port, tcp_conn)
+static void tcp_setup_conn(tcp_port, tcp_conn)
 tcp_port_t *tcp_port;
 tcp_conn_t *tcp_conn;
 {
@@ -2719,14 +2712,10 @@ tcp_conn_t *tcp_conn;
 	tcp_conn->tc_transmit_seq= 0;
 }
 
-PRIVATE u32_t tcp_rand32()
+static u32_t tcp_rand32()
 {
 	u8_t bits[RAND256_BUFSIZE];
 
 	rand256(bits);
 	return bits[0] | (bits[1] << 8) | (bits[2] << 16) | (bits[3] << 24);
 }
-
-/*
- * $PchId: tcp.c,v 1.34 2005/06/28 14:20:27 philip Exp $
- */

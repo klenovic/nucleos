@@ -93,7 +93,3 @@ char *dest;
   }
   *dst++ = '\0';
 }
-
-/*
- * $PchId: regsub.c,v 1.3 1995/11/27 20:18:16 philip Exp $
- */

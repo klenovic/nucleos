@@ -11,7 +11,7 @@
 
 #define sprofile _sprofile
 
-PUBLIC int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
+int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
 {
   message m;
 

@@ -46,7 +46,7 @@ static struct servent serv;
 static char *serv_aliases[MAXALIASES];
 int _serv_stayopen;
 
-static char *any _ARGS(( char *cp, char *match ));
+static char *any(char *cp, char *match);
 
 void
 setservent(f)

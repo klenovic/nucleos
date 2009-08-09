@@ -42,11 +42,6 @@
 #define ROOT_INO ((MNX(ino_t)) 1)	/* Inode nr of root dir. */
 #define IM_NAME_MAX       63
 
-/* Variables */
-#ifndef EXTERN
-#define EXTERN extern
-#endif
-
 typedef struct vector {
   MNX(u16_t) offset;
   MNX(u16_t) segment;
@@ -58,11 +53,11 @@ struct MNX(image_header) {
 };
 
 #if 0
-EXTERN vector rem_part;		/* boot partition table entry */
-EXTERN u16_t cseg, dseg;	/* code and data segment of the boot program */
-EXTERN u32_t runsize;		/* size of this program */
-EXTERN u16_t device;		/* drive being booted from */
-EXTERN u16_t heads, sectors;	/* the drive's number of heads and sectors */
+extern vector rem_part;		/* boot partition table entry */
+extern u16_t cseg, dseg;	/* code and data segment of the boot program */
+extern u32_t runsize;		/* size of this program */
+extern u16_t device;		/* drive being booted from */
+extern u16_t heads, sectors;	/* the drive's number of heads and sectors */
 extern u16_t eqscancode;	/* Set by peek/getch() if they see a '=' */
 
 /* Sticky attributes */
@@ -85,56 +80,55 @@ typedef struct environment {
 } environment;
 
 /* External variables */
-EXTERN environment *env;	/* Lists the environment */
-EXTERN int fsok;		/* True if the boot device contains an FS */
-EXTERN u32_t lowsec;		/* Offset to the file system on the boot dev */
+extern environment *env;	/* Lists the environment */
+extern int fsok;		/* True if the boot device contains an FS */
+extern u32_t lowsec;		/* Offset to the file system on the boot dev */
 
 /* Prototypes */
-_PROTOTYPE( off_t r_super, (void));
-_PROTOTYPE( void r_stat, (Ino_t _inum, struct stat *_stp ));
-_PROTOTYPE( ino_t r_readdir, (char *_name ));
-_PROTOTYPE( off_t r_vir2abs, (off_t _virblk ));
-_PROTOTYPE( ino_t r_lookup, (Ino_t _cwd, char *_path ));
+off_t r_super(void);
+void r_stat(Ino_t _inum, struct stat *_stp);
+ino_t r_readdir(char *_name);
+off_t r_vir2abs(off_t _virblk);
+ino_t r_lookup(Ino_t _cwd, char *_path);
 
 #ifdef _MONHEAD
-_PROTOTYPE( void readerr, (off_t _sec, int _err ));
-_PROTOTYPE( int numprefix, (char *_s, char **_ps ));
-_PROTOTYPE( int numeric, (char *_s ));
-_PROTOTYPE( dev_t name2dev, (char *_name ));
-_PROTOTYPE( int delay, (char *_msec ));
-_PROTOTYPE( char *unix_err, (int _err ));
-_PROTOTYPE( void init_cache, (void));
-_PROTOTYPE( void invalidate_cache, (void));
-_PROTOTYPE( char *b_value, (char *_name ));
-_PROTOTYPE( void raw_copy, (int _doff, int _dseg, int _soff, int _sseg,
-						int _count));
-_PROTOTYPE( void raw_clear, (int _off, int _seg, int _count));
-_PROTOTYPE( void bootstrap, (int _device, int _partoff, int _partseg));
+void readerr(off_t _sec, int _err);
+int numprefix(char *_s, char **_ps);
+int numeric(char *_s);
+dev_t name2dev(char *_name);
+int delay(char *_msec);
+char *unix_err(int _err);
+void init_cache(void);
+void invalidate_cache(void);
+char *b_value(char *_name);
+void raw_copy(int _doff, int _dseg, int _soff, int _sseg, int _count);
+void raw_clear(int _off, int _seg, int _count);
+void bootstrap(int _device, int _partoff, int _partseg);
 
-_PROTOTYPE( long a2l, (char *_a ));
-_PROTOTYPE( char *ul2a, (u32_t _n ));
-_PROTOTYPE( char *u2a, (int _n1 ));
+long a2l(char *_a);
+char *ul2a(u32_t _n);
+char *u2a(int _n1);
 
 /* Functions defined in monhead.s and usable by other files. */
-_PROTOTYPE( void reset_video, (int color));
-_PROTOTYPE( int dev_geometry, (void));
-_PROTOTYPE( u16_t get_ext_memsize, (void));
-_PROTOTYPE( u16_t get_low_memsize, (void));
-_PROTOTYPE( u16_t get_processor, (void));
-_PROTOTYPE( u32_t get_tick, (void));
-_PROTOTYPE( u16_t get_video, (void));
-_PROTOTYPE( u16_t get_word, (int _off, int _seg));
-_PROTOTYPE( int getchar, (void));
-_PROTOTYPE( void minix, (void));
-_PROTOTYPE( void minix86, (int _kcs, int _kds, char *_bpar, int _psize));
-_PROTOTYPE( void minix386, (int _kcs, int _kds, char *_bpar, int _psize));
-_PROTOTYPE( int peekchar, (void));
-_PROTOTYPE( void put_word, (int _off, int _seg, int _word));
-_PROTOTYPE( int putchar, (char _c));
-_PROTOTYPE( int readsectors, (int _off, int _seg, off_t _adr, int _ct));
-_PROTOTYPE( void reboot, (void));
-_PROTOTYPE( void relocate, (void));
-_PROTOTYPE( int writesectors, (int _off, int _seg, off_t _adr, int _ct));
+void reset_video(int color);
+int dev_geometry(void);
+u16_t get_ext_memsize(void);
+u16_t get_low_memsize(void);
+u16_t get_processor(void);
+u32_t get_tick(void);
+u16_t get_video(void);
+u16_t get_word(int _off, int _seg);
+int getchar(void);
+void minix(void);
+void minix86(int _kcs, int _kds, char *_bpar, int _psize);
+void minix386(int _kcs, int _kds, char *_bpar, int _psize);
+int peekchar(void);
+void put_word(int _off, int _seg, int _word);
+int putchar(char _c);
+int readsectors(int _off, int _seg, off_t _adr, int _ct);
+void reboot(void);
+void relocate(void);
+int writesectors(int _off, int _seg, off_t _adr, int _ct);
 #endif
 
 #endif /* 0 */

@@ -27,7 +27,7 @@ struct reg86u reg86;
 /*===========================================================================*
  *				do_int86					     *
  *===========================================================================*/
-PUBLIC int do_int86(m_ptr)
+int do_int86(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   data_copy(who_e, (vir_bytes) m_ptr->INT86_REG86,

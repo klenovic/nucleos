@@ -21,14 +21,13 @@
 #include <nucleos/vfsif.h>
 
 
-FORWARD _PROTOTYPE( int stat_inode, (struct inode *rip, int pipe_pos,
-			int who_e, cp_grant_id_t gid)			);
+static int stat_inode(struct inode *rip, int pipe_pos, int who_e, cp_grant_id_t gid);
 
 
 /*===========================================================================*
  *				stat_inode				     *
  *===========================================================================*/
-PRIVATE int stat_inode(rip, pipe_pos, who_e, gid)
+static int stat_inode(rip, pipe_pos, who_e, gid)
 register struct inode *rip;	/* pointer to inode to stat */
 int pipe_pos;   		/* position in a pipe, supplied by fstat() */
 int who_e;			/* Caller endpoint */
@@ -78,7 +77,7 @@ cp_grant_id_t gid;		/* grant for the stat buf */
 /*===========================================================================*
  *				fs_fstatfs				     *
  *===========================================================================*/
-PUBLIC int fs_fstatfs()
+int fs_fstatfs()
 {
   struct statfs st;
   struct inode *rip;
@@ -101,7 +100,7 @@ PUBLIC int fs_fstatfs()
 /*===========================================================================*
  *                             fs_stat					     *
  *===========================================================================*/
-PUBLIC int fs_stat()
+int fs_stat()
 {
   register int r;              /* return value */
   register struct inode *rip;  /* target inode */

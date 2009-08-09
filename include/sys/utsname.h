@@ -26,13 +26,12 @@ struct utsname {
 };
 
 /* Function Prototypes. */
-_PROTOTYPE( int uname, (struct utsname *_name)				);
+int uname(struct utsname *_name);
 
 #ifdef _MINIX
 /* Uname() is implemented with sysuname(). */
 
-_PROTOTYPE( int sysuname, (int _req, int _field, char *_value, 
-							size_t _len));
+int sysuname(int _req, int _field, char *_value, size_t _len);
 
 /* req: Get or set a string. */
 #define _UTS_GET	0

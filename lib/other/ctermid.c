@@ -13,7 +13,7 @@
  *
  *
  *  Ctermid(3) returns a pointer to a string naming the controlling
- *  terminal. If <name_space> is NULL then local PRIVATE storage
+ *  terminal. If <name_space> is NULL then local static storage
  *  is used, otherwise <name_space> must point to storage of at
  *  least L_ctermid characters.
  *
@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdio.h>
 
-_PROTOTYPE( char *ctermid, (char *name_space));
+char *ctermid(char *name_space);
 
 #ifndef L_ctermid
 #define L_ctermid  9
@@ -33,7 +33,7 @@ _PROTOTYPE( char *ctermid, (char *name_space));
 char *ctermid(name_space)
 char *name_space;
 {
-  PRIVATE char termid[L_ctermid];
+  static char termid[L_ctermid];
 
   if (name_space == (char *)NULL) name_space = termid;
   strcpy(name_space, "/dev/tty");

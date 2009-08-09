@@ -39,7 +39,3 @@ int rijndaelDecryptRound(word8 a[4][4], word8 rk[MAXROUNDS+1][4][4], int ROUNDS,
 #endif /* INTERMEDIATE_VALUE_KAT */
 
 #endif /* __RIJNDAEL_ALG_H */
-
-/*
- * $PchId: rijndael-alg.h,v 1.3 2003/09/29 09:19:17 philip Exp $
- */

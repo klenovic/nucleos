@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 
-PUBLIC int getsigset(sp)
+int getsigset(sp)
 sigset_t *sp;				/* where to put it */
 {
   message m;

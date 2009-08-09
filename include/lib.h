@@ -34,11 +34,10 @@
 #define MM                 PM_PROC_NR
 #define FS                 FS_PROC_NR
 
-_PROTOTYPE( int __execve, (const char *_path, char *const _argv[], 
-			char *const _envp[], int _nargs, int _nenvps)	);
-_PROTOTYPE( int _syscall, (int _who, int _syscallnr, message *_msgptr)	);
-_PROTOTYPE( void _loadname, (const char *_name, message *_msgptr)	);
-_PROTOTYPE( int _len, (const char *_s)					);
-_PROTOTYPE( void _begsig, (int _dummy)					);
+int __execve(const char *_path, char *const _argv[], char *const _envp[], int _nargs, int _nenvps);
+int _syscall(int _who, int _syscallnr, message *_msgptr);
+void _loadname(const char *_name, message *_msgptr);
+int _len(const char *_s);
+void _begsig(int _dummy);
 
 #endif /* _LIB_H */

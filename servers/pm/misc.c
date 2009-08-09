@@ -43,7 +43,7 @@
 
 extern struct utsname uts_val;
 
-PRIVATE char *uts_tbl[] = {
+static char *uts_tbl[] = {
   uts_val.arch,
   NULL,			/* No kernel architecture */
   uts_val.machine,
@@ -56,13 +56,13 @@ PRIVATE char *uts_tbl[] = {
 };
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-PUBLIC unsigned long calls_stats[NCALLS];
+unsigned long calls_stats[NCALLS];
 #endif
 
 /*===========================================================================*
  *				do_allocmem				     *
  *===========================================================================*/
-PUBLIC int do_allocmem()
+int do_allocmem()
 {
 	int r;
 	phys_bytes retmembase;
@@ -76,7 +76,7 @@ PUBLIC int do_allocmem()
 /*===========================================================================*
  *				do_freemem				     *
  *===========================================================================*/
-PUBLIC int do_freemem()
+int do_freemem()
 {
 #if 1
 	return ENOSYS;
@@ -105,7 +105,7 @@ PUBLIC int do_freemem()
 /*===========================================================================*
  *				do_procstat				     *
  *===========================================================================*/
-PUBLIC int do_procstat()
+int do_procstat()
 { 
   /* For the moment, this is only used to return pending signals to 
    * system processes that request the PM for their own status. 
@@ -136,7 +136,7 @@ PUBLIC int do_procstat()
 /*===========================================================================*
  *				do_sysuname				     *
  *===========================================================================*/
-PUBLIC int do_sysuname()
+int do_sysuname()
 {
 /* Set or get uname strings. */
 
@@ -200,7 +200,7 @@ PUBLIC int do_sysuname()
 /*===========================================================================*
  *				do_getsysinfo			       	     *
  *===========================================================================*/
-PUBLIC int do_getsysinfo()
+int do_getsysinfo()
 {
   struct mproc *proc_addr;
   vir_bytes src_addr, dst_addr;
@@ -267,7 +267,7 @@ PUBLIC int do_getsysinfo()
 /*===========================================================================*
  *				do_getsysinfo_up		       	     *
  *===========================================================================*/
-PUBLIC int do_getsysinfo_up()
+int do_getsysinfo_up()
 {
   vir_bytes src_addr, dst_addr;
   struct loadinfo loadinfo;
@@ -302,7 +302,7 @@ PUBLIC int do_getsysinfo_up()
 /*===========================================================================*
  *				do_getprocnr			             *
  *===========================================================================*/
-PUBLIC int do_getprocnr()
+int do_getprocnr()
 {
   register struct mproc *rmp;
   static char search_key[PROC_NAME_LEN+1];
@@ -365,7 +365,7 @@ PUBLIC int do_getprocnr()
 /*===========================================================================*
  *				do_getpuid			             *
  *===========================================================================*/
-PUBLIC int do_getpuid()
+int do_getpuid()
 {
   register struct mproc *rmp;
   endpoint_t ep;
@@ -395,7 +395,7 @@ PUBLIC int do_getpuid()
 /*===========================================================================*
  *				do_reboot				     *
  *===========================================================================*/
-PUBLIC int do_reboot()
+int do_reboot()
 {
   int r;
 
@@ -435,7 +435,7 @@ PUBLIC int do_reboot()
 /*===========================================================================*
  *				do_getsetpriority			     *
  *===========================================================================*/
-PUBLIC int do_getsetpriority()
+int do_getsetpriority()
 {
 	int arg_which, arg_who, arg_pri;
 	int rmp_nr;
@@ -480,7 +480,7 @@ PUBLIC int do_getsetpriority()
 /*===========================================================================*
  *				do_svrctl				     *
  *===========================================================================*/
-PUBLIC int do_svrctl()
+int do_svrctl()
 {
   int s, req;
   vir_bytes ptr;
@@ -588,7 +588,7 @@ PUBLIC int do_svrctl()
  *===========================================================================*/
 
 extern char *_brksize;
-PUBLIC int brk(brk_addr)
+int brk(brk_addr)
 char *brk_addr;
 {
 	int r;

@@ -64,7 +64,3 @@ typedef struct osdep_eth_port
 				 */
 
 #endif /* INET__OSDEP_ETH_H */
-
-/*
- * $PchId: osdep_eth.h,v 1.6 2001/04/20 06:39:54 philip Exp $
- */

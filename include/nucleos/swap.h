@@ -51,7 +51,3 @@ typedef struct swap_hdr
 #define SH_PRIORITY	    0
 
 #endif /* _MINIX__SWAP_H */
-
-/*
- * $PchId: swap.h,v 1.6 1996/04/10 20:25:48 philip Exp $
- */

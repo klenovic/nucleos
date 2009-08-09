@@ -28,7 +28,7 @@
 /*===========================================================================*
  *				arch_init_clock				     *
  *===========================================================================*/
-PUBLIC int arch_init_clock(void)
+int arch_init_clock(void)
 {
 	/* Initialize channel 0 of the 8253A timer to, e.g., 60 Hz,
 	 * and register the CLOCK task's interrupt handler to be run
@@ -44,7 +44,7 @@ PUBLIC int arch_init_clock(void)
 /*===========================================================================*
  *				clock_stop				     *
  *===========================================================================*/
-PUBLIC void clock_stop(void)
+void clock_stop(void)
 {
 /* Reset the clock to the BIOS rate. (For rebooting.) */
   outb(TIMER_MODE, 0x36);
@@ -55,7 +55,7 @@ PUBLIC void clock_stop(void)
 /*===========================================================================*
  *				read_clock				     *
  *===========================================================================*/
-PUBLIC clock_t read_clock(void)
+clock_t read_clock(void)
 {
 	/* Read the counter of channel 0 of the 8253A timer.  This counter
 	 * counts down at a rate of TIMER_FREQ and restarts at

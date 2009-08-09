@@ -26,7 +26,7 @@
 /*===========================================================================*
  *				do_exec					     *
  *===========================================================================*/
-PUBLIC int do_exec(m_ptr)
+int do_exec(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_exec().  A process has done a successful EXEC. Patch it up. */

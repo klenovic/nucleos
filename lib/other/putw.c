@@ -14,7 +14,7 @@
 
 #include	<stdio.h>
 
-_PROTOTYPE(int putw, (int w, FILE *stream ));
+int putw(int w, FILE *stream);
 
 int
 putw(w, stream)

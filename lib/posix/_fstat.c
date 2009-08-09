@@ -11,7 +11,7 @@
 #define fstat	_fstat
 #include <sys/stat.h>
 
-PUBLIC int fstat(fd, buffer)
+int fstat(fd, buffer)
 int fd;
 struct stat *buffer;
 {

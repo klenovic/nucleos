@@ -38,9 +38,8 @@ static char sccsid[] = "@(#)res_comp.c	6.18 (Berkeley) 6/27/90";
 #include <net/gen/nameser.h>
 #include <net/gen/resolv.h>
 
-static int dn_find _ARGS(( const u_char *exp_dn, const u_char *msg,
-	u_char **dnptrs, u_char **lastdnptr ));
-int dn_skipname _ARGS(( const u_char *comp_dn, const u_char *eom ));
+static int dn_find(const u_char *exp_dn, const u_char *msg, u_char **dnptrs, u_char **lastdnptr);
+int dn_skipname(const u_char *comp_dn, const u_char *eom);
 
 #define getshort _getshort
 #define getlong _getlong

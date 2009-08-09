@@ -24,10 +24,10 @@
 
 #define CR0_EM	0x0004		/* set to enable trap on any FP instruction */
 
-FORWARD _PROTOTYPE( void ser_debug, (int c));
-FORWARD _PROTOTYPE( void ser_dump_stats, (void));
+static void ser_debug(int c);
+static void ser_dump_stats(void);
 
-PUBLIC void arch_shutdown(int how)
+void arch_shutdown(int how)
 {
 	/* Mask all interrupts, including the clock. */
 	outb( INT_CTLMASK, ~0);
@@ -88,7 +88,7 @@ PUBLIC void arch_shutdown(int how)
 /* address of a.out headers, set in mpx386.s */
 phys_bytes aout;
 
-PUBLIC void arch_get_aout_headers(int i, struct exec *h)
+void arch_get_aout_headers(int i, struct exec *h)
 {
 	/* The bootstrap loader created an array of the a.out headers at
 	 * absolute address 'aout'. Get one element to h.
@@ -96,7 +96,7 @@ PUBLIC void arch_get_aout_headers(int i, struct exec *h)
 	phys_copy(aout + i * A_MINHDR, vir2phys(h), (phys_bytes) A_MINHDR);
 }
 
-PUBLIC void system_init(void)
+void system_init(void)
 {
 	prot_init();
 
@@ -113,7 +113,7 @@ PUBLIC void system_init(void)
 #define		LSR_DR		0x01
 #define		LSR_THRE	0x20
 
-PUBLIC void ser_putc(char c)
+void ser_putc(char c)
 {
         int i;
         int lsr, thr;
@@ -131,7 +131,7 @@ PUBLIC void ser_putc(char c)
 /*===========================================================================*
  *				do_ser_debug				     * 
  *===========================================================================*/
-PUBLIC void do_ser_debug()
+void do_ser_debug()
 {
 	u8_t c, lsr;
 
@@ -142,7 +142,7 @@ PUBLIC void do_ser_debug()
 	ser_debug(c);
 }
 
-PRIVATE void ser_debug(int c)
+static void ser_debug(int c)
 {
 	do_serial_debug++;
 	kprintf("ser_debug: %d\n", c);
@@ -158,7 +158,7 @@ PRIVATE void ser_debug(int c)
 	do_serial_debug--;
 }
 
-PUBLIC void ser_dump_proc()
+void ser_dump_proc()
 {
 	struct proc *pp;
 	int u = 0;
@@ -184,7 +184,7 @@ PUBLIC void ser_dump_proc()
 	if(u) { unlock; }
 }
 
-PRIVATE void ser_dump_stats()
+static void ser_dump_stats()
 {
 	kprintf("ipc_stats:\n");
 	kprintf("deadproc: %d\n", ipc_stats.deadproc);
@@ -222,7 +222,7 @@ PRIVATE void ser_dump_stats()
 
 #ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
-PUBLIC int arch_init_profile_clock(u32_t freq)
+int arch_init_profile_clock(u32_t freq)
 {
   int r;
   /* Set CMOS timer frequency. */
@@ -240,7 +240,7 @@ PUBLIC int arch_init_profile_clock(u32_t freq)
   return CMOS_CLOCK_IRQ;
 }
 
-PUBLIC void arch_stop_profile_clock(void)
+void arch_stop_profile_clock(void)
 {
   int r;
   /* Disable CMOS timer interrupts. */
@@ -250,7 +250,7 @@ PUBLIC void arch_stop_profile_clock(void)
   outb(RTC_IO, r & ~RTC_B_PIE);
 }
 
-PUBLIC void arch_ack_profile_clock(void)
+void arch_ack_profile_clock(void)
 {
   /* Mandatory read of CMOS register to re-enable timer interrupts. */
   outb(RTC_INDEX, RTC_REG_C);
@@ -261,7 +261,7 @@ PUBLIC void arch_ack_profile_clock(void)
 
 #define COLOR_BASE	0xB8000L
 
-PUBLIC void cons_setc(int pos, int c)
+void cons_setc(int pos, int c)
 {
 	char ch;
 
@@ -269,7 +269,7 @@ PUBLIC void cons_setc(int pos, int c)
 	phys_copy(vir2phys((vir_bytes)&ch), COLOR_BASE+(20*80+pos)*2, 1);
       }
 
-PUBLIC void cons_seth(int pos, int n)
+void cons_seth(int pos, int n)
 {
 	n &= 0xf;
 	if (n < 10)
@@ -281,7 +281,7 @@ PUBLIC void cons_seth(int pos, int n)
 /* Saved by mpx386.s into these variables. */
 u32_t params_size, params_offset, mon_ds;
 
-PUBLIC int arch_get_params(char *params, int maxsize)
+int arch_get_params(char *params, int maxsize)
 {
 	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params),
 		MIN(maxsize, params_size));
@@ -289,7 +289,7 @@ PUBLIC int arch_get_params(char *params, int maxsize)
 	return OK;
       }
 
-PUBLIC int arch_set_params(char *params, int size)
+int arch_set_params(char *params, int size)
 {
 	if(size > params_size)
 		return E2BIG;

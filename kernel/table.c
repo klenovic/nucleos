@@ -7,25 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* The object file of "table.c" contains most kernel data. Variables that
- * are declared in the *.h files appear with EXTERN in front of them, as in
- *
- *    EXTERN int x;
- *
- * Normally EXTERN is defined as extern, so when they are included in another
- * file, no storage is allocated.  If EXTERN were not present, but just say,
- *
- *    int x;
- *
- * then including this file in several source files would cause 'x' to be
- * declared several times.  While some linkers accept this, others do not,
- * so they are declared extern when included normally.  However, it must be
- * declared for real somewhere.  That is done here, by redefining EXTERN as
- * the null string, so that inclusion of all *.h files in table.c actually
- * generates storage for them.
- *
- * Various variables could not be declared EXTERN, but are declared PUBLIC
- * or PRIVATE. The reason for this is that extern variables cannot have a
+
+/* Various variables could not be declared extern, but are public
+ * or static. The reason for this is that extern variables cannot have a
  * default initialization. If such variables are shared, they must also be
  * declared in one of the *.h files without the initialization.  Examples
  * include 'boot_image' (this file) and 'idt' and 'gdt' (protect.c).
@@ -35,12 +19,73 @@
  *    Oct 17, 2004   updated above and tasktab comments  (Jorrit N. Herder)
  *    May 01, 2004   changed struct for system image  (Jorrit N. Herder)
  */
-#define _TABLE
-
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
 #include <kernel/ipc.h>
 #include <nucleos/com.h>
+
+/* Variables relating to shutting down MINIX. */
+char kernel_exception;           /* TRUE after system exceptions */
+char shutdown_started;           /* TRUE after shutdowns / reboots */
+
+/* Kernel information structures. This groups vital kernel information. */
+struct kinfo kinfo;              /* kernel information for users */
+struct machine machine;          /* machine information for users */
+struct kmessages kmess;          /* diagnostic messages in kernel */
+struct k_randomness krandom;     /* gather kernel random information */
+struct loadinfo kloadinfo;       /* status of load average */
+struct boot_param boot_param;    /* boot parameters */
+
+/* Process scheduling information and the kernel reentry count. */
+struct proc *prev_ptr;   /* previously running process */
+struct proc *proc_ptr;   /* pointer to currently running process */
+struct proc *next_ptr;   /* next process to run after restart() */
+struct proc *bill_ptr;   /* process to bill for clock ticks */
+struct proc *vmrestart;  /* first process on vmrestart queue */
+struct proc *vmrequest;  /* first process on vmrequest queue */
+struct proc *pagefaults; /* first process on pagefault queue */
+struct proc *softnotify; /* first process on softnotify queue */
+char k_reenter;          /* kernel reentry count (entry count less 1) */
+unsigned lost_ticks;     /* clock ticks counted outside clock task */
+
+/* Interrupt related variables. */
+irq_hook_t irq_hooks[NR_IRQ_HOOKS];      /* hooks for general use */
+int irq_actids[NR_IRQ_VECTORS];          /* IRQ ID bits active */
+int irq_use;                             /* map of all in-use irq's */
+u32_t system_hz;                         /* HZ value */
+
+struct ipc_stats ipc_stats;
+struct system_stats sys_stats;
+
+/* Miscellaneous. */
+reg_t mon_ss, mon_sp;            /* boot monitor stack */
+int mon_return;                  /* true if we can return to monitor */
+int do_serial_debug;
+endpoint_t who_e;                /* message source endpoint */
+int who_p;                       /* message source proc */
+int sys_call_code;               /* kernel call number in SYSTEM */
+time_t boottime;
+char params_buffer[512];         /* boot monitor parameters */
+int minix_panicing;
+int locklevel;
+
+unsigned long cr3switch;
+unsigned long cr3reload;
+
+/* VM */
+phys_bytes vm_base;
+phys_bytes vm_size;
+phys_bytes vm_mem_high;
+int vm_running;
+int must_notify_vm;
+
+/* Verbose flags (debugging). */
+int verbose_vm;
+
+/* Timing */
+util_timingdata_t timingdata[TIMING_CATEGORIES];
+
+void (*level0_func)(void);
 
 /* Define stack sizes for the kernel tasks included in the system image. */
 #define NO_STACK	0
@@ -51,7 +96,7 @@
 
 /* Stack space for all the task stacks.  Declared as (char *) to align it. */
 #define	TOT_STACK_SPACE	(IDL_S + HRD_S + (2 * TSK_S))
-PUBLIC char *t_stack[TOT_STACK_SPACE / sizeof(char *)];
+char *t_stack[TOT_STACK_SPACE / sizeof(char *)];
 	
 /* Define flags for the various process types. */
 #define IDL_F 	(SYS_PROC | PREEMPTIBLE | BILLABLE)	/* idle task */
@@ -93,7 +138,7 @@ PUBLIC char *t_stack[TOT_STACK_SPACE / sizeof(char *)];
 #define DRV_C	FS_C, SYS_SEGCTL, SYS_IRQCTL, SYS_INT86, SYS_DEVIO, \
 	SYS_SDEVIO, SYS_VDEVIO, SYS_SETGRANT, SYS_PROFBUF, SYS_SYSCTL
 
-PRIVATE int
+static int
   fs_c[] = { FS_C },
   pm_c[] = { SYS_ALL_CALLS },
   rs_c[] = { SYS_ALL_CALLS },
@@ -117,7 +162,7 @@ PRIVATE int
 #define c(calls) calls, (sizeof(calls) / sizeof((calls)[0]))
 #define no_c  (int*)0, 0
 
-PUBLIC struct boot_image image[] = {
+struct boot_image image[] = {
 	/* process nr, pc,flags, qs,  queue, stack, traps, ipcto, call,  name */
 	{IDLE,          idle_task, IDL_F,  8, IDLE_Q, IDL_S,     0,     0,    no_c,   "idle" },
 	{CLOCK,        clock_task, TSK_F,  8, TASK_Q, TSK_S, TSK_T,     0,    no_c,  "clock" },
@@ -146,4 +191,4 @@ extern int dummy[(NR_BOOT_PROCS==sizeof(image)/
 	sizeof(struct boot_image))?1:-1];
 extern int dummy[(BITCHUNK_BITS > NR_BOOT_PROCS - 1) ? 1 : -1];
 
-PUBLIC endpoint_t ipc_stats_target= NONE;
+endpoint_t ipc_stats_target= NONE;

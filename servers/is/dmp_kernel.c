@@ -46,23 +46,23 @@ static int pagelines;
 	((unsigned) ((((unsigned long) (n) << CLICK_SHIFT) + 512) / 1024))
 
 /* Declare some local dump procedures. */
-FORWARD _PROTOTYPE( char *proc_name, (int proc_nr)		);
-FORWARD _PROTOTYPE( char *s_traps_str, (int flags)		);
-FORWARD _PROTOTYPE( char *s_flags_str, (int flags)		);
-FORWARD _PROTOTYPE( char *p_rts_flags_str, (int flags)		);
+static char *proc_name(int proc_nr);
+static char *s_traps_str(int flags);
+static char *s_flags_str(int flags);
+static char *p_rts_flags_str(int flags);
 
 /* Some global data that is shared among several dumping procedures. 
  * Note that the process table copy has the same name as in the kernel
  * so that most macros and definitions from proc.h also apply here.
  */
-PUBLIC struct proc proc[NR_TASKS + NR_PROCS];
-PUBLIC struct priv priv[NR_SYS_PROCS];
-PUBLIC struct boot_image image[NR_BOOT_PROCS];
+struct proc proc[NR_TASKS + NR_PROCS];
+struct priv priv[NR_SYS_PROCS];
+struct boot_image image[NR_BOOT_PROCS];
 
 /*===========================================================================*
  *				timing_dmp				     *
  *===========================================================================*/
-PUBLIC void timing_dmp()
+void timing_dmp()
 {
   static struct util_timingdata timingdata[TIMING_CATEGORIES];
   int r, c, f, skipped = 0, printed = 0, maxlines = 23, x = 0;
@@ -98,7 +98,7 @@ PUBLIC void timing_dmp()
 /*===========================================================================*
  *				kmessages_dmp				     *
  *===========================================================================*/
-PUBLIC void kmessages_dmp()
+void kmessages_dmp()
 {
   struct kmessages kmess;		/* get copy of kernel messages */
   char print_buf[KMESS_BUF_SIZE+1];	/* this one is used to print */
@@ -130,7 +130,7 @@ PUBLIC void kmessages_dmp()
 /*===========================================================================*
  *				monparams_dmp				     *
  *===========================================================================*/
-PUBLIC void monparams_dmp()
+void monparams_dmp()
 {
   char val[1024];
   char *e;
@@ -157,7 +157,7 @@ PUBLIC void monparams_dmp()
 /*===========================================================================*
  *				irqtab_dmp				     *
  *===========================================================================*/
-PUBLIC void irqtab_dmp()
+void irqtab_dmp()
 {
   int i,r;
   struct irq_hook irq_hooks[NR_IRQ_HOOKS];
@@ -203,7 +203,7 @@ PUBLIC void irqtab_dmp()
 /*===========================================================================*
  *				image_dmp				     *
  *===========================================================================*/
-PUBLIC void image_dmp()
+void image_dmp()
 {
   int m, i,j,r;
   struct boot_image *ip;
@@ -233,7 +233,7 @@ PUBLIC void image_dmp()
 /*===========================================================================*
  *				sched_dmp    				     *
  *===========================================================================*/
-PUBLIC void sched_dmp()
+void sched_dmp()
 {
   struct proc *rdy_head[NR_SCHED_QUEUES];
   struct kinfo kinfo;
@@ -282,7 +282,7 @@ PUBLIC void sched_dmp()
 /*===========================================================================*
  *				kenv_dmp				     *
  *===========================================================================*/
-PUBLIC void kenv_dmp()
+void kenv_dmp()
 {
     struct kinfo kinfo;
     struct machine machine;
@@ -323,7 +323,7 @@ PUBLIC void kenv_dmp()
     printf("\n");
 }
 
-PRIVATE char *s_flags_str(int flags)
+static char *s_flags_str(int flags)
 {
 	static char str[10];
 	str[0] = (flags & PREEMPTIBLE) ? 'P' : '-';
@@ -336,7 +336,7 @@ PRIVATE char *s_flags_str(int flags)
 	return str;
 }
 
-PRIVATE char *s_traps_str(int flags)
+static char *s_traps_str(int flags)
 {
 	static char str[10];
 	str[0] = (flags & (1 << SEND))  ? 'S' : '-';
@@ -352,7 +352,7 @@ PRIVATE char *s_traps_str(int flags)
 /*===========================================================================*
  *				privileges_dmp 				     *
  *===========================================================================*/
-PUBLIC void privileges_dmp()
+void privileges_dmp()
 {
   register struct proc *rp;
   static struct proc *oldrp = BEG_PROC_ADDR;
@@ -395,7 +395,7 @@ PUBLIC void privileges_dmp()
   }
 }
 
-PRIVATE char *p_rts_flags_str(int flags)
+static char *p_rts_flags_str(int flags)
 {
 	static char str[10];
 	str[0] = (flags & NO_PRIORITY) ? 's' : '-';
@@ -414,7 +414,7 @@ PRIVATE char *p_rts_flags_str(int flags)
  *				proctab_dmp    				     *
  *===========================================================================*/
 #ifdef CONFIG_X86_32
-PUBLIC void proctab_dmp()
+void proctab_dmp()
 {
 /* Proc table dump */
 
@@ -451,7 +451,7 @@ PUBLIC void proctab_dmp()
 /*===========================================================================*
  *				procstack_dmp  				     *
  *===========================================================================*/
-PUBLIC void procstack_dmp()
+void procstack_dmp()
 {
 /* Proc table dump, with stack */
 
@@ -476,7 +476,7 @@ PUBLIC void procstack_dmp()
 /*===========================================================================*
  *				memmap_dmp    				     *
  *===========================================================================*/
-PUBLIC void memmap_dmp()
+void memmap_dmp()
 {
   register struct proc *rp;
   static struct proc *oldrp = proc;
@@ -508,7 +508,7 @@ PUBLIC void memmap_dmp()
 /*===========================================================================*
  *				proc_name    				     *
  *===========================================================================*/
-PRIVATE char *proc_name(proc_nr)
+static char *proc_name(proc_nr)
 int proc_nr;
 {
   struct proc *p;

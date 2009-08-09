@@ -179,10 +179,8 @@
 #define dma_bytes_left(phys)    \
    ((unsigned) (sizeof(int) == 2 ? 0 : 0x10000) - (unsigned) ((phys) & 0xFFFF))
 
-
-_PROTOTYPE(int mixer_set, (int reg, int data));
-_PROTOTYPE( int sb16_inb, (int port) );
-_PROTOTYPE( void sb16_outb, (int port, int value) );
-
+int mixer_set(int reg, int data);
+int sb16_inb(int port);
+void sb16_outb(int port, int value);
 
 #endif /* SB16_H */

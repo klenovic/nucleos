@@ -187,7 +187,3 @@ char *localbuf;
 	sprintf(localbuf, "%d", r->code);
 	return(localbuf);
 }
-
-/*
- * $PchId: regerror.c,v 1.2 1996/03/12 19:10:15 philip Exp $
- */

@@ -22,7 +22,7 @@
 
 #include <sys/queue.h>
 
-EXTERN struct inode {
+struct inode {
   mode_t i_mode;		/* file type, protection, etc. */
   nlink_t i_nlinks;		/* how many links to this file */
   uid_t i_uid;			/* user id of the file's owner */
@@ -51,17 +51,18 @@ EXTERN struct inode {
 
   LIST_ENTRY(inode) i_hash;     /* hash list */
   TAILQ_ENTRY(inode) i_unused;  /* free and unused list */
-  
 } inode[NR_INODES];
 
+extern struct inode inode[];
+
 /* list of unused/free inodes */ 
-EXTERN TAILQ_HEAD(unused_inodes_t, inode)  unused_inodes;
+extern TAILQ_HEAD(unused_inodes_t, inode)  unused_inodes;
 
 /* inode hashtable */
-EXTERN LIST_HEAD(inodelist, inode)         hash_inodes[INODE_HASH_SIZE];
+extern LIST_HEAD(inodelist, inode) hash_inodes[INODE_HASH_SIZE];
 
-EXTERN unsigned int inode_cache_hit;
-EXTERN unsigned int inode_cache_miss;
+extern unsigned int inode_cache_hit;
+extern unsigned int inode_cache_miss;
 
 #define NIL_INODE (struct inode *) 0	/* indicates absence of inode slot */
 

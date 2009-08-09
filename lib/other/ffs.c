@@ -12,7 +12,7 @@
  *
  *  Author: Terrence W. Holm          Sep. 1988
  */
-_PROTOTYPE( int ffs, (int word));
+int ffs(int word);
 
 int ffs(word)
 int word;

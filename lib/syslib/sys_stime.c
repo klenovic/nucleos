@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_stime(boottime)
+int sys_stime(boottime)
 time_t boottime;		/* New boottime */
 {
   message m;

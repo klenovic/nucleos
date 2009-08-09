@@ -24,7 +24,7 @@ extern u32_t kernel_cr3;
 /*===========================================================================*
  *				arch_do_vmctl				     *
  *===========================================================================*/
-PUBLIC int arch_do_vmctl(m_ptr, p)
+int arch_do_vmctl(m_ptr, p)
 register message *m_ptr;	/* pointer to request message */
 struct proc *p;
 {

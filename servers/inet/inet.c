@@ -96,12 +96,12 @@ extern int inet_buf_debug;
 u32_t system_hz;
 #endif
 
-_PROTOTYPE( void main, (void) );
+void main(void);
 
-FORWARD _PROTOTYPE( void nw_conf, (void) );
-FORWARD _PROTOTYPE( void nw_init, (void) );
+static void nw_conf(void);
+static void nw_init(void);
 
-PUBLIC void main()
+void main(void)
 {
 	mq_t *mq;
 	int r;
@@ -263,7 +263,7 @@ PUBLIC void main()
 	ip_panic(("task is not allowed to terminate"));
 }
 
-PRIVATE void nw_conf()
+static void nw_conf()
 {
 	read_conf();
 	eth_prep();
@@ -274,7 +274,7 @@ PRIVATE void nw_conf()
 	udp_prep();
 }
 
-PRIVATE void nw_init()
+static void nw_init()
 {
 	mq_init();
 	bf_init();
@@ -289,14 +289,14 @@ PRIVATE void nw_init()
 	udp_init();
 }
 
-PUBLIC void panic0(file, line)
+void panic0(file, line)
 char *file;
 int line;
 {
 	printf("panic at %s, %d: ", file, line);
 }
 
-PUBLIC void inet_panic()
+void inet_panic()
 {
 	printf("\ninet stacktrace: ");
 	util_stacktrace();
@@ -305,7 +305,7 @@ PUBLIC void inet_panic()
 }
 
 #if !NDEBUG
-PUBLIC void bad_assertion(file, line, what)
+void bad_assertion(file, line, what)
 char *file;
 int line;
 char *what;
@@ -316,7 +316,7 @@ char *what;
 }
 
 
-PUBLIC void bad_compare(file, line, lhs, what, rhs)
+void bad_compare(file, line, lhs, what, rhs)
 char *file;
 int line;
 int lhs;
@@ -328,7 +328,3 @@ int rhs;
 	panic();
 }
 #endif /* !NDEBUG */
-
-/*
- * $PchId: inet.c,v 1.23 2005/06/28 14:27:22 philip Exp $
- */

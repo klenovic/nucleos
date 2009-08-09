@@ -52,7 +52,3 @@ server/ip/gen/icmp.h
 #define ICMP_RA_LOCAL_PREF	0x10000000
 
 #endif /* __SERVER__IP__GEN__ICMP_H__ */
-
-/*
- * $PchId: icmp.h,v 1.6 2002/06/10 07:10:26 philip Exp $
- */

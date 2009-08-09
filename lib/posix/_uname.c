@@ -65,7 +65,3 @@ struct utsname *name;
   }
 	return 0;
 }
-
-/*
- * $PchId: _uname.c,v 1.4 1995/11/27 20:09:08 philip Exp $
- */

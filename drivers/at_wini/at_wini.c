@@ -274,7 +274,7 @@ int w_next_drive = 0;
  * Controller 0 is always the 'compatability' ide controller, at
  * the fixed locations, whether present or not.
  */
-PRIVATE struct wini {		/* main drive struct, one entry per drive */
+static struct wini {		/* main drive struct, one entry per drive */
   unsigned state;		/* drive state: deaf, initialized, dead */
   unsigned short w_status;	/* device status register */
   unsigned base_cmd;		/* command base register */
@@ -300,16 +300,16 @@ PRIVATE struct wini {		/* main drive struct, one entry per drive */
   struct device subpart[SUB_PER_DRIVE];	/* subpartitions */
 } wini[MAX_DRIVES], *w_wn;
 
-PRIVATE int w_device = -1;
-PRIVATE int w_controller = -1;
-PRIVATE int w_major = -1;
+static int w_device = -1;
+static int w_controller = -1;
+static int w_major = -1;
 
-PRIVATE int win_tasknr;			/* my task number */
-PRIVATE int w_command;			/* current command in execution */
-PRIVATE u8_t w_byteval;			/* used for SYS_IRQCTL */
-PRIVATE int w_drive;			/* selected drive */
-PRIVATE int w_controller;		/* selected controller */
-PRIVATE struct device *w_dv;		/* device's base and size */
+static int win_tasknr;			/* my task number */
+static int w_command;			/* current command in execution */
+static u8_t w_byteval;			/* used for SYS_IRQCTL */
+static int w_drive;			/* selected drive */
+static int w_controller;		/* selected controller */
+static struct device *w_dv;		/* device's base and size */
 
 /* Unfortunately, DMA_SECTORS and DMA_BUF_SIZE are already defined libdriver
  * for 'tmp_buf'.
@@ -317,12 +317,12 @@ PRIVATE struct device *w_dv;		/* device's base and size */
 #define ATA_DMA_SECTORS	64
 #define ATA_DMA_BUF_SIZE	(ATA_DMA_SECTORS*SECTOR_SIZE)
 
-PRIVATE char *dma_buf;
-PRIVATE phys_bytes dma_buf_phys;
+static char *dma_buf;
+static phys_bytes dma_buf_phys;
 
 #define N_PRDTE	1024	/* Should be enough for large requests */
 
-PRIVATE struct prdte
+struct prdte
 {
 	u32_t prdte_base;
 	u16_t prdte_count;
@@ -331,13 +331,13 @@ PRIVATE struct prdte
 };
 
 #define PRDT_BYTES (sizeof(struct prdte) * N_PRDTE)
-PRIVATE struct prdte *prdt;
-PRIVATE phys_bytes prdt_phys;
+static struct prdte *prdt;
+static phys_bytes prdt_phys;
 
 #define PRDTE_FL_EOT	0x80	/* End of table */
 
 /* Some IDE devices announce themselves as RAID controllers */
-PRIVATE struct
+static struct
 {
 	u16_t vendor;
 	u16_t device;
@@ -348,50 +348,48 @@ PRIVATE struct
 	{ 0,		0	}	/* end of list */
 };
 
-FORWARD _PROTOTYPE( void init_params, (void) 				);
-FORWARD _PROTOTYPE( void init_drive, (struct wini *w, int base_cmd,
-	int base_ctl, int base_dma, int irq, int ack, int hook,
-							int drive)	);
-FORWARD _PROTOTYPE( void init_params_pci, (int) 			);
-FORWARD _PROTOTYPE( int w_do_open, (struct driver *dp, message *m_ptr) 	);
-FORWARD _PROTOTYPE( struct device *w_prepare, (int dev) 		);
-FORWARD _PROTOTYPE( int w_identify, (void)				);
-FORWARD _PROTOTYPE( char *w_name, (void) 				);
-FORWARD _PROTOTYPE( int w_specify, (void) 				);
-FORWARD _PROTOTYPE( int w_io_test, (void) 				);
-FORWARD _PROTOTYPE( int w_transfer, (int proc_nr, int opcode, u64_t position,
-				iovec_t *iov, unsigned nr_req, int safe));
-FORWARD _PROTOTYPE( int com_out, (struct command *cmd) 			);
-FORWARD _PROTOTYPE( int com_out_ext, (struct command *cmd)		);
-FORWARD _PROTOTYPE( void setup_dma, (unsigned *sizep, int proc_nr,
-			iovec_t *iov, size_t addr_offset, int do_write,
-			int *do_copyoutp, int safe)			);
-FORWARD _PROTOTYPE( void w_need_reset, (void) 				);
-FORWARD _PROTOTYPE( void ack_irqs, (unsigned int) 			);
-FORWARD _PROTOTYPE( int w_do_close, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( int w_other, (struct driver *dp, message *m_ptr, int));
-FORWARD _PROTOTYPE( int w_hw_int, (struct driver *dp, message *m_ptr) 	);
-FORWARD _PROTOTYPE( int com_simple, (struct command *cmd) 		);
-FORWARD _PROTOTYPE( void w_timeout, (void) 				);
-FORWARD _PROTOTYPE( int w_reset, (void) 				);
-FORWARD _PROTOTYPE( void w_intr_wait, (void) 				);
-FORWARD _PROTOTYPE( int at_intr_wait, (void) 				);
-FORWARD _PROTOTYPE( int w_waitfor, (int mask, int value) 		);
-FORWARD _PROTOTYPE( int w_waitfor_dma, (int mask, int value) 		);
-FORWARD _PROTOTYPE( void w_geometry, (struct partition *entry) 		);
+static void init_params(void);
+static void init_drive(struct wini *w, int base_cmd, int base_ctl, int base_dma, int irq,
+		       int ack, int hook, int drive);
+static void init_params_pci(int);
+static int w_do_open(struct driver *dp, message *m_ptr);
+static struct device *w_prepare(int dev);
+static int w_identify(void);
+static char *w_name(void);
+static int w_specify(void);
+static int w_io_test(void);
+static int w_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov,
+		      unsigned nr_req, int safe);
+static int com_out(struct command *cmd);
+static int com_out_ext(struct command *cmd);
+static void setup_dma(unsigned *sizep, int proc_nr, iovec_t *iov, size_t addr_offset,
+		      int do_write, int *do_copyoutp, int safe);
+static void w_need_reset(void);
+static void ack_irqs(unsigned int);
+static int w_do_close(struct driver *dp, message *m_ptr);
+static int w_other(struct driver *dp, message *m_ptr, int);
+static int w_hw_int(struct driver *dp, message *m_ptr);
+static int com_simple(struct command *cmd);
+static void w_timeout(void);
+static int w_reset(void);
+static void w_intr_wait(void);
+static int at_intr_wait(void);
+static int w_waitfor(int mask, int value);
+static int w_waitfor_dma(int mask, int value);
+static void w_geometry(struct partition *entry);
 #if ENABLE_ATAPI
-FORWARD _PROTOTYPE( int atapi_sendpacket, (u8_t *packet, unsigned cnt) 	);
-FORWARD _PROTOTYPE( int atapi_intr_wait, (void) 			);
-FORWARD _PROTOTYPE( int atapi_open, (void) 				);
-FORWARD _PROTOTYPE( void atapi_close, (void) 				);
-FORWARD _PROTOTYPE( int atapi_transfer, (int proc_nr, int opcode,
-		u64_t position, iovec_t *iov, unsigned nr_req, int safe));
+static int atapi_sendpacket(u8_t *packet, unsigned cnt);
+static int atapi_intr_wait(void);
+static int atapi_open(void);
+static void atapi_close(void);
+static int atapi_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov, unsigned nr_req,
+			  int safe);
 #endif
 
 #define sys_voutb(out, n) at_voutb(__LINE__, (out), (n))
-FORWARD _PROTOTYPE( int at_voutb, (int line, pvb_pair_t *, int n));
+static int at_voutb(int line, pvb_pair_t *, int n);
 #define sys_vinb(in, n) at_vinb(__LINE__, (in), (n))
-FORWARD _PROTOTYPE( int at_vinb, (int line, pvb_pair_t *, int n));
+static int at_vinb(int line, pvb_pair_t *, int n);
 
 #undef sys_outb
 #undef sys_inb
@@ -400,10 +398,8 @@ FORWARD _PROTOTYPE( int at_vinb, (int line, pvb_pair_t *, int n));
 #undef sys_outl
 #undef sys_inl
 
-FORWARD _PROTOTYPE( int at_out, (int line, u32_t port, u32_t value,
-	char *typename, int type));
-FORWARD _PROTOTYPE( int at_in, (int line, u32_t port, u32_t *value,
-	char *typename, int type));
+static int at_out(int line, u32_t port, u32_t value, char *typename, int type);
+static int at_in(int line, u32_t port, u32_t *value, char *typename, int type);
 
 #define sys_outb(p, v) at_out(__LINE__, (p), (v), "outb", _DIO_BYTE)
 #define sys_inb(p, v) at_in(__LINE__, (p), (v), "inb", _DIO_BYTE)
@@ -413,7 +409,7 @@ FORWARD _PROTOTYPE( int at_in, (int line, u32_t port, u32_t *value,
 #define sys_inl(p, v) at_in(__LINE__, (p), (v), "inl", _DIO_LONG)
 
 /* Entry points to this driver. */
-PRIVATE struct driver w_dtab = {
+static struct driver w_dtab = {
   w_name,		/* current device's name */
   w_do_open,		/* open or mount request, initialize device */
   w_do_close,		/* release device */
@@ -433,7 +429,7 @@ PRIVATE struct driver w_dtab = {
 /*===========================================================================*
  *				at_winchester_task			     *
  *===========================================================================*/
-PUBLIC int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 /* Install signal handlers. Ask PM to transform signal into message. */
   struct sigaction sa;
@@ -461,7 +457,7 @@ PUBLIC int main(int argc, char *argv[])
 /*===========================================================================*
  *				init_params				     *
  *===========================================================================*/
-PRIVATE void init_params()
+static void init_params()
 {
 /* This routine is called at startup to initialize the drive parameters. */
 
@@ -577,7 +573,7 @@ PRIVATE void init_params()
 /*===========================================================================*
  *				init_drive				     *
  *===========================================================================*/
-PRIVATE void init_drive(struct wini *w, int base_cmd, int base_ctl,
+static void init_drive(struct wini *w, int base_cmd, int base_ctl,
 	int base_dma, int irq, int ack, int hook, int drive)
 {
 	w->state = 0;
@@ -601,7 +597,7 @@ PRIVATE void init_drive(struct wini *w, int base_cmd, int base_ctl,
 /*===========================================================================*
  *				init_params_pci				     *
  *===========================================================================*/
-PRIVATE void init_params_pci(int skip)
+static void init_params_pci(int skip)
 {
   int i, r, devind, drive, pci_compat = 0;
   int irq, irq_hook, raid;
@@ -777,7 +773,7 @@ PRIVATE void init_params_pci(int skip)
 /*===========================================================================*
  *				w_do_open				     *
  *===========================================================================*/
-PRIVATE int w_do_open(dp, m_ptr)
+static int w_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -842,7 +838,7 @@ message *m_ptr;
 /*===========================================================================*
  *				w_prepare				     *
  *===========================================================================*/
-PRIVATE struct device *w_prepare(int device)
+static struct device *w_prepare(int device)
 {
 /* Prepare for I/O on a device. */
 struct wini *prev_wn;
@@ -868,7 +864,7 @@ prev_wn = w_wn;
 /*===========================================================================*
  *				w_identify				     *
  *===========================================================================*/
-PRIVATE int w_identify()
+static int w_identify()
 {
 /* Find out if a device exists, if it is an old AT disk, or a newer ATA
  * drive, a removable media device, etc.
@@ -1118,7 +1114,7 @@ PRIVATE int w_identify()
 /*===========================================================================*
  *				w_name					     *
  *===========================================================================*/
-PRIVATE char *w_name()
+static char *w_name()
 {
 /* Return a name for the current device. */
   static char name[] = "AT0-D0";
@@ -1131,7 +1127,7 @@ PRIVATE char *w_name()
 /*===========================================================================*
  *				w_io_test				     *
  *===========================================================================*/
-PRIVATE int w_io_test(void)
+static int w_io_test(void)
 {
 	int r, save_dev;
 	int save_timeout, save_errors, save_wakeup;
@@ -1191,7 +1187,7 @@ PRIVATE int w_io_test(void)
 /*===========================================================================*
  *				w_specify				     *
  *===========================================================================*/
-PRIVATE int w_specify()
+static int w_specify()
 {
 /* Routine to initialize the drive after boot or when a reset is needed. */
 
@@ -1230,7 +1226,7 @@ PRIVATE int w_specify()
 /*===========================================================================*
  *				do_transfer				     *
  *===========================================================================*/
-PRIVATE int do_transfer(struct wini *wn, unsigned int precomp,
+static int do_transfer(struct wini *wn, unsigned int precomp,
 	unsigned int count, unsigned int sector,
 	unsigned int opcode, int do_dma)
 {
@@ -1306,7 +1302,7 @@ PRIVATE int do_transfer(struct wini *wn, unsigned int precomp,
 /*===========================================================================*
  *				w_transfer				     *
  *===========================================================================*/
-PRIVATE int w_transfer(proc_nr, opcode, position, iov, nr_req, safe)
+static int w_transfer(proc_nr, opcode, position, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t position;			/* offset on device to read or write */
@@ -1564,7 +1560,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 /*===========================================================================*
  *				com_out					     *
  *===========================================================================*/
-PRIVATE int com_out(cmd)
+static int com_out(cmd)
 struct command *cmd;		/* Command block */
 {
 /* Output the command block to the winchester controller and return status */
@@ -1616,7 +1612,7 @@ struct command *cmd;		/* Command block */
 /*===========================================================================*
  *				com_out_ext				     *
  *===========================================================================*/
-PRIVATE int com_out_ext(cmd)
+static int com_out_ext(cmd)
 struct command *cmd;		/* Command block */
 {
 /* Output the command block to the winchester controller and return status */
@@ -1673,7 +1669,7 @@ struct command *cmd;		/* Command block */
 /*===========================================================================*
  *				setup_dma				     *
  *===========================================================================*/
-PRIVATE void setup_dma(sizep, proc_nr, iov, addr_offset, do_write,
+static void setup_dma(sizep, proc_nr, iov, addr_offset, do_write,
 	do_copyoutp, safe)
 unsigned *sizep;
 int proc_nr;
@@ -1916,7 +1912,7 @@ int safe;
 /*===========================================================================*
  *				w_need_reset				     *
  *===========================================================================*/
-PRIVATE void w_need_reset()
+static void w_need_reset()
 {
 /* The controller needs to be reset. */
   struct wini *wn;
@@ -1933,7 +1929,7 @@ PRIVATE void w_need_reset()
 /*===========================================================================*
  *				w_do_close				     *
  *===========================================================================*/
-PRIVATE int w_do_close(dp, m_ptr)
+static int w_do_close(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -1950,7 +1946,7 @@ message *m_ptr;
 /*===========================================================================*
  *				com_simple				     *
  *===========================================================================*/
-PRIVATE int com_simple(cmd)
+static int com_simple(cmd)
 struct command *cmd;		/* Command block */
 {
 /* A simple controller command, only one interrupt and no data-out phase. */
@@ -1966,7 +1962,7 @@ struct command *cmd;		/* Command block */
 /*===========================================================================*
  *				w_timeout				     *
  *===========================================================================*/
-PRIVATE void w_timeout(void)
+static void w_timeout(void)
 {
   struct wini *wn = w_wn;
 
@@ -1999,7 +1995,7 @@ PRIVATE void w_timeout(void)
 /*===========================================================================*
  *				w_reset					     *
  *===========================================================================*/
-PRIVATE int w_reset()
+static int w_reset()
 {
 /* Issue a reset to the controller.  This is done after any catastrophe,
  * like the controller refusing to respond.
@@ -2046,7 +2042,7 @@ PRIVATE int w_reset()
 /*===========================================================================*
  *				w_intr_wait				     *
  *===========================================================================*/
-PRIVATE void w_intr_wait()
+static void w_intr_wait()
 {
 /* Wait for a task completion interrupt. */
 
@@ -2095,7 +2091,7 @@ PRIVATE void w_intr_wait()
 /*===========================================================================*
  *				at_intr_wait				     *
  *===========================================================================*/
-PRIVATE int at_intr_wait()
+static int at_intr_wait()
 {
 /* Wait for an interrupt, study the status bits and return error/success. */
   int r, s;
@@ -2120,7 +2116,7 @@ PRIVATE int at_intr_wait()
 /*===========================================================================*
  *				w_waitfor				     *
  *===========================================================================*/
-PRIVATE int w_waitfor(mask, value)
+static int w_waitfor(mask, value)
 int mask;			/* status mask */
 int value;			/* required status */
 {
@@ -2151,7 +2147,7 @@ int value;			/* required status */
 /*===========================================================================*
  *				w_waitfor_dma				     *
  *===========================================================================*/
-PRIVATE int w_waitfor_dma(mask, value)
+static int w_waitfor_dma(mask, value)
 int mask;			/* status mask */
 int value;			/* required status */
 {
@@ -2180,7 +2176,7 @@ int value;			/* required status */
 /*===========================================================================*
  *				w_geometry				     *
  *===========================================================================*/
-PRIVATE void w_geometry(entry)
+static void w_geometry(entry)
 struct partition *entry;
 {
   struct wini *wn = w_wn;
@@ -2200,7 +2196,7 @@ struct partition *entry;
 /*===========================================================================*
  *				atapi_open				     *
  *===========================================================================*/
-PRIVATE int atapi_open()
+static int atapi_open()
 {
 /* Should load and lock the device and obtain its size.  For now just set the
  * size of the device to something big.  What is really needed is a generic
@@ -2213,7 +2209,7 @@ PRIVATE int atapi_open()
 /*===========================================================================*
  *				atapi_close				     *
  *===========================================================================*/
-PRIVATE void atapi_close()
+static void atapi_close()
 {
 /* Should unlock the device.  For now do nothing.  (XXX) */
 }
@@ -2251,7 +2247,7 @@ void sense_request(void)
 /*===========================================================================*
  *				atapi_transfer				     *
  *===========================================================================*/
-PRIVATE int atapi_transfer(proc_nr, opcode, position, iov, nr_req, safe)
+static int atapi_transfer(proc_nr, opcode, position, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t position;			/* offset on device to read or write */
@@ -2397,7 +2393,7 @@ int safe;			/* use safecopies? */
 /*===========================================================================*
  *				atapi_sendpacket			     *
  *===========================================================================*/
-PRIVATE int atapi_sendpacket(packet, cnt)
+static int atapi_sendpacket(packet, cnt)
 u8_t *packet;
 unsigned cnt;
 {
@@ -2465,7 +2461,7 @@ unsigned cnt;
 /*===========================================================================*
  *				w_other					     *
  *===========================================================================*/
-PRIVATE int w_other(dr, m, safe)
+static int w_other(dr, m, safe)
 struct driver *dr;
 message *m;
 int safe;
@@ -2548,7 +2544,7 @@ int safe;
 /*===========================================================================*
  *				w_hw_int				     *
  *===========================================================================*/
-PRIVATE int w_hw_int(dr, m)
+static int w_hw_int(dr, m)
 struct driver *dr;
 message *m;
 {
@@ -2562,7 +2558,7 @@ message *m;
 /*===========================================================================*
  *				ack_irqs				     *
  *===========================================================================*/
-PRIVATE void ack_irqs(unsigned int irqs)
+static void ack_irqs(unsigned int irqs)
 {
   unsigned int drive;
   unsigned long w_status;
@@ -2622,7 +2618,7 @@ char *strerr(int e)
 /*===========================================================================*
  *				atapi_intr_wait				     *
  *===========================================================================*/
-PRIVATE int atapi_intr_wait()
+static int atapi_intr_wait()
 {
 /* Wait for an interrupt and study the results.  Returns a number of bytes
  * that need to be transferred, or an error code.
@@ -2704,7 +2700,7 @@ PRIVATE int atapi_intr_wait()
 #undef sys_voutb
 #undef sys_vinb
 
-PRIVATE int at_voutb(int line, pvb_pair_t *pvb, int n)
+static int at_voutb(int line, pvb_pair_t *pvb, int n)
 {
   int s, i;
   if ((s=sys_voutb(pvb,n)) == OK)
@@ -2715,7 +2711,7 @@ PRIVATE int at_voutb(int line, pvb_pair_t *pvb, int n)
   panic(w_name(), "sys_voutb failed", NO_NUM);
 }
 
-PRIVATE int at_vinb(int line, pvb_pair_t *pvb, int n)
+static int at_vinb(int line, pvb_pair_t *pvb, int n)
 {
   int s, i;
   if ((s=sys_vinb(pvb,n)) == OK)
@@ -2726,7 +2722,7 @@ PRIVATE int at_vinb(int line, pvb_pair_t *pvb, int n)
   panic(w_name(), "sys_vinb failed", NO_NUM);
 }
 
-PRIVATE int at_out(int line, u32_t port, u32_t value,
+static int at_out(int line, u32_t port, u32_t value,
 	char *typename, int type)
 {
 	int s;
@@ -2739,7 +2735,7 @@ PRIVATE int at_out(int line, u32_t port, u32_t value,
 }
 
 
-PRIVATE int at_in(int line, u32_t port, u32_t *value,
+static int at_in(int line, u32_t port, u32_t *value,
 	char *typename, int type)
 {
 	int s;

@@ -25,11 +25,11 @@
 
 #define DEBUG 0
 
-static int _tcp_accept(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len);
+static int _tcp_accept(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len);
 
-int accept(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len)
+int accept(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len)
 {
 	int r;
 	nwio_udpopt_t udpopt;
@@ -58,8 +58,8 @@ int accept(int socket, struct sockaddr *_RESTRICT address,
 	return r;
 }
 
-static int _tcp_accept(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len)
+static int _tcp_accept(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len)
 {
 	int r, s1, t_errno;
 	tcp_cookie_t cookie;

@@ -18,6 +18,6 @@ struct statfs {
   off_t f_bsize;		/* file system block size */
 };
 
-_PROTOTYPE( int fstatfs, (int fd, struct statfs *st)		);
+int fstatfs(int fd, struct statfs *st);
 
 #endif /* _STATFS_H */

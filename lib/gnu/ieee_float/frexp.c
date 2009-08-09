@@ -63,7 +63,3 @@ int *eptr;
 
 	return value;
 }
-
-/*
- * $PchId: frexp.c,v 1.3 1996/02/22 21:01:39 philip Exp $
- */

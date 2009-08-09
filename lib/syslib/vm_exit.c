@@ -15,7 +15,7 @@
 /*===========================================================================*
  *                                vm_exit				     *
  *===========================================================================*/
-PUBLIC int vm_exit(endpoint_t ep)
+int vm_exit(endpoint_t ep)
 {
     message m;
     int result;
@@ -30,7 +30,7 @@ PUBLIC int vm_exit(endpoint_t ep)
 /*===========================================================================*
  *                                vm_willexit				     *
  *===========================================================================*/
-PUBLIC int vm_willexit(endpoint_t ep)
+int vm_willexit(endpoint_t ep)
 {
     message m;
     int result;

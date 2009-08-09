@@ -52,16 +52,15 @@
 #define CORE_MODE	0777	/* mode to use on core image files */
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-PUBLIC unsigned long calls_stats[NCALLS];
+unsigned long calls_stats[NCALLS];
 #endif
 
-FORWARD _PROTOTYPE( void free_proc, (struct fproc *freed, int flags));
+static void free_proc(struct fproc *freed, int flags);
 /*
-FORWARD _PROTOTYPE( int dumpcore, (int proc_e, struct mem_map *seg_ptr));
-FORWARD _PROTOTYPE( int write_bytes, (struct inode *rip, off_t off,
-	char *buf, size_t bytes));
-FORWARD _PROTOTYPE( int write_seg, (struct inode *rip, off_t off, int proc_e,
-	int seg, off_t seg_off, phys_bytes seg_bytes));
+static int dumpcore(int proc_e, struct mem_map *seg_ptr);
+static int write_bytes(struct inode *rip, off_t off, char *buf, size_t bytes);
+static int write_seg(struct inode *rip, off_t off, int proc_e,
+		     int seg, off_t seg_off, phys_bytes seg_bytes));
 */
 
 #define FP_EXITING	1
@@ -70,7 +69,7 @@ FORWARD _PROTOTYPE( int write_seg, (struct inode *rip, off_t off, int proc_e,
 /*===========================================================================*
  *				do_getsysinfo				     *
  *===========================================================================*/
-PUBLIC int do_getsysinfo()
+int do_getsysinfo()
 {
   struct fproc *proc_addr;
   vir_bytes src_addr, dst_addr;
@@ -120,7 +119,7 @@ PUBLIC int do_getsysinfo()
 /*===========================================================================*
  *				do_dup					     *
  *===========================================================================*/
-PUBLIC int do_dup()
+int do_dup()
 {
 /* Perform the dup(fd) or dup2(fd,fd2) system call. These system calls are
  * obsolete.  In fact, it is not even possible to invoke them using the
@@ -161,7 +160,7 @@ PUBLIC int do_dup()
 /*===========================================================================*
  *				do_fcntl				     *
  *===========================================================================*/
-PUBLIC int do_fcntl()
+int do_fcntl()
 {
 /* Perform the fcntl(fd, request, ...) system call. */
 
@@ -285,7 +284,7 @@ PUBLIC int do_fcntl()
 /*===========================================================================*
  *				do_sync					     *
  *===========================================================================*/
-PUBLIC int do_sync()
+int do_sync()
 {
   struct vmnt *vmp;
   for (vmp = &vmnt[1]; vmp < &vmnt[NR_MNTS]; ++vmp) {
@@ -300,7 +299,7 @@ PUBLIC int do_sync()
 /*===========================================================================*
  *				do_fsync				     *
  *===========================================================================*/
-PUBLIC int do_fsync()
+int do_fsync()
 {
 /* Perform the fsync() system call. For now, don't be unnecessarily smart. */
 
@@ -337,7 +336,7 @@ void unmount_all(void)
 /*===========================================================================*
  *				pm_reboot				     *
  *===========================================================================*/
-PUBLIC void pm_reboot()
+void pm_reboot()
 {
   /* Perform the FS side of the reboot call. */
   int i;
@@ -370,7 +369,7 @@ PUBLIC void pm_reboot()
 /*===========================================================================*
  *				pm_fork					     *
  *===========================================================================*/
-PUBLIC void pm_fork(pproc, cproc, cpid)
+void pm_fork(pproc, cproc, cpid)
 int pproc;	/* Parent process */
 int cproc;	/* Child process */
 int cpid;	/* Child process id */
@@ -437,7 +436,7 @@ int cpid;	/* Child process id */
 /*===========================================================================*
  *				free_proc				     *
  *===========================================================================*/
-PRIVATE void free_proc(struct fproc *exiter, int flags)
+static void free_proc(struct fproc *exiter, int flags)
 {
   int i, task;
   register struct fproc *rfp;
@@ -524,7 +523,7 @@ PRIVATE void free_proc(struct fproc *exiter, int flags)
 /*===========================================================================*
  *				pm_exit					     *
  *===========================================================================*/
-PUBLIC void pm_exit(proc)
+void pm_exit(proc)
 int proc;
 {
   int exitee_p;
@@ -538,7 +537,7 @@ int proc;
 /*===========================================================================*
  *				pm_setgid				     *
  *===========================================================================*/
-PUBLIC void pm_setgid(proc_e, egid, rgid)
+void pm_setgid(proc_e, egid, rgid)
 int proc_e;
 int egid;
 int rgid;
@@ -557,7 +556,7 @@ int rgid;
 /*===========================================================================*
  *				pm_setuid				     *
  *===========================================================================*/
-PUBLIC void pm_setuid(proc_e, euid, ruid)
+void pm_setuid(proc_e, euid, ruid)
 int proc_e;
 int euid;
 int ruid;
@@ -575,7 +574,7 @@ int ruid;
 /*===========================================================================*
  *				do_svrctl				     *
  *===========================================================================*/
-PUBLIC int do_svrctl()
+int do_svrctl()
 {
   switch (m_in.svrctl_req) {
   case FSSIGNON: {
@@ -638,7 +637,7 @@ PUBLIC int do_svrctl()
 /*===========================================================================*
  *				pm_dumpcore				     *
  *===========================================================================*/
-PUBLIC int pm_dumpcore(proc_e, seg_ptr)
+int pm_dumpcore(proc_e, seg_ptr)
 int proc_e;
 struct mem_map *seg_ptr;
 {

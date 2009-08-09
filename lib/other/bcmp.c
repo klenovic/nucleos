@@ -13,8 +13,8 @@
 #include <string.h>
 
 int bcmp(s1, s2, length)	/* == 0 or != 0 for equality and inequality */ 
-_CONST void *s1;
-_CONST void *s2;
+const void *s1;
+const void *s2;
 size_t length;
 {
   return(memcmp(s1, s2, length));

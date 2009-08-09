@@ -10,8 +10,8 @@
 #include <lib.h>
 #include <string.h>
 
-PUBLIC void _loadname(name, msgptr)
-_CONST char *name;
+void _loadname(name, msgptr)
+const char *name;
 message *msgptr;
 {
 /* This function is used to load a string into a type m3 message. If the

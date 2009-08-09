@@ -71,9 +71,9 @@ struct flock {
 };
 
 /* Function Prototypes. */
-_PROTOTYPE( int creat, (const char *_path, _mnx_Mode_t _mode)		);
-_PROTOTYPE( int fcntl, (int _filedes, int _cmd, ...)	  		);
-_PROTOTYPE( int open,  (const char *_path, int _oflag, ...) 		);
+int creat(const char *_path, _mnx_Mode_t _mode);
+int fcntl(int _filedes, int _cmd, ...);
+int open(const char *_path, int _oflag, ...);
 
 /* For locking files. */
 #define LOCK_SH		F_RDLCK		/* Shared lock */
@@ -81,6 +81,6 @@ _PROTOTYPE( int open,  (const char *_path, int _oflag, ...) 		);
 #define LOCK_NB		0x0080		/* Do not block when locking */
 #define LOCK_UN		F_UNLCK		/* Unlock */
 
-_PROTOTYPE(  int flock, (int fd, int mode)				);
+int flock(int fd, int mode);
 
 #endif /* _FCNTL_H */

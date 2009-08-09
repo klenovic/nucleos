@@ -37,8 +37,8 @@
 /*
    getsockname...
 */
-int getsockname(int fd, struct sockaddr *_RESTRICT address, 
-   socklen_t *_RESTRICT address_len)
+int getsockname(int fd, struct sockaddr *__restrict address, 
+   socklen_t *__restrict address_len)
 {
 	nwio_tcpconf_t tcpconf;
 	socklen_t len;

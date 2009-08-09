@@ -11,7 +11,7 @@
 #define sigpending _sigpending
 #include <signal.h>
 
-PUBLIC int sigpending(set)
+int sigpending(set)
 sigset_t *set;
 {
   message m;

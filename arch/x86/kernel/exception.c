@@ -79,7 +79,7 @@ void pagefault(struct proc *pr, int trap_errno)
 /*===========================================================================*
  *				exception				     *
  *===========================================================================*/
-PUBLIC void exception_handler(vec_nr, trap_errno, old_eip, old_cs, old_eflags)
+void exception_handler(vec_nr, trap_errno, old_eip, old_cs, old_eflags)
 unsigned vec_nr;
 u32_t trap_errno;
 u32_t old_eip;
@@ -187,7 +187,7 @@ struct proc *t;
 /*===========================================================================*
  *				stacktrace				     *
  *===========================================================================*/
-PUBLIC void proc_stacktrace(struct proc *proc)
+void proc_stacktrace(struct proc *proc)
 {
 	reg_t bp, v_bp, v_pc, v_hbp;
 

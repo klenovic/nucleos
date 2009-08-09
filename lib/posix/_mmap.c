@@ -16,7 +16,7 @@
 #include <string.h>
 #include <errno.h>
 
-PUBLIC void *mmap(void *addr, size_t len, int prot, int flags,
+void *mmap(void *addr, size_t len, int prot, int flags,
 	int fd, off_t offset)
 {
 	message m;
@@ -38,7 +38,7 @@ PUBLIC void *mmap(void *addr, size_t len, int prot, int flags,
 	return (void *) m.VMM_RETADDR;
 }
 
-PUBLIC int munmap(void *addr, size_t len)
+int munmap(void *addr, size_t len)
 {
 	message m;
 

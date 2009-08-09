@@ -163,6 +163,3 @@ __findenv(name, offset)
 		}
 	return (NULL);
 }
-/*
- * $PchId: setenv.c,v 1.3 1996/05/09 20:43:02 philip Exp philip $
- */

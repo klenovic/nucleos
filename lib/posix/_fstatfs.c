@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <sys/statfs.h>
 
-PUBLIC int fstatfs(int fd, struct statfs *buffer)
+int fstatfs(int fd, struct statfs *buffer)
 {
   message m;
 

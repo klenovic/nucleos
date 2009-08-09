@@ -37,7 +37,7 @@ static char sccsid[] = "@(#)getprotoent.c	5.7 (Berkeley) 6/1/90";
 #ifdef _MINIX
 #include <net/gen/netdb.h>
 
-static char *any _ARGS(( char *cp, char *match ));
+static char *any(char *cp, char *match);
 #endif
 
 #define	MAXALIASES	35

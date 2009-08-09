@@ -265,7 +265,7 @@ char *cm;
 int destcol;
 int destline;
 {
-  PRIVATE char ret[24];
+  static char ret[24];
   char *rp = ret;
   int incr = 0;
   int argno = 0;
@@ -325,7 +325,7 @@ int destline;
 int tputs(cp, affcnt, outc)
 register char *cp;
 int affcnt;
-_PROTOTYPE( void (*outc), (int ch));
+void (*outc)(int ch);
 {
   if (cp == (char *)NULL) return(1);
   /* Do any padding interpretation - left null for MINIX just now */

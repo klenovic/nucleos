@@ -10,7 +10,7 @@
 #ifndef __SERVERS_VFS_VNODE_H
 #define __SERVERS_VFS_VNODE_H
 
-EXTERN struct vnode {
+struct vnode {
   endpoint_t v_fs_e;            /* FS process' endpoint number */
   ino_t v_inode_nr;		/* inode number on its (minor) device */
   mode_t v_mode;		/* file type, protection, etc. */
@@ -36,7 +36,9 @@ EXTERN struct vnode {
   /* For debugging */
   char *v_file;
   int v_line;
-} vnode[NR_VNODES];
+};
+
+extern struct vnode vnode[];
 
 #define NIL_VNODE (struct vnode *) 0	/* indicates absence of vnode slot */
 

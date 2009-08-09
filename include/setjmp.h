@@ -60,10 +60,6 @@
 #ifndef _SETJMP_H
 #define _SETJMP_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 typedef struct {
 #ifdef __GNUC__
   int __flags;			/* XXX - long might give better alignment */
@@ -72,8 +68,8 @@ typedef struct {
 #endif
 } jmp_buf[1];
 
-_PROTOTYPE( int __setjmp, (jmp_buf _env, int _savemask)			);
-_PROTOTYPE( void longjmp, (jmp_buf _env, int _val)			);
+int __setjmp(jmp_buf _env, int _savemask);
+void longjmp(jmp_buf _env, int _val);
 
 #define setjmp(env)	__setjmp((env), 1)
 

@@ -21,10 +21,10 @@
 #include <string.h>
 #include <unistd.h>
 
-PRIVATE char base[] = "/dev";
-PRIVATE char path[sizeof(base) + 1 + NAME_MAX];	/* extra 1 for '/' */
+static char base[] = "/dev";
+static char path[sizeof(base) + 1 + NAME_MAX];	/* extra 1 for '/' */
 
-PUBLIC char *ttyname(fildes)
+char *ttyname(fildes)
 int fildes;
 {
   DIR *devices;

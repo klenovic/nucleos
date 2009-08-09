@@ -203,65 +203,58 @@ typedef struct tcp_conn
 #define TCS_CLOSING		5
 
 /* tcp_recv.c */
-void tcp_frag2conn ARGS(( tcp_conn_t *tcp_conn, ip_hdr_t *ip_hdr,
-	tcp_hdr_t *tcp_hdr, acc_t *tcp_data, size_t data_len ));
-void tcp_fd_read ARGS(( tcp_conn_t *tcp_conn, int enq ));
-unsigned tcp_sel_read ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_rsel_read ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_bytesavailable ARGS(( tcp_fd_t *tcp_fd, int *bytesp ));
+void tcp_frag2conn(tcp_conn_t *tcp_conn, ip_hdr_t *ip_hdr,
+	tcp_hdr_t *tcp_hdr, acc_t *tcp_data, size_t data_len);
+void tcp_fd_read(tcp_conn_t *tcp_conn, int enq);
+unsigned tcp_sel_read(tcp_conn_t *tcp_conn);
+void tcp_rsel_read(tcp_conn_t *tcp_conn);
+void tcp_bytesavailable(tcp_fd_t *tcp_fd, int *bytesp);
 
 /* tcp_send.c */
-void tcp_conn_write ARGS(( tcp_conn_t *tcp_conn, int enq ));
-void tcp_release_retrans ARGS(( tcp_conn_t *tcp_conn, u32_t seg_ack,
-	U16_t new_win ));
-void tcp_fast_retrans ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_set_send_timer ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_fd_write ARGS(( tcp_conn_t *tcp_conn ));
-unsigned tcp_sel_write ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_rsel_write ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_close_connection ARGS(( tcp_conn_t *tcp_conn,
-	int error ));
-void tcp_port_write ARGS(( tcp_port_t *tcp_port ));
-void tcp_shutdown ARGS(( tcp_conn_t *tcp_conn ));
+void tcp_conn_write(tcp_conn_t *tcp_conn, int enq);
+void tcp_release_retrans(tcp_conn_t *tcp_conn, u32_t seg_ack, U16_t new_win);
+void tcp_fast_retrans(tcp_conn_t *tcp_conn);
+void tcp_set_send_timer(tcp_conn_t *tcp_conn);
+void tcp_fd_write(tcp_conn_t *tcp_conn);
+unsigned tcp_sel_write(tcp_conn_t *tcp_conn);
+void tcp_rsel_write(tcp_conn_t *tcp_conn);
+void tcp_close_connection(tcp_conn_t *tcp_conn, int error);
+void tcp_port_write(tcp_port_t *tcp_port);
+void tcp_shutdown(tcp_conn_t *tcp_conn);
 
 /* tcp_lib.c */
-void tcp_extract_ipopt ARGS(( tcp_conn_t *tcp_conn,
-	ip_hdr_t *ip_hdr ));
-void tcp_extract_tcpopt ARGS(( tcp_conn_t *tcp_conn,
-	tcp_hdr_t *tcp_hdr, size_t *mssp ));
-void tcp_get_ipopt ARGS(( tcp_conn_t *tcp_conn, ip_hdropt_t
-	*ip_hdropt ));
-void tcp_get_tcpopt ARGS(( tcp_conn_t *tcp_conn, tcp_hdropt_t
-	*tcp_hdropt ));
-acc_t *tcp_make_header ARGS(( tcp_conn_t *tcp_conn,
-	ip_hdr_t **ref_ip_hdr, tcp_hdr_t **ref_tcp_hdr, acc_t *data ));
-u16_t tcp_pack_oneCsum ARGS(( ip_hdr_t *ip_hdr, acc_t *tcp_pack ));
-int tcp_check_conn ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_print_pack ARGS(( ip_hdr_t *ip_hdr, tcp_hdr_t *tcp_hdr ));
-void tcp_print_state ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_print_conn ARGS(( tcp_conn_t *tcp_conn ));
-int tcp_LEmod4G ARGS(( u32_t n1, u32_t n2 ));
-int tcp_Lmod4G ARGS(( u32_t n1, u32_t n2 ));
-int tcp_GEmod4G ARGS(( u32_t n1, u32_t n2 ));
-int tcp_Gmod4G ARGS(( u32_t n1, u32_t n2 ));
+void tcp_extract_ipopt(tcp_conn_t *tcp_conn, ip_hdr_t *ip_hdr);
+void tcp_extract_tcpopt(tcp_conn_t *tcp_conn, tcp_hdr_t *tcp_hdr, size_t *mssp);
+void tcp_get_ipopt(tcp_conn_t *tcp_conn, ip_hdropt_t *ip_hdropt);
+void tcp_get_tcpopt(tcp_conn_t *tcp_conn, tcp_hdropt_t *tcp_hdropt);
+acc_t *tcp_make_header(tcp_conn_t *tcp_conn, ip_hdr_t **ref_ip_hdr, tcp_hdr_t **ref_tcp_hdr,
+		       acc_t *data);
+u16_t tcp_pack_oneCsum(ip_hdr_t *ip_hdr, acc_t *tcp_pack);
+int tcp_check_conn(tcp_conn_t *tcp_conn);
+void tcp_print_pack(ip_hdr_t *ip_hdr, tcp_hdr_t *tcp_hdr);
+void tcp_print_state(tcp_conn_t *tcp_conn);
+void tcp_print_conn(tcp_conn_t *tcp_conn);
+int tcp_LEmod4G(u32_t n1, u32_t n2);
+int tcp_Lmod4G(u32_t n1, u32_t n2);
+int tcp_GEmod4G(u32_t n1, u32_t n2);
+int tcp_Gmod4G(u32_t n1, u32_t n2);
 
 /* tcp.c */
-void tcp_restart_connect ARGS(( tcp_conn_t *tcp_conn ));
-int tcp_su4listen ARGS(( tcp_fd_t *tcp_fd, tcp_conn_t *tcp_conn,
-	int do_listenq ));
-void tcp_reply_ioctl ARGS(( tcp_fd_t *tcp_fd, int reply ));
-void tcp_reply_write ARGS(( tcp_fd_t *tcp_fd, size_t reply ));
-void tcp_reply_read ARGS(( tcp_fd_t *tcp_fd, size_t reply ));
-void tcp_notreach ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_mtu_exceeded ARGS(( tcp_conn_t *tcp_conn ));
-void tcp_mtu_incr ARGS(( tcp_conn_t *tcp_conn ));
+void tcp_restart_connect(tcp_conn_t *tcp_conn);
+int tcp_su4listen(tcp_fd_t *tcp_fd, tcp_conn_t *tcp_conn, int do_listenq);
+void tcp_reply_ioctl(tcp_fd_t *tcp_fd, int reply);
+void tcp_reply_write(tcp_fd_t *tcp_fd, size_t reply);
+void tcp_reply_read(tcp_fd_t *tcp_fd, size_t reply);
+void tcp_notreach(tcp_conn_t *tcp_conn);
+void tcp_mtu_exceeded(tcp_conn_t *tcp_conn);
+void tcp_mtu_incr(tcp_conn_t *tcp_conn);
 
 #define TCP_FD_NR	(10*IP_PORT_MAX)
 #define TCP_CONN_NR	(2*TCP_FD_NR)
 
-EXTERN tcp_port_t *tcp_port_table;
-EXTERN tcp_conn_t tcp_conn_table[TCP_CONN_NR];
-EXTERN tcp_fd_t tcp_fd_table[TCP_FD_NR];
+extern tcp_port_t *tcp_port_table;
+extern tcp_conn_t tcp_conn_table[TCP_CONN_NR];
+extern tcp_fd_t tcp_fd_table[TCP_FD_NR];
 
 #define tcp_Lmod4G(n1,n2)	(!!(((n1)-(n2)) & 0x80000000L))
 #define tcp_GEmod4G(n1,n2)	(!(((n1)-(n2)) & 0x80000000L))
@@ -269,7 +262,3 @@ EXTERN tcp_fd_t tcp_fd_table[TCP_FD_NR];
 #define tcp_LEmod4G(n1,n2)	(!(((n2)-(n1)) & 0x80000000L))
 
 #endif /* TCP_INT_H */
-
-/*
- * $PchId: tcp_int.h,v 1.17 2005/06/28 14:21:08 philip Exp $
- */

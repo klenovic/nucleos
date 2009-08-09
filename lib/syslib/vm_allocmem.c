@@ -15,7 +15,7 @@
 /*===========================================================================*
  *                                vm_allocmem				     *
  *===========================================================================*/
-PUBLIC int vm_allocmem(phys_clicks bytes, phys_clicks *retmembase)
+int vm_allocmem(phys_clicks bytes, phys_clicks *retmembase)
 {
     message m;
     int result;

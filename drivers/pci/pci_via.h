@@ -30,7 +30,3 @@ Created:	Jun 2001 by Philip Homburg <philip@cs.vu.nl>
 #define		VIA_ISABR_IRQ_INT1	0x0f	/* routing for INT1 */
 #define VIA_ISABR_IRQ_R4 0x58	/* IRQ routing 4 */
 #define		VIA_ISABR_IRQ_INT2	0x0f	/* routing for INT2 */
-
-/*
- * $PchId: pci_via.h,v 1.1 2001/06/20 15:50:25 philip Exp $
- */

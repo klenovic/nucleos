@@ -135,7 +135,3 @@ _gettemp(path, doopen)
 	}
 	/*NOTREACHED*/
 }
-
-/*
- * $PchId: mktemp.c,v 1.3 1995/11/20 19:10:39 philip Exp $
- */

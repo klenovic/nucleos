@@ -26,7 +26,7 @@
 /*===========================================================================*
  *				do_privctl				     *
  *===========================================================================*/
-PUBLIC int do_privctl(m_ptr)
+int do_privctl(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_privctl(). Update a process' privileges. If the process is not

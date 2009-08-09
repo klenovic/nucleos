@@ -54,9 +54,9 @@ union fsdata_u {
 
 #define BUFHASH(b) ((b) % NR_BUFS)
 
-EXTERN struct buf *front;	/* points to least recently used free block */
-EXTERN struct buf *rear;	/* points to most recently used free block */
-EXTERN int bufs_in_use;		/* # bufs currently in use (not on free list)*/
+extern struct buf *front;	/* points to least recently used free block */
+extern struct buf *rear;	/* points to most recently used free block */
+extern int bufs_in_use;		/* # bufs currently in use (not on free list)*/
 
 /* When a block is released, the type of usage is passed to put_block(). */
 #define WRITE_IMMED   0100 /* block should be written to disk now */
@@ -68,4 +68,3 @@ EXTERN int bufs_in_use;		/* # bufs currently in use (not on free list)*/
 #define MAP_BLOCK          3				 /* bit map */
 #define FULL_DATA_BLOCK    5		 	 	 /* data, fully used */
 #define PARTIAL_DATA_BLOCK 6 				 /* data, partly used*/
-

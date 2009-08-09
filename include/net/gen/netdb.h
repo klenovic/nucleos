@@ -108,32 +108,31 @@ extern int h_errno;
 #include <ansi.h>
 #endif
 
-void		endhostent _ARGS((void));
-void		endnetent _ARGS((void));
-void		endprotoent _ARGS((void));
-void		endservent _ARGS((void));
-struct hostent	*gethostbyaddr _ARGS((const char *, int, int));
-struct hostent	*gethostbyname _ARGS((const char *));
-struct hostent	*gethostent _ARGS((void));
-struct netent	*getnetbyaddr _ARGS((long, int)); /* u_long? */
-struct netent	*getnetbyname _ARGS((const char *));
-struct netent	*getnetent _ARGS((void));
-struct protoent	*getprotobyname _ARGS((const char *));
-struct protoent	*getprotobynumber _ARGS((int));
-struct protoent	*getprotoent _ARGS((void));
-struct servent	*getservbyname _ARGS((const char *, const char *));
-struct servent	*getservbyport _ARGS((int, const char *));
-struct servent	*getservent _ARGS((void));
-void		herror _ARGS((const char *));
-void		sethostent _ARGS((int));
-/* void		sethostfile _ARGS((const char *)); */
-void		setnetent _ARGS((int));
-void		setprotoent _ARGS((int));
-void		setservent _ARGS((int));
+void		endhostent(void);
+void		endnetent(void);
+void		endprotoent(void);
+void		endservent(void);
+struct hostent	*gethostbyaddr(const char *, int, int);
+struct hostent	*gethostbyname(const char *);
+struct hostent	*gethostent(void);
+struct netent	*getnetbyaddr(long, int); /* u_long? */
+struct netent	*getnetbyname(const char *);
+struct netent	*getnetent(void);
+struct protoent	*getprotobyname(const char *);
+struct protoent	*getprotobynumber(int);
+struct protoent	*getprotoent(void);
+struct servent	*getservbyname(const char *, const char *);
+struct servent	*getservbyport(int, const char *);
+struct servent	*getservent(void);
+void		herror(const char *);
+void		sethostent(int);
+/* void		sethostfile(const char *); */
+void		setnetent(int);
+void		setprotoent(int);
+void		setservent(int);
 #ifdef _MINIX
-int		servxcheck _ARGS((ipaddr_t _peer, const char *_service,
-			void (*_logf) _ARGS((int _pass, const char *_name))));
-char		*servxfile _ARGS((const char *_file));
+int servxcheck(ipaddr_t _peer, const char *_service, void (*_logf)(int _pass, const char *_name));
+char *servxfile(const char *_file);
 #endif
 
 #endif /* !_NETDB_H_ */

@@ -11,7 +11,7 @@
 #define pipe	_pipe
 #include <unistd.h>
 
-PUBLIC int pipe(fild)
+int pipe(fild)
 int fild[2];
 {
   message m;

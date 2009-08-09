@@ -27,14 +27,14 @@ int callnr;		/* system call number */
 extern int errno;	/* error number set by system library */
 
 /* Declare some local functions. */
-FORWARD _PROTOTYPE(void init_server, (int argc, char **argv)		);
-FORWARD _PROTOTYPE(void get_work, (void)				);
-FORWARD _PROTOTYPE(void reply, (int whom, int result)			);
+static void init_server(int argc, char **argv);
+static void get_work(void);
+static void reply(int whom, int result);
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 /* This is the main routine of this service. The main loop consists of 
  * three major activities: getting new work, processing the work, and
@@ -87,7 +87,7 @@ PUBLIC int main(int argc, char **argv)
 /*===========================================================================*
  *				 init_server                                 *
  *===========================================================================*/
-PRIVATE void init_server(int argc, char **argv)
+static void init_server(int argc, char **argv)
 {
 /* Initialize the information service. */
   int fkeys, sfkeys;
@@ -112,7 +112,7 @@ PRIVATE void init_server(int argc, char **argv)
 /*===========================================================================*
  *				get_work                                     *
  *===========================================================================*/
-PRIVATE void get_work()
+static void get_work()
 {
     int status = 0;
     status = receive(ANY, &m_in);   /* this blocks until message arrives */
@@ -125,7 +125,7 @@ PRIVATE void get_work()
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PRIVATE void reply(who, result)
+static void reply(who, result)
 int who;                           	/* destination */
 int result;                           	/* report result to replyee */
 {

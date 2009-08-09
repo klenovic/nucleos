@@ -11,7 +11,7 @@
 #define time	_time
 #include <time.h>
 
-PUBLIC time_t time(tp)
+time_t time(tp)
 time_t *tp;
 {
   message m;

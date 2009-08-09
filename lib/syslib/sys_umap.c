@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_umap				     *
  *===========================================================================*/
-PUBLIC int sys_umap(proc_nr, seg, vir_addr, bytes, phys_addr)
+int sys_umap(proc_nr, seg, vir_addr, bytes, phys_addr)
 int proc_nr; 				/* process number to do umap for */
 int seg;				/* T, D, or S segment */
 vir_bytes vir_addr;			/* address in bytes with segment*/

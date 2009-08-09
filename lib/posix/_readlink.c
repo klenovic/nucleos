@@ -12,8 +12,8 @@
 #include <unistd.h>
 #include <string.h>
 
-PUBLIC int readlink(name, buffer, bufsiz)
-_CONST char *name;
+int readlink(name, buffer, bufsiz)
+const char *name;
 char *buffer;
 size_t bufsiz;
 {

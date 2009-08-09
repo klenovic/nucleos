@@ -53,10 +53,6 @@ union MNX(fsdata_u) {
 
 #define BUFHASH(b) ((b) % NR_BUFS)
 
-EXTERN struct MNX(buf) *front; /* points to least recently used free block */
-EXTERN struct MNX(buf) *rear;  /* points to most recently used free block */
-EXTERN int bufs_in_use;        /* # bufs currently in use (not on free list)*/
-
 /* When a block is released, the type of usage is passed to put_block(). */
 #define WRITE_IMMED   0100 /* block should be written to disk now */
 #define ONE_SHOT      0200 /* set if block not likely to be needed soon */

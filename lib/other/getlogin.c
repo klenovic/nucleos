@@ -24,7 +24,7 @@
 
 char *getlogin()
 {
-  PRIVATE char userid[L_cuserid];
+  static char userid[L_cuserid];
   struct passwd *pw_entry;
 
   pw_entry = getpwuid(getuid());

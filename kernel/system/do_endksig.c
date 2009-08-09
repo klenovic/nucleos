@@ -23,7 +23,7 @@
 /*===========================================================================*
  *			      do_endksig				     *
  *===========================================================================*/
-PUBLIC int do_endksig(m_ptr)
+int do_endksig(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* Finish up after a kernel type signal, caused by a SYS_KILL message or a 

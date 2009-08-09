@@ -21,14 +21,14 @@
 #include <kernel/priv.h>
 #include "../rs/manager.h"
 
-PUBLIC struct rproc rproc[NR_SYS_PROCS];
+struct rproc rproc[NR_SYS_PROCS];
 
-FORWARD _PROTOTYPE( char *s_flags_str, (int flags)		);
+static char *s_flags_str(int flags);
 
 /*===========================================================================*
  *				rproc_dmp				     *
  *===========================================================================*/
-PUBLIC void rproc_dmp()
+void rproc_dmp()
 {
   struct rproc *rp;
   int i,j, n=0;
@@ -60,7 +60,7 @@ PUBLIC void rproc_dmp()
 }
 
 
-PRIVATE char *s_flags_str(int flags)
+static char *s_flags_str(int flags)
 {
 	static char str[5];
 	str[0] = (flags & RS_IN_USE) 	 ? 'U' : '-';

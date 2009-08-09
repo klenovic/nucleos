@@ -11,8 +11,8 @@
 #define access	_access
 #include <unistd.h>
 
-PUBLIC int access(name, mode)
-_CONST char *name;
+int access(name, mode)
+const char *name;
 int mode;
 {
   message m;

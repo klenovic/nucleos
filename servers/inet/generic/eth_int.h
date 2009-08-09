@@ -56,18 +56,14 @@ extern eth_port_t *eth_port_table;
 
 extern int no_ethWritePort;	/* debug, consistency check */
 
-void osdep_eth_init ARGS(( void ));
-int eth_get_stat ARGS(( eth_port_t *eth_port, eth_stat_t *eth_stat ));
-void eth_write_port ARGS(( eth_port_t *eth_port, acc_t *pack ));
-void eth_arrive ARGS(( eth_port_t *port, acc_t *pack, size_t pack_size ));
-void eth_set_rec_conf ARGS(( eth_port_t *eth_port, u32_t flags ));
-void eth_restart_write ARGS(( eth_port_t *eth_port ));
-void eth_loop_ev ARGS(( event_t *ev, ev_arg_t ev_arg ));
-void eth_reg_vlan ARGS(( eth_port_t *eth_port, eth_port_t *vlan_port ));
-void eth_restart_ioctl ARGS(( eth_port_t *eth_port ));
+void osdep_eth_init(void);
+int eth_get_stat(eth_port_t *eth_port, eth_stat_t *eth_stat);
+void eth_write_port(eth_port_t *eth_port, acc_t *pack);
+void eth_arrive(eth_port_t *port, acc_t *pack, size_t pack_size);
+void eth_set_rec_conf(eth_port_t *eth_port, u32_t flags);
+void eth_restart_write(eth_port_t *eth_port);
+void eth_loop_ev(event_t *ev, ev_arg_t ev_arg);
+void eth_reg_vlan(eth_port_t *eth_port, eth_port_t *vlan_port);
+void eth_restart_ioctl(eth_port_t *eth_port);
 
 #endif /* ETH_INT_H */
-
-/*
- * $PchId: eth_int.h,v 1.9 2001/04/23 08:04:06 philip Exp $
- */

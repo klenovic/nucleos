@@ -28,7 +28,7 @@
 /*===========================================================================*
  *			        do_getinfo				     *
  *===========================================================================*/
-PUBLIC int do_getinfo(m_ptr)
+int do_getinfo(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Request system information to be copied to caller's address space. This

@@ -14,7 +14,7 @@
  * inodes.  A slot is free if filp_count == 0.
  */
 
-EXTERN struct filp {
+struct filp {
   mode_t filp_mode;		/* RW bits, telling how file is opened */
   int filp_flags;		/* flags from open and fcntl */
   int filp_state;		/* state for crash recovery */
@@ -34,7 +34,9 @@ EXTERN struct filp {
 
   /* following are for fd-type-specific select() */
   int filp_pipe_select_ops;
-} filp[NR_FILPS];
+};
+
+extern struct filp filp[];
 
 #define FILP_CLOSED	0	/* filp_mode: associated device closed */
 

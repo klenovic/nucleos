@@ -46,7 +46,7 @@
 #include "vnode.h"
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-EXTERN unsigned long calls_stats[NCALLS];
+extern unsigned long calls_stats[NCALLS];
 #endif
 
 static void fs_init(void);
@@ -70,6 +70,8 @@ struct nucleos_binfmt *__binfmts[] = {
 #endif
 	0,
 };
+
+struct fproc fproc[NR_PROCS];
 
 /* @brief Number of register binary formats */
 int num_binfmts = sizeof(__binfmts)/sizeof(struct nucleos_binfmt*) - 1;

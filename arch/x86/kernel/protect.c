@@ -65,19 +65,17 @@ struct tss_s {
 /* u8_t iomap[0]; */
 };
 
-PUBLIC struct segdesc_s gdt[GDT_SIZE];		/* used in klib.s and mpx.s */
-PRIVATE struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
-PUBLIC struct tss_s tss;			/* zero init */
+struct segdesc_s gdt[GDT_SIZE];		/* used in klib.s and mpx.s */
+static struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
+struct tss_s tss;			/* zero init */
 
-FORWARD _PROTOTYPE( void int_gate, (unsigned vec_nr, vir_bytes offset,
-		unsigned dpl_type) );
-FORWARD _PROTOTYPE( void sdesc, (struct segdesc_s *segdp, phys_bytes base,
-		vir_bytes size) );
+static void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type);
+static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size);
 
 /*===========================================================================*
  *				enable_iop				     * 
  *===========================================================================*/
-PUBLIC void enable_iop(struct proc *pp)
+void enable_iop(struct proc *pp)
 {
 /* Allow a user process to use I/O instructions.  Change the I/O Permission
  * Level bits in the psw. These specify least-privileged Current Permission
@@ -90,7 +88,7 @@ PUBLIC void enable_iop(struct proc *pp)
 /*===========================================================================*
  *				seg2phys				     *
  *===========================================================================*/
-PUBLIC phys_bytes seg2phys(U16_t seg)
+phys_bytes seg2phys(U16_t seg)
 {
 /* Return the base address of a segment, with seg being a 
  * register, or a 286/386 segment selector.
@@ -108,7 +106,7 @@ PUBLIC phys_bytes seg2phys(U16_t seg)
 /*===========================================================================*
  *				phys2seg				     *
  *===========================================================================*/
-PUBLIC void phys2seg(u16_t *seg, vir_bytes *off, phys_bytes phys)
+void phys2seg(u16_t *seg, vir_bytes *off, phys_bytes phys)
 {
 /* Return a segment selector and offset that can be used to reach a physical
  * address, for use by a driver doing memory I/O in the A0000 - DFFFF range.
@@ -120,7 +118,7 @@ PUBLIC void phys2seg(u16_t *seg, vir_bytes *off, phys_bytes phys)
 /*===========================================================================*
  *				init_dataseg				     *
  *===========================================================================*/
-PUBLIC void init_dataseg(register struct segdesc_s *segdp,
+void init_dataseg(register struct segdesc_s *segdp,
 	phys_bytes base, vir_bytes size, int privilege)
 {
 	/* Build descriptor for a data segment. */
@@ -133,7 +131,7 @@ PUBLIC void init_dataseg(register struct segdesc_s *segdp,
 /*===========================================================================*
  *				init_codeseg				     *
  *===========================================================================*/
-PUBLIC void init_codeseg(register struct segdesc_s *segdp, phys_bytes base,
+void init_codeseg(register struct segdesc_s *segdp, phys_bytes base,
 	vir_bytes size, int privilege)
 {
 	/* Build descriptor for a code segment. */
@@ -146,7 +144,7 @@ PUBLIC void init_codeseg(register struct segdesc_s *segdp, phys_bytes base,
 /*===========================================================================*
  *				prot_init				     *
  *===========================================================================*/
-PUBLIC void prot_init(void)
+void prot_init(void)
 {
 /* Set up tables for protected mode.
  * All GDT slots are allocated at compile time.
@@ -157,7 +155,7 @@ PUBLIC void prot_init(void)
   register struct proc *rp;
 
   static struct gate_table_s {
-        _PROTOTYPE( void (*gate), (void) );
+        void (*gate)(void);
         unsigned char vec_nr;
         unsigned char privilege;
   }
@@ -257,7 +255,7 @@ PUBLIC void prot_init(void)
 /*===========================================================================*
  *				sdesc					     *
  *===========================================================================*/
-PRIVATE void sdesc(segdp, base, size)
+static void sdesc(segdp, base, size)
 register struct segdesc_s *segdp;
 phys_bytes base;
 vir_bytes size;
@@ -282,7 +280,7 @@ vir_bytes size;
 /*===========================================================================*
  *				int_gate				     *
  *===========================================================================*/
-PRIVATE void int_gate(vec_nr, offset, dpl_type)
+static void int_gate(vec_nr, offset, dpl_type)
 unsigned vec_nr;
 vir_bytes offset;
 unsigned dpl_type;
@@ -300,7 +298,7 @@ unsigned dpl_type;
 /*===========================================================================*
  *				alloc_segments				     *
  *===========================================================================*/
-PUBLIC void alloc_segments(register struct proc *rp)
+void alloc_segments(register struct proc *rp)
 {
 /* This is called at system initialization from main() and by do_newmap(). 
  * The code has a separate function because of all hardware-dependencies.

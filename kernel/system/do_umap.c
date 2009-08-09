@@ -26,7 +26,7 @@
 /*==========================================================================*
  *				do_umap					    *
  *==========================================================================*/
-PUBLIC int do_umap(m_ptr)
+int do_umap(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Map virtual address to physical, for non-kernel processes. */

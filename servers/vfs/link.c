@@ -39,7 +39,7 @@
 /*===========================================================================*
  *				do_link					     *
  *===========================================================================*/
-PUBLIC int do_link()
+int do_link()
 {
 /* Perform the link(name1, name2) system call. */
   int r;
@@ -105,7 +105,7 @@ PUBLIC int do_link()
 /*===========================================================================*
  *				do_unlink				     *
  *===========================================================================*/
-PUBLIC int do_unlink()
+int do_unlink()
 {
 /* Perform the unlink(name) or rmdir(name) system call. The code for these two
  * is almost the same.  They differ only in some condition testing.  Unlink()
@@ -154,7 +154,7 @@ PUBLIC int do_unlink()
 /*===========================================================================*
  *				do_rename				     *
  *===========================================================================*/
-PUBLIC int do_rename()
+int do_rename()
 {
 /* Perform the rename(name1, name2) system call. */
   int r;
@@ -238,7 +238,7 @@ PUBLIC int do_rename()
 /*===========================================================================*
  *				do_truncate				     *
  *===========================================================================*/
-PUBLIC int do_truncate()
+int do_truncate()
 {
 /* truncate_inode() does the actual work of do_truncate() and do_ftruncate().
  * do_truncate() and do_ftruncate() have to get hold of the inode, either
@@ -268,7 +268,7 @@ PUBLIC int do_truncate()
 /*===========================================================================*
  *				do_ftruncate				     *
  *===========================================================================*/
-PUBLIC int do_ftruncate()
+int do_ftruncate()
 {
 /* As with do_truncate(), truncate_inode() does the actual work. */
   int r;
@@ -285,7 +285,7 @@ PUBLIC int do_ftruncate()
 /*===========================================================================*
  *				truncate_vn				     *
  *===========================================================================*/
-PUBLIC int truncate_vn(vp, newsize)
+int truncate_vn(vp, newsize)
 struct vnode *vp;
 off_t newsize;
 {
@@ -306,7 +306,7 @@ off_t newsize;
 /*===========================================================================*
  *                             do_slink					     *
  *===========================================================================*/
-PUBLIC int do_slink()
+int do_slink()
 {
 /* Perform the symlink(name1, name2) system call. */
   int r;
@@ -350,7 +350,7 @@ PUBLIC int do_slink()
 /*===========================================================================*
  *                             do_rdlink                                    *
  *===========================================================================*/
-PUBLIC int do_rdlink()
+int do_rdlink()
 {
 /* Perform the readlink(name, buf) system call. */
   int r, copylen;

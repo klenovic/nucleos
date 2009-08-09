@@ -87,7 +87,3 @@ regex_t *preg;
 		free(g->must);
 	free((char *)g);
 }
-
-/*
- * $PchId: regfree.c,v 1.2 1996/03/12 19:10:15 philip Exp $
- */

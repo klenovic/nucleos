@@ -40,7 +40,7 @@ struct logdevice {
 };
 
 /* Function prototypes. */
-_PROTOTYPE( int do_new_kmess, (message *m)				);
-_PROTOTYPE( int do_diagnostics, (message *m, int safe)			);
-_PROTOTYPE( void log_append, (char *buf, int len)				);
+int do_new_kmess(message *m);
+int do_diagnostics(message *m, int safe);
+void log_append(char *buf, int len);
 

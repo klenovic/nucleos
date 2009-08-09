@@ -26,20 +26,14 @@ Copyright 1995 Philip Homburg
 
 struct acc;
 
-void udp_prep ARGS(( void ));
-void udp_init ARGS(( void ));
-int udp_open ARGS(( int port, int srfd,
-	get_userdata_t get_userdata, put_userdata_t put_userdata, 
-	put_pkt_t put_pkt, select_res_t select_res ));
-int udp_ioctl ARGS(( int fd, ioreq_t req ));
-int udp_read ARGS(( int fd, size_t count ));
-int udp_write ARGS(( int fd, size_t count ));
-void udp_close ARGS(( int fd ));
-int udp_cancel ARGS(( int fd, int which_operation ));
+void udp_prep(void);
+void udp_init(void);
+int udp_open(int port, int srfd, get_userdata_t get_userdata, put_userdata_t put_userdata,
+	     put_pkt_t put_pkt, select_res_t select_res);
+int udp_ioctl(int fd, ioreq_t req);
+int udp_read(int fd, size_t count);
+int udp_write(int fd, size_t count);
+void udp_close(int fd);
+int udp_cancel(int fd, int which_operation);
 
 #endif /* UDP_H */
-
-
-/*
- * $PchId: udp.h,v 1.9 2005/06/28 14:12:05 philip Exp $
- */

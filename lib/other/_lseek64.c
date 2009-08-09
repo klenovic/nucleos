@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <nucleos/u64.h>
 
-PUBLIC int lseek64(fd, offset, whence, newpos)
+int lseek64(fd, offset, whence, newpos)
 int fd;
 u64_t offset;
 int whence;

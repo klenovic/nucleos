@@ -83,7 +83,3 @@ size_t strlcpy(dst, src, siz)
 
 	return(s - src - 1);	/* count does not include NUL */
 }
-
-/*
- * $PchId: strlcpy.c,v 1.1 2004/11/02 12:29:53 philip Exp $
- */

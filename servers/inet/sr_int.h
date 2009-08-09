@@ -56,8 +56,4 @@ typedef struct sr_fd
 #define SFF_SELECT_W		0x2000
 #define SFF_SELECT_X		0x4000
 
-EXTERN sr_fd_t sr_fd_table[FD_NR];
-
-/*
- * $PchId: sr_int.h,v 1.2 2005/06/28 14:28:17 philip Exp $
- */
+extern sr_fd_t sr_fd_table[FD_NR];

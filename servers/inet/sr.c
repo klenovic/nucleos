@@ -75,44 +75,38 @@
 
 THIS_FILE
 
-PUBLIC sr_fd_t sr_fd_table[FD_NR];
+sr_fd_t sr_fd_table[FD_NR];
 
-PRIVATE mq_t *repl_queue, *repl_queue_tail;
-PRIVATE struct vir_cp_req vir_cp_req[CPVEC_NR];
-PRIVATE struct vscp_vec s_cp_req[CPVEC_NR];
+static mq_t *repl_queue, *repl_queue_tail;
+static struct vir_cp_req vir_cp_req[CPVEC_NR];
+static struct vscp_vec s_cp_req[CPVEC_NR];
 
-FORWARD _PROTOTYPE ( int sr_open, (message *m) );
-FORWARD _PROTOTYPE ( void sr_close, (message *m) );
-FORWARD _PROTOTYPE ( int sr_rwio, (mq_t *m) );
-FORWARD _PROTOTYPE ( int sr_rwio_s, (mq_t *m) );
-FORWARD _PROTOTYPE ( int sr_restart_read, (sr_fd_t *fdp) );
-FORWARD _PROTOTYPE ( int sr_restart_write, (sr_fd_t *fdp) );
-FORWARD _PROTOTYPE ( int sr_restart_ioctl, (sr_fd_t *fdp) );
-FORWARD _PROTOTYPE ( int sr_cancel, (message *m) );
-FORWARD _PROTOTYPE ( int sr_select, (message *m) );
-FORWARD _PROTOTYPE ( void sr_status, (message *m) );
-FORWARD _PROTOTYPE ( void sr_reply_, (mq_t *m, int reply, int is_revive) );
-FORWARD _PROTOTYPE ( sr_fd_t *sr_getchannel, (int minor));
-FORWARD _PROTOTYPE ( acc_t *sr_get_userdata, (int fd, vir_bytes offset,
-					vir_bytes count, int for_ioctl) );
-FORWARD _PROTOTYPE ( int sr_put_userdata, (int fd, vir_bytes offset,
-						acc_t *data, int for_ioctl) );
-FORWARD _PROTOTYPE (void sr_select_res, (int fd, unsigned ops) );
-FORWARD _PROTOTYPE ( int sr_repl_queue, (int proc, int ref, int operation) );
-FORWARD _PROTOTYPE ( int walk_queue, (sr_fd_t *sr_fd, mq_t **q_head_ptr, 
-	mq_t **q_tail_ptr, int type, int proc_nr, int ref, int first_flag) );
-FORWARD _PROTOTYPE ( void process_req_q, (mq_t *mq, mq_t *tail, 
-							mq_t **tail_ptr) );
-FORWARD _PROTOTYPE ( void sr_event, (event_t *evp, ev_arg_t arg) );
-FORWARD _PROTOTYPE ( int cp_u2b, (int proc, char *src, acc_t **var_acc_ptr,
-								 int size) );
-FORWARD _PROTOTYPE ( int cp_b2u, (acc_t *acc_ptr, int proc, char *dest) );
-FORWARD _PROTOTYPE ( int cp_u2b_s, (int proc, int gid, vir_bytes offset,
-	acc_t **var_acc_ptr, int size) );
-FORWARD _PROTOTYPE ( int cp_b2u_s, (acc_t *acc_ptr, int proc, int gid,
-	vir_bytes offset) );
+static int sr_open(message *m);
+static void sr_close(message *m);
+static int sr_rwio(mq_t *m);
+static int sr_rwio_s(mq_t *m);
+static int sr_restart_read(sr_fd_t *fdp);
+static int sr_restart_write(sr_fd_t *fdp);
+static int sr_restart_ioctl(sr_fd_t *fdp);
+static int sr_cancel(message *m);
+static int sr_select(message *m);
+static void sr_status(message *m);
+static void sr_reply_(mq_t *m, int reply, int is_revive);
+static sr_fd_t *sr_getchannel(int minor);
+static acc_t *sr_get_userdata(int fd, vir_bytes offset, vir_bytes count, int for_ioctl);
+static int sr_put_userdata(int fd, vir_bytes offset, acc_t *data, int for_ioctl);
+static void sr_select_res(int fd, unsigned ops);
+static int sr_repl_queue(int proc, int ref, int operation);
+static int walk_queue(sr_fd_t *sr_fd, mq_t **q_head_ptr, mq_t **q_tail_ptr, int type,
+		      int proc_nr, int ref, int first_flag);
+static void process_req_q(mq_t *mq, mq_t *tail, mq_t **tail_ptr);
+static void sr_event(event_t *evp, ev_arg_t arg);
+static int cp_u2b(int proc, char *src, acc_t **var_acc_ptr, int size);
+static int cp_b2u(acc_t *acc_ptr, int proc, char *dest);
+static int cp_u2b_s(int proc, int gid, vir_bytes offset, acc_t **var_acc_ptr, int size);
+static int cp_b2u_s(acc_t *acc_ptr, int proc, int gid, vir_bytes offset);
 
-PUBLIC void sr_init()
+void sr_init()
 {
 	int i;
 
@@ -126,7 +120,7 @@ PUBLIC void sr_init()
 	repl_queue= NULL;
 }
 
-PUBLIC void sr_rec(m)
+void sr_rec(m)
 mq_t *m;
 {
 	int result;
@@ -210,7 +204,7 @@ mq_t *m;
 		mq_free(m);
 }
 
-PUBLIC void sr_add_minor(minor, port, openf, closef, readf, writef,
+void sr_add_minor(minor, port, openf, closef, readf, writef,
 	ioctlf, cancelf, selectf)
 int minor;
 int port;
@@ -241,7 +235,7 @@ sr_select_t selectf;
 	sr_fd->srf_select= selectf;
 }
 
-PRIVATE int sr_open(m)
+static int sr_open(m)
 message *m;
 {
 	sr_fd_t *sr_fd;
@@ -282,7 +276,7 @@ message *m;
 	return i;
 }
 
-PRIVATE void sr_close(m)
+static void sr_close(m)
 message *m;
 {
 	sr_fd_t *sr_fd;
@@ -298,7 +292,7 @@ message *m;
 	sr_fd->srf_flags= SFF_FREE;
 }
 
-PRIVATE int sr_rwio(m)
+static int sr_rwio(m)
 mq_t *m;
 {
 	sr_fd_t *sr_fd;
@@ -399,7 +393,7 @@ mq_t *m;
 	return r;
 		}
 
-PRIVATE int sr_rwio_s(m)
+static int sr_rwio_s(m)
 mq_t *m;
 {
 	sr_fd_t *sr_fd;
@@ -496,7 +490,7 @@ mq_t *m;
 	return r;
 }
 
-PRIVATE int sr_restart_read(sr_fd)
+static int sr_restart_read(sr_fd)
 sr_fd_t *sr_fd;
 {
 	mq_t *mp;
@@ -522,7 +516,7 @@ sr_fd_t *sr_fd;
 	return r;
 }
 
-PRIVATE int sr_restart_write(sr_fd)
+static int sr_restart_write(sr_fd)
 sr_fd_t *sr_fd;
 {
 	mq_t *mp;
@@ -548,7 +542,7 @@ sr_fd_t *sr_fd;
 	return r;
 }
 
-PRIVATE int sr_restart_ioctl(sr_fd)
+static int sr_restart_ioctl(sr_fd)
 sr_fd_t *sr_fd;
 {
 	mq_t *mp;
@@ -574,7 +568,7 @@ sr_fd_t *sr_fd;
 	return r;
 }
 
-PRIVATE int sr_cancel(m)
+static int sr_cancel(m)
 message *m;
 {
 	sr_fd_t *sr_fd;
@@ -615,7 +609,7 @@ message *m;
 		m->NDEV_PROC, m->IO_GRANT));
 }
 
-PRIVATE int sr_select(m)
+static int sr_select(m)
 message *m;
 {
 	sr_fd_t *sr_fd;
@@ -649,7 +643,7 @@ message *m;
 	return m_ops;
 }
 
-PRIVATE void sr_status(m)
+static void sr_status(m)
 message *m;
 {
 	int fd, result;
@@ -708,7 +702,7 @@ message *m;
 		ip_panic(("unable to send"));
 }
 
-PRIVATE int walk_queue(sr_fd, q_head_ptr, q_tail_ptr, type, proc_nr, ref,
+static int walk_queue(sr_fd, q_head_ptr, q_tail_ptr, type, proc_nr, ref,
 	first_flag)
 sr_fd_t *sr_fd;
 mq_t **q_head_ptr;
@@ -753,7 +747,7 @@ int first_flag;
 	return EAGAIN;
 }
 
-PRIVATE sr_fd_t *sr_getchannel(minor)
+static sr_fd_t *sr_getchannel(minor)
 int minor;
 {
 	sr_fd_t *loc_fd;
@@ -769,7 +763,7 @@ int minor;
 	return loc_fd;
 }
 
-PRIVATE void sr_reply_(mq, status, is_revive)
+static void sr_reply_(mq, status, is_revive)
 mq_t *mq;
 int status;
 int is_revive;
@@ -816,7 +810,7 @@ int is_revive;
 		mq_free(mq);
 }
 
-PRIVATE acc_t *sr_get_userdata (fd, offset, count, for_ioctl)
+static acc_t *sr_get_userdata (fd, offset, count, for_ioctl)
 int fd;
 vir_bytes offset;
 vir_bytes count;
@@ -906,7 +900,7 @@ assert (loc_fd->srf_flags & ip_flag);
 	return result<0 ? NULL : acc;
 }
 
-PRIVATE int sr_put_userdata (fd, offset, data, for_ioctl)
+static int sr_put_userdata (fd, offset, data, for_ioctl)
 int fd;
 vir_bytes offset;
 acc_t *data;
@@ -991,7 +985,7 @@ int for_ioctl;
 }
 }
 
-PRIVATE void sr_select_res(fd, ops)
+static void sr_select_res(fd, ops)
 int fd;
 unsigned ops;
 {
@@ -1006,7 +1000,7 @@ unsigned ops;
 	notify(sr_fd->srf_select_proc);
 }
 
-PRIVATE void process_req_q(mq, tail, tail_ptr)
+static void process_req_q(mq, tail, tail_ptr)
 mq_t *mq, *tail, **tail_ptr;
 {
 	mq_t *m;
@@ -1031,7 +1025,7 @@ mq_t *mq, *tail, **tail_ptr;
 	return;
 }
 
-PRIVATE void sr_event(evp, arg)
+static void sr_event(evp, arg)
 event_t *evp;
 ev_arg_t arg;
 {
@@ -1072,7 +1066,7 @@ ev_arg_t arg;
 	ip_panic(("sr_event: unkown event\n"));
 }
 
-PRIVATE int cp_u2b (proc, src, var_acc_ptr, size)
+static int cp_u2b (proc, src, var_acc_ptr, size)
 int proc;
 char *src;
 acc_t **var_acc_ptr;
@@ -1123,7 +1117,7 @@ int size;
 	return OK;
 }
 
-PRIVATE int cp_b2u (acc_ptr, proc, dest)
+static int cp_b2u (acc_ptr, proc, dest)
 acc_t *acc_ptr;
 int proc;
 char *dest;
@@ -1174,7 +1168,7 @@ char *dest;
 	return OK;
 }
 
-PRIVATE int cp_u2b_s(proc, gid, offset, var_acc_ptr, size)
+static int cp_u2b_s(proc, gid, offset, var_acc_ptr, size)
 int proc;
 int gid;
 vir_bytes offset;
@@ -1237,7 +1231,7 @@ int size;
 	return OK;
 }
 
-PRIVATE int cp_b2u_s(acc_ptr, proc, gid, offset)
+static int cp_b2u_s(acc_ptr, proc, gid, offset)
 acc_t *acc_ptr;
 int proc;
 int gid;
@@ -1300,7 +1294,7 @@ vir_bytes offset;
 	return OK;
 }
 
-PRIVATE int sr_repl_queue(proc, ref, operation)
+static int sr_repl_queue(proc, ref, operation)
 int proc;
 int ref;
 int operation;
@@ -1341,7 +1335,3 @@ int operation;
 	}
 	return 0;
 }
-
-/*
- * $PchId: sr.c,v 1.17 2005/06/28 14:26:16 philip Exp $
- */

@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                               sys_segctl				     *    
  *===========================================================================*/
-PUBLIC int sys_segctl(index, seg, off, phys, size)
+int sys_segctl(index, seg, off, phys, size)
 int *index;				/* return index of remote segment */
 u16_t *seg;				/* return segment selector here */
 vir_bytes *off;				/* return offset in segment here */

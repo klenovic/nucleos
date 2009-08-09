@@ -916,7 +916,7 @@ long count;
 /*================================================================
  *           allocation assist group
  *===============================================================*/
-PRIVATE MNX(ino_t) alloc_inode(mode, usrid, grpid)
+static MNX(ino_t) alloc_inode(mode, usrid, grpid)
 int mode, usrid, grpid;
 {
   MNX(ino_t) num;
@@ -963,7 +963,7 @@ int mode, usrid, grpid;
 }
 
 
-PRIVATE MNX(zone_t) alloc_zone()
+static MNX(zone_t) alloc_zone()
 {
   /* Allocate a new zone */
   /* Works for zone > block */

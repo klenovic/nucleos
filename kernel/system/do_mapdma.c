@@ -20,7 +20,7 @@
 /*==========================================================================*
  *				do_mapdma				    *
  *==========================================================================*/
-PUBLIC int do_mapdma(m_ptr)
+int do_mapdma(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 	int r;

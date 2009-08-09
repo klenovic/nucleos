@@ -74,9 +74,5 @@ typedef struct udp_fd
 #define UFF_SEL_READ	0x40
 #define UFF_SEL_WRITE	0x80
 
-EXTERN udp_port_t *udp_port_table;
-EXTERN udp_fd_t udp_fd_table[UDP_FD_NR];
-
-/*
- * $PchId: udp_int.h,v 1.4 2004/08/03 11:12:01 philip Exp $
- */
+extern udp_port_t *udp_port_table;
+extern udp_fd_t udp_fd_table[UDP_FD_NR];

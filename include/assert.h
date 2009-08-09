@@ -37,7 +37,8 @@
 #define	__makestr(x)	# x
 #define	__xstr(x)	__makestr(x)
 
-_PROTOTYPE( void __bad_assertion, (const char *_mess) );
+void __bad_assertion(const char *_mess);
+
 #define	assert(expr)	((expr)? (void)0 : \
 				__bad_assertion("Assertion \"" #expr \
 				    "\" failed, file " __xstr(__FILE__) \

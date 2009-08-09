@@ -24,9 +24,9 @@ struct ttyent {
 	char	**ty_init;	/* Initialization command, normally stty. */
 };
 
-_PROTOTYPE( struct ttyent *getttyent, (void)				);
-_PROTOTYPE( struct ttyent *getttynam, (const char *_name)		);
-_PROTOTYPE( int setttyent, (void)					);
-_PROTOTYPE( void endttyent, (void)					);
+struct ttyent *getttyent(void);
+struct ttyent *getttynam(const char *_name);
+int setttyent(void);
+void endttyent(void);
 
 #endif /* _TTYENT_H */

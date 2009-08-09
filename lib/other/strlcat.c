@@ -83,7 +83,3 @@ size_t strlcat(dst, src, siz)
 
 	return(dlen + (s - src));	/* count does not include NUL */
 }
-
-/*
- * $PchId: strlcat.c,v 1.1 2004/11/02 12:29:23 philip Exp philip $
- */

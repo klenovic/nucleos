@@ -28,7 +28,7 @@
 /*===========================================================================*
  *			      do_sigsend				     *
  *===========================================================================*/
-PUBLIC int do_sigsend(m_ptr)
+int do_sigsend(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_sigsend, POSIX-style signal handling. */

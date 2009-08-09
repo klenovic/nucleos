@@ -11,7 +11,7 @@
 #define pause	_pause
 #include <unistd.h>
 
-PUBLIC int pause()
+int pause()
 {
   message m;
 

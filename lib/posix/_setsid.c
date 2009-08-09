@@ -11,7 +11,7 @@
 #define setsid	_setsid
 #include <unistd.h>
 
-PUBLIC pid_t setsid()
+pid_t setsid()
 {
   message m;
 

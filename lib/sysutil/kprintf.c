@@ -196,7 +196,3 @@ int printf(const char *fmt, ...)
 
 	return charcount;
 }
-
-/*
- * $PchId: kprintf.c,v 1.5 1996/04/11 06:59:05 philip Exp $
- */

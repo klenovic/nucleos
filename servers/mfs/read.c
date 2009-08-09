@@ -25,18 +25,17 @@
 
 
 
-FORWARD _PROTOTYPE( int rw_chunk, (struct inode *rip, u64_t position,
-	unsigned off, int chunk, unsigned left, int rw_flag,
-	char *buff, int seg, int usr, int block_size, int *completed));
-FORWARD _PROTOTYPE( int rw_chunk_s, (struct inode *rip, u64_t position,
-	unsigned off, int chunk, unsigned left, int rw_flag,
-	cp_grant_id_t gid, unsigned buf_off, int block_size, int *completed));
+static int rw_chunk(struct inode *rip, u64_t position, unsigned off, int chunk, unsigned left,
+		    int rw_flag, char *buff, int seg, int usr, int block_size, int *completed);
+static int rw_chunk_s(struct inode *rip, u64_t position, unsigned off, int chunk,
+		      unsigned left, int rw_flag, cp_grant_id_t gid, unsigned buf_off,
+		      int block_size, int *completed);
 
 
 /*===========================================================================*
  *				fs_readwrite_o				     *
  *===========================================================================*/
-PUBLIC int fs_readwrite_o(void)
+int fs_readwrite_o(void)
 {
   int r, usr, seg, rw_flag, chunk, block_size, block_spec;
   int partial_cnt, regular, partial_pipe, nrbytes;
@@ -176,7 +175,7 @@ PUBLIC int fs_readwrite_o(void)
 /*===========================================================================*
  *				fs_readwrite_s				     *
  *===========================================================================*/
-PUBLIC int fs_readwrite_s(void)
+int fs_readwrite_s(void)
 {
   int r, rw_flag, chunk, block_size, block_spec;
   int partial_cnt, regular, partial_pipe, nrbytes;
@@ -317,7 +316,7 @@ PUBLIC int fs_readwrite_s(void)
 /*===========================================================================*
  *				fs_breadwrite_o				     *
  *===========================================================================*/
-PUBLIC int fs_breadwrite_o(void)
+int fs_breadwrite_o(void)
 {
   int r, usr, rw_flag, chunk, block_size;
   int nrbytes;
@@ -384,7 +383,7 @@ PUBLIC int fs_breadwrite_o(void)
 /*===========================================================================*
  *				fs_breadwrite_s				     *
  *===========================================================================*/
-PUBLIC int fs_breadwrite_s(void)
+int fs_breadwrite_s(void)
 {
   int r, rw_flag, chunk, block_size;
   cp_grant_id_t gid;
@@ -449,7 +448,7 @@ PUBLIC int fs_breadwrite_s(void)
 /*===========================================================================*
  *				rw_chunk				     *
  *===========================================================================*/
-PRIVATE int rw_chunk(rip, position, off, chunk, left, rw_flag, buff,
+static int rw_chunk(rip, position, off, chunk, left, rw_flag, buff,
  seg, usr, block_size, completed)
 register struct inode *rip;	/* pointer to inode for file to be rd/wr */
 u64_t position;			/* position within file to read or write */
@@ -546,7 +545,7 @@ int *completed;			/* number of bytes copied */
 /*===========================================================================*
  *				rw_chunk_s				     *
  *===========================================================================*/
-PRIVATE int rw_chunk_s(rip, position, off, chunk, left, rw_flag, gid,
+static int rw_chunk_s(rip, position, off, chunk, left, rw_flag, gid,
  buf_off, block_size, completed)
 register struct inode *rip;	/* pointer to inode for file to be rd/wr */
 u64_t position;			/* position within file to read or write */
@@ -644,7 +643,7 @@ int *completed;			/* number of bytes copied */
 /*===========================================================================*
  *				read_map				     *
  *===========================================================================*/
-PUBLIC block_t read_map(rip, position)
+block_t read_map(rip, position)
 register struct inode *rip;	/* ptr to inode to map from */
 off_t position;			/* position in file whose blk wanted */
 {
@@ -710,7 +709,7 @@ off_t position;			/* position in file whose blk wanted */
 /*===========================================================================*
  *				rd_indir				     *
  *===========================================================================*/
-PUBLIC zone_t rd_indir(bp, index)
+zone_t rd_indir(bp, index)
 struct buf *bp;			/* pointer to indirect block */
 int index;			/* index into *bp */
 {
@@ -745,7 +744,7 @@ int index;			/* index into *bp */
 /*===========================================================================*
  *				read_ahead				     *
  *===========================================================================*/
-PUBLIC void read_ahead()
+void read_ahead()
 {
 /* Read a block into the cache before it is needed. */
   int block_size;
@@ -764,7 +763,7 @@ PUBLIC void read_ahead()
 /*===========================================================================*
  *				rahead					     *
  *===========================================================================*/
-PUBLIC struct buf *rahead(rip, baseblock, position, bytes_ahead)
+struct buf *rahead(rip, baseblock, position, bytes_ahead)
 register struct inode *rip;	/* pointer to inode for file to be read */
 block_t baseblock;		/* block at current position */
 u64_t position;			/* position within file */
@@ -882,12 +881,12 @@ unsigned bytes_ahead;		/* bytes beyond position for immediate use */
 
 #define GETDENTS_BUFSIZ	257
 
-PRIVATE char getdents_buf[GETDENTS_BUFSIZ];
+static char getdents_buf[GETDENTS_BUFSIZ];
 
 /*===========================================================================*
  *				fs_getdents				     *
  *===========================================================================*/
-PUBLIC int fs_getdents(void)
+int fs_getdents(void)
 {
   register struct inode *rip;
   int o, r, block_size, len, reclen, done;
@@ -1039,7 +1038,7 @@ printf("MFS(%d) get_inode by fs_getdents() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_getdents_o				     *
  *===========================================================================*/
-PUBLIC int fs_getdents_o(void)
+int fs_getdents_o(void)
 {
 /* Legacy support: wrapper around new getdents, returning the resulting number
  * of bytes in the m_type field of the reply message instead.

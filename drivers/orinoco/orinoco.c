@@ -81,7 +81,7 @@
 #define		tmra_inittimer(tp)	tmr_inittimer(tp)
 #define		VERBOSE		1	/* display message during init */
 
-PRIVATE struct pcitab {
+static struct pcitab {
 	u16_t vid;
 	u16_t did;
 	int checkclass;
@@ -199,45 +199,44 @@ struct {
 #define BITRATE_TABLE_SIZE (sizeof(bitrate_table) / sizeof(bitrate_table[0]))
 
 
-_PROTOTYPE (static void or_writev, (message * mp, int from_int, int vectored));
-_PROTOTYPE (static void or_readv, (message * mp, int from_int, int vectored));
-_PROTOTYPE (static void or_writev_s, (message * mp, int from_int));
-_PROTOTYPE (static void or_readv_s, (message * mp, int from_int));
-_PROTOTYPE (static void reply, (t_or * orp, int err, int may_block));
-_PROTOTYPE (static int  or_probe, (t_or *));
-_PROTOTYPE (static void or_ev_info, (t_or *));
-_PROTOTYPE (static void or_init, (message *));
-_PROTOTYPE (static void or_pci_conf, (void));
-_PROTOTYPE (static void or_init_struct, (t_or *));
-_PROTOTYPE (static void map_hw_buffer, (t_or *));
-_PROTOTYPE (static void or_init_hw, (t_or *));
-_PROTOTYPE (static void or_check_ints, (t_or *));
-_PROTOTYPE (static void or_writerids, (hermes_t *, t_or *));
-_PROTOTYPE (static void or_readrids, (hermes_t *, t_or *));
-_PROTOTYPE (static void or_rec_mode, (t_or *));
-_PROTOTYPE (static void mess_reply, (message *, message *));
-_PROTOTYPE (static u32_t or_get_bar, (int devind, t_or * orp));
-_PROTOTYPE (static void or_getstat, (message * mp));
-_PROTOTYPE (static void or_getstat_s, (message * mp));
-_PROTOTYPE (static void print_linkstatus, (t_or * orp, u16_t status));
-_PROTOTYPE (static int  or_get_recvd_packet, (t_or *orp, u16_t rxfid, 
-					u8_t *databuf));
-_PROTOTYPE (static void orinoco_stop, (void));
-_PROTOTYPE (static void or_reset, (void));
-_PROTOTYPE (static void or_watchdog_f, (timer_t *tp) );
-_PROTOTYPE (static void setup_wepkey, (t_or *orp, char *wepkey0) );
-_PROTOTYPE (static void or_getstat, (message *m));
-_PROTOTYPE (static int  do_hard_int, (void));
-_PROTOTYPE (static void check_int_events, (void));
-_PROTOTYPE (static void or_getname, (message *m));
-_PROTOTYPE (static int or_handler, (t_or *orp));
-_PROTOTYPE (static void or_dump, (message *m));
+static void or_writev(message * mp, int from_int, int vectored);
+static void or_readv(message * mp, int from_int, int vectored);
+static void or_writev_s(message * mp, int from_int);
+static void or_readv_s(message * mp, int from_int);
+static void reply(t_or * orp, int err, int may_block);
+static int  or_probe(t_or *);
+static void or_ev_info(t_or *);
+static void or_init(message *);
+static void or_pci_conf(void);
+static void or_init_struct(t_or *);
+static void map_hw_buffer(t_or *);
+static void or_init_hw(t_or *);
+static void or_check_ints(t_or *);
+static void or_writerids(hermes_t *, t_or *);
+static void or_readrids(hermes_t *, t_or *);
+static void or_rec_mode(t_or *);
+static void mess_reply(message *, message *);
+static u32_t or_get_bar(int devind, t_or * orp);
+static void or_getstat(message * mp);
+static void or_getstat_s(message * mp);
+static void print_linkstatus(t_or * orp, u16_t status);
+static int  or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf);
+static void orinoco_stop(void);
+static void or_reset(void);
+static void or_watchdog_f(timer_t *tp);
+static void setup_wepkey(t_or *orp, char *wepkey0);
+static void or_getstat(message *m);
+static int  do_hard_int(void);
+static void check_int_events(void);
+static void or_getname(message *m);
+static int or_handler(t_or *orp);
+static void or_dump(message *m);
 
 /* The message used in the main loop is made global, so that rl_watchdog_f()
  * can change its message type to fake a HARD_INT message.
  */
-PRIVATE message m;
-PRIVATE int int_event_check;		/* set to TRUE if events arrived */
+static message m;
+static int int_event_check;		/* set to TRUE if events arrived */
 
 u32_t system_hz;
 

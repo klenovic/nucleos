@@ -40,19 +40,13 @@ static char sccsid[] = "@(#)inet_addr.c	5.8 (Berkeley) 6/23/90";
 #include <net/gen/inet.h>
 #endif
 
-#ifdef __STDC__
-#define _CONST	const
-#else
-#define _CONST
-#endif
-
 /*
  * Ascii internet address interpretation routine.
  * The value returned is in network order.
  */
 ipaddr_t
 inet_addr(cp)
-	register _CONST char *cp;
+	register const char *cp;
 {
 	ipaddr_t val;
 
@@ -72,7 +66,7 @@ inet_addr(cp)
 
 int
 inet_aton(cp, addr)
-	register _CONST char *cp;
+	register const char *cp;
 	ipaddr_t *addr;
 {
 	register u32_t val, base, n;

@@ -26,7 +26,7 @@
 /*==========================================================================*
  *				do_new_kmess				    *
  *==========================================================================*/
-PUBLIC int do_new_kmess(m)
+int do_new_kmess(m)
 message *m;					/* notification message */
 {
 /* Notification for a new kernel message. */
@@ -109,7 +109,7 @@ message *m;					/* notification message */
 /*===========================================================================*
  *				do_diagnostics				     *
  *===========================================================================*/
-PUBLIC int do_diagnostics(message *m, int safe)
+int do_diagnostics(message *m, int safe)
 {
 /* The LOG server handles all diagnostic messages from servers and device 
  * drivers. It forwards the message to the TTY driver to display it to the

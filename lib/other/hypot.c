@@ -20,8 +20,8 @@ struct complex {
 	double r,i;
 };
 
-_PROTOTYPE(double hypot, (double x, double y ));
-_PROTOTYPE(double cabs, (struct complex p_compl ));
+double hypot(double x, double y);
+double cabs(struct complex p_compl);
 
 /* $Header$ */
 

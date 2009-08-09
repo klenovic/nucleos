@@ -39,59 +39,55 @@ typedef char wchar_t;		/* type expanded character set */
 #endif
 
 /* Function Prototypes. */
-_PROTOTYPE( void abort, (void)						);
-_PROTOTYPE( int atexit, (void (*_func)(void))				);
-_PROTOTYPE( double atof, (const char *_nptr)				);
-_PROTOTYPE( int atoi, (const char *_nptr)				);
-_PROTOTYPE( long atol, (const char *_nptr)				);
-_PROTOTYPE( void *calloc, (size_t _nmemb, size_t _size)			);
-_PROTOTYPE( div_t div, (int _numer, int _denom)				);
-_PROTOTYPE( void exit, (int _status)					);
-_PROTOTYPE( void free, (void *_ptr)					);
-_PROTOTYPE( char *getenv, (const char *_name)				);
-_PROTOTYPE( long labs, (long _j)					);
-_PROTOTYPE( ldiv_t ldiv, (long _numer, long _denom)			);
-_PROTOTYPE( void *malloc, (size_t _size)				);
-_PROTOTYPE( int mblen, (const char *_s, size_t _n)			);
-_PROTOTYPE( size_t mbstowcs, (wchar_t *_pwcs, const char *_s, size_t _n));
-_PROTOTYPE( int mbtowc, (wchar_t *_pwc, const char *_s, size_t _n)	);
-_PROTOTYPE( int rand, (void)						);
-_PROTOTYPE( void *realloc, (void *_ptr, size_t _size)			);
-_PROTOTYPE( void srand, (unsigned int _seed)				);
-_PROTOTYPE( double strtod, (const char *_nptr, char **_endptr)		);
-_PROTOTYPE( long strtol, (const char *_nptr, char **_endptr, int _base)	);
-_PROTOTYPE( int system, (const char *_string)				);
-_PROTOTYPE( size_t wcstombs, (char *_s, const wchar_t *_pwcs, size_t _n));
-_PROTOTYPE( int wctomb, (char *_s, wchar_t _wchar)			);
-_PROTOTYPE( void *bsearch, (const void *_key, const void *_base, 
-	size_t _nmemb, size_t _size, 
-	int (*compar) (const void *, const void *))			);
-_PROTOTYPE( void qsort, (void *_base, size_t _nmemb, size_t _size,
-	int (*compar) (const void *, const void *))			);
-_PROTOTYPE( unsigned long int strtoul,
-			(const char *_nptr, char **_endptr, int _base)	);
+void abort(void);
+int atexit(void (*_func)(void));
+double atof(const char *_nptr);
+int atoi(const char *_nptr);
+long atol(const char *_nptr);
+void *calloc(size_t _nmemb, size_t _size);
+div_t div(int _numer, int _denom);
+void exit(int _status);
+void free(void *_ptr);
+char *getenv(const char *_name);
+long labs(long _j);
+ldiv_t ldiv(long _numer, long _denom);
+void *malloc(size_t _size);
+int mblen(const char *_s, size_t _n);
+size_t mbstowcs(wchar_t *_pwcs, const char *_s, size_t _n);
+int mbtowc(wchar_t *_pwc, const char *_s, size_t _n);
+int rand(void);
+void *realloc(void *_ptr, size_t _size);
+void srand(unsigned int _seed);
+double strtod(const char *_nptr, char **_endptr);
+long strtol(const char *_nptr, char **_endptr, int _base);
+int system(const char *_string);
+size_t wcstombs(char *_s, const wchar_t *_pwcs, size_t _n);
+int wctomb(char *_s, wchar_t _wchar);
+void *bsearch(const void *_key, const void *_base, size_t _nmemb, size_t _size,
+	      int (*compar) (const void *, const void *));
+void qsort(void *_base, size_t _nmemb, size_t _size,
+	   int (*compar) (const void *, const void *));
+unsigned long int strtoul(const char *_nptr, char **_endptr, int _base);
 
 #ifdef _POSIX_SOURCE
 /* Open Group Base Specifications Issue 6 */
-_PROTOTYPE( int mkstemp, (char *_fmt)					);
-_PROTOTYPE( char *initstate, (unsigned _seed, char *_state,
-							size_t _size)	);
-_PROTOTYPE( long random, (void)						);
-_PROTOTYPE( char *setstate, (const char *state)				);
-_PROTOTYPE( void srandom, (unsigned seed)				);
-_PROTOTYPE( int putenv, (char *string)					);
-_PROTOTYPE( int setenv, (const char *envname, const char *envval,
-							int overwrite)	);
-_PROTOTYPE( int unsetenv, (const char *name)				);
+int mkstemp(char *_fmt);
+char *initstate(unsigned _seed, char *_state, size_t _size);
+long random(void);
+char *setstate(const char *state);
+void srandom(unsigned seed);
+int putenv(char *string);
+int setenv(const char *envname, const char *envval, int overwrite);
+int unsetenv(const char *name);
 #endif
 
 #ifdef _MINIX
-_PROTOTYPE( int getloadavg, (double *, int)				);
+int getloadavg(double *, int);
 
 /* According to POSIX, getopt should be in unistd.h. What do we do with
  * this?
  */
-_PROTOTYPE(int getopt, (int _argc, char * const _argv[], const char *_opts));
+int getopt(int _argc, char * const _argv[], const char *_opts);
 extern char *optarg;
 extern int optind, opterr, optopt;
 #endif /* _MINIX */

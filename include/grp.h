@@ -22,14 +22,14 @@ struct	group {
 };
 
 /* Function Prototypes. */
-_PROTOTYPE( struct group *getgrgid, (_mnx_Gid_t _gid)  			);
-_PROTOTYPE( struct group *getgrnam, (const char *_name)			);
+struct group *getgrgid(_mnx_Gid_t _gid);
+struct group *getgrnam(const char *_name);
 
 #ifdef _MINIX
-_PROTOTYPE( void endgrent, (void)					);
-_PROTOTYPE( struct group *getgrent, (void)				);
-_PROTOTYPE( int setgrent, (void)					);
-_PROTOTYPE( void setgrfile, (const char *_file)				);
+void endgrent(void);
+struct group *getgrent(void);
+int setgrent(void);
+void setgrfile(const char *_file);
 #endif
 
 #endif /* _GRP_H */

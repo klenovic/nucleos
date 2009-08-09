@@ -81,7 +81,3 @@ void cipherDecryptUpdateRounds(rd_keyinstance *key,
 #endif /* INTERMEDIATE_VALUE_KAT */
 
 #endif /* __RIJNDAEL_API_H */
-
-/*
- * $PchId: rijndael-api.h,v 1.2 2001/01/10 22:02:21 philip Exp $
- */

@@ -36,14 +36,14 @@
 #include <asm/servers/vm/memory.h>
 
 
-FORWARD _PROTOTYPE( int new_mem, (struct vmproc *vmp, struct vmproc *sh_vmp,
-	vir_bytes text_bytes, vir_bytes data_bytes, vir_bytes bss_bytes,
-	vir_bytes stk_bytes, phys_bytes tot_bytes)	);
+static int new_mem(struct vmproc *vmp, struct vmproc *sh_vmp, vir_bytes text_bytes,
+		   vir_bytes data_bytes, vir_bytes bss_bytes, vir_bytes stk_bytes,
+		   phys_bytes tot_bytes);
 
 /*===========================================================================*
  *                              find_share                                   *
  *===========================================================================*/
-PUBLIC struct vmproc *find_share(vmp_ign, ino, dev, ctime)
+struct vmproc *find_share(vmp_ign, ino, dev, ctime)
 struct vmproc *vmp_ign;         /* process that should not be looked at */
 ino_t ino;                      /* parameters that uniquely identify a file */
 dev_t dev;
@@ -71,7 +71,7 @@ time_t ctime;
 /*===========================================================================*
  *				exec_newmem				     *
  *===========================================================================*/
-PUBLIC int do_exec_newmem(message *msg)
+int do_exec_newmem(message *msg)
 {
 	int r, proc_e, proc_n;
 	vir_bytes stack_top;
@@ -162,7 +162,7 @@ PUBLIC int do_exec_newmem(message *msg)
 /*===========================================================================*
  *				new_mem					     *
  *===========================================================================*/
-PRIVATE int new_mem(rmp, sh_mp, text_bytes, data_bytes,
+static int new_mem(rmp, sh_mp, text_bytes, data_bytes,
 	bss_bytes,stk_bytes,tot_bytes)
 struct vmproc *rmp;		/* process to get a new memory map */
 struct vmproc *sh_mp;		/* text can be shared with this process */
@@ -316,7 +316,7 @@ SANITYCHECK(SCL_FUNCTIONS);
 /*===========================================================================*
  *				find_kernel_top				     *
  *===========================================================================*/
-PUBLIC phys_bytes find_kernel_top(void)
+phys_bytes find_kernel_top(void)
 {
 /* Find out where the kernel is, so we know where to start mapping
  * user processes.
@@ -336,7 +336,7 @@ PUBLIC phys_bytes find_kernel_top(void)
 /*===========================================================================*
  *				proc_new				     *
  *===========================================================================*/
-PUBLIC int proc_new(struct vmproc *vmp,
+int proc_new(struct vmproc *vmp,
   phys_bytes vstart,	  /* where to start the process in page table */
   phys_bytes text_bytes,  /* how much code, in bytes but page aligned */
   phys_bytes data_bytes,  /* how much data + bss, in bytes but page aligned */

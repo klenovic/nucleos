@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <string.h>
 
-PUBLIC int _pm_findproc(proc_name, proc_nr)
+int _pm_findproc(proc_name, proc_nr)
 char *proc_name;		/* name of process to search for */
 int *proc_nr;			/* return process number here */
 {

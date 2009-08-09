@@ -63,7 +63,3 @@
 #define NWIOGPSIPOPT	_IOR('n', 81, struct nwio_psipopt)
 
 #endif /* _NET__IOCTL_H */
-
-/*
- * $PchId: ioctl.h,v 1.2 2003/07/25 14:34:03 philip Exp $
- */

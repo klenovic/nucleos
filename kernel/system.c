@@ -58,7 +58,7 @@
  * because the dummy is declared extern. If an illegal call is given, the 
  * array size will be negative and this won't compile. 
  */
-PUBLIC int (*call_vec[NR_SYS_CALLS])(message *m_ptr);
+int (*call_vec[NR_SYS_CALLS])(message *m_ptr);
 char *callnames[NR_SYS_CALLS];
 
 #define map(call_nr, handler) \
@@ -66,14 +66,14 @@ char *callnames[NR_SYS_CALLS];
     callnames[(call_nr-KERNEL_CALL)] = #call_nr;	\
     call_vec[(call_nr-KERNEL_CALL)] = (handler)  
 
-FORWARD _PROTOTYPE( void initialize, (void));
-FORWARD _PROTOTYPE( void softnotify_check, (void));
-FORWARD _PROTOTYPE( struct proc *vmrestart_check, (message *));
+static void initialize(void);
+static void softnotify_check(void);
+static struct proc *vmrestart_check(message *);
 
 /*===========================================================================*
  *				sys_task				     *
  *===========================================================================*/
-PUBLIC void sys_task()
+void sys_task()
 {
 /* Main entry point of sys_task.  Get the message and dispatch on type. */
   static message m;
@@ -181,7 +181,7 @@ PUBLIC void sys_task()
 /*===========================================================================*
  *				initialize				     *
  *===========================================================================*/
-PRIVATE void initialize(void)
+static void initialize(void)
 {
   register struct priv *sp;
   int i;
@@ -272,7 +272,7 @@ PRIVATE void initialize(void)
 /*===========================================================================*
  *				get_priv				     *
  *===========================================================================*/
-PUBLIC int get_priv(rc, proc_type)
+int get_priv(rc, proc_type)
 register struct proc *rc;		/* new (child) process pointer */
 int proc_type;				/* system or user process flag */
 {
@@ -304,7 +304,7 @@ int proc_type;				/* system or user process flag */
 /*===========================================================================*
  *				set_sendto_bit				     *
  *===========================================================================*/
-PUBLIC void set_sendto_bit(struct proc *rp, int id)
+void set_sendto_bit(struct proc *rp, int id)
 {
 /* Allow a process to send messages to the process(es) associated with the
  * system privilege structure with the given ID. 
@@ -330,7 +330,7 @@ PUBLIC void set_sendto_bit(struct proc *rp, int id)
 /*===========================================================================*
  *				unset_sendto_bit			     *
  *===========================================================================*/
-PUBLIC void unset_sendto_bit(struct proc *rp, int id)
+void unset_sendto_bit(struct proc *rp, int id)
 {
 /* Prevent a process from sending to another process. Retain the send mask
  * symmetry by also unsetting the bit for the other direction.
@@ -344,7 +344,7 @@ PUBLIC void unset_sendto_bit(struct proc *rp, int id)
 /*===========================================================================*
  *				send_sig				     *
  *===========================================================================*/
-PUBLIC void send_sig(int proc_nr, int sig_nr)
+void send_sig(int proc_nr, int sig_nr)
 {
 /* Notify a system process about a signal. This is straightforward. Simply
  * set the signal that is to be delivered in the pending signals map and 
@@ -364,7 +364,7 @@ PUBLIC void send_sig(int proc_nr, int sig_nr)
 /*===========================================================================*
  *				cause_sig				     *
  *===========================================================================*/
-PUBLIC void cause_sig(proc_nr, sig_nr)
+void cause_sig(proc_nr, sig_nr)
 int proc_nr;			/* process to be signalled */
 int sig_nr;			/* signal to be sent, 1 to _NSIG */
 {
@@ -401,7 +401,7 @@ int sig_nr;			/* signal to be sent, 1 to _NSIG */
 /*===========================================================================*
  *				umap_bios				     *
  *===========================================================================*/
-PUBLIC phys_bytes umap_bios(vir_addr, bytes)
+phys_bytes umap_bios(vir_addr, bytes)
 vir_bytes vir_addr;		/* virtual address in BIOS segment */
 vir_bytes bytes;		/* # of bytes to be copied */
 {
@@ -426,7 +426,7 @@ vir_bytes bytes;		/* # of bytes to be copied */
 /*===========================================================================*
  *                              umap_grant                                   *
  *===========================================================================*/
-PUBLIC phys_bytes umap_grant(rp, grant, bytes)
+phys_bytes umap_grant(rp, grant, bytes)
 struct proc *rp;                /* pointer to proc table entry for process */
 cp_grant_id_t grant;            /* grant no. */
 vir_bytes bytes;                /* size */
@@ -465,7 +465,7 @@ vir_bytes bytes;                /* size */
 /*===========================================================================*
  *			         clear_endpoint				     *
  *===========================================================================*/
-PUBLIC void clear_endpoint(rc)
+void clear_endpoint(rc)
 register struct proc *rc;		/* slot of process to clean up */
 {
   register struct proc *rp;		/* iterate over process table */
@@ -562,7 +562,7 @@ register struct proc *rc;		/* slot of process to clean up */
 /*===========================================================================*
  *                              umap_verify_grant                            *
  *===========================================================================*/
-PUBLIC phys_bytes umap_verify_grant(rp, grantee, grant, offset, bytes, access)
+phys_bytes umap_verify_grant(rp, grantee, grant, offset, bytes, access)
 struct proc *rp;                /* pointer to proc table entry for process */
 endpoint_t grantee;             /* who wants to do this */ 
 cp_grant_id_t grant;            /* grant no. */
@@ -593,7 +593,7 @@ int access;                     /* does grantee want to CPF_READ or _WRITE? */
 /*===========================================================================*
  *                              softnotify_check                            *
  *===========================================================================*/
-PRIVATE void softnotify_check(void)
+static void softnotify_check(void)
 {  
 	struct proc *np, *nextnp;
 
@@ -615,7 +615,7 @@ PRIVATE void softnotify_check(void)
 /*===========================================================================*
  *                              vmrestart_check                            *
  *===========================================================================*/
-PRIVATE struct proc *vmrestart_check(message *m)
+static struct proc *vmrestart_check(message *m)
 {
 	int type, r;
 	struct proc *restarting;

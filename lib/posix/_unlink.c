@@ -11,8 +11,8 @@
 #define unlink	_unlink
 #include <unistd.h>
 
-PUBLIC int unlink(name)
-_CONST char *name;
+int unlink(name)
+const char *name;
 {
   message m;
 
