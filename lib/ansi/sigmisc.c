@@ -10,10 +10,6 @@
 /*
  * sigmisc.c - used to get a signal mask
  */
-/* $Header: /cvsup/minix/src/lib/ansi/sigmisc.c,v 1.1.1.1 2005/04/21 14:56:06 beng Exp $ */
-
-#if	defined(_POSIX_SOURCE)
-
 /* This can't be done in setjmp.e, since SIG_SETMASK is defined in
  * <signal.h>. This is a C-file, which can't be included.
  */
@@ -45,4 +41,3 @@ __oldsigset(sigset_t *p)
 {
 	_sigprocmask(SIG_SETMASK, p, NULL);
 }
-#endif	/* _POSIX_SOURCE */

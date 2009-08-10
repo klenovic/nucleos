@@ -22,10 +22,6 @@ typedef unsigned int size_t;	/* type returned by sizeof */
 #endif /*_SIZE_T */
 
 /* Function Prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 void *memchr(const void *_s, int _c, size_t _n);
 int memcmp(const void *_s1, const void *_s2, size_t _n);
 void *memcpy(void *_s1, const void *_s2, size_t _n);
@@ -49,12 +45,9 @@ char *strstr(const char *_s1, const char *_s2);
 char *strtok(char *_s1, const char *_s2);
 size_t strxfrm(char *_s1, const char *_s2, size_t _n);
 
-#ifdef _POSIX_SOURCE
 /* Open Group Base Specifications Issue 6 (not complete) */
 char *strdup(const char *_s1);
-#endif
 
-#ifdef _MINIX
 /* For backward compatibility. */
 char *index(const char *_s, int _charwanted);
 char *rindex(const char *_s, int _charwanted);
@@ -69,6 +62,5 @@ int strncasecmp(const char *_s1, const char *_s2, size_t _len);
 size_t strnlen(const char *_s, size_t _n);
 size_t strlcat(char *_dst, const char *_src, size_t _siz);
 size_t strlcpy(char *_dst, const char *_src, size_t _siz);
-#endif
 
 #endif /* _STRING_H */

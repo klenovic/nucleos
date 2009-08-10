@@ -104,10 +104,6 @@ extern int h_errno;
 #define	NO_DATA		4 /* Valid name, no data record of requested type */
 #define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 void		endhostent(void);
 void		endnetent(void);
 void		endprotoent(void);
@@ -130,9 +126,7 @@ void		sethostent(int);
 void		setnetent(int);
 void		setprotoent(int);
 void		setservent(int);
-#ifdef _MINIX
 int servxcheck(ipaddr_t _peer, const char *_service, void (*_logf)(int _pass, const char *_name));
 char *servxfile(const char *_file);
-#endif
 
 #endif /* !_NETDB_H_ */

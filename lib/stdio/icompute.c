@@ -10,8 +10,6 @@
 /*
  * icompute.c - compute an integer
  */
-/* $Header: /cvsup/minix/src/lib/stdio/icompute.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
 #include	"loc_incl.h"
 
 /* This routine is used in doprnt.c as well as in tmpfile.c and tmpnam.c. */

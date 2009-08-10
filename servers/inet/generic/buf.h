@@ -99,20 +99,20 @@ extern acc_t *bf_linkcheck_acc;
 
 #ifndef BUF_IMPLEMENTATION
 
-#define bf_memreq(a) _bf_memreq(this_file, __LINE__, a)
-#define bf_cut(a,b,c) _bf_cut(this_file, __LINE__, a, b, c)
-#define bf_delhead(a,b) _bf_delhead(this_file, __LINE__, a, b)
-#define bf_packIffLess(a,b) _bf_packIffLess(this_file, __LINE__, \
+#define bf_memreq(a) _bf_memreq(__FILE__, __LINE__, a)
+#define bf_cut(a,b,c) _bf_cut(__FILE__, __LINE__, a, b, c)
+#define bf_delhead(a,b) _bf_delhead(__FILE__, __LINE__, a, b)
+#define bf_packIffLess(a,b) _bf_packIffLess(__FILE__, __LINE__, \
 									a, b)
-#define bf_afree(a) _bf_afree(this_file, __LINE__, a)
-#define bf_pack(a) _bf_pack(this_file, __LINE__, a)
-#define bf_append(a,b) _bf_append(this_file, __LINE__, a, b)
-#define bf_dupacc(a) _bf_dupacc(this_file, __LINE__, a)
+#define bf_afree(a) _bf_afree(__FILE__, __LINE__, a)
+#define bf_pack(a) _bf_pack(__FILE__, __LINE__, a)
+#define bf_append(a,b) _bf_append(__FILE__, __LINE__, a, b)
+#define bf_dupacc(a) _bf_dupacc(__FILE__, __LINE__, a)
 #if 0
-#define bf_mark_1acc(a) _bf_mark_1acc(this_file, __LINE__, a)
-#define bf_mark_acc(a) _bf_mark_acc(this_file, __LINE__, a)
+#define bf_mark_1acc(a) _bf_mark_1acc(__FILE__, __LINE__, a)
+#define bf_mark_acc(a) _bf_mark_acc(__FILE__, __LINE__, a)
 #endif
-#define bf_align(a,s,al) _bf_align(this_file, __LINE__, a, s, al)
+#define bf_align(a,s,al) _bf_align(__FILE__, __LINE__, a, s, al)
 
 #else /* BUF_IMPLEMENTATION */
 

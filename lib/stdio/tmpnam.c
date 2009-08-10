@@ -10,14 +10,10 @@
 /*
  * tmpnam.c - create a unique filename
  */
-/* $Header: /cvsup/minix/src/lib/stdio/tmpnam.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
-#if	defined(_POSIX_SOURCE)
-#include	<nucleos/types.h>
-#endif
-#include	<stdio.h>
-#include	<string.h>
-#include	"loc_incl.h"
+#include <nucleos/types.h>
+#include <stdio.h>
+#include <string.h>
+#include "loc_incl.h"
 
 pid_t _getpid(void);
 

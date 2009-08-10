@@ -25,12 +25,6 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)inet_addr.c	5.8 (Berkeley) 6/23/90";
-#endif /* LIBC_SCCS and not lint */
-
-#if _MINIX
 #include <nucleos/types.h>
 #include <ctype.h>
 #include <errno.h>
@@ -38,7 +32,6 @@ static char sccsid[] = "@(#)inet_addr.c	5.8 (Berkeley) 6/23/90";
 #include <net/hton.h>
 #include <net/gen/in.h>
 #include <net/gen/inet.h>
-#endif
 
 /*
  * Ascii internet address interpretation routine.

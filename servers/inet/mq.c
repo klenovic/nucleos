@@ -19,8 +19,6 @@ Copyright 1995 Philip Homburg
 #include "mq.h"
 #include "generic/assert.h"
 
-THIS_FILE
-
 #define MQ_SIZE		128
 
 static mq_t mq_list[MQ_SIZE];

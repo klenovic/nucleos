@@ -13,6 +13,7 @@
 #define _UNISTD_H
 
 #include <nucleos/types.h>
+#include <nucleos/type.h>
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */
@@ -33,7 +34,6 @@
 #define STDOUT_FILENO      1	/* file descriptor for stdout */
 #define STDERR_FILENO      2	/* file descriptor for stderr */
 
-#ifdef _MINIX
 /* How to exit the system or stop a server process. */
 #define RBT_HALT	   0	/* shutdown and return to monitor */
 #define RBT_REBOOT	   1	/* reboot the system through the monitor */
@@ -41,9 +41,7 @@
 #define RBT_MONITOR	   3	/* let the monitor do this */
 #define RBT_RESET	   4	/* hard reset the system */
 #define RBT_INVALID	   5	/* first invalid reboot flag */
-
 #define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to FS by PM */
-#endif
 
 /* What system info to retrieve with sysgetinfo(). */
 #define SI_KINFO	   0	/* get kernel info via PM */
@@ -164,11 +162,6 @@ extern int optind, opterr, optopt;
 
 int usleep(useconds_t _useconds);
 
-#ifdef _MINIX
-#ifndef _TYPE_H
-#include <nucleos/type.h>
-#endif
-
 extern int optreset;	/* Reset getopt state */
 
 int brk(char *_addr);
@@ -215,7 +208,5 @@ int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep);
 int getpagesize(void);
 int setgroups(int ngroups, const gid_t *gidset);
 int initgroups(const char *name, gid_t basegid);
-
-#endif
 
 #endif /* _UNISTD_H */

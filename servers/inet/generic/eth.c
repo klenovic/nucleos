@@ -27,8 +27,6 @@ Copyright 1995 Philip Homburg
 #include "io.h"
 #include "sr.h"
 
-THIS_FILE
-
 #define ETH_FD_NR	(4*IP_PORT_MAX)
 #define EXPIRE_TIME	60*HZ	/* seconds */
 

@@ -10,8 +10,6 @@
 /*
  * mathconst.h - mathematic constants
  */
-/* $Header$ */
-
 #ifndef _MATHCONST_H
 #define	_MATHCONST_H
 

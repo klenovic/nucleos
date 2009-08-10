@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "udp.h"
 #include "udp_int.h"
 
-THIS_FILE
-
 static void read_ip_packets(udp_port_t *udp_port);
 static void udp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK

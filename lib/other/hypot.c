@@ -23,8 +23,6 @@ struct complex {
 double hypot(double x, double y);
 double cabs(struct complex p_compl);
 
-/* $Header$ */
-
 double
 hypot(x, y)
 double x, y;

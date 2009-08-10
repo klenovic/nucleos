@@ -35,13 +35,6 @@ static char	elsieid[] = "@(#)strftime.c	7.75";
 ** IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 */
-
-#ifndef LIBC_SCCS
-#ifndef lint
-static const char	sccsid[] = "@(#)strftime.c	5.4 (Berkeley) 3/14/89";
-#endif /* !defined lint */
-#endif /* !defined LIBC_SCCS */
-
 #include <zoneinfo/tzfile.h>
 #include "fcntl.h"
 #include "locale.h"

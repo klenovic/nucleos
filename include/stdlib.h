@@ -12,10 +12,6 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 /* The macros are NULL, EXIT_FAILURE, EXIT_SUCCESS, RAND_MAX, and MB_CUR_MAX.*/
 #define NULL    ((void *)0)
 
@@ -69,7 +65,6 @@ void qsort(void *_base, size_t _nmemb, size_t _size,
 	   int (*compar) (const void *, const void *));
 unsigned long int strtoul(const char *_nptr, char **_endptr, int _base);
 
-#ifdef _POSIX_SOURCE
 /* Open Group Base Specifications Issue 6 */
 int mkstemp(char *_fmt);
 char *initstate(unsigned _seed, char *_state, size_t _size);
@@ -79,9 +74,7 @@ void srandom(unsigned seed);
 int putenv(char *string);
 int setenv(const char *envname, const char *envval, int overwrite);
 int unsetenv(const char *name);
-#endif
 
-#ifdef _MINIX
 int getloadavg(double *, int);
 
 /* According to POSIX, getopt should be in unistd.h. What do we do with
@@ -90,6 +83,5 @@ int getloadavg(double *, int);
 int getopt(int _argc, char * const _argv[], const char *_opts);
 extern char *optarg;
 extern int optind, opterr, optopt;
-#endif /* _MINIX */
 
 #endif /* STDLIB_H */

@@ -10,16 +10,12 @@
 /*
  * perror.c - print an error message on the standard error output
  */
-/* $Header: /cvsup/minix/src/lib/stdio/perror.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
-#if	defined(_POSIX_SOURCE)
-#include	<nucleos/types.h>
-#endif
-#include	<stdio.h>
-#include	<errno.h>
-#include	<stdio.h>
-#include	<string.h>
-#include	"loc_incl.h"
+#include <nucleos/types.h>
+#include <stdio.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include "loc_incl.h"
 
 ssize_t _write(int d, const char *buf, size_t nbytes);
 

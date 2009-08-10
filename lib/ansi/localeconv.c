@@ -10,8 +10,6 @@
 /*
  * localeconv - set components of a struct according to current locale
  */
-/* $Header: /cvsup/minix/src/lib/ansi/localeconv.c,v 1.1.1.1 2005/04/21 14:56:05 beng Exp $ */
-
 #include	<nucleos/nucleos.h>
 #include	<locale.h>
 

@@ -25,10 +25,6 @@ struct tms {
 };
 
 /* Function Prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 clock_t times(struct tms *_buffer);
 
 #endif /* _TIMES_H */

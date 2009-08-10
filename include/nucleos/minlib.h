@@ -10,10 +10,6 @@
 #ifndef _MINLIB
 #define _MINLIB
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 /* Miscellaneous arch-dependent Nucleos. */
 #include <asm/minlib.h>
 

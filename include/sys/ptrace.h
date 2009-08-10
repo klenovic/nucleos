@@ -34,10 +34,6 @@
 				 */
 
 /* Function Prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 long ptrace(int _req, pid_t _pid, long _addr, long _data);
 
 #endif /* _PTRACE_H */

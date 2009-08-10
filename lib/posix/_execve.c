@@ -11,8 +11,6 @@
  *								21 Jan 1994
  */
 
-#define _MINIX_SOURCE
-
 #define execve _execve
 #define sbrk _sbrk
 #include <lib.h>

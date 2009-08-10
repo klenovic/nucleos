@@ -24,8 +24,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "ipr.h"
 
-THIS_FILE
-
 #define OROUTE_NR		128
 #define OROUTE_STATIC_NR	16
 #define OROUTE_HASH_ASS_NR	 4

@@ -18,9 +18,6 @@ Modified:	Apr 07, 2001 by Kees J. Bot
 Copyright 1995 Philip Homburg
 */
 
-#define _MINIX_SOURCE 1
-#define _POSIX_SOURCE 1
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -33,8 +30,6 @@ Copyright 1995 Philip Homburg
 #include <nucleos/syslib.h>
 #include "inet_config.h"
 #include "inet.h"
-
-THIS_FILE
 
 struct eth_conf eth_conf[IP_PORT_MAX];
 struct psip_conf psip_conf[IP_PORT_MAX];

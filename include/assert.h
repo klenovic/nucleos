@@ -24,16 +24,11 @@
 
 #undef assert
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 #ifdef NDEBUG
 /* Debugging disabled -- do not evaluate assertions. */
 #define assert(expr)  ((void) 0)
 #else
 /* Debugging enabled -- verify assertions at run time. */
-#ifdef _ANSI
 #define	__makestr(x)	# x
 #define	__xstr(x)	__makestr(x)
 
@@ -43,7 +38,4 @@ void __bad_assertion(const char *_mess);
 				__bad_assertion("Assertion \"" #expr \
 				    "\" failed, file " __xstr(__FILE__) \
 				    ", line " __xstr(__LINE__) "\n"))
-#else
-#define assert(expr) ((void) ((expr) ? 0 : __assert( __FILE__,  __LINE__)))
-#endif /* _ANSI */
 #endif

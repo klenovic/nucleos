@@ -10,8 +10,6 @@
 /*
  * fltpr.c - print floating point numbers
  */
-/* $Header: /cvsup/minix/src/lib/fphook/fphook.c,v 1.1.1.1 2005/04/21 14:56:11 beng Exp $ */
-
 #ifndef	NOFLOAT
 #include	<string.h>
 #include	<stdarg.h>
@@ -186,7 +184,6 @@ _f_print(va_list *ap, int flags, char *s, char c, int precision)
 	return s;
 }
 #endif	/* NOFLOAT */
-/* $Header: /cvsup/minix/src/lib/fphook/fphook.c,v 1.1.1.1 2005/04/21 14:56:11 beng Exp $ */
 
 #include <stdlib.h>
 #include "../ansi/ext_fmt.h"

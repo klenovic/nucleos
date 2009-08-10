@@ -15,13 +15,6 @@ sysenv.elf32-obj-y      := sysenv.o
 
 extobj-y := $(lib-arch)/rts/crtso.o
 
-# cflags commong for all files in this directory
-CFLAGS_cdprobe.o += -D_MINIX -D_POSIX_SOURCE
-CFLAGS_dev2name.o += -D_MINIX -D_POSIX_SOURCE
-CFLAGS_loadramdisk.o += -D_MINIX -D_POSIX_SOURCE
-CFLAGS_newroot.o += -D_MINIX -D_POSIX_SOURCE
-CFLAGS_sysenv.o += -D_MINIX -D_POSIX_SOURCE
-
 LDFLAGS += -Tservers/server_32.lds
 
 LDFLAGS_cdprobe.elf32 := -L$(lib-arch) -Llib -lnucc

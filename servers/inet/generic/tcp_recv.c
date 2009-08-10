@@ -25,8 +25,6 @@ Copyright 1995 Philip Homburg
 #include "tcp.h"
 #include "assert.h"
 
-THIS_FILE
-
 static void create_RST(tcp_conn_t *tcp_conn, ip_hdr_t *ip_hdr, tcp_hdr_t *tcp_hdr, int data_len);
 static void process_data(tcp_conn_t *tcp_conn, tcp_hdr_t *tcp_hdr, acc_t *tcp_data, int data_len);
 static void process_advanced_data(tcp_conn_t *tcp_conn, tcp_hdr_t *tcp_hdr,

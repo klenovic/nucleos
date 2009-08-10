@@ -33,8 +33,6 @@ Created:	June 1995 by Philip Homburg <philip@f-mnx.phicoh.com>
 #include "qp.h"
 #include "sr_int.h"
 
-THIS_FILE
-
 #define MAX_REQ	1024	/* Maximum size of a request */
 
 #define QP_FD_NR	4

@@ -13,8 +13,6 @@
  * CHARBITS should be defined only if the compiler lacks "unsigned char".
  * It should be a mask, e.g. 0377 for an 8-bit machine.
  */
-
-#include <ansi.h>
 #include <nucleos/stddef.h>
 
 void *memccpy(void *dst, const void *src, int ucharstop, size_t size);

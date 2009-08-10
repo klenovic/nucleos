@@ -73,8 +73,6 @@
 #define NDEV_MINOR DEVICE
 #define NDEV_PROC IO_ENDPT
 
-THIS_FILE
-
 sr_fd_t sr_fd_table[FD_NR];
 
 static mq_t *repl_queue, *repl_queue_tail;

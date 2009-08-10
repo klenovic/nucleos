@@ -21,7 +21,7 @@ libnucc.a-obj-y := editline.o complete.o sysunix.o
 ##	-DNEED_PERROR		Don't have  (used in testit)
 #-DNEED_STRDUP
 
-ccflags-y := -O -D_MINIX -D_POSIX_SOURCE
+ccflags-y := -O
 ccflags-y += -DANSI_ARROWS -DHAVE_STDLIB -DHAVE_TCGETATTR -DHIDE -DUSE_DIRENT \
 	-DHIST_SIZE=100 -DUSE_TERMCAP -DSYS_UNIX
 ccflags-y += -D__UKERNEL__

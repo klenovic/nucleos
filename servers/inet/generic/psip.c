@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "psip.h"
 #include "sr.h"
 
-THIS_FILE
-
 typedef struct psip_port
 {
 	int pp_flags;

@@ -22,8 +22,6 @@ Copyright 1995 Philip Homburg
 #include "io.h"
 #include "ip_int.h"
 
-THIS_FILE
-
 ipaddr_t ip_get_netmask (hostaddr)
 ipaddr_t hostaddr;
 {

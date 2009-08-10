@@ -16,7 +16,6 @@
 #define __NUCLEOS_LIMITS_H
 
 /* Minimum sizes required by the POSIX P1003.1 standard (Table 2-3). */
-#ifdef _POSIX_SOURCE		/* these are only visible for POSIX */
 #define _POSIX_ARG_MAX    4096	/* exec() may have 4K worth of args */
 #define _POSIX_CHILD_MAX     6	/* a process may have 6 children */
 #define _POSIX_LINK_MAX      8	/* a file may have 8 links */
@@ -60,7 +59,5 @@
 				 * be reliably traversed in the resolution of
 				 * a pathname in the absence of a loop.
 				 */
-
-#endif /* _POSIX_SOURCE */
 
 #endif /* __NUCLEOS_LIMITS_H */

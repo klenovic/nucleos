@@ -14,15 +14,10 @@
 #ifndef _LIB_H
 #define _LIB_H
 
-/* First come the defines. */
-#define _POSIX_SOURCE      1	/* tell headers to include POSIX stuff */
-#define _MINIX             1	/* tell headers to include MINIX stuff */
-
 /* The following are so basic, all the lib files get them automatically. */
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <errno.h>
-#include <ansi.h>
 
 #include <nucleos/const.h>
 #include <nucleos/com.h>

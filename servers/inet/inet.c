@@ -53,8 +53,6 @@ from DL_ETH:
 
 #include "inet.h"
 
-#define _MINIX_SOURCE 1
-
 #include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
@@ -78,8 +76,6 @@ from DL_ETH:
 #include "generic/sr.h"
 #include "generic/tcp.h"
 #include "generic/udp.h"
-
-THIS_FILE
 
 #define RANDOM_DEV_NAME	"/dev/random"
 

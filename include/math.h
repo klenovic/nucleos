@@ -12,10 +12,6 @@
 #ifndef _MATH_H
 #define _MATH_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 #define HUGE_VAL	(__huge_val())		/* may be infinity */
 
 /* Function Prototypes. */
@@ -47,8 +43,6 @@ double tan(double _x);
 double tanh(double _x);
 double hypot(double _x, double _y);
 
-#ifdef _POSIX_SOURCE	/* STD-C? */
 #include <mathconst.h>
-#endif
 
 #endif /* _MATH_H */

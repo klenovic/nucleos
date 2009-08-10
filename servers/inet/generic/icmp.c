@@ -27,8 +27,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "ipr.h"
 
-THIS_FILE
-
 typedef struct icmp_port
 {
 	int icp_flags;

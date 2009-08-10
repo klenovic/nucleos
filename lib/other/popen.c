@@ -10,26 +10,16 @@
 /*
  * popen - open a pipe
  */
-/* $Header$ */
+#include <nucleos/types.h>
+#include <nucleos/limits.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
 
-#include	<nucleos/types.h>
-#include	<nucleos/limits.h>
-#include	<errno.h>
-#include	<signal.h>
-#include	<stdio.h>
-
-#if	defined(__BSD4_2)
-union wait {
-	int	w_status;
-};
-typedef union wait wait_arg;
-#else
 typedef int wait_arg;
-#endif	/* __BSD4_2 */
 
-#include	"../stdio/loc_incl.h"
+#include "../stdio/loc_incl.h"
 
-#ifdef _ANSI
 int _close(int d);
 int _dup2(int oldd, int newd);		/* not present in System 5 */
 int _execl(const char *name, const char *_arg, ... );
@@ -37,7 +27,6 @@ pid_t _fork(void);
 int _pipe(int fildes[2]);
 pid_t _wait(wait_arg *status);
 void _exit(int status);
-#endif
 
 static int pids[OPEN_MAX];
 
@@ -73,11 +62,7 @@ const char *type;
 	return fdopen(piped[Xtype], type);
 }
 
-#if	defined(__BSD4_2)
-#define	ret_val	status.w_status
-#else
 #define	ret_val	status
-#endif
 
 int
 pclose(stream)
@@ -87,13 +72,9 @@ FILE *stream;
 	wait_arg status;
 	int wret;
 
-#ifdef _ANSI
 	void (*intsave)(int) = signal(SIGINT, SIG_IGN);
 	void (*quitsave)(int) = signal(SIGQUIT, SIG_IGN);
-#else
-	void (*intsave)() = signal(SIGINT, SIG_IGN);
-	void (*quitsave)() = signal(SIGQUIT, SIG_IGN);
-#endif
+
 	fclose(stream);
 	while ((wret = _wait(&status)) != -1) {
 		if (wret == pids[fd]) break;
@@ -104,28 +85,3 @@ FILE *stream;
 	pids[fd] = 0;
 	return ret_val;
 }
-
-#if	defined(__USG)
-int _dup(int fildes);
-
-static int
-_dup2(oldd, newd)
-int oldd, newd;
-{
-	int i = 0, fd, tmp;
-	int fdbuf[_NFILES];
-
-	/* ignore the error on the close() */
-	tmp = errno; (void) _close(newd); errno = tmp;
-	while ((fd = _dup(oldd)) != newd) {
-		if (fd == -1) break;
-		fdbuf[i++] = fd;
-	}
-	tmp = errno;
-	while (--i >= 0) {
-		_close(fdbuf[i]);
-	}
-	errno = tmp;
-	return -(fd == -1);
-}
-#endif	/* __USG */

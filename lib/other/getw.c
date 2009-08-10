@@ -10,8 +10,6 @@
 /*
  * getw - read a word from a stream
  */
-/* $Header$ */
-
 #include	<stdio.h>
 
 int getw(FILE *stream);

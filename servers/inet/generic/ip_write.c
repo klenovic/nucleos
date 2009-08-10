@@ -28,8 +28,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "ipr.h"
 
-THIS_FILE
-
 static void error_reply(ip_fd_t *fd, int error);
 
 int ip_write (fd, count)

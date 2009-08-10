@@ -49,12 +49,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef lint
-static const char rcsid[] =
-  "$FreeBSD: src/lib/libc/string/strtok.c,v 1.2.6.1 2001/07/09 23:30:07 obrien Exp $";
-#endif
-
 #include <nucleos/stddef.h>
 #include <string.h>
 

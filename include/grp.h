@@ -25,11 +25,9 @@ struct	group {
 struct group *getgrgid(_mnx_Gid_t _gid);
 struct group *getgrnam(const char *_name);
 
-#ifdef _MINIX
 void endgrent(void);
 struct group *getgrent(void);
 int setgrent(void);
 void setgrfile(const char *_file);
-#endif
 
 #endif /* _GRP_H */

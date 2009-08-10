@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "ipr.h"
 
-THIS_FILE
-
 static int ip_checkopt(ip_fd_t *ip_fd);
 static void reply_thr_get(ip_fd_t *ip_fd, size_t reply, int for_ioctl);
 static void report_addr(ip_port_t *ip_port);

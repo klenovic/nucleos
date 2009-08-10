@@ -112,7 +112,6 @@ void do_pagefaults(void)
 			continue;
 		}
 
-
 		/* Pagefault is handled, so now reactivate the process. */
 		if((s=sys_vmctl(ep, VMCTL_CLEAR_PAGEFAULT, r)) != OK)
 			vm_panic("do_pagefaults: sys_vmctl failed", ep);

@@ -8,10 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#define _MINIX 1
 #define _SYSTEM 1
 
-#include <ansi.h> 
 #include <assert.h> 
 #include <nucleos/types.h>
 #include <nucleos/const.h>

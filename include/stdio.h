@@ -13,14 +13,8 @@
  * (c) copyright 1987 by the Vrije Universiteit, Amsterdam, The Netherlands.
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
-/* $Header$ */
-
 #ifndef _STDIO_H
 #define	_STDIO_H
-
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
 
 /*
  * Focus point of all stdio activity.
@@ -141,19 +135,15 @@ int __flushbuf(int _c, FILE *_stream);
 #define	ferror(p)	(((p)->_flags & _IOERR) != 0)
 #define clearerr(p)     ((p)->_flags &= ~(_IOERR|_IOEOF))
 
-#ifdef _POSIX_SOURCE
 int fileno(FILE *_stream);
 FILE *fdopen(int _fildes, const char *_types);
 #define	fileno(stream)		((stream)->_fd)
 #define L_ctermid 255	/* required by POSIX */
 #define L_cuserid 255	/* required by POSIX */
-#endif
 
-#ifdef _MINIX
 FILE *popen(const char *_command, const char *_type);
 int pclose(FILE *_stream);
 int snprintf(char *_s, size_t _n, const char *_format, ...);
 int vsnprintf(char *_s, size_t _n, const char *_format, char *_arg);
-#endif
 
 #endif /* _STDIO_H */

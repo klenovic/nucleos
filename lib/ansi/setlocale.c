@@ -10,8 +10,6 @@
 /*
  * setlocale - set the programs locale
  */
-/* $Header: /cvsup/minix/src/lib/ansi/setlocale.c,v 1.1.1.1 2005/04/21 14:56:06 beng Exp $ */
-
 #include	<locale.h>
 #include	<string.h>
 

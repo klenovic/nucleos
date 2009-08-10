@@ -90,14 +90,11 @@ DIR *opendir(const char *_dirname);
 struct dirent *readdir(DIR *_dirp);
 void rewinddir(DIR *_dirp);
 
-#ifdef _MINIX
 int seekdir(DIR *_dirp, off_t _loc);
 off_t telldir(DIR *_dirp);
 
 #define   dirfd(dirp)     ((dirp)->_fd)
 
 int getdents(int _fildes, struct dirent *_buf, size_t _nbyte);
-
-#endif
 
 #endif /* _DIRENT_H */

@@ -10,8 +10,6 @@
 /*
  * sscanf - read formatted output from a string
  */
-/* $Header: /cvsup/minix/src/lib/stdio/sscanf.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
 #include	<stdio.h>
 #include	<stdarg.h>
 #include	<string.h>

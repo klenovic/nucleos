@@ -12,8 +12,6 @@
  *             Based on readfs by Paul Polderman
  */
 #define nil 0
-#define _POSIX_SOURCE   1
-#define _MINIX    1
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -185,9 +183,9 @@ void r_stat(MNX(Ino_t) inum, struct MNX(stat) *stp)
   stp->st_gid= curfil.i_gid;
   stp->st_rdev= (MNX(dev_t)) curfil.i_zone[0];
   stp->st_size= curfil.i_size;
-  stp->st_atime= curfil.i_atime;
-  stp->st_mtime= curfil.i_mtime;
-  stp->st_ctime= curfil.i_ctime;
+  stp->st_atim= curfil.i_atime;
+  stp->st_mtim= curfil.i_mtime;
+  stp->st_ctim= curfil.i_ctime;
   a_indir= a_dindir= 0;
   dirpos= 0;
 }

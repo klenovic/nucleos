@@ -10,8 +10,6 @@
 /*
  * puts.c - print a string onto the standard output stream
  */
-/* $Header: /cvsup/minix/src/lib/stdio/puts.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
 #include	<stdio.h>
 
 int

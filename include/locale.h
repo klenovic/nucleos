@@ -15,10 +15,6 @@
 #ifndef _LOCALE_H
 #define _LOCALE_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 struct lconv {
   char *decimal_point;		/* "." */
   char *thousands_sep;		/* ""  */

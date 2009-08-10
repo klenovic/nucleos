@@ -10,15 +10,12 @@
 /*
  * loc_incl.h - local include file for stdio library
  */
-/* $Header: /cvsup/minix/src/lib/stdio/loc_incl.h,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
+#include <stdio.h>
 
-#include	<stdio.h>
+#define io_testflag(p,x)	((p)->_flags & (x))
 
-#define	io_testflag(p,x)	((p)->_flags & (x))
+#include <stdarg.h>
 
-#include	<stdarg.h>
-
-#ifdef _ANSI
 int _doprnt(const char *format, va_list ap, FILE *stream);
 int _doscan(FILE * stream, const char *format, va_list ap);
 char *_i_compute(unsigned long val, int base, char *s, int nrdigits);
@@ -32,7 +29,6 @@ FILE *fdopen(int fd, const char *mode);
 char *_ecvt(long double value, int ndigit, int *decpt, int *sign);
 char *_fcvt(long double value, int ndigit, int *decpt, int *sign);
 #endif	/* NOFLOAT */
-#endif
 
 #define	FL_LJUST	0x0001		/* left-justify field */
 #define	FL_SIGN		0x0002		/* sign in signed conversions */

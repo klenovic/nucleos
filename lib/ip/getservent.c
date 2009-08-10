@@ -25,11 +25,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)getservent.c	5.8 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
 #include <nucleos/types.h>
 #include <ctype.h>
 #include <stdio.h>

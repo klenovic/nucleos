@@ -15,8 +15,6 @@ Created:	Oct 14, 1993 by Philip Homburg <philip@cs.vu.nl>
 Implementation of isnan that directly tests the bits in an ieee float
 */
 
-#define _MINIX_SOURCE
-
 #include <nucleos/types.h>
 #include <math.h>
 

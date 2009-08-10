@@ -7,4 +7,4 @@ libnucc.a-obj-y := abort.o abs.o assert.o atexit.o atof.o atoi.o atol.o bsearch.
 	       sigmisc.o signal.o strcoll.o strcspn.o strerror.o strpbrk.o strspn.o strstr.o \
 	       strtok.o strtol.o strxfrm.o system.o tolower.o toupper.o wcstombs.o wctomb.o
 
-ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__USG -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

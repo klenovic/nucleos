@@ -23,8 +23,6 @@ Copyright 1995 Philip Homburg
 #include "assert.h"
 #include "tcp_int.h"
 
-THIS_FILE
-
 #undef tcp_LEmod4G
 int tcp_LEmod4G(n1, n2)
 u32_t n1;

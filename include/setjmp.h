@@ -72,16 +72,11 @@ int __setjmp(jmp_buf _env, int _savemask);
 void longjmp(jmp_buf _env, int _val);
 
 #define setjmp(env)	__setjmp((env), 1)
-
-#ifdef _MINIX
 #define _setjmp(env)	__setjmp((env), 0)
 #define _longjmp(env, val)	longjmp((env), (val))
-#endif
 
-#ifdef _POSIX_SOURCE
 typedef jmp_buf sigjmp_buf;
 #define sigsetjmp(env, savemask) __setjmp((env), (savemask))
 #define siglongjmp(env, val)	longjmp((env), (val))
-#endif /* _POSIX_SOURCE */
 
 #endif /* _SETJMP_H */

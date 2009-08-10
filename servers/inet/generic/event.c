@@ -21,8 +21,6 @@ Copyright 1995 Philip Homburg
 #include "assert.h"
 #include "event.h"
 
-THIS_FILE
-
 event_t *ev_head;
 static event_t *ev_tail;
 

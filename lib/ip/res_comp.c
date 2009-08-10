@@ -25,12 +25,6 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_comp.c	6.18 (Berkeley) 6/27/90";
-#endif /* LIBC_SCCS and not lint */
-
-#if _MINIX
 #include <nucleos/types.h>
 #include <stdlib.h>
 
@@ -45,19 +39,6 @@ int dn_skipname(const u_char *comp_dn, const u_char *eom);
 #define getlong _getlong
 #define putshort __putshort
 #define putlong __putlong
-#else
-#include <nucleos/types.h>
-#include <stdio.h>
-#include <arpa/nameser.h>
-
-static dn_find();
-#endif
-
-#ifdef __STDC__
-#define CONST	const
-#else
-#define CONST
-#endif
 
 /*
  * Expand compressed domain name 'comp_dn' to full domain name.
@@ -67,14 +48,14 @@ static dn_find();
  * Return size of compressed name or -1 if there was an error.
  */
 dn_expand(msg, eomorig, comp_dn, exp_dn, length)
-	CONST u_char *msg, *eomorig, *comp_dn;
+	const u_char *msg, *eomorig, *comp_dn;
 	u_char *exp_dn;
 	int length;
 {
-	register CONST u_char *cp;
+	register const u_char *cp;
 	register u_char *dn;
 	register int n, c;
-	CONST u_char *eom;
+	const u_char *eom;
 	int len = -1, checked = 0;
 
 	dn = exp_dn;
@@ -149,13 +130,13 @@ dn_expand(msg, eomorig, comp_dn, exp_dn, length)
  */
 int
 dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
-	CONST u_char *exp_dn;
+	const u_char *exp_dn;
 	u_char *comp_dn;
 	int length;
 	u_char **dnptrs, **lastdnptr;
 {
 	register u_char *cp;
-	register CONST u_char *dn;
+	register const u_char *dn;
 	register int c, l;
 	u_char **cpp, **lpp, *sp, *eob;
 	u_char *msg;
@@ -229,9 +210,9 @@ dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
  * Skip over a compressed domain name. Return the size or -1.
  */
 dn_skipname(comp_dn, eom)
-	CONST u_char *comp_dn, *eom;
+	const u_char *comp_dn, *eom;
 {
-	register CONST u_char *cp;
+	register const u_char *cp;
 	register int n;
 
 	cp = comp_dn;
@@ -261,13 +242,13 @@ dn_skipname(comp_dn, eom)
  */
 static int
 dn_find(exp_dn, msg, dnptrs, lastdnptr)
-	CONST u_char *exp_dn, *msg;
+	const u_char *exp_dn, *msg;
 	u_char **dnptrs, **lastdnptr;
 {
-	CONST register u_char *dn, *cp;
+	const register u_char *dn, *cp;
 	register u_char **cpp;
 	register int n;
-	CONST u_char *sp;
+	const u_char *sp;
 
 	for (cpp = dnptrs; cpp < lastdnptr; cpp++) {
 		dn = exp_dn;
@@ -316,14 +297,14 @@ dn_find(exp_dn, msg, dnptrs, lastdnptr)
 
 u16_t
 getshort(msgp)
-	CONST u8_t *msgp;
+	const u8_t *msgp;
 {
 	return ((msgp[0] << 8) | (msgp[1] << 0));
 }
 
 u32_t
 getlong(msgp)
-	CONST u8_t *msgp;
+	const u8_t *msgp;
 {
 	return (  ((u32_t) msgp[0] << 24)
 		| ((u32_t) msgp[1] << 16)

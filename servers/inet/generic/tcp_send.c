@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "tcp.h"
 #include "tcp_int.h"
 
-THIS_FILE
-
 static acc_t *make_pack(tcp_conn_t *tcp_conn);
 static void tcp_send_timeout(int conn, struct timer *timer);
 static void do_snd_event(event_t *ev, ev_arg_t arg);

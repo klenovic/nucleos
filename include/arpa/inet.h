@@ -39,9 +39,7 @@ char *inet_ntoa(struct in_addr _in);
 uint32_t ntohl(uint32_t _netval);
 uint16_t ntohs(uint16_t _netval);
 
-#ifdef _MINIX
 /* Additional functions */
 int inet_aton(const char *_cp, struct in_addr *_pin);
-#endif
 
 #endif /* _ARPA__INET_H */

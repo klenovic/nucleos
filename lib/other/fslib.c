@@ -9,7 +9,6 @@
  */
 /* fslib.c - routines needed by fs and fs utilities */
 
-#include <ansi.h>
 #include <nucleos/nucleos.h>
 #include <dirent.h>
 #include <nucleos/types.h>

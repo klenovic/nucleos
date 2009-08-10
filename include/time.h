@@ -19,10 +19,7 @@
 #define _TIME_H
 
 #define CLOCKS_PER_SEC    60
-
-#ifdef _POSIX_SOURCE
 #define CLK_TCK CLOCKS_PER_SEC	/* obsolescent mame for CLOCKS_PER_SEC */
-#endif
 
 #define NULL    ((void *)0)
 
@@ -65,13 +62,9 @@ struct tm *gmtime(const time_t *_timer);
 struct tm *localtime(const time_t *_timer);
 size_t strftime(char *_s, size_t _max, const char *_fmt, const struct tm *_timep);
 
-#ifdef _POSIX_SOURCE
 void tzset(void);
-#endif
 
-#ifdef _MINIX
 int stime(time_t *_top);
-#endif
 
 extern long timezone;
 

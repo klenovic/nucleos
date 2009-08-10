@@ -11,12 +11,9 @@
  * device driver code.
  */
 
-#define _POSIX_SOURCE      1	/* tell headers to include POSIX stuff */
-#define _MINIX             1	/* tell headers to include MINIX stuff */
 #define _SYSTEM		   1	/* get negative error number in <errno.h> */
 
 /* The following are so basic, all the *.c files get them automatically. */
-#include <ansi.h>		/* MUST be second */
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>
 #include <nucleos/com.h>

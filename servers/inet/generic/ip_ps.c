@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "psip.h"
 
-THIS_FILE
-
 static void ipps_main(ip_port_t *ip_port);
 static void ipps_set_ipaddr(ip_port_t *ip_port);
 static int ipps_send(struct ip_port *ip_port, ipaddr_t dest, acc_t *pack, int type);

@@ -10,8 +10,6 @@
 /*
  * fdopen - convert a (UNIX) file descriptor into a FILE pointer
  */
-/* $Header$ */
-
 #include	<stdlib.h>
 #include	"../stdio/loc_incl.h"
 #include	<stdio.h>

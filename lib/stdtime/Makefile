@@ -2,5 +2,5 @@
 lib-y := libnucc.a
 libnucc.a-obj-y := asctime.o localtime.o strftime.o
 
-ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__USG -D__UKERNEL__
+ccflags-y := -D__UKERNEL__
 

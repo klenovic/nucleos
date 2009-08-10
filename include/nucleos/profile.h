@@ -10,8 +10,6 @@
 #ifndef _PROFILE_H
 #define _PROFILE_H
 
-#include <ansi.h>
-
 /*
  * Types relating to system profiling.  Types are supplied for both
  * statistical profiling and call profiling.

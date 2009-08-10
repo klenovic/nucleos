@@ -126,10 +126,6 @@ struct termios {
 #define TCION              4	/* transmit a START character on the line */
 
 /* Function Prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 int tcsendbreak(int _fildes, int _duration);
 int tcdrain(int _filedes);
 int tcflush(int _filedes, int _queue_selector);
@@ -146,7 +142,6 @@ int tcsetattr (int _filedes, int _opt_actions, const struct termios *_termios_p)
 #define cfsetispeed(termios_p, speed)	((termios_p)->c_ispeed = (speed), 0)
 #define cfsetospeed(termios_p, speed)	((termios_p)->c_ospeed = (speed), 0)
 
-#ifdef _MINIX
 /* Here are the local extensions to the POSIX standard for Minix. Posix
  * conforming programs are not able to access these, and therefore they are
  * only defined when a Minix program is compiled.
@@ -209,6 +204,5 @@ struct winsize
 	unsigned short	ws_xpixel;	/* horizontal size, pixels */
 	unsigned short	ws_ypixel;	/* vertical size, pixels */
 };
-#endif /* _MINIX */
 
 #endif /* _TERMIOS_H */

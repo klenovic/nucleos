@@ -29,8 +29,6 @@ Copyright 1995 Philip Homburg
 #include "generic/eth_int.h"
 #include "generic/sr.h"
 
-THIS_FILE
-
 static int recv_debug= 0;
 
 static void setup_read(eth_port_t *eth_port);

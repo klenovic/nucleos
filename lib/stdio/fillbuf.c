@@ -10,14 +10,10 @@
 /*
  * fillbuf.c - fill a buffer
  */
-/* $Header: /cvsup/minix/src/lib/stdio/fillbuf.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
-#if	defined(_POSIX_SOURCE)
-#include	<nucleos/types.h>
-#endif
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	"loc_incl.h"
+#include <nucleos/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "loc_incl.h"
 
 ssize_t _read(ssize_t d, char *buf, size_t nbytes);
 

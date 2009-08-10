@@ -10,10 +10,6 @@
 #ifndef __NUCLEOS_UTSNAME_H
 #define __NUCLEOS_UTSNAME_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 struct utsname {
   char sysname[64+1];
   char nodename[64+1];
@@ -26,10 +22,9 @@ struct utsname {
 /* Function Prototypes. */
 int uname(struct utsname *_name);
 
-#ifdef _MINIX
 /* Uname() is implemented with sysuname(). */
-
 int sysuname(int _req, int _field, char *_value, size_t _len);
+
 /* req: Get or set a string. */
 #define _UTS_GET	0
 #define _UTS_SET	1
@@ -45,6 +40,5 @@ int sysuname(int _req, int _field, char *_value, size_t _len);
 #define _UTS_SYSNAME	7
 #define _UTS_BUS	8
 #define _UTS_MAX	9	/* Number of strings. */
-#endif /* _MINIX */
 
 #endif /* __NUCLEOS_UTSNAME_H */

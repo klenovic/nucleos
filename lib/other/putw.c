@@ -10,8 +10,6 @@
 /* 
  * putw - write an word on a stream
  */
-/* $Header$ */
-
 #include	<stdio.h>
 
 int putw(int w, FILE *stream);

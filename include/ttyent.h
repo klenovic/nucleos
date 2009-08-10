@@ -13,10 +13,6 @@
 #ifndef _TTYENT_H
 #define _TTYENT_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 struct ttyent {
 	char	*ty_name;	/* Name of the terminal device. */
 	char	*ty_type;	/* Terminal type name (termcap(3)). */

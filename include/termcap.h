@@ -10,8 +10,6 @@
 #ifndef _TERMCAP_H
 #define _TERMCAP_H
 
-#include <ansi.h>
-
 int tgetent(char *_bp, char *_name);
 int tgetflag(char *_id);
 int tgetnum(char *_id);

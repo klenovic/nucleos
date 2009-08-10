@@ -13,9 +13,6 @@ bintoc.c
 Convert a (binary) file to a series of comma separated hex values suitable
 for initializing a character array in C.
 */
-
-#define _POSIX_C_SOURCE 2
-
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>

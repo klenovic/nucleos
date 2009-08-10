@@ -10,9 +10,7 @@
 /* Header file including all needed system headers. */
 
 #define _SYSTEM            1    /* get OK and negative error codes */
-#define _MINIX             1    /* tell headers to include MINIX stuff */
 
-#include <ansi.h>
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <errno.h>

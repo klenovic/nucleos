@@ -25,12 +25,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_mkquery.c	6.12 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
-#if _MINIX
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,13 +40,6 @@ static char sccsid[] = "@(#)res_mkquery.c	6.12 (Berkeley) 6/1/90";
 
 #define putshort __putshort
 #define putlong __putlong
-#else
-#include <stdio.h>
-#include <nucleos/types.h>
-#include <netinet/in.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
-#endif
 
 /*
  * Form all types of queries.

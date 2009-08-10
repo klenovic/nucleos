@@ -45,11 +45,6 @@
  *
  *	@(#)regcomp.c	8.5 (Berkeley) 3/20/94
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
-#endif /* LIBC_SCCS and not lint */
-
 #include <nucleos/nucleos.h>
 #include <nucleos/types.h>
 #include <stdio.h>

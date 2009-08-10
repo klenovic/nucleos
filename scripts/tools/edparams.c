@@ -12,8 +12,6 @@
  */
 char version[]=   "2.20";
 
-#define _POSIX_SOURCE 1
-#define _MINIX  1
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/stat.h>

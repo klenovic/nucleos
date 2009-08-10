@@ -26,8 +26,6 @@ Copyright 1995 Philip Homburg
 #include "ip_int.h"
 #include "ipr.h"
 
-THIS_FILE
-
 static ip_ass_t *find_ass_ent(ip_port_t *ip_port, U16_t id, int proto, ipaddr_t src, ipaddr_t dst);
 static acc_t *merge_frags(acc_t *first, acc_t *second);
 static int ip_frag_chk(acc_t *pack);

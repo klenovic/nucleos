@@ -25,8 +25,6 @@ Copyright 1995 Philip Homburg
 #include "io.h"
 #include "sr.h"
 
-THIS_FILE
-
 #define ARP_CACHE_NR	 256
 #define AP_REQ_NR	  32
 

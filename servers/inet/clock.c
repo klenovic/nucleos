@@ -20,8 +20,6 @@ Copyright 1995 Philip Homburg
 #include "generic/clock.h"
 #include "generic/type.h"
 
-THIS_FILE
-
 int clck_call_expire;
 
 static time_t curr_time;

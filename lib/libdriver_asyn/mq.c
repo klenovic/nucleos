@@ -14,10 +14,7 @@ Created:	Jan 3, 1992 by Philip Homburg
 
 Copyright 1995 Philip Homburg
 */
-
-#include <ansi.h>
 #include <assert.h>
-
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>

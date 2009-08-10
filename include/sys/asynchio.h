@@ -17,10 +17,6 @@
 #ifndef _SYS__ASYNCHIO_H
 #define _SYS__ASYNCHIO_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 #include <nucleos/time.h>
 
 typedef struct {

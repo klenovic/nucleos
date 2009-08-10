@@ -30,8 +30,6 @@ Copyright 1995 Philip Homburg
 #include "ipr.h"
 #include "sr.h"
 
-THIS_FILE
-
 static void ip_close(int fd);
 static int ip_cancel(int fd, int which_operation);
 static int ip_select(int fd, unsigned operations);

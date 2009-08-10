@@ -20,9 +20,9 @@ Copyright 1995 Philip Homburg
 void bad_assertion(char *file, int line, char *what) __noreturn;
 void bad_compare(char *file, int line, int lhs, char *what, int rhs) __noreturn;
 
-#define assert(x)	((void)(!(x) ? bad_assertion(this_file, __LINE__, \
+#define assert(x)	((void)(!(x) ? bad_assertion(__FILE__, __LINE__, \
 			#x),0 : 0))
-#define compare(a,t,b)	(!((a) t (b)) ? bad_compare(this_file, __LINE__, \
+#define compare(a,t,b)	(!((a) t (b)) ? bad_compare(__FILE__, __LINE__, \
 				(a), #a " " #t " " #b, (b)) : (void) 0)
 
 #else /* NDEBUG */

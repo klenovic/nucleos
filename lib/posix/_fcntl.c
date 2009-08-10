@@ -12,13 +12,7 @@
 #include <fcntl.h>
 #include <stdarg.h>
 
-#if _ANSI
 int fcntl(int fd, int cmd, ...)
-#else
-int fcntl(fd, cmd)
-int fd;
-int cmd;
-#endif
 {
   va_list argp;
   message m;

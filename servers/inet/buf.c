@@ -24,8 +24,6 @@ Copyright 1995 Philip Homburg
 #include "generic/buf.h"
 #include "generic/type.h"
 
-THIS_FILE
-
 #ifndef BUF_USEMALLOC
 #define BUF_USEMALLOC	0
 #endif

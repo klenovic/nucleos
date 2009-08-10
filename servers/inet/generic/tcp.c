@@ -27,8 +27,6 @@ Copyright 1995 Philip Homburg
 #include "tcp.h"
 #include "tcp_int.h"
 
-THIS_FILE
-
 #define NOT_IMPLEMENTED 0
 
 tcp_port_t *tcp_port_table;

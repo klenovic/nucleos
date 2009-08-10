@@ -30,8 +30,6 @@ Copyright 1995 Philip Homburg
 #include "ip.h"
 #include "ip_int.h"
 
-THIS_FILE
-
 typedef struct xmit_hdr
 {
 	time_t xh_time;

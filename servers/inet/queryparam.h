@@ -13,8 +13,6 @@
 #ifndef _MINIX__QUERYPARAM_H
 #define _MINIX__QUERYPARAM_H
 
-#include <ansi.h>
-
 typedef size_t _mnx_size_t;
 
 struct export_param_list {
@@ -28,13 +26,8 @@ struct export_params {
 	struct export_params	 *next;	/* Link several sets of parameters. */
 };
 
-#ifdef __STDC__
 #define qp_stringize(var)	#var
 #define qp_dotstringize(var)	"." #var
-#else
-#define qp_stringize(var)	"var"
-#define qp_dotstringize(var)	".var"
-#endif
 #define QP_VARIABLE(var)	{ qp_stringize(var), &(var), sizeof(var) }
 #define QP_ARRAY(var)		{ "[", 0, sizeof((var)[0]) }
 #define QP_VECTOR(var,ptr,len)	{ qp_stringize(var), &(ptr), -1 },\

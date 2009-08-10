@@ -15,10 +15,6 @@
  * by the signal catching mechanism.
  */
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 /* The following structure should match the stackframe_s structure used
  * by the kernel's context switching code.  Floating point registers should
  * be added in a different struct.

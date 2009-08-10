@@ -64,19 +64,17 @@ typedef int ioreq_t;
 #include "const.h"
 #include "inet_config.h"
 
-#define THIS_FILE static char *this_file= __FILE__;
-
 void panic0(char *file, int line);
 void inet_panic(void) __noreturn; 
 
 #define ip_panic(print_list)  \
-	(panic0(this_file, __LINE__), printf print_list, panic())
+	(panic0(__FILE__, __LINE__), printf print_list, panic())
 #define panic() inet_panic()
 
 #if DEBUG
 #define ip_warning(print_list)  \
 	( \
-		printf("warning at %s, %d: ", this_file, __LINE__), \
+		printf("warning at %s, %d: ", __FILE__, __LINE__), \
 		printf print_list, \
 		printf("\ninet stacktrace: "), \
 		util_stacktrace() \

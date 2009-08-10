@@ -10,4 +10,4 @@ libnucc.a-obj-y := accept.o bind.o connect.o dhcp_gettag.o dhcp_settag.o domainn
 	                 res_mkquery.o res_query.o res_send.o ruserok.o send.o sendto.o servxcheck.o \
 	                 sethostent.o setsockopt.o shutdown.o socket.o strcasecmp.o
 
-ccflags-y := -D_MINIX -D_POSIX_SOURCE -DNDEBUG -D__UKERNEL__
+ccflags-y := -DNDEBUG -D__UKERNEL__

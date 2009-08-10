@@ -13,13 +13,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#if _ANSI
 int open(const char *name, int flags, ...)
-#else
-int open(name, flags)
-const char *name;
-int flags;
-#endif
 {
   va_list argp;
   message m;
