@@ -12,7 +12,7 @@
 #define kill	_kill
 #include <signal.h>
 
-PUBLIC int killpg(pgrp, sig)
+int killpg(pgrp, sig)
 int pgrp;			/* which process group is to be sent the
 				 * signal
 				 */

@@ -95,7 +95,3 @@ void *alloc(size_t size);
 extern int ip_forward_directed_bcast;
 
 #endif /* INET__INET_CONFIG_H */
-
-/*
- * $PchId: inet_config.h,v 1.10 2003/08/21 09:24:33 philip Exp $
- */

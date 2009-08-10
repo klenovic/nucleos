@@ -11,7 +11,7 @@
 
 #define cprofile _cprofile
 
-PUBLIC int cprofile(int action, int size, char *ctl_ptr, int *mem_ptr)
+int cprofile(int action, int size, char *ctl_ptr, int *mem_ptr)
 {
   message m;
 

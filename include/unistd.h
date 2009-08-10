@@ -13,6 +13,7 @@
 #define _UNISTD_H
 
 #include <nucleos/types.h>
+#include <nucleos/type.h>
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */
@@ -33,7 +34,6 @@
 #define STDOUT_FILENO      1	/* file descriptor for stdout */
 #define STDERR_FILENO      2	/* file descriptor for stderr */
 
-#ifdef _MINIX
 /* How to exit the system or stop a server process. */
 #define RBT_HALT	   0	/* shutdown and return to monitor */
 #define RBT_REBOOT	   1	/* reboot the system through the monitor */
@@ -41,9 +41,7 @@
 #define RBT_MONITOR	   3	/* let the monitor do this */
 #define RBT_RESET	   4	/* hard reset the system */
 #define RBT_INVALID	   5	/* first invalid reboot flag */
-
 #define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to FS by PM */
-#endif
 
 /* What system info to retrieve with sysgetinfo(). */
 #define SI_KINFO	   0	/* get kernel info via PM */
@@ -98,129 +96,117 @@
 #define _POSIX_CHOWN_RESTRICTED  1
 
 /* Function Prototypes. */
-_PROTOTYPE( void _exit, (int _status)					);
-_PROTOTYPE( int access, (const char *_path, int _amode)			);
-_PROTOTYPE( unsigned int alarm, (unsigned int _seconds)			);
-_PROTOTYPE( int chdir, (const char *_path)				);
-_PROTOTYPE( int fchdir, (int fd)					);
-_PROTOTYPE( int chown, (const char *_path, _mnx_Uid_t _owner, _mnx_Gid_t _group)	);
-_PROTOTYPE( int fchown, (int fd, _mnx_Uid_t _owner, _mnx_Gid_t _group)	);
-_PROTOTYPE( int close, (int _fd)					);
-_PROTOTYPE( char *ctermid, (char *_s)					);
-_PROTOTYPE( char *cuserid, (char *_s)					);
-_PROTOTYPE( int dup, (int _fd)						);
-_PROTOTYPE( int dup2, (int _fd, int _fd2)				);
-_PROTOTYPE( int execl, (const char *_path, const char *_arg, ...)	);
-_PROTOTYPE( int execle, (const char *_path, const char *_arg, ...)	);
-_PROTOTYPE( int execlp, (const char *_file, const char *arg, ...)	);
-_PROTOTYPE( int execv, (const char *_path, char *const _argv[])		);
-_PROTOTYPE( int execve, (const char *_path, char *const _argv[], 
-						char *const _envp[])	);
-_PROTOTYPE( int execvp, (const char *_file, char *const _argv[])	);
-_PROTOTYPE( pid_t fork, (void)						);
-_PROTOTYPE( long fpathconf, (int _fd, int _name)			);
-_PROTOTYPE( char *getcwd, (char *_buf, size_t _size)			);
-_PROTOTYPE( gid_t getegid, (void)					);
-_PROTOTYPE( uid_t geteuid, (void)					);
-_PROTOTYPE( gid_t getgid, (void)					);
-_PROTOTYPE( int getgroups, (int _gidsetsize, gid_t _grouplist[])	);
-_PROTOTYPE( char *getlogin, (void)					);
-_PROTOTYPE( pid_t getpgrp, (void)					);
-_PROTOTYPE( pid_t getpid, (void)					);
-_PROTOTYPE( pid_t getnpid, (int proc_nr)				);
-_PROTOTYPE( pid_t getppid, (void)					);
-_PROTOTYPE( uid_t getuid, (void)					);
-_PROTOTYPE( int isatty, (int _fd)					);
-_PROTOTYPE( int link, (const char *_existing, const char *_new)		);
-_PROTOTYPE( off_t lseek, (int _fd, off_t _offset, int _whence)		);
-_PROTOTYPE( long pathconf, (const char *_path, int _name)		);
-_PROTOTYPE( int pause, (void)						);
-_PROTOTYPE( int pipe, (int _fildes[2])					);
-_PROTOTYPE( ssize_t read, (int _fd, void *_buf, size_t _n)		);
-_PROTOTYPE( int rmdir, (const char *_path)				);
-_PROTOTYPE( int setgid, (_mnx_Gid_t _gid)				);
-_PROTOTYPE( int setegid, (_mnx_Gid_t _gid)				);
-_PROTOTYPE( int setpgid, (pid_t _pid, pid_t _pgid)			);
-_PROTOTYPE( pid_t setsid, (void)					);
-_PROTOTYPE( int setuid, (_mnx_Uid_t _uid)				);
-_PROTOTYPE( int seteuid, (_mnx_Uid_t _uid)				);
-_PROTOTYPE( unsigned int sleep, (unsigned int _seconds)			);
-_PROTOTYPE( long sysconf, (int _name)					);
-_PROTOTYPE( pid_t tcgetpgrp, (int _fd)					);
-_PROTOTYPE( int tcsetpgrp, (int _fd, pid_t _pgrp_id)			);
-_PROTOTYPE( char *ttyname, (int _fd)					);
-_PROTOTYPE( int unlink, (const char *_path)				);
-_PROTOTYPE( ssize_t write, (int _fd, const void *_buf, size_t _n)	);
-_PROTOTYPE( int truncate, (const char *_path, off_t _length)		);
-_PROTOTYPE( int ftruncate, (int _fd, off_t _length)			);
-_PROTOTYPE( int nice, (int _incr)					);
+void _exit(int _status);
+int access(const char *_path, int _amode);
+unsigned int alarm(unsigned int _seconds);
+int chdir(const char *_path);
+int fchdir(int fd);
+int chown(const char *_path, _mnx_Uid_t _owner, _mnx_Gid_t _group);
+int fchown(int fd, _mnx_Uid_t _owner, _mnx_Gid_t _group);
+int close(int _fd);
+char *ctermid(char *_s);
+char *cuserid(char *_s);
+int dup(int _fd);
+int dup2(int _fd, int _fd2);
+int execl(const char *_path, const char *_arg, ...);
+int execle(const char *_path, const char *_arg, ...);
+int execlp(const char *_file, const char *arg, ...);
+int execv(const char *_path, char *const _argv[]);
+int execve(const char *_path, char *const _argv[], char *const _envp[]);
+int execvp(const char *_file, char *const _argv[]);
+pid_t fork(void);
+long fpathconf(int _fd, int _name);
+char *getcwd(char *_buf, size_t _size);
+gid_t getegid(void);
+uid_t geteuid(void);
+gid_t getgid(void);
+int getgroups(int _gidsetsize, gid_t _grouplist[]);
+char *getlogin(void);
+pid_t getpgrp(void);
+pid_t getpid(void);
+pid_t getnpid(int proc_nr);
+pid_t getppid(void);
+uid_t getuid(void);
+int isatty(int _fd);
+int link(const char *_existing, const char *_new);
+off_t lseek(int _fd, off_t _offset, int _whence);
+long pathconf(const char *_path, int _name);
+int pause(void);
+int pipe(int _fildes[2]);
+ssize_t read(int _fd, void *_buf, size_t _n);
+int rmdir(const char *_path);
+int setgid(_mnx_Gid_t _gid);
+int setegid(_mnx_Gid_t _gid);
+int setpgid(pid_t _pid, pid_t _pgid);
+pid_t setsid(void);
+int setuid(_mnx_Uid_t _uid);
+int seteuid(_mnx_Uid_t _uid);
+unsigned int sleep(unsigned int _seconds);
+long sysconf(int _name);
+pid_t tcgetpgrp(int _fd);
+int tcsetpgrp(int _fd, pid_t _pgrp_id);
+char *ttyname(int _fd);
+int unlink(const char *_path);
+ssize_t write(int _fd, const void *_buf, size_t _n);
+int truncate(const char *_path, off_t _length);
+int ftruncate(int _fd, off_t _length);
+int nice(int _incr);
 
 /* Open Group Base Specifications Issue 6 (not complete) */
-_PROTOTYPE( int symlink, (const char *path1, const char *path2)		);
-_PROTOTYPE( int readlink, (const char *, char *, size_t)		);
-_PROTOTYPE( int getopt, (int _argc, char * const _argv[], char const *_opts)		);
+int symlink(const char *path1, const char *path2);
+int readlink(const char *, char *, size_t);
+int getopt(int _argc, char * const _argv[], char const *_opts);
+
 extern char *optarg;
 extern int optind, opterr, optopt;
-_PROTOTYPE( int usleep, (useconds_t _useconds)				);
 
-#ifdef _MINIX
-#ifndef _TYPE_H
-#include <nucleos/type.h>
-#endif
+int usleep(useconds_t _useconds);
 
 extern int optreset;	/* Reset getopt state */
 
-_PROTOTYPE( int brk, (char *_addr)					);
-_PROTOTYPE( int chroot, (const char *_name)				);
-_PROTOTYPE( int lseek64, (int _fd, u64_t _offset, int _whence,
-						u64_t *_newpos)		);
-_PROTOTYPE( int mknod, (const char *_name, _mnx_Mode_t _mode, Dev_t _addr)	);
-_PROTOTYPE( int mknod4, (const char *_name, _mnx_Mode_t _mode, Dev_t _addr,
-	    long _size)							);
-_PROTOTYPE( char *mktemp, (char *_template)				);
-_PROTOTYPE( int mount, (char *_spec, char *_name, int _flag,
-						char *type, char *args)	);
-_PROTOTYPE( long ptrace, (int _req, pid_t _pid, long _addr, long _data)	);
-_PROTOTYPE( char *sbrk, (int _incr)					);
-_PROTOTYPE( int sync, (void)						);
-_PROTOTYPE( int fsync, (int fd)						);
-_PROTOTYPE( int umount, (const char *_name)				);
-_PROTOTYPE( int reboot, (int _how, ...)					);
-_PROTOTYPE( int gethostname, (char *_hostname, size_t _len)		);
-_PROTOTYPE( int getdomainname, (char *_domain, size_t _len)		);
-_PROTOTYPE( int ttyslot, (void)						);
-_PROTOTYPE( int fttyslot, (int _fd)					);
-_PROTOTYPE( char *crypt, (const char *_key, const char *_salt)		);
-_PROTOTYPE( int getsysinfo, (int who, int what, void *where)		);
-_PROTOTYPE( int getsigset, (sigset_t *sigset)				);
-_PROTOTYPE( int getprocnr, (void)					);
-_PROTOTYPE( int getnprocnr, (pid_t pid)					);
-_PROTOTYPE( int getpprocnr, (void)					);
-_PROTOTYPE( int _pm_findproc, (char *proc_name, int *proc_nr)		);
-_PROTOTYPE( int allocmem, (phys_bytes size, phys_bytes *base)		);
-_PROTOTYPE( int freemem, (phys_bytes size, phys_bytes base)		);
+int brk(char *_addr);
+int chroot(const char *_name);
+int lseek64(int _fd, u64_t _offset, int _whence, u64_t *_newpos);
+int mknod(const char *_name, _mnx_Mode_t _mode, Dev_t _addr);
+int mknod4(const char *_name, _mnx_Mode_t _mode, Dev_t _addr, long _size);
+char *mktemp(char *_template);
+int mount(char *_spec, char *_name, int _flag, char *type, char *args);
+long ptrace(int _req, pid_t _pid, long _addr, long _data);
+char *sbrk(int _incr);
+int sync(void);
+int fsync(int fd);
+int umount(const char *_name);
+int reboot(int _how, ...);
+int gethostname(char *_hostname, size_t _len);
+int getdomainname(char *_domain, size_t _len);
+int ttyslot(void);
+int fttyslot(int _fd);
+char *crypt(const char *_key, const char *_salt);
+int getsysinfo(int who, int what, void *where);
+int getsigset(sigset_t *sigset);
+int getprocnr(void);
+int getnprocnr(pid_t pid);
+int getpprocnr(void);
+int _pm_findproc(char *proc_name, int *proc_nr);
+int allocmem(phys_bytes size, phys_bytes *base);
+int freemem(phys_bytes size, phys_bytes base);
+
 #define DEV_MAP 1
 #define DEV_UNMAP 2
 #define mapdriver(driver, device, style, force) \
 	devctl(DEV_MAP, driver, device, style, force)
 #define unmapdriver(device) devctl(DEV_UNMAP, 0, device, 0)
-_PROTOTYPE( int devctl, (int ctl_req, int driver, int device, int style, 
-	int force)							);
-_PROTOTYPE( int mapdriver5, (char *label, size_t len, int major,
-	int style, int force)						);
-_PROTOTYPE( uid_t getpeuid, (endpoint_t ep)				);
-_PROTOTYPE(int adddma, (endpoint_t proc_e,
-				phys_bytes start, phys_bytes size)	);
-_PROTOTYPE(int deldma, (endpoint_t proc_e,
-				phys_bytes start, phys_bytes size)	);
-_PROTOTYPE(int getdma, (endpoint_t *procp, phys_bytes *basep, 
-						phys_bytes *sizep)	);
+
+int devctl(int ctl_req, int driver, int device, int style, int force);
+int mapdriver5(char *label, size_t len, int major, int style, int force);
+uid_t getpeuid(endpoint_t ep);
+int adddma(endpoint_t proc_e, phys_bytes start, phys_bytes size);
+int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size);
+int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep);
 
 /* For compatibility with other Unix systems */
-_PROTOTYPE( int getpagesize, (void)					);
-_PROTOTYPE( int setgroups, (int ngroups, const gid_t *gidset)		);
-_PROTOTYPE( int initgroups, (const char *name, gid_t basegid)		);
-
-#endif
+int getpagesize(void);
+int setgroups(int ngroups, const gid_t *gidset);
+int initgroups(const char *name, gid_t basegid);
 
 #endif /* _UNISTD_H */

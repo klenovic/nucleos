@@ -432,7 +432,3 @@ d8	R/W	Config5		Configuration register 5
 	0	R/W	PME_STS	PME_Status bit
 d9-ff				reserved
 #endif
-
-/*
- * $PchId: rtl8139.h,v 1.1 2003/09/05 10:58:50 philip Exp $
- */

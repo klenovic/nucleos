@@ -12,20 +12,19 @@
 #include "inc.h"
 
 /* Allocate space for the data store. */
-PRIVATE struct data_store ds_store[NR_DS_KEYS];
-PRIVATE struct subscription ds_subs[NR_DS_SUBS];
-PRIVATE int nr_in_use;
+static struct data_store ds_store[NR_DS_KEYS];
+static struct subscription ds_subs[NR_DS_SUBS];
+static int nr_in_use;
 
-PRIVATE _PROTOTYPE(int find_key, (char *key, struct data_store **dsp, int t));
-PRIVATE _PROTOTYPE(int set_owner, (struct data_store *dsp, int auth));
-PRIVATE _PROTOTYPE(int is_authorized, (struct data_store *dsp, int auth));
-PRIVATE _PROTOTYPE(void check_subscribers, (struct data_store *dsp));
-
+static int find_key(char *key, struct data_store **dsp, int t);
+static int set_owner(struct data_store *dsp, int auth);
+static int is_authorized(struct data_store *dsp, int auth);
+static void check_subscribers(struct data_store *dsp);
 
 /*===========================================================================*
  *				ds_init				     	     *
  *===========================================================================*/
-PUBLIC void ds_init(void)
+void ds_init(void)
 {
 	int i;
 
@@ -44,7 +43,7 @@ PUBLIC void ds_init(void)
 	return;
 }
 
-PRIVATE int set_owner(dsp, auth)
+static int set_owner(dsp, auth)
 struct data_store *dsp;				/* data store structure */
 int auth;
 {
@@ -52,7 +51,7 @@ int auth;
 }
 
 
-PRIVATE int is_authorized(dsp, ap)
+static int is_authorized(dsp, ap)
 struct data_store *dsp;				/* data store structure */
 int ap;						/* authorization value */
 {
@@ -61,7 +60,7 @@ int ap;						/* authorization value */
 }
 
 
-PRIVATE int find_key(key_name, dsp, type)
+static int find_key(key_name, dsp, type)
 char *key_name;					/* key to look up */
 struct data_store **dsp;			/* store pointer here */
 int type;					/* type info */
@@ -82,7 +81,7 @@ int type;					/* type info */
 }
 
 
-PUBLIC int do_publish(m_ptr)
+int do_publish(m_ptr)
 message *m_ptr;					/* request message */
 {
   struct data_store* dsp;
@@ -167,7 +166,7 @@ message *m_ptr;					/* request message */
 /*===========================================================================*
  *				do_retrieve				     *
  *===========================================================================*/
-PUBLIC int do_retrieve(m_ptr)
+int do_retrieve(m_ptr)
 message *m_ptr;					/* request message */
 {
   struct data_store *dsp;
@@ -228,7 +227,7 @@ message *m_ptr;					/* request message */
 /*===========================================================================*
  *				do_check				     *
  *===========================================================================*/
-PUBLIC int do_check(m_ptr)
+int do_check(m_ptr)
 message *m_ptr;					/* request message */
 {
 /* This routine goes through all subscriptions for a client,
@@ -304,7 +303,7 @@ message *m_ptr;					/* request message */
   return(ESRCH);                                        /* key not found */
 }
 
-PUBLIC int do_subscribe(m_ptr)
+int do_subscribe(m_ptr)
 message *m_ptr;					/* request message */
 {
   char regex[DS_MAX_KEYLEN+3];
@@ -377,7 +376,7 @@ message *m_ptr;					/* request message */
 /*===========================================================================*
  *				do_getsysinfo				     *
  *===========================================================================*/
-PUBLIC int do_getsysinfo(m_ptr)
+int do_getsysinfo(m_ptr)
 message *m_ptr;
 {
   vir_bytes src_addr, dst_addr;
@@ -408,7 +407,7 @@ message *m_ptr;
 /*===========================================================================*
  *				check_subscribers			     *
  *===========================================================================*/
-PRIVATE void
+static void
 check_subscribers(struct data_store *dsp)
 {
 /* Send subscribers whose subscriptions match this (new

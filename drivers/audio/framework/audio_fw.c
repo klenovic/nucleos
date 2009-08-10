@@ -57,36 +57,35 @@
 #include <asm/servers/vm/vm.h>
 
 
-FORWARD _PROTOTYPE( int msg_open, (int minor_dev_nr) );
-FORWARD _PROTOTYPE( int msg_close, (int minor_dev_nr) );
-FORWARD _PROTOTYPE( int msg_ioctl, (message *m_ptr) );
-FORWARD _PROTOTYPE( void msg_write, (message *m_ptr) );
-FORWARD _PROTOTYPE( void msg_read, (message *m_ptr) );
-FORWARD _PROTOTYPE( void msg_hardware, (void) );
-FORWARD _PROTOTYPE( void msg_sig_stop, (void) );
-FORWARD _PROTOTYPE( void msg_status, (message *m_ptr) );
-FORWARD _PROTOTYPE( int init_driver, (void) );
-FORWARD _PROTOTYPE( int open_sub_dev, (int sub_dev_nr, int operation) );
-FORWARD _PROTOTYPE( int close_sub_dev, (int sub_dev_nr) );
-FORWARD _PROTOTYPE( void handle_int_write,(int sub_dev_nr) );
-FORWARD _PROTOTYPE( void handle_int_read,(int sub_dev_nr) );
-FORWARD _PROTOTYPE( void data_to_user, (sub_dev_t *sub_dev_ptr) );
-FORWARD _PROTOTYPE( void data_from_user, (sub_dev_t *sub_dev_ptr) );
-FORWARD _PROTOTYPE( int init_buffers, (sub_dev_t *sub_dev_ptr) );
-FORWARD _PROTOTYPE( int get_started, (sub_dev_t *sub_dev_ptr) );
-FORWARD _PROTOTYPE( void reply,(int code, int replyee, int process,int status));
-FORWARD _PROTOTYPE( int io_ctl_length, (int io_request) );
-FORWARD _PROTOTYPE( special_file_t* get_special_file, (int minor_dev_nr) );
-FORWARD _PROTOTYPE( void tell_dev, (vir_bytes buf, size_t size, int pci_bus,
-					int pci_dev, int pci_func) );
+static int msg_open(int minor_dev_nr);
+static int msg_close(int minor_dev_nr);
+static int msg_ioctl(message *m_ptr);
+static void msg_write(message *m_ptr);
+static void msg_read(message *m_ptr);
+static void msg_hardware(void);
+static void msg_sig_stop(void);
+static void msg_status(message *m_ptr);
+static int init_driver(void);
+static int open_sub_dev(int sub_dev_nr, int operation);
+static int close_sub_dev(int sub_dev_nr);
+static void handle_int_write(int sub_dev_nr);
+static void handle_int_read(int sub_dev_nr);
+static void data_to_user(sub_dev_t *sub_dev_ptr);
+static void data_from_user(sub_dev_t *sub_dev_ptr);
+static int init_buffers(sub_dev_t *sub_dev_ptr);
+static int get_started(sub_dev_t *sub_dev_ptr);
+static void reply(int code, int replyee, int process,int status);
+static int io_ctl_length(int io_request);
+static special_file_t* get_special_file(int minor_dev_nr);
+static void tell_dev(vir_bytes buf, size_t size, int pci_bus, int pci_dev, int pci_func);
 
-PRIVATE char io_ctl_buf[_IOCPARM_MASK];
-PRIVATE int irq_hook_id = 0;	/* id of irq hook at the kernel */
-PRIVATE int irq_hook_set = FALSE;
-PRIVATE device_available = 0;/*todo*/
+static char io_ctl_buf[_IOCPARM_MASK];
+static int irq_hook_id = 0;	/* id of irq hook at the kernel */
+static int irq_hook_set = FALSE;
+static device_available = 0;/*todo*/
 
 
-PUBLIC void main(void) 
+void main(void) 
 {	
 	int r, caller, proc_nr, chan;
 	message mess, repl_mess;
@@ -173,7 +172,7 @@ PUBLIC void main(void)
 }
 
 
-PRIVATE int init_driver(void) {
+static int init_driver(void) {
 	u32_t i; char irq;
 	static int executed = 0;
 	sub_dev_t* sub_dev_ptr;
@@ -222,7 +221,7 @@ PRIVATE int init_driver(void) {
 }
 
 
-PRIVATE int msg_open (int minor_dev_nr) {
+static int msg_open (int minor_dev_nr) {
 	int r, read_chan, write_chan, io_ctl;
 	special_file_t* special_file_ptr;
 
@@ -276,7 +275,7 @@ PRIVATE int msg_open (int minor_dev_nr) {
 }
 
 
-PRIVATE int open_sub_dev(int sub_dev_nr, int dma_mode) {
+static int open_sub_dev(int sub_dev_nr, int dma_mode) {
 	sub_dev_t* sub_dev_ptr; int i;
 	sub_dev_ptr = &sub_dev[sub_dev_nr];
 
@@ -312,7 +311,7 @@ PRIVATE int open_sub_dev(int sub_dev_nr, int dma_mode) {
 }
 
 
-PRIVATE int msg_close(int minor_dev_nr) {
+static int msg_close(int minor_dev_nr) {
 
 	int r, read_chan, write_chan, io_ctl; 
 	special_file_t* special_file_ptr;
@@ -349,7 +348,7 @@ PRIVATE int msg_close(int minor_dev_nr) {
 }
 
 
-PRIVATE int close_sub_dev(int sub_dev_nr) {
+static int close_sub_dev(int sub_dev_nr) {
 	sub_dev_t *sub_dev_ptr;
 	sub_dev_ptr = &sub_dev[sub_dev_nr];
 	if (sub_dev_ptr->DmaMode == DEV_WRITE_S && !sub_dev_ptr->OutOfData) {
@@ -372,7 +371,7 @@ PRIVATE int close_sub_dev(int sub_dev_nr) {
 }
 
 
-PRIVATE int msg_ioctl(message *m_ptr)
+static int msg_ioctl(message *m_ptr)
 {
 	int status, len, chan;
 	phys_bytes user_phys;
@@ -436,7 +435,7 @@ PRIVATE int msg_ioctl(message *m_ptr)
 }
 
 
-PRIVATE void msg_write(message *m_ptr) 
+static void msg_write(message *m_ptr) 
 {
 	int s, chan; sub_dev_t *sub_dev_ptr;
 	special_file_t* special_file_ptr;
@@ -487,7 +486,7 @@ PRIVATE void msg_write(message *m_ptr)
 }
 
 
-PRIVATE void msg_read(message *m_ptr) 
+static void msg_read(message *m_ptr) 
 {
 	int s, chan; sub_dev_t *sub_dev_ptr;
 	special_file_t* special_file_ptr;
@@ -538,7 +537,7 @@ PRIVATE void msg_read(message *m_ptr)
 }
 
 
-PRIVATE void msg_hardware(void) {
+static void msg_hardware(void) {
 
 	u32_t     i;
 	int j = 0;
@@ -567,7 +566,7 @@ PRIVATE void msg_hardware(void) {
 }
 
 
-PRIVATE void msg_status(message *m_ptr)
+static void msg_status(message *m_ptr)
 {
 	int i; 
 
@@ -596,7 +595,7 @@ PRIVATE void msg_status(message *m_ptr)
 }
 
 
-PRIVATE void msg_sig_stop(void) 
+static void msg_sig_stop(void) 
 {
 	int i; char irq;
 	for (i = 0; i < drv.NrOfSubDevices; i++) {
@@ -619,7 +618,7 @@ PRIVATE void msg_sig_stop(void)
 
 
 /* handle interrupt for specified sub device; DmaMode == DEV_WRITE_S*/
-PRIVATE void handle_int_write(int sub_dev_nr) 
+static void handle_int_write(int sub_dev_nr) 
 {
 	sub_dev_t *sub_dev_ptr;
 	int r;
@@ -681,7 +680,7 @@ PRIVATE void handle_int_write(int sub_dev_nr)
 
 
 /* handle interrupt for specified sub device; DmaMode == DEV_READ_S */
-PRIVATE void handle_int_read(int sub_dev_nr) 
+static void handle_int_read(int sub_dev_nr) 
 {
 	sub_dev_t *sub_dev_ptr; int r,i;
 
@@ -735,7 +734,7 @@ PRIVATE void handle_int_read(int sub_dev_nr)
 }
 
 
-PRIVATE int get_started(sub_dev_t *sub_dev_ptr) {
+static int get_started(sub_dev_t *sub_dev_ptr) {
 	u32_t i;char c;  
 
 	/* enable interrupt messages from MINIX */
@@ -755,7 +754,7 @@ PRIVATE int get_started(sub_dev_t *sub_dev_ptr) {
 }
 
 
-PRIVATE void data_from_user(sub_dev_t *subdev)
+static void data_from_user(sub_dev_t *subdev)
 {
 	int r;
 	message m;
@@ -827,7 +826,7 @@ PRIVATE void data_from_user(sub_dev_t *subdev)
 }
 
 
-PRIVATE void data_to_user(sub_dev_t *sub_dev_ptr)
+static void data_to_user(sub_dev_t *sub_dev_ptr)
 {
 	int r;
 	message m;
@@ -888,7 +887,7 @@ PRIVATE void data_to_user(sub_dev_t *sub_dev_ptr)
 	sub_dev_ptr->RevivePending = 0;
 }
 
-PRIVATE int init_buffers(sub_dev_t *sub_dev_ptr)
+static int init_buffers(sub_dev_t *sub_dev_ptr)
 {
 #ifdef CONFIG_X86_32
 	char *base;
@@ -947,7 +946,7 @@ PRIVATE int init_buffers(sub_dev_t *sub_dev_ptr)
 }
 
 
-PRIVATE void reply(int code, int replyee, int process, int status) {
+static void reply(int code, int replyee, int process, int status) {
 	message m;
 
 	m.m_type = code;		/* DEV_REVIVE */
@@ -957,13 +956,13 @@ PRIVATE void reply(int code, int replyee, int process, int status) {
 }
 
 
-PRIVATE int io_ctl_length(int io_request) {
+static int io_ctl_length(int io_request) {
 	io_request >>= 16; 
 	return io_request & _IOCPARM_MASK;
 }
 
 
-PRIVATE special_file_t* get_special_file(int minor_dev_nr) {
+static special_file_t* get_special_file(int minor_dev_nr) {
 	int i;
 
 	for(i = 0; i < drv.NrOfSpecialFiles; i++) {
@@ -978,7 +977,7 @@ PRIVATE special_file_t* get_special_file(int minor_dev_nr) {
 	return NULL;
 }
 
-PRIVATE void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
+static void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
 vir_bytes buf;
 size_t size;
 int pci_bus;

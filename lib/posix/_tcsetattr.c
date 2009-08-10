@@ -23,7 +23,7 @@ Created:	June 11, 1993 by Philip Homburg
 int tcsetattr(fd, opt_actions, termios_p)
 int fd;
 int opt_actions;
-_CONST struct termios *termios_p;
+const struct termios *termios_p;
 {
   int request;
 

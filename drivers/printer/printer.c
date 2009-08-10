@@ -93,41 +93,41 @@
  * with the sys_outb() messages exchanged.
  */
 
-PRIVATE int caller;		/* process to tell when printing done (FS) */
-PRIVATE int revive_pending;	/* set to true if revive is pending */
-PRIVATE int revive_status;	/* revive status */
-PRIVATE int done_status;	/* status of last output completion */
-PRIVATE int oleft;		/* bytes of output left in obuf */
-PRIVATE char obuf[128];		/* output buffer */
-PRIVATE unsigned char *optr;		/* ptr to next char in obuf to print */
-PRIVATE int orig_count;		/* original byte count */
-PRIVATE int port_base;		/* I/O port for printer */
-PRIVATE int proc_nr;		/* user requesting the printing */
-PRIVATE cp_grant_id_t grant_nr;	/* grant on which print happens */
-PRIVATE int user_left;		/* bytes of output left in user buf */
-PRIVATE vir_bytes user_vir_g;	/* start of user buf (address or grant) */
-PRIVATE vir_bytes user_vir_d;	/* offset in user buf */
-PRIVATE int user_safe;		/* address or grant? */
-PRIVATE int writing;		/* nonzero while write is in progress */
-PRIVATE int irq_hook_id;	/* id of irq hook at kernel */
+static int caller;		/* process to tell when printing done (FS) */
+static int revive_pending;	/* set to true if revive is pending */
+static int revive_status;	/* revive status */
+static int done_status;	/* status of last output completion */
+static int oleft;		/* bytes of output left in obuf */
+static char obuf[128];		/* output buffer */
+static unsigned char *optr;		/* ptr to next char in obuf to print */
+static int orig_count;		/* original byte count */
+static int port_base;		/* I/O port for printer */
+static int proc_nr;		/* user requesting the printing */
+static cp_grant_id_t grant_nr;	/* grant on which print happens */
+static int user_left;		/* bytes of output left in user buf */
+static vir_bytes user_vir_g;	/* start of user buf (address or grant) */
+static vir_bytes user_vir_d;	/* offset in user buf */
+static int user_safe;		/* address or grant? */
+static int writing;		/* nonzero while write is in progress */
+static int irq_hook_id;	/* id of irq hook at kernel */
 
 extern int errno;		/* error number */
 
-FORWARD _PROTOTYPE( void do_cancel, (message *m_ptr) );
-FORWARD _PROTOTYPE( void output_done, (void) );
-FORWARD _PROTOTYPE( void do_write, (message *m_ptr, int safe) );
-FORWARD _PROTOTYPE( void do_status, (message *m_ptr) );
-FORWARD _PROTOTYPE( void prepare_output, (void) );
-FORWARD _PROTOTYPE( void do_initialize, (void) );
-FORWARD _PROTOTYPE( void reply, (int code,int replyee,int proc,int status));
-FORWARD _PROTOTYPE( void do_printer_output, (void) );
-FORWARD _PROTOTYPE( void do_signal, (message *m_ptr) );
+static void do_cancel(message *m_ptr);
+static void output_done(void);
+static void do_write(message *m_ptr, int safe);
+static void do_status(message *m_ptr);
+static void prepare_output(void);
+static void do_initialize(void);
+static void reply(int code,int replyee,int proc,int status);
+static void do_printer_output(void);
+static void do_signal(message *m_ptr);
 
 
 /*===========================================================================*
  *				printer_task				     *
  *===========================================================================*/
-PUBLIC void main(void)
+void main(void)
 {
 /* Main routine of the printer task. */
   message pr_mess;		/* buffer for all incoming messages */
@@ -166,7 +166,7 @@ PUBLIC void main(void)
 /*===========================================================================*
  *				 do_signal	                             *
  *===========================================================================*/
-PRIVATE void do_signal(m_ptr)
+static void do_signal(m_ptr)
 message *m_ptr;					/* signal message */
 {
   int sig;
@@ -182,7 +182,7 @@ message *m_ptr;					/* signal message */
 /*===========================================================================*
  *				do_write				     *
  *===========================================================================*/
-PRIVATE void do_write(m_ptr, safe)
+static void do_write(m_ptr, safe)
 register message *m_ptr;	/* pointer to the newly arrived message */
 int safe;			/* use virtual addresses or grant id's? */
 {
@@ -237,7 +237,7 @@ int safe;			/* use virtual addresses or grant id's? */
 /*===========================================================================*
  *				output_done				     *
  *===========================================================================*/
-PRIVATE void output_done()
+static void output_done()
 {
 /* Previous chunk of printing is finished.  Continue if OK and more.
  * Otherwise, reply to caller (FS).
@@ -276,7 +276,7 @@ PRIVATE void output_done()
 /*===========================================================================*
  *				do_status				     *
  *===========================================================================*/
-PRIVATE void do_status(m_ptr)
+static void do_status(m_ptr)
 register message *m_ptr;	/* pointer to the newly arrived message */
 {
   if (revive_pending) {
@@ -296,7 +296,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 /*===========================================================================*
  *				do_cancel				     *
  *===========================================================================*/
-PRIVATE void do_cancel(m_ptr)
+static void do_cancel(m_ptr)
 register message *m_ptr;	/* pointer to the newly arrived message */
 {
 /* Cancel a print request that has already started.  Usually this means that
@@ -316,7 +316,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PRIVATE void reply(code, replyee, process, status)
+static void reply(code, replyee, process, status)
 int code;			/* TASK_REPLY or REVIVE */
 int replyee;			/* destination for message (normally FS) */
 int process;			/* which user requested the printing */
@@ -335,7 +335,7 @@ int status;			/* number of  chars printed or error code */
 /*===========================================================================*
  *				do_initialize				     *
  *===========================================================================*/
-PRIVATE void do_initialize()
+static void do_initialize()
 {
 /* Set global variables and initialize the printer. */
   static int initialized = FALSE;
@@ -366,7 +366,7 @@ PRIVATE void do_initialize()
 /*==========================================================================*
  *		    	      prepare_output				    *
  *==========================================================================*/
-PRIVATE void prepare_output()
+static void prepare_output()
 {
 /* Start next chunk of printer output. Fetch the data from user space. */
   int s;
@@ -392,7 +392,7 @@ PRIVATE void prepare_output()
 /*===========================================================================*
  *				do_printer_output				     *
  *===========================================================================*/
-PRIVATE void do_printer_output()
+static void do_printer_output()
 {
 /* This function does the actual output to the printer. This is called on
  * a HARD_INT message sent from the generic interrupt handler that 'forwards'

@@ -180,7 +180,3 @@ void *realloc(void *op, size_t size)
 	free(op);
 	return new;
 }
-
-/*
- * $PchId: malloc.c,v 1.4 1996/02/22 09:15:56 philip Exp $
- */

@@ -7,8 +7,6 @@ inet.elf32-obj-y += buf.o clock.o inet.o inet_config.o \
 
 inet.elf32-obj-y += generic/built-in.o
 
-ccflags-y := -D_MINIX
-
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
 LDFLAGS_inet.elf32 := -L$(lib-arch) -Llib \

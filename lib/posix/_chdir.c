@@ -12,8 +12,8 @@
 #define fchdir	_fchdir
 #include <unistd.h>
 
-PUBLIC int chdir(name)
-_CONST char *name;
+int chdir(name)
+const char *name;
 {
   message m;
 
@@ -21,7 +21,7 @@ _CONST char *name;
   return(_syscall(FS, CHDIR, &m));
 }
 
-PUBLIC int fchdir(fd)
+int fchdir(fd)
 int fd;
 {
   message m;

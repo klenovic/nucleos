@@ -43,16 +43,18 @@
 #include <kernel/const.h>
 #include <kernel/proc.h>
 
+struct mproc mproc[NR_PROCS];
+
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-EXTERN unsigned long calls_stats[NCALLS];
+extern unsigned long calls_stats[NCALLS];
 #endif
 
-FORWARD _PROTOTYPE( void get_work, (void)				);
-FORWARD _PROTOTYPE( void pm_init, (void)				);
-FORWARD _PROTOTYPE( int get_nice_value, (int queue)			);
-FORWARD _PROTOTYPE( void send_work, (void)				);
-FORWARD _PROTOTYPE( void handle_fs_reply, (message *m_ptr)		);
-FORWARD _PROTOTYPE( void restart_sigs, (struct mproc *rmp)		);
+static void get_work(void);
+static void pm_init(void);
+static int get_nice_value(int queue);
+static void send_work(void);
+static void handle_fs_reply(message *m_ptr);
+static void restart_sigs(struct mproc *rmp);
 
 #define click_to_round_k(n) \
 	((unsigned) ((((unsigned long) (n) << CLICK_SHIFT) + 512) / 1024))
@@ -60,7 +62,7 @@ FORWARD _PROTOTYPE( void restart_sigs, (struct mproc *rmp)		);
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
-PUBLIC int main()
+int main()
 {
 /* Main routine of the process manager. */
   int result, s, proc_nr;
@@ -175,7 +177,7 @@ PUBLIC int main()
 /*===========================================================================*
  *				get_work				     *
  *===========================================================================*/
-PRIVATE void get_work()
+static void get_work()
 {
 /* Wait for the next message and extract useful information from it. */
   if (receive(ANY, &m_in) != OK)
@@ -201,7 +203,7 @@ PRIVATE void get_work()
 /*===========================================================================*
  *				setreply				     *
  *===========================================================================*/
-PUBLIC void setreply(proc_nr, result)
+void setreply(proc_nr, result)
 int proc_nr;			/* process to reply to */
 int result;			/* result of call (usually OK or error #) */
 {
@@ -221,7 +223,7 @@ int result;			/* result of call (usually OK or error #) */
 /*===========================================================================*
  *				pm_init					     *
  *===========================================================================*/
-PRIVATE void pm_init()
+static void pm_init()
 {
 	int failed = 0;
 	int f = 0;
@@ -355,7 +357,7 @@ PRIVATE void pm_init()
 /*===========================================================================*
  *				get_nice_value				     *
  *===========================================================================*/
-PRIVATE int get_nice_value(queue)
+static int get_nice_value(queue)
 int queue;				/* store mem chunks here */
 {
 /* Processes in the boot image have a priority assigned. The PM doesn't know
@@ -392,7 +394,7 @@ void checkme(char *str, int line)
 /*=========================================================================*
  *				send_work				   *
  *=========================================================================*/
-PRIVATE void send_work()
+static void send_work()
 {
 	int r, call;
 	struct mproc *rmp;
@@ -572,7 +574,7 @@ PRIVATE void send_work()
 	if (r != OK) panic("pm", "send_work: send failed", r);
 }
 
-PRIVATE void handle_fs_reply(m_ptr)
+static void handle_fs_reply(m_ptr)
 message *m_ptr;
 {
 	int r, proc_e, proc_n, s;
@@ -658,7 +660,7 @@ message *m_ptr;
 /*===========================================================================*
  *                             restart_sigs                                 *
  *===========================================================================*/
-PRIVATE void restart_sigs(rmp)
+static void restart_sigs(rmp)
 struct mproc *rmp;
 {
 

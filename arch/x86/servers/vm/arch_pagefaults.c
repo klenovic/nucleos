@@ -36,11 +36,10 @@
 /*===========================================================================*
  *				arch_handle_pagefaults	     		     *
  *===========================================================================*/
-PUBLIC int arch_get_pagefault(who, addr, err)
+int arch_get_pagefault(who, addr, err)
 endpoint_t *who;
 vir_bytes *addr;
 u32_t *err;
 {
 	return sys_vmctl_get_pagefault_i386(who, (u32_t*)addr, err);
 }
-

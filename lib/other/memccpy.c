@@ -13,12 +13,10 @@
  * CHARBITS should be defined only if the compiler lacks "unsigned char".
  * It should be a mask, e.g. 0377 for an 8-bit machine.
  */
-
-#include <ansi.h>
 #include <nucleos/stddef.h>
 
-_PROTOTYPE( void *memccpy, (void *dst, const void *src,
-			    int ucharstop, size_t size));
+void *memccpy(void *dst, const void *src, int ucharstop, size_t size);
+
 #ifndef CHARBITS
 #	define	UNSCHAR(c)	((unsigned char)(c))
 #else
@@ -27,13 +25,13 @@ _PROTOTYPE( void *memccpy, (void *dst, const void *src,
 
 void *memccpy(dst, src, ucharstop, size)
 void * dst;
-_CONST void * src;
+const void * src;
 int ucharstop;
-_SIZET size;
+size_t size;
 {
   register char *d;
-  register _CONST char *s;
-  register _SIZET n;
+  register const char *s;
+  register size_t n;
   register int uc;
 
   if (size <= 0) return( (void *) NULL);

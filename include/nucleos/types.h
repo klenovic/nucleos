@@ -18,10 +18,6 @@
 #include <asm/types.h>
 #include <nucleos/posix_types.h>
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
 typedef __u32	__kernel_zone_t;	/* zone number */

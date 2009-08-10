@@ -11,9 +11,9 @@
 #define sigprocmask _sigprocmask
 #include <signal.h>
 
-PUBLIC int sigprocmask(how, set, oset)
+int sigprocmask(how, set, oset)
 int how;
-_CONST sigset_t *set;
+const sigset_t *set;
 sigset_t *oset;
 {
   message m;

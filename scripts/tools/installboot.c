@@ -12,9 +12,6 @@
  *
  * Either make a device bootable or make an image from kernel, mm, fs, etc.
  */
-#define _POSIX_SOURCE  1
-#define _MINIX  1
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>

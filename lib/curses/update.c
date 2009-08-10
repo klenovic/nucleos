@@ -18,12 +18,11 @@ static WINDOW *twin;		/* used by many routines */
 /* The screen. We don't optimize here - on a PC, it takes more  */
 /* Time to optimize than to do things directly.                 */
 /****************************************************************/
-
-_PROTOTYPE(static void gotoxy, (int row, int col ));
-_PROTOTYPE(static void newattr, (int ch ));
-_PROTOTYPE(static void Putchar, (int ch ));
-_PROTOTYPE(static void clrupdate, (WINDOW *scr ));
-_PROTOTYPE(static void transformline, (int lineno ));
+static void gotoxy(int row, int col );
+static void newattr(int ch );
+static void Putchar(int ch );
+static void clrupdate(WINDOW *scr);
+static void transformline(int lineno);
 
 static void gotoxy(row, col)
 int row, col;

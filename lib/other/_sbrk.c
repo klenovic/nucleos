@@ -13,7 +13,7 @@
 
 extern char *_brksize;
 
-PUBLIC char *sbrk(incr)
+char *sbrk(incr)
 int incr;
 {
   char *newsize, *oldsize;

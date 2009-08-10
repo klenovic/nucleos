@@ -245,7 +245,7 @@ struct cbl_conf
 #define CCB6_TNO_INT	0x04	/* Enable TNO Interrupt (82557 only) */
 #define CCB6_TCOSC	0x04	/* TCO Statistical Counter (82559 only) */
 #define CCB6_RES	0x02	/* Reserved, must be set to 1. Called "disable
-				 * direct rcv dma mode" by the FreeBSD
+				 * direct rcv dma mode by the FreeBSD
 				 * driver.
 				 */
 #define CCB6_LSCB	0x01	/* Late SCB Update. Only on 82557. */
@@ -579,7 +579,3 @@ struct rfd
 #define	    MII_SCR_T4		0x0004	/* 100Base-T4 negotiated */
 #define	    MII_SCR_100		0x0002	/* 100 Mbps negotiated */
 #define	    MII_SCR_FD		0x0001	/* Full Duplex negotiated */
-
-/*
- * $PchId: fxp.h,v 1.1 2004/11/23 14:34:03 philip Exp $
- */

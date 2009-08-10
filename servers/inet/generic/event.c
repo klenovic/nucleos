@@ -21,8 +21,6 @@ Copyright 1995 Philip Homburg
 #include "assert.h"
 #include "event.h"
 
-THIS_FILE
-
 event_t *ev_head;
 static event_t *ev_tail;
 
@@ -71,8 +69,3 @@ event_t *ev;
 {
 	return ev->ev_func != 0;
 }
-
-
-/*
- * $PchId: event.c,v 1.6 2004/08/03 16:23:32 philip Exp $
- */

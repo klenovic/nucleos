@@ -27,12 +27,12 @@
 #ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
 /* user address to write info struct */
-PRIVATE vir_bytes sprof_info_addr_vir;
+static vir_bytes sprof_info_addr_vir;
 
 /*===========================================================================*
  *				do_sprofile				     *
  *===========================================================================*/
-PUBLIC int do_sprofile(m_ptr)
+int do_sprofile(m_ptr)
 register message *m_ptr;    /* pointer to request message */
 {
   int proc_nr, i;

@@ -33,8 +33,6 @@ Created:	June 1995 by Philip Homburg <philip@f-mnx.phicoh.com>
 #include "qp.h"
 #include "sr_int.h"
 
-THIS_FILE
-
 #define MAX_REQ	1024	/* Maximum size of a request */
 
 #define QP_FD_NR	4
@@ -51,9 +49,9 @@ typedef struct qp_fd
 #define QFF_EMPTY	0
 #define QFF_INUSE	1
 
-PRIVATE qp_fd_t qp_fd_table[QP_FD_NR];
+static qp_fd_t qp_fd_table[QP_FD_NR];
 
-PRIVATE struct export_param_list inet_ex_list[]=
+static struct export_param_list inet_ex_list[]=
 {
 	QP_VARIABLE(sr_fd_table),
 	QP_VARIABLE(ip_dev),
@@ -65,9 +63,9 @@ PRIVATE struct export_param_list inet_ex_list[]=
 	QP_END()
 };
 
-PRIVATE struct export_params inet_ex_params= { inet_ex_list, NULL };
+static struct export_params inet_ex_params= { inet_ex_list, NULL };
 
-PRIVATE struct queryvars {
+static struct queryvars {
 	/* Input */
 	acc_t *param;
 
@@ -82,25 +80,24 @@ PRIVATE struct queryvars {
 } *qvars;
 
 
-FORWARD int  qp_open ARGS(( int port, int srfd,
-	get_userdata_t get_userdata, put_userdata_t put_userdata,
-	put_pkt_t put_pkt, select_res_t select_res ));
-FORWARD void qp_close ARGS(( int fd ));
-FORWARD int qp_read ARGS(( int fd, size_t count ));
-FORWARD int qp_write ARGS(( int fd, size_t count ));
-FORWARD int qp_ioctl ARGS(( int fd, ioreq_t req ));
-FORWARD int qp_cancel ARGS(( int fd, int which_operation ));
-FORWARD int qp_select ARGS(( int fd, unsigned operations ));
-FORWARD qp_fd_t *get_qp_fd ARGS(( int fd ));
-FORWARD int do_query ARGS(( qp_fd_t *qp_fd, acc_t *pkt, int count ));
-FORWARD int qp_getc ARGS(( void ));
-FORWARD void qp_putc ARGS(( struct queryvars *qv, int c ));
-FORWARD void qp_buffree ARGS(( int priority ));
+static int  qp_open(int port, int srfd, get_userdata_t get_userdata, put_userdata_t put_userdata,
+		    put_pkt_t put_pkt, select_res_t select_res);
+static void qp_close(int fd);
+static int qp_read(int fd, size_t count);
+static int qp_write(int fd, size_t count);
+static int qp_ioctl(int fd, ioreq_t req);
+static int qp_cancel(int fd, int which_operation);
+static int qp_select(int fd, unsigned operations);
+static qp_fd_t *get_qp_fd(int fd);
+static int do_query(qp_fd_t *qp_fd, acc_t *pkt, int count);
+static int qp_getc(void);
+static void qp_putc(struct queryvars *qv, int c);
+static void qp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK
-FORWARD void qp_bufcheck ARGS(( void ));
+static void qp_bufcheck(void);
 #endif
 
-PUBLIC void qp_init()
+void qp_init()
 {
 	int i;
 
@@ -119,7 +116,7 @@ PUBLIC void qp_init()
 		qp_ioctl, qp_cancel, qp_select);
 }
 
-PRIVATE int qp_open(port, srfd, get_userdata, put_userdata, put_pkt,
+static int qp_open(port, srfd, get_userdata, put_userdata, put_pkt,
 	select_res)
 int port;
 int srfd;
@@ -148,7 +145,7 @@ select_res_t select_res;
 	return i;
 }
 
-PRIVATE void qp_close(fd)
+static void qp_close(fd)
 int fd;
 {
 	qp_fd_t *qp_fd;
@@ -162,7 +159,7 @@ int fd;
 	}
 }
 
-PRIVATE int qp_read(fd, count)
+static int qp_read(fd, count)
 int fd;
 size_t count;
 {
@@ -187,7 +184,7 @@ size_t count;
 	return OK;
 }
 
-PRIVATE int qp_write(fd, count)
+static int qp_write(fd, count)
 int fd;
 size_t count;
 {
@@ -220,7 +217,7 @@ size_t count;
 	return OK;
 }
 
-PRIVATE int qp_ioctl(fd, req)
+static int qp_ioctl(fd, req)
 int fd;
 ioreq_t req;
 {
@@ -232,14 +229,14 @@ ioreq_t req;
 	return OK;
 }
 
-PRIVATE int qp_cancel(fd, which_operation)
+static int qp_cancel(fd, which_operation)
 int fd;
 int which_operation;
 {
-	ip_panic(( "qp_cancel: should not be here, no blocking calls" ));
+	ip_panic(( "qp_cancel: should not be here, no blocking calls"));
 }
 
-PRIVATE int qp_select(fd, operations)
+static int qp_select(fd, operations)
 int fd;
 unsigned operations;
 {
@@ -253,7 +250,7 @@ unsigned operations;
 	return resops;
 }
 
-PRIVATE qp_fd_t *get_qp_fd(fd)
+static qp_fd_t *get_qp_fd(fd)
 int fd;
 {
 	qp_fd_t *qp_fd;
@@ -264,7 +261,7 @@ int fd;
 	return qp_fd;
 }
 
-PRIVATE int do_query(qp_fd, pkt, count)
+static int do_query(qp_fd, pkt, count)
 qp_fd_t *qp_fd;
 acc_t *pkt;
 int count;
@@ -306,7 +303,7 @@ int count;
 	return qv.fd_offset;
 }
 
-PRIVATE int qp_getc()
+static int qp_getc()
 {
 	/* Return one character of the names to search for. */
 	acc_t *pkt;
@@ -331,7 +328,7 @@ PRIVATE int qp_getc()
 	return c;
 }
 
-PRIVATE void qp_putc(qv, c)
+static void qp_putc(qv, c)
 struct queryvars *qv;
 int c;
 {
@@ -367,14 +364,14 @@ int c;
 	qv->outbuf_off= 0;
 }
 
-PRIVATE void qp_buffree (priority)
+static void qp_buffree (priority)
 int priority;
 {
 	/* For the moment, we are not going to free anything */
 }
 
 #ifdef BUF_CONSISTENCY_CHECK
-PRIVATE void qp_bufcheck()
+static void qp_bufcheck()
 {
 	int i;
 	qp_fd_t *qp_fd;
@@ -388,7 +385,3 @@ PRIVATE void qp_bufcheck()
 }
 }
 #endif
-
-/*
- * $PchId: qp.c,v 1.7 2005/06/28 14:25:25 philip Exp $
- */

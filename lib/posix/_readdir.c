@@ -47,8 +47,4 @@ struct dirent *readdir(DIR *dp)
 	dp->_pos= pos+reclen;
 
 	return entp;
-		}
-
-/*
- * $PchId: _readdir.c,v 1.6 2005/01/27 21:46:42 philip Exp $
- */
+}

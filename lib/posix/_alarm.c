@@ -11,7 +11,7 @@
 #define alarm	_alarm
 #include <unistd.h>
 
-PUBLIC unsigned int alarm(sec)
+unsigned int alarm(sec)
 unsigned int sec;
 {
   message m;

@@ -21,7 +21,7 @@ Media Independent (Ethernet) Interface functions
 /*===========================================================================*
  *				mii_print_stat_speed			     *
  *===========================================================================*/
-PUBLIC void mii_print_stat_speed(stat, extstat)
+void mii_print_stat_speed(stat, extstat)
 u16_t stat;
 u16_t extstat;
 {
@@ -124,7 +124,7 @@ u16_t extstat;
 /*===========================================================================*
  *				mii_print_techab			     *
  *===========================================================================*/
-PUBLIC void mii_print_techab(techab)
+void mii_print_techab(techab)
 u16_t techab;
 {
 	int fs, ft;
@@ -197,7 +197,3 @@ u16_t techab;
 		printf("0x%x", (techab & MII_ANA_TAF_RES) >> MII_ANA_TAF_S);
 	}
 }
-
-/*
- * $PchId: mii.c,v 1.2 2005/01/31 22:17:26 philip Exp $
- */

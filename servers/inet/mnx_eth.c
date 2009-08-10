@@ -29,25 +29,23 @@ Copyright 1995 Philip Homburg
 #include "generic/eth_int.h"
 #include "generic/sr.h"
 
-THIS_FILE
-
 static int recv_debug= 0;
 
-FORWARD _PROTOTYPE( void setup_read, (eth_port_t *eth_port) );
-FORWARD _PROTOTYPE( void read_int, (eth_port_t *eth_port, int count) );
-FORWARD _PROTOTYPE( void eth_issue_send, (eth_port_t *eth_port) );
-FORWARD _PROTOTYPE( void write_int, (eth_port_t *eth_port) );
-FORWARD _PROTOTYPE( void eth_recvev, (event_t *ev, ev_arg_t ev_arg) );
-FORWARD _PROTOTYPE( void eth_sendev, (event_t *ev, ev_arg_t ev_arg) );
-FORWARD _PROTOTYPE( eth_port_t *find_port, (message *m) );
-FORWARD _PROTOTYPE( void eth_restart, (eth_port_t *eth_port, int tasknr) );
-FORWARD _PROTOTYPE( void send_getstat, (eth_port_t *eth_port) );
+static void setup_read(eth_port_t *eth_port);
+static void read_int(eth_port_t *eth_port, int count);
+static void eth_issue_send(eth_port_t *eth_port);
+static void write_int(eth_port_t *eth_port);
+static void eth_recvev(event_t *ev, ev_arg_t ev_arg);
+static void eth_sendev(event_t *ev, ev_arg_t ev_arg);
+static eth_port_t *find_port(message *m);
+static void eth_restart(eth_port_t *eth_port, int tasknr);
+static void send_getstat(eth_port_t *eth_port);
 
 #if 0
-FORWARD _PROTOTYPE( int asynsend, (endpoint_t dst, message *mp) );
+static int asynsend(endpoint_t dst, message *mp);
 #endif
 
-PUBLIC void osdep_eth_init()
+void osdep_eth_init()
 {
 	int i, j, r, rport;
 	u32_t tasknr;
@@ -226,7 +224,7 @@ PUBLIC void osdep_eth_init()
 	}
 }
 
-PUBLIC void eth_write_port(eth_port, pack)
+void eth_write_port(eth_port, pack)
 eth_port_t *eth_port;
 acc_t *pack;
 {
@@ -252,9 +250,9 @@ acc_t *pack;
 	eth_issue_send(eth_port);
 }
 
-PRIVATE int notification_count;
+static int notification_count;
 
-PUBLIC void eth_rec(m)
+void eth_rec(m)
 message *m;
 	{
 	int i, r, m_type, stat;
@@ -494,7 +492,7 @@ message *m;
 	}
 }
 
-PUBLIC void eth_check_drivers(m)
+void eth_check_drivers(m)
 message *m;
 {
 	int i, r, tasknr;
@@ -517,7 +515,7 @@ message *m;
 	}
 }
 
-PUBLIC int eth_get_stat(eth_port, eth_stat)
+int eth_get_stat(eth_port, eth_stat)
 eth_port_t *eth_port;
 eth_stat_t *eth_stat;
 {
@@ -551,7 +549,7 @@ eth_stat_t *eth_stat;
 	return SUSPEND;
 }
 
-PUBLIC void eth_set_rec_conf (eth_port, flags)
+void eth_set_rec_conf (eth_port, flags)
 eth_port_t *eth_port;
 u32_t flags;
 {
@@ -605,7 +603,7 @@ u32_t flags;
 	}
 }
 
-PRIVATE void eth_issue_send(eth_port)
+static void eth_issue_send(eth_port)
 eth_port_t *eth_port;
 {
 	int i, r, pack_size;
@@ -688,7 +686,7 @@ eth_port_t *eth_port;
 	eth_port->etp_osdep.etp_state= OEPS_SEND_SENT;
 }
 
-PRIVATE void write_int(eth_port)
+static void write_int(eth_port)
 eth_port_t *eth_port;
 {
 	acc_t *pack;
@@ -722,7 +720,7 @@ eth_port_t *eth_port;
 	eth_restart_write(eth_port);
 }
 
-PRIVATE void read_int(eth_port, count)
+static void read_int(eth_port, count)
 eth_port_t *eth_port;
 int count;
 {
@@ -759,7 +757,7 @@ int count;
 	setup_read(eth_port);
 }
 
-PRIVATE void setup_read(eth_port)
+static void setup_read(eth_port)
 eth_port_t *eth_port;
 {
 	eth_port_t *loc_port;
@@ -836,7 +834,7 @@ eth_port_t *eth_port;
 	eth_port->etp_flags |= EPF_READ_SP;
 }
 
-PRIVATE void eth_recvev(ev, ev_arg)
+static void eth_recvev(ev, ev_arg)
 event_t *ev;
 ev_arg_t ev_arg;
 {
@@ -862,7 +860,7 @@ ev_arg_t ev_arg;
 	read_int(eth_port, m_ptr->DL_COUNT);
 }
 
-PRIVATE void eth_sendev(ev, ev_arg)
+static void eth_sendev(ev, ev_arg)
 event_t *ev;
 ev_arg_t ev_arg;
 {
@@ -886,7 +884,7 @@ ev_arg_t ev_arg;
 	write_int(eth_port);
 }
 
-PRIVATE eth_port_t *find_port(m)
+static eth_port_t *find_port(m)
 message *m;
 {
 	eth_port_t *loc_port;
@@ -999,7 +997,7 @@ int tasknr;
 
 }
 
-PRIVATE void send_getstat(eth_port)
+static void send_getstat(eth_port)
 eth_port_t *eth_port;
 	{
 	int r;
@@ -1020,10 +1018,10 @@ eth_port_t *eth_port;
 	}
 
 #if 0
-PRIVATE asynmsg_t *msgtable= NULL;
-PRIVATE size_t msgtable_n= 0;
+static asynmsg_t *msgtable= NULL;
+static size_t msgtable_n= 0;
 
-PRIVATE int asynsend(dst, mp)
+static int asynsend(dst, mp)
 endpoint_t dst;
 message *mp;
 	{
@@ -1069,7 +1067,3 @@ message *mp;
 	return senda(msgtable, msgtable_n);
 }
 #endif
-
-/*
- * $PchId: mnx_eth.c,v 1.16 2005/06/28 14:24:37 philip Exp $
- */

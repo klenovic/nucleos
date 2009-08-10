@@ -11,7 +11,7 @@
 
 .globl	read_tsc	// read the cycle counter (Pentium and up)
 //===========================================================================
-// PUBLIC void read_tsc(unsigned long *high, unsigned long *low);
+// void read_tsc(unsigned long *high, unsigned long *low);
 // Read the cycle counter of the CPU. Pentium and up. 
 .p2align 4
 read_tsc:

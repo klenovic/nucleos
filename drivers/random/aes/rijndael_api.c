@@ -589,7 +589,3 @@ void cipherDecryptUpdateRounds(rd_keyinstance *key,
     blockcpy(output, block);
 }
 #endif /* INTERMEDIATE_VALUE_KAT */
-
-/*
- * $PchId: rijndael_api.c,v 1.2 2001/01/10 22:01:20 philip Exp $
- */

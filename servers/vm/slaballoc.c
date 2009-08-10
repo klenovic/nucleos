@@ -52,7 +52,7 @@
 #define MAXSIZE (SLABSIZES-1+MINSIZE)
 #define USEELEMENTS (1+(VM_PAGE_SIZE/MINSIZE/8))
 
-PRIVATE int pages = 0;
+static int pages = 0;
 
 typedef u8_t element_t;
 #define BITS_FULL (~(element_t)0)
@@ -94,14 +94,14 @@ struct sdh {
 #define LIST_FULL	3
 #define LIST_NUMBER	4
 
-PRIVATE struct slabheader {
+static struct slabheader {
 	struct slabdata {
 		struct	sdh sdh;
 		u8_t 	data[DATABYTES];
 	} *list_head[LIST_NUMBER];
 } slabs[SLABSIZES];
 
-FORWARD _PROTOTYPE( int objstats, (void *, int, struct slabheader **, struct slabdata **, int *)); 
+static int objstats(void *, int, struct slabheader **, struct slabdata **, int *); 
 
 #define GETSLAB(b, s) {			\
 	int i;				\
@@ -172,7 +172,7 @@ struct slabdata *newslabdata(int list)
 /*===========================================================================*
  *				checklist				     *
  *===========================================================================*/
-PRIVATE int checklist(char *file, int line,
+static int checklist(char *file, int line,
 	struct slabheader *s, int l, int bytes)
 {
 	struct slabdata *n = s->list_head[l];
@@ -204,7 +204,7 @@ PRIVATE int checklist(char *file, int line,
 /*===========================================================================*
  *				void slab_sanitycheck			     *
  *===========================================================================*/
-PUBLIC void slab_sanitycheck(char *file, int line)
+void slab_sanitycheck(char *file, int line)
 {
 	int s;
 	for(s = 0; s < SLABSIZES; s++) {
@@ -218,7 +218,7 @@ PUBLIC void slab_sanitycheck(char *file, int line)
 /*===========================================================================*
  *				int slabsane				     *
  *===========================================================================*/
-PUBLIC int slabsane(void *mem, int bytes)
+int slabsane(void *mem, int bytes)
 {
 	struct slabheader *s;
 	struct slabdata *f;
@@ -230,7 +230,7 @@ PUBLIC int slabsane(void *mem, int bytes)
 /*===========================================================================*
  *				void *slaballoc				     *
  *===========================================================================*/
-PUBLIC void *slaballoc(int bytes)
+void *slaballoc(int bytes)
 {
 	int i, n = 0;
 	struct slabheader *s;
@@ -321,7 +321,7 @@ PUBLIC void *slaballoc(int bytes)
 /*===========================================================================*
  *				int objstats				     *
  *===========================================================================*/
-PRIVATE int objstats(void *mem, int bytes,
+static int objstats(void *mem, int bytes,
 	struct slabheader **sp, struct slabdata **fp, int *ip)
 {
 #define OBJSTATSCHECK(cond) \
@@ -378,7 +378,7 @@ PRIVATE int objstats(void *mem, int bytes,
 /*===========================================================================*
  *				void *slabfree				     *
  *===========================================================================*/
-PUBLIC void slabfree(void *mem, int bytes)
+void slabfree(void *mem, int bytes)
 {
 	int i;
 	struct slabheader *s;
@@ -433,7 +433,7 @@ PUBLIC void slabfree(void *mem, int bytes)
 /*===========================================================================*
  *				void slabstats				     *
  *===========================================================================*/
-PUBLIC void slabstats(void)
+void slabstats(void)
 {
 	int s, total = 0, totalbytes = 0;
 	static int n;

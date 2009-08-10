@@ -10,8 +10,6 @@
 /*
  * ftell.c - obtain the value of the file-position indicator of a stream
  */
-/* $Header: /cvsup/minix/src/lib/stdio/ftell.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
 #include	<stdio.h>
 
 #if	(SEEK_CUR != 1) || (SEEK_SET != 0) || (SEEK_END != 2)

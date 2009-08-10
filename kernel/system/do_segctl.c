@@ -24,7 +24,7 @@
 /*===========================================================================*
  *			        do_segctl				     *
  *===========================================================================*/
-PUBLIC int do_segctl(m_ptr)
+int do_segctl(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Return a segment selector and offset that can be used to reach a physical

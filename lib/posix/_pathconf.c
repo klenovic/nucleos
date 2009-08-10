@@ -17,8 +17,8 @@
 #include <errno.h>
 #include <unistd.h>
 
-PUBLIC long pathconf(path, name)
-_CONST char *path;		/* name of file being interrogated */
+long pathconf(path, name)
+const char *path;		/* name of file being interrogated */
 int name;			/* property being inspected */
 {
 /* POSIX allows some of the values in <nucleos/limits.h> to be increased at

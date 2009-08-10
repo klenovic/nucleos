@@ -44,10 +44,10 @@ typedef struct environment {
         char    *defval;        /* Safehouse for default values. */
 } environment;
 
-EXTERN environment *env;        /* Lists the environment. */
+extern environment *env;        /* Lists the environment. */
 
 char *b_value(char *name);      /* Get/set the value of a variable. */
 int b_setvar(int flags, char *name, char *value);
 
-EXTERN MNX(u32_t) lowsec;       /* Offset to the file system on the boot device. */
+extern MNX(u32_t) lowsec;       /* Offset to the file system on the boot device. */
 #endif /* !__NUCS_EDPARAMS_H */

@@ -18,7 +18,7 @@ int panicing= 0;
 /*===========================================================================*
  *				panic					     *
  *===========================================================================*/
-PUBLIC void panic(who, mess, num)
+void panic(who, mess, num)
 char *who;			/* server identification */
 char *mess;			/* message format string */
 int num;			/* number to go with format string */

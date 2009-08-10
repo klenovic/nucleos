@@ -8,10 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#define _MINIX 1
 #define _SYSTEM 1
 
-#include <ansi.h> 
 #include <assert.h> 
 #include <nucleos/types.h>
 #include <nucleos/const.h>
@@ -26,10 +24,10 @@
 #include <errno.h>
 
 #define ASYN_NR	100
-PRIVATE asynmsg_t msgtable[ASYN_NR];
-PRIVATE int first_slot= 0, next_slot= 0;
+static asynmsg_t msgtable[ASYN_NR];
+static int first_slot= 0, next_slot= 0;
 
-PUBLIC int asynsend(dst, mp)
+int asynsend(dst, mp)
 endpoint_t dst;
 message *mp;
 {

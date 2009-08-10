@@ -11,7 +11,7 @@
 #define sync	_sync
 #include <unistd.h>
 
-PUBLIC int sync()
+int sync()
 {
   message m;
 

@@ -22,11 +22,11 @@
 
 #define DEBUG 0
 
-static int _tcp_getpeername(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len, nwio_tcpconf_t *tcpconfp);
+static int _tcp_getpeername(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len, nwio_tcpconf_t *tcpconfp);
 
-int getpeername(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len)
+int getpeername(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len)
 {
 	int r;
 	nwio_tcpconf_t tcpconf;
@@ -50,8 +50,8 @@ int getpeername(int socket, struct sockaddr *_RESTRICT address,
 	return -1;
 }
 
-static int _tcp_getpeername(int socket, struct sockaddr *_RESTRICT address,
-	socklen_t *_RESTRICT address_len, nwio_tcpconf_t *tcpconfp)
+static int _tcp_getpeername(int socket, struct sockaddr *__restrict address,
+	socklen_t *__restrict address_len, nwio_tcpconf_t *tcpconfp)
 {
 	socklen_t len;
 	struct sockaddr_in sin;

@@ -14,9 +14,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
-#if _ANSI
 #include <stdlib.h>
-#endif
 
 typedef enum {
   False, True
@@ -26,21 +24,18 @@ typedef enum {
 #define MAXTRIES 3
 #define NAPTIME (unsigned int)5
 
-PRIVATE _PROTOTYPE( char *lockpath, (char *name));
-_PROTOTYPE( void syserr, (char *errstring));
-_PROTOTYPE( BOOLEAN lock, (char *name));
-_PROTOTYPE( void unlock, (char *name));
+static char *lockpath(char *name);
+void syserr(char *errstring);
+BOOLEAN lock(char *name);
+void unlock(char *name);
 
-void
-syserr(errstring)
-char *errstring;
+void syserr(char *errstring)
 {
 	fprintf(stderr,"couldn't %s\n", errstring);
 	exit(1);
 }
 
-BOOLEAN lock(name)		/* acquire lock */
-char *name;
+BOOLEAN lock(char *name)		/* acquire lock */
 {
   char *path;
   int fd, tries;
@@ -55,16 +50,14 @@ char *name;
   return(True);
 }
 
-void unlock(name)		/* free lock */
-char *name;
+void unlock(char *name)		/* free lock */
 {
   if (unlink(lockpath(name)) == -1) syserr("unlock");
 }
 
-PRIVATE char *lockpath(name)	/* generate lock file path */
-char *name;
+static char *lockpath(char *name)	/* generate lock file path */
 {
-  PRIVATE char path[20];
+  static char path[20];
 
   strcpy(path, LOCKDIR);
   return(strcat(path, name));

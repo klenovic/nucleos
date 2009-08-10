@@ -29,7 +29,3 @@ int sysuname(int req, int field, char *value, size_t len)
 
 	return _syscall(MM, SYSUNAME, &m);
 }
-
-/*
- * $PchId: _sysuname.c,v 1.4 1995/11/27 19:42:09 philip Exp $
- */

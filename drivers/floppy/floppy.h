@@ -11,5 +11,5 @@
 #include <nucleos/driver.h>
 #include <nucleos/drvlib.h>
 
-_PROTOTYPE(void main, (void));
+void main(void);
 

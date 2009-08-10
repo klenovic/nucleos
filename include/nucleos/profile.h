@@ -10,8 +10,6 @@
 #ifndef _PROFILE_H
 #define _PROFILE_H
 
-#include <ansi.h>
-
 /*
  * Types relating to system profiling.  Types are supplied for both
  * statistical profiling and call profiling.
@@ -75,12 +73,12 @@ struct {
 #define CPROF_ACCOUNCE_KERNEL	10000	/* kernel announces not directly */
 
 /* Prototype for function called by procentry to get size of table. */
-_PROTOTYPE(int profile_get_tbl_size, (void)				);
+int profile_get_tbl_size(void);
 /* Prototype for function called by procentry to get announce number. */
-_PROTOTYPE(int profile_get_announce, (void)				);
+int profile_get_announce(void);
 /* Prototype for function called by procentry to announce control struct
  * and table locations to the kernel. */
-_PROTOTYPE(void profile_register, (void *ctl_ptr, void *tbl_ptr)	);
+void profile_register(void *ctl_ptr, void *tbl_ptr);
 
 /* Info struct to be copied from kernel to user program. */
 struct cprof_info_s {
@@ -104,11 +102,9 @@ struct cprof_tbl_s {
   u64_t cycles;				/* execution time of path, in cycles */
 } cprof_tbl_inst;
 
-_PROTOTYPE( int sprofile, (int action, int size, int freq, 
-                                       void *ctl_ptr, void *mem_ptr)   );
+int sprofile(int action, int size, int freq, void *ctl_ptr, void *mem_ptr);
 
-_PROTOTYPE( int cprofile, (int action, int size, void *ctl_ptr,
-                                                       void *mem_ptr)  );
+int cprofile(int action, int size, void *ctl_ptr, void *mem_ptr);
 
 #endif /* PROFILE_H */
 

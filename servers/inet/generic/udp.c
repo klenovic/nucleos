@@ -26,47 +26,40 @@ Copyright 1995 Philip Homburg
 #include "udp.h"
 #include "udp_int.h"
 
-THIS_FILE
-
-FORWARD void read_ip_packets ARGS(( udp_port_t *udp_port ));
-FORWARD void udp_buffree ARGS(( int priority ));
+static void read_ip_packets(udp_port_t *udp_port);
+static void udp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK
-FORWARD void udp_bufcheck ARGS(( void ));
+static void udp_bufcheck(void);
 #endif
-FORWARD void udp_main ARGS(( udp_port_t *udp_port ));
-FORWARD int udp_select ARGS(( int fd, unsigned operations ));
-FORWARD acc_t *udp_get_data ARGS(( int fd, size_t offset, size_t count, 
-	int for_ioctl ));
-FORWARD int udp_put_data ARGS(( int fd, size_t offset, acc_t *data, 	
-	int for_ioctl ));
-FORWARD int udp_peek ARGS(( udp_fd_t * ));
-FORWARD int udp_sel_read ARGS(( udp_fd_t * ));
-FORWARD void udp_restart_write_port ARGS(( udp_port_t *udp_port ));
-FORWARD void udp_ip_arrived ARGS(( int port, acc_t *pack, size_t pack_size ));
-FORWARD void reply_thr_put ARGS(( udp_fd_t *udp_fd, int reply,
-	int for_ioctl ));
-FORWARD void reply_thr_get ARGS(( udp_fd_t *udp_fd, int reply,
-	int for_ioctl ));
-FORWARD int udp_setopt ARGS(( udp_fd_t *udp_fd ));
-FORWARD udpport_t find_unused_port ARGS(( int fd ));
-FORWARD int is_unused_port ARGS(( Udpport_t port ));
-FORWARD int udp_packet2user ARGS(( udp_fd_t *udp_fd ));
-FORWARD void restart_write_fd ARGS(( udp_fd_t *udp_fd ));
-FORWARD u16_t pack_oneCsum ARGS(( acc_t *pack ));
-FORWARD void udp_rd_enqueue ARGS(( udp_fd_t *udp_fd, acc_t *pack,
-							clock_t exp_tim ));
-FORWARD void hash_fd ARGS(( udp_fd_t *udp_fd ));
-FORWARD void unhash_fd ARGS(( udp_fd_t *udp_fd ));
+static void udp_main(udp_port_t *udp_port);
+static int udp_select(int fd, unsigned operations);
+static acc_t *udp_get_data(int fd, size_t offset, size_t count, int for_ioctl);
+static int udp_put_data(int fd, size_t offset, acc_t *data, int for_ioctl);
+static int udp_peek(udp_fd_t *);
+static int udp_sel_read(udp_fd_t *);
+static void udp_restart_write_port(udp_port_t *udp_port);
+static void udp_ip_arrived(int port, acc_t *pack, size_t pack_size);
+static void reply_thr_put(udp_fd_t *udp_fd, int reply, int for_ioctl);
+static void reply_thr_get(udp_fd_t *udp_fd, int reply, int for_ioctl);
+static int udp_setopt(udp_fd_t *udp_fd);
+static udpport_t find_unused_port(int fd);
+static int is_unused_port(Udpport_t port);
+static int udp_packet2user(udp_fd_t *udp_fd);
+static void restart_write_fd(udp_fd_t *udp_fd);
+static u16_t pack_oneCsum(acc_t *pack);
+static void udp_rd_enqueue(udp_fd_t *udp_fd, acc_t *pack, clock_t exp_tim);
+static void hash_fd(udp_fd_t *udp_fd);
+static void unhash_fd(udp_fd_t *udp_fd);
 
-PUBLIC udp_port_t *udp_port_table;
-PUBLIC udp_fd_t udp_fd_table[UDP_FD_NR];
+udp_port_t *udp_port_table;
+udp_fd_t udp_fd_table[UDP_FD_NR];
 
-PUBLIC void udp_prep()
+void udp_prep()
 {
 	udp_port_table= alloc(udp_conf_nr * sizeof(udp_port_table[0]));
 }
 
-PUBLIC void udp_init()
+void udp_init()
 {
 	udp_fd_t *udp_fd;
 	udp_port_t *udp_port;
@@ -113,7 +106,7 @@ PUBLIC void udp_init()
 	}
 }
 
-PUBLIC int udp_open (port, srfd, get_userdata, put_userdata, put_pkt,
+int udp_open (port, srfd, get_userdata, put_userdata, put_pkt,
 	select_res)
 int port;
 int srfd;
@@ -150,7 +143,7 @@ select_res_t select_res;
 
 }
 
-PUBLIC int udp_ioctl (fd, req)
+int udp_ioctl (fd, req)
 int fd;
 ioreq_t req;
 {
@@ -201,7 +194,7 @@ assert (opt_acc->acc_length == sizeof(*udp_opt));
 	return result;
 }
 
-PUBLIC int udp_read (fd, count)
+int udp_read (fd, count)
 int fd;
 size_t count;
 {
@@ -234,7 +227,7 @@ size_t count;
 	return NW_SUSPEND;
 }
 
-PRIVATE void udp_main(udp_port)
+static void udp_main(udp_port)
 udp_port_t *udp_port;
 {
 	udp_fd_t *udp_fd;
@@ -301,7 +294,7 @@ udp_port_t *udp_port;
 	}
 }
 
-PRIVATE int udp_select(fd, operations)
+static int udp_select(fd, operations)
 int fd;
 unsigned operations;
 {
@@ -333,7 +326,7 @@ unsigned operations;
 	return resops;
 }
 
-PRIVATE acc_t *udp_get_data (port, offset, count, for_ioctl)
+static acc_t *udp_get_data (port, offset, count, for_ioctl)
 int port;
 size_t offset;
 size_t count;
@@ -419,7 +412,7 @@ assert (udp_port->up_wr_pack);
 	return NULL;
 }
 
-PRIVATE int udp_put_data (fd, offset, data, for_ioctl)
+static int udp_put_data (fd, offset, data, for_ioctl)
 int fd;
 size_t offset;
 acc_t *data;
@@ -488,7 +481,7 @@ assert (!offset);	/* This isn't a valid assertion but ip sends only
 	return NW_OK;
 }
 
-PRIVATE int udp_setopt(udp_fd)
+static int udp_setopt(udp_fd)
 udp_fd_t *udp_fd;
 {
 	udp_fd_t *fd_ptr;
@@ -686,7 +679,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	return NW_OK;
 }
 
-PRIVATE udpport_t find_unused_port(fd)
+static udpport_t find_unused_port(fd)
 int fd;
 {
 	udpport_t port, nw_port;
@@ -711,7 +704,7 @@ int fd;
 reply_thr_put
 */
 
-PRIVATE void reply_thr_put(udp_fd, reply, for_ioctl)
+static void reply_thr_put(udp_fd, reply, for_ioctl)
 udp_fd_t *udp_fd;
 int reply;
 int for_ioctl;
@@ -727,7 +720,7 @@ int for_ioctl;
 reply_thr_get
 */
 
-PRIVATE void reply_thr_get(udp_fd, reply, for_ioctl)
+static void reply_thr_get(udp_fd, reply, for_ioctl)
 udp_fd_t *udp_fd;
 int reply;
 int for_ioctl;
@@ -738,7 +731,7 @@ int for_ioctl;
 	assert (!result);
 }
 
-PRIVATE int is_unused_port(port)
+static int is_unused_port(port)
 udpport_t port;
 {
 	int i;
@@ -755,7 +748,7 @@ udpport_t port;
 	return TRUE;
 }
 
-PRIVATE void read_ip_packets(udp_port)
+static void read_ip_packets(udp_port)
 udp_port_t *udp_port;
 {
 	int result;
@@ -775,7 +768,7 @@ assert(result == NW_OK);
 }
 
 
-PRIVATE int udp_peek (udp_fd)
+static int udp_peek (udp_fd)
 udp_fd_t *udp_fd;
 {
 	acc_t *pack, *tmp_acc, *next_acc;
@@ -816,7 +809,7 @@ udp_fd_t *udp_fd;
 	return NW_SUSPEND;
 }
 
-PRIVATE int udp_sel_read (udp_fd)
+static int udp_sel_read (udp_fd)
 udp_fd_t *udp_fd;
 {
 	acc_t *pack, *tmp_acc, *next_acc;
@@ -842,7 +835,7 @@ udp_fd_t *udp_fd;
 	return 0;
 }
 
-PRIVATE int udp_packet2user (udp_fd)
+static int udp_packet2user (udp_fd)
 udp_fd_t *udp_fd;
 {
 	acc_t *pack, *tmp_pack;
@@ -902,7 +895,7 @@ udp_fd_t *udp_fd;
 	return result;
 }
 
-PRIVATE void udp_ip_arrived(port, pack, pack_size)
+static void udp_ip_arrived(port, pack, pack_size)
 int port;
 acc_t *pack;
 size_t pack_size;
@@ -1171,7 +1164,7 @@ size_t pack_size;
 	bf_afree(udp_acc);
 }
 
-PUBLIC void udp_close(fd)
+void udp_close(fd)
 int fd;
 {
 	udp_fd_t *udp_fd;
@@ -1195,7 +1188,7 @@ int fd;
 	udp_fd->uf_rdbuf_head= NULL;
 }
 
-PUBLIC int udp_write(fd, count)
+int udp_write(fd, count)
 int fd;
 size_t count;
 {
@@ -1231,7 +1224,7 @@ assert (!(udp_fd->uf_flags & UFF_WRITE_IP));
 	}
 }
 
-PRIVATE void restart_write_fd(udp_fd)
+static void restart_write_fd(udp_fd)
 udp_fd_t *udp_fd;
 {
 	udp_port_t *udp_port;
@@ -1392,7 +1385,7 @@ assert (!(udp_port->up_flags & UPF_WRITE_IP));
 		reply_thr_get (udp_fd, udp_fd->uf_wr_count, FALSE);
 }
 
-PRIVATE u16_t pack_oneCsum(pack)
+static u16_t pack_oneCsum(pack)
 acc_t *pack;
 {
 	u16_t prev;
@@ -1440,7 +1433,7 @@ acc_t *pack;
 	return prev;
 }
 
-PRIVATE void udp_restart_write_port(udp_port )
+static void udp_restart_write_port(udp_port )
 udp_port_t *udp_port;
 {
 	udp_fd_t *udp_fd;
@@ -1476,7 +1469,7 @@ assert (!(udp_port->up_flags & (UPF_WRITE_IP|UPF_WRITE_SP)));
 	}
 }
 
-PUBLIC int udp_cancel(fd, which_operation)
+int udp_cancel(fd, which_operation)
 int fd;
 int which_operation;
 {
@@ -1512,7 +1505,7 @@ assert (udp_fd->uf_flags & UFF_IOCTL_IP);
 	return NW_OK;
 }
 
-PRIVATE void udp_buffree (priority)
+static void udp_buffree (priority)
 int priority;
 {
 	int i;
@@ -1547,7 +1540,7 @@ int priority;
 	}
 }
 
-PRIVATE void udp_rd_enqueue(udp_fd, pack, exp_tim)
+static void udp_rd_enqueue(udp_fd, pack, exp_tim)
 udp_fd_t *udp_fd;
 acc_t *pack;
 clock_t exp_tim;
@@ -1595,7 +1588,7 @@ clock_t exp_tim;
 	}
 }
 
-PRIVATE void hash_fd(udp_fd)
+static void hash_fd(udp_fd)
 udp_fd_t *udp_fd;
 {
 	udp_port_t *udp_port;
@@ -1619,7 +1612,7 @@ udp_fd_t *udp_fd;
 	}
 }
 
-PRIVATE void unhash_fd(udp_fd)
+static void unhash_fd(udp_fd)
 udp_fd_t *udp_fd;
 {
 	udp_port_t *udp_port;
@@ -1654,7 +1647,7 @@ udp_fd_t *udp_fd;
 }
 
 #ifdef BUF_CONSISTENCY_CHECK
-PRIVATE void udp_bufcheck()
+static void udp_bufcheck()
 {
 	int i;
 	udp_port_t *udp_port;
@@ -1677,7 +1670,3 @@ PRIVATE void udp_bufcheck()
 	}
 }
 #endif
-
-/*
- * $PchId: udp.c,v 1.25 2005/06/28 14:14:44 philip Exp $
- */

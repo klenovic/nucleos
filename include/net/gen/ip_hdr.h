@@ -50,7 +50,3 @@ typedef struct ip_hdr
 #define IP_OPT_RR_MIN		4
 
 #endif /* __SERVER__IP__GEN__HDR_H__ */
-
-/*
- * $PchId: ip_hdr.h,v 1.5 2002/06/10 07:11:46 philip Exp $
- */

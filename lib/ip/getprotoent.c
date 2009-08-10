@@ -25,20 +25,13 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)getprotoent.c	5.7 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _MINIX
 #include <net/gen/netdb.h>
 
-static char *any _ARGS(( char *cp, char *match ));
-#endif
+static char *any(char *cp, char *match);
 
 #define	MAXALIASES	35
 

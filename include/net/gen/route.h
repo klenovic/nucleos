@@ -34,7 +34,3 @@ typedef struct nwio_route
 #define NWRF_UNREACHABLE	4
 
 #endif /* __SERVER__IP__GEN__ROUTE_H__ */
-
-/*
- * $PchId: route.h,v 1.3 1995/11/17 22:19:50 philip Exp $
- */

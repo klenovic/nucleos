@@ -42,7 +42,7 @@
 /*===========================================================================*
  *				do_mmap			     		     *
  *===========================================================================*/
-PUBLIC int do_mmap(message *m)
+int do_mmap(message *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -98,7 +98,7 @@ PUBLIC int do_mmap(message *m)
 /*===========================================================================*
  *				do_map_phys		     		     *
  *===========================================================================*/
-PUBLIC int do_map_phys(message *m)
+int do_map_phys(message *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -136,7 +136,7 @@ PUBLIC int do_map_phys(message *m)
 /*===========================================================================*
  *				do_unmap_phys		     		     *
  *===========================================================================*/
-PUBLIC int do_unmap_phys(message *m)
+int do_unmap_phys(message *m)
 {
 	int r, n;
 	struct vmproc *vmp;

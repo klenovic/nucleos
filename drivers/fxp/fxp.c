@@ -103,7 +103,7 @@ struct pcitab
 	int checkclass;
 };
 
-PRIVATE struct pcitab pcitab_fxp[]=
+static struct pcitab pcitab_fxp[]=
 {
 	{ 0x8086, 0x1229, 0 },		/* Intel 82557, etc. */
 	{ 0x8086, 0x2449, 0 },		/* Intel 82801BA/BAM/CA/CAM */
@@ -238,50 +238,44 @@ u32_t system_hz;
 #define fxp_outw(port, offset, value)	(do_outw((port) + (offset), (value)))
 #define fxp_outl(port, offset, value)	(do_outl((port) + (offset), (value)))
 
-_PROTOTYPE( static void fxp_init, (message *mp)				);
-_PROTOTYPE( static void fxp_pci_conf, (void)				);
-_PROTOTYPE( static int fxp_probe, (fxp_t *fp)				);
-_PROTOTYPE( static void fxp_conf_hw, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_init_hw, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_init_buf, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_reset_hw, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_confaddr, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_rec_mode, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_writev, (message *mp, int from_int,
-							int vectored)	);
-_PROTOTYPE( static void fxp_writev_s, (message *mp, int from_int)	);
-_PROTOTYPE( static void fxp_readv, (message *mp, int from_int, 
-							int vectored)	);
-_PROTOTYPE( static void fxp_readv_s, (message *mp, int from_int)	);
-_PROTOTYPE( static void fxp_do_conf, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_cu_ptr_cmd, (fxp_t *fp, int cmd,
-				phys_bytes bus_addr, int check_idle)	);
-_PROTOTYPE( static void fxp_ru_ptr_cmd, (fxp_t *fp, int cmd,
-				phys_bytes bus_addr, int check_idle)	);
-_PROTOTYPE( static void fxp_restart_ru, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_getstat, (message *mp)			);
-_PROTOTYPE( static void fxp_getstat_s, (message *mp)			);
-_PROTOTYPE( static void fxp_getname, (message *mp)			);
-_PROTOTYPE( static int fxp_handler, (fxp_t *fp)				);
-_PROTOTYPE( static void fxp_check_ints, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_watchdog_f, (timer_t *tp)			);
-_PROTOTYPE( static int fxp_link_changed, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_report_link, (fxp_t *fp)			);
-_PROTOTYPE( static void fxp_stop, (void));
-_PROTOTYPE( static void reply, (fxp_t *fp, int err, int may_block)	);
-_PROTOTYPE( static void mess_reply, (message *req, message *reply)	);
-_PROTOTYPE( static u16_t eeprom_read, (fxp_t *fp, int reg)		);
-_PROTOTYPE( static void eeprom_addrsize, (fxp_t *fp)			);
-_PROTOTYPE( static u16_t mii_read, (fxp_t *fp, int reg)			);
-_PROTOTYPE( static void fxp_set_timer,(timer_t *tp, clock_t delta,
-						tmr_func_t watchdog)	);
-_PROTOTYPE( static void fxp_expire_timers,(void)			);
-_PROTOTYPE( static u8_t do_inb, (port_t port)				);
-_PROTOTYPE( static u32_t do_inl, (port_t port)				);
-_PROTOTYPE( static void do_outb, (port_t port, u8_t v)			);
-_PROTOTYPE( static void do_outl, (port_t port, u32_t v)			);
-_PROTOTYPE( static void tell_dev, (vir_bytes start, size_t size,
-				int pci_bus, int pci_dev, int pci_func)	);
+static void fxp_init(message *mp);
+static void fxp_pci_conf(void);
+static int fxp_probe(fxp_t *fp);
+static void fxp_conf_hw(fxp_t *fp);
+static void fxp_init_hw(fxp_t *fp);
+static void fxp_init_buf(fxp_t *fp);
+static void fxp_reset_hw(fxp_t *fp);
+static void fxp_confaddr(fxp_t *fp);
+static void fxp_rec_mode(fxp_t *fp);
+static void fxp_writev(message *mp, int from_int, int vectored);
+static void fxp_writev_s(message *mp, int from_int);
+static void fxp_readv(message *mp, int from_int, int vectored);
+static void fxp_readv_s(message *mp, int from_int);
+static void fxp_do_conf(fxp_t *fp);
+static void fxp_cu_ptr_cmd(fxp_t *fp, int cmd, phys_bytes bus_addr, int check_idle);
+static void fxp_ru_ptr_cmd(fxp_t *fp, int cmd, phys_bytes bus_addr, int check_idle);
+static void fxp_restart_ru(fxp_t *fp);
+static void fxp_getstat(message *mp);
+static void fxp_getstat_s(message *mp);
+static void fxp_getname(message *mp);
+static int fxp_handler(fxp_t *fp);
+static void fxp_check_ints(fxp_t *fp);
+static void fxp_watchdog_f(timer_t *tp);
+static int fxp_link_changed(fxp_t *fp);
+static void fxp_report_link(fxp_t *fp);
+static void fxp_stop(void);
+static void reply(fxp_t *fp, int err, int may_block);
+static void mess_reply(message *req, message *reply);
+static u16_t eeprom_read(fxp_t *fp, int reg);
+static void eeprom_addrsize(fxp_t *fp);
+static u16_t mii_read(fxp_t *fp, int reg);
+static void fxp_set_timer(timer_t *tp, clock_t delta, tmr_func_t watchdog);
+static void fxp_expire_timers(void);
+static u8_t do_inb(port_t port);
+static u32_t do_inl(port_t port);
+static void do_outb(port_t port, u8_t v);
+static void do_outl(port_t port, u32_t v);
+static void tell_dev(vir_bytes start, size_t size, int pci_bus, int pci_dev, int pci_func);
 
 /*===========================================================================*
  *				main					     *
@@ -2678,7 +2672,7 @@ message *reply_mess;
 /*===========================================================================*
  *				eeprom_read				     *
  *===========================================================================*/
-PRIVATE u16_t eeprom_read(fp, reg)
+static u16_t eeprom_read(fp, reg)
 fxp_t *fp;
 int reg;
 {
@@ -2738,7 +2732,7 @@ int reg;
 /*===========================================================================*
  *				eeprom_addrsize				     *
  *===========================================================================*/
-PRIVATE void eeprom_addrsize(fp)
+static void eeprom_addrsize(fp)
 fxp_t *fp;
 {
 	port_t port;
@@ -2796,7 +2790,7 @@ fxp_t *fp;
 /*===========================================================================*
  *				mii_read				     *
  *===========================================================================*/
-PRIVATE u16_t mii_read(fp, reg)
+static u16_t mii_read(fp, reg)
 fxp_t *fp;
 int reg;
 {
@@ -2833,7 +2827,7 @@ int reg;
 /*===========================================================================*
  *				fxp_set_timer				     *
  *===========================================================================*/
-PRIVATE void fxp_set_timer(tp, delta, watchdog)
+static void fxp_set_timer(tp, delta, watchdog)
 timer_t *tp;				/* timer to be set */
 clock_t delta;				/* in how many ticks */
 tmr_func_t watchdog;			/* watchdog function to be called */
@@ -2869,7 +2863,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
 /*===========================================================================*
  *				fxp_expire_tmrs				     *
  *===========================================================================*/
-PRIVATE void fxp_expire_timers()
+static void fxp_expire_timers()
 {
 /* A synchronous alarm message was received. Check if there are any expired 
  * timers. Possibly reschedule the next alarm.  
@@ -2938,7 +2932,7 @@ static void do_outl(port_t port, u32_t value)
 		panic("FXP","sys_outl failed", r);
 }
 
-PRIVATE void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
+static void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
 vir_bytes buf;
 size_t size;
 int pci_bus;
@@ -2984,8 +2978,4 @@ int pci_func;
 		return;
 	}
 }
-
-/*
- * $PchId: fxp.c,v 1.4 2005/01/31 22:10:37 philip Exp $
- */
 

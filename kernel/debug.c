@@ -22,7 +22,7 @@
 
 #define MAX_LOOP (NR_PROCS + NR_TASKS)
 
-PUBLIC void
+void
 check_runqueues_f(char *file, int line)
 {
   int q, l = 0;

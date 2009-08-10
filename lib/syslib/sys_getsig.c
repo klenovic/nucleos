@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_getksig				     *
  *===========================================================================*/
-PUBLIC int sys_getksig(k_proc_nr, k_sig_map)
+int sys_getksig(k_proc_nr, k_sig_map)
 int *k_proc_nr;				/* return process number here */
 sigset_t *k_sig_map;			/* return signal map here */
 {

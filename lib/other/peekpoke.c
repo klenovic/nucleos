@@ -20,8 +20,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-_PROTOTYPE( int peek, (unsigned segment, unsigned offset));
-_PROTOTYPE( int poke, (unsigned segment, unsigned offset, unsigned value));
+int peek(unsigned segment, unsigned offset);
+int poke(unsigned segment, unsigned offset, unsigned value);
 
 #define SEGSIZE 0x10
 

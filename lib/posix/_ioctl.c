@@ -12,7 +12,7 @@
 #include <nucleos/com.h>
 #include <sys/ioctl.h>
 
-PUBLIC int ioctl(fd, request, data)
+int ioctl(fd, request, data)
 int fd;
 int request;
 void *data;

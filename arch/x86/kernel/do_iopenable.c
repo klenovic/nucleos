@@ -25,7 +25,7 @@
 /*===========================================================================*
  *			        do_iopenable				     *
  *===========================================================================*/
-PUBLIC int do_iopenable(m_ptr)
+int do_iopenable(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   int proc_nr;

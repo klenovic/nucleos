@@ -12,7 +12,7 @@
 #include <lib.h>
 #include <unistd.h>
 
-PUBLIC int mstats(struct message_statentry *ms, int entries, int reset)
+int mstats(struct message_statentry *ms, int entries, int reset)
 {
 	message m;
 

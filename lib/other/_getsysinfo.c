@@ -14,7 +14,7 @@
 #include <nucleos/sysinfo.h>
 
 
-PUBLIC int getsysinfo(who, what, where)
+int getsysinfo(who, what, where)
 endpoint_t who;			/* from whom to request info */
 int what;			/* what information is requested */
 void *where;			/* where to put it */
@@ -27,7 +27,7 @@ void *where;			/* where to put it */
 }
 
 /* Unprivileged variant of getsysinfo. */
-PUBLIC ssize_t getsysinfo_up(who, what, size, where)
+ssize_t getsysinfo_up(who, what, size, where)
 endpoint_t who;			/* from whom to request info */
 int what;			/* what information is requested */
 size_t size;			/* input and output size */

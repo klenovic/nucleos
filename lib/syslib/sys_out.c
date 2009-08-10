@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_out				     *
  *===========================================================================*/
-PUBLIC int sys_out(port, value, type)
+int sys_out(port, value, type)
 int port; 				/* port address to write to */
 unsigned long value;			/* value to write */
 int type;				/* byte, word, long */

@@ -21,7 +21,7 @@
 
 #define fail(fp)	(fclose(fp), -1)	/* ret. exp. when nlist fails */
 
-_PROTOTYPE( int nlist, (char *file, struct nlist nl[]));
+int nlist(char *file, struct nlist nl[]);
 
 /*
  * Nlist fills fields n_sclass and n_value of array nl with values found in

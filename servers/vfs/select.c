@@ -35,7 +35,7 @@
 /* max. number of simultaneously pending select() calls */
 #define MAXSELECTS 25
 
-PRIVATE struct selectentry {
+static struct selectentry {
 	struct fproc *requestor;	/* slot is free iff this is NULL */
 	int req_endpt;
 	fd_set readfds, writefds, errorfds;
@@ -51,25 +51,21 @@ PRIVATE struct selectentry {
 	timer_t timer;	/* if expiry > 0 */
 } selecttab[MAXSELECTS];
 
-FORWARD _PROTOTYPE(int select_reevaluate, (struct filp *fp));
+static int select_reevaluate(struct filp *fp);
 
-FORWARD _PROTOTYPE(int select_request_file,
-	 (struct filp *f, int *ops, int block));
-FORWARD _PROTOTYPE(int select_match_file, (struct filp *f));
+static int select_request_file (struct filp *f, int *ops, int block);
+static int select_match_file(struct filp *f);
 
-FORWARD _PROTOTYPE(int select_request_general,
-	 (struct filp *f, int *ops, int block));
-FORWARD _PROTOTYPE(int select_request_asynch,
-	 (struct filp *f, int *ops, int block));
-FORWARD _PROTOTYPE(int select_major_match,
-	(int match_major, struct filp *file));
+static int select_request_general(struct filp *f, int *ops, int block);
+static int select_request_asynch(struct filp *f, int *ops, int block);
+static int select_major_match(int match_major, struct filp *file);
 
-FORWARD _PROTOTYPE(void select_cancel_all, (struct selectentry *e));
-FORWARD _PROTOTYPE(void select_wakeup, (struct selectentry *e, int r));
-FORWARD _PROTOTYPE(void select_return, (struct selectentry *, int));
-FORWARD _PROTOTYPE(void sel_restart_dev, (void));
-FORWARD _PROTOTYPE(void filp_status, (struct filp *fp, int status));
-FORWARD _PROTOTYPE(void restart_proc, (int slot));
+static void select_cancel_all(struct selectentry *e);
+static void select_wakeup(struct selectentry *e, int r);
+static void select_return(struct selectentry *, int);
+static void sel_restart_dev(void);
+static void filp_status(struct filp *fp, int status);
+static void restart_proc(int slot);
 
 /* The Open Group:
  * "The pselect() and select() functions shall support
@@ -77,7 +73,7 @@ FORWARD _PROTOTYPE(void restart_proc, (int slot));
  * STREAMS-based files, FIFOs, pipes, and sockets."
  */
 
-PRIVATE struct fdtype {
+static struct fdtype {
 	int (*select_request)(struct filp *, int *ops, int block);	
 	int (*select_match)(struct filp *);
 	int select_major;
@@ -98,7 +94,7 @@ PRIVATE struct fdtype {
 /*===========================================================================*
  *				select_request_file			     *
  *===========================================================================*/
-PRIVATE int select_request_file(struct filp *f, int *ops, int block)
+static int select_request_file(struct filp *f, int *ops, int block)
 {
 	/* output *ops is input *ops */
 	return SEL_OK;
@@ -107,7 +103,7 @@ PRIVATE int select_request_file(struct filp *f, int *ops, int block)
 /*===========================================================================*
  *				select_match_file			     *
  *===========================================================================*/
-PRIVATE int select_match_file(struct filp *file)
+static int select_match_file(struct filp *file)
 {
 	if (file && file->filp_vno && (file->filp_vno->v_mode & I_REGULAR))
 		return 1;
@@ -117,7 +113,7 @@ PRIVATE int select_match_file(struct filp *file)
 /*===========================================================================*
  *				select_request_general			     *
  *===========================================================================*/
-PRIVATE int select_request_general(struct filp *f, int *ops, int block)
+static int select_request_general(struct filp *f, int *ops, int block)
 {
 	int rops = *ops;
 	if (block) rops |= SEL_NOTIFY;
@@ -131,7 +127,7 @@ PRIVATE int select_request_general(struct filp *f, int *ops, int block)
 /*===========================================================================*
  *				select_request_asynch			     *
  *===========================================================================*/
-PRIVATE int select_request_asynch(struct filp *f, int *ops, int block)
+static int select_request_asynch(struct filp *f, int *ops, int block)
 {
 	int r, rops;
 	struct dmap *dp;
@@ -170,7 +166,7 @@ PRIVATE int select_request_asynch(struct filp *f, int *ops, int block)
 /*===========================================================================*
  *				select_major_match			     *
  *===========================================================================*/
-PRIVATE int select_major_match(int match_major, struct filp *file)
+static int select_major_match(int match_major, struct filp *file)
 {
 	int major;
 	if (!(file && file->filp_vno &&
@@ -185,7 +181,7 @@ PRIVATE int select_major_match(int match_major, struct filp *file)
 /*===========================================================================*
  *				tab2ops					     *
  *===========================================================================*/
-PRIVATE int tab2ops(int fd, struct selectentry *e)
+static int tab2ops(int fd, struct selectentry *e)
 {
 	return (FD_ISSET(fd, &e->readfds) ? SEL_RD : 0) |
 		(FD_ISSET(fd, &e->writefds) ? SEL_WR : 0) |
@@ -195,7 +191,7 @@ PRIVATE int tab2ops(int fd, struct selectentry *e)
 /*===========================================================================*
  *				ops2tab					     *
  *===========================================================================*/
-PRIVATE void ops2tab(int ops, int fd, struct selectentry *e)
+static void ops2tab(int ops, int fd, struct selectentry *e)
 {
 	if ((ops & SEL_RD) && e->vir_readfds && FD_ISSET(fd, &e->readfds)
 	        && !FD_ISSET(fd, &e->ready_readfds)) {
@@ -219,7 +215,7 @@ PRIVATE void ops2tab(int ops, int fd, struct selectentry *e)
 /*===========================================================================*
  *				copy_fdsets				     *
  *===========================================================================*/
-PRIVATE void copy_fdsets(struct selectentry *e)
+static void copy_fdsets(struct selectentry *e)
 {
        int fd_setsize;
        if(e->nfds < 0 || e->nfds > OPEN_MAX)
@@ -245,7 +241,7 @@ PRIVATE void copy_fdsets(struct selectentry *e)
 /*===========================================================================*
  *				do_select				      *
  *===========================================================================*/
-PUBLIC int do_select(void)
+int do_select(void)
 {
 	int r, nfds, is_timeout = 1, nonzero_timeout = 0,
 		fd, s, block = 0, fd_setsize;
@@ -503,7 +499,7 @@ PUBLIC int do_select(void)
 /*===========================================================================*
  *				select_cancel_all			     *
  *===========================================================================*/
-PRIVATE void select_cancel_all(struct selectentry *e)
+static void select_cancel_all(struct selectentry *e)
 {
 	int fd;
 
@@ -541,7 +537,7 @@ PRIVATE void select_cancel_all(struct selectentry *e)
 /*===========================================================================*
  *				select_wakeup				     *
  *===========================================================================*/
-PRIVATE void select_wakeup(struct selectentry *e, int r)
+static void select_wakeup(struct selectentry *e, int r)
 {
 	revive(e->req_endpt, r);
 }
@@ -549,7 +545,7 @@ PRIVATE void select_wakeup(struct selectentry *e, int r)
 /*===========================================================================*
  *				select_reevaluate			     *
  *===========================================================================*/
-PRIVATE int select_reevaluate(struct filp *fp)
+static int select_reevaluate(struct filp *fp)
 {
 	int s, remain_ops = 0, fd, type = -1;
 
@@ -583,7 +579,7 @@ PRIVATE int select_reevaluate(struct filp *fp)
 /*===========================================================================*
  *				select_return				     *
  *===========================================================================*/
-PRIVATE void select_return(struct selectentry *s, int r)
+static void select_return(struct selectentry *s, int r)
 {
 	select_cancel_all(s);
 	copy_fdsets(s);
@@ -594,7 +590,7 @@ PRIVATE void select_return(struct selectentry *s, int r)
 /*===========================================================================*
  *				select_callback			             *
  *===========================================================================*/
-PUBLIC int select_callback(struct filp *fp, int ops)
+int select_callback(struct filp *fp, int ops)
 {
 	int s, fd, want_ops, type;
 
@@ -634,7 +630,7 @@ PUBLIC int select_callback(struct filp *fp, int ops)
 /*===========================================================================*
  *				select_notified			             *
  *===========================================================================*/
-PUBLIC int select_notified(int major, int minor, int selected_ops)
+int select_notified(int major, int minor, int selected_ops)
 {
 	int s, f, t;
 
@@ -682,7 +678,7 @@ PUBLIC int select_notified(int major, int minor, int selected_ops)
 /*===========================================================================*
  *				init_select  				     *
  *===========================================================================*/
-PUBLIC void init_select(void)
+void init_select(void)
 {
 	int s;
 
@@ -693,7 +689,7 @@ PUBLIC void init_select(void)
 /*===========================================================================*
  *				select_forget			             *
  *===========================================================================*/
-PUBLIC void select_forget(int proc_e)
+void select_forget(int proc_e)
 {
 	/* something has happened (e.g. signal delivered that interrupts
 	 * select()). totally forget about the select().
@@ -724,7 +720,7 @@ PUBLIC void select_forget(int proc_e)
 /*===========================================================================*
  *				select_timeout_check	  	     	     *
  *===========================================================================*/
-PUBLIC void select_timeout_check(timer_t *timer)
+void select_timeout_check(timer_t *timer)
 {
 	int s;
 
@@ -760,7 +756,7 @@ PUBLIC void select_timeout_check(timer_t *timer)
 /*===========================================================================*
  *				select_unsuspend_by_endpt  	     	     *
  *===========================================================================*/
-PUBLIC void select_unsuspend_by_endpt(int proc_e)
+void select_unsuspend_by_endpt(int proc_e)
 {
 	int fd, s;
 
@@ -784,7 +780,7 @@ PUBLIC void select_unsuspend_by_endpt(int proc_e)
 /*===========================================================================*
  *				select_reply1				     *
  *===========================================================================*/
-PUBLIC void select_reply1()
+void select_reply1()
 {
 	int i, s, minor, status;
 	endpoint_t driver_e;
@@ -871,7 +867,7 @@ PUBLIC void select_reply1()
 /*===========================================================================*
  *				select_reply2				     *
  *===========================================================================*/
-PUBLIC void select_reply2()
+void select_reply2()
 {
 	int i, s, minor, status;
 	endpoint_t driver_e;
@@ -938,7 +934,7 @@ PUBLIC void select_reply2()
 }
 
 
-PRIVATE void sel_restart_dev()
+static void sel_restart_dev()
 {
 	int i, s;
 	struct filp *fp;
@@ -989,7 +985,7 @@ PRIVATE void sel_restart_dev()
 	}
 }
 
-PRIVATE void filp_status(fp, status)
+static void filp_status(fp, status)
 struct filp *fp;
 int status;
 {
@@ -1018,7 +1014,7 @@ int status;
 	}
 }
 
-PRIVATE void restart_proc(slot)
+static void restart_proc(slot)
 int slot;
 {
 	int fd;

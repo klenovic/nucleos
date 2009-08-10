@@ -17,9 +17,6 @@ for which ttyname() returns a name. The index is the line number in the
 
 Created:	Oct 11, 1992 by Philip Homburg
 */
-
-#define _MINIX_SOURCE
-
 #include <nucleos/types.h>
 #include <ttyent.h>
 #include <string.h>

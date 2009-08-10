@@ -27,7 +27,3 @@ typedef struct nwio_psipopt
 #define		NWUO_DI_NEXTHOP		0x00020000L
 
 #endif /* __SERVER__IP__GEN__PSIP_IO_H__ */
-
-/*
- * $PchId: psip_io.h,v 1.3 2001/02/19 07:35:58 philip Exp $
- */

@@ -33,18 +33,18 @@
 #include "sb16.h"
 
 
-_PROTOTYPE(void main, (void));
-FORWARD _PROTOTYPE( int mixer_init, (void)); 
-FORWARD _PROTOTYPE( int mixer_open, (message *m_ptr));
-FORWARD _PROTOTYPE( int mixer_close, (message *m_ptr));
-FORWARD _PROTOTYPE( int mixer_ioctl, (message *m_ptr));
-FORWARD _PROTOTYPE( int mixer_get, (int reg));
-FORWARD _PROTOTYPE( int get_set_volume, (message *m_ptr, int flag));
-FORWARD _PROTOTYPE( int get_set_input, (message *m_ptr, int flag, int channel));
-FORWARD _PROTOTYPE( int get_set_output, (message *m_ptr, int flag));
+void main(void);
+static int mixer_init(void); 
+static int mixer_open(message *m_ptr);
+static int mixer_close(message *m_ptr);
+static int mixer_ioctl(message *m_ptr);
+static int mixer_get(int reg);
+static int get_set_volume(message *m_ptr, int flag);
+static int get_set_input(message *m_ptr, int flag, int channel);
+static int get_set_output(message *m_ptr, int flag);
 
 
-PRIVATE int mixer_avail = 0;	/* Mixer exists? */
+static int mixer_avail = 0;	/* Mixer exists? */
 
 
 #define dprint (void)
@@ -53,7 +53,7 @@ PRIVATE int mixer_avail = 0;	/* Mixer exists? */
 /*===========================================================================*
  *				main
  *===========================================================================*/
-PUBLIC void main() {
+void main() {
 message mess;
 	int err, caller, proc_nr;
 
@@ -101,7 +101,7 @@ message mess;
 /*=========================================================================*
  *				mixer_open				   	
  *=========================================================================*/
-PRIVATE int mixer_open(m_ptr)
+static int mixer_open(m_ptr)
 message *m_ptr;
 {
 	dprint("mixer_open\n");
@@ -116,7 +116,7 @@ message *m_ptr;
 /*=========================================================================*
  *				mixer_close				   	
  *=========================================================================*/
-PRIVATE int mixer_close(m_ptr)
+static int mixer_close(m_ptr)
 message *m_ptr;
 {
 	dprint("mixer_close\n");
@@ -128,7 +128,7 @@ message *m_ptr;
 /*=========================================================================*
  *				mixer_ioctl				   	
  *=========================================================================*/
-PRIVATE int mixer_ioctl(m_ptr)
+static int mixer_ioctl(m_ptr)
 message *m_ptr;
 {
 	int status;
@@ -155,7 +155,7 @@ message *m_ptr;
 /*=========================================================================*
  *				mixer_init				   
  *=========================================================================*/
-PRIVATE int mixer_init()
+static int mixer_init()
 {
 	/* Try to detect the mixer by writing to MIXER_DAC_LEVEL if the
 	* value written can be read back the mixer is there
@@ -180,7 +180,7 @@ PRIVATE int mixer_init()
 /*=========================================================================*
  *				mixer_get				  
  *=========================================================================*/
-PRIVATE int mixer_get(reg)
+static int mixer_get(reg)
 int reg;
 {
 	int i;
@@ -194,7 +194,7 @@ int reg;
 /*=========================================================================*
  *				get_set_volume				   *
  *=========================================================================*/
-PRIVATE int get_set_volume(m_ptr, flag)
+static int get_set_volume(m_ptr, flag)
 message *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 {
@@ -278,7 +278,7 @@ int flag;	/* 0 = get, 1 = set */
 /*=========================================================================*
  *				get_set_input				   *
  *=========================================================================*/
-PRIVATE int get_set_input(m_ptr, flag, channel)
+static int get_set_input(m_ptr, flag, channel)
 message *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 int channel;    /* 0 = left, 1 = right */
@@ -343,7 +343,7 @@ int channel;    /* 0 = left, 1 = right */
 /*=========================================================================*
  *				get_set_output				   *
  *=========================================================================*/
-PRIVATE int get_set_output(m_ptr, flag)
+static int get_set_output(m_ptr, flag)
 message *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 {

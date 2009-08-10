@@ -41,7 +41,6 @@
 */
 
 #include <nucleos/types.h>
-#include <ansi.h>
 #include <strings.h>
 #include <ctype.h>
 

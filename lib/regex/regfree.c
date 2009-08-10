@@ -45,11 +45,6 @@
  *
  *	@(#)regfree.c	8.3 (Berkeley) 3/20/94
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)regfree.c	8.3 (Berkeley) 3/20/94";
-#endif /* LIBC_SCCS and not lint */
-
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,7 +82,3 @@ regex_t *preg;
 		free(g->must);
 	free((char *)g);
 }
-
-/*
- * $PchId: regfree.c,v 1.2 1996/03/12 19:10:15 philip Exp $
- */

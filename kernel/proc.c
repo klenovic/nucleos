@@ -57,23 +57,37 @@
 #include <kernel/ipc.h>
 #include <kernel/vm.h>
 
+/* The process table and pointers to process table slots. The pointers allow
+ * faster access because now a process entry can be found by indexing the
+ * pproc_addr array, while accessing an element i requires a multiplication
+ * with sizeof(struct proc) to determine the address.
+ */
+struct proc proc[NR_TASKS + NR_PROCS];   /* process table */
+struct proc *pproc_addr[NR_TASKS + NR_PROCS];
+struct proc *rdy_head[NR_SCHED_QUEUES]; /* ptrs to ready list headers */
+struct proc *rdy_tail[NR_SCHED_QUEUES]; /* ptrs to ready list tails */
+
+/* The system structures table and pointers to individual table slots. The
+ * pointers allow faster access because now a process entry can be found by
+ * indexing the psys_addr array, while accessing an element i requires a
+ * multiplication with sizeof(struct sys) to determine the address.
+ */
+struct priv priv[NR_SYS_PROCS];          /* system properties table */
+struct priv *ppriv_addr[NR_SYS_PROCS];   /* direct slot pointers */
+
 /* Scheduling and message passing functions. The functions are available to 
  * other parts of the kernel through lock_...(). The lock temporarily disables 
  * interrupts to prevent race conditions. 
  */
-FORWARD _PROTOTYPE( int mini_send, (struct proc *caller_ptr, int dst_e,
-		message *m_ptr, int flags));
-FORWARD _PROTOTYPE( int mini_receive, (struct proc *caller_ptr, int src,
-		message *m_ptr, int flags));
-FORWARD _PROTOTYPE( int mini_notify, (struct proc *caller_ptr, int dst));
-FORWARD _PROTOTYPE( int mini_senda, (struct proc *caller_ptr,
-	asynmsg_t *table, size_t size));
-FORWARD _PROTOTYPE( int deadlock, (int function,
-		register struct proc *caller, int src_dst));
-FORWARD _PROTOTYPE( int try_async, (struct proc *caller_ptr));
-FORWARD _PROTOTYPE( int try_one, (struct proc *src_ptr, struct proc *dst_ptr));
-FORWARD _PROTOTYPE( void sched, (struct proc *rp, int *queue, int *front));
-FORWARD _PROTOTYPE( void pick_proc, (void));
+static int mini_send(struct proc *caller_ptr, int dst_e, message *m_ptr, int flags);
+static int mini_receive(struct proc *caller_ptr, int src, message *m_ptr, int flags);
+static int mini_notify(struct proc *caller_ptr, int dst);
+static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size);
+static int deadlock(int function, register struct proc *caller, int src_dst);
+static int try_async(struct proc *caller_ptr);
+static int try_one(struct proc *src_ptr, struct proc *dst_ptr);
+static void sched(struct proc *rp, int *queue, int *front);
+static void pick_proc(void);
 
 #define BuildMess(m_ptr, src, dst_ptr) \
 	(m_ptr)->m_source = proc_addr(src)->p_endpoint;		\
@@ -137,7 +151,7 @@ FORWARD _PROTOTYPE( void pick_proc, (void));
 /*===========================================================================*
  *				sys_call				     * 
  *===========================================================================*/
-PUBLIC int sys_call(call_nr, src_dst_e, m_ptr, bit_map)
+int sys_call(call_nr, src_dst_e, m_ptr, bit_map)
 int call_nr;			/* system call number and flags */
 int src_dst_e;			/* src to receive from or dst to send to */
 message *m_ptr;			/* pointer to message in the caller's space */
@@ -402,7 +416,7 @@ long bit_map;			/* notification event set or flags */
 /*===========================================================================*
  *				deadlock				     * 
  *===========================================================================*/
-PRIVATE int deadlock(function, cp, src_dst) 
+static int deadlock(function, cp, src_dst) 
 int function;					/* trap number */
 register struct proc *cp;			/* pointer to caller */
 int src_dst;					/* src or dst process */
@@ -471,7 +485,7 @@ int src_dst;					/* src or dst process */
 /*===========================================================================*
  *				sys_call_restart			     * 
  *===========================================================================*/
-PUBLIC void sys_call_restart(caller)
+void sys_call_restart(caller)
 struct proc *caller;
 {
 	int r;
@@ -487,7 +501,7 @@ struct proc *caller;
 /*===========================================================================*
  *				mini_send				     * 
  *===========================================================================*/
-PRIVATE int mini_send(caller_ptr, dst_e, m_ptr, flags)
+static int mini_send(caller_ptr, dst_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* who is trying to send a message? */
 int dst_e;				/* to whom is message being sent? */
 message *m_ptr;				/* pointer to message buffer */
@@ -543,7 +557,7 @@ int flags;
 /*===========================================================================*
  *				mini_receive				     * 
  *===========================================================================*/
-PRIVATE int mini_receive(caller_ptr, src_e, m_ptr, flags)
+static int mini_receive(caller_ptr, src_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* process trying to get message */
 int src_e;				/* which message source is wanted */
 message *m_ptr;				/* pointer to message buffer */
@@ -669,7 +683,7 @@ int flags;
 /*===========================================================================*
  *				mini_notify				     * 
  *===========================================================================*/
-PRIVATE int mini_notify(caller_ptr, dst)
+static int mini_notify(caller_ptr, dst)
 register struct proc *caller_ptr;	/* sender of the notification */
 int dst;				/* which process to notify */
 {
@@ -728,7 +742,7 @@ field, caller->p_name, entry, priv(caller)->s_asynsize, priv(caller)->s_asyntab)
 /*===========================================================================*
  *				mini_senda				     *
  *===========================================================================*/
-PRIVATE int mini_senda(caller_ptr, table, size)
+static int mini_senda(caller_ptr, table, size)
 struct proc *caller_ptr;
 asynmsg_t *table;
 size_t size;
@@ -915,7 +929,7 @@ size_t size;
 /*===========================================================================*
  *				try_async				     * 
  *===========================================================================*/
-PRIVATE int try_async(caller_ptr)
+static int try_async(caller_ptr)
 struct proc *caller_ptr;
 {
 	int r;
@@ -951,7 +965,7 @@ struct proc *caller_ptr;
 /*===========================================================================*
  *				try_one					     *
  *===========================================================================*/
-PRIVATE int try_one(src_ptr, dst_ptr)
+static int try_one(src_ptr, dst_ptr)
 struct proc *src_ptr;
 struct proc *dst_ptr;
 {
@@ -1045,7 +1059,7 @@ struct proc *dst_ptr;
 /*===========================================================================*
  *				lock_notify				     *
  *===========================================================================*/
-PUBLIC int lock_notify(src_e, dst_e)
+int lock_notify(src_e, dst_e)
 int src_e;			/* (endpoint) sender of the notification */
 int dst_e;			/* (endpoint) who is to be notified */
 {
@@ -1077,7 +1091,7 @@ int dst_e;			/* (endpoint) who is to be notified */
 /*===========================================================================*
  *				soft_notify				     *
  *===========================================================================*/
-PUBLIC int soft_notify(dst_e)
+int soft_notify(dst_e)
 int dst_e;			/* (endpoint) who is to be notified */
 {
 	int dst, u = 0;
@@ -1114,7 +1128,7 @@ int dst_e;			/* (endpoint) who is to be notified */
 /*===========================================================================*
  *				enqueue					     * 
  *===========================================================================*/
-PUBLIC void enqueue(rp)
+void enqueue(rp)
 register struct proc *rp;	/* this process is now runnable */
 {
 /* Add 'rp' to one of the queues of runnable processes.  This function is 
@@ -1167,7 +1181,7 @@ register struct proc *rp;	/* this process is now runnable */
 /*===========================================================================*
  *				dequeue					     * 
  *===========================================================================*/
-PUBLIC void dequeue(rp)
+void dequeue(rp)
 register struct proc *rp;	/* this process is no longer runnable */
 {
 /* A process must be removed from the scheduling queues, for example, because
@@ -1217,7 +1231,7 @@ register struct proc *rp;	/* this process is no longer runnable */
 /*===========================================================================*
  *				sched					     * 
  *===========================================================================*/
-PRIVATE void sched(rp, queue, front)
+static void sched(rp, queue, front)
 register struct proc *rp;			/* process to be scheduled */
 int *queue;					/* return: queue to use */
 int *front;					/* return: front or back */
@@ -1250,7 +1264,7 @@ int *front;					/* return: front or back */
 /*===========================================================================*
  *				pick_proc				     * 
  *===========================================================================*/
-PRIVATE void pick_proc()
+static void pick_proc()
 {
 /* Decide who to run now.  A new process is selected by setting 'next_ptr'.
  * When a billable process is selected, record it in 'bill_ptr', so that the 
@@ -1282,7 +1296,7 @@ PRIVATE void pick_proc()
  *				balance_queues				     *
  *===========================================================================*/
 #define Q_BALANCE_TICKS	 100
-PUBLIC void balance_queues(tp)
+void balance_queues(tp)
 timer_t *tp;					/* watchdog timer pointer */
 {
 /* Check entire process table and give all process a higher priority. This
@@ -1324,7 +1338,7 @@ timer_t *tp;					/* watchdog timer pointer */
 /*===========================================================================*
  *				lock_send				     *
  *===========================================================================*/
-PUBLIC int lock_send(dst_e, m_ptr)
+int lock_send(dst_e, m_ptr)
 int dst_e;			/* to whom is message being sent? */
 message *m_ptr;			/* pointer to message buffer */
 {
@@ -1339,7 +1353,7 @@ message *m_ptr;			/* pointer to message buffer */
 /*===========================================================================*
  *				lock_enqueue				     *
  *===========================================================================*/
-PUBLIC void lock_enqueue(rp)
+void lock_enqueue(rp)
 struct proc *rp;		/* this process is now runnable */
 {
 /* Safe gateway to enqueue() for tasks. */
@@ -1351,7 +1365,7 @@ struct proc *rp;		/* this process is now runnable */
 /*===========================================================================*
  *				lock_dequeue				     *
  *===========================================================================*/
-PUBLIC void lock_dequeue(rp)
+void lock_dequeue(rp)
 struct proc *rp;		/* this process is no longer runnable */
 {
 /* Safe gateway to dequeue() for tasks. */
@@ -1370,7 +1384,7 @@ struct proc *rp;		/* this process is no longer runnable */
 /*===========================================================================*
  *				endpoint_lookup				     *
  *===========================================================================*/
-PUBLIC struct proc *endpoint_lookup(endpoint_t e)
+struct proc *endpoint_lookup(endpoint_t e)
 {
 	int n;
 
@@ -1383,11 +1397,11 @@ PUBLIC struct proc *endpoint_lookup(endpoint_t e)
  *				isokendpt_f				     *
  *===========================================================================*/
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-PUBLIC int isokendpt_f(file, line, e, p, fatalflag)
+int isokendpt_f(file, line, e, p, fatalflag)
 char *file;
 int line;
 #else
-PUBLIC int isokendpt_f(e, p, fatalflag)
+int isokendpt_f(e, p, fatalflag)
 #endif
 endpoint_t e;
 int *p, fatalflag;

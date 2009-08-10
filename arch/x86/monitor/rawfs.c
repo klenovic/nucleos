@@ -11,9 +11,6 @@
  *                23 Dec 1991
  *             Based on readfs by Paul Polderman
  */
-#define _POSIX_SOURCE   1
-#define _MINIX    1
-
 #include <nucleos/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -21,7 +18,6 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-//#include <sys/stat.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <servers/mfs/const.h>

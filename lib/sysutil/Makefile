@@ -4,4 +4,4 @@ libsys.a-obj-y := asynsend.o kmalloc.o kprintf.o kputc.o tickdelay.o get_randomn
 		  fkey_ctl.o micro_delay.o report.o taskcall.o read_tsc.o read_tsc_64.o \
 		  ser_putc.o stacktrace.o sys_hz.o timing.o profile_extern.o profile.o
 
-ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

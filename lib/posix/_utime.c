@@ -14,9 +14,9 @@
 #include <string.h>
 #include <utime.h>
 
-PUBLIC int utime(name, timp)
-_CONST char *name;
-_CONST struct utimbuf *timp;
+int utime(name, timp)
+const char *name;
+const struct utimbuf *timp;
 {
   message m;
 

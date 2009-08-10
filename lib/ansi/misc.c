@@ -10,38 +10,10 @@
 /*
  * misc - data and miscellaneous routines
  */
-/* $Header$ */
-
-#include	<ctype.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
-#if	defined(__BSD4_2)
-
-struct timeval {
-	long	tv_sec;		/* seconds */
-	long	tv_usec;	/* and microseconds */
-};
-
-struct timezone {
-	int	tz_minuteswest;	/* minutes west of Greenwich */
-	int	tz_dsttime;	/* type of dst correction */
-};
-
-int _gettimeofday(struct timeval *tp, struct timezone *tzp);
-
-#elif	!defined(_POSIX_SOURCE) && !defined(__USG)
-#if	!defined(_MINIX)		/* MINIX has no ftime() */
-struct timeb {
-	long	time;
-	unsigned short millitm;
-	short	timezone;
-	short	dstflag;
-};
-void _ftime(struct timeb *bp);
-#endif
-#endif
+#include <ctype.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include	"loc_time.h"
 
@@ -59,13 +31,8 @@ long	_timezone = 0;
 long	_dst_off = 60 * 60;
 int	_daylight = 0;
 
-#if	defined(__USG) || defined(_POSIX_SOURCE)
-
-#if	defined(__USG)
 long	timezone = 0;
 int	daylight = 0;
-#endif
-#endif
 
 static struct dsttype {
 	char ds_type;		/* Unknown, Julian, Zero-based or M */

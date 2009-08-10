@@ -39,7 +39,7 @@
 /*=========================================================================*
  *				arch_init_vm				   *
  *=========================================================================*/
-PUBLIC void arch_init_vm(mem_chunks)
+void arch_init_vm(mem_chunks)
 struct memory mem_chunks[NR_MEMS];
 {
 	phys_bytes high, bytes;
@@ -103,7 +103,7 @@ struct memory mem_chunks[NR_MEMS];
 /*===========================================================================*
  *				arch_map2vir				     *
  *===========================================================================*/
-PUBLIC vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
+vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
 {
 	vir_bytes bottom = CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys);
 
@@ -115,7 +115,7 @@ PUBLIC vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
 /*===========================================================================*
  *				arch_vir2map				     *
  *===========================================================================*/
-PUBLIC vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr)
+vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr)
 {
 	vir_bytes bottom = CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys);
 

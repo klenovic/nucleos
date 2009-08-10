@@ -35,9 +35,9 @@ extern u32_t system_hz;
 
 #define MILLIS_TO_TICKS(m)  (((m)*system_hz/1000)+1)
 
-_PROTOTYPE(static void el2_init, (dpeth_t *dep));
-_PROTOTYPE(static void el2_stop, (dpeth_t *dep));
-_PROTOTYPE( static void milli_delay, (unsigned long millis)		);
+static void el2_init(dpeth_t *dep);
+static void el2_stop(dpeth_t *dep);
+static void milli_delay(unsigned long millis);
 
 /*===========================================================================*
  *				el2_init				     *
@@ -201,9 +201,3 @@ static void milli_delay(unsigned long millis)
 }
 
 #endif /* ENABLE_3C503 */
-
-/** 3c503.c **/
-
-/*
- * $PchId: 3c503.c,v 1.3 2003/09/10 15:33:04 philip Exp $
- */

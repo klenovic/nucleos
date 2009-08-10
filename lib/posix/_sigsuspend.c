@@ -11,8 +11,8 @@
 #define sigsuspend _sigsuspend
 #include <signal.h>
 
-PUBLIC int sigsuspend(set)
-_CONST sigset_t *set;
+int sigsuspend(set)
+const sigset_t *set;
 {
   message m;
 

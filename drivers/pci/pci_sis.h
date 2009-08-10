@@ -20,7 +20,3 @@ Created:	Nov 2001 by Philip Homburg <philip@cs.vu.nl>
 #define SIS_ISABR_IRQ_D 0x44	/* IRQD routing */
 #define 	SIS_IRQ_DISABLED	0x80
 #define		SIS_IRQ_MASK		0x0F
-
-/*
- * $PchId: pci_sis.h,v 1.1 2001/12/06 20:22:52 philip Exp $
- */

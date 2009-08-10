@@ -15,11 +15,12 @@
 #include "fs.h"
 #include "vmnt.h"
 
+struct vmnt vmnt[NR_MNTS];
 
 /*===========================================================================*
  *                             get_free_vmnt				     *
  *===========================================================================*/
-PUBLIC struct vmnt *get_free_vmnt(short *index)
+struct vmnt *get_free_vmnt(short *index)
 {
   struct vmnt *vp;
   *index = 0;
@@ -33,7 +34,7 @@ PUBLIC struct vmnt *get_free_vmnt(short *index)
 /*===========================================================================*
  *                             find_vmnt				     *
  *===========================================================================*/
-PUBLIC struct vmnt *find_vmnt(int fs_e) 
+struct vmnt *find_vmnt(int fs_e) 
 {
   struct vmnt *vp;
   for (vp = &vmnt[0]; vp < &vmnt[NR_MNTS]; ++vp) {

@@ -11,7 +11,7 @@
 #define fork	_fork
 #include <unistd.h>
 
-PUBLIC pid_t fork()
+pid_t fork()
 {
   message m;
 

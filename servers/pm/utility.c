@@ -38,7 +38,7 @@
 /*===========================================================================*
  *				get_free_pid				     *
  *===========================================================================*/
-PUBLIC pid_t get_free_pid()
+pid_t get_free_pid()
 {
   static pid_t next_pid = INIT_PID + 1;		/* next pid to be assigned */
   register struct mproc *rmp;			/* check process table */
@@ -61,7 +61,7 @@ PUBLIC pid_t get_free_pid()
 /*===========================================================================*
  *				no_sys					     *
  *===========================================================================*/
-PUBLIC int no_sys()
+int no_sys()
 {
 /* A system call number not implemented by PM has been requested. */
   printf("PM: in no_sys, call nr %d from %d\n", call_nr, who_e);
@@ -71,7 +71,7 @@ PUBLIC int no_sys()
 /*===========================================================================*
  *				find_param				     *
  *===========================================================================*/
-PUBLIC char *find_param(name)
+char *find_param(name)
 const char *name;
 {
   register const char *namep;
@@ -91,7 +91,7 @@ const char *name;
 /*===========================================================================*
  *				proc_from_pid				     *
  *===========================================================================*/
-PUBLIC int proc_from_pid(mp_pid)
+int proc_from_pid(mp_pid)
 pid_t mp_pid;
 {
 	int rmp;
@@ -106,7 +106,7 @@ pid_t mp_pid;
 /*===========================================================================*
  *				pm_isokendpt			 	     *
  *===========================================================================*/
-PUBLIC int pm_isokendpt(int endpoint, int *proc)
+int pm_isokendpt(int endpoint, int *proc)
 {
 	*proc = _ENDPOINT_P(endpoint);
 	if(*proc < -NR_TASKS || *proc >= NR_PROCS)

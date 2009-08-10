@@ -13,10 +13,6 @@
 #ifndef _TTYENT_H
 #define _TTYENT_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 struct ttyent {
 	char	*ty_name;	/* Name of the terminal device. */
 	char	*ty_type;	/* Terminal type name (termcap(3)). */
@@ -24,9 +20,9 @@ struct ttyent {
 	char	**ty_init;	/* Initialization command, normally stty. */
 };
 
-_PROTOTYPE( struct ttyent *getttyent, (void)				);
-_PROTOTYPE( struct ttyent *getttynam, (const char *_name)		);
-_PROTOTYPE( int setttyent, (void)					);
-_PROTOTYPE( void endttyent, (void)					);
+struct ttyent *getttyent(void);
+struct ttyent *getttynam(const char *_name);
+int setttyent(void);
+void endttyent(void);
 
 #endif /* _TTYENT_H */

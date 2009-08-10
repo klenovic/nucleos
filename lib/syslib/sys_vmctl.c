@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_vmctl(endpoint_t who, int param, u32_t value)
+int sys_vmctl(endpoint_t who, int param, u32_t value)
 {
   message m;
   int r;
@@ -21,7 +21,7 @@ PUBLIC int sys_vmctl(endpoint_t who, int param, u32_t value)
   return(r);
 }
 
-PUBLIC int sys_vmctl_get_pagefault_i386(endpoint_t *who, u32_t *cr2, u32_t *err)
+int sys_vmctl_get_pagefault_i386(endpoint_t *who, u32_t *cr2, u32_t *err)
 {
   message m;
   int r;
@@ -37,7 +37,7 @@ PUBLIC int sys_vmctl_get_pagefault_i386(endpoint_t *who, u32_t *cr2, u32_t *err)
   return(r);
 }
 
-PUBLIC int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3)
+int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3)
 {
   message m;
   int r;
@@ -51,7 +51,7 @@ PUBLIC int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3)
   return(r);
 }
 
-PUBLIC int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem,
+int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem,
 	vir_bytes *len, int *wrflag)
 {
   message m;

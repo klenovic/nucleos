@@ -11,7 +11,7 @@
 #define getdents _getdents
 #include <dirent.h>
 
-PUBLIC ssize_t getdents(fd, buffer, nbytes)
+ssize_t getdents(fd, buffer, nbytes)
 int fd;
 struct dirent *buffer;
 size_t nbytes;

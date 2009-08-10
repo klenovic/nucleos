@@ -27,7 +27,7 @@
 /*===========================================================================*
  *				do_times				     *
  *===========================================================================*/
-PUBLIC int do_times(m_ptr)
+int do_times(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_times().  Retrieve the accounting information. */

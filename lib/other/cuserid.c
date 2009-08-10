@@ -25,7 +25,7 @@
 char *cuserid(user_name)
 char *user_name;
 {
-  PRIVATE char userid[L_cuserid];
+  static char userid[L_cuserid];
   struct passwd *pw_entry;
 
   if (user_name == (char *)NULL) user_name = userid;

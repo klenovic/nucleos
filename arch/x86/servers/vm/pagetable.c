@@ -90,7 +90,7 @@ u32_t page_directories_phys, *page_directories = NULL;
 /*===========================================================================*
  *				pt_sanitycheck		     		     *
  *===========================================================================*/
-PUBLIC void pt_sanitycheck(pt_t *pt, char *file, int line)
+void pt_sanitycheck(pt_t *pt, char *file, int line)
 {
 /* Basic pt sanity check. */
 	int i;
@@ -114,7 +114,7 @@ PUBLIC void pt_sanitycheck(pt_t *pt, char *file, int line)
 /*===========================================================================*
  *				aalloc			     		     *
  *===========================================================================*/
-PRIVATE void *aalloc(size_t bytes)
+static void *aalloc(size_t bytes)
 {
 /* Page-aligned malloc(). only used if vm_allocpages can't be used.  */
 	u32_t b;
@@ -129,7 +129,7 @@ PRIVATE void *aalloc(size_t bytes)
 /*===========================================================================*
  *				findhole		     		     *
  *===========================================================================*/
-PRIVATE u32_t findhole(pt_t *pt, u32_t virbytes, u32_t vmin, u32_t vmax)
+static u32_t findhole(pt_t *pt, u32_t virbytes, u32_t vmin, u32_t vmax)
 {
 /* Find a space in the virtual address space of pageteble 'pt',
  * between page-aligned BYTE offsets vmin and vmax, to fit
@@ -213,7 +213,7 @@ PRIVATE u32_t findhole(pt_t *pt, u32_t virbytes, u32_t vmin, u32_t vmax)
 /*===========================================================================*
  *				vm_freepages		     		     *
  *===========================================================================*/
-PRIVATE void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
+static void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
 {
 	vm_assert(reason >= 0 && reason < VMP_CATEGORIES);
 	if(vir >= vmp->vm_stacktop) {
@@ -233,7 +233,7 @@ PRIVATE void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
 /*===========================================================================*
  *				vm_getsparepage		     		     *
  *===========================================================================*/
-PRIVATE void *vm_getsparepage(u32_t *phys)
+static void *vm_getsparepage(u32_t *phys)
 {
 	int s;
 	vm_assert(missing_spares >= 0 && missing_spares <= SPAREPAGES);
@@ -255,7 +255,7 @@ PRIVATE void *vm_getsparepage(u32_t *phys)
 /*===========================================================================*
  *				vm_checkspares		     		     *
  *===========================================================================*/
-PRIVATE void *vm_checkspares(void)
+static void *vm_checkspares(void)
 {
 	int s, n = 0;
 	static int total = 0, worst = 0;
@@ -280,7 +280,7 @@ PRIVATE void *vm_checkspares(void)
 /*===========================================================================*
  *				vm_allocpages		     		     *
  *===========================================================================*/
-PUBLIC void *vm_allocpages(phys_bytes *phys, int pages, int reason)
+void *vm_allocpages(phys_bytes *phys, int pages, int reason)
 {
 /* Allocate a number of pages for use by VM itself. */
 	phys_bytes newpage;
@@ -347,7 +347,7 @@ PUBLIC void *vm_allocpages(phys_bytes *phys, int pages, int reason)
 /*===========================================================================*
  *				pt_ptalloc		     		     *
  *===========================================================================*/
-PRIVATE int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
+static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 {
 /* Allocate a page table and write its address into the page directory. */
 	int i;
@@ -386,7 +386,7 @@ PRIVATE int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 /*===========================================================================*
  *				pt_writemap		     		     *
  *===========================================================================*/
-PUBLIC int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
+int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 	size_t bytes, u32_t flags, u32_t writemapflags)
 {
 /* Write mapping into page table. Allocate a new page table if necessary. */
@@ -487,7 +487,7 @@ PUBLIC int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 /*===========================================================================*
  *				pt_new			     		     *
  *===========================================================================*/
-PUBLIC int pt_new(pt_t *pt)
+int pt_new(pt_t *pt)
 {
 /* Allocate a pagetable root. On i386, allocate a page-aligned page directory
  * and set them to 0 (indicating no page tables are allocated). Lookup
@@ -518,7 +518,7 @@ PUBLIC int pt_new(pt_t *pt)
 /*===========================================================================*
  *                              pt_init                                      *
  *===========================================================================*/
-PUBLIC void pt_init(void)
+void pt_init(void)
 {
 /* By default, the kernel gives us a data segment with pre-allocated
  * memory that then can't grow. We want to be able to allocate memory
@@ -662,7 +662,7 @@ PUBLIC void pt_init(void)
 /*===========================================================================*
  *				pt_bind			     		     *
  *===========================================================================*/
-PUBLIC int pt_bind(pt_t *pt, struct vmproc *who)
+int pt_bind(pt_t *pt, struct vmproc *who)
 {
 	int slot;
 
@@ -690,7 +690,7 @@ PUBLIC int pt_bind(pt_t *pt, struct vmproc *who)
 /*===========================================================================*
  *				pt_free			     		     *
  *===========================================================================*/
-PUBLIC void pt_free(pt_t *pt)
+void pt_free(pt_t *pt)
 {
 /* Free memory associated with this pagetable. */
 	int i;
@@ -720,7 +720,7 @@ PUBLIC void pt_free(pt_t *pt)
 /*===========================================================================*
  *				pt_mapkernel		     		     *
  *===========================================================================*/
-PUBLIC int pt_mapkernel(pt_t *pt)
+int pt_mapkernel(pt_t *pt)
 {
 	int r;
 	static int pde = -1, do_bigpage = 0;
@@ -769,7 +769,7 @@ PUBLIC int pt_mapkernel(pt_t *pt)
 /*===========================================================================*
  *				pt_freerange		     		     *
  *===========================================================================*/
-PUBLIC void pt_freerange(pt_t *pt, vir_bytes low, vir_bytes high)
+void pt_freerange(pt_t *pt, vir_bytes low, vir_bytes high)
 {
 /* Free memory allocated by pagetable functions in this range. */
 	int pde;
@@ -799,7 +799,7 @@ PUBLIC void pt_freerange(pt_t *pt, vir_bytes low, vir_bytes high)
 /*===========================================================================*
  *				pt_cycle		     		     *
  *===========================================================================*/
-PUBLIC void pt_cycle(void)
+void pt_cycle(void)
 {
 	vm_checkspares();
 }
@@ -851,7 +851,7 @@ static u32_t ismapped = MAP_NONE;
 /*===========================================================================*
  *                              phys_writeaddr                               *
  *===========================================================================*/
-PUBLIC void phys_writeaddr(phys_bytes addr, phys_bytes v1, phys_bytes v2)
+void phys_writeaddr(phys_bytes addr, phys_bytes v1, phys_bytes v2)
 {
 	phys_bytes offset;
 
@@ -869,7 +869,7 @@ PUBLIC void phys_writeaddr(phys_bytes addr, phys_bytes v1, phys_bytes v2)
 /*===========================================================================*
  *                              phys_readaddr                                *
  *===========================================================================*/
-PUBLIC void phys_readaddr(phys_bytes addr, phys_bytes *v1, phys_bytes *v2)
+void phys_readaddr(phys_bytes addr, phys_bytes *v1, phys_bytes *v2)
 {
 	phys_bytes offset;
 

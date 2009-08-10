@@ -14,8 +14,6 @@
 char version[]=   "2.20";
 
 #define nil 0
-#define _POSIX_SOURCE 1
-#define _MINIX  1
 #include <nucleos/nucleos.h>
 #include <nucleos/stringify.h>
 #include <nucleos/stddef.h>

@@ -28,10 +28,12 @@
 
 #include "vnode.h"
 
+struct filp filp[NR_FILPS];
+
 /*===========================================================================*
  *				get_fd					     *
  *===========================================================================*/
-PUBLIC int get_fd(int start, mode_t bits, int *k, struct filp **fpt)
+int get_fd(int start, mode_t bits, int *k, struct filp **fpt)
 {
 /* Look for a free file descriptor and a free filp slot.  Fill in the mode word
  * in the latter, but don't claim either one yet, since the open() or creat()
@@ -77,7 +79,7 @@ PUBLIC int get_fd(int start, mode_t bits, int *k, struct filp **fpt)
 /*===========================================================================*
  *				get_filp				     *
  *===========================================================================*/
-PUBLIC struct filp *get_filp(fild)
+struct filp *get_filp(fild)
 int fild;			/* file descriptor */
 {
 /* See if 'fild' refers to a valid file descr.  If so, return its filp ptr. */
@@ -88,7 +90,7 @@ int fild;			/* file descriptor */
 /*===========================================================================*
  *				get_filp2				     *
  *===========================================================================*/
-PUBLIC struct filp *get_filp2(rfp, fild)
+struct filp *get_filp2(rfp, fild)
 register struct fproc *rfp;
 int fild;			/* file descriptor */
 {
@@ -109,7 +111,7 @@ int fild;			/* file descriptor */
 /*===========================================================================*
  *				find_filp				     *
  *===========================================================================*/
-PUBLIC struct filp *find_filp(register struct vnode *vp, mode_t bits)
+struct filp *find_filp(register struct vnode *vp, mode_t bits)
 {
 /* Find a filp slot that refers to the vnode 'vp' in a way as described
  * by the mode bit 'bits'. Used for determining whether somebody is still
@@ -133,7 +135,7 @@ PUBLIC struct filp *find_filp(register struct vnode *vp, mode_t bits)
 /*===========================================================================*
  *				inval_filp				     *
  *===========================================================================*/
-PUBLIC int inval_filp(struct filp *fp)
+int inval_filp(struct filp *fp)
 {
     int f, fd, n = 0;
     for(f = 0; f < NR_PROCS; f++) {

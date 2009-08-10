@@ -15,18 +15,14 @@
 
 /* AC97 Mixer and Mode control function prototypes */
 
-FORWARD _PROTOTYPE( int  AC97_read, 
-		(DEV_STRUCT * pCC, u16_t wAddr, u16_t *data) );
-FORWARD _PROTOTYPE( int  AC97_write, 
-		(DEV_STRUCT * pCC, u16_t wAddr, u16_t wData) );
-FORWARD _PROTOTYPE( void set_src_sync_state, (int state) );
-FORWARD _PROTOTYPE( int  AC97_write_unsynced, 
-		(DEV_STRUCT * pCC, u16_t wAddr, u16_t wData) );
-FORWARD _PROTOTYPE( int  AC97_read_unsynced, 
-		(DEV_STRUCT * pCC, u16_t wAddr, u16_t *data) );
-FORWARD _PROTOTYPE( void set_nice_volume, (void) );
-FORWARD _PROTOTYPE( int AC97_get_volume, (struct volume_level *level) );
-FORWARD _PROTOTYPE( int AC97_set_volume, (struct volume_level *level) );
+static int  AC97_read(DEV_STRUCT * pCC, u16_t wAddr, u16_t *data);
+static int  AC97_write(DEV_STRUCT * pCC, u16_t wAddr, u16_t wData);
+static void set_src_sync_state(int state);
+static int  AC97_write_unsynced(DEV_STRUCT * pCC, u16_t wAddr, u16_t wData);
+static int  AC97_read_unsynced(DEV_STRUCT * pCC, u16_t wAddr, u16_t *data);
+static void set_nice_volume(void);
+static int AC97_get_volume(struct volume_level *level);
+static int AC97_set_volume(struct volume_level *level);
 
 
 
@@ -67,7 +63,7 @@ static u32_t SrcSyncState = 0x00010000UL;
 static DEV_STRUCT *dev;
 
 
-PRIVATE void set_src_sync_state (int state)
+static void set_src_sync_state (int state)
 {
     if (state < 0)
         SrcSyncState = SRC_UNSYNCED;
@@ -78,7 +74,7 @@ PRIVATE void set_src_sync_state (int state)
 }
 
 
-PRIVATE int AC97_write (DEV_STRUCT * pCC, u16_t wAddr, u16_t wData)
+static int AC97_write (DEV_STRUCT * pCC, u16_t wAddr, u16_t wData)
 {
 u32_t dtemp, i;
 u16_t  wBaseAddr = pCC->base;
@@ -142,7 +138,7 @@ u16_t  wBaseAddr = pCC->base;
 }
 
 
-PRIVATE int AC97_read (DEV_STRUCT * pCC, u16_t wAddr, u16_t *data)
+static int AC97_read (DEV_STRUCT * pCC, u16_t wAddr, u16_t *data)
 {
 u32_t dtemp, i;
 u16_t  base = pCC->base;
@@ -215,7 +211,7 @@ u16_t  base = pCC->base;
 }
 
 
-PRIVATE int AC97_write_unsynced (DEV_STRUCT * pCC, u16_t wAddr, u16_t wData)
+static int AC97_write_unsynced (DEV_STRUCT * pCC, u16_t wAddr, u16_t wData)
 {
     /* wait for WIP to go away */
     if (WaitBitd (pCC->base + CODEC_READ, 30, 0, WIP_TIMEOUT))
@@ -227,7 +223,7 @@ PRIVATE int AC97_write_unsynced (DEV_STRUCT * pCC, u16_t wAddr, u16_t wData)
 }
 
 
-PRIVATE int AC97_read_unsynced (DEV_STRUCT * pCC, u16_t wAddr, u16_t *data)
+static int AC97_read_unsynced (DEV_STRUCT * pCC, u16_t wAddr, u16_t *data)
 {
 u32_t dtemp;
 
@@ -315,7 +311,7 @@ int AC97_init( DEV_STRUCT * pCC ) {
 }
 
 
-PRIVATE void set_nice_volume(void) {
+static void set_nice_volume(void) {
   /* goofy code to set the DAC1 channel to an audibe volume 
      to be able to test it without using the mixer */
   
@@ -346,7 +342,7 @@ PRIVATE void set_nice_volume(void) {
 }
 
 
-PRIVATE int get_volume(u8_t *left, u8_t *right, int cmd) {
+static int get_volume(u8_t *left, u8_t *right, int cmd) {
 	u16_t value;
 
 	AC97_read_unsynced(dev, (u16_t)cmd, &value);
@@ -358,7 +354,7 @@ PRIVATE int get_volume(u8_t *left, u8_t *right, int cmd) {
 }
 
 
-PRIVATE int set_volume(int left, int right, int cmd) {
+static int set_volume(int left, int right, int cmd) {
 	u16_t waarde;
 
 	waarde = (u16_t)((left<<8)|right);
@@ -399,7 +395,7 @@ int AC97_get_set_volume(struct volume_level *level, int flag) {
 }
 
 
-PRIVATE int AC97_get_volume(struct volume_level *level) {
+static int AC97_get_volume(struct volume_level *level) {
 	int cmd;
 	u8_t left;
 	u8_t right;
@@ -461,7 +457,7 @@ PRIVATE int AC97_get_volume(struct volume_level *level) {
 }
 
 
-PRIVATE int AC97_set_volume(struct volume_level *level) {
+static int AC97_set_volume(struct volume_level *level) {
 	int cmd;
 	int left;
 	int right;

@@ -13,7 +13,7 @@
 #include <lib.h>
 #include <nucleos/time.h>
 
-PUBLIC int select(int nfds,
+int select(int nfds,
 	fd_set *readfds, fd_set *writefds, fd_set *errorfds,
 	struct timeval *timeout)
 {

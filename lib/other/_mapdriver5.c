@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 
-PUBLIC int mapdriver5(label, len, major, dev_style, force)
+int mapdriver5(label, len, major, dev_style, force)
 char *label;
 size_t len;
 int major;

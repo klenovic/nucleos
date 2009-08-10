@@ -10,7 +10,7 @@
 #include <lib.h>
 #include <unistd.h>
 
-PUBLIC int allocmem(size, base)
+int allocmem(size, base)
 phys_bytes size;			/* size of mem chunk requested */
 phys_bytes *base;			/* return base address */
 {

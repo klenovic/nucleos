@@ -34,7 +34,7 @@
 /*===========================================================================*
  *				intr_init				     *
  *===========================================================================*/
-PUBLIC int intr_init(mine)
+int intr_init(mine)
 int mine;
 {
 /* Initialize the 8259s, finishing with all interrupts disabled.  This is
@@ -81,7 +81,7 @@ int mine;
 /*===========================================================================*
  *				intr_disabled			     	     *
  *===========================================================================*/
-PUBLIC int intr_disabled(void)
+int intr_disabled(void)
 {
 	if(!(read_cpu_flags() & X86_FLAG_I))
 		return 1;

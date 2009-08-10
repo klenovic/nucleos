@@ -39,11 +39,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)mktemp.c	8.1 (Berkeley) 6/4/93";
-#endif /* LIBC_SCCS and not lint */
-
 #include <nucleos/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -135,7 +130,3 @@ _gettemp(path, doopen)
 	}
 	/*NOTREACHED*/
 }
-
-/*
- * $PchId: mktemp.c,v 1.3 1995/11/20 19:10:39 philip Exp $
- */

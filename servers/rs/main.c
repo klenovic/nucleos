@@ -24,20 +24,20 @@
 #include <kernel/type.h>
 
 /* Declare some local functions. */
-FORWARD _PROTOTYPE(void init_server, (void)				);
-FORWARD _PROTOTYPE(void sig_handler, (void)				);
-FORWARD _PROTOTYPE(void get_work, (message *m)				);
-FORWARD _PROTOTYPE(void reply, (int whom, message *m_out)		);
+static void init_server(void);
+static void sig_handler(void);
+static void get_work(message *m);
+static void reply(int whom, message *m_out);
 
 /* Data buffers to retrieve info during initialization. */
-PRIVATE struct boot_image image[NR_BOOT_PROCS];
+static struct boot_image image[NR_BOOT_PROCS];
 
 long rs_verbose = 0;
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(void)
+int main(void)
 {
 /* This is the main routine of this service. The main loop consists of 
  * three major activities: getting new work, processing the work, and
@@ -140,7 +140,7 @@ PUBLIC int main(void)
 /*===========================================================================*
  *				init_server                                  *
  *===========================================================================*/
-PRIVATE void init_server(void)
+static void init_server(void)
 {
 /* Initialize the reincarnation server. */
   struct sigaction sa;
@@ -190,7 +190,7 @@ PRIVATE void init_server(void)
 /*===========================================================================*
  *				sig_handler                                  *
  *===========================================================================*/
-PRIVATE void sig_handler()
+static void sig_handler()
 {
   sigset_t sigset;
   int sig;
@@ -206,7 +206,7 @@ PRIVATE void sig_handler()
 /*===========================================================================*
  *				get_work                                     *
  *===========================================================================*/
-PRIVATE void get_work(m_in)
+static void get_work(m_in)
 message *m_in;				/* pointer to message */
 {
     int s;				/* receive status */
@@ -219,7 +219,7 @@ message *m_in;				/* pointer to message */
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PRIVATE void reply(who, m_out)
+static void reply(who, m_out)
 int who;                           	/* replyee */
 message *m_out;                         /* reply message */
 {

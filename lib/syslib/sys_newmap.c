@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_newmap(proc, ptr)
+int sys_newmap(proc, ptr)
 int proc;			/* process whose map is to be changed */
 struct mem_map *ptr;		/* pointer to new map */
 {

@@ -34,15 +34,15 @@
 #include <string.h>
 
 /* Function prototype for the profiling clock handler. */ 
-FORWARD _PROTOTYPE( int profile_clock_handler, (irq_hook_t *hook) );
+static int profile_clock_handler(irq_hook_t *hook);
 
 /* A hook for the profiling clock interrupt handler. */
-PRIVATE irq_hook_t profile_clock_hook;
+static irq_hook_t profile_clock_hook;
 
 /*===========================================================================*
  *			init_profile_clock				     *
  *===========================================================================*/
-PUBLIC void init_profile_clock(u32_t freq)
+void init_profile_clock(u32_t freq)
 {
   int r, irq;
 
@@ -61,7 +61,7 @@ PUBLIC void init_profile_clock(u32_t freq)
 /*===========================================================================*
  *			profile_clock_stop				     *
  *===========================================================================*/
-PUBLIC void stop_profile_clock()
+void stop_profile_clock()
 {
   intr_disable();
   arch_stop_profile_clock();
@@ -75,7 +75,7 @@ PUBLIC void stop_profile_clock()
 /*===========================================================================*
  *			profile_clock_handler                           *
  *===========================================================================*/
-PRIVATE int profile_clock_handler(hook)
+static int profile_clock_handler(hook)
 irq_hook_t *hook;
 {
 /* This executes on every tick of the CMOS timer. */
@@ -140,13 +140,13 @@ irq_hook_t *hook;
 struct cprof_tbl_s cprof_tbl[CPROF_TABLE_SIZE_KERNEL];
 
 /* Function that returns table size. */
-PUBLIC int profile_get_tbl_size(void)
+int profile_get_tbl_size(void)
 {
   return CPROF_TABLE_SIZE_KERNEL;
 }
 
 /* Function that returns on which execution of procentry to announce. */
-PUBLIC int profile_get_announce(void)
+int profile_get_announce(void)
 {
   return CPROF_ACCOUNCE_KERNEL;
 }
@@ -155,7 +155,7 @@ PUBLIC int profile_get_announce(void)
  * The kernel "announces" its control struct and table locations
  * to itself through this function.
  */
-PUBLIC void profile_register(ctl_ptr, tbl_ptr)
+void profile_register(ctl_ptr, tbl_ptr)
 void *ctl_ptr;
 void *tbl_ptr;
 {

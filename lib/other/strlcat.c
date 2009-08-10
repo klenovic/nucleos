@@ -33,17 +33,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$OpenBSD: strlcat.c,v 1.2 1999/06/17 16:28:58 millert Exp $";
-#endif /* LIBC_SCCS and not lint */
-#ifndef lint
-static const char rcsid[] =
-  "$FreeBSD: src/lib/libc/string/strlcat.c,v 1.2.4.2 2001/07/09 23:30:06 obrien Exp $";
-#endif
-
-#define _MINIX_SOURCE
-
 #include <nucleos/types.h>
 #include <string.h>
 
@@ -83,7 +72,3 @@ size_t strlcat(dst, src, siz)
 
 	return(dlen + (s - src));	/* count does not include NUL */
 }
-
-/*
- * $PchId: strlcat.c,v 1.1 2004/11/02 12:29:23 philip Exp philip $
- */

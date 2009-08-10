@@ -41,16 +41,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)sethostent.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$From: sethostent.c,v 8.5 1996/09/28 06:51:07 vixie Exp $";
-#else
-static char rcsid[] = "$OpenBSD: sethostent.c,v 1.1 1997/03/12 10:42:11 downsj Exp $";
-#endif
-#endif /* LIBC_SCCS and not lint */
-
 #ifdef notyet
 #include <nucleos/types.h>
 #include <sys/param.h>
@@ -84,7 +74,3 @@ endhostent()
 	_res.options &= ~(RES_STAYOPEN | RES_USEVC);
 	_res_close();
 }
-
-/*
- * $PchId: sethostent.c,v 1.2 2000/04/01 18:27:16 philip Exp $
- */

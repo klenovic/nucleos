@@ -29,7 +29,7 @@
 /*===========================================================================*
  *				do_copy					     *
  *===========================================================================*/
-PUBLIC int do_copy(m_ptr)
+int do_copy(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_vircopy() and sys_physcopy().  Copy data using virtual or

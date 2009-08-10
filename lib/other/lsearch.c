@@ -16,19 +16,17 @@
 
 #include <nucleos/stddef.h>
 
-_PROTOTYPE( char *lsearch, (char *key, char *base,
-			    unsigned *count, unsigned width,
-			    int (*keycmp)(const void *, const void *)));
-_PROTOTYPE( char *lfind, (char *key, char *base,
-			    unsigned *count, unsigned width,
-			    int (*keycmp)(const void *, const void *)));
+char *lsearch(char *key, char *base, unsigned *count, unsigned width,
+	      int (*keycmp)(const void *, const void *));
+char *lfind(char *key, char *base, unsigned *count, unsigned width,
+	    int (*keycmp)(const void *, const void *));
 
 char *lsearch(key, base, count, width, keycmp)
 char *key;
 char *base;
 unsigned *count;
 unsigned width;
-_PROTOTYPE( int (*keycmp), (const void *, const void *));
+int (*keycmp)(const void *, const void *);
 {
   char *entry;
   char *last = base + *count * width;
@@ -47,7 +45,7 @@ char *key;
 char *base;
 unsigned *count;
 unsigned width;
-_PROTOTYPE( int (*keycmp), (const void *, const void *));
+int (*keycmp)(const void *, const void *);
 {
   char *entry;
   char *last = base + *count * width;

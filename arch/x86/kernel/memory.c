@@ -22,18 +22,18 @@
 #include <kernel/proto.h>
 
 /* VM functions and data. */
-PRIVATE u32_t vm_cr3;
-PUBLIC u32_t kernel_cr3;
+static u32_t vm_cr3;
+u32_t kernel_cr3;
 extern u32_t cswitch;
 u32_t last_cr3 = 0;
 
 #define HASPT(procptr) ((procptr)->p_seg.p_cr3 != 0)
 
-FORWARD _PROTOTYPE( void phys_put32, (phys_bytes addr, u32_t value)	);
-FORWARD _PROTOTYPE( u32_t phys_get32, (phys_bytes addr)			);
-FORWARD _PROTOTYPE( void vm_set_cr3, (u32_t value)			);
-FORWARD _PROTOTYPE( void set_cr3, (void)				);
-FORWARD _PROTOTYPE( void vm_enable_paging, (void)			);
+static void phys_put32(phys_bytes addr, u32_t value);
+static u32_t phys_get32(phys_bytes addr);
+static void vm_set_cr3(u32_t value);
+static void set_cr3(void);
+static void vm_enable_paging(void);
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 #define vmassert(t) { \
@@ -44,7 +44,7 @@ FORWARD _PROTOTYPE( void vm_enable_paging, (void)			);
 
 /* *** Internal VM Functions *** */
 
-PUBLIC void vm_init(void)
+void vm_init(void)
 {
 	int o;
 	phys_bytes p, pt_size;
@@ -128,14 +128,14 @@ PUBLIC void vm_init(void)
 	vm_running = 1;
 }
 
-PRIVATE void phys_put32(addr, value)
+static void phys_put32(addr, value)
 phys_bytes addr;
 u32_t value;
 {
 	phys_copy(vir2phys((vir_bytes)&value), addr, sizeof(value));
 }
 
-PRIVATE u32_t phys_get32(addr)
+static u32_t phys_get32(addr)
 phys_bytes addr;
 {
 	u32_t value;
@@ -145,19 +145,19 @@ phys_bytes addr;
 	return value;
 }
 
-PRIVATE void vm_set_cr3(value)
+static void vm_set_cr3(value)
 u32_t value;
 {
 	vm_cr3= value;
 	level0(set_cr3);
 }
 
-PRIVATE void set_cr3()
+static void set_cr3()
 {
 	write_cr3(vm_cr3);
 }
 
-PRIVATE void vm_enable_paging(void)
+static void vm_enable_paging(void)
 {
 	u32_t cr0, cr4;
 	int psok, pgeok;
@@ -187,7 +187,7 @@ PRIVATE void vm_enable_paging(void)
 	write_cr4(cr4);
 }
 
-PUBLIC vir_bytes alloc_remote_segment(u32_t *selector,
+vir_bytes alloc_remote_segment(u32_t *selector,
 	segframe_t *segments, int index, phys_bytes phys, vir_bytes size,
 	int priv)
 {
@@ -212,7 +212,7 @@ PUBLIC vir_bytes alloc_remote_segment(u32_t *selector,
 	return offset;
 }
 
-PUBLIC phys_bytes umap_remote(struct proc* rp, int seg,
+phys_bytes umap_remote(struct proc* rp, int seg,
 	vir_bytes vir_addr, vir_bytes bytes)
 {
 /* Calculate the physical memory address for a given virtual address. */
@@ -235,7 +235,7 @@ PUBLIC phys_bytes umap_remote(struct proc* rp, int seg,
 /*===========================================================================*
  *                              umap_local                                   *
  *===========================================================================*/
-PUBLIC phys_bytes umap_local(rp, seg, vir_addr, bytes)
+phys_bytes umap_local(rp, seg, vir_addr, bytes)
 register struct proc *rp;       /* pointer to proc table entry for process */
 int seg;                        /* T, D, or S segment */
 vir_bytes vir_addr;             /* virtual address in bytes within the seg */
@@ -272,7 +272,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 /*===========================================================================*
  *                              umap_virtual                                 *
  *===========================================================================*/
-PUBLIC phys_bytes umap_virtual(rp, seg, vir_addr, bytes)
+phys_bytes umap_virtual(rp, seg, vir_addr, bytes)
 register struct proc *rp;       /* pointer to proc table entry for process */
 int seg;                        /* T, D, or S segment */
 vir_bytes vir_addr;             /* virtual address in bytes within the seg */
@@ -322,7 +322,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 /*===========================================================================*
  *                              vm_lookup                                    *
  *===========================================================================*/
-PUBLIC int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *ptent)
+int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *ptent)
 {
 	u32_t *root, *pt;
 	int pde, pte;
@@ -445,7 +445,7 @@ int vm_copy(vir_bytes src, struct proc *srcproc,
 /*===========================================================================*
  *                              vm_contiguous                                *
  *===========================================================================*/
-PUBLIC int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
+int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
 {
 	int first = 1, r, boundaries = 0;
 	u32_t prev_phys, po;
@@ -509,7 +509,7 @@ int vm_checkrange_verbose = 0;
 /*===========================================================================*
  *                              vm_checkrange                                *
  *===========================================================================*/
-PUBLIC int vm_checkrange(struct proc *caller, struct proc *target,
+int vm_checkrange(struct proc *caller, struct proc *target,
 	vir_bytes vir, vir_bytes bytes, int wrfl, int checkonly)
 {
 	u32_t flags, po, v;
@@ -700,7 +700,7 @@ void vm_print(u32_t *root)
 /*===========================================================================*
  *				virtual_copy_f				     *
  *===========================================================================*/
-PUBLIC int virtual_copy_f(src_addr, dst_addr, bytes, vmcheck)
+int virtual_copy_f(src_addr, dst_addr, bytes, vmcheck)
 struct vir_addr *src_addr;	/* source virtual address */
 struct vir_addr *dst_addr;	/* destination virtual address */
 vir_bytes bytes;		/* # of bytes to copy  */
@@ -809,7 +809,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 /*===========================================================================*
  *				data_copy				     *
  *===========================================================================*/
-PUBLIC int data_copy(
+int data_copy(
 	endpoint_t from_proc, vir_bytes from_addr,
 	endpoint_t to_proc, vir_bytes to_addr,
 	size_t bytes)
@@ -828,7 +828,7 @@ PUBLIC int data_copy(
 /*===========================================================================*
  *				arch_pre_exec				     *
  *===========================================================================*/
-PUBLIC int arch_pre_exec(struct proc *pr, u32_t ip, u32_t sp)
+int arch_pre_exec(struct proc *pr, u32_t ip, u32_t sp)
 {
 /* wipe extra LDT entries, set program counter, and stack pointer. */
 	memset(pr->p_seg.p_ldt + EXTRA_LDT_INDEX, 0,
@@ -840,7 +840,7 @@ PUBLIC int arch_pre_exec(struct proc *pr, u32_t ip, u32_t sp)
 /*===========================================================================*
  *				arch_umap				     *
  *===========================================================================*/
-PUBLIC int arch_umap(struct proc *pr, vir_bytes offset, vir_bytes count,
+int arch_umap(struct proc *pr, vir_bytes offset, vir_bytes count,
 	int seg, phys_bytes *addr)
 {
 	switch(seg) {
@@ -855,5 +855,3 @@ PUBLIC int arch_umap(struct proc *pr, vir_bytes offset, vir_bytes count,
 	 */
 	return EINVAL;
 }
-
-

@@ -12,8 +12,6 @@
 
 // adds prefix to input
 #define MNX(x)  mnx_ ## x
-#define EXTERN
-
 #define NUCS_LEVEL_TRACE  1
 
 #define NUCS_TRACE(level,msg,args...)                             \

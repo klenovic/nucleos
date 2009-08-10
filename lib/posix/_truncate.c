@@ -13,7 +13,7 @@
 #define ftruncate	_ftruncate
 #include <unistd.h>
 
-PUBLIC int truncate(const char *_path, off_t _length)
+int truncate(const char *_path, off_t _length)
 {
   message m;
   m.m2_p1 = (char *) _path;
@@ -23,7 +23,7 @@ PUBLIC int truncate(const char *_path, off_t _length)
   return(_syscall(FS, TRUNCATE, &m));
 }
 
-PUBLIC int ftruncate(int _fd, off_t _length)
+int ftruncate(int _fd, off_t _length)
 {
   message m;
   m.m2_l1 = _length;

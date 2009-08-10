@@ -25,12 +25,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)gethostnamadr.c	6.41 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
-#ifdef _MINIX
 #include <nucleos/types.h>
 #include <ctype.h>
 #include <errno.h>
@@ -44,47 +38,28 @@ static char sccsid[] = "@(#)gethostnamadr.c	6.41 (Berkeley) 6/1/90";
 #include <net/gen/inet.h>
 #include <net/gen/resolv.h>
 #include <net/gen/socket.h>
-#else
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <ctype.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <errno.h>
-#include <arpa/inet.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
-#endif /* AMOEABA */
 
 #define	MAXALIASES	35
 #define	MAXADDRS	35
 
 static char *h_addr_ptrs[MAXADDRS + 1];
 
-#ifdef _MINIX
 struct in_addr
 {
 	ipaddr_t s_addr;
 };
 union querybuf;
 
-extern int dn_skipname _ARGS(( const u_char *comp_dn, const u_char *eom ));
+extern int dn_skipname(const u_char *comp_dn, const u_char *eom);
 #define getshort _getshort
-static struct hostent *getanswer _ARGS(( union querybuf *answer, int anslen, 
-	int iquery ));
+static struct hostent *getanswer(union querybuf *answer, int anslen, int iquery);
 #define bcmp memcmp
 #define bcopy(s, d, l) memcpy(d, s, l)
-#endif /* _MINIX */
 
 static struct hostent host;
 static char *host_aliases[MAXALIASES];
 static char hostbuf[BUFSIZ+1];
 static struct in_addr host_addr;
-
-#ifndef _MINIX
-char *strpbrk();
-#endif /* !_MINIX */
 
 #if PACKETSZ > 1024
 #define	MAXPACKET	PACKETSZ
@@ -250,10 +225,10 @@ getanswer(answer, anslen, iquery)
 
 struct hostent *
 gethostbyname(name)
-	_CONST char *name;
+	const char *name;
 {
 	querybuf_t buf;
-	register _CONST char *cp;
+	register const char *cp;
 	int n;
 
 	/*

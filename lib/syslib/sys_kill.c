@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_kill(proc, signr)
+int sys_kill(proc, signr)
 int proc;			/* which proc has exited */
 int signr;			/* signal number: 1 - 16 */
 {

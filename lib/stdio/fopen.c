@@ -10,15 +10,11 @@
 /*
  * fopen.c - open a stream
  */
-/* $Header: /cvsup/minix/src/lib/stdio/fopen.c,v 1.4 2006/02/02 16:59:07 beng Exp $ */
-
-#if	defined(_POSIX_SOURCE)
-#include	<nucleos/types.h>
-#endif
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	"loc_incl.h"
-#include	<sys/stat.h>
+#include <nucleos/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "loc_incl.h"
+#include <sys/stat.h>
 
 #define	PMODE		0666
 

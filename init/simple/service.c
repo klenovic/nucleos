@@ -35,7 +35,7 @@
 
 
 /* This array defines all known requests. */
-PRIVATE char *known_requests[] = {
+static char *known_requests[] = {
   "up", 
   "down",
   "refresh", 
@@ -87,28 +87,28 @@ PRIVATE char *known_requests[] = {
  * parameters passed to this utility. Request parameters that are needed
  * are stored globally in the following variables:
  */
-PRIVATE int req_type;
-PRIVATE int do_run= 0;		/* 'run' command instead of 'up' */
-PRIVATE char *req_label;
-PRIVATE char *req_path;
-PRIVATE char *req_args = "";
-PRIVATE int req_major;
-PRIVATE long req_period;
-PRIVATE char *req_script;
-PRIVATE char *req_ipc;
-PRIVATE char *req_config = PATH_CONFIG;
-PRIVATE int req_printep;
-PRIVATE int class_recurs;	/* Nesting level of class statements */
+static int req_type;
+static int do_run= 0;		/* 'run' command instead of 'up' */
+static char *req_label;
+static char *req_path;
+static char *req_args = "";
+static int req_major;
+static long req_period;
+static char *req_script;
+static char *req_ipc;
+static char *req_config = PATH_CONFIG;
+static int req_printep;
+static int class_recurs;	/* Nesting level of class statements */
 
 /* Buffer to build "/command arg1 arg2 ..." string to pass to RS server. */
-PRIVATE char command[4096];	
+static char command[4096];	
 
 /* Arguments for RS to start a new service */
-PRIVATE struct rs_start rs_start;
+static struct rs_start rs_start;
 
 /* An error occurred. Report the problem, print the usage, and exit. 
  */
-PRIVATE void print_usage(char *app_name, char *problem) 
+static void print_usage(char *app_name, char *problem) 
 {
   fprintf(stderr, "Warning, %s\n", problem);
   fprintf(stderr, "Usage:\n");
@@ -125,7 +125,7 @@ PRIVATE void print_usage(char *app_name, char *problem)
 
 /* A request to the RS server failed. Report and exit. 
  */
-PRIVATE void failure(int num) 
+static void failure(int num) 
 {
   fprintf(stderr, "Request to RS failed: %s (error %d)\n", strerror(num), num);
   exit(num);
@@ -135,7 +135,7 @@ PRIVATE void failure(int num)
 /* Parse and verify correctness of arguments. Report problem and exit if an 
  * error is found. Store needed parameters in global variables.
  */
-PRIVATE int parse_arguments(int argc, char **argv)
+static int parse_arguments(int argc, char **argv)
 {
   struct stat stat_buf;
   char *hz;
@@ -308,7 +308,7 @@ PRIVATE int parse_arguments(int argc, char **argv)
   return(req_nr);
       }
 
-PRIVATE void fatal(char *fmt, ...)
+static void fatal(char *fmt, ...)
 {
 	va_list ap;
 
@@ -332,9 +332,9 @@ PRIVATE void fatal(char *fmt, ...)
 #define KW_SYSTEM	"system"
 #define KW_IPC		"ipc"
 
-FORWARD void do_driver(config_t *cpe, config_t *config);
+static void do_driver(config_t *cpe, config_t *config);
 
-PRIVATE void do_class(config_t *cpe, config_t *config)
+static void do_class(config_t *cpe, config_t *config)
 {
 	config_t *cp, *cp1;
 
@@ -405,7 +405,7 @@ PRIVATE void do_class(config_t *cpe, config_t *config)
 	class_recurs--;
 }
 
-PRIVATE void do_uid(config_t *cpe)
+static void do_uid(config_t *cpe)
 {
 	uid_t uid;
 	struct passwd *pw;
@@ -444,7 +444,7 @@ PRIVATE void do_uid(config_t *cpe)
 	rs_start.rss_uid= uid;
 }
 
-PRIVATE void do_nice(config_t *cpe)
+static void do_nice(config_t *cpe)
 {
 	int nice_val;
 	char *check;
@@ -478,7 +478,7 @@ PRIVATE void do_nice(config_t *cpe)
 	rs_start.rss_nice= nice_val;
 }
 
-PRIVATE void do_irq(config_t *cpe)
+static void do_irq(config_t *cpe)
 {
 	int irq;
 	char *check;
@@ -509,7 +509,7 @@ PRIVATE void do_irq(config_t *cpe)
 	}
 }
 
-PRIVATE void do_io(config_t *cpe)
+static void do_io(config_t *cpe)
 {
 	int irq;
 	unsigned base, len;
@@ -548,7 +548,7 @@ PRIVATE void do_io(config_t *cpe)
 	}
 }
 
-PRIVATE void do_pci_device(config_t *cpe)
+static void do_pci_device(config_t *cpe)
 {
 	u16_t vid, did;
 	char *check, *check2;
@@ -585,7 +585,7 @@ PRIVATE void do_pci_device(config_t *cpe)
 	}
 }
 
-PRIVATE void do_pci_class(config_t *cpe)
+static void do_pci_class(config_t *cpe)
 {
 	u8_t baseclass, subclass, interface;
 	u32_t class_id, mask;
@@ -638,7 +638,7 @@ PRIVATE void do_pci_class(config_t *cpe)
 	}
 }
 
-PRIVATE void do_pci(config_t *cpe)
+static void do_pci(config_t *cpe)
 {
 	int i, call_nr, word, bits_per_word;
 	unsigned long mask;
@@ -702,7 +702,7 @@ struct
 	{ NULL,		0 }
 };
 
-PRIVATE void do_ipc(config_t *cpe)
+static void do_ipc(config_t *cpe)
 {
 	char *list;
 	size_t listsize, wordlen;
@@ -751,7 +751,7 @@ PRIVATE void do_ipc(config_t *cpe)
 	req_ipc= list;
 }
 
-PRIVATE void do_system(config_t *cpe)
+static void do_system(config_t *cpe)
 {
 	int i, call_nr, word, bits_per_word;
 	unsigned long mask;
@@ -807,7 +807,7 @@ PRIVATE void do_system(config_t *cpe)
 	}
 }
 
-PRIVATE void do_driver(config_t *cpe, config_t *config)
+static void do_driver(config_t *cpe, config_t *config)
 {
 	config_t *cp;
 
@@ -886,7 +886,7 @@ PRIVATE void do_driver(config_t *cpe, config_t *config)
 	}
 }
 
-PRIVATE void do_config(char *label, char *filename)
+static void do_config(char *label, char *filename)
 {
 	config_t *config, *cp, *cpe;
 
@@ -942,7 +942,7 @@ PRIVATE void do_config(char *label, char *filename)
 
 /* Main program. 
  */
-PUBLIC int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   message m;
   int result;

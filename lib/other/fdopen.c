@@ -10,8 +10,6 @@
 /*
  * fdopen - convert a (UNIX) file descriptor into a FILE pointer
  */
-/* $Header$ */
-
 #include	<stdlib.h>
 #include	"../stdio/loc_incl.h"
 #include	<stdio.h>
@@ -20,7 +18,7 @@
 FILE *
 fdopen(fd, mode)
 int fd;
-_CONST char *mode;
+const char *mode;
 {
 	register int i;
 	struct stat st;

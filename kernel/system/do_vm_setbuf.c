@@ -22,7 +22,7 @@
 /*===========================================================================*
  *				do_vm_setbuf				     *
  *===========================================================================*/
-PUBLIC int do_vm_setbuf(m_ptr)
+int do_vm_setbuf(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 	vm_base= m_ptr->m4_l1;

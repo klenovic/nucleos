@@ -11,7 +11,7 @@
 #define wait	_wait
 #include <sys/wait.h>
 
-PUBLIC pid_t wait(status)
+pid_t wait(status)
 int *status;
 {
   message m;

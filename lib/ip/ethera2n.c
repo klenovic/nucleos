@@ -22,7 +22,7 @@ Created:	Nov 17, 1992 by Philip Homburg
 #include <net/gen/if_ether.h>
 
 struct ether_addr *ether_aton(s)
-_CONST char *s;
+const char *s;
 {
 	static struct ether_addr ea;
 
@@ -45,7 +45,3 @@ _CONST char *s;
 	}
 	return &ea;
 }
-
-/*
- * $PchId: ethera2n.c,v 1.3 1996/02/22 21:10:01 philip Exp $
- */

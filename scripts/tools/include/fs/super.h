@@ -27,7 +27,7 @@
  * A super_block slot is free if s_dev == NO_DEV. 
  */
 
-EXTERN struct MNX(super_block) {
+struct MNX(super_block) {
   MNX(ino_t) s_ninodes;   /* # usable inodes on the minor device */
   MNX(zone1_t)  s_nzones; /* total device size, including bit maps etc */
   short s_imap_blocks;    /* # of blocks used by inode bit map */
@@ -63,7 +63,7 @@ EXTERN struct MNX(super_block) {
   MNX(bit_t) s_isearch; /* inodes below this bit number are in use */
   MNX(bit_t) s_zsearch; /* all zones below this bit number are in use*/
   char s_is_root;
-} MNX(superblock);
+};
 
 #define NIL_SUPER (struct MNX(super_block) *) 0
 #define IMAP 0 /* operating on the inode bit map */

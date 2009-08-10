@@ -11,7 +11,7 @@
 #define geteuid	_geteuid
 #include <unistd.h>
 
-PUBLIC uid_t geteuid()
+uid_t geteuid()
 {
   message m;
 

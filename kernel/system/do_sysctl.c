@@ -21,7 +21,7 @@
 /*===========================================================================*
  *			        do_sysctl				     *
  *===========================================================================*/
-PUBLIC int do_sysctl(m_ptr)
+int do_sysctl(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   phys_bytes ph;

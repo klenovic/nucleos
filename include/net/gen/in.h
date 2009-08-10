@@ -42,7 +42,3 @@ typedef struct ip_hdropt
 } ip_hdropt_t;
 
 #endif /* __SERVER__IP__GEN__IN_H__ */
-
-/*
- * $PchId: in.h,v 1.6 2002/06/10 07:11:15 philip Exp $
- */

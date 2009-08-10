@@ -23,7 +23,7 @@
 /*===========================================================================*
  *				do_memset				     *
  *===========================================================================*/
-PUBLIC int do_memset(m_ptr)
+int do_memset(m_ptr)
 register message *m_ptr;
 {
 /* Handle sys_memset(). This writes a pattern into the specified memory. */

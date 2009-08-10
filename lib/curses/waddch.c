@@ -15,7 +15,7 @@
 /* If error, return -1.						*/
 /****************************************************************/
 
-_PROTOTYPE( static short newline, (WINDOW *win, int lin));
+static short newline(WINDOW *win, int lin);
 
 static short newline(win, lin)
 WINDOW *win;

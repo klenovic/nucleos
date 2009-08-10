@@ -21,7 +21,7 @@
 /*===========================================================================*
  *				fs_utime				     *
  *===========================================================================*/
-PUBLIC int fs_utime()
+int fs_utime()
 {
   register struct inode *rip;
   register int r;
@@ -47,7 +47,7 @@ printf("MFS(%d) get_inode by fs_utime() failed\n", SELF_E);
   return(r);
 }
 
-PUBLIC int fs_stime()
+int fs_stime()
 {
   boottime = fs_m_in.REQ_BOOTTIME;
   return OK;

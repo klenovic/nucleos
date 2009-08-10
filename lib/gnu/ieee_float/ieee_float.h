@@ -54,7 +54,3 @@ struct f64
 				(((val) & F64_MANT_MASK) << F64_MANT_SHIFT))
 
 #endif /* IEEE_FLOAT_H */
-
-/*
- * $PchId: ieee_float.h,v 1.3 1996/02/22 21:01:39 philip Exp $
- */

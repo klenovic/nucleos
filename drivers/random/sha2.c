@@ -1089,7 +1089,3 @@ char* SHA384_Data(const sha2_byte* data, size_t len, char digest[SHA384_DIGEST_S
 }
 
 #endif /* !NO_64BIT */
-
-/*
- * $PchId: sha2.c,v 1.1 2005/06/28 14:29:23 philip Exp $
- */

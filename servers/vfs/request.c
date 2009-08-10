@@ -36,7 +36,7 @@
 #include "vnode.h"
 #include "param.h"
 
-FORWARD _PROTOTYPE(int fs_sendrec_f, (char *file, int line, endpoint_t fs_e, message *reqm));
+static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm);
 
 #define fs_sendrec(e, m) fs_sendrec_f(__FILE__, __LINE__, (e), (m))
 
@@ -44,7 +44,7 @@ FORWARD _PROTOTYPE(int fs_sendrec_f, (char *file, int line, endpoint_t fs_e, mes
 /*===========================================================================*
  *			req_breadwrite					     *
  *===========================================================================*/
-PUBLIC int req_breadwrite(fs_e, user_e, dev, pos, num_of_bytes, user_addr,
+int req_breadwrite(fs_e, user_e, dev, pos, num_of_bytes, user_addr,
 	rw_flag, new_posp, cum_iop)
 endpoint_t fs_e;
 endpoint_t user_e;
@@ -91,7 +91,7 @@ unsigned int *cum_iop;
 /*===========================================================================*
  *				req_chmod	      			     *
  *===========================================================================*/
-PUBLIC int req_chmod(fs_e, inode_nr, rmode, new_modep)
+int req_chmod(fs_e, inode_nr, rmode, new_modep)
 int fs_e;
 ino_t inode_nr;
 mode_t rmode;
@@ -120,7 +120,7 @@ mode_t *new_modep;
 /*===========================================================================*
  *				req_chown          			     *
  *===========================================================================*/
-PUBLIC int req_chown(fs_e, inode_nr, newuid, newgid, new_modep)
+int req_chown(fs_e, inode_nr, newuid, newgid, new_modep)
 endpoint_t fs_e;
 ino_t inode_nr;
 uid_t newuid;
@@ -203,7 +203,7 @@ node_details_t *res;
 /*===========================================================================*
  *				req_flush	      			     *
  *===========================================================================*/
-PUBLIC int req_flush(fs_e, dev)
+int req_flush(fs_e, dev)
 endpoint_t fs_e; 
 dev_t dev;
 {
@@ -221,7 +221,7 @@ dev_t dev;
 /*===========================================================================*
  *				req_fstatfs	    			     *
  *===========================================================================*/
-PUBLIC int req_fstatfs(fs_e, who_e, buf)
+int req_fstatfs(fs_e, who_e, buf)
 int fs_e;
 int who_e;
 char *buf;
@@ -251,7 +251,7 @@ char *buf;
 /*===========================================================================*
  *				req_ftrunc	     			     *
  *===========================================================================*/
-PUBLIC int req_ftrunc(fs_e, inode_nr, start, end)
+int req_ftrunc(fs_e, inode_nr, start, end)
 endpoint_t fs_e;
 ino_t inode_nr;
 off_t start;
@@ -273,7 +273,7 @@ off_t end;
 /*===========================================================================*
  *				req_getdents	     			     *
  *===========================================================================*/
-PUBLIC int req_getdents(fs_e, inode_nr, pos, gid, size, pos_change)
+int req_getdents(fs_e, inode_nr, pos, gid, size, pos_change)
 endpoint_t fs_e;
 ino_t inode_nr;
 off_t pos;
@@ -318,7 +318,7 @@ off_t *pos_change;
 /*===========================================================================*
  *				req_inhibread	  			     *
  *===========================================================================*/
-PUBLIC int req_inhibread(fs_e, inode_nr)
+int req_inhibread(fs_e, inode_nr)
 endpoint_t fs_e;
 ino_t inode_nr;
 {
@@ -336,7 +336,7 @@ ino_t inode_nr;
 /*===========================================================================*
  *				req_link	       			     *
  *===========================================================================*/
-PUBLIC int req_link(fs_e, link_parent, lastc, linked_file)
+int req_link(fs_e, link_parent, lastc, linked_file)
 endpoint_t fs_e;
 ino_t link_parent;
 char *lastc;
@@ -371,7 +371,7 @@ ino_t linked_file;
 /*===========================================================================*
  *				req_lookup	                   	     *
  *===========================================================================*/
-PUBLIC int req_lookup(fs_e, path_off, dir_ino, root_ino, uid, gid, flags, res)
+int req_lookup(fs_e, path_off, dir_ino, root_ino, uid, gid, flags, res)
 endpoint_t fs_e;
 size_t path_off;
 ino_t dir_ino;
@@ -449,7 +449,7 @@ lookup_res_t *res;
 /*===========================================================================*
  *				req_mkdir	      			     *
  *===========================================================================*/
-PUBLIC int req_mkdir(fs_e, inode_nr, lastc, uid, gid, dmode)
+int req_mkdir(fs_e, inode_nr, lastc, uid, gid, dmode)
 endpoint_t fs_e;
 ino_t inode_nr;
 char *lastc;
@@ -488,7 +488,7 @@ mode_t dmode;
 /*===========================================================================*
  *				req_mknod	      			     *
  *===========================================================================*/
-PUBLIC int req_mknod(fs_e, inode_nr, lastc, uid, gid, dmode, dev)
+int req_mknod(fs_e, inode_nr, lastc, uid, gid, dmode, dev)
 endpoint_t fs_e;
 ino_t inode_nr;
 char *lastc;
@@ -529,7 +529,7 @@ dev_t dev;
 /*===========================================================================*
  *				req_mountpoint	                 	     *
  *===========================================================================*/
-PUBLIC int req_mountpoint(fs_e, inode_nr)
+int req_mountpoint(fs_e, inode_nr)
 endpoint_t fs_e;
 ino_t inode_nr;
 {
@@ -548,7 +548,7 @@ ino_t inode_nr;
 /*===========================================================================*
  *				req_newnode	      			     *
  *===========================================================================*/
-PUBLIC int req_newnode(fs_e, uid, gid, dmode, dev, res)
+int req_newnode(fs_e, uid, gid, dmode, dev, res)
 endpoint_t fs_e;
 uid_t uid;
 gid_t gid;
@@ -584,7 +584,7 @@ struct node_details *res;
 /*===========================================================================*
  *				req_newdriver          			     *
  *===========================================================================*/
-PUBLIC int req_newdriver(fs_e, dev, driver_e)
+int req_newdriver(fs_e, dev, driver_e)
 endpoint_t fs_e;
 Dev_t dev;
 endpoint_t driver_e;
@@ -617,7 +617,7 @@ endpoint_t driver_e;
 /*===========================================================================*
  *				req_putnode				     *
  *===========================================================================*/
-PUBLIC int req_putnode(fs_e, inode_nr, count)
+int req_putnode(fs_e, inode_nr, count)
 int fs_e;
 ino_t inode_nr;
 int count;
@@ -637,7 +637,7 @@ int count;
 /*===========================================================================*
  *				req_rdlink	     			     *
  *===========================================================================*/
-PUBLIC int req_rdlink(fs_e, inode_nr, who_e, buf, len)
+int req_rdlink(fs_e, inode_nr, who_e, buf, len)
 endpoint_t fs_e;
 ino_t inode_nr;
 endpoint_t who_e;
@@ -687,7 +687,7 @@ size_t len;
 /*===========================================================================*
  *				req_readsuper	                  	     *
  *===========================================================================*/
-PUBLIC int req_readsuper(fs_e, label, dev, readonly, isroot, res_nodep)
+int req_readsuper(fs_e, label, dev, readonly, isroot, res_nodep)
 endpoint_t fs_e;
 char *label;
 dev_t dev;
@@ -735,7 +735,7 @@ struct node_details *res_nodep;
 /*===========================================================================*
  *				req_readwrite				     *
  *===========================================================================*/
-PUBLIC int req_readwrite(fs_e, inode_nr, inode_index, pos, rw_flag, user_e,
+int req_readwrite(fs_e, inode_nr, inode_index, pos, rw_flag, user_e,
 	user_addr, num_of_bytes, new_posp, cum_iop)
 endpoint_t fs_e;
 ino_t inode_nr;
@@ -786,7 +786,7 @@ unsigned int *cum_iop;
 /*===========================================================================*
  *				req_rename	     			     *
  *===========================================================================*/
-PUBLIC int req_rename(fs_e, old_dir, old_name, new_dir, new_name)
+int req_rename(fs_e, old_dir, old_name, new_dir, new_name)
 endpoint_t fs_e;
 ino_t old_dir;
 char *old_name;
@@ -831,7 +831,7 @@ char *new_name;
 /*===========================================================================*
  *				req_rmdir	      			     *
  *===========================================================================*/
-PUBLIC int req_rmdir(fs_e, inode_nr, lastc)
+int req_rmdir(fs_e, inode_nr, lastc)
 endpoint_t fs_e;
 ino_t inode_nr;
 char *lastc;
@@ -864,7 +864,7 @@ char *lastc;
 /*===========================================================================*
  *				req_slink	      			     *
  *===========================================================================*/
-PUBLIC int req_slink(fs_e, inode_nr, lastc, who_e, path_addr, path_length,
+int req_slink(fs_e, inode_nr, lastc, who_e, path_addr, path_length,
 	uid, gid)
 endpoint_t fs_e;
 ino_t inode_nr;
@@ -917,7 +917,7 @@ gid_t gid;
 /*===========================================================================*
  *				req_stat	       			     *
  *===========================================================================*/
-PUBLIC int req_stat(fs_e, inode_nr, who_e, buf, pos)
+int req_stat(fs_e, inode_nr, who_e, buf, pos)
 int fs_e;
 ino_t inode_nr;
 int who_e;
@@ -966,7 +966,7 @@ int pos;
 /*===========================================================================*
  *				req_sync	       			     *
  *===========================================================================*/
-PUBLIC int req_sync(fs_e)
+int req_sync(fs_e)
 endpoint_t fs_e; 
 {
     message m;
@@ -982,7 +982,7 @@ endpoint_t fs_e;
 /*===========================================================================*
  *				req_unlink	     			     *
  *===========================================================================*/
-PUBLIC int req_unlink(fs_e, inode_nr, lastc)
+int req_unlink(fs_e, inode_nr, lastc)
 endpoint_t fs_e;
 ino_t inode_nr;
 char *lastc;
@@ -1015,7 +1015,7 @@ char *lastc;
 /*===========================================================================*
  *				req_unmount	    			     *
  *===========================================================================*/
-PUBLIC int req_unmount(fs_e)
+int req_unmount(fs_e)
 endpoint_t fs_e; 
 {
     message m;
@@ -1031,7 +1031,7 @@ endpoint_t fs_e;
 /*===========================================================================*
  *				req_utime	      			     *
  *===========================================================================*/
-PUBLIC int req_utime(fs_e, inode_nr, actime, modtime)
+int req_utime(fs_e, inode_nr, actime, modtime)
 endpoint_t fs_e;
 ino_t inode_nr;
 time_t actime;
@@ -1055,7 +1055,7 @@ time_t modtime;
 /*===========================================================================*
  *				fs_sendrec				     *
  *===========================================================================*/
-PRIVATE int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
+static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
 {
 /* This is the low level function that sends requests to FS processes.
  * It also handles driver recovery mechanism and reissuing the

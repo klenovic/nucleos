@@ -25,26 +25,22 @@
 #endif
 #define error printf
 
+void main(void);
 
-
-_PROTOTYPE( void main, (void) );
-
-_PROTOTYPE( int drv_init, (void) );
-_PROTOTYPE( int drv_init_hw, (void) );
-_PROTOTYPE( int drv_reset, (void) );
-_PROTOTYPE( int drv_start, (int sub_dev, int DmaMode) );
-_PROTOTYPE( int drv_stop, (int sub_dev) );
-_PROTOTYPE( int drv_set_dma, (u32_t dma, u32_t length, int chan) );
-_PROTOTYPE( int drv_reenable_int, (int chan) );
-_PROTOTYPE( int drv_int_sum, (void) );
-_PROTOTYPE( int drv_int, (int sub_dev) );
-_PROTOTYPE( int drv_pause, (int chan) );
-_PROTOTYPE( int drv_resume, (int chan) );
-_PROTOTYPE( int drv_io_ctl, (int request, void * val, int * len, int sub_dev) );
-_PROTOTYPE( int drv_get_irq, (char *irq) );
-_PROTOTYPE( int drv_get_frag_size, (u32_t *frag_size, int sub_dev) );
-
-
+int drv_init(void);
+int drv_init_hw(void);
+int drv_reset(void);
+int drv_start(int sub_dev, int DmaMode);
+int drv_stop(int sub_dev);
+int drv_set_dma(u32_t dma, u32_t length, int chan);
+int drv_reenable_int(int chan);
+int drv_int_sum(void);
+int drv_int(int sub_dev);
+int drv_pause(int chan);
+int drv_resume(int chan);
+int drv_io_ctl(int request, void * val, int * len, int sub_dev);
+int drv_get_irq(char *irq);
+int drv_get_frag_size(u32_t *frag_size, int sub_dev);
 
 /* runtime status fields */
 typedef struct {
@@ -95,9 +91,9 @@ typedef struct {
 	int NrOfSpecialFiles;
 } drv_t;
 
-EXTERN drv_t drv;
-EXTERN sub_dev_t sub_dev[];
-EXTERN special_file_t special_file[];
+extern drv_t drv;
+extern sub_dev_t sub_dev[];
+extern special_file_t special_file[];
 
 /* Number of bytes you can DMA before hitting a 64K boundary: */
 #define dma_bytes_left(phys)    \

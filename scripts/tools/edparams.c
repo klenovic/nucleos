@@ -12,8 +12,6 @@
  */
 char version[]=   "2.20";
 
-#define _POSIX_SOURCE 1
-#define _MINIX  1
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,6 +29,9 @@ char version[]=   "2.20";
 #include "include/sys/stat.h"
 #include "include/fs/rawfs.h"
 #include "edparams.h"
+
+environment *env;        /* Lists the environment. */
+MNX(u32_t) lowsec;       /* Offset to the file system on the boot device. */
 
 #define arraysize(a)      (sizeof(a) / sizeof((a)[0]))
 #define arraylimit(a)     ((a) + arraysize(a))

@@ -33,7 +33,7 @@
 
 #define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
 
-PUBLIC int sigaddset(set, signo)
+int sigaddset(set, signo)
 sigset_t *set;
 int signo;
 {
@@ -45,7 +45,7 @@ int signo;
   return 0;
 }
 
-PUBLIC int sigdelset(set, signo)
+int sigdelset(set, signo)
 sigset_t *set;
 int signo;
 {
@@ -57,22 +57,22 @@ int signo;
   return 0;
 }
 
-PUBLIC int sigemptyset(set)
+int sigemptyset(set)
 sigset_t *set;
 {
   *set = 0;
   return 0;
 }
 
-PUBLIC int sigfillset(set)
+int sigfillset(set)
 sigset_t *set;
 {
   *set = SIGMASK;
   return 0;
 }
 
-PUBLIC int sigismember(set, signo)
-_CONST sigset_t *set;
+int sigismember(set, signo)
+const sigset_t *set;
 int signo;
 {
   if (!sigisvalid(signo)) {

@@ -11,7 +11,7 @@
 #define fchmod	_fchmod
 #include <sys/stat.h>
 
-PUBLIC int fchmod(fd, mode)
+int fchmod(fd, mode)
 int fd;
 _mnx_Mode_t mode;
 {

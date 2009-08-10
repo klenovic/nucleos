@@ -17,7 +17,7 @@
  * process. Thus NR_PROCS must be the same as in the kernel. It is not 
  * possible or even necessary to tell when a slot is free here.
  */
-EXTERN struct fproc {
+struct fproc {
   unsigned fp_flags;
 
   mode_t fp_umask;		/* mask set by umask system call */
@@ -50,7 +50,9 @@ EXTERN struct fproc {
 
   fd_set fp_cloexec_set;	/* bit map for POSIX Table 6-2 FD_CLOEXEC */
   endpoint_t fp_endpoint;	/* kernel endpoint number of this process */
-} fproc[NR_PROCS];
+};
+
+extern struct fproc fproc[];
 
 /* fp_flags */
 #define NO_FLAGS	0

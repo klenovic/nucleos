@@ -65,6 +65,9 @@
 #define __attribute_const__		__attribute__((__const__))
 #define __maybe_unused			__attribute__((unused))
 
+/* restricting pointer aliasing */
+#define __restrict			__restrict__
+
 #define __gcc_header(x) #x
 #define _gcc_header(x) __gcc_header(nucleos/compiler-gcc##x.h)
 #define gcc_header(x) _gcc_header(x)

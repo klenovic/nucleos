@@ -11,7 +11,7 @@
 #define read	_read
 #include <unistd.h>
 
-PUBLIC ssize_t read(fd, buffer, nbytes)
+ssize_t read(fd, buffer, nbytes)
 int fd;
 void *buffer;
 size_t nbytes;

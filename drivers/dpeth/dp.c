@@ -370,7 +370,7 @@ static void do_init(message * mp)
 **  Name:	void dp_next_iovec(iovec_dat_t *iovp)
 **  Function:	Retrieves data from next iovec element.
 */
-PUBLIC void dp_next_iovec(iovec_dat_s_t * iovp)
+void dp_next_iovec(iovec_dat_s_t * iovp)
 {
 
   iovp->iod_iovec_s -= IOVEC_NR;
@@ -558,7 +558,7 @@ static void do_watchdog(void *message)
 **  Name:	int dpeth_task(void)
 **  Function:	Main entry for dp task
 */
-PUBLIC int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   message m;
   dpeth_t *dep;

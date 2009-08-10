@@ -18,7 +18,7 @@ pci_rescan_bus.c
 /*===========================================================================*
  *				pci_rescan_bus				     *
  *===========================================================================*/
-PUBLIC void pci_rescan_bus(busnr)
+void pci_rescan_bus(busnr)
 u8_t busnr;
 {
 	int r;

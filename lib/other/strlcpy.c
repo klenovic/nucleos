@@ -35,19 +35,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char *rcsid = "$OpenBSD: strlcpy.c,v 1.4 1999/05/01 18:56:41 millert Exp $";
-#endif
-#endif /* LIBC_SCCS and not lint */
-#ifndef lint
-static const char rcsid[] =
-  "$FreeBSD: src/lib/libc/string/strlcpy.c,v 1.2.4.1 2001/07/09 23:30:06 obrien Exp $";
-#endif
-
-#define _MINIX_SOURCE
-
 #include <nucleos/types.h>
 #include <string.h>
 
@@ -83,7 +70,3 @@ size_t strlcpy(dst, src, siz)
 
 	return(s - src - 1);	/* count does not include NUL */
 }
-
-/*
- * $PchId: strlcpy.c,v 1.1 2004/11/02 12:29:53 philip Exp $
- */

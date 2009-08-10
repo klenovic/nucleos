@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_mapdma				     *
  *===========================================================================*/
-PUBLIC int sys_mapdma(vir_addr, bytes)
+int sys_mapdma(vir_addr, bytes)
 vir_bytes vir_addr;			/* address in bytes with segment*/
 vir_bytes bytes;			/* number of bytes to be copied */
 {

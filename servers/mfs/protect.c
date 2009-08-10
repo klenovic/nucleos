@@ -22,7 +22,7 @@
 /*===========================================================================*
  *				fs_chmod				     *
  *===========================================================================*/
-PUBLIC int fs_chmod()
+int fs_chmod()
 {
 /* Perform the chmod(name, mode) system call. */
 
@@ -51,7 +51,7 @@ printf("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_chown				     *
  *===========================================================================*/
-PUBLIC int fs_chown()
+int fs_chown()
 {
   register struct inode *rip;
   register int r;
@@ -86,7 +86,7 @@ printf("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_access_o				     *
  *===========================================================================*/
-PUBLIC int fs_access_o()
+int fs_access_o()
 {
   struct inode *rip;
   register int r;
@@ -110,7 +110,7 @@ printf("MFS(%d) get_inode by fs_access() failed\n", SELF_E);
 /*===========================================================================*
  *				forbidden				     *
  *===========================================================================*/
-PUBLIC int forbidden(register struct inode *rip, mode_t access_desired)
+int forbidden(register struct inode *rip, mode_t access_desired)
 {
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
@@ -183,7 +183,7 @@ PUBLIC int forbidden(register struct inode *rip, mode_t access_desired)
 /*===========================================================================*
  *				read_only				     *
  *===========================================================================*/
-PUBLIC int read_only(ip)
+int read_only(ip)
 struct inode *ip;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted

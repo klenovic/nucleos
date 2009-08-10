@@ -26,10 +26,12 @@
 
 #include "vnode.h"
 
+struct file_lock file_lock[NR_LOCKS];
+
 /*===========================================================================*
  *				lock_op					     *
  *===========================================================================*/
-PUBLIC int lock_op(f, req)
+int lock_op(f, req)
 struct filp *f;
 int req;			/* either F_SETLK or F_SETLKW */
 {
@@ -179,7 +181,7 @@ int req;			/* either F_SETLK or F_SETLKW */
 /*===========================================================================*
  *				lock_revive				     *
  *===========================================================================*/
-PUBLIC void lock_revive()
+void lock_revive()
 {
 /* Go find all the processes that are waiting for any kind of lock and 
  * revive them all.  The ones that are still blocked will block again when 

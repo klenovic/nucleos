@@ -86,19 +86,14 @@ Copyright 1995 Philip Homburg
 
 struct acc;
 
-void tcp_prep ARGS(( void ));
-void tcp_init ARGS(( void ));
-int tcp_open ARGS(( int port, int srfd,
-	get_userdata_t get_userdata, put_userdata_t put_userdata, 
-	put_pkt_t put_pkt, select_res_t select_res ));
-int tcp_read ARGS(( int fd, size_t count));
-int tcp_write ARGS(( int fd, size_t count));
-int tcp_ioctl ARGS(( int fd, ioreq_t req));
-int tcp_cancel ARGS(( int fd, int which_operation ));
-void tcp_close ARGS(( int fd));
+void tcp_prep(void);
+void tcp_init(void);
+int tcp_open(int port, int srfd, get_userdata_t get_userdata, put_userdata_t put_userdata, 
+	     put_pkt_t put_pkt, select_res_t select_res);
+int tcp_read(int fd, size_t count);
+int tcp_write(int fd, size_t count);
+int tcp_ioctl(int fd, ioreq_t req);
+int tcp_cancel(int fd, int which_operation);
+void tcp_close(int fd);
 
 #endif /* TCP_H */
-
-/*
- * $PchId: tcp.h,v 1.17 2005/06/28 14:20:54 philip Exp $
- */

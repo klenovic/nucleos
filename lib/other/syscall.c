@@ -9,7 +9,7 @@
  */
 #include <lib.h>
 
-PUBLIC int _syscall(who, syscallnr, msgptr)
+int _syscall(who, syscallnr, msgptr)
 int who;
 int syscallnr;
 register message *msgptr;

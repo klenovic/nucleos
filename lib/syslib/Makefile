@@ -15,4 +15,4 @@ libsys.a-obj-y := alloc_util.o assert.o panic.o pci_attr_r16.o pci_attr_r32.o pc
 	       vm_allocmem.o vm_brk.o vm_exec_newmem.o vm_exit.o vm_fork.o vm_map_phys.o vm_umap.o \
 	       vm_push_sig.o
 
-ccflags-y := -D_MINIX -D_POSIX_SOURCE -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

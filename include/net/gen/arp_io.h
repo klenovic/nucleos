@@ -26,7 +26,3 @@ typedef struct nwio_arp
 #define NWAF_DEAD	2
 #define NWAF_PERM	4
 #define NWAF_PUB	8
-
-/*
- * $PchId: arp_io.h,v 1.2 2004/08/03 11:01:59 philip Exp $
- */

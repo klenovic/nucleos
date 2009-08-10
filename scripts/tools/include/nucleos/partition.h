@@ -12,12 +12,10 @@
  * Place of a partition on disk and the disk geometry,
  * for use with the DIOCGETP and DIOCSETP ioctl's.
  */
-#ifndef _MINIX__PARTITION_H
-#define _MINIX__PARTITION_H
+#ifndef _MINIX_PARTITION_H
+#define _MINIX_PARTITION_H
 
-#ifndef _TYPES_H
 #include "../sys/types.h"
-#endif
 
 struct MNX(partition) {
   MNX(u64_t) base;		/* byte offset to the partition start */
@@ -27,4 +25,4 @@ struct MNX(partition) {
   unsigned sectors;
 };
 
-#endif /* _MINIX__PARTITION_H */
+#endif /* _MINIX_PARTITION_H */

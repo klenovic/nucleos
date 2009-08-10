@@ -12,8 +12,6 @@
  *								21 Jan 1994
  */
 
-#define _MINIX_SOURCE
-
 #define nil 0
 #define execve _execve
 #define execvp _execvp

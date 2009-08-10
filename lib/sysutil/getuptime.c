@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                               getuptime			    	     *
  *===========================================================================*/
-PUBLIC int getuptime(ticks)
+int getuptime(ticks)
 clock_t *ticks;				/* uptime in ticks */
 {
     message m;

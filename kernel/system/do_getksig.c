@@ -25,7 +25,7 @@
 /*===========================================================================*
  *			      do_getksig				     *
  *===========================================================================*/
-PUBLIC int do_getksig(m_ptr)
+int do_getksig(m_ptr)
 message *m_ptr;			/* pointer to request message */
 {
 /* PM is ready to accept signals and repeatedly does a kernel call to get 

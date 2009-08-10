@@ -26,7 +26,7 @@
 /*===========================================================================*
  *			panic                                        *
  *===========================================================================*/
-PUBLIC void panic(what, mess,nr)
+void panic(what, mess,nr)
 char *what;
 char *mess;
 int nr;
@@ -41,7 +41,7 @@ int nr;
 /*===========================================================================*
  *			minix_panic                                        *
  *===========================================================================*/
-PUBLIC void minix_panic(mess,nr)
+void minix_panic(mess,nr)
 char *mess;
 int nr;
 {
@@ -71,7 +71,7 @@ int nr;
 /*===========================================================================*
  *				kputc				     	     *
  *===========================================================================*/
-PUBLIC void kputc(c)
+void kputc(c)
 int c;					/* character to append */
 {
 /* Accumulate a single character for a kernel message. Send a notification

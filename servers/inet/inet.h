@@ -31,8 +31,6 @@ Copyright 1995 Philip Homburg
 #include <nucleos/time.h>
 #include <nucleos/type.h>
 
-#define _NORETURN	/* Should be non empty for GCC */
-
 typedef int ioreq_t;
 
 #include <nucleos/const.h>
@@ -66,24 +64,17 @@ typedef int ioreq_t;
 #include "const.h"
 #include "inet_config.h"
 
-#define PUBLIC
-#define EXTERN	extern
-#define PRIVATE	static
-#define FORWARD	static
-
-#define THIS_FILE static char *this_file= __FILE__;
-
-_PROTOTYPE( void panic0, (char *file, int line) );
-_PROTOTYPE( void inet_panic, (void) ) _NORETURN; 
+void panic0(char *file, int line);
+void inet_panic(void) __noreturn; 
 
 #define ip_panic(print_list)  \
-	(panic0(this_file, __LINE__), printf print_list, panic())
+	(panic0(__FILE__, __LINE__), printf print_list, panic())
 #define panic() inet_panic()
 
 #if DEBUG
 #define ip_warning(print_list)  \
 	( \
-		printf("warning at %s, %d: ", this_file, __LINE__), \
+		printf("warning at %s, %d: ", __FILE__, __LINE__), \
 		printf print_list, \
 		printf("\ninet stacktrace: "), \
 		util_stacktrace() \
@@ -98,23 +89,13 @@ _PROTOTYPE( void inet_panic, (void) ) _NORETURN;
 	do { if (((level) & DEBUG) && (condition)) \
 		{ where(); code; } } while(0)
 
-#if _ANSI
-#define ARGS(x) x
-#else /* _ANSI */
-#define ARGS(x) ()
-#endif /* _ANSI */
-
 extern int this_proc;
 extern char version[];
 
 #ifndef HZ
-EXTERN u32_t system_hz;
+extern u32_t system_hz;
 #define HZ system_hz
 #define HZ_DYNAMIC 1
 #endif
 
 #endif /* INET__INET_H */
-
-/*
- * $PchId: inet.h,v 1.16 2005/06/28 14:27:54 philip Exp $
- */

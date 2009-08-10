@@ -36,52 +36,52 @@
 #include "sb16.h"
 
 
-_PROTOTYPE(void main, (void));
-FORWARD _PROTOTYPE( int dsp_open, (void) );
-FORWARD _PROTOTYPE( int dsp_close, (void) );
-FORWARD _PROTOTYPE( int dsp_ioctl, (message *m_ptr) );
-FORWARD _PROTOTYPE( void dsp_write, (message *m_ptr) );
-FORWARD _PROTOTYPE( void dsp_hardware_msg, (void) );
-FORWARD _PROTOTYPE( void dsp_status, (message *m_ptr) );
+void main(void);
+static int dsp_open(void);
+static int dsp_close(void);
+static int dsp_ioctl(message *m_ptr);
+static void dsp_write(message *m_ptr);
+static void dsp_hardware_msg(void);
+static void dsp_status(message *m_ptr);
 
-FORWARD _PROTOTYPE( void reply, (int code, int replyee, int process, int status) );
-FORWARD _PROTOTYPE( void init_buffer, (void) );
-FORWARD _PROTOTYPE( int dsp_init, (void) );
-FORWARD _PROTOTYPE( int dsp_reset, (void) );
-FORWARD _PROTOTYPE( int dsp_command, (int value) );
-FORWARD _PROTOTYPE( int dsp_set_size, (unsigned int size) );
-FORWARD _PROTOTYPE( int dsp_set_speed, (unsigned int speed) );
-FORWARD _PROTOTYPE( int dsp_set_stereo, (unsigned int stereo) );
-FORWARD _PROTOTYPE( int dsp_set_bits, (unsigned int bits) );
-FORWARD _PROTOTYPE( int dsp_set_sign, (unsigned int sign) );
-FORWARD _PROTOTYPE( void dsp_dma_setup, (phys_bytes address, int count) );
-FORWARD _PROTOTYPE( void dsp_setup, (void) );
+static void reply(int code, int replyee, int process, int status);
+static void init_buffer(void);
+static int dsp_init(void);
+static int dsp_reset(void);
+static int dsp_command(int value);
+static int dsp_set_size(unsigned int size);
+static int dsp_set_speed(unsigned int speed);
+static int dsp_set_stereo(unsigned int stereo);
+static int dsp_set_bits(unsigned int bits);
+static int dsp_set_sign(unsigned int sign);
+static void dsp_dma_setup(phys_bytes address, int count);
+static void dsp_setup(void);
 
-PRIVATE int irq_hook_id;	/* id of irq hook at the kernel */
+static int irq_hook_id;	/* id of irq hook at the kernel */
 
-PRIVATE char DmaBuffer[DMA_SIZE + 64 * 1024];
-PRIVATE char* DmaPtr;
-PRIVATE phys_bytes DmaPhys;
+static char DmaBuffer[DMA_SIZE + 64 * 1024];
+static char* DmaPtr;
+static phys_bytes DmaPhys;
 
-PRIVATE char Buffer[DSP_MAX_FRAGMENT_SIZE * DSP_NR_OF_BUFFERS];
+static char Buffer[DSP_MAX_FRAGMENT_SIZE * DSP_NR_OF_BUFFERS];
 
-PRIVATE int DspVersion[2]; 
-PRIVATE unsigned int DspStereo = DEFAULT_STEREO;
-PRIVATE unsigned int DspSpeed = DEFAULT_SPEED; 
-PRIVATE unsigned int DspBits = DEFAULT_BITS;
-PRIVATE unsigned int DspSign = DEFAULT_SIGN;
-PRIVATE unsigned int DspFragmentSize = DSP_MAX_FRAGMENT_SIZE;
-PRIVATE int DspAvail = 0;
-PRIVATE int DspBusy = 0;
-PRIVATE int DmaMode = 0;
-PRIVATE int DmaBusy = -1;
-PRIVATE int DmaFillNext = 0;
-PRIVATE int BufReadNext = -1;
-PRIVATE int BufFillNext = 0;
+static int DspVersion[2]; 
+static unsigned int DspStereo = DEFAULT_STEREO;
+static unsigned int DspSpeed = DEFAULT_SPEED; 
+static unsigned int DspBits = DEFAULT_BITS;
+static unsigned int DspSign = DEFAULT_SIGN;
+static unsigned int DspFragmentSize = DSP_MAX_FRAGMENT_SIZE;
+static int DspAvail = 0;
+static int DspBusy = 0;
+static int DmaMode = 0;
+static int DmaBusy = -1;
+static int DmaFillNext = 0;
+static int BufReadNext = -1;
+static int BufFillNext = 0;
 
-PRIVATE int revivePending = 0;
-PRIVATE int reviveStatus;
-PRIVATE int reviveProcNr;
+static int revivePending = 0;
+static int reviveStatus;
+static int reviveProcNr;
 
 #define dprint (void)
 
@@ -89,7 +89,7 @@ PRIVATE int reviveProcNr;
 /*===========================================================================*
  *				main
  *===========================================================================*/
-PUBLIC void main() 
+void main() 
 {	
 	int r, caller, proc_nr, s;
 	message mess;
@@ -135,7 +135,7 @@ PUBLIC void main()
 /*===========================================================================*
  *				dsp_open
  *===========================================================================*/
-PRIVATE int dsp_open()
+static int dsp_open()
 {
 	dprint("sb16_dsp.c: dsp_open()\n");
 	
@@ -164,7 +164,7 @@ PRIVATE int dsp_open()
 /*===========================================================================*
  *				dsp_close
  *===========================================================================*/
-PRIVATE int dsp_close()
+static int dsp_close()
 {
 	dprint("sb16_dsp.c: dsp_close()\n");
 
@@ -177,7 +177,7 @@ PRIVATE int dsp_close()
 /*===========================================================================*
  *				dsp_ioctl
  *===========================================================================*/
-PRIVATE int dsp_ioctl(m_ptr)
+static int dsp_ioctl(m_ptr)
 message *m_ptr;
 {
 	int status;
@@ -218,7 +218,7 @@ message *m_ptr;
 /*===========================================================================*
  *				dsp_write
  *===========================================================================*/
-PRIVATE void dsp_write(m_ptr)
+static void dsp_write(m_ptr)
 message *m_ptr;
 {
 	int s;
@@ -282,7 +282,7 @@ message *m_ptr;
 /*===========================================================================*
  *				dsp_hardware_msg
  *===========================================================================*/
-PRIVATE void dsp_hardware_msg()
+static void dsp_hardware_msg()
 {	
 	dprint("Interrupt: ");
 	if(DmaBusy >= 0) { /* Dma transfer was actually busy */
@@ -323,7 +323,7 @@ PRIVATE void dsp_hardware_msg()
 /*===========================================================================*
  *				dsp_status				     *
  *===========================================================================*/
-PRIVATE void dsp_status(m_ptr)
+static void dsp_status(m_ptr)
 message *m_ptr;	/* pointer to the newly arrived message */
 {
 	if(revivePending) {
@@ -343,7 +343,7 @@ message *m_ptr;	/* pointer to the newly arrived message */
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PRIVATE void reply(code, replyee, process, status)
+static void reply(code, replyee, process, status)
 int code;
 int replyee;
 int process;
@@ -362,7 +362,7 @@ int status;
 /*===========================================================================*
  *				init_buffer
  *===========================================================================*/
-PRIVATE void init_buffer()
+static void init_buffer()
 {
 /* Select a buffer that can safely be used for dma transfers.  
  * Its absolute address is 'DmaPhys', the normal address is 'DmaPtr'.
@@ -388,7 +388,7 @@ PRIVATE void init_buffer()
 /*===========================================================================*
  *				dsp_init
  *===========================================================================*/
-PRIVATE int dsp_init()
+static int dsp_init()
 {
 	int i, s;
 
@@ -436,7 +436,7 @@ PRIVATE int dsp_init()
 /*===========================================================================*
  *				dsp_reset
  *===========================================================================*/
-PRIVATE int dsp_reset()
+static int dsp_reset()
 {
 	int i;
 
@@ -457,7 +457,7 @@ PRIVATE int dsp_reset()
 /*===========================================================================*
  *				dsp_command
  *===========================================================================*/
-PRIVATE int dsp_command(value)
+static int dsp_command(value)
 int value;
 {
 	int i, status;
@@ -575,7 +575,7 @@ unsigned int sign;
 /*===========================================================================*
  *				dsp_dma_setup
  *===========================================================================*/
-PRIVATE void dsp_dma_setup(address, count)
+static void dsp_dma_setup(address, count)
 phys_bytes address;
 int count;
 {
@@ -626,7 +626,7 @@ int count;
 /*===========================================================================*
  *				dsp_setup()
  *===========================================================================*/
-PRIVATE void dsp_setup()
+static void dsp_setup()
 { 
 	/* Set current sample speed */
 	dsp_set_speed(DspSpeed);

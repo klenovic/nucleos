@@ -10,8 +10,6 @@
 /*
  * data.c - this is the initialization for the standard streams
  */
-/* $Header: /cvsup/minix/src/lib/stdio/data.c,v 1.1.1.1 2005/04/21 14:56:34 beng Exp $ */
-
 #include	<stdio.h>
 
 struct __iobuf __stdin = {

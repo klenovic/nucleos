@@ -39,7 +39,7 @@
 /*===========================================================================*
  *				do_read					     *
  *===========================================================================*/
-PUBLIC int do_read()
+int do_read()
 {
   return(read_write(READING));
 }
@@ -48,7 +48,7 @@ PUBLIC int do_read()
 /*===========================================================================*
  *				read_write				     *
  *===========================================================================*/
-PUBLIC int read_write(rw_flag)
+int read_write(rw_flag)
 int rw_flag;			/* READING or WRITING */
 {
 /* Perform read(fd, buffer, nbytes) or write(fd, buffer, nbytes) call. */
@@ -221,7 +221,7 @@ int rw_flag;			/* READING or WRITING */
 /*===========================================================================*
  *				do_getdents				     *
  *===========================================================================*/
-PUBLIC int do_getdents()
+int do_getdents()
 {
 /* Perform the getdents(fd, buf, size) system call. */
   int r;
@@ -262,7 +262,7 @@ PUBLIC int do_getdents()
 /*===========================================================================*
  *				rw_pipe					     *
  *===========================================================================*/
-PUBLIC int rw_pipe(rw_flag, usr, fd_nr, f, buf, req_size)
+int rw_pipe(rw_flag, usr, fd_nr, f, buf, req_size)
 int rw_flag;			/* READING or WRITING */
 endpoint_t usr;
 int fd_nr;

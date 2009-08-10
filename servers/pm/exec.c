@@ -45,7 +45,7 @@
 /*===========================================================================*
  *				do_exec					     *
  *===========================================================================*/
-PUBLIC int do_exec()
+int do_exec()
 {
 	int r;
 
@@ -73,7 +73,7 @@ PUBLIC int do_exec()
 /*===========================================================================*
  *				exec_newmem				     *
  *===========================================================================*/
-PUBLIC int exec_newmem()
+int exec_newmem()
 {
 	int proc_e, proc_n, allow_setuid;
 	char *ptr;
@@ -137,7 +137,7 @@ PUBLIC int exec_newmem()
 /*===========================================================================*
  *				do_execrestart				     *
  *===========================================================================*/
-PUBLIC int do_execrestart()
+int do_execrestart()
 {
 	int proc_e, proc_n, result;
 	struct mproc *rmp;
@@ -163,7 +163,7 @@ PUBLIC int do_execrestart()
 /*===========================================================================*
  *				exec_restart				     *
  *===========================================================================*/
-PUBLIC void exec_restart(rmp, result)
+void exec_restart(rmp, result)
 struct mproc *rmp;
 int result;
 {

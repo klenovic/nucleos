@@ -11,9 +11,9 @@
 #define write	_write
 #include <unistd.h>
 
-PUBLIC ssize_t write(fd, buffer, nbytes)
+ssize_t write(fd, buffer, nbytes)
 int fd;
-_CONST void *buffer;
+const void *buffer;
 size_t nbytes;
 {
   message m;

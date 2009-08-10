@@ -23,12 +23,12 @@
 #if (USE_VIRVCOPY || USE_PHYSVCOPY)
 
 /* Buffer to hold copy request vector from user. */
-PRIVATE struct vir_cp_req vir_cp_req[VCOPY_VEC_SIZE];
+static struct vir_cp_req vir_cp_req[VCOPY_VEC_SIZE];
 
 /*===========================================================================*
  *				do_vcopy					     *
  *===========================================================================*/
-PUBLIC int do_vcopy(m_ptr)
+int do_vcopy(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_virvcopy() and sys_physvcopy() that pass a vector with copy

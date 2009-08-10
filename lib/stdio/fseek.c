@@ -10,8 +10,6 @@
 /*
  * fseek.c - perform an fseek
  */
-/* $Header: /cvsup/minix/src/lib/stdio/fseek.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
 #include	<stdio.h>
 
 #if	(SEEK_CUR != 1) || (SEEK_END != 2) || (SEEK_SET != 0)

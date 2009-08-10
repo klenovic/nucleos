@@ -21,7 +21,7 @@
 /*===========================================================================*
  *				do_stime				     *
  *===========================================================================*/
-PUBLIC int do_stime(m_ptr)
+int do_stime(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   boottime= m_ptr->T_BOOTTIME;

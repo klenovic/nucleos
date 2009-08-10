@@ -31,7 +31,3 @@ Created:	March 15, 1994 by Philip Homburg <philip@f-mnx.phicoh.com>
 #define outw_ne(dep, reg, data)	(outw(dep->de_base_port+reg, data))
 
 #endif /* NE2000_H */
-
-/*
- * $PchId: ne2000.h,v 1.4 2004/08/03 12:03:20 philip Exp $
- */

@@ -10,8 +10,6 @@
 /*
  * doprnt.c - print formatted output
  */
-/* $Header: /cvsup/minix/src/lib/stdio/doprnt.c,v 1.1.1.1 2005/04/21 14:56:34 beng Exp $ */
-
 #include	<ctype.h>
 #include	<stdio.h>
 #include	<stdarg.h>

@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 
-#ifdef _MINIX
 #include <nucleos/types.h>
 #include <stdlib.h>
 
@@ -22,10 +21,7 @@
 #define ETHERSTRLEN 18			/* max length of "xx:xx:xx:xx:xx:xx" */
 #define ether_addr	ether_addr_t
 #define bytes		ea_addr
-char *ether_e2a _ARGS(( ether_addr_t *a, char *e ));
-#else
-#include "libether.h"
-#endif
+char *ether_e2a(ether_addr_t *a, char *e);
 
 char *
 ether_e2a (addr, estring)

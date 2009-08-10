@@ -51,7 +51,7 @@
 /*===========================================================================*
  *				do_pipe					     *
  *===========================================================================*/
-PUBLIC int do_pipe()
+int do_pipe()
 {
 /* Perform the pipe(fil_des) system call. */
 
@@ -137,7 +137,7 @@ PUBLIC int do_pipe()
 /*===========================================================================*
  *				pipe_check				     *
  *===========================================================================*/
-PUBLIC int Xpipe_check(vp, rw_flag, oflags, bytes, position, notouch)
+int Xpipe_check(vp, rw_flag, oflags, bytes, position, notouch)
 register struct vnode *vp;	/* the inode of the pipe */
 int rw_flag;			/* READING or WRITING */
 int oflags;			/* flags set by open or fcntl */
@@ -238,7 +238,7 @@ int notouch;			/* check only */
 /*===========================================================================*
  *				suspend					     *
  *===========================================================================*/
-PUBLIC void suspend(task)
+void suspend(task)
 int task;			/* who is proc waiting for? (PIPE = pipe) */
 {
 /* Take measures to suspend the processing of the present system call.
@@ -278,7 +278,7 @@ int task;			/* who is proc waiting for? (PIPE = pipe) */
 /*===========================================================================*
  *				pipe_suspend					     *
  *===========================================================================*/
-PUBLIC void pipe_suspend(rw_flag, fd_nr, buf, size)
+void pipe_suspend(rw_flag, fd_nr, buf, size)
 int rw_flag;
 int fd_nr;
 char *buf;
@@ -307,7 +307,7 @@ size_t size;
 /*===========================================================================*
  *				unsuspend_by_endpt			     *
  *===========================================================================*/
-PUBLIC void unsuspend_by_endpt(int proc_e)
+void unsuspend_by_endpt(int proc_e)
 {
   struct fproc *rp;
   int client = 0;
@@ -333,7 +333,7 @@ PUBLIC void unsuspend_by_endpt(int proc_e)
 /*===========================================================================*
  *				release					     *
  *===========================================================================*/
-PUBLIC void release(vp, call_nr, count)
+void release(vp, call_nr, count)
 register struct vnode *vp;	/* inode of pipe */
 int call_nr;			/* READ, WRITE, OPEN or CREAT */
 int count;			/* max number of processes to release */
@@ -386,7 +386,7 @@ int count;			/* max number of processes to release */
 /*===========================================================================*
  *				revive					     *
  *===========================================================================*/
-PUBLIC void revive(proc_nr_e, returned)
+void revive(proc_nr_e, returned)
 int proc_nr_e;			/* process to revive */
 int returned;			/* if hanging on task, how many bytes read */
 {
@@ -468,7 +468,7 @@ int returned;			/* if hanging on task, how many bytes read */
 /*===========================================================================*
  *				unpause					     *
  *===========================================================================*/
-PUBLIC void unpause(proc_nr_e)
+void unpause(proc_nr_e)
 int proc_nr_e;
 {
 /* A signal has been sent to a user who is paused on the file system.
@@ -572,7 +572,7 @@ int proc_nr_e;
 /*===========================================================================*
  *				select_request_pipe			     *
  *===========================================================================*/
-PUBLIC int select_request_pipe(struct filp *f, int *ops, int block)
+int select_request_pipe(struct filp *f, int *ops, int block)
 {
 	int orig_ops, r = 0, err, canwrite;
 	orig_ops = *ops;
@@ -616,7 +616,7 @@ PUBLIC int select_request_pipe(struct filp *f, int *ops, int block)
 /*===========================================================================*
  *				select_match_pipe			     *
  *===========================================================================*/
-PUBLIC int select_match_pipe(struct filp *f)
+int select_match_pipe(struct filp *f)
 {
 	/* recognize either pipe or named pipe (FIFO) */
 	if (f && f->filp_vno && (f->filp_vno->v_mode & I_NAMED_PIPE))
@@ -628,7 +628,7 @@ PUBLIC int select_match_pipe(struct filp *f)
 /*===========================================================================*
  *				check_pipe			     *
  *===========================================================================*/
-PUBLIC int check_pipe(void)
+int check_pipe(void)
 {
 	struct fproc *rfp;
 	int mycount = 0;

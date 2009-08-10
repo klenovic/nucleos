@@ -53,7 +53,7 @@ struct hook_entry {
  *===========================================================================*/
 #define pressed(k) ((F1<=(k)&&(k)<=F12 && bit_isset(m->FKEY_FKEYS,((k)-F1+1)))\
   	|| (SF1<=(k) && (k)<=SF12 && bit_isset(m->FKEY_SFKEYS, ((k)-SF1+1)))) 
-PUBLIC int do_fkey_pressed(m)
+int do_fkey_pressed(m)
 message *m;					/* notification message */
 {
   int s, h;
@@ -78,7 +78,7 @@ message *m;					/* notification message */
 /*===========================================================================*
  *				key_name				     *
  *===========================================================================*/
-PRIVATE char *key_name(int key)
+static char *key_name(int key)
 {
 	static char name[15];
 
@@ -95,7 +95,7 @@ PRIVATE char *key_name(int key)
 /*===========================================================================*
  *				mapping_dmp				     *
  *===========================================================================*/
-PUBLIC void mapping_dmp(void)
+void mapping_dmp(void)
 {
   int h;
 

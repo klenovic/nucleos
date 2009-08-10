@@ -155,7 +155,3 @@ fail:
 	*psize= 0;
 	return c != 0;
 }
-
-/*
- * $PchId: queryparam.c,v 1.1 2005/06/28 14:30:56 philip Exp $
- */

@@ -21,11 +21,12 @@
 #include <servers/ds/ds.h>
 #include <nucleos/vfsif.h>
 
+struct super_block superblock;
 
 /*===========================================================================*
  *				fs_readsuper_s				     *
  *===========================================================================*/
-PUBLIC int fs_readsuper_s()
+int fs_readsuper_s()
 {
 /* This function reads the superblock of the partition, gets the root inode
  * and sends back the details of them. Note, that the FS process does not
@@ -132,7 +133,7 @@ PUBLIC int fs_readsuper_s()
 /*===========================================================================*
  *				fs_readsuper_o				     *
  *===========================================================================*/
-PUBLIC int fs_readsuper_o()
+int fs_readsuper_o()
 {
 /* This function reads the superblock of the partition, gets the root inode
  * and sends back the details of them. Note, that the FS process does not
@@ -197,7 +198,7 @@ PUBLIC int fs_readsuper_o()
 /*===========================================================================*
  *				fs_mountpoint_o				     *
  *===========================================================================*/
-PUBLIC int fs_mountpoint_o()
+int fs_mountpoint_o()
 {
 /* This function looks up the mount point, it checks the condition whether
  * the partition can be mounted on the inode or not. If ok, it gets the
@@ -251,7 +252,7 @@ printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_mountpoint_s				     *
  *===========================================================================*/
-PUBLIC int fs_mountpoint_s()
+int fs_mountpoint_s()
 {
 /* This function looks up the mount point, it checks the condition whether
  * the partition can be mounted on the inode or not. 
@@ -284,7 +285,7 @@ printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
 /*===========================================================================*
  *				fs_unmount				     *
  *===========================================================================*/
-PUBLIC int fs_unmount()
+int fs_unmount()
 {
 /* Unmount a file system by device number. */
   struct super_block *sp1;

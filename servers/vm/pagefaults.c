@@ -56,7 +56,7 @@ char *pf_errstr(u32_t err)
 /*===========================================================================*
  *				do_pagefaults	     		     *
  *===========================================================================*/
-PUBLIC void do_pagefaults(void)
+void do_pagefaults(void)
 {
 	endpoint_t ep;
 	u32_t addr, err;
@@ -112,7 +112,6 @@ PUBLIC void do_pagefaults(void)
 			continue;
 		}
 
-
 		/* Pagefault is handled, so now reactivate the process. */
 		if((s=sys_vmctl(ep, VMCTL_CLEAR_PAGEFAULT, r)) != OK)
 			vm_panic("do_pagefaults: sys_vmctl failed", ep);
@@ -124,7 +123,7 @@ PUBLIC void do_pagefaults(void)
 /*===========================================================================*
  *				do_memory	     		     *
  *===========================================================================*/
-PUBLIC void do_memory(void)
+void do_memory(void)
 {
 	int r, s;
 	endpoint_t who;

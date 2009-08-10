@@ -20,11 +20,10 @@
 /* Extended partition? */
 #define ext_part(s)	((s) == 0x05 || (s) == 0x0F)
 
-FORWARD _PROTOTYPE( void extpartition, (struct driver *dp, int extdev,
-						unsigned long extbase) );
-FORWARD _PROTOTYPE( int get_part_table, (struct driver *dp, int device,
-			unsigned long offset, struct part_entry *table));
-FORWARD _PROTOTYPE( void sort, (struct part_entry *table) );
+static void extpartition(struct driver *dp, int extdev, unsigned long extbase);
+static int get_part_table(struct driver *dp, int device, unsigned long offset,
+			  struct part_entry *table);
+static void sort(struct part_entry *table);
 
 #ifndef CD_SECTOR_SIZE
 #define CD_SECTOR_SIZE 2048
@@ -33,7 +32,7 @@ FORWARD _PROTOTYPE( void sort, (struct part_entry *table) );
 /*============================================================================*
  *				partition				      *
  *============================================================================*/
-PUBLIC void partition(dp, device, style, atapi)
+void partition(dp, device, style, atapi)
 struct driver *dp;	/* device dependent entry points */
 int device;		/* device to partition */
 int style;		/* partitioning style: floppy, primary, sub. */
@@ -108,7 +107,7 @@ int atapi;		/* atapi device */
 /*============================================================================*
  *				extpartition				      *
  *============================================================================*/
-PRIVATE void extpartition(dp, extdev, extbase)
+static void extpartition(dp, extdev, extbase)
 struct driver *dp;	/* device dependent entry points */
 int extdev;		/* extended partition to scan */
 unsigned long extbase;	/* sector offset of the base extended partition */
@@ -156,7 +155,7 @@ unsigned long extbase;	/* sector offset of the base extended partition */
 /*============================================================================*
  *				get_part_table				      *
  *============================================================================*/
-PRIVATE int get_part_table(dp, device, offset, table)
+static int get_part_table(dp, device, offset, table)
 struct driver *dp;
 int device;
 unsigned long offset;		/* sector offset to the table */
@@ -189,7 +188,7 @@ struct part_entry *table;	/* four entries */
 /*===========================================================================*
  *				sort					     *
  *===========================================================================*/
-PRIVATE void sort(table)
+static void sort(table)
 struct part_entry *table;
 {
 /* Sort a partition table. */

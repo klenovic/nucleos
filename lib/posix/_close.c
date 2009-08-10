@@ -11,7 +11,7 @@
 #define close	_close
 #include <unistd.h>
 
-PUBLIC int close(fd)
+int close(fd)
 int fd;
 {
   message m;

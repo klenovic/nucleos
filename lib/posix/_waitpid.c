@@ -11,7 +11,7 @@
 #define waitpid	_waitpid
 #include <sys/wait.h>
 
-PUBLIC pid_t waitpid(pid, status, options)
+pid_t waitpid(pid, status, options)
 pid_t pid;
 int *status;
 int options;

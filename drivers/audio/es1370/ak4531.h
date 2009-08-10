@@ -14,8 +14,7 @@
 #include "../../drivers.h"
 #include <nucleos/sound.h>
 
-_PROTOTYPE( int ak4531_init, (u16_t base, u16_t status_reg, u16_t bit, 
-			u16_t poll) );
-_PROTOTYPE( int ak4531_get_set_volume, (struct volume_level *level, int flag) );
+int ak4531_init(u16_t base, u16_t status_reg, u16_t bit, u16_t poll);
+int ak4531_get_set_volume(struct volume_level *level, int flag);
 
 #endif

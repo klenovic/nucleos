@@ -30,7 +30,7 @@
 /*===========================================================================*
  *			        do_sdevio                                    *
  *===========================================================================*/
-PUBLIC int do_sdevio(m_ptr)
+int do_sdevio(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   int proc_nr, proc_nr_e = m_ptr->DIO_VEC_ENDPT;

@@ -15,7 +15,7 @@
 #include <lib.h>
 #include <nucleos/syslib.h>
 
-PUBLIC int _taskcall(who, syscallnr, msgptr)
+int _taskcall(who, syscallnr, msgptr)
 int who;
 int syscallnr;
 register message *msgptr;

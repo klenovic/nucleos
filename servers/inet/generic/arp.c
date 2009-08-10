@@ -25,8 +25,6 @@ Copyright 1995 Philip Homburg
 #include "io.h"
 #include "sr.h"
 
-THIS_FILE
-
 #define ARP_CACHE_NR	 256
 #define AP_REQ_NR	  32
 
@@ -135,36 +133,32 @@ typedef struct arp_cache
 #define ACS_VALID	2
 #define ACS_UNREACHABLE	3
 
-PRIVATE struct arp_hash_ent
+static struct arp_hash_ent
 {
 	arp_cache_t *ahe_row[ARP_HASH_WIDTH];
 } arp_hash[ARP_HASH_NR];
 
-PRIVATE arp_port_t *arp_port_table;
-PRIVATE	arp_cache_t *arp_cache;
-PRIVATE int arp_cache_nr;
+static arp_port_t *arp_port_table;
+static arp_cache_t *arp_cache;
+static int arp_cache_nr;
 
-FORWARD acc_t *arp_getdata ARGS(( int fd, size_t offset,
-	size_t count, int for_ioctl ));
-FORWARD int arp_putdata ARGS(( int fd, size_t offset,
-	acc_t *data, int for_ioctl ));
-FORWARD void arp_main ARGS(( arp_port_t *arp_port ));
-FORWARD void arp_timeout ARGS(( int ref, timer_t *timer ));
-FORWARD void setup_write ARGS(( arp_port_t *arp_port ));
-FORWARD void setup_read ARGS(( arp_port_t *arp_port ));
-FORWARD void do_reclist ARGS(( event_t *ev, ev_arg_t ev_arg ));
-FORWARD void process_arp_pkt ARGS(( arp_port_t *arp_port, acc_t *data ));
-FORWARD void client_reply ARGS(( arp_port_t *arp_port,
-	ipaddr_t ipaddr, ether_addr_t *ethaddr ));
-FORWARD arp_cache_t *find_cache_ent ARGS(( arp_port_t *arp_port,
-	ipaddr_t ipaddr ));
-FORWARD arp_cache_t *alloc_cache_ent ARGS(( int flags ));
-FORWARD void arp_buffree ARGS(( int priority ));
+static acc_t *arp_getdata(int fd, size_t offset, size_t count, int for_ioctl);
+static int arp_putdata(int fd, size_t offset, acc_t *data, int for_ioctl);
+static void arp_main(arp_port_t *arp_port);
+static void arp_timeout(int ref, timer_t *timer);
+static void setup_write(arp_port_t *arp_port);
+static void setup_read(arp_port_t *arp_port);
+static void do_reclist(event_t *ev, ev_arg_t ev_arg);
+static void process_arp_pkt(arp_port_t *arp_port, acc_t *data);
+static void client_reply(arp_port_t *arp_port, ipaddr_t ipaddr, ether_addr_t *ethaddr);
+static arp_cache_t *find_cache_ent(arp_port_t *arp_port, ipaddr_t ipaddr);
+static arp_cache_t *alloc_cache_ent(int flags);
+static void arp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK
-FORWARD void arp_bufcheck ARGS(( void ));
+static void arp_bufcheck(void);
 #endif
 
-PUBLIC void arp_prep()
+void arp_prep()
 {
 	arp_port_table= alloc(eth_conf_nr * sizeof(arp_port_table[0]));
 
@@ -178,7 +172,7 @@ PUBLIC void arp_prep()
 	arp_cache= alloc(arp_cache_nr * sizeof(arp_cache[0]));
 }
 
-PUBLIC void arp_init()
+void arp_init()
 {
 	arp_port_t *arp_port;
 	arp_cache_t *cache;
@@ -210,7 +204,7 @@ PUBLIC void arp_init()
 #endif
 }
 
-PRIVATE void arp_main(arp_port)
+static void arp_main(arp_port)
 arp_port_t *arp_port;
 {
 	int result;
@@ -274,7 +268,7 @@ arp_port_t *arp_port;
 	}
 }
 
-PRIVATE acc_t *arp_getdata (fd, offset, count, for_ioctl)
+static acc_t *arp_getdata (fd, offset, count, for_ioctl)
 int fd;
 size_t offset;
 size_t count;
@@ -355,7 +349,7 @@ int for_ioctl;
 	return 0;
 }
 
-PRIVATE int arp_putdata (fd, offset, data, for_ioctl)
+static int arp_putdata (fd, offset, data, for_ioctl)
 int fd;
 size_t offset;
 acc_t *data;
@@ -455,7 +449,7 @@ int for_ioctl;
 	return EGENERIC;
 }
 
-PRIVATE void setup_read(arp_port)
+static void setup_read(arp_port)
 arp_port_t *arp_port;
 {
 	int result;
@@ -475,7 +469,7 @@ arp_port_t *arp_port;
 	}
 }
 
-PRIVATE void setup_write(arp_port)
+static void setup_write(arp_port)
 arp_port_t *arp_port;
 {
 	int result;
@@ -520,7 +514,7 @@ arp_port_t *arp_port;
 	}
 }
 
-PRIVATE void do_reclist(ev, ev_arg)
+static void do_reclist(ev, ev_arg)
 event_t *ev;
 ev_arg_t ev_arg;
 {
@@ -538,7 +532,7 @@ ev_arg_t ev_arg;
 	}
 }
 
-PRIVATE void process_arp_pkt (arp_port, data)
+static void process_arp_pkt (arp_port, data)
 arp_port_t *arp_port;
 acc_t *data;
 {
@@ -700,7 +694,7 @@ acc_t *data;
 	}
 }
 
-PRIVATE void client_reply (arp_port, ipaddr, ethaddr)
+static void client_reply (arp_port, ipaddr, ethaddr)
 arp_port_t *arp_port;
 ipaddr_t ipaddr;
 ether_addr_t *ethaddr;
@@ -708,7 +702,7 @@ ether_addr_t *ethaddr;
 	(*arp_port->ap_arp_func)(arp_port->ap_ip_port, ipaddr, ethaddr);
 }
 
-PRIVATE arp_cache_t *find_cache_ent (arp_port, ipaddr)
+static arp_cache_t *find_cache_ent (arp_port, ipaddr)
 arp_port_t *arp_port;
 ipaddr_t ipaddr;
 {
@@ -757,7 +751,7 @@ ipaddr_t ipaddr;
 	return NULL;
 }
 
-PRIVATE arp_cache_t *alloc_cache_ent(flags)
+static arp_cache_t *alloc_cache_ent(flags)
 int flags;
 {
 	arp_cache_t *cache, *old;
@@ -822,7 +816,7 @@ int flags;
 	return old;
 }
 
-PUBLIC void arp_set_ipaddr (eth_port, ipaddr)
+void arp_set_ipaddr (eth_port, ipaddr)
 int eth_port;
 ipaddr_t ipaddr;
 {
@@ -839,7 +833,7 @@ ipaddr_t ipaddr;
 		arp_main(arp_port);
 }
 
-PUBLIC int arp_set_cb(eth_port, ip_port, arp_func)
+int arp_set_cb(eth_port, ip_port, arp_func)
 int eth_port;
 int ip_port;
 arp_func_t arp_func;
@@ -869,7 +863,7 @@ arp_func_t arp_func;
 	return NW_OK;
 }
 
-PUBLIC int arp_ip_eth (eth_port, ipaddr, ethaddr)
+int arp_ip_eth (eth_port, ipaddr, ethaddr)
 int eth_port;
 ipaddr_t ipaddr;
 ether_addr_t *ethaddr;
@@ -967,7 +961,7 @@ ether_addr_t *ethaddr;
 	return NW_SUSPEND;
 }
 
-PUBLIC int arp_ioctl (eth_port, fd, req, get_userdata, put_userdata)
+int arp_ioctl (eth_port, fd, req, get_userdata, put_userdata)
 int eth_port;
 int fd;
 ioreq_t req;
@@ -1198,7 +1192,7 @@ put_userdata_t put_userdata;
 	return 0;
 }
 
-PRIVATE void arp_timeout (ref, timer)
+static void arp_timeout (ref, timer)
 int ref;
 timer_t *timer;
 {
@@ -1280,7 +1274,7 @@ timer_t *timer;
 		arp_timeout, ref);
 }
 
-PRIVATE void arp_buffree(priority)
+static void arp_buffree(priority)
 int priority;
 {
 	int i;
@@ -1341,7 +1335,7 @@ int priority;
 }
 
 #ifdef BUF_CONSISTENCY_CHECK
-PRIVATE void arp_bufcheck()
+static void arp_bufcheck()
 {
 	int i;
 	arp_port_t *arp_port;
@@ -1362,7 +1356,3 @@ PRIVATE void arp_bufcheck()
 	}
 }
 #endif /* BUF_CONSISTENCY_CHECK */
-
-/*
- * $PchId: arp.c,v 1.22 2005/06/28 14:15:06 philip Exp $
- */

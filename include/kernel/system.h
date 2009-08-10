@@ -47,159 +47,159 @@
 #ifdef __KERNEL__
 
 /* Default handler for unused kernel calls. */
-_PROTOTYPE( int do_unused, (message *m_ptr) );
+int do_unused(message *m_ptr);
 
-_PROTOTYPE( int do_exec, (message *m_ptr) );
+int do_exec(message *m_ptr);
 #if ! USE_EXEC
 #define do_exec do_unused
 #endif
 
-_PROTOTYPE( int do_fork, (message *m_ptr) );
+int do_fork(message *m_ptr);
 #if ! USE_FORK
 #define do_fork do_unused
 #endif
 
-_PROTOTYPE( int do_newmap, (message *m_ptr) );
+int do_newmap(message *m_ptr);
 #if ! USE_NEWMAP
 #define do_newmap do_unused
 #endif
 
-_PROTOTYPE( int do_exit, (message *m_ptr) );
+int do_exit(message *m_ptr);
 #if ! USE_EXIT
 #define do_exit do_unused
 #endif
 
-_PROTOTYPE( int do_trace, (message *m_ptr) );
+int do_trace(message *m_ptr);
 #if ! USE_TRACE
 #define do_trace do_unused
 #endif
 
-_PROTOTYPE( int do_nice, (message *m_ptr) );
+int do_nice(message *m_ptr);
 #if ! USE_NICE
 #define do_nice do_unused
 #endif
 
-_PROTOTYPE( int do_copy, (message *m_ptr) );
+int do_copy(message *m_ptr);
 #define do_vircopy 	do_copy
 #if ! (USE_VIRCOPY || USE_PHYSCOPY)
 #define do_copy do_unused
 #endif
 
-_PROTOTYPE( int do_vcopy, (message *m_ptr) );
+int do_vcopy(message *m_ptr);
 #define do_virvcopy 	do_vcopy
 #if ! (USE_VIRVCOPY || USE_PHYSVCOPY)
 #define do_vcopy do_unused
 #endif
 
-_PROTOTYPE( int do_umap, (message *m_ptr) );
+int do_umap(message *m_ptr);
 #if ! USE_UMAP
 #define do_umap do_unused
 #endif
 
-_PROTOTYPE( int do_memset, (message *m_ptr) );
+int do_memset(message *m_ptr);
 #if ! USE_MEMSET
 #define do_memset do_unused
 #endif
 
-_PROTOTYPE( int do_vm_setbuf, (message *m_ptr) );
-_PROTOTYPE( int do_vm_map, (message *m_ptr) );
+int do_vm_setbuf(message *m_ptr);
+int do_vm_map(message *m_ptr);
 
-_PROTOTYPE( int do_abort, (message *m_ptr) );
+int do_abort(message *m_ptr);
 #if ! USE_ABORT
 #define do_abort do_unused
 #endif
 
-_PROTOTYPE( int do_getinfo, (message *m_ptr) );
+int do_getinfo(message *m_ptr);
 #if ! USE_GETINFO
 #define do_getinfo do_unused
 #endif
 
-_PROTOTYPE( int do_privctl, (message *m_ptr) );	
+int do_privctl(message *m_ptr);
 #if ! USE_PRIVCTL
 #define do_privctl do_unused
 #endif
 
-_PROTOTYPE( int do_segctl, (message *m_ptr) );
+int do_segctl(message *m_ptr);
 #if ! USE_SEGCTL
 #define do_segctl do_unused
 #endif
 
-_PROTOTYPE( int do_irqctl, (message *m_ptr) );
+int do_irqctl(message *m_ptr);
 #if ! USE_IRQCTL
 #define do_irqctl do_unused
 #endif
 
-_PROTOTYPE( int do_devio, (message *m_ptr) );
+int do_devio(message *m_ptr);
 #if ! USE_DEVIO
 #define do_devio do_unused
 #endif
 
-_PROTOTYPE( int do_vdevio, (message *m_ptr) );
+int do_vdevio(message *m_ptr);
 #if ! USE_VDEVIO
 #define do_vdevio do_unused
 #endif
 
-_PROTOTYPE( int do_int86, (message *m_ptr) );
+int do_int86(message *m_ptr);
 
-_PROTOTYPE( int do_sdevio, (message *m_ptr) );
+int do_sdevio(message *m_ptr);
 #if ! USE_SDEVIO
 #define do_sdevio do_unused
 #endif
 
-_PROTOTYPE( int do_kill, (message *m_ptr) );
+int do_kill(message *m_ptr);
 #if ! USE_KILL
 #define do_kill do_unused
 #endif
 
-_PROTOTYPE( int do_getksig, (message *m_ptr) );
+int do_getksig(message *m_ptr);
 #if ! USE_GETKSIG
 #define do_getksig do_unused
 #endif
 
-_PROTOTYPE( int do_endksig, (message *m_ptr) );
+int do_endksig(message *m_ptr);
 #if ! USE_ENDKSIG
 #define do_endksig do_unused
 #endif
 
-_PROTOTYPE( int do_sigsend, (message *m_ptr) );
+int do_sigsend(message *m_ptr);
 #if ! USE_SIGSEND
 #define do_sigsend do_unused
 #endif
 
-_PROTOTYPE( int do_sigreturn, (message *m_ptr) );
+int do_sigreturn(message *m_ptr);
 #if ! USE_SIGRETURN
 #define do_sigreturn do_unused
 #endif
 
-_PROTOTYPE( int do_times, (message *m_ptr) );
+int do_times(message *m_ptr);
 #if ! USE_TIMES
 #define do_times do_unused
 #endif
 
-_PROTOTYPE( int do_setalarm, (message *m_ptr) );
+int do_setalarm(message *m_ptr);
 #if ! USE_SETALARM
 #define do_setalarm do_unused
 #endif
 
-_PROTOTYPE( int do_stime, (message *m_ptr) );
+int do_stime(message *m_ptr);
 
-_PROTOTYPE( int do_safecopy, (message *m_ptr) );
-_PROTOTYPE( int do_vsafecopy, (message *m_ptr) );
-_PROTOTYPE( int do_iopenable, (message *m_ptr) );
-_PROTOTYPE( int do_vmctl, (message *m_ptr) );
-_PROTOTYPE( int do_setgrant, (message *m_ptr) );
-_PROTOTYPE( int do_readbios, (message *m_ptr) );
-_PROTOTYPE( int do_mapdma, (message *m_ptr) );
+int do_safecopy(message *m_ptr);
+int do_vsafecopy(message *m_ptr);
+int do_iopenable(message *m_ptr);
+int do_vmctl(message *m_ptr);
+int do_setgrant(message *m_ptr);
+int do_readbios(message *m_ptr);
+int do_mapdma(message *m_ptr);
 
-_PROTOTYPE( int do_sprofile, (message *m_ptr) );
+int do_sprofile(message *m_ptr);
 #ifndef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 #define do_sprofile do_unused
 #endif
 
-_PROTOTYPE( int do_cprofile, (message *m_ptr) );
-_PROTOTYPE( int do_profbuf, (message *m_ptr) );
+int do_cprofile(message *m_ptr);
+int do_profbuf(message *m_ptr);
 
-_PROTOTYPE( int do_mapdma, (message *m_ptr) );
+int do_mapdma(message *m_ptr);
 #endif /* __KERNEL__ */
 #endif	/* __KERNEL_SYSTEM_H */
 

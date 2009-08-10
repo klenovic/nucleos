@@ -10,8 +10,6 @@
 /*
  * fread.c - read a number of members into an array
  */
-/* $Header: /cvsup/minix/src/lib/stdio/fread.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
 #include	<stdio.h>
 
 size_t

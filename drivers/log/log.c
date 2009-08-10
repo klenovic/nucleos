@@ -25,24 +25,24 @@
 
 #define LOGINC(n, i)	do { (n) = (((n) + (i)) % LOG_SIZE); } while(0)
 
-PUBLIC struct logdevice logdevices[NR_DEVS];
-PRIVATE struct device log_geom[NR_DEVS];  	/* base and size of devices */
-PRIVATE int log_device = -1;	 		/* current device */
+struct logdevice logdevices[NR_DEVS];
+static struct device log_geom[NR_DEVS];  	/* base and size of devices */
+static int log_device = -1;	 		/* current device */
 
-FORWARD _PROTOTYPE( char *log_name, (void) );
-FORWARD _PROTOTYPE( struct device *log_prepare, (int device) );
-FORWARD _PROTOTYPE( int log_transfer, (int proc_nr, int opcode, u64_t position,
-			iovec_t *iov, unsigned nr_req, int safe) );
-FORWARD _PROTOTYPE( int log_do_open, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( int log_cancel, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( int log_select, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( void log_signal, (struct driver *dp, message *m_ptr) );
-FORWARD _PROTOTYPE( int log_other, (struct driver *dp, message *m_ptr, int) );
-FORWARD _PROTOTYPE( void log_geometry, (struct partition *entry) );
-FORWARD _PROTOTYPE( int subread, (struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t, int safe) );
+static char *log_name(void);
+static struct device *log_prepare(int device);
+static int log_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov,
+		        unsigned nr_req, int safe);
+static int log_do_open(struct driver *dp, message *m_ptr);
+static int log_cancel(struct driver *dp, message *m_ptr);
+static int log_select(struct driver *dp, message *m_ptr);
+static void log_signal(struct driver *dp, message *m_ptr);
+static int log_other(struct driver *dp, message *m_ptr, int);
+static void log_geometry(struct partition *entry);
+static int subread(struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t, int safe);
 
 /* Entry points to this driver. */
-PRIVATE struct driver log_dtab = {
+static struct driver log_dtab = {
   log_name,	/* current device's name */
   log_do_open,	/* open or mount */
   do_nop,	/* nothing on a close */
@@ -64,7 +64,7 @@ extern int device_caller;
 /*===========================================================================*
  *				   main 				     *
  *===========================================================================*/
-PUBLIC int main(void)
+int main(void)
 {
   int i;
   for(i = 0; i < NR_DEVS; i++) {
@@ -85,7 +85,7 @@ PUBLIC int main(void)
 /*===========================================================================*
  *				 log_name					     *
  *===========================================================================*/
-PRIVATE char *log_name()
+static char *log_name()
 {
 /* Return a name for the current device. */
   static char name[] = "log";
@@ -95,7 +95,7 @@ PRIVATE char *log_name()
 /*===========================================================================*
  *				log_prepare				     *
  *===========================================================================*/
-PRIVATE struct device *log_prepare(device)
+static struct device *log_prepare(device)
 int device;
 {
 /* Prepare for I/O on a device: check if the minor device number is ok. */
@@ -109,7 +109,7 @@ int device;
 /*===========================================================================*
  *				subwrite					     *
  *===========================================================================*/
-PRIVATE int
+static int
 subwrite(struct logdevice *log, int count, int proc_nr,
 	vir_bytes user_vir, size_t offset, int safe)
 {
@@ -202,7 +202,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 /*===========================================================================*
  *				log_append				*
  *===========================================================================*/
-PUBLIC void
+void
 log_append(char *buf, int count)
 {
 	int w = 0, skip = 0;
@@ -221,7 +221,7 @@ log_append(char *buf, int count)
 /*===========================================================================*
  *				subread					     *
  *===========================================================================*/
-PRIVATE int
+static int
 subread(struct logdevice *log, int count, int proc_nr,
 	vir_bytes user_vir, size_t offset, int safe)
 {
@@ -252,7 +252,7 @@ subread(struct logdevice *log, int count, int proc_nr,
 /*===========================================================================*
  *				log_transfer				     *
  *===========================================================================*/
-PRIVATE int log_transfer(proc_nr, opcode, position, iov, nr_req, safe)
+static int log_transfer(proc_nr, opcode, position, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t position;			/* offset on device to read or write */
@@ -339,7 +339,7 @@ int safe;			/* safe copies? */
 /*============================================================================*
  *				log_do_open				      *
  *============================================================================*/
-PRIVATE int log_do_open(dp, m_ptr)
+static int log_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -350,7 +350,7 @@ message *m_ptr;
 /*============================================================================*
  *				log_geometry				      *
  *============================================================================*/
-PRIVATE void log_geometry(entry)
+static void log_geometry(entry)
 struct partition *entry;
 {
   /* take a page from the fake memory device geometry */
@@ -363,7 +363,7 @@ struct partition *entry;
 /*============================================================================*
  *				log_cancel				      *
  *============================================================================*/
-PRIVATE int log_cancel(dp, m_ptr)
+static int log_cancel(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -380,7 +380,7 @@ message *m_ptr;
 /*============================================================================*
  *				log_signal				      *
  *============================================================================*/
-PRIVATE void log_signal(dp, m_ptr)
+static void log_signal(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -394,7 +394,7 @@ message *m_ptr;
 /*============================================================================*
  *				log_other				      *
  *============================================================================*/
-PRIVATE int log_other(dp, m_ptr, safe)
+static int log_other(dp, m_ptr, safe)
 struct driver *dp;
 message *m_ptr;
 int safe;
@@ -432,7 +432,7 @@ int safe;
 /*============================================================================*
  *				log_select				      *
  *============================================================================*/
-PRIVATE int log_select(dp, m_ptr)
+static int log_select(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {

@@ -12,8 +12,8 @@
 #include <string.h>
 #include <stdio.h>
 
-PUBLIC int rename(name, name2)
-_CONST char *name, *name2;
+int rename(name, name2)
+const char *name, *name2;
 {
   message m;
 

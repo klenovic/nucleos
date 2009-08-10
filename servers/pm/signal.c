@@ -43,14 +43,14 @@
 #include "mproc.h"
 #include "param.h"
 
-FORWARD _PROTOTYPE( void unpause, (int pro, int for_trace)		);
-FORWARD _PROTOTYPE( void handle_ksig, (int proc_nr, sigset_t sig_map)	);
-FORWARD _PROTOTYPE( void cause_sigalrm, (struct timer *tp)		);
+static void unpause(int pro, int for_trace);
+static void handle_ksig(int proc_nr, sigset_t sig_map);
+static void cause_sigalrm(struct timer *tp);
 
 /*===========================================================================*
  *				do_sigaction				     *
  *===========================================================================*/
-PUBLIC int do_sigaction()
+int do_sigaction()
 {
   int r;
   struct sigaction svec;
@@ -100,14 +100,13 @@ PUBLIC int do_sigaction()
   mp->mp_sigact[m_in.sig_nr].sa_mask = svec.sa_mask;
   mp->mp_sigact[m_in.sig_nr].sa_flags = svec.sa_flags;
   mp->mp_sigreturn = (vir_bytes) m_in.sig_ret;
-
   return(OK);
 }
 
 /*===========================================================================*
  *				do_sigpending                                *
  *===========================================================================*/
-PUBLIC int do_sigpending()
+int do_sigpending()
 {
   mp->mp_reply.reply_mask = (long) mp->mp_sigpending;
   return OK;
@@ -116,7 +115,7 @@ PUBLIC int do_sigpending()
 /*===========================================================================*
  *				do_sigprocmask                               *
  *===========================================================================*/
-PUBLIC int do_sigprocmask()
+int do_sigprocmask()
 {
 /* Note that the library interface passes the actual mask in sigmask_set,
  * not a pointer to the mask, in order to save a copy.  Similarly,
@@ -171,7 +170,7 @@ PUBLIC int do_sigprocmask()
 /*===========================================================================*
  *				do_sigsuspend                                *
  *===========================================================================*/
-PUBLIC int do_sigsuspend()
+int do_sigsuspend()
 {
   mp->mp_sigmask2 = mp->mp_sigmask;	/* save the old mask */
   mp->mp_sigmask = (sigset_t) m_in.sig_set;
@@ -184,7 +183,7 @@ PUBLIC int do_sigsuspend()
 /*===========================================================================*
  *				do_sigreturn				     *
  *===========================================================================*/
-PUBLIC int do_sigreturn()
+int do_sigreturn()
 {
 /* A user signal handler is done.  Restore context and check for
  * pending unblocked signals.
@@ -203,7 +202,7 @@ PUBLIC int do_sigreturn()
 /*===========================================================================*
  *				do_kill					     *
  *===========================================================================*/
-PUBLIC int do_kill()
+int do_kill()
 {
 /* Perform the kill(pid, signo) system call. */
 
@@ -213,7 +212,7 @@ PUBLIC int do_kill()
 /*===========================================================================*
  *				ksig_pending				     *
  *===========================================================================*/
-PUBLIC int ksig_pending()
+int ksig_pending()
 {
 /* Certain signals, such as segmentation violations originate in the kernel.
  * When the kernel detects such signals, it notifies the PM to take further 
@@ -256,7 +255,7 @@ PUBLIC int ksig_pending()
 /*===========================================================================*
  *				handle_ksig				     *
  *===========================================================================*/
-PRIVATE void handle_ksig(proc_nr_e, sig_map)
+static void handle_ksig(proc_nr_e, sig_map)
 int proc_nr_e;
 sigset_t sig_map;
 {
@@ -306,7 +305,7 @@ sigset_t sig_map;
 /*===========================================================================*
  *				do_alarm				     *
  *===========================================================================*/
-PUBLIC int do_alarm()
+int do_alarm()
 {
 /* Perform the alarm(seconds) system call. */
   return(set_alarm(who_e, m_in.seconds));
@@ -315,7 +314,7 @@ PUBLIC int do_alarm()
 /*===========================================================================*
  *				set_alarm				     *
  *===========================================================================*/
-PUBLIC int set_alarm(proc_nr_e, sec)
+int set_alarm(proc_nr_e, sec)
 int proc_nr_e;			/* process that wants the alarm */
 int sec;			/* how many seconds delay before the signal */
 {
@@ -377,7 +376,7 @@ int sec;			/* how many seconds delay before the signal */
 /*===========================================================================*
  *				cause_sigalrm				     *
  *===========================================================================*/
-PRIVATE void cause_sigalrm(tp)
+static void cause_sigalrm(tp)
 struct timer *tp;
 {
   int proc_nr_n;
@@ -401,7 +400,7 @@ struct timer *tp;
 /*===========================================================================*
  *				do_pause				     *
  *===========================================================================*/
-PUBLIC int do_pause()
+int do_pause()
 {
 /* Perform the pause() system call. */
 
@@ -412,7 +411,7 @@ PUBLIC int do_pause()
 /*===========================================================================*
  *				sig_proc				     *
  *===========================================================================*/
-PUBLIC void sig_proc(rmp, signo)
+void sig_proc(rmp, signo)
 register struct mproc *rmp;	/* pointer to the process to be signaled */
 int signo;			/* signal to send to process (1 to _NSIG) */
 {
@@ -545,7 +544,7 @@ doterminate:
 /*===========================================================================*
  *				check_sig				     *
  *===========================================================================*/
-PUBLIC int check_sig(proc_id, signo)
+int check_sig(proc_id, signo)
 pid_t proc_id;			/* pid of proc to sig, or 0 or -1, or -pgrp */
 int signo;			/* signal to send to process (0 to _NSIG) */
 {
@@ -611,7 +610,7 @@ int signo;			/* signal to send to process (0 to _NSIG) */
 /*===========================================================================*
  *				check_pending				     *
  *===========================================================================*/
-PUBLIC void check_pending(rmp)
+void check_pending(rmp)
 register struct mproc *rmp;
 {
   /* Check to see if any pending signals have been unblocked.  The
@@ -640,7 +639,7 @@ register struct mproc *rmp;
 /*===========================================================================*
  *				unpause					     *
  *===========================================================================*/
-PRIVATE void unpause(pro, for_trace)
+static void unpause(pro, for_trace)
 int pro;			/* which process number */
 int for_trace;			/* for tracing */
 {

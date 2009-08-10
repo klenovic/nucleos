@@ -97,7 +97,3 @@ Created:	before Dec 28, 1992 by Philip Homburg
 #define outb_we(dep, reg, data)	(outb(dep->de_base_port+reg, data))
 
 #endif /* WDETH_H */
-
-/*
- * $PchId: wdeth.h,v 1.6 2003/09/10 19:29:52 philip Exp $
- */

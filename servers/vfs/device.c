@@ -46,21 +46,19 @@
 
 #define ELEMENTS(a) (sizeof(a)/sizeof((a)[0]))
 
-FORWARD _PROTOTYPE( int safe_io_conversion, (endpoint_t,
-  cp_grant_id_t *, int *, cp_grant_id_t *, int, endpoint_t *,
-  void **, int *, vir_bytes, u32_t *));
-FORWARD _PROTOTYPE( void safe_io_cleanup, (cp_grant_id_t, cp_grant_id_t *,
-	int));
-FORWARD _PROTOTYPE( void restart_reopen, (int maj)			);
+static int safe_io_conversion(endpoint_t, cp_grant_id_t *, int *, cp_grant_id_t *, int,
+			      endpoint_t *, void **, int *, vir_bytes, u32_t *);
+static void safe_io_cleanup(cp_grant_id_t, cp_grant_id_t *, int);
+static void restart_reopen(int maj);
 
 extern int dmap_size;
-PRIVATE int dummyproc;
+static int dummyproc;
 
 
 /*===========================================================================*
  *				dev_open				     *
  *===========================================================================*/
-PUBLIC int dev_open(dev, proc, flags)
+int dev_open(dev, proc, flags)
 dev_t dev;			/* device to open */
 int proc;			/* process to open for */
 int flags;			/* mode bits and flags */
@@ -85,7 +83,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				dev_reopen				     *
  *===========================================================================*/
-PUBLIC int dev_reopen(dev, filp_no, flags)
+int dev_reopen(dev, filp_no, flags)
 dev_t dev;			/* device to open */
 int filp_no;			/* filp to reopen for */
 int flags;			/* mode bits and flags */
@@ -112,7 +110,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				dev_close				     *
  *===========================================================================*/
-PUBLIC int dev_close(dev, filp_no)
+int dev_close(dev, filp_no)
 dev_t dev;			/* device to close */
 int filp_no;
 {
@@ -150,7 +148,7 @@ endpoint_t suspended_ep(endpoint_t driver, cp_grant_id_t g)
 /*===========================================================================*
  *				dev_status				     *
  *===========================================================================*/
-PUBLIC void dev_status(message *m)
+void dev_status(message *m)
 {
 	message st;
 	int d, get_more = 1;
@@ -219,7 +217,7 @@ PUBLIC void dev_status(message *m)
 /*===========================================================================*
  *				safe_io_conversion			     *
  *===========================================================================*/
-PRIVATE int safe_io_conversion(driver, gid, op, gids, gids_size,
+static int safe_io_conversion(driver, gid, op, gids, gids_size,
 	io_ept, buf, vec_grants, bytes, pos_lo)
 endpoint_t driver;
 cp_grant_id_t *gid;
@@ -337,7 +335,7 @@ u32_t *pos_lo;
 /*===========================================================================*
  *			safe_io_cleanup					     *
  *===========================================================================*/
-PRIVATE void safe_io_cleanup(gid, gids, gids_size)
+static void safe_io_cleanup(gid, gids, gids_size)
 cp_grant_id_t gid;
 cp_grant_id_t *gids;
 int gids_size;
@@ -357,7 +355,7 @@ int gids_size;
 /*===========================================================================*
  *				dev_io					     *
  *===========================================================================*/
-PUBLIC int dev_io(op, dev, proc_e, buf, pos, bytes, flags, suspend_reopen)
+int dev_io(op, dev, proc_e, buf, pos, bytes, flags, suspend_reopen)
 int op;				/* DEV_READ, DEV_WRITE, DEV_IOCTL, etc. */
 dev_t dev;			/* major-minor device number */
 int proc_e;			/* in whose address space is buf? */
@@ -508,7 +506,7 @@ int suspend_reopen;		/* Just suspend the process */
 /*===========================================================================*
  *				gen_opcl				     *
  *===========================================================================*/
-PUBLIC int gen_opcl(op, dev, proc_e, flags)
+int gen_opcl(op, dev, proc_e, flags)
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
 int proc_e;			/* process to open/close for */
@@ -542,7 +540,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				tty_opcl				     *
  *===========================================================================*/
-PUBLIC int tty_opcl(op, dev, proc_e, flags)
+int tty_opcl(op, dev, proc_e, flags)
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
 int proc_e;			/* process to open/close for */
@@ -579,7 +577,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				ctty_opcl				     *
  *===========================================================================*/
-PUBLIC int ctty_opcl(op, dev, proc_e, flags)
+int ctty_opcl(op, dev, proc_e, flags)
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
 int proc_e;			/* process to open/close for */
@@ -595,7 +593,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				pm_setsid				     *
  *===========================================================================*/
-PUBLIC void pm_setsid(proc_e)
+void pm_setsid(proc_e)
 int proc_e;
 {
 /* Perform the FS side of the SETSID call, i.e. get rid of the controlling
@@ -614,7 +612,7 @@ int proc_e;
 /*===========================================================================*
  *				do_ioctl				     *
  *===========================================================================*/
-PUBLIC int do_ioctl()
+int do_ioctl()
 {
 /* Perform the ioctl(ls_fd, request, argx) system call (uses m2 fmt). */
 
@@ -637,7 +635,7 @@ PUBLIC int do_ioctl()
 /*===========================================================================*
  *				gen_io					     *
  *===========================================================================*/
-PUBLIC int gen_io(task_nr, mess_ptr)
+int gen_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
 message *mess_ptr;		/* pointer to message for task */
 {
@@ -684,7 +682,7 @@ message *mess_ptr;		/* pointer to message for task */
 /*===========================================================================*
  *				asyn_io					     *
  *===========================================================================*/
-PUBLIC int asyn_io(task_nr, mess_ptr)
+int asyn_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
 message *mess_ptr;		/* pointer to message for task */
 {
@@ -708,7 +706,7 @@ message *mess_ptr;		/* pointer to message for task */
 /*===========================================================================*
  *				ctty_io					     *
  *===========================================================================*/
-PUBLIC int ctty_io(task_nr, mess_ptr)
+int ctty_io(task_nr, mess_ptr)
 int task_nr;			/* not used - for compatibility with dmap_t */
 message *mess_ptr;		/* pointer to message for task */
 {
@@ -747,7 +745,7 @@ message *mess_ptr;		/* pointer to message for task */
 /*===========================================================================*
  *				no_dev					     *
  *===========================================================================*/
-PUBLIC int no_dev(op, dev, proc, flags)
+int no_dev(op, dev, proc, flags)
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
 int proc;			/* process to open/close for */
@@ -760,7 +758,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				no_dev_io				     *
  *===========================================================================*/
-PUBLIC int no_dev_io(int proc, message *m)
+int no_dev_io(int proc, message *m)
 {
 /* Called when doing i/o on a nonexistent device. */
   printf("VFS: I/O on unmapped device number\n");
@@ -772,7 +770,7 @@ PUBLIC int no_dev_io(int proc, message *m)
 /*===========================================================================*
  *				clone_opcl				     *
  *===========================================================================*/
-PUBLIC int clone_opcl(op, dev, proc_e, flags)
+int clone_opcl(op, dev, proc_e, flags)
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
 int proc_e;			/* process to open/close for */
@@ -870,7 +868,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				dev_up					     *
  *===========================================================================*/
-PUBLIC void dev_up(int maj)
+void dev_up(int maj)
 {
   /* A new device driver has been mapped in. This function
    * checks if any filesystems are mounted on it, and if so,
@@ -949,7 +947,7 @@ PUBLIC void dev_up(int maj)
 /*===========================================================================*
  *				restart_reopen				     *
  *===========================================================================*/
-PRIVATE void restart_reopen(maj)
+static void restart_reopen(maj)
 int maj;
 {
   int n, r, minor, fd_nr;
@@ -1059,7 +1057,7 @@ int maj;
 /*===========================================================================*
  *				reopen_reply				     *
  *===========================================================================*/
-PUBLIC void reopen_reply()
+void reopen_reply()
 {
 	endpoint_t driver_e;
 	int filp_no, status, maj;
@@ -1135,10 +1133,10 @@ PUBLIC void reopen_reply()
 
 #if 0
 #define ASYN_NR	100
-PRIVATE asynmsg_t msgtable[ASYN_NR];
-PRIVATE int first_slot= 0, next_slot= 0;
+static asynmsg_t msgtable[ASYN_NR];
+static int first_slot= 0, next_slot= 0;
 
-PUBLIC int asynsend(dst, mp)
+int asynsend(dst, mp)
 endpoint_t dst;
 message *mp;
 {

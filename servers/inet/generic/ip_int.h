@@ -28,9 +28,9 @@ Copyright 1995 Philip Homburg
 
 struct ip_port;
 struct ip_fd;
-typedef void (*ip_dev_t) ARGS(( struct ip_port *ip_port ));
-typedef int (*ip_dev_send_t) ARGS(( struct ip_port *ip_port, ipaddr_t dest, 
-						acc_t *pack, int type ));
+typedef void (*ip_dev_t)(struct ip_port *ip_port);
+typedef int (*ip_dev_send_t)(struct ip_port *ip_port, ipaddr_t dest, 
+						acc_t *pack, int type);
 
 #define IP_PROTO_HASH_NR	32
 
@@ -149,39 +149,39 @@ typedef enum nettype
 struct nwio_ipconf;
 
 /* ip_eth.c */
-int ipeth_init ARGS(( ip_port_t *ip_port ));
+int ipeth_init(ip_port_t *ip_port);
 
 /* ip_ioctl.c */
-void ip_hash_proto ARGS(( ip_fd_t *ip_fd ));
-void ip_unhash_proto ARGS(( ip_fd_t *ip_fd ));
-int ip_setconf ARGS(( int ip_port, struct nwio_ipconf *ipconfp ));
+void ip_hash_proto(ip_fd_t *ip_fd);
+void ip_unhash_proto(ip_fd_t *ip_fd);
+int ip_setconf(int ip_port, struct nwio_ipconf *ipconfp);
 
 /* ip_lib.c */
-ipaddr_t ip_get_netmask ARGS(( ipaddr_t hostaddr ));
-ipaddr_t ip_get_ifaddr ARGS(( int ip_port_nr ));
-int ip_chk_hdropt ARGS(( u8_t *opt, int optlen ));
-void ip_print_frags ARGS(( acc_t *acc ));
-nettype_t ip_nettype ARGS(( ipaddr_t ipaddr ));
-ipaddr_t ip_netmask ARGS(( nettype_t nettype ));
-char *ip_nettoa ARGS(( nettype_t nettype ));
+ipaddr_t ip_get_netmask(ipaddr_t hostaddr);
+ipaddr_t ip_get_ifaddr(int ip_port_nr);
+int ip_chk_hdropt(u8_t *opt, int optlen);
+void ip_print_frags(acc_t *acc);
+nettype_t ip_nettype(ipaddr_t ipaddr);
+ipaddr_t ip_netmask(nettype_t nettype);
+char *ip_nettoa(nettype_t nettype);
 
 /* ip_ps.c */
-int ipps_init ARGS(( ip_port_t *ip_port ));
-void ipps_get ARGS(( int ip_port_nr ));
-void ipps_put ARGS(( int ip_port_nr, ipaddr_t nexthop, acc_t *pack ));
+int ipps_init(ip_port_t *ip_port);
+void ipps_get(int ip_port_nr);
+void ipps_put(int ip_port_nr, ipaddr_t nexthop, acc_t *pack);
 
 /* ip_read.c */
-void ip_port_arrive ARGS(( ip_port_t *port, acc_t *pack, ip_hdr_t *ip_hdr ));
-void ip_arrived ARGS(( ip_port_t *port, acc_t *pack ));
-void ip_arrived_broadcast ARGS(( ip_port_t *port, acc_t *pack ));
-void ip_process_loopb ARGS(( event_t *ev, ev_arg_t arg ));
-void ip_packet2user ARGS(( ip_fd_t *ip_fd, acc_t *pack, time_t exp_time,
-	size_t data_len ));
+void ip_port_arrive(ip_port_t *port, acc_t *pack, ip_hdr_t *ip_hdr);
+void ip_arrived(ip_port_t *port, acc_t *pack);
+void ip_arrived_broadcast(ip_port_t *port, acc_t *pack);
+void ip_process_loopb(event_t *ev, ev_arg_t arg);
+void ip_packet2user(ip_fd_t *ip_fd, acc_t *pack, time_t exp_time,
+	size_t data_len);
 
 /* ip_write.c */
-void dll_eth_write_frame ARGS(( ip_port_t *port ));
-acc_t *ip_split_pack ARGS(( ip_port_t *ip_port, acc_t **ref_last, int mtu ));
-void ip_hdr_chksum ARGS(( ip_hdr_t *ip_hdr, int ip_hdr_len ));
+void dll_eth_write_frame(ip_port_t *port);
+acc_t *ip_split_pack(ip_port_t *ip_port, acc_t **ref_last, int mtu);
+void ip_hdr_chksum(ip_hdr_t *ip_hdr, int ip_hdr_len);
 
 
 extern ip_fd_t ip_fd_table[IP_FD_NR];
@@ -192,7 +192,3 @@ extern ip_ass_t ip_ass_table[IP_ASS_NR];
 	NWIO_RWDATALL | NWIO_HDR_O_SPEC)
 
 #endif /* INET_IP_INT_H */
-
-/*
- * $PchId: ip_int.h,v 1.19 2004/08/03 16:24:23 philip Exp $
- */

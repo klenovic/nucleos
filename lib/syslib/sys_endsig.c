@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_endksig				     *
  *===========================================================================*/
-PUBLIC int sys_endksig(proc_nr)
+int sys_endksig(proc_nr)
 int proc_nr;				/* process number */
 {
     message m;

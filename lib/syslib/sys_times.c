@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_times(proc, user_time, sys_time, uptime)
+int sys_times(proc, user_time, sys_time, uptime)
 int proc;			/* proc whose times are needed */
 clock_t *user_time;		/* time spend in the process itself */
 clock_t *sys_time;		/* time spend in system on behalf of the

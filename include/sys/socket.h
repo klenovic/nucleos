@@ -56,36 +56,26 @@ struct sockaddr
 	char		sa_data[8];	/* Big enough for sockaddr_in */
 };
 
-_PROTOTYPE( int accept, (int _socket,
-				struct sockaddr *_RESTRICT _address,
-				socklen_t *_RESTRICT _address_len)	);
-_PROTOTYPE( int bind, (int _socket, const struct sockaddr *_address,
-						socklen_t _address_len)	);
-_PROTOTYPE( int connect, (int _socket, const struct sockaddr *_address,
-						socklen_t _address_len)	);
-_PROTOTYPE( int getpeername, (int _socket,
-				struct sockaddr *_RESTRICT _address,
-				socklen_t *_RESTRICT _address_len)	);
-_PROTOTYPE( int getsockname, (int _socket,
-				struct sockaddr *_RESTRICT _address,
-				socklen_t *_RESTRICT _address_len)	);
-_PROTOTYPE( int setsockopt,(int _socket, int _level, int _option_name,
-		const void *_option_value, socklen_t _option_len)	);
-_PROTOTYPE( int getsockopt, (int _socket, int _level, int _option_name,
-        void *_RESTRICT _option_value, socklen_t *_RESTRICT _option_len));
-_PROTOTYPE( int listen, (int _socket, int _backlog)			);
-_PROTOTYPE( ssize_t recv, (int _socket, void *_buffer, size_t _length,
-							int _flags)	);
-_PROTOTYPE( ssize_t recvfrom, (int _socket, void *_RESTRICT _buffer,
-	size_t _length, int _flags, struct sockaddr *_RESTRICT _address,
-				socklen_t *_RESTRICT _address_len)	);
-_PROTOTYPE( ssize_t send, (int _socket, const void *_buffer,
-					size_t _length, int _flags)	);
-_PROTOTYPE( ssize_t sendto, (int _socket, const void *_message,
-	size_t _length, int _flags, const struct sockaddr *_dest_addr,
-						socklen_t _dest_len)	);
-_PROTOTYPE( int shutdown, (int _socket, int _how)			);
-_PROTOTYPE( int socket, (int _domain, int _type, int _protocol)		);
+int accept(int _socket, struct sockaddr *__restrict _address, socklen_t *__restrict _address_len);
+int bind(int _socket, const struct sockaddr *_address, socklen_t _address_len);
+int connect(int _socket, const struct sockaddr *_address, socklen_t _address_len);
+int getpeername(int _socket, struct sockaddr *__restrict _address,
+		socklen_t *__restrict _address_len);
+int getsockname(int _socket, struct sockaddr *__restrict _address,
+		socklen_t *__restrict _address_len);
+int setsockopt(int _socket, int _level, int _option_name, const void *_option_value,
+	       socklen_t _option_len);
+int getsockopt(int _socket, int _level, int _option_name, void *__restrict _option_value,
+	       socklen_t *__restrict _option_len);
+int listen(int _socket, int _backlog);
+ssize_t recv(int _socket, void *_buffer, size_t _length, int _flags);
+ssize_t recvfrom(int _socket, void *__restrict _buffer, size_t _length, int _flags,
+		 struct sockaddr *__restrict _address, socklen_t *__restrict _address_len);
+ssize_t send(int _socket, const void *_buffer, size_t _length, int _flags);
+ssize_t sendto(int _socket, const void *_message, size_t _length, int _flags,
+	       const struct sockaddr *_dest_addr, socklen_t _dest_len);
+int shutdown(int _socket, int _how);
+int socket(int _domain, int _type, int _protocol);
 
 /* The following constants are often used in applications, but are not defined
  * by POSIX.

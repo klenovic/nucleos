@@ -13,10 +13,6 @@
 #ifndef _REGEXP_H
 #define _REGEXP_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 #define CHARBITS 0377
 #define NSUBEXP  10
 typedef struct regexp {
@@ -42,7 +38,3 @@ void regsub(regexp *_prog, char *_source, char *_dest);
 void regerror(const char *_message) ;
 
 #endif /* _REGEXP_H */
-
-/*
- * $PchId: regexp.h,v 1.4 1996/04/10 21:43:17 philip Exp $
- */

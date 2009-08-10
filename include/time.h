@@ -19,10 +19,7 @@
 #define _TIME_H
 
 #define CLOCKS_PER_SEC    60
-
-#ifdef _POSIX_SOURCE
 #define CLK_TCK CLOCKS_PER_SEC	/* obsolescent mame for CLOCKS_PER_SEC */
-#endif
 
 #define NULL    ((void *)0)
 
@@ -55,29 +52,19 @@ struct tm {
 
 extern char *tzname[];
 
-/* Function Prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
+clock_t clock(void);
+double difftime(time_t _time1, time_t _time0);
+time_t mktime(struct tm *_timeptr);
+time_t time(time_t *_timeptr);
+char *asctime(const struct tm *_timeptr);
+char *ctime(const time_t *_timer);
+struct tm *gmtime(const time_t *_timer);
+struct tm *localtime(const time_t *_timer);
+size_t strftime(char *_s, size_t _max, const char *_fmt, const struct tm *_timep);
 
-_PROTOTYPE( clock_t clock, (void)					);
-_PROTOTYPE( double difftime, (time_t _time1, time_t _time0)		);
-_PROTOTYPE( time_t mktime, (struct tm *_timeptr)			);
-_PROTOTYPE( time_t time, (time_t *_timeptr)				);
-_PROTOTYPE( char *asctime, (const struct tm *_timeptr)			);
-_PROTOTYPE( char *ctime, (const time_t *_timer)			);
-_PROTOTYPE( struct tm *gmtime, (const time_t *_timer)			);
-_PROTOTYPE( struct tm *localtime, (const time_t *_timer)		);
-_PROTOTYPE( size_t strftime, (char *_s, size_t _max, const char *_fmt,
-				const struct tm *_timep)		);
+void tzset(void);
 
-#ifdef _POSIX_SOURCE
-_PROTOTYPE( void tzset, (void)						);
-#endif
-
-#ifdef _MINIX
-_PROTOTYPE( int stime, (time_t *_top)					);
-#endif
+int stime(time_t *_top);
 
 extern long timezone;
 

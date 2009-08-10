@@ -45,11 +45,6 @@
  *
  *	@(#)regexec.c	8.3 (Berkeley) 3/20/94
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)regexec.c	8.3 (Berkeley) 3/20/94";
-#endif /* LIBC_SCCS and not lint */
-
 /*
  * the outer shell of regexec()
  *
@@ -189,7 +184,3 @@ int eflags;
 	else
 		return(lmatcher(g, (char *)string, nmatch, pmatch, eflags));
 }
-
-/*
- * $PchId: regexec.c,v 1.2 1996/03/12 19:10:15 philip Exp $
- */

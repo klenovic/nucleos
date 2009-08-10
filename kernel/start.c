@@ -137,7 +137,7 @@ static char *get_value(const char *params, const char *name)
 /* Get environment value - kernel version of getenv to avoid setting up the
  * usual environment array.
  */
-	register _CONST char *namep;
+	register const char *namep;
 	register char *envp;
 
 	for (envp = (char *) params; *envp != 0;) {

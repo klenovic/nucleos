@@ -33,29 +33,25 @@ struct rproc rproc[NR_SYS_PROCS];		/* system process table */
 struct rproc *rproc_ptr[NR_PROCS];		/* mapping for fast access */
 
 /* Prototypes for internal functions that do the hard work. */
-FORWARD _PROTOTYPE( int start_service, (struct rproc *rp, int flags,
-	endpoint_t *ep) );
-FORWARD _PROTOTYPE( int stop_service, (struct rproc *rp,int how) );
-FORWARD _PROTOTYPE( int fork_nb, (void) );
-FORWARD _PROTOTYPE( int read_exec, (struct rproc *rp) );
-FORWARD _PROTOTYPE( void run_script, (struct rproc *rp) );
-FORWARD _PROTOTYPE( char *get_next_label, (char *ptr, char *label,
-	char *caller_label) );
-FORWARD _PROTOTYPE( void add_forward_ipc, (struct rproc *rp,
-	struct priv *privp) );
-FORWARD _PROTOTYPE( void add_backward_ipc, (struct rproc *rp,
-	struct priv *privp) );
-FORWARD _PROTOTYPE( void init_privs, (struct rproc *rp, struct priv *privp) );
-FORWARD _PROTOTYPE( void init_pci, (struct rproc *rp, int endpoint) );
+static int start_service(struct rproc *rp, int flags, endpoint_t *ep);
+static int stop_service(struct rproc *rp,int how);
+static int fork_nb(void);
+static int read_exec(struct rproc *rp);
+static void run_script(struct rproc *rp);
+static char *get_next_label(char *ptr, char *label, char *caller_label);
+static void add_forward_ipc(struct rproc *rp, struct priv *privp);
+static void add_backward_ipc(struct rproc *rp, struct priv *privp);
+static void init_privs(struct rproc *rp, struct priv *privp);
+static void init_pci(struct rproc *rp, int endpoint);
 
-PRIVATE int shutting_down = FALSE;
+static int shutting_down = FALSE;
 
 extern int rs_verbose;
 
 /*===========================================================================*
  *					do_up				     *
  *===========================================================================*/
-PUBLIC int do_up(m_ptr, do_copy, flags)
+int do_up(m_ptr, do_copy, flags)
 message *m_ptr;					/* request message pointer */
 int do_copy;					/* keep copy in memory */
 int flags;					/* extra flags, if any */
@@ -156,7 +152,7 @@ printf("RS: in do_up\n");
 /*===========================================================================*
  *					do_start			     *
  *===========================================================================*/
-PUBLIC int do_start(m_ptr)
+int do_start(m_ptr)
 message *m_ptr;					/* request message pointer */
 {
 /* A request was made to start a new system service. 
@@ -394,7 +390,7 @@ message *m_ptr;					/* request message pointer */
 /*===========================================================================*
  *				do_down					     *
  *===========================================================================*/
-PUBLIC int do_down(message *m_ptr)
+int do_down(message *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -443,7 +439,7 @@ PUBLIC int do_down(message *m_ptr)
 /*===========================================================================*
  *				do_restart				     *
  *===========================================================================*/
-PUBLIC int do_restart(message *m_ptr)
+int do_restart(message *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -487,7 +483,7 @@ PUBLIC int do_restart(message *m_ptr)
 /*===========================================================================*
  *				do_refresh				     *
  *===========================================================================*/
-PUBLIC int do_refresh(message *m_ptr)
+int do_refresh(message *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -521,7 +517,7 @@ PUBLIC int do_refresh(message *m_ptr)
 /*===========================================================================*
  *				do_shutdown				     *
  *===========================================================================*/
-PUBLIC int do_shutdown(message *m_ptr)
+int do_shutdown(message *m_ptr)
 {
   /* Set flag so that RS server knows services shouldn't be restarted. */
   shutting_down = TRUE;
@@ -531,7 +527,7 @@ PUBLIC int do_shutdown(message *m_ptr)
 /*===========================================================================*
  *				do_exit					     *
  *===========================================================================*/
-PUBLIC void do_exit(message *m_ptr)
+void do_exit(message *m_ptr)
 {
   register struct rproc *rp;
   pid_t exit_pid;
@@ -679,7 +675,7 @@ rp->r_restarts= 0;
 /*===========================================================================*
  *				do_period				     *
  *===========================================================================*/
-PUBLIC void do_period(m_ptr)
+void do_period(m_ptr)
 message *m_ptr;
 {
   register struct rproc *rp;
@@ -754,7 +750,7 @@ message *m_ptr;
 /*===========================================================================*
  *				start_service				     *
  *===========================================================================*/
-PRIVATE int start_service(rp, flags, endpoint)
+static int start_service(rp, flags, endpoint)
 struct rproc *rp;
 int flags;
 endpoint_t *endpoint;
@@ -898,7 +894,7 @@ endpoint_t *endpoint;
 /*===========================================================================*
  *				stop_service				     *
  *===========================================================================*/
-PRIVATE int stop_service(rp,how)
+static int stop_service(rp,how)
 struct rproc *rp;
 int how;
 {
@@ -919,7 +915,7 @@ int how;
 /*===========================================================================*
  *				do_getsysinfo				     *
  *===========================================================================*/
-PUBLIC int do_getsysinfo(m_ptr)
+int do_getsysinfo(m_ptr)
 message *m_ptr;
 {
   vir_bytes src_addr, dst_addr;
@@ -943,14 +939,14 @@ message *m_ptr;
   return(OK);
 }
 
-PRIVATE pid_t fork_nb()
+static pid_t fork_nb()
 {
   message m;
 
   return(_syscall(PM_PROC_NR, FORK_NB, &m));
 }
 
-PRIVATE int read_exec(rp)
+static int read_exec(rp)
 struct rproc *rp;
 {
 	int e, r, fd;
@@ -996,7 +992,7 @@ struct rproc *rp;
 /*===========================================================================*
  *				run_script				     *
  *===========================================================================*/
-PRIVATE void run_script(rp)
+static void run_script(rp)
 struct rproc *rp;
 {
 	int r, proc_nr_e;
@@ -1063,7 +1059,7 @@ struct rproc *rp;
 /*===========================================================================*
  *				get_next_label				     *
  *===========================================================================*/
-PRIVATE char *get_next_label(ptr, label, caller_label)
+static char *get_next_label(ptr, label, caller_label)
 char *ptr;
 char *label;
 char *caller_label;
@@ -1105,7 +1101,7 @@ char *caller_label;
 /*===========================================================================*
  *				add_forward_ipc				     *
  *===========================================================================*/
-PRIVATE void add_forward_ipc(rp, privp)
+static void add_forward_ipc(rp, privp)
 struct rproc *rp;
 struct priv *privp;
 {
@@ -1177,7 +1173,7 @@ struct priv *privp;
 /*===========================================================================*
  *				add_backward_ipc			     *
  *===========================================================================*/
-PRIVATE void add_backward_ipc(rp, privp)
+static void add_backward_ipc(rp, privp)
 struct rproc *rp;
 struct priv *privp;
 {
@@ -1233,7 +1229,7 @@ struct priv *privp;
 /*===========================================================================*
  *				init_privs				     *
  *===========================================================================*/
-PRIVATE void init_privs(rp, privp)
+static void init_privs(rp, privp)
 struct rproc *rp;
 struct priv *privp;
 {
@@ -1293,7 +1289,7 @@ struct priv *privp;
 /*===========================================================================*
  *				init_pci				     *
  *===========================================================================*/
-PRIVATE void init_pci(rp, endpoint)
+static void init_pci(rp, endpoint)
 struct rproc *rp;
 int endpoint;
 {

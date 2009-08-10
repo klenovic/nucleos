@@ -3,7 +3,7 @@ app-y := init.elf32
 init.elf32-type := server
 init.elf32-obj-y := init.o
 
-ccflags-y += -O -D_MINIX -D_POSIX_SOURCE
+ccflags-y += -O2
 
 LDFLAGS_init.elf32 := -L$(lib-arch) -Llib \
 		      -lnucc \

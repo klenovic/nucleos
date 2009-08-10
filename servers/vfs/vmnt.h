@@ -10,13 +10,15 @@
 #ifndef __SERVERS_VFS_VMNT_H
 #define __SERVERS_VFS_VMNT_H
 
-EXTERN struct vmnt {
+struct vmnt {
   int m_fs_e;                   /* FS process' kernel endpoint */
   dev_t m_dev;                  /* device number */
   int m_flags;                  /* mount flags */
   struct vnode *m_mounted_on;   /* the vnode on which the partition is mounted */
   struct vnode *m_root_node;    /* root vnode */
-} vmnt[NR_MNTS];
+};
+
+extern struct vmnt vmnt[];
 
 #define NIL_VMNT (struct vmnt *) 0
 

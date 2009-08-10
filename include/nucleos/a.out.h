@@ -118,10 +118,6 @@ struct nlist {			/* symbol table entry */
 #define C_STAT		0030	/* static */
 
 /* Function prototypes. */
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
-_PROTOTYPE( int nlist, (char *_file, struct nlist *_nl)			);
+int nlist(char *_file, struct nlist *_nl);
 
 #endif /* __NUCLEOS_AOUT_H */

@@ -31,36 +31,35 @@
 #define U64_LO 0
 #define U64_HI 1
 
-PRIVATE char cpath[CPROF_CPATH_MAX_LEN];	/* current call path string */
-PRIVATE int cpath_len;				/* current call path len */
-PRIVATE struct cprof_tbl_s *cprof_slot;		/* slot of current function */
+static char cpath[CPROF_CPATH_MAX_LEN];	/* current call path string */
+static int cpath_len;				/* current call path len */
+static struct cprof_tbl_s *cprof_slot;		/* slot of current function */
 
-PRIVATE struct stack_s {			/* stack entry */
+static struct stack_s {			/* stack entry */
 		int cpath_len;			/* call path len */
 		struct cprof_tbl_s *slot;	/* table slot */
 		u64_t start_1;			/* count @ begin of procentry */
 		u64_t start_2;			/* count @ end of procentry */
 		u64_t spent_deeper;		/* spent in called functions */
 };
-PRIVATE struct stack_s cprof_stk[CPROF_STACK_SIZE];	/* stack */
-PRIVATE int cprof_stk_top;				/* top of stack */
-EXTERN struct cprof_tbl_s cprof_tbl[];			/* hash table */
-PRIVATE int cprof_tbl_size;				/* nr of slots */
-PRIVATE struct cprof_tbl_s *idx[CPROF_INDEX_SIZE];	/* index to table */
-PRIVATE struct cprof_ctl_s control;		/* for comms with kernel */
-PRIVATE int cprof_announce;			/* announce on n-th execution
+static struct stack_s cprof_stk[CPROF_STACK_SIZE];	/* stack */
+static int cprof_stk_top;				/* top of stack */
+extern struct cprof_tbl_s cprof_tbl[];			/* hash table */
+static int cprof_tbl_size;				/* nr of slots */
+static struct cprof_tbl_s *idx[CPROF_INDEX_SIZE];	/* index to table */
+static struct cprof_ctl_s control;		/* for comms with kernel */
+static int cprof_announce;			/* announce on n-th execution
 						 * of procentry */
-PRIVATE int cprof_locked;			/* for reentrancy */
+static int cprof_locked;			/* for reentrancy */
 
-_PROTOTYPE(void procentry, (char *name) );
-_PROTOTYPE(void procexit, (char *name) );
+void procentry(char *name);
+void procexit(char *name);
 
-FORWARD _PROTOTYPE(void cprof_init, (void) );
-FORWARD _PROTOTYPE(void reset, (void) );
-FORWARD _PROTOTYPE(void clear_tbl, (void) );
+static void cprof_init(void);
+static void reset(void);
+static void clear_tbl(void);
 
-
-PUBLIC void procentry (name)
+void procentry (name)
 char *name;
 {
   static int init = 0;
@@ -197,7 +196,7 @@ char *name;
 }
 
 
-PUBLIC void procexit (name)
+void procexit (name)
 char *name;
 {
   u64_t stop,spent;
@@ -266,7 +265,7 @@ char *name;
 }
 
 
-PRIVATE void cprof_init() {
+static void cprof_init() {
   message m;
   int i;
 
@@ -297,14 +296,14 @@ PRIVATE void cprof_init() {
 }
 
 
-PRIVATE void reset()
+static void reset()
 {
   clear_tbl();
   control.reset = 0;
 }
 
 
-PRIVATE void clear_tbl()
+static void clear_tbl()
 {
   int i;
 

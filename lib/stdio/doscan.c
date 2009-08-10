@@ -10,8 +10,6 @@
 /*
  * doscan.c - scan formatted input
  */
-/* $Header: /cvsup/minix/src/lib/stdio/doscan.c,v 1.1.1.1 2005/04/21 14:56:35 beng Exp $ */
-
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<ctype.h>

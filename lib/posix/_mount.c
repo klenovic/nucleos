@@ -24,7 +24,7 @@
 #define FSPATH "/sbin/"
 #define FSDEFAULT "mfs"
 
-PRIVATE int rs_down(char *label)
+static int rs_down(char *label)
 {
 	char cmd[200];
 	message m;
@@ -34,10 +34,10 @@ PRIVATE int rs_down(char *label)
 	return system(cmd);
 }
 
-PRIVATE char *makelabel(_CONST char *special)
+static char *makelabel(const char *special)
 {
   static char label[40];
-  _CONST char *dev;
+  const char *dev;
 
   /* Make label name. */
   dev = strrchr(special, '/');
@@ -55,7 +55,7 @@ PRIVATE char *makelabel(_CONST char *special)
   return label;
 }
 
-PUBLIC int mount(special, name, rwflag, type, args)
+int mount(special, name, rwflag, type, args)
 char *name, *special, *type, *args;
 int rwflag;
 {
@@ -137,8 +137,8 @@ int rwflag;
   return r;
 }
 
-PUBLIC int umount(name)
-_CONST char *name;
+int umount(name)
+const char *name;
 {
   message m;
   char *label;

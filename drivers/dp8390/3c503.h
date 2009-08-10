@@ -65,9 +65,3 @@
 
 #define inb_el2(dep,reg)	(inb((dep)->de_base_port+(reg)))
 #define outb_el2(dep,reg,data)	(outb((dep)->de_base_port+(reg),(data)))
-
-/** 3c503.h **/
-
-/*
- * $PchId: 3c503.h,v 1.3 2003/09/10 15:34:29 philip Exp $
- */

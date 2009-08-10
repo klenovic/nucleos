@@ -11,9 +11,6 @@
 /* This file contains the table used to map system call numbers onto the
  * routines that perform them.
  */
-
-#define _TABLE
-
 #include "fs.h"
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
@@ -22,7 +19,52 @@
 #include "super.h"
 #include "drivers.h"
 
-PUBLIC _PROTOTYPE (int (*fs_call_vec[]), (void) ) = {
+off_t rdahedpos;         /* position to read ahead */
+struct inode *rdahed_inode;      /* pointer to inode to read ahead */
+
+/* The following variables are used for returning results to the caller. */
+int err_code;            /* temporary storage for error number */
+int rdwt_err;            /* status of last disk i/o request */
+
+int cch[NR_INODES];
+
+message fs_m_in;
+message fs_m_out;
+int FS_STATE;
+
+uid_t caller_uid;
+gid_t caller_gid;
+
+time_t boottime;         /* time in seconds at system boot */
+int use_getuptime2;      /* Should be removed togetherwith boottime */
+
+int req_nr;
+
+int SELF_E;
+
+struct inode *chroot_dir;
+
+short path_processed;      /* number of characters processed */
+char user_path[PATH_MAX+1];  /* pathname to be processed */
+char *vfs_slink_storage;
+int Xsymloop;
+
+dev_t fs_dev;            /* The device that is handled by this FS proc.
+                                 */
+char fs_dev_label[16];   /* Name of the device driver that is handled
+                                 * by this FS proc.
+                                 */
+int unmountdone;
+int exitsignaled;
+
+/* our block size. */
+int fs_block_size;
+
+/* Buffer cache. */
+struct buf buf[NR_BUFS];
+struct buf *buf_hash[NR_BUFS];   /* the buffer hash table */
+
+int (*fs_call_vec[])(void) = {
         no_sys,             /* 0   not used */
         fs_getnode,         /* 1   */
         fs_putnode,         /* 2   */
@@ -79,4 +121,3 @@ PUBLIC _PROTOTYPE (int (*fs_call_vec[]), (void) ) = {
         fs_rdlink_s,	    /* 53  */
         fs_getdents,	    /* 54  */
 };
-

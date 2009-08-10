@@ -15,8 +15,6 @@ Created:	Oct 14, 1993 by Philip Homburg <philip@cs.vu.nl>
 Implementation of isnan that directly tests the bits in an ieee float
 */
 
-#define _MINIX_SOURCE
-
 #include <nucleos/types.h>
 #include <math.h>
 
@@ -34,7 +32,3 @@ double value;
 		return 0;
 	return F64_GET_MANT_LOW(f64p) != 0 || F64_GET_MANT_HIGH(f64p) != 0;
 }
-
-/*
- * $PchId: isnan.c,v 1.3 1996/02/22 21:01:39 philip Exp $
- */

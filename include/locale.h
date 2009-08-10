@@ -15,10 +15,6 @@
 #ifndef _LOCALE_H
 #define _LOCALE_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 struct lconv {
   char *decimal_point;		/* "." */
   char *thousands_sep;		/* ""  */
@@ -50,7 +46,7 @@ struct lconv {
 #define LC_TIME            6
 
 /* Function Prototypes. */
-_PROTOTYPE( char *setlocale, (int _category, const char *_locale)	);
-_PROTOTYPE( struct lconv *localeconv, (void)				);
+char *setlocale(int _category, const char *_locale);
+struct lconv *localeconv(void);
 
 #endif /* _LOCALE_H */

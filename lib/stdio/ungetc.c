@@ -10,8 +10,6 @@
 /*
  * ungetc.c - push a character back onto an input stream
  */
-/* $Header: /cvsup/minix/src/lib/stdio/ungetc.c,v 1.1.1.1 2005/04/21 14:56:36 beng Exp $ */
-
 #include	<stdio.h>
 #include	"loc_incl.h"
 

@@ -9,6 +9,7 @@
  */
 #include <nucleos/compile.h>
 #include <nucleos/uts.h>
+#include <nucleos/types.h>
 #include <nucleos/utsname.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>

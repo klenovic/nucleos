@@ -56,19 +56,19 @@
 u8_t *tmp_buf = NULL;		/* the DMA buffer eventually */
 phys_bytes tmp_phys;		/* phys address of DMA buffer */
 
-FORWARD _PROTOTYPE( void init_buffer, (void) );
-FORWARD _PROTOTYPE( int do_rdwt, (struct driver *dr, message *mp, int safe) );
-FORWARD _PROTOTYPE( int do_vrdwt, (struct driver *dr, message *mp, int safe) );
+static void init_buffer(void);
+static int do_rdwt(struct driver *dr, message *mp, int safe);
+static int do_vrdwt(struct driver *dr, message *mp, int safe);
 
-_PROTOTYPE( int asynsend, (endpoint_t dst, message *mp));
+int asynsend(endpoint_t dst, message *mp);
 
 int device_caller;
-PRIVATE mq_t *queue_head = NULL;
+static mq_t *queue_head = NULL;
 
 /*===========================================================================*
  *				driver_task				     *
  *===========================================================================*/
-PUBLIC void driver_task(dp)
+void driver_task(dp)
 struct driver *dp;	/* Device dependent entry points. */
 {
 /* Main program of any device driver task. */
@@ -238,7 +238,7 @@ struct driver *dp;	/* Device dependent entry points. */
 /*===========================================================================*
  *				init_buffer				     *
  *===========================================================================*/
-PRIVATE void init_buffer()
+static void init_buffer()
 {
 /* Select a buffer that can safely be used for DMA transfers.  It may also
  * be used to read partition tables and such.  Its absolute address is
@@ -255,7 +255,7 @@ PRIVATE void init_buffer()
 /*===========================================================================*
  *				do_rdwt					     *
  *===========================================================================*/
-PRIVATE int do_rdwt(dp, mp, safe)
+static int do_rdwt(dp, mp, safe)
 struct driver *dp;		/* device dependent entry points */
 message *mp;			/* pointer to read or write message */
 int safe;			/* use safecopies? */
@@ -300,7 +300,7 @@ int safe;			/* use safecopies? */
 /*==========================================================================*
  *				do_vrdwt				    *
  *==========================================================================*/
-PRIVATE int do_vrdwt(dp, mp, safe)
+static int do_vrdwt(dp, mp, safe)
 struct driver *dp;	/* device dependent entry points */
 message *mp;		/* pointer to read or write message */
 int safe;		/* use safecopies? */
@@ -364,7 +364,7 @@ int safe;		/* use safecopies? */
 /*===========================================================================*
  *				no_name					     *
  *===========================================================================*/
-PUBLIC char *no_name()
+char *no_name()
 {
 /* Use this default name if there is no specific name for the device. This was
  * originally done by fetching the name from the task table for this process: 
@@ -379,7 +379,7 @@ PUBLIC char *no_name()
 /*============================================================================*
  *				do_nop					      *
  *============================================================================*/
-PUBLIC int do_nop(dp, mp)
+int do_nop(dp, mp)
 struct driver *dp;
 message *mp;
 {
@@ -399,7 +399,7 @@ message *mp;
 /*============================================================================*
  *				nop_ioctl				      *
  *============================================================================*/
-PUBLIC int nop_ioctl(dp, mp, safe)
+int nop_ioctl(dp, mp, safe)
 struct driver *dp;
 message *mp;
 int safe;
@@ -410,7 +410,7 @@ int safe;
 /*============================================================================*
  *				nop_signal			  	      *
  *============================================================================*/
-PUBLIC void nop_signal(dp, mp)
+void nop_signal(dp, mp)
 struct driver *dp;
 message *mp;
 {
@@ -420,7 +420,7 @@ message *mp;
 /*============================================================================*
  *				nop_alarm				      *
  *============================================================================*/
-PUBLIC void nop_alarm(dp, mp)
+void nop_alarm(dp, mp)
 struct driver *dp;
 message *mp;
 {
@@ -430,7 +430,7 @@ message *mp;
 /*===========================================================================*
  *				nop_prepare				     *
  *===========================================================================*/
-PUBLIC struct device *nop_prepare(device)
+struct device *nop_prepare(device)
 {
 /* Nothing to prepare for. */
   return(NIL_DEV);
@@ -439,7 +439,7 @@ PUBLIC struct device *nop_prepare(device)
 /*===========================================================================*
  *				nop_cleanup				     *
  *===========================================================================*/
-PUBLIC void nop_cleanup()
+void nop_cleanup()
 {
 /* Nothing to clean up. */
 }
@@ -447,7 +447,7 @@ PUBLIC void nop_cleanup()
 /*===========================================================================*
  *				nop_cancel				     *
  *===========================================================================*/
-PUBLIC int nop_cancel(struct driver *dr, message *m)
+int nop_cancel(struct driver *dr, message *m)
 {
 /* Nothing to do for cancel. */
    return(OK);
@@ -456,7 +456,7 @@ PUBLIC int nop_cancel(struct driver *dr, message *m)
 /*===========================================================================*
  *				nop_select				     *
  *===========================================================================*/
-PUBLIC int nop_select(struct driver *dr, message *m)
+int nop_select(struct driver *dr, message *m)
 {
 /* Nothing to do for select. */
    return(OK);
@@ -465,7 +465,7 @@ PUBLIC int nop_select(struct driver *dr, message *m)
 /*============================================================================*
  *				do_diocntl				      *
  *============================================================================*/
-PUBLIC int do_diocntl(dp, mp, safe)
+int do_diocntl(dp, mp, safe)
 struct driver *dp;
 message *mp;			/* pointer to ioctl request */
 int safe;			/* addresses or grants? */
@@ -518,7 +518,7 @@ int safe;			/* addresses or grants? */
 /*===========================================================================*
  *				mq_queue				     *
  *===========================================================================*/
-PUBLIC int mq_queue(message *m)
+int mq_queue(message *m)
 {
 	mq_t *mq, *mi;
 
@@ -540,10 +540,10 @@ PUBLIC int mq_queue(message *m)
 #if 0
 
 #define ASYN_NR	100
-PRIVATE asynmsg_t msgtable[ASYN_NR];
-PRIVATE int first_slot= 0, next_slot= 0;
+static asynmsg_t msgtable[ASYN_NR];
+static int first_slot= 0, next_slot= 0;
 
-PUBLIC int asynsend(dst, mp)
+int asynsend(dst, mp)
 endpoint_t dst;
 message *mp;
 {

@@ -33,7 +33,7 @@
 /*===========================================================================*
  *				alloc_bit				     *
  *===========================================================================*/
-PUBLIC bit_t alloc_bit(sp, map, origin)
+bit_t alloc_bit(sp, map, origin)
 struct super_block *sp;		/* the filesystem to allocate from */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
 bit_t origin;			/* number of bit to start searching at */
@@ -109,7 +109,7 @@ bit_t origin;			/* number of bit to start searching at */
 /*===========================================================================*
  *				free_bit				     *
  *===========================================================================*/
-PUBLIC void free_bit(sp, map, bit_returned)
+void free_bit(sp, map, bit_returned)
 struct super_block *sp;		/* the filesystem to operate on */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
 bit_t bit_returned;		/* number of bit to insert into the map */
@@ -154,7 +154,7 @@ bit_t bit_returned;		/* number of bit to insert into the map */
 /*===========================================================================*
  *				get_super				     *
  *===========================================================================*/
-PUBLIC struct super_block *get_super(dev)
+struct super_block *get_super(dev)
 dev_t dev;			/* device number whose super_block is sought */
 {
   if (dev == NO_DEV)
@@ -169,7 +169,7 @@ dev_t dev;			/* device number whose super_block is sought */
 /*===========================================================================*
  *				get_block_size				     *
  *===========================================================================*/
-PUBLIC int get_block_size(dev_t dev)
+int get_block_size(dev_t dev)
 {
   if (dev == NO_DEV)
   	panic(__FILE__,"request for block size of NO_DEV", NO_NUM);
@@ -196,7 +196,7 @@ PUBLIC int get_block_size(dev_t dev)
  *===========================================================================*/
 /* Report on whether the given inode is on a mounted (or ROOT) file system. */
 /*
-PUBLIC int mounted(rip)
+int mounted(rip)
 register struct inode *rip;
 {
 
@@ -214,7 +214,7 @@ register struct inode *rip;
 /*===========================================================================*
  *				read_super				     *
  *===========================================================================*/
-PUBLIC int read_super(sp)
+int read_super(sp)
 register struct super_block *sp; /* pointer to a superblock */
 {
 /* Read a superblock. */

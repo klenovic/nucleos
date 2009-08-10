@@ -257,7 +257,3 @@ rl_list_possib(pathname, avp)
     DISPOSE(file);
     return ac;
 }
-
-/*
- * $PchId: complete.c,v 1.3 1996/02/22 21:18:51 philip Exp $
- */

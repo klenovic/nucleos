@@ -36,13 +36,13 @@
 #include "vnode.h"
 #include "vmnt.h"
 
-FORWARD _PROTOTYPE( int change, (struct vnode **iip, char *name_ptr, int len));
-FORWARD _PROTOTYPE( int change_into, (struct vnode **iip, struct vnode *vp));
+static int change(struct vnode **iip, char *name_ptr, int len);
+static int change_into(struct vnode **iip, struct vnode *vp);
 
 /*===========================================================================*
  *				do_fchdir				     *
  *===========================================================================*/
-PUBLIC int do_fchdir()
+int do_fchdir()
 {
   /* Change directory on already-opened fd. */
   struct filp *rfilp;
@@ -73,7 +73,7 @@ PUBLIC int do_fchdir()
 /*===========================================================================*
  *				do_chdir				     *
  *===========================================================================*/
-PUBLIC int do_chdir()
+int do_chdir()
 {
 /* Change directory.  This function is  also called by MM to simulate a chdir
  * in order to do EXEC, etc.  It also changes the root directory, the uids and
@@ -125,7 +125,7 @@ PUBLIC int do_chdir()
 /*===========================================================================*
  *				do_chroot				     *
  *===========================================================================*/
-PUBLIC int do_chroot()
+int do_chroot()
 {
 /* Perform the chroot(name) system call. */
 
@@ -147,7 +147,7 @@ PUBLIC int do_chroot()
 /*===========================================================================*
  *				change					     *
  *===========================================================================*/
-PRIVATE int change(iip, name_ptr, len)
+static int change(iip, name_ptr, len)
 struct vnode **iip;		/* pointer to the inode pointer for the dir */
 char *name_ptr;			/* pointer to the directory name to change to */
 int len;			/* length of the directory name string */
@@ -182,7 +182,7 @@ int len;			/* length of the directory name string */
 /*===========================================================================*
  *				change_into				     *
  *===========================================================================*/
-PRIVATE int change_into(iip, vp)
+static int change_into(iip, vp)
 struct vnode **iip;		/* pointer to the inode pointer for the dir */
 struct vnode *vp;		/* this is what the inode has to become */
 {
@@ -197,7 +197,7 @@ struct vnode *vp;		/* this is what the inode has to become */
 /*===========================================================================*
  *				do_stat					     *
  *===========================================================================*/
-PUBLIC int do_stat()
+int do_stat()
 {
 /* Perform the stat(name, buf) system call. */
   int r;
@@ -220,7 +220,7 @@ PUBLIC int do_stat()
 /*===========================================================================*
  *				do_fstat				     *
  *===========================================================================*/
-PUBLIC int do_fstat()
+int do_fstat()
 {
 /* Perform the fstat(fd, buf) system call. */
   register struct filp *rfilp;
@@ -253,7 +253,7 @@ PUBLIC int do_fstat()
 /*===========================================================================*
  *				do_fstatfs				     *
  *===========================================================================*/
-PUBLIC int do_fstatfs()
+int do_fstatfs()
 {
   /* Perform the fstatfs(fd, buf) system call. */
   register struct filp *rfilp;
@@ -270,7 +270,7 @@ PUBLIC int do_fstatfs()
 /*===========================================================================*
  *                             do_lstat					     *
  *===========================================================================*/
-PUBLIC int do_lstat()
+int do_lstat()
 {
 /* Perform the lstat(name, buf) system call. */
   struct vnode *vp;

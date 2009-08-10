@@ -19,15 +19,15 @@ Generate 256-bit random numbers
 #include "../inet.h"
 #include "rand256.h"
 
-PRIVATE u32_t base_bits[8];
+static u32_t base_bits[8];
 
-PUBLIC void init_rand256(bits)
+void init_rand256(bits)
 u8_t bits[32];
 {
 	memcpy(base_bits, bits, sizeof(base_bits));
 }
 
-PUBLIC void rand256(bits)
+void rand256(bits)
 u8_t bits[32];
 {
 	u32_t a;
@@ -40,7 +40,3 @@ u8_t bits[32];
 	SHA256_Update(&ctx, (unsigned char *)base_bits, sizeof(base_bits));
 	SHA256_Final(bits, &ctx);
 }
-
-/*
- * $PchId: rand256.c,v 1.1 2005/06/28 14:13:43 philip Exp $
- */

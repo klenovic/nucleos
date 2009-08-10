@@ -85,20 +85,16 @@ struct dirent {		/* Largest entry (8 slots) */
 };
 
 /* Function Prototypes. */
-_PROTOTYPE( int closedir, (DIR *_dirp)					);
-_PROTOTYPE( DIR *opendir, (const char *_dirname)			);
-_PROTOTYPE( struct dirent *readdir, (DIR *_dirp)			);
-_PROTOTYPE( void rewinddir, (DIR *_dirp)				);
+int closedir(DIR *_dirp);
+DIR *opendir(const char *_dirname);
+struct dirent *readdir(DIR *_dirp);
+void rewinddir(DIR *_dirp);
 
-#ifdef _MINIX
-_PROTOTYPE( int seekdir, (DIR *_dirp, off_t _loc)			);
-_PROTOTYPE( off_t telldir, (DIR *_dirp)					);
+int seekdir(DIR *_dirp, off_t _loc);
+off_t telldir(DIR *_dirp);
 
 #define   dirfd(dirp)     ((dirp)->_fd)
 
-_PROTOTYPE( int getdents, (int _fildes, struct dirent *_buf,
-							size_t _nbyte)	);
-
-#endif
+int getdents(int _fildes, struct dirent *_buf, size_t _nbyte);
 
 #endif /* _DIRENT_H */

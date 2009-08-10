@@ -298,7 +298,3 @@ struct pci_pcibridge pci_pcibridge[]=
 #endif
 	{ 0x0000, 0x0000, 0, },
 };
-
-/*
- * $PchId: pci_table.c,v 1.7 2003/09/05 10:53:22 philip Exp $
- */

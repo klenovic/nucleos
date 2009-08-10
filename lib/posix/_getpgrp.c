@@ -11,7 +11,7 @@
 #define getpgrp	_getpgrp
 #include <unistd.h>
 
-PUBLIC pid_t getpgrp()
+pid_t getpgrp()
 {
   message m;
 

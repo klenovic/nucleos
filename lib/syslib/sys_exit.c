@@ -12,7 +12,7 @@
 /*===========================================================================*
  *                                sys_exit			     	     *
  *===========================================================================*/
-PUBLIC int sys_exit(proc)
+int sys_exit(proc)
 int proc;			/* which process has exited */
 {
 /* A process has exited. PM tells the kernel. In addition this call can be

@@ -13,9 +13,8 @@
  * with _t.
  */
 
-#ifndef _TYPES_H
-#define _TYPES_H
-
+#ifndef _MNX_TYPES_H
+#define _MNX_TYPES_H
 /* The type size_t holds all results of the sizeof operator.  At first glance,
  * it seems obvious that it should be an unsigned int, but this is not always 
  * the case. For example, MINIX-ST (68000) has 32-bit pointers and 16-bit
@@ -35,7 +34,7 @@ typedef int MNX(ssize_t);
 
 #ifndef _MNX_TIME_T
 #define _MNX_TIME_T
-typedef long MNX(time_t);    /* time in sec since 1 Jan 1970 0000 GMT */
+typedef long mnx_time_t;    /* time in sec since 1 Jan 1970 0000 GMT */
 #endif
 
 #ifndef _MNX_CLOCK_T

@@ -37,7 +37,7 @@
 /*===========================================================================*
  *				register_callback			     *
  *===========================================================================*/
-PRIVATE void register_callback(struct vmproc *for_who, callback_t callback,
+static void register_callback(struct vmproc *for_who, callback_t callback,
 	int callback_type)
 {
 	if(for_who->vm_callback) {
@@ -53,7 +53,7 @@ PRIVATE void register_callback(struct vmproc *for_who, callback_t callback,
 /*===========================================================================*
  *				vfs_open				     *
  *===========================================================================*/
-PUBLIC int vfs_open(struct vmproc *for_who, callback_t callback,
+int vfs_open(struct vmproc *for_who, callback_t callback,
 	cp_grant_id_t filename_gid, int filename_len, int flags, int mode)
 {
 	static message m;
@@ -78,7 +78,7 @@ PUBLIC int vfs_open(struct vmproc *for_who, callback_t callback,
 /*===========================================================================*
  *				vfs_close				     *
  *===========================================================================*/
-PUBLIC int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
+int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
 {
 	static message m;
 	int r;
@@ -99,7 +99,7 @@ PUBLIC int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
 /*===========================================================================*
  *				do_vfs_reply			     	*
  *===========================================================================*/
-PUBLIC int do_vfs_reply(message *m)
+int do_vfs_reply(message *m)
 {
 /* Reply to a request has been received from vfs. Handle it. First verify
  * and look up which process, identified by endpoint, this is about.

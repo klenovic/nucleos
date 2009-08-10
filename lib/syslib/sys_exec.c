@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_exec(proc, ptr, prog_name, initpc)
+int sys_exec(proc, ptr, prog_name, initpc)
 int proc;			/* process that did exec */
 char *ptr;			/* new stack pointer */
 char *prog_name;		/* name of the new program */

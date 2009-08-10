@@ -24,10 +24,15 @@
 #include <kernel/system.h>
 #include <string.h>
 
+int cprof_mem_size;              /* available user memory for data */
+struct cprof_info_s cprof_info;  /* profiling info for user program */
+int cprof_procs_no;              /* number of profiled processes */
+struct cprof_proc_info_s cprof_proc_info[NR_SYS_PROCS];
+
 /*===========================================================================*
  *				do_cprofile				     *
  *===========================================================================*/
-PUBLIC int do_cprofile(m_ptr)
+int do_cprofile(m_ptr)
 register message *m_ptr;    /* pointer to request message */
 {
   int proc_nr, i, err = 0, k = 0;

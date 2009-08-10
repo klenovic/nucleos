@@ -15,7 +15,7 @@
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
 
-typedef _PROTOTYPE( void task_t, (void) );
+typedef void task_t(void);
 
 /* Process table and system property related types. */ 
 typedef int proc_nr_t;			/* process table entry number */

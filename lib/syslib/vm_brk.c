@@ -15,7 +15,7 @@
 /*===========================================================================*
  *                                vm_brk				     *
  *===========================================================================*/
-PUBLIC int vm_brk(endpoint_t ep, char *addr)
+int vm_brk(endpoint_t ep, char *addr)
 {
     message m;
     int result;

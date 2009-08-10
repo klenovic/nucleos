@@ -26,7 +26,7 @@ Created:	Dec 2005 by Philip Homburg
 
 #define NR_PORTS 2
 
-PRIVATE struct port
+static struct port
 {
 	unsigned p_flags;
 	int p_devind;
@@ -51,22 +51,22 @@ struct pcitab
 	int checkclass;
 };
 
-PRIVATE struct pcitab pcitab_ti[]=
+static struct pcitab pcitab_ti[]=
 {
 	{ 0x104C, 0xAC1C, 0 },		/* TI PCI1225 */
 
 	{ 0x0000, 0x0000, 0 }
 };
-PRIVATE char *progname;
-PRIVATE int debug;
+static char *progname;
+static int debug;
 
-FORWARD _PROTOTYPE( void init, (void)					);
-FORWARD _PROTOTYPE( void hw_init, (struct port *pp)			);
-FORWARD _PROTOTYPE( void map_regs, (struct port *pp, u32_t base)	);
-FORWARD _PROTOTYPE( void do_int, (struct port *pp)			);
-FORWARD _PROTOTYPE( u8_t read_exca, (struct port *pp, int socket, int reg) );
-FORWARD _PROTOTYPE( void do_outb, (port_t port, u8_t value)		);
-FORWARD _PROTOTYPE( u8_t do_inb, (port_t port)				);
+static void init(void);
+static void hw_init(struct port *pp);
+static void map_regs(struct port *pp, u32_t base);
+static void do_int(struct port *pp);
+static u8_t read_exca(struct port *pp, int socket, int reg);
+static void do_outb(port_t port, u8_t value);
+static u8_t do_inb(port_t port);
 
 int main(int argc, char *argv[])
 {
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-PRIVATE void init()
+static void init()
 {
 	int i, r, first, devind, port;
 	u16_t vid, did;
@@ -159,7 +159,7 @@ PRIVATE void init()
 	}
 }
 
-PRIVATE void hw_init(pp)
+static void hw_init(pp)
 struct port *pp;
 {
 	int i, r, devind, irq, socket;
@@ -259,7 +259,7 @@ struct port *pp;
 #endif
 }
 
-PRIVATE void map_regs(pp, base)
+static void map_regs(pp, base)
 struct port *pp;
 u32_t base;
 {
@@ -289,7 +289,7 @@ u32_t base;
 		panic("ti1225", "map_regs: sys_vm_map failed", r);
 }
 
-PRIVATE void do_int(pp)
+static void do_int(pp)
 struct port *pp;
 {
 	int i, r, devind, vcc_5v, vcc_3v, vcc_Xv, vcc_Yv,
@@ -472,7 +472,7 @@ struct port *pp;
 
 }
 
-PRIVATE u8_t read_exca(pp, socket, reg)
+static u8_t read_exca(pp, socket, reg)
 struct port *pp;
 int socket;
 int reg;
@@ -486,7 +486,7 @@ int reg;
 	return do_inb(port+1);
 }
 
-PRIVATE u8_t do_inb(port_t port)
+static u8_t do_inb(port_t port)
 {
 	int r;
 	u32_t value;
@@ -497,7 +497,7 @@ PRIVATE u8_t do_inb(port_t port)
 	return value;
 }
 
-PRIVATE void do_outb(port_t port, u8_t value)
+static void do_outb(port_t port, u8_t value)
 {
 	int r;
 

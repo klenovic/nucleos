@@ -18,7 +18,7 @@ Copyright 1995 Philip Homburg
 
 struct timer;
 
-typedef void (*timer_func_t) ARGS(( int fd, struct timer *timer ));
+typedef void (*timer_func_t)(int fd, struct timer *timer);
 
 typedef struct timer
 {
@@ -31,18 +31,13 @@ typedef struct timer
 
 extern int clck_call_expire;	/* Call clck_expire_timer from the mainloop */
 
-void clck_init ARGS(( void ));
-void set_time ARGS(( time_t time ));
-time_t get_time ARGS(( void ));
-void reset_time ARGS(( void ));
+void clck_init(void);
+void set_time(time_t time);
+time_t get_time(void);
+void reset_time(void);
 /* set a timer to go off at the time specified by timeout */
-void clck_timer ARGS(( struct timer *timer, time_t timeout, timer_func_t func,
-								int fd ));
-void clck_untimer ARGS(( struct timer *timer ));
-void clck_expire_timers ARGS(( void ));
+void clck_timer(struct timer *timer, time_t timeout, timer_func_t func, int fd);
+void clck_untimer(struct timer *timer);
+void clck_expire_timers(void);
 
 #endif /* CLOCK_H */
-
-/*
- * $PchId: clock.h,v 1.5 1995/11/21 06:45:27 philip Exp $
- */

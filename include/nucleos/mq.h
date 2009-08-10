@@ -25,12 +25,8 @@ typedef struct mq
 	int mq_allocated;
 } mq_t;
 
-_PROTOTYPE( mq_t *mq_get, (void) );
-_PROTOTYPE( void mq_free, (mq_t *mq) );
-_PROTOTYPE( void mq_init, (void) );
+mq_t *mq_get(void);
+void mq_free(mq_t *mq);
+void mq_init(void);
 
 #endif /* INET__MQ_H */
-
-/*
- * $PchId: mq.h,v 1.4 1995/11/21 06:40:30 philip Exp $
- */

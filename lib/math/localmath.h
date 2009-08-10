@@ -10,8 +10,6 @@
 /*
  * localmath.h - This header is used by the mathematical library.
  */
-/* $Header: /cvsup/minix/src/lib/math/localmath.h,v 1.1.1.1 2005/04/21 14:56:26 beng Exp $ */
-
 /* some constants (Hart & Cheney) */
 #define	M_PI		3.14159265358979323846264338327950288
 #define	M_2PI		6.28318530717958647692528676655900576

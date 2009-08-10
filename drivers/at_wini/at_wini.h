@@ -11,7 +11,7 @@
 #include <nucleos/driver.h>
 #include <nucleos/drvlib.h>
 
-_PROTOTYPE(int main, (int argc, char *argv[]));
+int main(int argc, char *argv[]);
 
 #define VERBOSE		   0	/* display identify messages during boot */
 #define ENABLE_ATAPI	   1	/* add ATAPI cd-rom support to driver */

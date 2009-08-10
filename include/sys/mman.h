@@ -31,7 +31,7 @@
 /* mmap() error return */
 #define MAP_FAILED      ((void *)-1)
 
-_PROTOTYPE( void *mmap, (void *, size_t, int, int, int, off_t));
-_PROTOTYPE( int munmap, (void *, size_t));
+void *mmap(void *, size_t, int, int, int, off_t);
+int munmap(void *, size_t);
 
 #endif /* _MMAN_H */

@@ -13,8 +13,6 @@
  *
  * Author: Ceriel J.H. Jacobs
  */
-/* $Header: /cvsup/minix/src/lib/math/floor.c,v 1.1.1.1 2005/04/21 14:56:26 beng Exp $ */
-
 #include	<math.h>
 
 double

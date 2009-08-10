@@ -13,7 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-PUBLIC int isatty(fd)
+int isatty(fd)
 int fd;
 {
   struct termios dummy;

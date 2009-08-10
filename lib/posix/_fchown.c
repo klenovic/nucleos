@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 
-PUBLIC int fchown(fd, owner, grp)
+int fchown(fd, owner, grp)
 int fd;
 _mnx_Uid_t owner;
 _mnx_Gid_t grp;

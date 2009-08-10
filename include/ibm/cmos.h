@@ -88,7 +88,3 @@ Dallas DS12887, compatible with the Motorola MC146818
 #define		CS_BAD_HD	0x08	/* Harddisk failed */
 #define		CS_BAD_TIME	0x04	/* CMOS time is invalid */
 					/* bits 0 and 1 are reserved */
-
-/*
- * $PchId: cmos.h,v 1.1 1998/12/16 09:14:21 philip Exp $
- */

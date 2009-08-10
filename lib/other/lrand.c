@@ -31,15 +31,15 @@
 
 #include <lib.h>
 
-_PROTOTYPE( long seed, (long lseed));
-_PROTOTYPE( long lrand, (void));
+long seed(long lseed);
+long lrand(void);
 
 #define  A	  16807L	/* A "good" multiplier	  */
 #define  M   2147483647L	/* Modulus: 2^31 - 1	  */
 #define  Q       127773L	/* M / A		  */
 #define  R         2836L	/* M % A		  */
 
-PRIVATE long _lseed = 1L;
+static long _lseed = 1L;
 
 long seed(lseed)
 long lseed;

@@ -52,25 +52,25 @@ extern size_t initrd_size;
 
 #define NR_DEVS            (7+RAMDISKS)	/* number of minor devices */
 
-PRIVATE struct device m_geom[NR_DEVS];  /* base and size of each device */
-PRIVATE vir_bytes m_vaddrs[NR_DEVS];
-PRIVATE int m_device;			/* current device */
-PRIVATE struct kinfo kinfo;		/* kernel information */ 
-PRIVATE struct boot_param boot_param;	/* boot parameters */
+static struct device m_geom[NR_DEVS];  /* base and size of each device */
+static vir_bytes m_vaddrs[NR_DEVS];
+static int m_device;			/* current device */
+static struct kinfo kinfo;		/* kernel information */ 
+static struct boot_param boot_param;	/* boot parameters */
 
 extern int errno;			/* error number for PM calls */
 
-FORWARD _PROTOTYPE( char *m_name, (void) 				);
-FORWARD _PROTOTYPE( struct device *m_prepare, (int device) 		);
-FORWARD _PROTOTYPE( int m_transfer, (int proc_nr, int opcode, u64_t position,
-				iovec_t *iov, unsigned nr_req, int safe));
-FORWARD _PROTOTYPE( int m_do_open, (struct driver *dp, message *m_ptr) 	);
-FORWARD _PROTOTYPE( void m_init, (void) );
-FORWARD _PROTOTYPE( int m_ioctl, (struct driver *dp, message *m_ptr, int safe));
-FORWARD _PROTOTYPE( void m_geometry, (struct partition *entry) 		);
+static char *m_name(void);
+static struct device *m_prepare(int device);
+static int m_transfer(int proc_nr, int opcode, u64_t position,
+		      iovec_t *iov, unsigned nr_req, int safe);
+static int m_do_open(struct driver *dp, message *m_ptr);
+static void m_init(void);
+static int m_ioctl(struct driver *dp, message *m_ptr, int safe);
+static void m_geometry(struct partition *entry);
 
 /* Entry points to this driver. */
-PRIVATE struct driver m_dtab = {
+static struct driver m_dtab = {
   m_name,	/* current device's name */
   m_do_open,	/* open or mount */
   do_nop,	/* nothing on a close */
@@ -89,7 +89,7 @@ PRIVATE struct driver m_dtab = {
 
 /* Buffer for the /dev/zero null byte feed. */
 #define ZERO_BUF_SIZE 			1024
-PRIVATE char dev_zero[ZERO_BUF_SIZE];
+static char dev_zero[ZERO_BUF_SIZE];
 
 #define click_to_round_k(n) \
 	((unsigned) ((((unsigned long) (n) << CLICK_SHIFT) + 512) / 1024))
@@ -97,7 +97,7 @@ PRIVATE char dev_zero[ZERO_BUF_SIZE];
 /*===========================================================================*
  *				   main 				     *
  *===========================================================================*/
-PUBLIC int main(void)
+int main(void)
 {
 /* Main program. Initialize the memory driver and start the main loop. */
   struct sigaction sa;
@@ -115,7 +115,7 @@ PUBLIC int main(void)
 /*===========================================================================*
  *				 m_name					     *
  *===========================================================================*/
-PRIVATE char *m_name()
+static char *m_name()
 {
 /* Return a name for the current device. */
   static char name[] = "memory";
@@ -125,7 +125,7 @@ PRIVATE char *m_name()
 /*===========================================================================*
  *				m_prepare				     *
  *===========================================================================*/
-PRIVATE struct device *m_prepare(device)
+static struct device *m_prepare(device)
 int device;
 {
 /* Prepare for I/O on a device: check if the minor device number is ok. */
@@ -138,7 +138,7 @@ int device;
 /*===========================================================================*
  *				m_transfer				     *
  *===========================================================================*/
-PRIVATE int m_transfer(proc_nr, opcode, pos64, iov, nr_req, safe)
+static int m_transfer(proc_nr, opcode, pos64, iov, nr_req, safe)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t pos64;			/* offset on device to read or write */
@@ -303,7 +303,7 @@ int safe;			/* safe copies */
 /*===========================================================================*
  *				m_do_open				     *
  *===========================================================================*/
-PRIVATE int m_do_open(dp, m_ptr)
+static int m_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
@@ -327,7 +327,7 @@ message *m_ptr;
 /*===========================================================================*
  *				m_init					     *
  *===========================================================================*/
-PRIVATE void m_init()
+static void m_init()
 {
   /* Initialize this task. All minor devices are initialized one by one. */
   int i, s;
@@ -387,7 +387,7 @@ printf("\n");
 /*===========================================================================*
  *				m_ioctl					     *
  *===========================================================================*/
-PRIVATE int m_ioctl(dp, m_ptr, safe)
+static int m_ioctl(dp, m_ptr, safe)
 struct driver *dp;			/* pointer to driver structure */
 message *m_ptr;				/* pointer to control message */
 int safe;
@@ -458,7 +458,7 @@ int safe;
 /*===========================================================================*
  *				m_geometry				     *
  *===========================================================================*/
-PRIVATE void m_geometry(entry)
+static void m_geometry(entry)
 struct partition *entry;
 {
 	/* Memory devices don't have a geometry, but the outside world insists. */

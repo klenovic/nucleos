@@ -63,10 +63,10 @@ typedef struct timer
  * can be used to operate on the lists of timers. Adding a timer to a list 
  * automatically takes care of removing it.
  */
-_PROTOTYPE( clock_t tmrs_clrtimer, (timer_t **tmrs, timer_t *tp, clock_t *new_head)		);
-_PROTOTYPE( void tmrs_exptimers, (timer_t **tmrs, clock_t now, clock_t *new_head)		);
-_PROTOTYPE( clock_t tmrs_settimer, (timer_t **tmrs, timer_t *tp, 
-	clock_t exp_time, tmr_func_t watchdog, clock_t *new_head)				);
+clock_t tmrs_clrtimer(timer_t **tmrs, timer_t *tp, clock_t *new_head);
+void tmrs_exptimers(timer_t **tmrs, clock_t now, clock_t *new_head);
+clock_t tmrs_settimer(timer_t **tmrs, timer_t *tp, clock_t exp_time, tmr_func_t watchdog,
+		      clock_t *new_head);
 
 #endif /* _TIMERS_H */
 

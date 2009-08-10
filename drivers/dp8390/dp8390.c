@@ -123,93 +123,75 @@ extern int ___dummy[DE_PORT_NR == sizeof(dp_conf)/sizeof(dp_conf[0]) ? 1 : -1];
 #define CR_EXTRA	CR_STA
 
 #if ENABLE_PCI
-_PROTOTYPE( static void pci_conf, (void)				);
+static void pci_conf(void);
 #endif
-_PROTOTYPE( static void do_vwrite, (message *mp, int from_int,
-							int vectored)	);
-_PROTOTYPE( static void do_vwrite_s, (message *mp, int from_int)	);
-_PROTOTYPE( static void do_vread, (message *mp, int vectored)		);
-_PROTOTYPE( static void do_vread_s, (message *mp)			);
-_PROTOTYPE( static void do_init, (message *mp)				);
-_PROTOTYPE( static void do_int, (dpeth_t *dep)				);
-_PROTOTYPE( static void do_getstat, (message *mp)			);
-_PROTOTYPE( static void do_getstat_s, (message *mp)			);
-_PROTOTYPE( static void do_getname, (message *mp)			);
-_PROTOTYPE( static void do_stop, (message *mp)				);
-_PROTOTYPE( static void dp_init, (dpeth_t *dep)				);
-_PROTOTYPE( static void dp_confaddr, (dpeth_t *dep)			);
-_PROTOTYPE( static void dp_reinit, (dpeth_t *dep)			);
-_PROTOTYPE( static void dp_reset, (dpeth_t *dep)			);
-_PROTOTYPE( static void dp_check_ints, (dpeth_t *dep)			);
-_PROTOTYPE( static void dp_recv, (dpeth_t *dep)				);
-_PROTOTYPE( static void dp_send, (dpeth_t *dep)				);
-_PROTOTYPE( static void dp8390_stop, (void)				);
-_PROTOTYPE( static void dp_getblock, (dpeth_t *dep, int page,
-				size_t offset, size_t size, void *dst)	);
-_PROTOTYPE( static void dp_pio8_getblock, (dpeth_t *dep, int page,
-				size_t offset, size_t size, void *dst)	);
-_PROTOTYPE( static void dp_pio16_getblock, (dpeth_t *dep, int page,
-				size_t offset, size_t size, void *dst)	);
-_PROTOTYPE( static int dp_pkt2user, (dpeth_t *dep, int page,
-							int length)	);
-_PROTOTYPE( static int dp_pkt2user_s, (dpeth_t *dep, int page,
-							int length)	);
-_PROTOTYPE( static void dp_user2nic, (dpeth_t *dep, iovec_dat_t *iovp, 
-		vir_bytes offset, int nic_addr, vir_bytes count)	);
-_PROTOTYPE( static void dp_user2nic_s, (dpeth_t *dep, iovec_dat_s_t *iovp, 
-		vir_bytes offset, int nic_addr, vir_bytes count)	);
-_PROTOTYPE( static void dp_pio8_user2nic, (dpeth_t *dep,
-				iovec_dat_t *iovp, vir_bytes offset,
-				int nic_addr, vir_bytes count)		);
-_PROTOTYPE( static void dp_pio8_user2nic_s, (dpeth_t *dep,
-				iovec_dat_s_t *iovp, vir_bytes offset,
-				int nic_addr, vir_bytes count)		);
-_PROTOTYPE( static void dp_pio16_user2nic, (dpeth_t *dep,
-				iovec_dat_t *iovp, vir_bytes offset,
-				int nic_addr, vir_bytes count)		);
-_PROTOTYPE( static void dp_pio16_user2nic_s, (dpeth_t *dep,
-				iovec_dat_s_t *iovp, vir_bytes offset,
-				int nic_addr, vir_bytes count)		);
-_PROTOTYPE( static void dp_nic2user, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_nic2user_s, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_s_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_pio8_nic2user, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_pio8_nic2user_s, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_s_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_pio16_nic2user, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_pio16_nic2user_s, (dpeth_t *dep, int nic_addr, 
-		iovec_dat_s_t *iovp, vir_bytes offset, vir_bytes count)	);
-_PROTOTYPE( static void dp_next_iovec, (iovec_dat_t *iovp)		);
-_PROTOTYPE( static void dp_next_iovec_s, (iovec_dat_s_t *iovp)		);
-_PROTOTYPE( static void conf_hw, (dpeth_t *dep)				);
-_PROTOTYPE( static void update_conf, (dpeth_t *dep, dp_conf_t *dcp)	);
-_PROTOTYPE( static void map_hw_buffer, (dpeth_t *dep)			);
-_PROTOTYPE( static int calc_iovec_size, (iovec_dat_t *iovp)		);
-_PROTOTYPE( static int calc_iovec_size_s, (iovec_dat_s_t *iovp)		);
-_PROTOTYPE( static void reply, (dpeth_t *dep, int err, int may_block)	);
-_PROTOTYPE( static void mess_reply, (message *req, message *reply)	);
-_PROTOTYPE( static void get_userdata, (int user_proc,
-		vir_bytes user_addr, vir_bytes count, void *loc_addr)	);
-_PROTOTYPE( static void get_userdata_s, (int user_proc,
-		cp_grant_id_t grant, vir_bytes offset, vir_bytes count,
-		void *loc_addr)	);
-_PROTOTYPE( static void put_userdata, (int user_proc,
-		vir_bytes user_addr, vir_bytes count, void *loc_addr)	);
-_PROTOTYPE( static void put_userdata_s, (int user_proc,
-		cp_grant_id_t grant, size_t count, void *loc_addr)	);
-_PROTOTYPE( static void insb, (port_t port, void *buf, size_t size)				);
-_PROTOTYPE( static void insw, (port_t port, void *buf, size_t size)				);
-_PROTOTYPE( static void do_vir_insb, (port_t port, int proc,
-					vir_bytes buf, size_t size)	);
-_PROTOTYPE( static void do_vir_insw, (port_t port, int proc,
-					vir_bytes buf, size_t size)	);
-_PROTOTYPE( static void do_vir_outsb, (port_t port, int proc,
-					vir_bytes buf, size_t size)	);
-_PROTOTYPE( static void do_vir_outsw, (port_t port, int proc,
-					vir_bytes buf, size_t size)	);
+static void do_vwrite(message *mp, int from_int, int vectored);
+static void do_vwrite_s(message *mp, int from_int);
+static void do_vread(message *mp, int vectored);
+static void do_vread_s(message *mp);
+static void do_init(message *mp);
+static void do_int(dpeth_t *dep);
+static void do_getstat(message *mp);
+static void do_getstat_s(message *mp);
+static void do_getname(message *mp);
+static void do_stop(message *mp);
+static void dp_init(dpeth_t *dep);
+static void dp_confaddr(dpeth_t *dep);
+static void dp_reinit(dpeth_t *dep);
+static void dp_reset(dpeth_t *dep);
+static void dp_check_ints(dpeth_t *dep);
+static void dp_recv(dpeth_t *dep);
+static void dp_send(dpeth_t *dep);
+static void dp8390_stop(void);
+static void dp_getblock(dpeth_t *dep, int page, size_t offset, size_t size, void *dst);
+static void dp_pio8_getblock(dpeth_t *dep, int page, size_t offset, size_t size, void *dst);
+static void dp_pio16_getblock(dpeth_t *dep, int page, size_t offset, size_t size, void *dst);
+static int dp_pkt2user(dpeth_t *dep, int page, int length);
+static int dp_pkt2user_s(dpeth_t *dep, int page, int length);
+static void dp_user2nic(dpeth_t *dep, iovec_dat_t *iovp, vir_bytes offset, int nic_addr,
+			vir_bytes count);
+static void dp_user2nic_s(dpeth_t *dep, iovec_dat_s_t *iovp, vir_bytes offset, int nic_addr,
+			  vir_bytes count);
+static void dp_pio8_user2nic(dpeth_t *dep, iovec_dat_t *iovp, vir_bytes offset, int nic_addr,
+			     vir_bytes count);
+static void dp_pio8_user2nic_s(dpeth_t *dep, iovec_dat_s_t *iovp, vir_bytes offset, int nic_addr,
+			       vir_bytes count);
+static void dp_pio16_user2nic(dpeth_t *dep, iovec_dat_t *iovp, vir_bytes offset, int nic_addr,
+			      vir_bytes count);
+static void dp_pio16_user2nic_s(dpeth_t *dep, iovec_dat_s_t *iovp, vir_bytes offset, int nic_addr,
+				vir_bytes count);
+static void dp_nic2user(dpeth_t *dep, int nic_addr, iovec_dat_t *iovp, vir_bytes offset,
+			vir_bytes count);
+static void dp_nic2user_s(dpeth_t *dep, int nic_addr, iovec_dat_s_t *iovp, vir_bytes offset,
+			  vir_bytes count);
+static void dp_pio8_nic2user(dpeth_t *dep, int nic_addr, iovec_dat_t *iovp, vir_bytes offset,
+			     vir_bytes count);
+static void dp_pio8_nic2user_s(dpeth_t *dep, int nic_addr, iovec_dat_s_t *iovp, vir_bytes offset,
+			       vir_bytes count);
+static void dp_pio16_nic2user(dpeth_t *dep, int nic_addr, iovec_dat_t *iovp, vir_bytes offset,
+			      vir_bytes count);
+static void dp_pio16_nic2user_s(dpeth_t *dep, int nic_addr, iovec_dat_s_t *iovp, vir_bytes offset,
+				vir_bytes count);
+static void dp_next_iovec(iovec_dat_t *iovp);
+static void dp_next_iovec_s(iovec_dat_s_t *iovp);
+static void conf_hw(dpeth_t *dep);
+static void update_conf(dpeth_t *dep, dp_conf_t *dcp);
+static void map_hw_buffer(dpeth_t *dep);
+static int calc_iovec_size(iovec_dat_t *iovp);
+static int calc_iovec_size_s(iovec_dat_s_t *iovp);
+static void reply(dpeth_t *dep, int err, int may_block);
+static void mess_reply(message *req, message *reply);
+static void get_userdata(int user_proc, vir_bytes user_addr, vir_bytes count, void *loc_addr);
+static void get_userdata_s(int user_proc, cp_grant_id_t grant, vir_bytes offset, vir_bytes count,
+			   void *loc_addr);
+static void put_userdata(int user_proc, vir_bytes user_addr, vir_bytes count, void *loc_addr);
+static void put_userdata_s(int user_proc, cp_grant_id_t grant, size_t count, void *loc_addr);
+static void insb(port_t port, void *buf, size_t size);
+static void insw(port_t port, void *buf, size_t size);
+static void do_vir_insb(port_t port, int proc, vir_bytes buf, size_t size);
+static void do_vir_insw(port_t port, int proc, vir_bytes buf, size_t size);
+static void do_vir_outsb(port_t port, int proc, vir_bytes buf, size_t size);
+static void do_vir_outsw(port_t port, int proc, vir_bytes buf, size_t size);
 
 /*===========================================================================*
  *				dpeth_task				     *
@@ -2840,7 +2822,3 @@ static void do_vir_outsw(port_t port, int proc, vir_bytes buf, size_t size)
 	if (r != OK)
 		panic("DP8390", "sys_sdevio failed", r);
 }
-
-/*
- * $PchId: dp8390.c,v 1.25 2005/02/10 17:32:07 philip Exp $
- */

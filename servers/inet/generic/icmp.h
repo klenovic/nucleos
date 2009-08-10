@@ -28,12 +28,8 @@ Copyright 1995 Philip Homburg
 
 /* Prototypes */
 
-void icmp_prep ARGS(( void ));
-void icmp_init ARGS(( void ));
+void icmp_prep(void);
+void icmp_init(void);
 
 
 #endif /* ICMP_H */
-
-/*
- * $PchId: icmp.h,v 1.7 2001/04/19 19:06:18 philip Exp $
- */

@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 
-PUBLIC int freemem(size, base)
+int freemem(size, base)
 phys_bytes size;			/* size of mem chunk requested */
 phys_bytes base;			/* base address of mem chunk */
 {

@@ -25,12 +25,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_query.c	5.7 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
-#if _MINIX
 #include <nucleos/types.h>
 #include <ctype.h>
 #include <errno.h>
@@ -47,27 +41,6 @@ static char sccsid[] = "@(#)res_query.c	5.7 (Berkeley) 6/1/90";
 #define bcopy(s,d,l) memcpy(d,s,l)
 
 #define hostalias __hostalias
-#else
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <ctype.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
-
-extern int errno;
-#endif
-
-#if __STDC__
-#define CONST	const
-#else
-#define CONST
-#endif
 
 #if PACKETSZ > 1024
 #define MAXPACKET	PACKETSZ
@@ -273,7 +246,7 @@ res_querydomain(name, domain, class, type, answer, anslen)
 
 char *
 hostalias(name)
-	register CONST char *name;
+	register const char *name;
 {
 	register char *C1, *C2;
 	FILE *fp;

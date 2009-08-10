@@ -45,11 +45,11 @@ Copyright 1995 Philip Homburg
 #define PSIP_PRI_EXP_PROMISC	2
 
 struct acc;
-typedef void (*buffree_t) ARGS(( struct acc *acc ));
-typedef void (*bf_freereq_t) ARGS(( int priority ));
+typedef void (*buffree_t)(struct acc *acc);
+typedef void (*bf_freereq_t)(int priority);
 
 #ifdef BUF_CONSISTENCY_CHECK
-typedef void (*bf_checkreq_t) ARGS(( void ));
+typedef void (*bf_checkreq_t)(void);
 #endif
 
 typedef struct buf
@@ -99,20 +99,20 @@ extern acc_t *bf_linkcheck_acc;
 
 #ifndef BUF_IMPLEMENTATION
 
-#define bf_memreq(a) _bf_memreq(this_file, __LINE__, a)
-#define bf_cut(a,b,c) _bf_cut(this_file, __LINE__, a, b, c)
-#define bf_delhead(a,b) _bf_delhead(this_file, __LINE__, a, b)
-#define bf_packIffLess(a,b) _bf_packIffLess(this_file, __LINE__, \
+#define bf_memreq(a) _bf_memreq(__FILE__, __LINE__, a)
+#define bf_cut(a,b,c) _bf_cut(__FILE__, __LINE__, a, b, c)
+#define bf_delhead(a,b) _bf_delhead(__FILE__, __LINE__, a, b)
+#define bf_packIffLess(a,b) _bf_packIffLess(__FILE__, __LINE__, \
 									a, b)
-#define bf_afree(a) _bf_afree(this_file, __LINE__, a)
-#define bf_pack(a) _bf_pack(this_file, __LINE__, a)
-#define bf_append(a,b) _bf_append(this_file, __LINE__, a, b)
-#define bf_dupacc(a) _bf_dupacc(this_file, __LINE__, a)
+#define bf_afree(a) _bf_afree(__FILE__, __LINE__, a)
+#define bf_pack(a) _bf_pack(__FILE__, __LINE__, a)
+#define bf_append(a,b) _bf_append(__FILE__, __LINE__, a, b)
+#define bf_dupacc(a) _bf_dupacc(__FILE__, __LINE__, a)
 #if 0
-#define bf_mark_1acc(a) _bf_mark_1acc(this_file, __LINE__, a)
-#define bf_mark_acc(a) _bf_mark_acc(this_file, __LINE__, a)
+#define bf_mark_1acc(a) _bf_mark_1acc(__FILE__, __LINE__, a)
+#define bf_mark_acc(a) _bf_mark_acc(__FILE__, __LINE__, a)
 #endif
-#define bf_align(a,s,al) _bf_align(this_file, __LINE__, a, s, al)
+#define bf_align(a,s,al) _bf_align(__FILE__, __LINE__, a, s, al)
 
 #else /* BUF_IMPLEMENTATION */
 
@@ -135,83 +135,75 @@ extern acc_t *bf_linkcheck_acc;
 
 /* Prototypes */
 
-void bf_init ARGS(( void ));
+void bf_init(void);
 #ifndef BUF_CONSISTENCY_CHECK
-void bf_logon ARGS(( bf_freereq_t func ));
+void bf_logon(bf_freereq_t func);
 #else
-void bf_logon ARGS(( bf_freereq_t func, bf_checkreq_t checkfunc ));
+void bf_logon(bf_freereq_t func, bf_checkreq_t checkfunc);
 #endif
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_memreq ARGS(( unsigned size));
+acc_t *bf_memreq(unsigned size);
 #else
-acc_t *_bf_memreq ARGS(( char *clnt_file, int clnt_line,
-			unsigned size));
+acc_t *_bf_memreq(char *clnt_file, int clnt_line, unsigned size);
 #endif
 /* the result is an acc with linkC == 1 */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_dupacc ARGS(( acc_t *acc ));
+acc_t *bf_dupacc(acc_t *acc);
 #else
-acc_t *_bf_dupacc ARGS(( char *clnt_file, int clnt_line,
-			acc_t *acc ));
+acc_t *_bf_dupacc(char *clnt_file, int clnt_line, acc_t *acc);
 #endif
 /* the result is an acc with linkC == 1 identical to the given one */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-void bf_afree ARGS(( acc_t *acc));
+void bf_afree(acc_t *acc);
 #else
-void _bf_afree ARGS(( char *clnt_file, int clnt_line,
-			acc_t *acc));
+void _bf_afree(char *clnt_file, int clnt_line, acc_t *acc);
 #endif
 /* this reduces the linkC off the given acc with one */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_pack ARGS(( acc_t *pack));
+acc_t *bf_pack(acc_t *pack);
 #else
-acc_t *_bf_pack ARGS(( char *clnt_file, int clnt_line,
-			acc_t *pack));
+acc_t *_bf_pack(char *clnt_file, int clnt_line, acc_t *pack);
 #endif
 /* this gives a packed copy of the given acc, the linkC of the given acc is
    reduced by one, the linkC of the result == 1 */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_packIffLess ARGS(( acc_t *pack, int min_len ));
+acc_t *bf_packIffLess(acc_t *pack, int min_len);
 #else
-acc_t *_bf_packIffLess ARGS(( char *clnt_file, int clnt_line,
-				acc_t *pack, int min_len ));
+acc_t *_bf_packIffLess(char *clnt_file, int clnt_line, acc_t *pack, int min_len);
 #endif
 /* this performs a bf_pack iff pack->acc_length<min_len */
 
-size_t bf_bufsize ARGS(( acc_t *pack));
+size_t bf_bufsize(acc_t *pack);
 /* this gives the length of the buffer specified by the given acc. The linkC
    of the given acc remains the same */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_cut ARGS(( acc_t *data, unsigned offset, unsigned length ));
+acc_t *bf_cut(acc_t *data, unsigned offset, unsigned length);
 #else
-acc_t *_bf_cut ARGS(( char *clnt_file, int clnt_line,
-			acc_t *data, unsigned offset, unsigned length ));
+acc_t *_bf_cut(char *clnt_file, int clnt_line, acc_t *data, unsigned offset, unsigned length);
 #endif
 /* the result is a cut of the buffer from offset with length length.
    The linkC of the result == 1, the linkC of the given acc remains the
    same. */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_delhead ARGS(( acc_t *data, unsigned offset ));
+acc_t *bf_delhead(acc_t *data, unsigned offset);
 #else
-acc_t *_bf_delhead ARGS(( char *clnt_file, int clnt_line,
-			acc_t *data, unsigned offset ));
+acc_t *_bf_delhead(char *clnt_file, int clnt_line, acc_t *data, unsigned offset);
 #endif
 /* the result is a cut of the buffer from offset until the end.
    The linkC of the result == 1, the linkC of the given acc is
    decremented. */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_append ARGS(( acc_t *data_first, acc_t  *data_second ));
+acc_t *bf_append(acc_t *data_first, acc_t  *data_second);
 #else
-acc_t *_bf_append ARGS(( char *clnt_file, int clnt_line,
-			acc_t *data_first, acc_t  *data_second ));
+acc_t *_bf_append(char *clnt_file, int clnt_line, acc_t *data_first, acc_t  *data_second);
 #endif
 /* data_second is appended after data_first, a link is returned to the
 	result and the linkCs of data_first and data_second are reduced.
@@ -221,17 +213,16 @@ acc_t *_bf_append ARGS(( char *clnt_file, int clnt_line,
 */
 
 #ifndef BUF_TRACK_ALLOC_FREE
-acc_t *bf_align ARGS(( acc_t *acc, size_t size, size_t alignment ));
+acc_t *bf_align(acc_t *acc, size_t size, size_t alignment);
 #else
-acc_t *_bf_align ARGS(( char *clnt_file, int clnt_line,
-			acc_t *acc, size_t size, size_t alignment ));
+acc_t *_bf_align(char *clnt_file, int clnt_line, acc_t *acc, size_t size, size_t alignment);
 #endif
 /* size bytes of acc (or all bytes of acc if the size buffer is smaller
 	than size) are aligned on an address that is multiple of alignment.
 	Size must be less than or equal to BUF_S.
 */
 
-int bf_linkcheck ARGS(( acc_t *acc ));
+int bf_linkcheck(acc_t *acc);
 /* check if all link count are positive, and offsets and sizes are within 
  * the underlying buffer.
  */
@@ -245,14 +236,10 @@ int bf_linkcheck ARGS(( acc_t *acc ));
 	compare((buf)->acc_buffer->buf_linkC,>,0)) : (void)0)
 
 #ifdef BUF_CONSISTENCY_CHECK
-int bf_consistency_check ARGS(( void ));
-void bf_check_acc ARGS(( acc_t *acc ));
-void _bf_mark_1acc ARGS(( char *clnt_file, int clnt_line, acc_t *acc ));
-void _bf_mark_acc ARGS(( char *clnt_file, int clnt_line, acc_t *acc ));
+int bf_consistency_check(void);
+void bf_check_acc(acc_t *acc);
+void _bf_mark_1acc(char *clnt_file, int clnt_line, acc_t *acc);
+void _bf_mark_acc(char *clnt_file, int clnt_line, acc_t *acc);
 #endif
 
 #endif /* BUF_H */
-
-/*
- * $PchId: buf.h,v 1.13 2003/09/10 08:52:09 philip Exp $
- */

@@ -25,11 +25,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)inet_ntoa.c	5.5 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
 /*
  * Convert network-format internet address
  * to base 256 d.d.d.d representation.

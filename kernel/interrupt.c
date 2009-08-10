@@ -28,12 +28,12 @@
 #include <asm/kernel/const.h>
 
 /* number of lists of IRQ hooks, one list per supported line. */
-PUBLIC irq_hook_t* irq_handlers[NR_IRQ_VECTORS] = {0};
+irq_hook_t* irq_handlers[NR_IRQ_VECTORS] = {0};
 /*===========================================================================*
  *				put_irq_handler				     *
  *===========================================================================*/
 /* Register an interrupt handler.  */
-PUBLIC void put_irq_handler( irq_hook_t* hook, int irq, irq_handler_t handler)
+void put_irq_handler( irq_hook_t* hook, int irq, irq_handler_t handler)
 {
   int id;
   irq_hook_t **line;
@@ -76,7 +76,7 @@ PUBLIC void put_irq_handler( irq_hook_t* hook, int irq, irq_handler_t handler)
  *				rm_irq_handler				     *
  *===========================================================================*/
 /* Unregister an interrupt handler.  */
-PUBLIC void rm_irq_handler( irq_hook_t* hook ) {
+void rm_irq_handler( irq_hook_t* hook ) {
   int irq = hook->irq; 
   int id = hook->id;
   irq_hook_t **line;
@@ -107,7 +107,7 @@ PUBLIC void rm_irq_handler( irq_hook_t* hook ) {
 /*===========================================================================*
  *				intr_handle				     *
  *===========================================================================*/
-PUBLIC void intr_handle(irq_hook_t *hook)
+void intr_handle(irq_hook_t *hook)
 {
 /* Call the interrupt handlers for an interrupt with the given hook list.
  * The assembly part of the handler has already masked the IRQ, reenabled the
@@ -135,7 +135,7 @@ PUBLIC void intr_handle(irq_hook_t *hook)
 }
 
 /* Enable/Disable a interrupt line.  */
-PUBLIC void enable_irq(hook)
+void enable_irq(hook)
 irq_hook_t* hook;
 {
   if((irq_actids[hook->irq] &= ~hook->id) == 0) {
@@ -145,7 +145,7 @@ irq_hook_t* hook;
 }
 
 /* Return true if the interrupt was enabled before call.  */
-PUBLIC int disable_irq(hook)
+int disable_irq(hook)
 irq_hook_t* hook;
 {
   if(irq_actids[hook->irq] & hook->id)  /* already disabled */

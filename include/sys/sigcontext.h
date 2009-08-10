@@ -15,10 +15,6 @@
  * by the signal catching mechanism.
  */
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
 /* The following structure should match the stackframe_s structure used
  * by the kernel's context switching code.  Floating point registers should
  * be added in a different struct.
@@ -47,12 +43,12 @@ struct sigregs {
 };
 
 struct sigframe {		/* stack frame created for signalled process */
-  _PROTOTYPE( void (*sf_retadr), (void) );
+  void (*sf_retadr)(void);
   int sf_signo;
   int sf_code;
   struct sigcontext *sf_scp;
   int sf_fp;
-  _PROTOTYPE( void (*sf_retadr2), (void) );
+  void (*sf_retadr2)(void);
   struct sigcontext *sf_scpcopy;
 };
 #endif /* CONFIG_X86_32 */
@@ -85,6 +81,6 @@ struct sigcontext {
 #define sc_ss sc_regs.sr_ss
 #endif /* CONFIG_X86_32 */
 
-_PROTOTYPE( int sigreturn, (struct sigcontext *_scp)			);
+int sigreturn(struct sigcontext *_scp);
 
 #endif /* _SIGCONTEXT_H */

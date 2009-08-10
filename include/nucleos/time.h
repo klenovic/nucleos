@@ -24,7 +24,7 @@ struct timezone {
 	int     tz_dsttime;     /* type of dst correction */
 };
 
-int gettimeofday(struct timeval *_RESTRICT tp, void *_RESTRICT tzp);
+int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp);
 
 /* Compatibility with other Unix systems */
 int settimeofday(const struct timeval *tp, const void *tzp);

@@ -114,7 +114,7 @@
 /* Configuration */
 #define RL_ENVVAR	"RTLETH"
 
-PRIVATE struct pcitab
+static struct pcitab
 {
 	u16_t vid;
 	u16_t did;
@@ -212,9 +212,10 @@ static re_t re_table[RE_PORT_NR];
 static u16_t eth_ign_proto;
 static tmra_ut rl_watchdog;
 
-FORWARD _PROTOTYPE( unsigned my_inb, (U16_t port) );
-FORWARD _PROTOTYPE( unsigned my_inw, (U16_t port) );
-FORWARD _PROTOTYPE( unsigned my_inl, (U16_t port) );
+static  unsigned my_inb(U16_t port);
+static  unsigned my_inw(U16_t port);
+static  unsigned my_inl(U16_t port);
+
 static unsigned my_inb(U16_t port) {
 	u32_t value;
 	int s;
@@ -240,9 +241,10 @@ static unsigned my_inl(U16_t port) {
 #define rl_inw(port, offset)	(my_inw((port) + (offset)))
 #define rl_inl(port, offset)	(my_inl((port) + (offset)))
 
-FORWARD _PROTOTYPE( void my_outb, (U16_t port, U8_t value) );
-FORWARD _PROTOTYPE( void my_outw, (U16_t port, U16_t value) );
-FORWARD _PROTOTYPE( void my_outl, (U16_t port, U32_t value) );
+static void my_outb(U16_t port, U8_t value);
+static void my_outw(U16_t port, U16_t value);
+static void my_outl(U16_t port, U32_t value);
+
 static void my_outb(U16_t port, U8_t value) {
 	int s;
 	if ((s=sys_outb(port, value)) !=OK)
@@ -262,50 +264,46 @@ static void my_outl(U16_t port, U32_t value) {
 #define rl_outw(port, offset, value)	(my_outw((port) + (offset), (value)))
 #define rl_outl(port, offset, value)	(my_outl((port) + (offset), (value)))
 
-_PROTOTYPE( static void rl_init, (message *mp)				);
-_PROTOTYPE( static void rl_pci_conf, (void)				);
-_PROTOTYPE( static int rl_probe, (re_t *rep)				);
-_PROTOTYPE( static void rl_conf_hw, (re_t *rep)				);
-_PROTOTYPE( static void rl_init_buf, (re_t *rep)				);
-_PROTOTYPE( static void rl_init_hw, (re_t *rep)				);
-_PROTOTYPE( static void rl_reset_hw, (re_t *rep)			);
-_PROTOTYPE( static void rl_confaddr, (re_t *rep)			);
-_PROTOTYPE( static void rl_rec_mode, (re_t *rep)			);
-_PROTOTYPE( static void rl_readv, (message *mp, int from_int, 
-							int vectored)	);
-_PROTOTYPE( static void rl_readv_s, (message *mp, int from_int)	);
-_PROTOTYPE( static void rl_writev, (message *mp, int from_int,
-							int vectored)	);
-_PROTOTYPE( static void rl_writev_s, (message *mp, int from_int)	);
-_PROTOTYPE( static void rl_check_ints, (re_t *rep)			);
-_PROTOTYPE( static void rl_report_link, (re_t *rep)			);
-_PROTOTYPE( static void mii_print_techab, (U16_t techab)		);
-_PROTOTYPE( static void mii_print_stat_speed, (U16_t stat,
-							U16_t extstat)	);
-_PROTOTYPE( static void rl_clear_rx, (re_t *rep)			);
-_PROTOTYPE( static void rl_do_reset, (re_t *rep)			);
-_PROTOTYPE( static void rl_getstat, (message *mp)			);
-_PROTOTYPE( static void rl_getstat_s, (message *mp)			);
-_PROTOTYPE( static void rl_getname, (message *mp)			);
-_PROTOTYPE( static void reply, (re_t *rep, int err, int may_block)	);
-_PROTOTYPE( static void mess_reply, (message *req, message *reply)	);
-_PROTOTYPE( static void rtl8139_stop, (void)				);
-_PROTOTYPE( static void check_int_events, (void)				);
-_PROTOTYPE( static int do_hard_int, (void)				);
-_PROTOTYPE( static void rtl8139_dump, (message *m)				);
+static void rl_init(message *mp);
+static void rl_pci_conf(void);
+static int rl_probe(re_t *rep);
+static void rl_conf_hw(re_t *rep);
+static void rl_init_buf(re_t *rep);
+static void rl_init_hw(re_t *rep);
+static void rl_reset_hw(re_t *rep);
+static void rl_confaddr(re_t *rep);
+static void rl_rec_mode(re_t *rep);
+static void rl_readv(message *mp, int from_int, int vectored);
+static void rl_readv_s(message *mp, int from_int);
+static void rl_writev(message *mp, int from_int, int vectored);
+static void rl_writev_s(message *mp, int from_int);
+static void rl_check_ints(re_t *rep);
+static void rl_report_link(re_t *rep);
+static void mii_print_techab(U16_t techab);
+static void mii_print_stat_speed(U16_t stat, U16_t extstat);
+static void rl_clear_rx(re_t *rep);
+static void rl_do_reset(re_t *rep);
+static void rl_getstat(message *mp);
+static void rl_getstat_s(message *mp);
+static void rl_getname(message *mp);
+static void reply(re_t *rep, int err, int may_block);
+static void mess_reply(message *req, message *reply);
+static void rtl8139_stop(void);
+static void check_int_events(void);
+static int do_hard_int(void);
+static void rtl8139_dump(message *m);
 #if 0
-_PROTOTYPE( static void dump_phy, (re_t *rep)				);
+static void dump_phy(re_t *rep);
 #endif
-_PROTOTYPE( static int rl_handler, (re_t *rep)			);
-_PROTOTYPE( static void rl_watchdog_f, (timer_t *tp)			);
-_PROTOTYPE( static void tell_dev, (vir_bytes start, size_t size,
-				int pci_bus, int pci_dev, int pci_func)	);
+static int rl_handler(re_t *rep);
+static void rl_watchdog_f(timer_t *tp);
+static void tell_dev(vir_bytes start, size_t size, int pci_bus, int pci_dev, int pci_func);
 
 /* The message used in the main loop is made global, so that rl_watchdog_f()
  * can change its message type to fake a HARD_INT message.
  */
-PRIVATE message m;
-PRIVATE int int_event_check;		/* set to TRUE if events arrived */
+static message m;
+static int int_event_check;		/* set to TRUE if events arrived */
 
 static char *progname;
 extern int errno;
@@ -2836,11 +2834,11 @@ timer_t *tp;
 
 #if 0
 
-_PROTOTYPE( static void rtl_init, (struct dpeth *dep)			);
-_PROTOTYPE( static u16_t get_ee_word, (dpeth_t *dep, int a)		);
-_PROTOTYPE( static void ee_wen, (dpeth_t *dep)				);
-_PROTOTYPE( static void set_ee_word, (dpeth_t *dep, int a, U16_t w)	);
-_PROTOTYPE( static void ee_wds, (dpeth_t *dep)				);
+static void rtl_init(struct dpeth *dep);
+static u16_t get_ee_word(dpeth_t *dep, int a);
+static void ee_wen(dpeth_t *dep);
+static void set_ee_word(dpeth_t *dep, int a, U16_t w);
+static void ee_wds(dpeth_t *dep);
 
 static void rtl_init(dep)
 dpeth_t *dep;
@@ -3065,7 +3063,7 @@ dpeth_t *dep;
 }
 #endif
 
-PRIVATE void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
+static void tell_dev(buf, size, pci_bus, pci_dev, pci_func)
 vir_bytes buf;
 size_t size;
 int pci_bus;
@@ -3111,7 +3109,3 @@ int pci_func;
 		return;
 	}
 }
-
-/*
- * $PchId: rtl8139.c,v 1.3 2003/09/11 14:15:15 philip Exp $
- */

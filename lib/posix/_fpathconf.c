@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-PUBLIC long fpathconf(fd, name)
+long fpathconf(fd, name)
 int fd;				/* file descriptor being interrogated */
 int name;			/* property being inspected */
 {

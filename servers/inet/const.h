@@ -37,7 +37,3 @@ Copyright 1995 Philip Homburg
 #define BUF_S		512
 
 #endif /* INET__CONST_H */
-
-/*
- * $PchId: const.h,v 1.7 2000/08/12 09:21:44 philip Exp $
- */

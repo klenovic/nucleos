@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 
-PUBLIC int sys_trace(req, proc_nr, addr, data_p)
+int sys_trace(req, proc_nr, addr, data_p)
 int req, proc_nr;
 long addr, *data_p;
 {

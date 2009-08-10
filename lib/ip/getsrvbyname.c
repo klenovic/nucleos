@@ -25,13 +25,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)getservbyname.c	5.6 (Berkeley) 6/1/90";
-#endif /* LIBC_SCCS and not lint */
-
 #include <string.h>
-
 #include <net/gen/netdb.h>
 
 extern int _serv_stayopen;

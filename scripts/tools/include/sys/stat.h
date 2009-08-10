@@ -12,12 +12,14 @@
  * some file.  These calls are the only approved way to inspect i-nodes.
  */
 
-#ifndef _STAT_H
-#define _STAT_H
+#ifndef __SYS_STAT_H
+#define __SYS_STAT_H
 
 #include "types.h"
 
-struct MNX(stat) {
+
+
+struct mnx_stat {
   MNX(dev_t) st_dev;   /* major/minor device number */
   MNX(ino_t) st_ino;   /* i-node number */
   MNX(mode_t) st_mode; /* file mode, protection bits, etc. */
@@ -26,9 +28,9 @@ struct MNX(stat) {
   short int st_gid;    /* gid; TEMPORARY HACK: should be gid_t */
   MNX(dev_t) st_rdev;
   MNX(off_t) st_size;   /* file size */
-  MNX(time_t) st_atime; /* time of last access */
-  MNX(time_t) st_mtime; /* time of last data modification */
-  MNX(time_t) st_ctime; /* time of last file status change */
+  MNX(time_t) st_atim; /* time of last access */
+  MNX(time_t) st_mtim; /* time of last data modification */
+  MNX(time_t) st_ctim; /* time of last file status change */
 };
 
 /* Traditional mask definitions for st_mode. */

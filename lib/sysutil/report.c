@@ -12,7 +12,7 @@
 /*===========================================================================*
  *				    report					     *
  *===========================================================================*/
-PUBLIC void report(who, mess, num)
+void report(who, mess, num)
 char *who;				/* server identification */
 char *mess;				/* message format to print */
 int num;				/* number to go with the message */

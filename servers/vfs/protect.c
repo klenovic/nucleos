@@ -37,7 +37,7 @@
 /*===========================================================================*
  *				do_chmod				     *
  *===========================================================================*/
-PUBLIC int do_chmod()
+int do_chmod()
 {
   struct filp *flp;
   struct vnode *vp;
@@ -95,7 +95,7 @@ PUBLIC int do_chmod()
 /*===========================================================================*
  *				do_chown				     *
  *===========================================================================*/
-PUBLIC int do_chown()
+int do_chown()
 {
   int inode_nr;
   int fs_e;
@@ -163,7 +163,7 @@ PUBLIC int do_chown()
 /*===========================================================================*
  *				do_umask				     *
  *===========================================================================*/
-PUBLIC int do_umask()
+int do_umask()
 {
 /* Perform the umask(co_mode) system call. */
   register mode_t r;
@@ -177,7 +177,7 @@ PUBLIC int do_umask()
 /*===========================================================================*
  *				do_access				     *
  *===========================================================================*/
-PUBLIC int do_access()
+int do_access()
 {
 /* Perform the access(name, mode) system call. */
   int r;
@@ -202,7 +202,7 @@ PUBLIC int do_access()
 /*===========================================================================*
  *				forbidden				     *
  *===========================================================================*/
-PUBLIC int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
+int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
 {
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
@@ -273,7 +273,7 @@ PUBLIC int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
 /*===========================================================================*
  *				read_only				     *
  *===========================================================================*/
-PUBLIC int read_only(vp)
+int read_only(vp)
 struct vnode *vp;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted

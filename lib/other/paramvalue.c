@@ -53,8 +53,3 @@ size_t paramvalue(char **value, void *address, size_t size)
 	*value= v;
 	return n / 2;
 }
-
-
-/*
- * $PchId: paramvalue.c,v 1.3 1996/02/22 09:15:56 philip Exp $
- */

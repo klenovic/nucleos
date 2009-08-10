@@ -11,8 +11,6 @@
  *                    19 Jan 1992
  */
 #define BIOS      1       /* Can only be used under the BIOS. */
-#define _POSIX_SOURCE   1
-#define _MINIX    1
 #include <nucleos/stddef.h>
 #include <nucleos/types.h>
 #include <sys/stat.h>

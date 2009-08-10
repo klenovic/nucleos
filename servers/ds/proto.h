@@ -10,12 +10,12 @@
 /* Function prototypes. */
 
 /* main.c */
-_PROTOTYPE(int main, (int argc, char **argv));
+int main(int argc, char **argv);
 
 /* store.c */
-_PROTOTYPE(int do_publish, (message *m_ptr));
-_PROTOTYPE(int do_retrieve, (message *m_ptr));
-_PROTOTYPE(int do_subscribe, (message *m_ptr));
-_PROTOTYPE(int do_check, (message *m_ptr));
-_PROTOTYPE(int do_getsysinfo, (message *m_ptr));
-_PROTOTYPE(void ds_init, (void));
+int do_publish(message *m_ptr);
+int do_retrieve(message *m_ptr);
+int do_subscribe(message *m_ptr);
+int do_check(message *m_ptr);
+int do_getsysinfo(message *m_ptr);
+void ds_init(void);

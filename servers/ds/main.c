@@ -27,16 +27,16 @@ int sys_panic;          /* flag to indicate system-wide panic */
 extern int errno;       /* error number set by system library */
 
 /* Declare some local functions. */
-FORWARD _PROTOTYPE(void init_server, (int argc, char **argv)		);
-FORWARD _PROTOTYPE(void exit_server, (void)				);
-FORWARD _PROTOTYPE(void sig_handler, (void)				);
-FORWARD _PROTOTYPE(void get_work, (message *m_ptr)			);
-FORWARD _PROTOTYPE(void reply, (int whom, message *m_ptr)		);
+static void init_server(int argc, char **argv);
+static void exit_server(void);
+static void sig_handler(void);
+static void get_work(message *m_ptr);
+static void reply(int whom, message *m_ptr);
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 /* This is the main routine of this service. The main loop consists of 
  * three major activities: getting new work, processing the work, and
@@ -91,7 +91,7 @@ PUBLIC int main(int argc, char **argv)
 /*===========================================================================*
  *				 init_server                                 *
  *===========================================================================*/
-PRIVATE void init_server(int argc, char **argv)
+static void init_server(int argc, char **argv)
 {
 /* Initialize the data store server. */
   int i, s;
@@ -104,7 +104,7 @@ PRIVATE void init_server(int argc, char **argv)
 /*===========================================================================*
  *				 sig_handler                                 *
  *===========================================================================*/
-PRIVATE void sig_handler()
+static void sig_handler()
 {
 /* Signal handler. */
   sigset_t sigset;
@@ -122,7 +122,7 @@ PRIVATE void sig_handler()
 /*===========================================================================*
  *				exit_server                                  *
  *===========================================================================*/
-PRIVATE void exit_server()
+static void exit_server()
 {
 /* Shut down the information service. */
 
@@ -133,7 +133,7 @@ PRIVATE void exit_server()
 /*===========================================================================*
  *				get_work                                     *
  *===========================================================================*/
-PRIVATE void get_work(m_ptr)
+static void get_work(m_ptr)
 message *m_ptr;				/* message buffer */
 {
     int status = 0;
@@ -149,7 +149,7 @@ message *m_ptr;				/* message buffer */
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PRIVATE void reply(who_e, m_ptr)
+static void reply(who_e, m_ptr)
 int who_e;                           	/* destination */
 message *m_ptr;				/* message buffer */
 {

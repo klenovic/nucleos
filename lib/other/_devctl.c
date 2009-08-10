@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 
-PUBLIC int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style,
+int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style,
 	int force)
 {
   message m;

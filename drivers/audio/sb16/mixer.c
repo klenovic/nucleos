@@ -12,17 +12,14 @@
 
 
  
-FORWARD _PROTOTYPE( int get_set_volume, (struct volume_level *level, int flag));
-FORWARD _PROTOTYPE( int get_set_input, (struct inout_ctrl *input, int flag, int channel));
-FORWARD _PROTOTYPE( int get_set_output, (struct inout_ctrl *output, int flag));
-
-
-
+static int get_set_volume(struct volume_level *level, int flag);
+static int get_set_input(struct inout_ctrl *input, int flag, int channel);
+static int get_set_output(struct inout_ctrl *output, int flag);
 
 /*=========================================================================*
  *				mixer_ioctl				   	
  *=========================================================================*/
-PUBLIC int mixer_ioctl(int request, void *val, int *len) {
+int mixer_ioctl(int request, void *val, int *len) {
 	int status;
 
 	switch(request) {
@@ -44,7 +41,7 @@ PUBLIC int mixer_ioctl(int request, void *val, int *len) {
 /*=========================================================================*
  *				mixer_init				   
  *=========================================================================*/
-PUBLIC int mixer_init() {
+int mixer_init() {
 	/* Try to detect the mixer by writing to MIXER_DAC_LEVEL if the
 	* value written can be read back the mixer is there
 	*/
@@ -68,7 +65,7 @@ PUBLIC int mixer_init() {
 /*=========================================================================*
  *				get_set_volume				   *
  *=========================================================================*/
-PRIVATE int get_set_volume(struct volume_level *level, int flag) {
+static int get_set_volume(struct volume_level *level, int flag) {
 	int cmd_left, cmd_right, shift, max_level;
 
 	shift = 3;
@@ -141,7 +138,7 @@ PRIVATE int get_set_volume(struct volume_level *level, int flag) {
 /*=========================================================================*
  *				get_set_input				   *
  *=========================================================================*/
-PRIVATE int get_set_input(struct inout_ctrl *input, int flag, int channel) {
+static int get_set_input(struct inout_ctrl *input, int flag, int channel) {
 	int input_cmd, input_mask, mask, del_mask, shift;
 
 	input_cmd = (channel == 0 ? MIXER_IN_LEFT : MIXER_IN_RIGHT);
@@ -195,7 +192,7 @@ PRIVATE int get_set_input(struct inout_ctrl *input, int flag, int channel) {
 /*=========================================================================*
  *				get_set_output				   *
  *=========================================================================*/
-PRIVATE int get_set_output(struct inout_ctrl *output, int flag) {
+static int get_set_output(struct inout_ctrl *output, int flag) {
 	int output_mask, mask, del_mask, shift;
 
 	mask = mixer_get(MIXER_OUTPUT_CTRL); 
@@ -241,7 +238,7 @@ PRIVATE int get_set_output(struct inout_ctrl *output, int flag) {
 
 
 
-PUBLIC int mixer_set(int reg, int data) {
+int mixer_set(int reg, int data) {
 	int i;
 
 	sb16_outb(MIXER_REG, reg);
@@ -253,7 +250,7 @@ PUBLIC int mixer_set(int reg, int data) {
 
 
 
-PUBLIC int mixer_get(int reg) {
+int mixer_get(int reg) {
 	int i;
 
 	sb16_outb(MIXER_REG, reg);

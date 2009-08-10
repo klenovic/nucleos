@@ -23,7 +23,7 @@
 /*===========================================================================*
  *				do_write				     *
  *===========================================================================*/
-PUBLIC int do_write()
+int do_write()
 {
 /* Perform the write(fd, buffer, nbytes) system call. */
   return(read_write(WRITING));

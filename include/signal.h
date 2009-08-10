@@ -15,22 +15,14 @@
 #ifndef _SIGNAL_H
 #define _SIGNAL_H
 
-#ifndef _ANSI_H
-#include <ansi.h>
-#endif
-
-#ifdef _POSIX_SOURCE
 #include <nucleos/types.h>
-#endif
 
 /* Here are types that are closely associated with signal handling. */
 typedef int sig_atomic_t;
 
-#ifdef _POSIX_SOURCE
 #ifndef _SIGSET_T
 #define _SIGSET_T
 typedef unsigned long sigset_t;
-#endif
 #endif
 
 /* Regular signals. */
@@ -64,7 +56,6 @@ typedef unsigned long sigset_t;
 
 #define _NSIG             24	/* highest signal number plus one */
 
-#ifdef _MINIX
 #define SIGIOT             SIGABRT /* for people who speak PDP-11 */
 
 /* MINIX specific signals. These signals are not used by user proceses, 
@@ -74,10 +65,7 @@ typedef unsigned long sigset_t;
 #define SIGKSIG    	  30	/* kernel signal pending */
 #define SIGKSTOP    	  31	/* kernel shutting down */
 
-#endif
-
-/* The sighandler_t type is not allowed unless _POSIX_SOURCE is defined. */
-typedef void _PROTOTYPE( (*__sighandler_t), (int) );
+typedef void (*__sighandler_t)(int);
 
 /* Macros used as function pointers. */
 #define SIG_ERR    ((__sighandler_t) -1)	/* error return */
@@ -87,7 +75,6 @@ typedef void _PROTOTYPE( (*__sighandler_t), (int) );
 #define SIG_CATCH  ((__sighandler_t)  3)	/* catch signal */
 #define SIG_MESS   ((__sighandler_t)  4)	/* pass as message (MINIX) */
 
-#ifdef _POSIX_SOURCE
 struct sigaction {
   __sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
   sigset_t sa_mask;		/* signals to be blocked during handler */
@@ -108,26 +95,21 @@ struct sigaction {
 #define SIG_UNBLOCK        1	/* for unblocking signals */
 #define SIG_SETMASK        2	/* for setting the signal mask */
 #define SIG_INQUIRE        4	/* for internal use only */
-#endif	/* _POSIX_SOURCE */
 
 /* POSIX and ANSI function prototypes. */
-_PROTOTYPE( int raise, (int _sig)					);
-_PROTOTYPE( __sighandler_t signal, (int _sig, __sighandler_t _func)	);
+int raise(int _sig);
+__sighandler_t signal(int _sig, __sighandler_t _func);
 
-#ifdef _POSIX_SOURCE
-_PROTOTYPE( int kill, (pid_t _pid, int _sig)				);
-_PROTOTYPE( int killpg, (pid_t _pgrp, int _sig)				);
-_PROTOTYPE( int sigaction,
-    (int _sig, const struct sigaction *_act, struct sigaction *_oact)	);
-_PROTOTYPE( int sigaddset, (sigset_t *_set, int _sig)			);
-_PROTOTYPE( int sigdelset, (sigset_t *_set, int _sig)			);
-_PROTOTYPE( int sigemptyset, (sigset_t *_set)				);
-_PROTOTYPE( int sigfillset, (sigset_t *_set)				);
-_PROTOTYPE( int sigismember, (const sigset_t *_set, int _sig)		);
-_PROTOTYPE( int sigpending, (sigset_t *_set)				);
-_PROTOTYPE( int sigprocmask,
-	    (int _how, const sigset_t *_set, sigset_t *_oset)		);
-_PROTOTYPE( int sigsuspend, (const sigset_t *_sigmask)			);
-#endif
+int kill(pid_t _pid, int _sig);
+int killpg(pid_t _pgrp, int _sig);
+int sigaction(int _sig, const struct sigaction *_act, struct sigaction *_oact);
+int sigaddset(sigset_t *_set, int _sig);
+int sigdelset(sigset_t *_set, int _sig);
+int sigemptyset(sigset_t *_set);
+int sigfillset(sigset_t *_set);
+int sigismember(const sigset_t *_set, int _sig);
+int sigpending(sigset_t *_set);
+int sigprocmask(int _how, const sigset_t *_set, sigset_t *_oset);
+int sigsuspend(const sigset_t *_sigmask);
 
 #endif /* _SIGNAL_H */

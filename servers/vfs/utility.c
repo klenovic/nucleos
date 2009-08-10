@@ -33,7 +33,7 @@
 /*===========================================================================*
  *				fetch_name				     *
  *===========================================================================*/
-PUBLIC int fetch_name(path, len, flag)
+int fetch_name(path, len, flag)
 char *path;			/* pointer to the path in user space */
 int len;			/* path length, including 0 byte */
 int flag;			/* M3 means path may be in message */
@@ -94,7 +94,7 @@ int flag;			/* M3 means path may be in message */
 /*===========================================================================*
  *				no_sys					     *
  *===========================================================================*/
-PUBLIC int no_sys()
+int no_sys()
 {
 /* Somebody has used an illegal system call number */
   printf("VFSno_sys: call %d from %d\n", call_nr, who_e);
@@ -104,7 +104,7 @@ PUBLIC int no_sys()
 /*===========================================================================*
  *				isokendpt_f				     *
  *===========================================================================*/
-PUBLIC int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
+int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
 {
     int failed = 0;
     endpoint_t ke;
@@ -139,7 +139,7 @@ PUBLIC int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
 /*===========================================================================*
  *				clock_time				     *
  *===========================================================================*/
-PUBLIC time_t clock_time()
+time_t clock_time()
 {
 /* This routine returns the time in seconds since 1.1.1970.  MINIX is an
  * astrophysically naive system that assumes the earth rotates at a constant

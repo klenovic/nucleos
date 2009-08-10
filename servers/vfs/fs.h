@@ -37,8 +37,6 @@
 /* This is the master header for fs.  It includes some other files
  * and defines the principal constants.
  */
-#define _POSIX_SOURCE      1	/* tell headers to include POSIX stuff */
-#define _MINIX             1	/* tell headers to include MINIX stuff */
 #define _SYSTEM            1	/* tell headers that this is the kernel */
 
 #define DO_SANITYCHECKS	   0
@@ -56,7 +54,6 @@
 #endif
 
 /* The following are so basic, all the *.c files get them automatically. */
-#include <ansi.h>		/* MUST be second */
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
