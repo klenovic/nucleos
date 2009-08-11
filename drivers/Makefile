@@ -1,5 +1,5 @@
 # Makefile for all device drivers.
-obj-y := at_wini/ bios_wini/ floppy/ log/ pci/ random/ \
+obj-y := at_wini/ bios_wini/ floppy/ lance/ log/ pci/ random/ \
 	 readclock/ tty/ memory/
 
 #subdir-y-flags := not-sort
