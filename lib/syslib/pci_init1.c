@@ -15,6 +15,7 @@ pci_init1.c
 #include "syslib.h"
 #include <string.h>
 #include <unistd.h>
+#include <servers/ds/ds.h>
 #include <nucleos/sysutil.h>
 
 int pci_procnr= ANY;

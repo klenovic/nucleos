@@ -68,4 +68,12 @@ int stime(time_t *_top);
 
 extern long timezone;
 
+struct timespec
+{
+	time_t tv_sec;
+	long tv_nsec;
+};
+
+int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
+
 #endif /* _TIME_H */

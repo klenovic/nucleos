@@ -285,7 +285,7 @@ ifeq ($(KBUILD_EXTMOD),)
 # directories we have to visit
 drivers-y := drivers/
 servers-y := servers/
-core-y := kernel/
+core-y := kernel/ init/
 libs-y := lib/
 endif
 

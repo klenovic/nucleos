@@ -6,6 +6,10 @@ app-y += newroot.elf32
 app-y += service.elf32 
 app-y += sysenv.elf32 
 
+# @klenovic: This is just a fake to compile these utilities.
+#            They are _not_ the user part of kernel!
+ccflags-y := -D__UKERNEL__
+
 cdprobe.elf32-obj-y     := cdprobe.o
 dev2name.elf32-obj-y    := dev2name.o
 loadramdisk.elf32-obj-y := loadramdisk.o

@@ -7,12 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SYS_PARAM_H__
-#define __SYS_PARAM_H__
-/*
-sys/param.h
-*/
+.section .text
 
-#define MAXHOSTNAMELEN  256	/* max hostname size */
+.globl nanosleep
+.p2align 1
 
-#endif /* __SYS_PARAM_H__ */
+nanosleep:
+	jmp	_nanosleep

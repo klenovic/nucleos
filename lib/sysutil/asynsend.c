@@ -16,6 +16,7 @@
 #include <nucleos/type.h>
 
 #include <fcntl.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>

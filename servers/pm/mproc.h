@@ -21,6 +21,8 @@
 #include <signal.h>
 #include <nucleos/com.h>
 
+#include "const.h"
+
 struct mproc {
 	char mp_exitstatus;	/* storage for status when process exits */
 	char mp_sigstatus;	/* storage for signal # for killed procs */
@@ -51,7 +53,8 @@ struct mproc {
 	vir_bytes mp_sigreturn;			/* address of C library __sigreturn function */
 	struct sigmsg mp_sigmsg;		/* Save the details of the signal until the
 						 * PM_UNPAUSE request is delivered. */
-	struct timer mp_timer;			/* watchdog timer for alarm(2) */
+	struct timer mp_timer;			/* watchdog timer for alarm(2), setitimer(2) */
+	clock_t mp_interval[NR_ITIMERS];	/* setitimer(2) repetition intervals */
 
 	unsigned mp_flags;	/* flag bits */
 	vir_bytes mp_procargs;	/* ptr to proc's initial stack arguments */

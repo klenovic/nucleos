@@ -10,6 +10,7 @@
 #define _SYSTEM 1
 #include <lib.h>
 #include <sys/mman.h>
+#include <nucleos/syslib.h>
 #include <nucleos/vm.h>
 #include <stdarg.h>
 #include <string.h>
