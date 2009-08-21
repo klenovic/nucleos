@@ -241,6 +241,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 	/* Read in text and data segments. */
 	for (i = 0; i < ehdr.e_shnum; i++) {
 		sh = &shdrs[i];
+		addr_off = sh->sh_addr;
 
 		if (param->load_text && sh->sh_type == SHT_PROGBITS) {
 			if ((sh->sh_flags & SHF_ALLOC) && (sh->sh_flags & SHF_EXECINSTR))  {
@@ -251,9 +252,6 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 					app_err("Can't load text section\n");
 					return err;
 				}
-
-				if (!exec.sep_id)
-					addr_off += sh->sh_size;
 #ifdef CONFIG_DEBUG_VFS_ELF32
 				app_dbg("text sections loaded\n");
 #endif
@@ -265,9 +263,6 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 					app_err("Can't load data section\n");
 					return err;
 				}
-
-				if (!exec.sep_id)
-					addr_off += sh->sh_size;
 #ifdef CONFIG_DEBUG_VFS_ELF32
 				app_dbg("sata sections loaded\n");
 #endif

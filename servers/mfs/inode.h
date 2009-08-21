@@ -51,7 +51,7 @@ struct inode {
 
   LIST_ENTRY(inode) i_hash;     /* hash list */
   TAILQ_ENTRY(inode) i_unused;  /* free and unused list */
-} inode[NR_INODES];
+};
 
 extern struct inode inode[];
 
