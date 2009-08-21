@@ -112,8 +112,7 @@ int (*call_vec[])(void) = {
 	do_chroot,	/* 61 = chroot	*/
 	no_sys,		/* 62 = (setsid) */
 	no_sys,		/* 63 = (getpgrp) */
-
-	no_sys,		/* 64 = unused	*/
+	no_sys,		/* 64 = (itimer) */
 	no_sys,		/* 65 = unused	*/
 	no_sys, 	/* 66 = unused  */
 	no_sys,		/* 67 = unused	*/
@@ -127,7 +126,6 @@ int (*call_vec[])(void) = {
 	no_sys,		/* 75 = (sigreturn) */
 	no_sys,		/* 76 = (reboot) */
 	do_svrctl,	/* 77 = svrctl */
-
 	no_sys,		/* 78 = (sysuname) */
 	do_getsysinfo,  /* 79 = getsysinfo */
 	do_getdents,	/* 80 = getdents */

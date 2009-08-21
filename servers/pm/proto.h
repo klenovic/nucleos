@@ -18,6 +18,12 @@ struct memory;
 
 #include <timers.h>
 
+/* alarm.c */
+int do_alarm(void);
+int do_itimer(void);
+void set_alarm(struct mproc *rmp, clock_t ticks);
+void check_vtimer(int proc_nr, int sig);
+
 /* break.c */
 int do_brk(void);
 
@@ -77,11 +83,9 @@ int do_sprofile(void);
 int do_cprofile(void);
 
 /* signal.c */
-int do_alarm(void);
 int do_kill(void);
 int ksig_pending(void);
 int do_pause(void);
-int set_alarm(int proc_nr, int sec);
 int check_sig(pid_t proc_id, int signo);
 void sig_proc(struct mproc *rmp, int sig_nr);
 int do_sigaction(void);

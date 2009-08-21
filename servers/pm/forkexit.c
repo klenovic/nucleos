@@ -50,7 +50,7 @@ int do_fork()
   register struct mproc *rmc;	/* pointer to child */
   pid_t new_pid;
   static int next_child;
-  int n = 0, r, s;
+  int i, n = 0, r, s;
   endpoint_t child_ep;
 
  /* If tables might fill up during FORK, don't even start since recovery half
@@ -95,6 +95,8 @@ int do_fork()
   rmc->mp_exitstatus = 0;
   rmc->mp_sigstatus = 0;
   rmc->mp_endpoint = child_ep;		/* passed back by VM */
+  for (i = 0; i < NR_ITIMERS; i++)
+	rmc->mp_interval[i] = 0;	/* reset timer intervals */
 
   /* Find a free pid for the child and put it in the table. */
   new_pid = get_free_pid();
@@ -123,7 +125,7 @@ int do_fork_nb()
   int s;
   pid_t new_pid;
   static int next_child;
-  int n = 0, r;
+  int i, n = 0, r;
   endpoint_t child_ep;
 
   /* Only system processes are allowed to use fork_nb */
@@ -167,6 +169,8 @@ int do_fork_nb()
   rmc->mp_child_utime = 0;		/* reset administration */
   rmc->mp_child_stime = 0;		/* reset administration */
   rmc->mp_endpoint = child_ep;		/* passed back by VM */
+  for (i = 0; i < NR_ITIMERS; i++)
+	rmc->mp_interval[i] = 0;	/* reset timer intervals */
 
   /* Find a free pid for the child and put it in the table. */
   new_pid = get_free_pid();
@@ -231,7 +235,7 @@ int dump_core;			/* flag indicating whether to dump core */
   procgrp = (rmp->mp_pid == mp->mp_procgrp) ? mp->mp_procgrp : 0;
 
   /* If the exited process has a timer pending, kill it. */
-  if (rmp->mp_flags & ALARM_ON) set_alarm(proc_nr_e, (unsigned) 0);
+  if (rmp->mp_flags & ALARM_ON) set_alarm(rmp, (clock_t) 0);
 
   /* Do accounting: fetch usage times and accumulate at parent. */
   if((r=sys_times(proc_nr_e, &user_time, &sys_time, NULL)) != OK)

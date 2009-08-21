@@ -20,8 +20,6 @@
  *   do_sigreturn:   perform the SIGRETURN system call
  *   do_sigsuspend:  perform the SIGSUSPEND system call
  *   do_kill:	perform the KILL system call
- *   do_alarm:	perform the ALARM system call by calling set_alarm()
- *   set_alarm:	tell the clock task to start or stop a timer
  *   do_pause:	perform the PAUSE system call
  *   ksig_pending: the kernel notified about pending signals
  *   sig_proc:	interrupt or terminate a signaled process
@@ -45,7 +43,6 @@
 
 static void unpause(int pro, int for_trace);
 static void handle_ksig(int proc_nr, sigset_t sig_map);
-static void cause_sigalrm(struct timer *tp);
 
 /*===========================================================================*
  *				do_sigaction				     *
@@ -279,9 +276,10 @@ sigset_t sig_map;
   /* Check each bit in turn to see if a signal is to be sent.  Unlike
    * kill(), the kernel may collect several unrelated signals for a
    * process and pass them to PM in one blow.  Thus loop on the bit
-   * map. For SIGINT, SIGWINCH and SIGQUIT, use proc_id 0 to indicate
-   * a broadcast to the recipient's process group.  For SIGKILL, use
-   * proc_id -1 to indicate a systemwide broadcast.
+   * map. For SIGVTALRM and SIGPROF, see if we need to restart a
+   * virtual timer. For SIGINT, SIGWINCH and SIGQUIT, use proc_id 0
+   * to indicate a broadcast to the recipient's process group.  For
+   * SIGKILL, use proc_id -1 to indicate a systemwide broadcast.
    */
   for (i = 1; i <= _NSIG; i++) {
 	if (!sigismember(&sig_map, i)) continue;
@@ -294,107 +292,16 @@ sigset_t sig_map;
 	    case SIGQUIT:
 	    case SIGWINCH:
 		id = 0; break;	/* broadcast to process group */
+	    case SIGVTALRM:
+	    case SIGPROF:
+	    	check_vtimer(proc_nr, i);
+	    	/* fall-through */
 	    default:
 		id = proc_id;
 		break;
 	}
 	check_sig(id, i);
   }
-}
-
-/*===========================================================================*
- *				do_alarm				     *
- *===========================================================================*/
-int do_alarm()
-{
-/* Perform the alarm(seconds) system call. */
-  return(set_alarm(who_e, m_in.seconds));
-}
-
-/*===========================================================================*
- *				set_alarm				     *
- *===========================================================================*/
-int set_alarm(proc_nr_e, sec)
-int proc_nr_e;			/* process that wants the alarm */
-int sec;			/* how many seconds delay before the signal */
-{
-/* This routine is used by do_alarm() to set the alarm timer.  It is also used
- * to turn the timer off when a process exits with the timer still on.
- */
-  clock_t ticks;	/* number of ticks for alarm */
-  clock_t exptime;	/* needed for remaining time on previous alarm */
-  clock_t uptime;	/* current system time */
-  int remaining;	/* previous time left in seconds */
-  int s;
-  int proc_nr_n;
-
-  if(pm_isokendpt(proc_nr_e, &proc_nr_n) != OK)
-	return EINVAL;
-
-  /* First determine remaining time of previous alarm, if set. */
-  if (mproc[proc_nr_n].mp_flags & ALARM_ON) {
-  	if ( (s=getuptime(&uptime)) != OK) 
-  		panic(__FILE__,"set_alarm couldn't get uptime", s);
-  	exptime = *tmr_exp_time(&mproc[proc_nr_n].mp_timer);
-  	remaining = (int) ((exptime - uptime + (system_hz-1))/system_hz);
-  	if (remaining < 0) remaining = 0;	
-  } else {
-  	remaining = 0; 
-  }
-
-  /* Tell the clock task to provide a signal message when the time comes.
-   *
-   * Large delays cause a lot of problems.  First, the alarm system call
-   * takes an unsigned seconds count and the library has cast it to an int.
-   * That probably works, but on return the library will convert "negative"
-   * unsigneds to errors.  Presumably no one checks for these errors, so
-   * force this call through.  Second, If unsigned and long have the same
-   * size, converting from seconds to ticks can easily overflow.  Finally,
-   * the kernel has similar overflow bugs adding ticks.
-   *
-   * Fixing this requires a lot of ugly casts to fit the wrong interface
-   * types and to avoid overflow traps.  ALRM_EXP_TIME has the right type
-   * (clock_t) although it is declared as long.  How can variables like
-   * this be declared properly without combinatorial explosion of message
-   * types?
-   */
-  ticks = (clock_t) (system_hz * (unsigned long) (unsigned) sec);
-  if ( (unsigned long) ticks / system_hz != (unsigned) sec)
-	ticks = LONG_MAX;	/* eternity (really TMR_NEVER) */
-
-  if (ticks != 0) {
-  	pm_set_timer(&mproc[proc_nr_n].mp_timer, ticks,
-		cause_sigalrm, proc_nr_e);
-  	mproc[proc_nr_n].mp_flags |=  ALARM_ON;
-  } else if (mproc[proc_nr_n].mp_flags & ALARM_ON) {
-  	pm_cancel_timer(&mproc[proc_nr_n].mp_timer);
-  	mproc[proc_nr_n].mp_flags &= ~ALARM_ON;
-  }
-  return(remaining);
-}
-
-/*===========================================================================*
- *				cause_sigalrm				     *
- *===========================================================================*/
-static void cause_sigalrm(tp)
-struct timer *tp;
-{
-  int proc_nr_n;
-  register struct mproc *rmp;
-
-  /* get process from timer */
-  if(pm_isokendpt(tmr_arg(tp)->ta_int, &proc_nr_n) != OK) {
-	printf("PM: ignoring timer for invalid endpoint %d\n",
-		tmr_arg(tp)->ta_int);
-	return;
-  }
-
-  rmp = &mproc[proc_nr_n];
-
-  if ((rmp->mp_flags & (IN_USE | EXITING)) != IN_USE) return;
-  if ((rmp->mp_flags & ALARM_ON) == 0) return;
-  rmp->mp_flags &= ~ALARM_ON;
-  check_sig(rmp->mp_pid, SIGALRM);
 }
 
 /*===========================================================================*

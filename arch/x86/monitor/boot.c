@@ -737,12 +737,12 @@ void get_parameters(void)
   /* Variables boot needs: */
   b_setvar(E_SPECIAL|E_VAR, "image", "boot/image");
   b_setvar(E_SPECIAL|E_FUNCTION, "leader",
-    "echo --- Welcome to MINIX 3. This is the boot monitor. ---\\n");
+    "echo --- This is the boot monitor ---\\n");
   b_setvar(E_SPECIAL|E_FUNCTION, "main", "menu");
   b_setvar(E_SPECIAL|E_FUNCTION, "trailer", "");
 
   /* Default hidden menu function: */
-  b_setenv(E_RESERVED|E_FUNCTION, null, "=,Start MINIX", "boot");
+  b_setenv(E_RESERVED|E_FUNCTION, null, "=,Start Nucleos", "boot");
 
   /* Tokenize bootparams sector. */
   if ((r = readsectors(mon2abs(params), lowsec+PARAMSEC, 1)) != 0) {

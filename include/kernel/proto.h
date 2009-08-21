@@ -86,6 +86,9 @@ phys_bytes umap_verify_grant(struct proc *rp, endpoint_t grantee,  cp_grant_id_t
 /* system/do_newmap.c */
 int newmap(struct proc *rp, struct mem_map *map_ptr);
 
+/* system/do_vtimer.c */
+void vtimer_check(struct proc *rp);
+
 /* interrupt.c */
 void intr_handle(irq_hook_t *hook);
 void put_irq_handler(irq_hook_t *hook, int irq, irq_handler_t handler);

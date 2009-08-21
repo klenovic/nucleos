@@ -183,6 +183,11 @@ int do_setalarm(message *m_ptr);
 
 int do_stime(message *m_ptr);
 
+int do_vtimer(message *m_ptr);
+#if ! USE_VTIMER
+#define do_vtimer do_unused
+#endif
+
 int do_safecopy(message *m_ptr);
 int do_vsafecopy(message *m_ptr);
 int do_iopenable(message *m_ptr);

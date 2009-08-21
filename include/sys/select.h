@@ -7,12 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SYS_PARAM_H__
-#define __SYS_PARAM_H__
-/*
-sys/param.h
-*/
 
-#define MAXHOSTNAMELEN  256	/* max hostname size */
+#ifndef __SYS_SELECT_H
+#define __SYS_SELECT_H
 
-#endif /* __SYS_PARAM_H__ */
+#include <nucleos/types.h>
+#include <nucleos/time.h>
+
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
+
+#endif /* __SYS_SELECT_H */
+
