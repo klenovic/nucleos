@@ -61,18 +61,19 @@ MAKE ?= make
 # Do not print "Entering directory..."
 MAKEFLAGS += -rR --no-print-directory
 
-AS      = $(CROSS_COMPILE)as
-AR      = $(CROSS_COMPILE)ar
-LD      = $(CROSS_COMPILE)ld
-CXX     = $(CROSS_COMPILE)g++
-CC      = $(CROSS_COMPILE)gcc
-CPP     = $(CC) -E
-NM      = $(CROSS_COMPILE)nm
-OBJCOPY = $(CROSS_COMPILE)objcopy
-OBJDUMP = $(CROSS_COMPILE)objdump
-RANLIB  = $(CROSS_COMPILE)ranlib
-READELF = $(CROSS_COMPILE)readelf
-OBJCOPY = $(CROSS_COMPILE)objcopy
+AS		= $(CROSS_COMPILE)as
+AR		= $(CROSS_COMPILE)ar
+LD		= $(CROSS_COMPILE)ld
+CXX		= $(CROSS_COMPILE)g++
+CC		= $(CROSS_COMPILE)gcc
+CPP		= $(CC) -E
+NM		= $(CROSS_COMPILE)nm
+OBJCOPY		= $(CROSS_COMPILE)objcopy
+OBJDUMP		= $(CROSS_COMPILE)objdump
+RANLIB		= $(CROSS_COMPILE)ranlib
+READELF		= $(CROSS_COMPILE)readelf
+OBJCOPY		= $(CROSS_COMPILE)objcopy
+PERL		= perl
 
 # SUBARCH tells the usermode build what the underlying arch is.  That is set
 # first, and if a usermode build is happening, the "ARCH=um" on the command
@@ -184,7 +185,7 @@ export HOST_CFLAGS HOST_PPFLAGS
 # variables to export
 export AR ARCH AS AS16 AS64 KBUILD_AFLAGS CC CC16 CC64 CONFIG_SHELL CPP \
 	CXX CXX16 CXX64 CXXFLAGS EXTRA_CFLAGS INSTALL_PATH LD LDFLAGS \
-	MAKE NUCLEOSINCLUDE OBJCOPY RANLIB READELF SRCARCH
+	MAKE NUCLEOSINCLUDE OBJCOPY PERL RANLIB READELF SRCARCH
 
 export KBUILD_ARFLAGS KBUILD_CFLAGS KBUILD_CPPFLAGS
 
@@ -231,7 +232,7 @@ endif
 
 # goals that don't need .config
 no-dot-config-targets := clean distclean help mrproper tools \
-			 include/nucleos/version.h
+			 include/nucleos/version.h headers_%
 
 # possible %config goals
 config-goals := config menuconfig xconfig gconfig \
@@ -453,6 +454,48 @@ tools: scripts_basic scripts_tools
 PHONY += $(nucleos-dirs)
 $(nucleos-dirs): prepare scripts_tools
 	$(Q)$(MAKE) -f scripts/mk/Makefile.build obj=$@
+
+# ---------------------------------------------------------------------------
+# Kernel headers
+
+#Default location for installed headers
+export INSTALL_HDR_PATH = $(objtree)/usr
+
+hdr-inst := -rR -f $(srctree)/scripts/mk/Makefile.headersinst obj
+# Find out where the Kbuild file is located to support
+# arch/$(ARCH)/include/asm
+hdr-dir = $(strip                                                         \
+	  $(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/asm/Kbuild), \
+	       arch/$(hdr-arch)/include/asm, include/asm-$(hdr-arch)))
+
+# If we do an all arch process set dst to asm-$(hdr-arch)
+hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
+
+PHONY += __headers
+__headers: include/nucleos/version.h scripts_basic FORCE
+	$(Q)$(MAKE) $(build)=scripts/unifdef scripts/unifdef/unifdef
+
+PHONY += headers_install_all
+headers_install_all:
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/headers.sh install
+
+PHONY += headers_install
+headers_install: __headers
+	$(if $(wildcard $(srctree)/$(hdr-dir)/Kbuild),, \
+	$(error Headers not exportable for the $(SRCARCH) architecture))
+	$(Q)$(MAKE) $(hdr-inst)=include
+	$(Q)$(MAKE) $(hdr-inst)=$(hdr-dir) $(hdr-dst)
+
+PHONY += headers_check_all
+headers_check_all: headers_install_all
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/headers.sh check
+
+PHONY += headers_check
+headers_check: headers_install
+	$(Q)$(MAKE) $(hdr-inst)=include HDRCHECK=1
+	$(Q)$(MAKE) $(hdr-inst)=$(hdr-dir) $(hdr-dst) HDRCHECK=1
+
+# ---------------------------------------------------------------------------
 
 ###
 # Cleaning is done on three levels.
