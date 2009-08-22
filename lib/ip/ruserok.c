@@ -21,7 +21,7 @@
  */
 
 #include <nucleos/types.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>

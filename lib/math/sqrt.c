@@ -15,7 +15,7 @@
  */
 #include	<math.h>
 #include	<float.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 
 #define NITER	5
 

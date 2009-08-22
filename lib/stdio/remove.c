@@ -11,7 +11,7 @@
  * remove.c - remove a file
  */
 #include	<stdio.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 
 int _rmdir(const char *path);
 int _unlink(const char *path);

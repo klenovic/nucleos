@@ -146,7 +146,7 @@ ld-option = $(call try-run,\
 # Shorthand for $(Q)$(MAKE) -f scripts/Makefile.build obj=
 # Usage:
 # $(Q)$(MAKE) $(build)=dir
-build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
+build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/mk/Makefile.build obj
 
 # Prefix -I with $(srctree) if it is not an absolute path.
 # skip if -I has no parameter

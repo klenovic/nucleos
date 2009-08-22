@@ -24,7 +24,7 @@
 #define AT_MINORS	8
 #define MAGIC_OFF	24
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>

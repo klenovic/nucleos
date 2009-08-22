@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <nucleos/sysutil.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 
 #include "pci_helper.h"

@@ -98,7 +98,7 @@ void logwtmp(char *, char *, char *);
 
 #include <nucleos/types.h>	/* for time_t */
 #include <stdio.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 #include <nucleos/limits.h>	/* for CHAR_BIT */
 #include <time.h>

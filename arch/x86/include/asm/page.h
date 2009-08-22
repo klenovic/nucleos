@@ -12,8 +12,8 @@
  * @brief
  * @details
  */
-#ifndef __X86_ASM_PAGE_H
-#define __X86_ASM_PAGE_H
+#ifndef __ASM_X86_PAGE_H
+#define __ASM_X86_PAGE_H
 
 #include <kernel/const.h>
 
@@ -27,4 +27,4 @@
 // maybe 64-bit one day :)
 #endif 
 
-#endif /* !__X86_ASM_PAGE_32_H */
+#endif /* __ASM_X86_PAGE_32_H */

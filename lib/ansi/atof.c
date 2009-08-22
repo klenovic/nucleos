@@ -12,7 +12,7 @@
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
 #include	<stdlib.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 
 double
 atof(const char *nptr)

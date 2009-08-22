@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __X86_ASM_KERNEL_TYPES_H
-#define __X86_ASM_KERNEL_TYPES_H
+#ifndef __ASM_X86_KERNEL_TYPES_H
+#define __ASM_X86_KERNEL_TYPES_H
 
 #include <asm/kernel/const.h>
 
@@ -79,4 +79,4 @@ struct pagefault
 };
 
 #endif /* !(__KERNEL__ || __UKERNEL__) */
-#endif /* __X86_ASM_KERNEL_TYPES_H */
+#endif /* __ASM_X86_KERNEL_TYPES_H */

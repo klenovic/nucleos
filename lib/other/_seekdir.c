@@ -18,7 +18,7 @@
 #include <nucleos/types.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 int seekdir(DIR *dp, off_t pos)
 /* Seek to position pos in a directory. */

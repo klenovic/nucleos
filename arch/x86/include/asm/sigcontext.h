@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _SIGCONTEXT_H
-#define _SIGCONTEXT_H
+#ifndef __ASM_X86_SIGCONTEXT_H
+#define __ASM_X86_SIGCONTEXT_H
 
 /* The sigcontext structure is used by the sigreturn(2) system call.
  * sigreturn() is seldom called by user programs, but it is used internally
@@ -83,4 +83,4 @@ struct sigcontext {
 
 int sigreturn(struct sigcontext *_scp);
 
-#endif /* _SIGCONTEXT_H */
+#endif /* __ASM_X86_SIGCONTEXT_H */

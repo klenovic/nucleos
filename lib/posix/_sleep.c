@@ -16,7 +16,7 @@
 #define sleep _sleep
 #include <signal.h>
 #include <unistd.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <time.h>
 #include <sys/select.h>
 #include <nucleos/time.h>

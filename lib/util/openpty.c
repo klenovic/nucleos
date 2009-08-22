@@ -23,7 +23,7 @@
 #include <grp.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <nucleos/types.h>

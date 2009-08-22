@@ -27,7 +27,7 @@
  */
 #include <nucleos/types.h>
 #include <ctype.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include <net/hton.h>
 #include <net/gen/in.h>

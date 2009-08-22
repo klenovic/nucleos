@@ -22,7 +22,7 @@ Copyright 1995 Philip Homburg
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/types.h>
 #include <sys/stat.h>
 #include <nucleos/type.h>

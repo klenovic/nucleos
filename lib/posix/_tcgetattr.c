@@ -10,7 +10,7 @@
 #define tcgetattr _tcgetattr
 #define ioctl _ioctl
 #include <sys/ioctl.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <termios.h>
 
 int tcgetattr(fd, termios_p)

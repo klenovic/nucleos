@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <nucleos/stddef.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>

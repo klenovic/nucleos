@@ -11,8 +11,8 @@
  * @file arch/x86/include/asm/linkage_32.h
  * @brief linkage
  */
-#ifndef __X86_ASM_LINKAGE_H
-#define __X86_ASM_LINKAGE_H
+#ifndef __ASM_X86_LINKAGE_H
+#define __ASM_X86_LINKAGE_H
 
 #ifdef __CODE16__
 #include <asm/linkage_16.h>
@@ -73,4 +73,4 @@ name:
 #define END_FUNC(name) .size name, .-name;
 
 #endif /* !__ASSEMBLY__ */
-#endif /* !__X86_ASM_LINKAGE_H */
+#endif /* !__ASM_X86_LINKAGE_H */

@@ -17,7 +17,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 
 #define NIL ((char*)0)

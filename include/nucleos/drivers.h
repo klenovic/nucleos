@@ -10,7 +10,7 @@
 /* This is the master header for all device drivers. It includes some other
  * files and defines the principal constants.
  */
-#define _SYSTEM		   1	/* get negative error number in <errno.h> */
+#define _SYSTEM		   1	/* get negative error number in <nucleos/errno.h> */
 
 /* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/type.h>
@@ -33,6 +33,6 @@
 #include <stdlib.h>
 #include <nucleos/limits.h>
 #include <nucleos/stddef.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 

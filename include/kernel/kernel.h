@@ -21,7 +21,7 @@
 #include <nucleos/type.h>		/* MINIX specific types, e.g. message */
 #include <nucleos/ipc.h>		/* MINIX run-time system */
 #include <timers.h>		/* watchdog timer management */
-#include <errno.h>		/* return codes and error numbers */
+#include <nucleos/errno.h>		/* return codes and error numbers */
 
 /* Important kernel header files. */
 #include <kernel/const.h>		/* constants, MUST be second */

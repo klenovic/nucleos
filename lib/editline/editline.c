@@ -13,7 +13,7 @@
 */
 #include "editline.h"
 #include <signal.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <ctype.h>
 
 /*

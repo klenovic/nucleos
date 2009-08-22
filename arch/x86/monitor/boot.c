@@ -23,7 +23,7 @@ char version[]=   "2.20";
 #include <stdlib.h>
 #include <nucleos/limits.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <ibm/partition.h>
 #include <ibm/bios.h>
 #include <nucleos/type.h>

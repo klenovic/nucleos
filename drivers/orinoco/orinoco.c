@@ -106,7 +106,7 @@ static tmra_ut or_watchdog;
 #include	<nucleos/types.h>
 #include	<fcntl.h>
 #include 	<unistd.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 
 #include	"assert.h"
 #include	"hermes.h"

@@ -13,7 +13,7 @@
 #define fstat		_fstat
 #define fpathconf	_fpathconf
 #include <sys/stat.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/limits.h>
 #include <unistd.h>
 #include <termios.h>

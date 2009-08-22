@@ -20,7 +20,7 @@
 #include <string.h>
 #include <signal.h>
 #include <ibm/cpu.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 
 #if USE_SIGRETURN 
 

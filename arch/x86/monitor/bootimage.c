@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <nucleos/limits.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/a.out.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>

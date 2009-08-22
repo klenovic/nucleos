@@ -15,7 +15,7 @@
  */
 
 #include <lib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/sysutil.h>
 #include <assert.h>
 #include <stdlib.h>

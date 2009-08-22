@@ -14,7 +14,7 @@
 #include <lib.h>
 #include <nucleos/types.h>
 #include <dirent.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 
 off_t telldir(DIR *dp)

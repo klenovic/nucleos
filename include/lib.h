@@ -17,7 +17,7 @@
 /* The following are so basic, all the lib files get them automatically. */
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include <nucleos/const.h>
 #include <nucleos/com.h>

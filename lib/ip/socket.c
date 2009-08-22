@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>

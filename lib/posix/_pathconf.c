@@ -14,7 +14,7 @@
 #define open		_open
 #define pathconf	_pathconf
 #include <fcntl.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 
 long pathconf(path, name)

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __X86_ASM_KERNEL_PROTO_H
-#define __X86_ASM_KERNEL_PROTO_H
+#ifndef __ASM_X86_KERNEL_PROTO_H
+#define __ASM_X86_KERNEL_PROTO_H
 
 #ifdef __KERNEL__
 
@@ -91,4 +91,4 @@ void init_dataseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int 
 void enable_iop(struct proc *pp);
 
 #endif /* __KERNEL__ */
-#endif /* __X86_ASM_KERNEL_PROTO_H */
+#endif /* __ASM_X86_KERNEL_PROTO_H */

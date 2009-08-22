@@ -11,7 +11,7 @@
 #include "syslib.h"
 
 #include <stdlib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <sys/mman.h>
 #include <nucleos/sysutil.h>
 

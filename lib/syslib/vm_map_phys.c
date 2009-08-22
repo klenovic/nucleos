@@ -14,7 +14,7 @@
 #include <nucleos/vm.h>
 #include <stdarg.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)
 {

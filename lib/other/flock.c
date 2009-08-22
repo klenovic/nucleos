@@ -18,7 +18,7 @@
 #include <nucleos/types.h>
 #include <fcntl.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 
 /*

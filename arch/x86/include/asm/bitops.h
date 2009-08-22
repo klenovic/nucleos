@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __X86_ASM_BITOPS_H
-#define __X86_ASM_BITOPS_H
+#ifndef __ASM_X86_BITOPS_H
+#define __ASM_X86_BITOPS_H
 /*
  * Copyright 1992, Linus Torvalds.
  *
@@ -45,4 +45,4 @@ static inline int fls(int x)
 }
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __X86_ASM_BITOPS_H */
+#endif /* __ASM_X86_BITOPS_H */

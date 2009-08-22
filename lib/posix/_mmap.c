@@ -14,7 +14,7 @@
 #include <sys/mman.h>
 #include <stdarg.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 void *mmap(void *addr, size_t len, int prot, int flags,
 	int fd, off_t offset)

@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 
 struct dirent *readdir(DIR *dp)

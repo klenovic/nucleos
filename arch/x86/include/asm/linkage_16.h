@@ -12,12 +12,12 @@
  * @brief Data definition
  * @details Basic types upon which most other types are built.
  */
-#ifndef __X86_ASM_LINKAGE_16_H
-#define __X86_ASM_LINKAGE_16_H
+#ifndef __ASM_X86_LINKAGE_16_H
+#define __ASM_X86_LINKAGE_16_H
 
 // 16-bit code alignment
 #ifdef CONFIG_X86_P2ALIGN_16
 #define P2ALIGN_16 CONFIG_X86_P2ALIGN_16
 #endif
 
-#endif /* !__X86_ASM_LINKAGE_16_H */
+#endif /* __ASM_X86_LINKAGE_16_H */

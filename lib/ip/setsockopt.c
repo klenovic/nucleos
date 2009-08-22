@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <assert.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>

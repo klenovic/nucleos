@@ -13,7 +13,7 @@ newroot.c
 Replace the current root with a new one
 */
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

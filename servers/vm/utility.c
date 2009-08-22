@@ -26,7 +26,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <env.h>
 #include <unistd.h>
 

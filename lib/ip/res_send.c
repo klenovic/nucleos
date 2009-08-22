@@ -46,7 +46,7 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <assert.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>

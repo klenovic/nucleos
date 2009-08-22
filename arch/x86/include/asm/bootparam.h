@@ -12,8 +12,8 @@
  * @brief Boot parameters
  * @details Interfaces to handle the x86 boot parameters.
  */
-#ifndef __X86_ASM_BOOTPARAM_H
-#define __X86_ASM_BOOTPARAM_H
+#ifndef __ASM_X86_BOOTPARAM_H
+#define __ASM_X86_BOOTPARAM_H
 
 #include <asm/types.h>
 
@@ -22,4 +22,4 @@ struct boot_param {
 	__u32 initrd_size; /* size of initial ramdisk in bytes */
 };
 
-#endif /* !__X86_ASM_BOOTPARAM_H */
+#endif /* !__ASM_X86_BOOTPARAM_H */

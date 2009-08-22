@@ -66,7 +66,7 @@
 #include <net/gen/udp.h>
 #include <net/gen/udp_io.h>
 #include <net/gen/netdb.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <net/gen/inet.h>
 
 static int LogPid = (-1);
