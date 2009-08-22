@@ -11,8 +11,8 @@
  * @file arch/x86/include/asm/types.h
  * @brief x86 specific
  */
-#ifndef __X86_ASM_TYPES_H
-#define __X86_ASM_TYPES_H
+#ifndef __ASM_X86_TYPES_H
+#define __ASM_X86_TYPES_H
 
 #include <asm-generic/int-ll64.h>
 
@@ -23,4 +23,4 @@
 #define SEL_ERR         (1 << 2)
 #define SEL_NOTIFY      (1 << 3) /* not a real select operation */
 
-#endif /* !__X86_ASM_TYPES_H */
+#endif /* !__ASM_X86_TYPES_H */

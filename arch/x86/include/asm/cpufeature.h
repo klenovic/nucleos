@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __X86_ASM_CPUFEATURE_H
-#define __X86_ASM_CPUFEATURE_H
+#ifndef __ASM_X86_CPUFEATURE_H
+#define __ASM_X86_CPUFEATURE_H
 
 #define _CPUF_I386_PSE 1	/* Page Size Extension */
 #define _CPUF_I386_PGE 2	/* Page Global Enable */

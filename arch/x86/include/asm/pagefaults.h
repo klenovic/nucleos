@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _PAGEFAULTS_H
-#define _PAGEFAULTS_H 1
+#ifndef __ASM_X86_PAGEFAULTS_H
+#define __ASM_X86_PAGEFAULTS_H
 
 #include <asm/servers/vm/vm.h>
 
@@ -18,5 +18,5 @@
 #define PFERR_WRITE(e)	((e) & I386_VM_PFE_W)
 #define PFERR_READ(e)	(!((e) & I386_VM_PFE_W))
 
-#endif
+#endif /* __ASM_X86_PAGEFAULTS_H */
 

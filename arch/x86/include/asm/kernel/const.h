@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __X86_ASM_KERNEL_CONST_H
-#define __X86_ASM_KERNEL_CONST_H
+#ifndef __ASM_X86_KERNEL_CONST_H
+#define __ASM_X86_KERNEL_CONST_H
 
 #include <ibm/interrupt.h>
 #include <ibm/memory.h>
@@ -148,4 +148,4 @@
 
 #define vir2phys(vir)   (kinfo.data_base + (vir_bytes) (vir))
 #endif /* !(__KERNEL__ || __UKERNEL__) */
-#endif /* __X86_ASM_KERNEL_CONST_H */
+#endif /* __ASM_X86_KERNEL_CONST_H */

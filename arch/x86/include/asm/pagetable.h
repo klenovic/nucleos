@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _PAGETABLE_H
-#define _PAGETABLE_H 1
+#ifndef __ASM_X86_PAGETABLE_H
+#define __ASM_X86_PAGETABLE_H
 
 #include <nucleos/types.h>
 #include <asm/servers/vm/vm.h>
@@ -43,5 +43,4 @@ typedef struct {
  */
 #define PTF_ALLFLAGS	(PTF_WRITE|PTF_PRESENT|PTF_USER|PTF_GLOBAL)
 
-#endif
-
+#endif /* __ASM_X86_PAGETABLE_H */

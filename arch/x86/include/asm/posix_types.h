@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __X86_ASM_POSIX_TYPES_H
-#define __X86_ASM_POSIX_TYPES_H
+#ifndef __ASM_X86_POSIX_TYPES_H
+#define __ASM_X86_POSIX_TYPES_H
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -29,4 +29,4 @@
 
 #endif
 
-#endif /* __X86_ASM_POSIX_TYPES_H */
+#endif /* __ASM_X86_POSIX_TYPES_H */
