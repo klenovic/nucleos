@@ -14,7 +14,7 @@
  * Author: Ceriel J.H. Jacobs
  */
 #include	<math.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 #include	"localmath.h"
 
 double

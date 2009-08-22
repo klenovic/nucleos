@@ -10,7 +10,7 @@
 #undef NDEBUG
 
 #include <assert.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

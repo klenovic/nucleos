@@ -26,7 +26,7 @@
 #include <nucleos/sysutil.h>
 
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include "const.h"
 #include "type.h"

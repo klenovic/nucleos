@@ -9,7 +9,7 @@
  */
 #include <lib.h>
 #define sigaction _sigaction
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 #include <signal.h>
 
 int __sigreturn(void);

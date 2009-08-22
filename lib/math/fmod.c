@@ -14,7 +14,7 @@
  * Author: Hans van Eck
  */
 #include	<math.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 
 double
 fmod(double x, double y)

@@ -13,7 +13,7 @@ loadramdisk.c
 Copy a device or file specified as argument to /dev/ram
 */
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>

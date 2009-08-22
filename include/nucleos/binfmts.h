@@ -16,7 +16,7 @@
 
 #include <string.h>
 #include <nucleos/types.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #define BINFMT_BUFSIZE	128
 

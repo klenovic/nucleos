@@ -11,7 +11,7 @@
  * device driver code.
  */
 
-#define _SYSTEM		   1	/* get negative error number in <errno.h> */
+#define _SYSTEM		   1	/* get negative error number in <nucleos/errno.h> */
 
 /* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/type.h>
@@ -26,7 +26,7 @@
 #include <string.h>
 #include <nucleos/limits.h>
 #include <nucleos/stddef.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include <nucleos/partition.h>
 #include <nucleos/u64.h>

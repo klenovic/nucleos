@@ -27,7 +27,7 @@
 
 #include <sys/mman.h>
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <string.h>
 #include <env.h>
 #include <stdio.h>

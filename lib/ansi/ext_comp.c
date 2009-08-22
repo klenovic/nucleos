@@ -22,7 +22,7 @@
 
 #include	"ext_fmt.h"
 #include	<float.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 #include	<ctype.h>
 
 static int b64_add(struct mantissa *e1, struct mantissa *e2);

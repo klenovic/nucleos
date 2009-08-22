@@ -15,7 +15,7 @@ Created:	June 11, 1993 by Philip Homburg
 
 #define tcsetattr _tcsetattr
 #define ioctl _ioctl
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <nucleos/types.h>

@@ -26,7 +26,7 @@
 #include <nucleos/safecopies.h>
 #include <asm/cpufeature.h>
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <assert.h>
 #include <string.h>
 #include <env.h>

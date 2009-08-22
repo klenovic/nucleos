@@ -11,7 +11,7 @@
 priority.c
 */
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/types.h>
 #include <sys/resource.h>
 #include <lib.h>

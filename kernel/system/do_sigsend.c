@@ -21,7 +21,7 @@
 #include <kernel/vm.h>
 #include <signal.h>
 #include <string.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 
 #if USE_SIGSEND
 

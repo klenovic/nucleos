@@ -18,7 +18,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 int closedir(DIR *dp)
 /* Finish reading a directory. */

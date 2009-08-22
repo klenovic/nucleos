@@ -17,7 +17,7 @@
 
 #include <kernel/system.h>
 #include <signal.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 #include <nucleos/endpoint.h>
 
 #if USE_GETKSIG

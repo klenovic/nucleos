@@ -69,7 +69,7 @@
 
 #include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <glob.h>
 #include <nucleos/limits.h>
 #include <pwd.h>

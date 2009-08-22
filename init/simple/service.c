@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <pwd.h>
 #include <unistd.h>
 #include <nucleos/com.h>

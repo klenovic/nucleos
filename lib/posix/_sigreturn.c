@@ -11,7 +11,7 @@
 #define sigfillset	_sigfillset
 #define sigprocmask	_sigprocmask
 #define sigreturn	_sigreturn
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 #include <signal.h>
 
 int sigreturn(scp)

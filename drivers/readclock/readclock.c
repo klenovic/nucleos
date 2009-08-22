@@ -56,7 +56,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <signal.h>
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>

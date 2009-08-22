@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* The <errno.h> header defines the numbers of the various errors that can
+/* The <nucleos/errno.h> header defines the numbers of the various errors that can
  * occur during program execution.  They are visible to user programs and 
  * should be small positive integers.  However, they are also used within 
  * MINIX, where they must be negative.  For example, the READ system call is 
@@ -26,8 +26,8 @@
  * file is included in an ordinary user program, EPERM has the value ( 1).
  */
 
-#ifndef _ERRNO_H		/* check if <errno.h> is already included */
-#define _ERRNO_H		/* it is not included; note that fact */
+#ifndef __NUCLEOS_ERRNO_H		/* check if <nucleos/errno.h> is already included */
+#define __NUCLEOS_ERRNO_H		/* it is not included; note that fact */
 
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
@@ -129,4 +129,4 @@ extern int errno;		  /* place where the error numbers go */
 #define ETRAPDENIED  (_SIGN 110)  /* IPC trap not allowed */
 #define EDONTREPLY   (_SIGN 201)  /* pseudo-code: don't send a reply */
 
-#endif /* _ERRNO_H */
+#endif /* __NUCLEOS_ERRNO_H */

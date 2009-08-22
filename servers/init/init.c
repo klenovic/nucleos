@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <sys/svrctl.h>
 #include <ttyent.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <nucleos/limits.h>
 #include <signal.h>

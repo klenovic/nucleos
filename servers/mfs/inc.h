@@ -13,7 +13,7 @@
 
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <signal.h>
 #include <unistd.h>
 

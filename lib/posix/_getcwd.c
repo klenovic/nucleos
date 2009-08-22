@@ -21,7 +21,7 @@
 #define stat _stat
 #include <nucleos/types.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <nucleos/limits.h>

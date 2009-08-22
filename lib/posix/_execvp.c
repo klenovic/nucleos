@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <sys/stat.h>
 
 extern char * const **_penviron;	/* The default environment. */

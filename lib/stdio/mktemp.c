@@ -42,7 +42,7 @@
 #include <nucleos/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <unistd.h>

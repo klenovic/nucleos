@@ -17,7 +17,7 @@
 
 #include <kernel/system.h>
 #include <signal.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 
 #if USE_KILL
 

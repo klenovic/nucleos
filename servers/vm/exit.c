@@ -22,7 +22,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <env.h>
 
 #include <servers/vm/glo.h>

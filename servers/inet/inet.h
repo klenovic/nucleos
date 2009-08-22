@@ -21,7 +21,7 @@ Copyright 1995 Philip Homburg
 #define _SYSTEM	1	/* get OK and negative error codes */
 
 #include <nucleos/types.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <string.h>

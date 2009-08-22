@@ -12,7 +12,7 @@
  */
 #include	<nucleos/types.h>
 #include	<stdio.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 #include	"loc_incl.h"
 
 ssize_t _write(int d, const char *buf, size_t nbytes);

@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <nucleos/limits.h>
 #include <pwd.h>

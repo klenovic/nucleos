@@ -51,7 +51,7 @@
 #include <dirent.h>
 #include <nucleos/nucleos.h>
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <fcntl.h>
 #include <fts.h>
 #include <stdlib.h>

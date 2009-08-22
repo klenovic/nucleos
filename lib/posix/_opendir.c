@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 DIR *opendir(const char *name)
 /* Open a directory for reading. */

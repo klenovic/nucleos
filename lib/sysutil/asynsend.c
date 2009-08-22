@@ -22,7 +22,7 @@
 #include <nucleos/sysutil.h>
 
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #define ASYN_NR	100
 static asynmsg_t msgtable[ASYN_NR];

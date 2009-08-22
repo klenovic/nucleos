@@ -21,9 +21,9 @@
 #include <nucleos/ipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <env.h>
 
 #include <servers/vm/glo.h>

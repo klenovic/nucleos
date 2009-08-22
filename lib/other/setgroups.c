@@ -11,7 +11,7 @@
 setgroups.c
 */
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <grp.h>

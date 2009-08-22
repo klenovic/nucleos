@@ -21,7 +21,7 @@
 
 #include <nucleos/limits.h>
 #include <string.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <assert.h>
 #include <nucleos/types.h>
 

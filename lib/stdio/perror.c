@@ -12,7 +12,7 @@
  */
 #include <nucleos/types.h>
 #include <stdio.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <stdio.h>
 #include <string.h>
 #include "loc_incl.h"

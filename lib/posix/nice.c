@@ -11,7 +11,7 @@
 nice.c
 */
 
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <unistd.h>
 #include <sys/resource.h>
 

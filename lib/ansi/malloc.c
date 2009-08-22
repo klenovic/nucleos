@@ -17,7 +17,7 @@
 
 #include	<stdlib.h>
 #include	<string.h>
-#include	<errno.h>
+#include	<nucleos/errno.h>
 #include	<assert.h>
 
 #define	ptrint		int

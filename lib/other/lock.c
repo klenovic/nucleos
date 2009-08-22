@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <lib.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <nucleos/types.h>
 #include <unistd.h>
 #include <string.h>

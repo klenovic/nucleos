@@ -46,7 +46,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/sigcontext.h>
+#include <asm/sigcontext.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/u64.h>

@@ -17,7 +17,7 @@
 
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include <nucleos/callnr.h>
 #include <nucleos/type.h>

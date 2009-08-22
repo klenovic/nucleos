@@ -21,7 +21,7 @@
 #include <nucleos/dmap.h>
 
 #include <nucleos/limits.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>

@@ -17,7 +17,7 @@ ieee float
 */
 
 #include <nucleos/types.h>
-#include <errno.h>
+#include <nucleos/errno.h>
 #include <math.h>
 
 #include "ieee_float.h"
