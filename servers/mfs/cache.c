@@ -244,7 +244,7 @@ zone_t z;			/* try to allocate new zone near this one */
   }
   b = alloc_bit(sp, ZMAP, bit);
   if (b == NO_BIT) {
-	err_code = ENOSPC;
+	err_code = -ENOSPC;
 	major = (int) (sp->s_dev >> MAJOR) & BYTE;
 	minor = (int) (sp->s_dev >> MINOR) & BYTE;
 	printf("No space on device %d/%d\n", major, minor);
@@ -320,7 +320,7 @@ int rw_flag;			/* READING or WRITING */
 
   bp->b_dirt = CLEAN;
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -415,7 +415,7 @@ int rw_flag;			/* READING or WRITING */
 		bp = bufq[i];
 		if (iop->iov_size != 0) {
 			/* Transfer failed. An error? Do we care? */
-			if (r != OK && i == 0) {
+			if (r != 0 && i == 0) {
 				printf(
 				"fs: I/O error on device %d/%d, block %lu\n",
 					(dev>>MAJOR)&BYTE, (dev>>MINOR)&BYTE,

@@ -48,7 +48,7 @@ int do_getset()
 	case GETPID:
 		r = mproc[who_p].mp_pid;
 		rmp->mp_reply.reply_res2 = mproc[rmp->mp_parent].mp_pid;
-		if(pm_isokendpt(m_in.endpt, &proc) == OK && proc >= 0)
+		if(pm_isokendpt(m_in.endpt, &proc) == 0 && proc >= 0)
 			rmp->mp_reply.reply_res3 = mproc[proc].mp_pid;
 		break;
 
@@ -56,7 +56,7 @@ int do_getset()
 	case SETUID:
 		if (rmp->mp_realuid != (uid_t) m_in.usr_id && 
 				rmp->mp_effuid != SUPER_USER)
-			return(EPERM);
+			return(-EPERM);
 		if(call_nr == SETUID) rmp->mp_realuid = (uid_t) m_in.usr_id;
 		rmp->mp_effuid = (uid_t) m_in.usr_id;
 
@@ -67,7 +67,7 @@ int do_getset()
 		}
 		rmp->mp_fs_call= PM_SETUID;
 		r= notify(FS_PROC_NR);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "do_getset: unable to notify FS", r);
 		
 		/* Do not reply until FS is ready to process the setuid
@@ -80,7 +80,7 @@ int do_getset()
 	case SETGID:
 		if (rmp->mp_realgid != (gid_t) m_in.grp_id && 
 				rmp->mp_effuid != SUPER_USER)
-			return(EPERM);
+			return(-EPERM);
 		if(call_nr == SETGID) rmp->mp_realgid = (gid_t) m_in.grp_id;
 		rmp->mp_effgid = (gid_t) m_in.grp_id;
 
@@ -91,7 +91,7 @@ int do_getset()
 		}
 		rmp->mp_fs_call= PM_SETGID;
 		r= notify(FS_PROC_NR);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "do_getset: unable to notify FS", r);
 
 		/* Do not reply until FS is ready to process the setgid
@@ -101,7 +101,7 @@ int do_getset()
 		break;
 
 	case SETSID:
-		if (rmp->mp_procgrp == rmp->mp_pid) return(EPERM);
+		if (rmp->mp_procgrp == rmp->mp_pid) return(-EPERM);
 		rmp->mp_procgrp = rmp->mp_pid;
 
 		if (rmp->mp_fs_call != PM_IDLE)
@@ -111,7 +111,7 @@ int do_getset()
 		}
 		rmp->mp_fs_call= PM_SETSID;
 		r= notify(FS_PROC_NR);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "do_getset: unable to notify FS", r);
 
 		/* Do not reply until FS is ready to process the setsid
@@ -125,7 +125,7 @@ int do_getset()
 		break;
 
 	default:
-		r = EINVAL;
+		r = -EINVAL;
 		break;	
   }
   return(r);

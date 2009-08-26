@@ -197,7 +197,7 @@ message *mp;
 	devind= mp->m1_i1;
 
 	r= pci_ids_s(devind, &vid, &did);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("pci:do_ids: failed for devind %d: %d\n",
 			devind, r);
@@ -230,7 +230,7 @@ message *mp;
 	if (name == NULL)
 	{
 		/* No name */
-		r= ENOENT;
+		r= -ENOENT;
 	}
 	else
 	{
@@ -268,7 +268,7 @@ message *mp;
 	if (name == NULL)
 	{
 		/* No name */
-		r= ENOENT;
+		r= -ENOENT;
 	}
 	else
 	{
@@ -300,13 +300,13 @@ message *mp;
 	gid= mp->m1_i3;
 
 	r= pci_slot_name_s(devind, &name);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("pci:do_slot_name_s: failed for devind %d: %d\n",
 			devind, r);
 	}
 
-	if (r == OK)
+	if (r == 0)
 	{
 	len= strlen(name)+1;
 	if (len > name_len)
@@ -332,7 +332,7 @@ message *mp;
 	if (mp->m_source != RS_PROC_NR)
 	{
 		printf("PCI: do_set_acl: not from RS\n");
-		reply(mp, EPERM);
+		reply(mp, -EPERM);
 		return;
 	}
 
@@ -344,7 +344,7 @@ message *mp;
 	if (i >= NR_DRIVERS)
 	{
 		printf("PCI: do_set_acl: table is full\n");
-		reply(mp, ENOMEM);
+		reply(mp, -ENOMEM);
 		return;
 	}
 
@@ -352,7 +352,7 @@ message *mp;
 
 	r= sys_safecopyfrom(mp->m_source, gid, 0, (vir_bytes)&acl[i].acl,
 		sizeof(acl[i].acl), D);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("PCI: do_set_acl: safecopyfrom failed\n");
 		reply(mp, r);
@@ -364,7 +364,7 @@ message *mp;
 		acl[i].acl.rsp_endpoint, acl[i].acl.rsp_label,
 		i);
 
-	reply(mp, OK);
+	reply(mp, 0);
 }
 
 static void do_del_acl(mp)
@@ -375,7 +375,7 @@ message *mp;
 	if (mp->m_source != RS_PROC_NR)
 	{
 		printf("do_del_acl: not from RS\n");
-		reply(mp, EPERM);
+		reply(mp, -EPERM);
 		return;
 	}
 
@@ -392,7 +392,7 @@ message *mp;
 	if (i >= NR_DRIVERS)
 	{
 		printf("do_del_acl: nothing found for %d\n", proc_nr);
-		reply(mp, EINVAL);
+		reply(mp, -EINVAL);
 		return;
 	}
 
@@ -405,7 +405,7 @@ message *mp;
 	/* Also release all devices held by this process */
 	pci_release(proc_nr);
 
-	reply(mp, OK);
+	reply(mp, 0);
 }
 
 static void do_reserve(mp)
@@ -434,7 +434,7 @@ message *mp;
 	port= mp->m2_i2;
 
 	r= pci_attr_r8_s(devind, port, &v);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf(
 		"pci:do_attr_r8: pci_attr_r8_s(%d, %d, ...) failed: %d\n",
@@ -461,7 +461,7 @@ message *mp;
 
 	v= pci_attr_r16(devind, port);
 	mp->m2_l1= v;
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{
@@ -480,14 +480,14 @@ message *mp;
 	port= mp->m2_i2;
 
 	r= pci_attr_r32_s(devind, port, &v);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf(
 		"pci:do_attr_r32: pci_attr_r32_s(%d, %d, ...) failed: %d\n",
 			devind, port, r);
 	}
 	mp->m2_l1= v;
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{
@@ -507,7 +507,7 @@ message *mp;
 	v= mp->m2_l1;
 
 	pci_attr_w8(devind, port, v);
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{
@@ -527,7 +527,7 @@ message *mp;
 	v= mp->m2_l1;
 
 	pci_attr_w16(devind, port, v);
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{
@@ -547,7 +547,7 @@ message *mp;
 	v= mp->m2_l1;
 
 	pci_attr_w32(devind, port, v);
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{
@@ -564,7 +564,7 @@ message *mp;
 	busnr= mp->m2_i1;
 
 	pci_rescan_bus(busnr);
-	mp->m_type= OK;
+	mp->m_type= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 	{

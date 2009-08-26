@@ -35,12 +35,12 @@ int do_time()
   clock_t uptime;
   int s;
 
-  if ( (s=getuptime(&uptime)) != OK) 
+  if ( (s=getuptime(&uptime)) != 0) 
   	panic(__FILE__,"do_time couldn't get uptime", s);
 
   mp->mp_reply.reply_time = (time_t) (boottime + (uptime/system_hz));
   mp->mp_reply.reply_utime = (uptime%system_hz)*1000000/system_hz;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -56,17 +56,17 @@ int do_stime()
   int s;
 
   if (mp->mp_effuid != SUPER_USER) { 
-      return(EPERM);
+      return(-EPERM);
   }
-  if ( (s=getuptime(&uptime)) != OK) 
+  if ( (s=getuptime(&uptime)) != 0) 
       panic(__FILE__,"do_stime couldn't get uptime", s);
   boottime = (long) m_in.stime - (uptime/system_hz);
 
   s= sys_stime(boottime);		/* Tell kernel about boottime */
-  if (s != OK)
+  if (s != 0)
 	panic(__FILE__, "pm: sys_stime failed", s);
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -79,7 +79,7 @@ int do_times()
   clock_t user_time, sys_time, uptime;
   int s;
 
-  if (OK != (s=sys_times(who_e, &user_time, &sys_time, &uptime)))
+  if ((s=sys_times(who_e, &user_time, &sys_time, &uptime)) != 0)
       panic(__FILE__,"do_times couldn't get times", s);
   rmp->mp_reply.reply_t1 = user_time;		/* user time */
   rmp->mp_reply.reply_t2 = sys_time;		/* system time */
@@ -87,6 +87,6 @@ int do_times()
   rmp->mp_reply.reply_t4 = rmp->mp_child_stime;	/* child system time */
   rmp->mp_reply.reply_t5 = uptime;		/* uptime since boot */
 
-  return(OK);
+  return 0;
 }
 

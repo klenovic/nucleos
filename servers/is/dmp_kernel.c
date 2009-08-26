@@ -68,7 +68,7 @@ void timing_dmp()
   int r, c, f, skipped = 0, printed = 0, maxlines = 23, x = 0;
   static int offsetlines = 0;
 
-  if ((r = sys_getlocktimings(&timingdata[0])) != OK) {
+  if ((r = sys_getlocktimings(&timingdata[0])) != 0) {
       report("IS","warning: couldn't get copy of lock timings", r);
       return;
   } 
@@ -106,7 +106,7 @@ void kmessages_dmp()
   int r;
 
   /* Try to get a copy of the kernel messages. */
-  if ((r = sys_getkmessages(&kmess)) != OK) {
+  if ((r = sys_getkmessages(&kmess)) != 0) {
       report("IS","warning: couldn't get copy of kmessages", r);
       return;
   }
@@ -137,7 +137,7 @@ void monparams_dmp()
   int r;
 
   /* Try to get a copy of the boot monitor parameters. */
-  if ((r = sys_getmonparams(val, sizeof(val))) != OK) {
+  if ((r = sys_getmonparams(val, sizeof(val))) != 0) {
       report("IS","warning: couldn't get copy of monitor params", r);
       return;
   }
@@ -164,11 +164,11 @@ void irqtab_dmp()
   int irq_actids[NR_IRQ_VECTORS];
   struct irq_hook *e;	/* irq tab entry */
 
-  if ((r = sys_getirqhooks(irq_hooks)) != OK) {
+  if ((r = sys_getirqhooks(irq_hooks)) != 0) {
       report("IS","warning: couldn't get copy of irq hooks", r);
       return;
   }
-  if ((r = sys_getirqactids(irq_actids)) != OK) {
+  if ((r = sys_getirqactids(irq_actids)) != 0) {
       report("IS","warning: couldn't get copy of irq mask", r);
       return;
   }
@@ -209,7 +209,7 @@ void image_dmp()
   struct boot_image *ip;
   static char ipc_to[BITCHUNK_BITS*2];
 	
-  if ((r = sys_getimage(image)) != OK) {
+  if ((r = sys_getimage(image)) != 0) {
       report("IS","warning: couldn't get copy of image table", r);
       return;
   }
@@ -242,12 +242,12 @@ void sched_dmp()
   int r;
 
   /* First obtain a scheduling information. */
-  if ((r = sys_getschedinfo(proc, rdy_head)) != OK) {
+  if ((r = sys_getschedinfo(proc, rdy_head)) != 0) {
       report("IS","warning: couldn't get copy of process table", r);
       return;
   }
   /* Then obtain kernel addresses to correct pointer information. */
-  if ((r = sys_getkinfo(&kinfo)) != OK) {
+  if ((r = sys_getkinfo(&kinfo)) != 0) {
       report("IS","warning: couldn't get kernel addresses", r);
       return;
   }
@@ -287,11 +287,11 @@ void kenv_dmp()
     struct kinfo kinfo;
     struct machine machine;
     int r;
-    if ((r = sys_getkinfo(&kinfo)) != OK) {
+    if ((r = sys_getkinfo(&kinfo)) != 0) {
     	report("IS","warning: couldn't get copy of kernel info struct", r);
     	return;
     }
-    if ((r = sys_getmachine(&machine)) != OK) {
+    if ((r = sys_getmachine(&machine)) != 0) {
     	report("IS","warning: couldn't get copy of kernel machine struct", r);
     	return;
     }
@@ -360,11 +360,11 @@ void privileges_dmp()
   int r, i, n = 0;
 
   /* First obtain a fresh copy of the current process and system table. */
-  if ((r = sys_getprivtab(priv)) != OK) {
+  if ((r = sys_getprivtab(priv)) != 0) {
       report("IS","warning: couldn't get copy of system privileges table", r);
       return;
   }
-  if ((r = sys_getproctab(proc)) != OK) {
+  if ((r = sys_getproctab(proc)) != 0) {
       report("IS","warning: couldn't get copy of process table", r);
       return;
   }
@@ -424,7 +424,7 @@ void proctab_dmp()
   phys_clicks text, data, size;
 
   /* First obtain a fresh copy of the current process table. */
-  if ((r = sys_getproctab(proc)) != OK) {
+  if ((r = sys_getproctab(proc)) != 0) {
       report("IS","warning: couldn't get copy of process table", r);
       return;
   }
@@ -460,7 +460,7 @@ void procstack_dmp()
   int r, n = 0;
 
   /* First obtain a fresh copy of the current process table. */
-  if ((r = sys_getproctab(proc)) != OK) {
+  if ((r = sys_getproctab(proc)) != 0) {
       report("IS","warning: couldn't get copy of process table", r);
       return;
   }
@@ -484,7 +484,7 @@ void memmap_dmp()
   phys_clicks size;
 
   /* First obtain a fresh copy of the current process table. */
-  if ((r = sys_getproctab(proc)) != OK) {
+  if ((r = sys_getproctab(proc)) != 0) {
       report("IS","warning: couldn't get copy of process table", r);
       return;
   }

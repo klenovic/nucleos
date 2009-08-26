@@ -15,7 +15,7 @@ Initialization of PCI DP8390-based ethernet cards
 Created:	April 2000 by Philip Homburg <philip@f-mnx.phicoh.com>
 */
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 
 #include <stdlib.h>
 #include <nucleos/types.h>
@@ -124,7 +124,7 @@ struct dpeth *dep;
 		dname= "unknown device";
 	printf("%s: %s (%04X/%04X) at %s\n",
 		dep->de_name, dname, vid, did, pci_slot_name(devind));
-        if(pci_reserve_ok(devind) != OK)
+        if(pci_reserve_ok(devind) != 0)
                return 0;
 	/* printf("cr = 0x%x\n", pci_attr_r16(devind, PCI_CR)); */
 	bar= pci_attr_r32(devind, PCI_BAR) & 0xffffffe0;

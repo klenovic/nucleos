@@ -83,11 +83,11 @@ int flags;					/* extra flags, if any */
   /* Obtain command name and parameters. This is a space-separated string
    * that looks like "/sbin/service arg1 arg2 ...". Arguments are optional.
    */
-  if (m_ptr->RS_CMD_LEN > MAX_COMMAND_LEN) return(E2BIG);
-  if (OK!=(s=sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
-  	SELF, (vir_bytes) rp->r_cmd, m_ptr->RS_CMD_LEN))) return(s);
+  if (m_ptr->RS_CMD_LEN > MAX_COMMAND_LEN) return(-E2BIG);
+  if ((s=sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
+  	SELF, (vir_bytes) rp->r_cmd, m_ptr->RS_CMD_LEN)) != 0) return(s);
   rp->r_cmd[m_ptr->RS_CMD_LEN] = '\0';		/* ensure it is terminated */
-  if (rp->r_cmd[0] != '/') return(EINVAL);	/* insist on absolute path */
+  if (rp->r_cmd[0] != '/') return(-EINVAL);	/* insist on absolute path */
 
   rp->r_script[0]= '\0';
 
@@ -131,7 +131,7 @@ int flags;					/* extra flags, if any */
   if (do_copy)
   {
 	s= read_exec(rp);
-	if (s != OK)
+	if (s != 0)
 		return s;
   }
 
@@ -175,7 +175,7 @@ message *m_ptr;					/* request message pointer */
   /* Get the request structure */
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
   	SELF, (vir_bytes) &rs_start, sizeof(rs_start));
-  if (s != OK) return(s);
+  if (s != 0) return(s);
 
   /* See if there is a free entry in the table with system processes. */
   for (slot_nr = 0; slot_nr < NR_SYS_PROCS; slot_nr++) {
@@ -186,18 +186,18 @@ message *m_ptr;					/* request message pointer */
   if (slot_nr >= NR_SYS_PROCS)
   {
 	printf("rs`do_start: driver table full\n");
-	return ENOMEM;
+	return -ENOMEM;
   }
 
   /* Obtain command name and parameters. This is a space-separated string
    * that looks like "/sbin/service arg1 arg2 ...". Arguments are optional.
    */
-  if (rs_start.rss_cmdlen > MAX_COMMAND_LEN-1) return(E2BIG);
+  if (rs_start.rss_cmdlen > MAX_COMMAND_LEN-1) return(-E2BIG);
   s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_cmd, 
   	SELF, (vir_bytes) rp->r_cmd, rs_start.rss_cmdlen);
-  if (s != OK) return(s);
+  if (s != 0) return(s);
   rp->r_cmd[rs_start.rss_cmdlen] = '\0';	/* ensure it is terminated */
-  if (rp->r_cmd[0] != '/') return(EINVAL);	/* insist on absolute path */
+  if (rp->r_cmd[0] != '/') return(-EINVAL);	/* insist on absolute path */
 
   /* Build argument vector to be passed to execute call. The format of the
    * arguments vector is: path, arguments, NULL. 
@@ -224,7 +224,7 @@ message *m_ptr;					/* request message pointer */
 	len = MIN(sizeof(rp->r_label)-1, rs_start.rss_labellen);
         s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_label,
         	SELF, (vir_bytes) rp->r_label, len);
-	if(s != OK)
+	if(s != 0)
 		return s;
 	rp->r_label[len] = '\0';
         if(rs_verbose)
@@ -257,17 +257,17 @@ message *m_ptr;					/* request message pointer */
       {
 	  printf("RS: found duplicate label '%s': slot %d\n",
 		rp->r_label, slot_nr);
-	  return EBUSY;
+	  return -EBUSY;
       }
   }
 
   rp->r_script[0]= '\0';
-  if (rs_start.rss_scriptlen > MAX_SCRIPT_LEN-1) return(E2BIG);
+  if (rs_start.rss_scriptlen > MAX_SCRIPT_LEN-1) return(-E2BIG);
   if (rs_start.rss_script != NULL)
   {
 	  s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_script, 
 		SELF, (vir_bytes) rp->r_script, rs_start.rss_scriptlen);
-	  if (s != OK) return(s);
+	  if (s != 0) return(s);
 	  rp->r_script[rs_start.rss_scriptlen] = '\0';
   }
   rp->r_uid= rs_start.rss_uid;
@@ -278,11 +278,11 @@ message *m_ptr;					/* request message pointer */
 	if (rs_start.rss_ipclen+1 > sizeof(rp->r_ipc_list))
 	{
 		printf("rs: ipc list too long for '%s'\n", rp->r_label);
-		return EINVAL;
+		return -EINVAL;
 	}
 	s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_ipc, 
 		SELF, (vir_bytes) rp->r_ipc_list, rs_start.rss_ipclen);
-	if (s != OK) return(s);
+	if (s != 0) return(s);
 	rp->r_ipc_list[rs_start.rss_ipclen]= '\0';
   }
   else
@@ -315,7 +315,7 @@ message *m_ptr;					/* request message pointer */
 	else
 		s = copy_exec(rp, rp2); 
 
-	if (s != OK)
+	if (s != 0)
 		return s;
   }
 
@@ -323,7 +323,7 @@ message *m_ptr;					/* request message pointer */
   if (rs_start.rss_nr_irq > NR_IRQ)
   {
 	printf("RS: do_start: too many IRQs requested\n");
-	return EINVAL;
+	return -EINVAL;
   }
   rp->r_priv.s_nr_irq= rs_start.rss_nr_irq;
   for (i= 0; i<rp->r_priv.s_nr_irq; i++)
@@ -336,7 +336,7 @@ message *m_ptr;					/* request message pointer */
   if (rs_start.rss_nr_io > NR_IO_RANGE)
   {
 	printf("RS: do_start: too many I/O ranges requested\n");
-	return EINVAL;
+	return -EINVAL;
   }
   rp->r_priv.s_nr_io_range= rs_start.rss_nr_io;
   for (i= 0; i<rp->r_priv.s_nr_io_range; i++)
@@ -355,7 +355,7 @@ message *m_ptr;					/* request message pointer */
   if (rs_start.rss_nr_pci_id > MAX_NR_PCI_ID)
   {
 	printf("RS: do_start: too many PCI device IDs\n");
-	return EINVAL;
+	return -EINVAL;
   }
   rp->r_nr_pci_id= rs_start.rss_nr_pci_id;
   for (i= 0; i<rp->r_nr_pci_id; i++)
@@ -369,7 +369,7 @@ message *m_ptr;					/* request message pointer */
   if (rs_start.rss_nr_pci_class > MAX_NR_PCI_CLASS)
   {
 	printf("RS: do_start: too many PCI class IDs\n");
-	return EINVAL;
+	return -EINVAL;
   }
   rp->r_nr_pci_class= rs_start.rss_nr_pci_class;
   for (i= 0; i<rp->r_nr_pci_class; i++)
@@ -423,11 +423,11 @@ int do_down(message *m_ptr)
 
   len= m_ptr->RS_CMD_LEN;
   if (len >= sizeof(label))
-	return EINVAL;		/* Too long */
+	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
   	SELF, (vir_bytes) label, len);
-  if (s != OK) return(s);
+  if (s != 0) return(s);
   label[len]= '\0';
 
 	for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
@@ -447,19 +447,19 @@ int do_down(message *m_ptr)
 
 				proc = _ENDPOINT_P(rp->r_proc_nr_e);
 				rproc_ptr[proc] = NULL;
-				return(OK);
+				return 0;
 			}
 
 			/* Late reply - send a reply when process dies. */
 			rp->r_flags |= RS_LATEREPLY;
 			rp->r_caller = m_ptr->m_source;
-			return EDONTREPLY;
+			return -EDONTREPLY;
 		}
 	}
 
 	if(rs_verbose) printf("RS: do_down: '%s' not found\n", label);
 
-	return(ESRCH);
+	return(-ESRCH);
 }
 
 
@@ -476,11 +476,11 @@ int do_restart(message *m_ptr)
 
   len= m_ptr->RS_CMD_LEN;
   if (len >= sizeof(label))
-	return EINVAL;		/* Too long */
+	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
   	SELF, (vir_bytes) label, len);
-  if (s != OK) return(s);
+  if (s != 0) return(s);
   label[len]= '\0';
 
   for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
@@ -491,11 +491,11 @@ int do_restart(message *m_ptr)
 		if(rs_verbose)
 		  printf("RS: do_restart: '%s' is (still) running, pid = %d\n",
 			rp->r_pid);
-		return EBUSY;
+		return -EBUSY;
 	  }
 	  rp->r_flags &= ~(RS_EXITING|RS_REFRESHING|RS_NOPINGREPLY);
 	  r = start_service(rp, 0, &ep);	
-	  if (r != OK) printf("do_restart: start_service failed: %d\n", r);
+	  if (r != 0) printf("do_restart: start_service failed: %d\n", r);
 	  m_ptr->RS_ENDPOINT = ep;
 	  return(r);
       }
@@ -503,7 +503,7 @@ int do_restart(message *m_ptr)
 #if VERBOSE
   printf("RS: do_restart: '%s' not found\n", label);
 #endif
-  return(ESRCH);
+  return(-ESRCH);
 }
 
 
@@ -519,11 +519,11 @@ int do_refresh(message *m_ptr)
 
   len= m_ptr->RS_CMD_LEN;
   if (len >= sizeof(label))
-	return EINVAL;		/* Too long */
+	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
   	SELF, (vir_bytes) label, len);
-  if (s != OK) return(s);
+  if (s != 0) return(s);
   label[len]= '\0';
 
   for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
@@ -532,13 +532,13 @@ int do_refresh(message *m_ptr)
 	  printf("RS: refreshing %s (%d)\n", rp->r_label, rp->r_pid);
 #endif
 	  stop_service(rp,RS_REFRESHING);
-  return(OK);
+  return 0;
 }
   }
 #if VERBOSE
   printf("RS: do_refresh: '%s' not found\n", label);
 #endif
-  return(ESRCH);
+  return(-ESRCH);
 }
 
 /*===========================================================================*
@@ -548,7 +548,7 @@ int do_shutdown(message *m_ptr)
 {
   /* Set flag so that RS server knows services shouldn't be restarted. */
   shutting_down = TRUE;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -627,7 +627,7 @@ void do_exit(message *m_ptr)
 		  /* No reply sent to RS_DOWN yet. */
 		  if(rp->r_flags & RS_LATEREPLY) {
 			message rsm;
-			rsm.m_type = OK;
+			rsm.m_type = 0;
 			send(rp->r_caller, &rsm);
 		  }
 
@@ -769,7 +769,7 @@ message *m_ptr;
   }
 
   /* Reschedule a synchronous alarm for the next period. */
-  if (OK != (s=sys_setalarm(RS_DELTA_T, 0)))
+  if ((s=sys_setalarm(RS_DELTA_T, 0)) != 0)
       panic("RS", "couldn't set alarm", s);
 }
 
@@ -873,7 +873,7 @@ endpoint_t *endpoint;
       }
 
   s= ds_publish_u32(rp->r_label, child_proc_nr_e);
-  if (s != OK)
+  if (s != 0)
 	printf("RS: start_service: ds_publish_u32 failed: %d\n", s);
  else if(rs_verbose)
 	printf("RS: start_service: ds_publish_u32 done: %s -> %d\n", 
@@ -914,7 +914,7 @@ endpoint_t *endpoint;
 
   if(endpoint) *endpoint = child_proc_nr_e;	/* send back child endpoint */
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -955,14 +955,14 @@ message *m_ptr;
   	len = sizeof(struct rproc) * NR_SYS_PROCS;
   	break; 
   default:
-  	return(EINVAL);
+  	return(-EINVAL);
   }
 
   dst_proc = m_ptr->m_source;
   dst_addr = (vir_bytes) m_ptr->m1_p1;
-  if (OK != (s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len)))
+  if ((s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len)) != 0)
   	return(s);
-  return(OK);
+  return 0;
 }
 
 static pid_t fork_nb()
@@ -979,14 +979,14 @@ struct rproc *rp_dst, *rp_src;
 	rp_dst->r_exec_len = rp_src->r_exec_len;
 	rp_dst->r_exec = malloc(rp_dst->r_exec_len);
 	if(rp_dst->r_exec == NULL)
-	        return ENOMEM;
+	        return -ENOMEM;
 
 	memcpy(rp_dst->r_exec, rp_src->r_exec, rp_dst->r_exec_len);
 	if(rp_dst->r_exec_len != 0 && rp_dst->r_exec != NULL)
-	        return OK;
+	        return 0;
 	        
         rp_dst->r_exec = NULL;
-        return EIO;
+        return -EIO;
 }
 
 static int read_exec(rp)
@@ -1013,14 +1013,14 @@ struct rproc *rp;
 		printf("RS: read_exec: unable to allocate %d bytes\n",
 			rp->r_exec_len);
 		close(fd);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	r= read(fd, rp->r_exec, rp->r_exec_len);
 	e= errno;
 	close(fd);
 	if (r == rp->r_exec_len)
-		return OK;
+		return 0;
 
 	printf("RS: read_exec: read failed %d, errno %d\n", r, e);
 
@@ -1028,7 +1028,7 @@ struct rproc *rp;
 	rp->r_exec= NULL;
 
 	if (r >= 0)
-		return EIO;
+		return -EIO;
 	else
 		return -e;
 }
@@ -1396,7 +1396,7 @@ int endpoint;
 	if(rs_verbose)
 		printf("RS: init_pci: after pci_set_acl\n");
 
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("RS: init_pci: pci_set_acl failed: %s\n",
 			strerror(errno));

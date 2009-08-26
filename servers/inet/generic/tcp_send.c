@@ -119,24 +119,24 @@ tcp_port_t *tcp_port;
 			}
 			r= ip_send(tcp_port->tp_ipfd, pack2write,
 				bf_bufsize(pack2write));
-			if (r != NW_OK)
+			if (r != 0)
 			{
-				if (r == NW_WOULDBLOCK)
+				if (r == -EWOULDBLOCK)
 					break;
-				if (r == EPACKSIZE)
+				if (r == -EPACKSIZE)
 				{
 					tcp_mtu_exceeded(tcp_conn);
 					continue;
 				}
-				if (r == EDSTNOTRCH)
+				if (r == -EDSTNOTRCH)
 				{
 					tcp_notreach(tcp_conn);
 					continue;
 				}
-				if (r == EBADDEST)
+				if (r == -EBADDEST)
 					continue;
 			}
-			assert(r == NW_OK ||
+			assert(r == 0 ||
 				(printf("ip_send failed, error %d\n", r),0));
 		}
 
@@ -152,7 +152,7 @@ tcp_port_t *tcp_port;
 				tcp_port->tp_flags |= TPF_WRITE_SP;
 				return;
 			}
-			assert(r == NW_OK);
+			assert(r == 0);
 			tcp_port->tp_flags &= ~TPF_WRITE_IP;
 			assert(!(tcp_port->tp_flags &
 				(TPF_WRITE_IP|TPF_WRITE_SP)));
@@ -741,7 +741,7 @@ u16_t new_win;
 			assert(tcp_conn->tc_state == TCS_CLOSING);
 			DBLOCK(0x10,
 			printf("all data sent in abondoned connection\n"));
-			tcp_close_connection(tcp_conn, ENOTCONN);
+			tcp_close_connection(tcp_conn, -ENOTCONN);
 			return;
 		}
 	}
@@ -1021,7 +1021,7 @@ struct timer *timer;
 
 	if (curr_time-stt > tcp_conn->tc_rt_dead)
 	{
-		tcp_close_connection(tcp_conn, ETIMEDOUT);
+		tcp_close_connection(tcp_conn, -ETIMEDOUT);
 		return;
 	}
 
@@ -1093,7 +1093,7 @@ tcp_conn_t *tcp_conn;
 		{
 			if (tcp_conn->tc_SND_UNA == tcp_conn->tc_SND_NXT)
 			{
-				tcp_reply_ioctl (tcp_fd, NW_OK);
+				tcp_reply_ioctl (tcp_fd, 0);
 				DBLOCK(0x10, printf("shutdown completed\n"));
 			}
 			else
@@ -1156,7 +1156,7 @@ tcp_conn_t *tcp_conn;
 					tcp_fd->tf_write_offset);
 			}
 			else
-				tcp_reply_write(tcp_fd, EFAULT);
+				tcp_reply_write(tcp_fd, -EFAULT);
 			return;
 		}
 		tcp_fd->tf_write_offset += write_count;
@@ -1253,7 +1253,7 @@ tcp_conn_t *tcp_conn;
 	case TCS_LISTEN:
 	case TCS_SYN_SENT:
 	case TCS_SYN_RECEIVED:
-		tcp_close_connection(tcp_conn, ENOTCONN);
+		tcp_close_connection(tcp_conn, -ENOTCONN);
 		return;
 	}
 

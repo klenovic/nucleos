@@ -120,7 +120,7 @@ int drv_init_hw (void) {
 	u16_t chip_sel_ctrl_reg;
 
     /* First, detect the hardware */
-    if (detect_hw() != OK) {
+    if (detect_hw() != 0) {
       return EIO;
     }
 
@@ -150,10 +150,10 @@ int drv_init_hw (void) {
 	}
 
 	/* Sample Rate Converter initialization */
-	if (src_init(&dev) != OK) {
+	if (src_init(&dev) != 0) {
       return EIO;
     }
-	if (AC97_init(&dev) != OK) {
+	if (AC97_init(&dev) != 0) {
       return EIO;
     }
     
@@ -169,7 +169,7 @@ int drv_init_hw (void) {
 				sub_dev[i].DmaSize / sub_dev[i].NrOfDmaFragments;
       }
     }
-    return OK;
+    return 0;
 }
 
 
@@ -211,7 +211,7 @@ static int detect_hw(void) {
   dev.d_id = d_id;
   dev.v_id = v_id;
   dev.devind = devind; /* pci device identifier */
-  return OK;
+  return 0;
 }
 
 
@@ -219,12 +219,12 @@ static int reset(int chan) {
 	drv_stop(chan);
 	sub_dev[chan].OutOfData = 1;
 
-	return OK;
+	return 0;
   }
 
 
 int drv_reset() {
-  return OK;
+  return 0;
 }
 
 
@@ -265,7 +265,7 @@ int drv_start(int sub_dev, int DmaMode) {
   
   aud_conf[sub_dev].busy = 1;
 
-  return OK;
+  return 0;
 }
 
 
@@ -286,7 +286,7 @@ int drv_stop(int sub_dev)
   aud_conf[sub_dev].busy = 0;
   disable_int(sub_dev);
 
-  return OK;
+  return 0;
 }
 
 
@@ -326,19 +326,19 @@ int drv_io_ctl(int request, void * val, int * len, int sub_dev) {
 			status = EINVAL; break;
 	}
   
-  return OK;
+  return 0;
 }
 
 
 int drv_get_irq(char *irq) {
   *irq = dev.irq;
-  return OK;
+  return 0;
 }
 
 
 int drv_get_frag_size(u32_t *frag_size, int sub_dev) {
   *frag_size = aud_conf[sub_dev].fragment_size;
-  return OK;  
+  return 0;  
 }
 
 
@@ -375,7 +375,7 @@ int drv_set_dma(u32_t dma, u32_t length, int chan) {
 	 */
   pci_outl(reg(frame_count_reg), (u32_t) (length - 1));
 
-	return OK;
+	return 0;
 }
 
 
@@ -418,7 +418,7 @@ int drv_reenable_int(int chan) {
 	pci_outw(reg(SERIAL_INTERFACE_CTRL), ser_interface & ~int_en_bit);
 	pci_outw(reg(SERIAL_INTERFACE_CTRL), ser_interface | int_en_bit);
 
-	return OK;
+	return 0;
 }
 
 
@@ -437,7 +437,7 @@ int drv_pause(int sub_dev) {
 	pci_outl(reg(SERIAL_INTERFACE_CTRL),
 			pci_inl(reg(SERIAL_INTERFACE_CTRL)) | pause_bit);
 
-  return OK;
+  return 0;
 }
 
 
@@ -456,7 +456,7 @@ int drv_resume(int sub_dev) {
 	pci_outl(reg(SERIAL_INTERFACE_CTRL),
 			pci_inl(reg(SERIAL_INTERFACE_CTRL)) & ~pause_bit);
 
-  return OK;
+  return 0;
 }
 
 
@@ -480,7 +480,7 @@ static int set_bits(u32_t nr_of_bits, int sub_dev) {
   }
 	pci_outw(reg(SERIAL_INTERFACE_CTRL), ser_interface);
   aud_conf[sub_dev].nr_of_bits = nr_of_bits;
-  return OK;
+  return 0;
 }
 
 
@@ -502,12 +502,12 @@ static int set_stereo(u32_t stereo, int sub_dev) {
 	pci_outw(reg(SERIAL_INTERFACE_CTRL), ser_interface);
   aud_conf[sub_dev].stereo = stereo;
 
-  return OK;
+  return 0;
 }
 
 
 static int set_sign(u32_t val, int sub_dev) {
-  return OK;
+  return 0;
 }
 
 
@@ -518,7 +518,7 @@ static int set_frag_size(u32_t fragment_size, int sub_dev_nr) {
     return EINVAL;
   }
   aud_conf[sub_dev_nr].fragment_size = fragment_size;
-  return OK;
+  return 0;
 }
 
 
@@ -537,7 +537,7 @@ static int set_sample_rate(u32_t rate, int sub_dev) {
   }
 	src_set_rate(&dev, src_base_reg, rate);
   aud_conf[sub_dev].sample_rate = rate;
-  return OK;
+  return 0;
 }
 
 
@@ -572,7 +572,7 @@ static int set_int_cnt(int chan) {
   }    
   /* set the sample count - 1 for the specified channel. */
   pci_outw(reg(int_cnt_reg), sample_count - 1);
-  return OK;
+  return 0;
 }
 
 
@@ -580,7 +580,7 @@ static int get_max_frag_size(u32_t * val, int * len, int sub_dev_nr) {
   *len = sizeof(*val);
 	*val = (sub_dev[sub_dev_nr].DmaSize / 
 			sub_dev[sub_dev_nr].NrOfDmaFragments);
-  return OK;
+  return 0;
 }
 
 
@@ -626,7 +626,7 @@ static int get_samples_in_buf (u32_t *samples_in_buf, int *len, int chan) {
 	*samples_in_buf = (u32_t) (sub_dev[chan].BufLength * 8192) + 
 		curr_samp_ct;
   
-	return OK;
+	return 0;
 }
 
 
@@ -640,7 +640,7 @@ static int free_buf (u32_t *val, int *len, int sub_dev_nr) {
 	else {
 		*val = 1;
 	}
-	return OK;
+	return 0;
 }  
 
 

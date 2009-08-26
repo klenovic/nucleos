@@ -8,6 +8,10 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
+ * (c) copyright 1987 by the Vrije Universiteit, Amsterdam, The Netherlands.
+ * See the copyright notice in the ACK home directory, in the file "Copyright".
+ */
+/*
 ibm/rtl8139.h
 
 Created:	Aug 2003 by Philip Homburg <philip@cs.vu.nl>

@@ -124,7 +124,7 @@ select_res_t select_res;
 	if (i>= UDP_FD_NR)
 	{
 		DBLOCK(1, printf("out of fds\n"));
-		return EAGAIN;
+		return -EAGAIN;
 	}
 
 	udp_fd= &udp_fd_table[i];
@@ -178,15 +178,15 @@ assert (opt_acc->acc_length == sizeof(*udp_opt));
 		udp_opt->nwuo_locaddr= udp_fd->uf_port->up_ipaddr;
 		result= (*udp_fd->uf_put_userdata)(udp_fd->uf_srfd, 0, opt_acc,
 			TRUE);
-		if (result == NW_OK)
-			reply_thr_put(udp_fd, NW_OK, TRUE);
+		if (result == 0)
+			reply_thr_put(udp_fd, 0, TRUE);
 		break;
 	case NWIOUDPPEEK:
 		result= udp_peek(udp_fd);
 		break;
 	default:
-		reply_thr_get(udp_fd, EBADIOCTL, TRUE);
-		result= NW_OK;
+		reply_thr_get(udp_fd, -EBADIOCTL, TRUE);
+		result= 0;
 		break;
 	}
 	if (result != NW_SUSPEND)
@@ -204,8 +204,8 @@ size_t count;
 	udp_fd= &udp_fd_table[fd];
 	if (!(udp_fd->uf_flags & UFF_OPTSET))
 	{
-		reply_thr_put(udp_fd, EBADMODE, FALSE);
-		return NW_OK;
+		reply_thr_put(udp_fd, -EBADMODE, FALSE);
+		return 0;
 	}
 
 	udp_fd->uf_rd_count= count;
@@ -432,7 +432,7 @@ int for_ioctl;
 			if (result<0)
 			{
 				udp_port->up_state= UPS_ERROR;
-				return NW_OK;
+				return 0;
 			}
 			udp_port->up_state= UPS_MAIN;
 			if (udp_port->up_flags & UPF_SUSPEND)
@@ -478,7 +478,7 @@ assert (!offset);	/* This isn't a valid assertion but ip sends only
 		"udp_put_data(%d, 0x%x, %p) called but up_state= 0x%x\n",
 					fd, offset, data, udp_port->up_state ));
 	}
-	return NW_OK;
+	return 0;
 }
 
 static int udp_setopt(udp_fd)
@@ -496,7 +496,7 @@ udp_fd_t *udp_fd;
 		sizeof(nwio_udpopt_t), TRUE);
 
 	if (!data)
-		return EFAULT;
+		return -EFAULT;
 
 	data= bf_packIffLess(data, sizeof(nwio_udpopt_t));
 assert (data->acc_length == sizeof(nwio_udpopt_t));
@@ -513,19 +513,19 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 
 	if (new_en_flags & new_di_flags)
 	{
-		DBLOCK(1, printf("returning EBADMODE\n"));
+		DBLOCK(1, printf("returning -EBADMODE\n"));
 
-		reply_thr_get(udp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(udp_fd, -EBADMODE, TRUE);
+		return 0;
 	}
 
 	/* NWUO_ACC_MASK */
 	if (new_di_flags & NWUO_ACC_MASK)
 	{
-		DBLOCK(1, printf("returning EBADMODE\n"));
+		DBLOCK(1, printf("returning -EBADMODE\n"));
 
-		reply_thr_get(udp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(udp_fd, -EBADMODE, TRUE);
+		return 0;
 		/* access modes can't be disabled */
 	}
 
@@ -535,10 +535,10 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	/* NWUO_LOCPORT_MASK */
 	if (new_di_flags & NWUO_LOCPORT_MASK)
 	{
-		DBLOCK(1, printf("returning EBADMODE\n"));
+		DBLOCK(1, printf("returning -EBADMODE\n"));
 
-		reply_thr_get(udp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(udp_fd, -EBADMODE, TRUE);
+		return 0;
 		/* the loc ports can't be disabled */
 	}
 	if (!(new_en_flags & NWUO_LOCPORT_MASK))
@@ -554,10 +554,10 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	{
 		if (!newopt.nwuo_locport)
 		{
-			DBLOCK(1, printf("returning EBADMODE\n"));
+			DBLOCK(1, printf("returning -EBADMODE\n"));
 
-			reply_thr_get(udp_fd, EBADMODE, TRUE);
-			return NW_OK;
+			reply_thr_get(udp_fd, -EBADMODE, TRUE);
+			return 0;
 		}
 	}
 
@@ -610,10 +610,10 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 		((new_flags & NWUO_LOCPORT_MASK) == NWUO_LP_ANY || 
 		(new_flags & (NWUO_RP_ANY|NWUO_RA_ANY|NWUO_EN_IPOPT))))
 	{
-		DBLOCK(1, printf("returning EBADMODE\n"));
+		DBLOCK(1, printf("returning -EBADMODE\n"));
 
-		reply_thr_get(udp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(udp_fd, -EBADMODE, TRUE);
+		return 0;
 	}
 
 	/* Check the access modes */
@@ -646,8 +646,8 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 					fd_ptr-udp_fd_table,
 					newopt.nwuo_locport));
 
-				reply_thr_get(udp_fd, EADDRINUSE, TRUE);
-				return NW_OK;
+				reply_thr_get(udp_fd, -EADDRINUSE, TRUE);
+				return 0;
 			}
 		}
 	}
@@ -675,8 +675,8 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	if (udp_fd->uf_flags & UFF_OPTSET)
 		hash_fd(udp_fd);
 
-	reply_thr_get(udp_fd, NW_OK, TRUE);
-	return NW_OK;
+	reply_thr_get(udp_fd, 0, TRUE);
+	return 0;
 }
 
 static udpport_t find_unused_port(fd)
@@ -713,7 +713,7 @@ int for_ioctl;
 
 	result= (*udp_fd->uf_put_userdata)(udp_fd->uf_srfd, reply,
 		(acc_t *)0, for_ioctl);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 /*
@@ -762,7 +762,7 @@ udp_port_t *udp_port;
 			udp_port->up_flags |= UPF_READ_SP;
 			return;
 		}
-assert(result == NW_OK);
+assert(result == 0);
 		udp_port->up_flags &= ~UPF_READ_IP;
 	} while(!(udp_port->up_flags & UPF_READ_IP));
 }
@@ -777,8 +777,8 @@ udp_fd_t *udp_fd;
 	if (!(udp_fd->uf_flags & UFF_OPTSET))
 	{
 		udp_fd->uf_flags &= ~UFF_IOCTL_IP;
-		reply_thr_put(udp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_put(udp_fd, -EBADMODE, TRUE);
+		return 0;
 	}
 
 	if (udp_fd->uf_rdbuf_head)
@@ -883,7 +883,7 @@ udp_fd_t *udp_fd;
 
 	if (result >= 0)
 		if (size > transf_size)
-			result= EPACKSIZE;
+			result= -EPACKSIZE;
 		else
 			result= transf_size;
 
@@ -1200,8 +1200,8 @@ size_t count;
 
 	if (!(udp_fd->uf_flags & UFF_OPTSET))
 	{
-		reply_thr_get (udp_fd, EBADMODE, FALSE);
-		return NW_OK;
+		reply_thr_get (udp_fd, -EBADMODE, FALSE);
+		return 0;
 	}
 
 assert (!(udp_fd->uf_flags & UFF_WRITE_IP));
@@ -1220,7 +1220,7 @@ assert (!(udp_fd->uf_flags & UFF_WRITE_IP));
 	}
 	else
 	{
-		return NW_OK;
+		return 0;
 	}
 }
 
@@ -1256,7 +1256,7 @@ assert (!udp_port->up_wr_pack);
 	if (!pack)
 	{
 		udp_fd->uf_flags &= ~UFF_WRITE_IP;
-		reply_thr_get (udp_fd, EFAULT, FALSE);
+		reply_thr_get (udp_fd, -EFAULT, FALSE);
 		return;
 	}
 
@@ -1282,7 +1282,7 @@ assert (!udp_port->up_wr_pack);
 			bf_afree(ip_hdr_pack);
 			bf_afree(udp_hdr_pack);
 			bf_afree(pack);
-			reply_thr_get (udp_fd, EINVAL, FALSE);
+			reply_thr_get (udp_fd, -EINVAL, FALSE);
 			return;
 		}
 		if (ip_opt_size & 3)
@@ -1290,7 +1290,7 @@ assert (!udp_port->up_wr_pack);
 			bf_afree(ip_hdr_pack);
 			bf_afree(udp_hdr_pack);
 			bf_afree(pack);
-			reply_thr_get (udp_fd, EFAULT, FALSE);
+			reply_thr_get (udp_fd, -EFAULT, FALSE);
 			return;
 		}
 		if (ip_opt_size)
@@ -1484,25 +1484,25 @@ int which_operation;
 	case SR_CANCEL_READ:
 assert (udp_fd->uf_flags & UFF_READ_IP);
 		udp_fd->uf_flags &= ~UFF_READ_IP;
-		reply_thr_put(udp_fd, EINTR, FALSE);
+		reply_thr_put(udp_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_WRITE:
 assert (udp_fd->uf_flags & UFF_WRITE_IP);
 		udp_fd->uf_flags &= ~UFF_WRITE_IP;
 		if (udp_fd->uf_port->up_write_fd == udp_fd)
 			udp_fd->uf_port->up_write_fd= NULL;
-		reply_thr_get(udp_fd, EINTR, FALSE);
+		reply_thr_get(udp_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_IOCTL:
 assert (udp_fd->uf_flags & UFF_IOCTL_IP);
 		udp_fd->uf_flags &= ~UFF_IOCTL_IP;
 		udp_fd->uf_flags &= ~UFF_PEEK_IP;
-		reply_thr_get(udp_fd, EINTR, TRUE);
+		reply_thr_get(udp_fd, -EINTR, TRUE);
 		break;
 	default:
 		ip_panic(( "got unknown cancel request" ));
 	}
-	return NW_OK;
+	return 0;
 }
 
 static void udp_buffree (priority)

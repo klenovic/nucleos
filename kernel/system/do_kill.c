@@ -40,15 +40,15 @@ message *m_ptr;			/* pointer to request message */
 
   proc_nr_e= m_ptr->SIG_ENDPT;
 
-  if (!isokendpt(proc_nr_e, &proc_nr)) return(EINVAL);
-  if (sig_nr > _NSIG) return(EINVAL);
-  if (iskerneln(proc_nr)) return(EPERM);
+  if (!isokendpt(proc_nr_e, &proc_nr)) return(-EINVAL);
+  if (sig_nr > _NSIG) return(-EINVAL);
+  if (iskerneln(proc_nr)) return(-EPERM);
 
   /* Set pending signal to be processed by the PM. */
   cause_sig(proc_nr, sig_nr);
   if (sig_nr == SIGKILL)
 	clear_endpoint(proc_addr(proc_nr));
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_KILL */

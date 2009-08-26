@@ -317,9 +317,9 @@ void main()
    * reenable interrupts. ID return on interrupt is the IRQ line number. 
    */
   irq_hook_id = FLOPPY_IRQ;
-  if ((s=sys_irqsetpolicy(FLOPPY_IRQ, 0, &irq_hook_id )) != OK)
+  if ((s=sys_irqsetpolicy(FLOPPY_IRQ, 0, &irq_hook_id )) != 0)
   	panic("FLOPPY", "Couldn't set IRQ policy", s);
-  if ((s=sys_irqenable(&irq_hook_id)) != OK)
+  if ((s=sys_irqenable(&irq_hook_id)) != 0)
   	panic("FLOPPY", "Couldn't enable IRQs", s);
 
   /* Ignore signals */
@@ -341,7 +341,7 @@ static void f_expire_tmrs(struct driver *dp, message *m_ptr)
   int s;
 
   /* Get the current time to compare the timers against. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
  	panic("FLOPPY","Couldn't get uptime from clock.", s);
 
   /* Scan the timers queue for expired timers. Dispatch the watchdog function
@@ -353,7 +353,7 @@ static void f_expire_tmrs(struct driver *dp, message *m_ptr)
   	f_next_timeout = TMR_NEVER;
   } else {  					  /* set new sync alarm */
   	f_next_timeout = f_timers->tmr_exp_time;
-  	if ((s=sys_setalarm(f_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(f_next_timeout, 1)) != 0)
  		panic("FLOPPY","Couldn't set synchronous alarm.", s);
   }
 }
@@ -370,7 +370,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
   int s;
 
   /* Get the current time. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
  	panic("FLOPPY","Couldn't get uptime from clock.", s);
 
   /* Add the timer to the local timer queue. */
@@ -382,7 +382,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
    */
   if (f_timers->tmr_exp_time != f_next_timeout) {
   	f_next_timeout = f_timers->tmr_exp_time; 
-  	if ((s=sys_setalarm(f_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(f_next_timeout, 1)) != 0)
  		panic("FLOPPY","Couldn't set synchronous alarm.", s);
   }
 }
@@ -465,7 +465,7 @@ int safe;
   u8_t cmd[3];
 
   if (ex64hi(pos64) != 0)
-	return OK;	/* Way beyond EOF */
+	return 0;	/* Way beyond EOF */
   position= cv64ul(pos64);
 
   /* internally, floppy uses f_transfer without grant id, with safe set to
@@ -475,7 +475,7 @@ int safe;
 	panic("FLOPPY", "f_transfer: not safe and proc_nr not SELF", proc_nr);
 
   /* Check disk address. */
-  if ((position & SECTOR_MASK) != 0) return(EINVAL);
+  if ((position & SECTOR_MASK) != 0) return(-EINVAL);
 
 #if 0	/* XXX hack to create a disk driver that crashes */
   { static int count= 0; if (++count > 10) {
@@ -490,23 +490,23 @@ int safe;
 	for (iop = iov; iop < iov_end; iop++) nbytes += iop->iov_size;
 
 	/* Which block on disk and how close to EOF? */
-	if (position >= dv_size) return(OK);		/* At EOF */
+	if (position >= dv_size) return 0;		/* At EOF */
 	if (position + nbytes > dv_size) nbytes = dv_size - position;
 	block = div64u(add64ul(f_dv->dv_base, position), SECTOR_SIZE);
 
-	if ((nbytes & SECTOR_MASK) != 0) return(EINVAL);
+	if ((nbytes & SECTOR_MASK) != 0) return(-EINVAL);
 
 	/* Using a formatting device? */
 	if (f_device & FORMAT_DEV_BIT) {
-		if (opcode != DEV_SCATTER_S) return(EIO);
+		if (opcode != DEV_SCATTER_S) return(-EIO);
 		if (iov->iov_size < SECTOR_SIZE + sizeof(fmt_param))
-			return(EINVAL);
+			return(-EINVAL);
 
 		if(safe) {
 		   s=sys_safecopyfrom(proc_nr, iov->iov_addr,
 			SECTOR_SIZE + iov_offset, (vir_bytes) &fmt_param,
 			(phys_bytes) sizeof(fmt_param), D);
-		   if(s != OK)
+		   if(s != 0)
 			panic("FLOPPY", "sys_safecopyfrom failed", s);
 		} else {
 			assert(proc_nr == SELF);
@@ -519,7 +519,7 @@ int safe;
 		 * to avoid division by 0.  Leave checking of other data to
 		 * the FDC.
 		 */
-		if (fmt_param.sectors_per_cylinder == 0) return(EIO);
+		if (fmt_param.sectors_per_cylinder == 0) return(-EIO);
 
 		/* Only the first sector of the parameters now needed. */
 		iov->iov_size = nbytes = SECTOR_SIZE;
@@ -546,7 +546,7 @@ int safe;
 		nr++;
 		user_offset = iop_offset;
 		chunk = iop->iov_size;
-		if ((chunk & SECTOR_MASK) != 0) return(EINVAL);
+		if ((chunk & SECTOR_MASK) != 0) return(-EINVAL);
 
 		while (chunk > 0) {
 			ugrants[sector] = iop->iov_addr;
@@ -574,7 +574,7 @@ int safe;
 		cmd[1] = f_dp->spec1;
 		cmd[2] = SPEC2;
 		(void) fdc_command(cmd, 3);
-		if ((s=sys_outb(FDC_RATE, f_dp->rate)) != OK)
+		if ((s=sys_outb(FDC_RATE, f_dp->rate)) != 0)
 			panic("FLOPPY","Sys_outb failed", s);
 		prev_dp = f_dp;
 	}
@@ -591,11 +591,11 @@ int safe;
 			/* Find out what the current sector is.  This often
 			 * fails right after a seek, so try it twice.
 			 */
-			if (r == OK && read_id() != OK) r = read_id();
+			if (r == 0 && read_id() != 0) r = read_id();
 		}
 
 		/* Look for the next job in uoffsets[] */
-		if (r == OK) {
+		if (r == 0) {
 			for (;;) {
 				if (fp->fl_sector >= f_sectors)
 					fp->fl_sector = 0;
@@ -607,13 +607,13 @@ int safe;
 			}
 		}
 
-		if (r == OK && opcode == DEV_SCATTER_S) {
+		if (r == 0 && opcode == DEV_SCATTER_S) {
 			/* Copy the user bytes to the DMA buffer. */
 			if(safe) {
 		   	   s=sys_safecopyfrom(proc_nr, *ug, *up,
 				(vir_bytes) tmp_buf,
 			  	 (phys_bytes) SECTOR_SIZE, D);
-			   if(s != OK)
+			   if(s != 0)
 				panic("FLOPPY", "sys_safecopyfrom failed", s);
 			} else {
 			   assert(proc_nr == SELF);
@@ -622,24 +622,24 @@ int safe;
 		}
 
 		/* Set up the DMA chip and perform the transfer. */
-		if (r == OK) {
-			if (dma_setup(opcode) != OK) {
+		if (r == 0) {
+			if (dma_setup(opcode) != 0) {
 				/* This can only fail for addresses above 16MB
 				 * that cannot be handled by the controller, 
  				 * because it uses 24-bit addressing.
 				 */
-				return(EIO);
+				return(-EIO);
 			}
 			r = fdc_transfer(opcode);
 		}
 
-		if (r == OK && opcode == DEV_GATHER_S) {
+		if (r == 0 && opcode == DEV_GATHER_S) {
 			/* Copy the DMA buffer to user space. */
 			if(safe) {
 		   	   s=sys_safecopyto(proc_nr, *ug, *up,
 				(vir_bytes) tmp_buf,
 			  	 (phys_bytes) SECTOR_SIZE, D);
-			if(s != OK)
+			if(s != 0)
 				panic("FLOPPY", "sys_safecopyto failed", s);
 			} else {
 			   assert(proc_nr == SELF);
@@ -647,10 +647,10 @@ int safe;
 			}
 		}
 
-		if (r != OK) {
+		if (r != 0) {
 			/* Don't retry if write protected or too many errors. */
 			if (err_no_retry(r) || ++errors == MAX_ERRORS) {
-				return(EIO);
+				return(-EIO);
 			}
 
 			/* Recalibrate if halfway. */
@@ -678,13 +678,13 @@ int safe;
 			/* The rest is optional, so we return to give FS a
 			 * chance to think it over.
 			 */
-			return(OK);
+			return 0;
 		}
 		iov++;
 		nr_req--;
 	}
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -711,7 +711,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
   /* First check the DMA memory address not to exceed maximum. */
   if (tmp_phys != (tmp_phys & DMA_ADDR_MASK)) {
 	report("FLOPPY", "DMA denied because address out of range", NO_NUM);
-	return(EIO);
+	return(-EIO);
   }
 
   /* Set up the DMA registers.  (The comment on the reset is a bit strong,
@@ -727,9 +727,9 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
   pv_set(byte_out[7], DMA_COUNT, (SECTOR_SIZE - 1) >> 8);
   pv_set(byte_out[8], DMA_INIT, 2);		/* some sort of enable */
 
-  if ((s=sys_voutb(byte_out, 9)) != OK)
+  if ((s=sys_voutb(byte_out, 9)) != 0)
   	panic("FLOPPY","Sys_voutb in dma_setup() failed", s);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -755,7 +755,7 @@ static void start_motor()
   motor_status |= motor_bit;		/* want this drive running too */
 
   if ((s=sys_outb(DOR,
-  		(motor_status << MOTOR_SHIFT) | ENABLE_INT | f_drive)) != OK)
+  		(motor_status << MOTOR_SHIFT) | ENABLE_INT | f_drive)) != 0)
 	panic("FLOPPY","Sys_outb in start_motor() failed", s);
 
   /* If the motor was already running, we don't have to wait for it. */
@@ -790,7 +790,7 @@ timer_t *tp;
  */
   int s;
   motor_status &= ~(1 << tmr_arg(tp)->ta_int);
-  if ((s=sys_outb(DOR, (motor_status << MOTOR_SHIFT) | ENABLE_INT)) != OK)
+  if ((s=sys_outb(DOR, (motor_status << MOTOR_SHIFT) | ENABLE_INT)) != 0)
 	panic("FLOPPY","Sys_outb in stop_motor() failed", s);
 }
 
@@ -803,7 +803,7 @@ static void floppy_stop(struct driver *dp, message *m_ptr)
   int s;
   sigset_t sigset = m_ptr->NOTIFY_ARG;
   if (sigismember(&sigset, SIGTERM) || sigismember(&sigset, SIGKSTOP)) {
-      if ((s=sys_outb(DOR, ENABLE_INT)) != OK)
+      if ((s=sys_outb(DOR, ENABLE_INT)) != 0)
 		panic("FLOPPY","Sys_outb in floppy_stop() failed", s);
       exit(0);	
   }
@@ -825,20 +825,20 @@ static int seek()
 
   /* Are we already on the correct cylinder? */
   if (fp->fl_calibration == UNCALIBRATED)
-	if (recalibrate() != OK) return(ERR_SEEK);
-  if (fp->fl_curcyl == fp->fl_hardcyl) return(OK);
+	if (recalibrate() != 0) return(ERR_SEEK);
+  if (fp->fl_curcyl == fp->fl_hardcyl) return 0;
 
   /* No.  Wrong cylinder.  Issue a SEEK and wait for interrupt. */
   cmd[0] = FDC_SEEK;
   cmd[1] = (fp->fl_head << 2) | f_drive;
   cmd[2] = fp->fl_hardcyl;
-  if (fdc_command(cmd, 3) != OK) return(ERR_SEEK);
-  if (f_intr_wait() != OK) return(ERR_TIMEOUT);
+  if (fdc_command(cmd, 3) != 0) return(ERR_SEEK);
+  if (f_intr_wait() != 0) return(ERR_TIMEOUT);
 
   /* Interrupt has been received.  Check drive status. */
   fdc_out(FDC_SENSE);		/* probe FDC to make it return status */
   r = fdc_results();		/* get controller status bytes */
-  if (r != OK || (f_results[ST0] & ST0_BITS_SEEK) != SEEK_ST0
+  if (r != 0 || (f_results[ST0] & ST0_BITS_SEEK) != SEEK_ST0
 				|| f_results[ST1] != fp->fl_hardcyl) {
 	/* seek failed, may need a recalibrate */
 	return(ERR_SEEK);
@@ -863,7 +863,7 @@ static int seek()
   }
   fp->fl_curcyl = fp->fl_hardcyl;
   fp->fl_sector = NO_SECTOR;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -891,7 +891,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 	cmd[3] = fmt_param.sectors_per_cylinder;
 	cmd[4] = fmt_param.gap_length_for_format;
 	cmd[5] = fmt_param.fill_byte_for_format;
-	if (fdc_command(cmd, 6) != OK) return(ERR_TRANSFER);
+	if (fdc_command(cmd, 6) != 0) return(ERR_TRANSFER);
   } else {
 	cmd[0] = opcode == DEV_SCATTER_S ? FDC_WRITE : FDC_READ;
 	cmd[1] = (fp->fl_head << 2) | f_drive;
@@ -902,18 +902,18 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 	cmd[6] = f_sectors;
 	cmd[7] = f_dp->gap;	/* sector gap */
 	cmd[8] = DTL;		/* data length */
-	if (fdc_command(cmd, 9) != OK) return(ERR_TRANSFER);
+	if (fdc_command(cmd, 9) != 0) return(ERR_TRANSFER);
   }
 
   /* Block, waiting for disk interrupt. */
-  if (f_intr_wait() != OK) {
+  if (f_intr_wait() != 0) {
 	printf("%s: disk interrupt timed out.\n", f_name());
   	return(ERR_TIMEOUT);
   }
 
   /* Get controller status and check for errors. */
   r = fdc_results();
-  if (r != OK) return(r);
+  if (r != 0) return(r);
 
   if (f_results[ST1] & WRITE_PROTECT) {
 	printf("%s: diskette is write protected.\n", f_name());
@@ -923,7 +923,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
   if ((f_results[ST0] & ST0_BITS_TRANS) != TRANS_ST0) return(ERR_TRANSFER);
   if (f_results[ST1] | f_results[ST2]) return(ERR_TRANSFER);
 
-  if (f_device & FORMAT_DEV_BIT) return(OK);
+  if (f_device & FORMAT_DEV_BIT) return 0;
 
   /* Compare actual numbers of sectors transferred with expected number. */
   s =  (f_results[ST_CYL] - fp->fl_cylinder) * NR_HEADS * f_sectors;
@@ -936,7 +936,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 #if 0
   if (processor < 386) fp->fl_sector++;		/* Old CPU can't keep up. */
 #endif
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -963,29 +963,29 @@ static int fdc_results()
 	 * bit must be set instead of clear, but the CTL_BUSY bit destroys
 	 * the perfection of the mirror.
 	 */
-	if ((s=sys_inb(FDC_STATUS, &status)) != OK)
+	if ((s=sys_inb(FDC_STATUS, &status)) != 0)
 		panic("FLOPPY","Sys_inb in fdc_results() failed", s);
 	status &= (MASTER | DIRECTION | CTL_BUSY);
 	if (status == (MASTER | DIRECTION | CTL_BUSY)) {
 		unsigned long tmp_r;
 		if (result_nr >= MAX_RESULTS) break;	/* too many results */
-		if ((s=sys_inb(FDC_DATA, &tmp_r)) != OK)
+		if ((s=sys_inb(FDC_DATA, &tmp_r)) != 0)
 		   panic("FLOPPY","Sys_inb in fdc_results() failed", s);
 		f_results[result_nr] = tmp_r;
 		result_nr ++;
 		continue;
 	}
 	if (status == MASTER) {			/* all read */
-		if ((s=sys_irqenable(&irq_hook_id)) != OK)
+		if ((s=sys_irqenable(&irq_hook_id)) != 0)
 			panic("FLOPPY", "Couldn't enable IRQs", s);
 
-		return(OK);			/* only good exit */
+		return 0;			/* only good exit */
 	}
-  } while ( (s=getuptime(&t1))==OK && (t1-t0) < TIMEOUT_TICKS );
-  if (OK!=s) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
+  } while ( (s=getuptime(&t1)) == 0 && (t1-t0) < TIMEOUT_TICKS );
+  if (s != 0) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
   need_reset = TRUE;		/* controller chip must be reset */
 
-  if ((s=sys_irqenable(&irq_hook_id)) != OK)
+  if ((s=sys_irqenable(&irq_hook_id)) != 0)
 	panic("FLOPPY", "Couldn't enable IRQs", s);
   return(ERR_STATUS);
 }
@@ -1011,7 +1011,7 @@ int len;		/* command length */
 	fdc_out(*cmd++);
 	len--;
   }
-  return(need_reset ? ERR_DRIVE : OK);
+  return(need_reset ? ERR_DRIVE : 0);
 }
 
 /*===========================================================================*
@@ -1033,17 +1033,17 @@ int val;		/* write this byte to floppy disk controller */
   /* It may take several tries to get the FDC to accept a command.  */
   getuptime(&t0);
   do {
-  	if ( (s=getuptime(&t1))==OK && (t1-t0) > TIMEOUT_TICKS ) {
-  		if (OK!=s) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
+  	if ( (s=getuptime(&t1)) == 0 && (t1-t0) > TIMEOUT_TICKS ) {
+  		if (s != 0) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
 		need_reset = TRUE;	/* hit it over the head */
 		return;
 	}
-  	if ((s=sys_inb(FDC_STATUS, &status)) != OK)
+  	if ((s=sys_inb(FDC_STATUS, &status)) != 0)
   		panic("FLOPPY","Sys_inb in fdc_out() failed", s);
   }
   while ((status & (MASTER | DIRECTION)) != (MASTER | 0)); 
   
-  if ((s=sys_outb(FDC_DATA, val)) != OK)
+  if ((s=sys_outb(FDC_DATA, val)) != 0)
 	panic("FLOPPY","Sys_outb in fdc_out() failed", s);
 }
 
@@ -1068,15 +1068,15 @@ static int recalibrate()
   /* Issue the RECALIBRATE command and wait for the interrupt. */
   cmd[0] = FDC_RECALIBRATE;	/* tell drive to recalibrate itself */
   cmd[1] = f_drive;		/* specify drive */
-  if (fdc_command(cmd, 2) != OK) return(ERR_SEEK);
-  if (f_intr_wait() != OK) return(ERR_TIMEOUT);
+  if (fdc_command(cmd, 2) != 0) return(ERR_SEEK);
+  if (f_intr_wait() != 0) return(ERR_TIMEOUT);
 
   /* Determine if the recalibration succeeded. */
   fdc_out(FDC_SENSE);		/* issue SENSE command to request results */
   r = fdc_results();		/* get results of the FDC_RECALIBRATE command*/
   fp->fl_curcyl = NO_CYL;	/* force a SEEK next time */
   fp->fl_sector = NO_SECTOR;
-  if (r != OK ||		/* controller would not respond */
+  if (r != 0 ||		/* controller would not respond */
      (f_results[ST0] & ST0_BITS_SEEK) != SEEK_ST0 || f_results[ST_PCN] != 0) {
 	/* Recalibration failed.  FDC must be reset. */
 	need_reset = TRUE;
@@ -1085,7 +1085,7 @@ static int recalibrate()
 	/* Recalibration succeeded. */
 	fp->fl_calibration = CALIBRATED;
 	fp->fl_curcyl = f_results[ST_PCN];
-	return(OK);
+	return 0;
   }
 }
 
@@ -1117,7 +1117,7 @@ static void f_reset()
   motor_status = 0;
   pv_set(byte_out[0], DOR, 0);			/* strobe reset bit low */
   pv_set(byte_out[1], DOR, ENABLE_INT);		/* strobe it high again */
-  if ((s=sys_voutb(byte_out, 2)) != OK)
+  if ((s=sys_voutb(byte_out, 2)) != 0)
   	panic("FLOPPY", "Sys_voutb in f_reset() failed", s); 
 
   /* A synchronous alarm timer was set in fdc_command. Expect a HARD_INT
@@ -1190,7 +1190,7 @@ static int f_intr_wait()
 	need_reset = TRUE;
 	return(ERR_TIMEOUT);
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1227,19 +1227,19 @@ static int read_id()
   /* The command is issued by outputting 2 bytes to the controller chip. */
   cmd[0] = FDC_READ_ID;		/* issue the read id command */
   cmd[1] = (fp->fl_head << 2) | f_drive;
-  if (fdc_command(cmd, 2) != OK) return(ERR_READ_ID);
-  if (f_intr_wait() != OK) return(ERR_TIMEOUT);
+  if (fdc_command(cmd, 2) != 0) return(ERR_READ_ID);
+  if (f_intr_wait() != 0) return(ERR_TIMEOUT);
 
   /* Get controller status and check for errors. */
   result = fdc_results();
-  if (result != OK) return(result);
+  if (result != 0) return(result);
 
   if ((f_results[ST0] & ST0_BITS_TRANS) != TRANS_ST0) return(ERR_READ_ID);
   if (f_results[ST1] | f_results[ST2]) return(ERR_READ_ID);
 
   /* The next sector is next for I/O: */
   fp->fl_sector = f_results[ST_SEC] - BASE_SECTOR + 1;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1255,7 +1255,7 @@ message *m_ptr;			/* pointer to open message */
   struct test_order *top;
 
   /* Decode the message parameters. */
-  if (f_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (f_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
 
   dtype = f_device & DEV_TYPE_BITS;	/* get density from minor dev */
   if (dtype >= MINOR_fd0p0) dtype = 0;
@@ -1263,12 +1263,12 @@ message *m_ptr;			/* pointer to open message */
   if (dtype != 0) {
 	/* All types except 0 indicate a specific drive/medium combination.*/
 	dtype = (dtype >> DEV_TYPE_SHIFT) - 1;
-	if (dtype >= NT) return(ENXIO);
+	if (dtype >= NT) return(-ENXIO);
 	f_fp->fl_density = dtype;
 	(void) f_prepare(f_device);	/* Recompute parameters. */
-	return(OK);
+	return 0;
   }
-  if (f_device & FORMAT_DEV_BIT) return(EIO);	/* Can't format /dev/fdN */
+  if (f_device & FORMAT_DEV_BIT) return(-EIO);	/* Can't format /dev/fdN */
 
   /* The device opened is /dev/fdN.  Experimentally determine drive/medium.
    * First check fl_density.  If it is not NO_DENS, the drive has been used
@@ -1276,8 +1276,8 @@ message *m_ptr;			/* pointer to open message */
    * that first.  If the motor is still running then assume nothing changed.
    */
   if (f_fp->fl_density != NO_DENS) {
-	if (motor_status & (1 << f_drive)) return(OK);
-	if (test_read(f_fp->fl_density) == OK) return(OK);
+	if (motor_status & (1 << f_drive)) return 0;
+	if (test_read(f_fp->fl_density) == 0) return 0;
   }
 
   /* Either drive type is unknown or a different diskette is now present.
@@ -1289,18 +1289,18 @@ message *m_ptr;			/* pointer to open message */
 	/* Skip densities that have been proven to be impossible */
 	if (!(f_fp->fl_class & (1 << dtype))) continue;
 
-	if (test_read(dtype) == OK) {
+	if (test_read(dtype) == 0) {
 		/* The test succeeded, use this knowledge to limit the
 		 * drive class to match the density just read.
 		 */
 		f_fp->fl_class &= top->t_class;
-		return(OK);
+		return 0;
 	}
 	/* Test failed, wrong density or did it time out? */
 	if (f_busy == BSY_WAKEN) break;
   }
   f_fp->fl_density = NO_DENS;
-  return(EIO);			/* nothing worked */
+  return(-EIO);			/* nothing worked */
 }
 
 /*===========================================================================*
@@ -1327,10 +1327,10 @@ int density;
   iovec1.iov_size = SECTOR_SIZE;
   result = f_transfer(SELF, DEV_GATHER_S, cvul64(position), &iovec1, 1, 0);
 
-  if (iovec1.iov_size != 0) return(EIO);
+  if (iovec1.iov_size != 0) return(-EIO);
 
   partition(&f_dtab, f_drive, P_FLOPPY, 0);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*

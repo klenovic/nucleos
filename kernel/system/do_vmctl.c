@@ -36,7 +36,7 @@ register message *m_ptr;	/* pointer to request message */
 
   if(!isokendpt(ep, &proc_nr)) {
 	kprintf("do_vmctl: unexpected endpoint %d from VM\n", ep);
-	return EINVAL;
+	return -EINVAL;
   }
 
   p = proc_addr(proc_nr);
@@ -44,11 +44,11 @@ register message *m_ptr;	/* pointer to request message */
   switch(m_ptr->SVMCTL_PARAM) {
 	case VMCTL_CLEAR_PAGEFAULT:
 		RTS_LOCK_UNSET(p, PAGEFAULT);
-		return OK;
+		return 0;
 	case VMCTL_MEMREQ_GET:
 		/* Send VM the information about the memory request.  */
 		if(!(rp = vmrequest))
-			return ESRCH;
+			return -ESRCH;
 		if(!RTS_ISSET(rp, VMREQUEST))
 			minix_panic("do_vmctl: no VMREQUEST set", NO_NUM);
 
@@ -62,7 +62,7 @@ register message *m_ptr;	/* pointer to request message */
 		/* Remove from request chain. */
 		vmrequest = vmrequest->p_vmrequest.nextrequestor;
 
-		return OK;
+		return 0;
 	case VMCTL_MEMREQ_REPLY:
 		if(!(rp = p->p_vmrequest.requestor))
 			minix_panic("do_vmctl: no requestor set", ep);
@@ -75,7 +75,7 @@ register message *m_ptr;	/* pointer to request message */
 		rp->p_vmrequest.vmresult = m_ptr->SVMCTL_VALUE;
 		if(rp->p_vmrequest.vmresult == VMSUSPEND)
 			minix_panic("VM returned VMSUSPEND?", NO_NUM);
-		if(rp->p_vmrequest.vmresult != OK)
+		if(rp->p_vmrequest.vmresult != 0)
 			kprintf("SYSTEM: VM replied %d to mem request\n",
 				rp->p_vmrequest.vmresult);
 
@@ -85,11 +85,11 @@ register message *m_ptr;	/* pointer to request message */
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 		/* Sanity check. */
-		if(rp->p_vmrequest.vmresult == OK) {
+		if(rp->p_vmrequest.vmresult == 0) {
 			if(CHECKRANGE(p,
 				rp->p_vmrequest.start,
 				rp->p_vmrequest.length,
-				rp->p_vmrequest.writeflag) != OK) {
+				rp->p_vmrequest.writeflag) != 0) {
 kprintf("SYSTEM: request %d:0x%lx-0x%lx, wrflag %d, failed\n",
 	rp->p_endpoint,
 	rp->p_vmrequest.start,  rp->p_vmrequest.start + rp->p_vmrequest.length,
@@ -99,10 +99,10 @@ kprintf("SYSTEM: request %d:0x%lx-0x%lx, wrflag %d, failed\n",
 			}
 		}
 #endif
-		return OK;
+		return 0;
 #ifdef CONFIG_KERNEL_VM_NOPAGEZERO
 	case VMCTL_NOPAGEZERO:
-		return OK;
+		return 0;
 #endif
   }
 

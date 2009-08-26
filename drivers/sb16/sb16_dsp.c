@@ -140,13 +140,13 @@ static int dsp_open()
 	dprint("sb16_dsp.c: dsp_open()\n");
 	
 	/* try to detect SoundBlaster card */
-	if(!DspAvail && dsp_init() != OK) return EIO;
+	if(!DspAvail && dsp_init() != 0) return EIO;
 
 	/* Only one open at a time with soundcards */
 	if(DspBusy) return EBUSY;
 
 	/* Start with a clean DSP */
-	if(dsp_reset() != OK) return EIO;
+	if(dsp_reset() != 0) return EIO;
 
 	/* Setup default values */
 	DspStereo = DEFAULT_STEREO;
@@ -157,7 +157,7 @@ static int dsp_open()
 
 	DspBusy = 1;
 
-	return OK;
+	return 0;
 }
 
 
@@ -170,7 +170,7 @@ static int dsp_close()
 
 	DspBusy = 0;                  /* soundcard available again */
 
-	return OK;
+	return 0;
 }
 
 
@@ -392,7 +392,7 @@ static int dsp_init()
 {
 	int i, s;
 
-	if(dsp_reset () != OK) { 
+	if(dsp_reset () != 0) { 
 		dprint("sb16: No SoundBlaster card detected\n");
 		return -1;
 	}
@@ -423,13 +423,13 @@ static int dsp_init()
 	mixer_set(MIXER_SET_DMA, (1 << SB_DMA_8 | 1 << SB_DMA_16)); 
 
 	/* register interrupt vector and enable irq */
-	if ((s=sys_irqsetpolicy(SB_IRQ, IRQ_REENABLE, &irq_hook_id )) != OK)
+	if ((s=sys_irqsetpolicy(SB_IRQ, IRQ_REENABLE, &irq_hook_id )) != 0)
   		panic("SB16DSP", "Couldn't set IRQ policy", s);
-	if ((s=sys_irqenable(&irq_hook_id)) != OK)
+	if ((s=sys_irqenable(&irq_hook_id)) != 0)
   		panic("SB16DSP", "Couldn't enable IRQ", s);
 
 	DspAvail = 1;
-	return OK;
+	return 0;
 }
 
 
@@ -450,7 +450,7 @@ static int dsp_reset()
 
 	DmaBusy = -1;
 
-	return OK;
+	return 0;
 }
 
 
@@ -465,7 +465,7 @@ int value;
 	for (i = 0; i < SB_TIMEOUT; i++) {
 		if((sb16_inb(DSP_STATUS) & 0x80) == 0) {
 			sb16_outb(DSP_COMMAND, value);
-			return OK;
+			return 0;
 		}
 	}
 
@@ -489,7 +489,7 @@ unsigned int size;
 
 	DspFragmentSize = size; 
 
-	return OK;
+	return 0;
 }
 
 
@@ -521,7 +521,7 @@ unsigned int speed;
 
 	DspSpeed = speed;
 
-	return OK;
+	return 0;
 }
 
 
@@ -537,7 +537,7 @@ unsigned int stereo;
 		DspStereo = 0;
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -554,7 +554,7 @@ unsigned int bits;
 
 	DspBits = bits; 
 
-	return OK;
+	return 0;
 }
 
 
@@ -568,7 +568,7 @@ unsigned int sign;
 
 	DspSign = (sign > 0 ? 1 : 0); 
 
-	return OK;
+	return 0;
 }
 
 

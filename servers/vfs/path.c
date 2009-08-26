@@ -61,12 +61,12 @@ struct vnode **vpp;
   if ((new_vp = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
       printf("vfs:lookup_rel_vp: no free vnode available\n");
       *vpp= NULL;
-      return EINVAL;
+      return -EINVAL;
   }
 
   lookup_res = lookup_rel(start_node, flags, use_realuid, &res);
 
-  if (lookup_res != OK)
+  if (lookup_res != 0)
   {
 #if 0
 	printf("vfs:lookup_rel_vp: lookup_rel failed with %d\n", lookup_res);
@@ -79,7 +79,7 @@ struct vnode **vpp;
         vp->v_ref_count++;
 	vp->v_fs_count++;	/* We got a reference from the FS */
 	*vpp= vp;
-	return OK;
+	return 0;
   }
 
   /* Fill in the free vnode's fields */
@@ -100,7 +100,7 @@ struct vnode **vpp;
   new_vp->v_ref_count = 1;
 
   *vpp= new_vp;
-  return OK;
+  return 0;
 }
 
 
@@ -119,7 +119,7 @@ struct vnode **vpp;
 
   if(!fp->fp_rd || !fp->fp_wd) {
 	printf("VFS: lookup_vp %d: no rd/wd\n", fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
 
   vp= (user_fullpath[0] == '/' ? fp->fp_rd : fp->fp_wd);
@@ -152,7 +152,7 @@ struct vnode **vpp;
 	if (len == 0)
 	{
 		/* Empty path, always fail */
-		return ENOENT;
+		return -ENOENT;
 	}
 
 #if !DO_POSIX_PATHNAME_RES
@@ -171,7 +171,7 @@ struct vnode **vpp;
 		dup_vnode(start_node);
 		*vpp= start_node;
 
-		return OK;
+		return 0;
 	}
 	else if (cp[1] == '\0')
 	{
@@ -194,13 +194,13 @@ struct vnode **vpp;
 
 	/* Request lookup */
 	r = lookup_rel_vp(start_node, 0 /*no flags*/, use_realuid, vpp);
-	if (r != OK)
+	if (r != 0)
 		return r;
 
 	/* Copy the directory entry back to user_fullpath */
 	strcpy(user_fullpath, dir_entry);
 
-	return OK;
+	return 0;
 }
 
 
@@ -222,7 +222,7 @@ struct vnode **vpp;
 
   if(!fp->fp_rd || !fp->fp_wd) {
 	printf("VFS: lookup_lastdir %d: no rd/wd\n", fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
 
 	vp= (user_fullpath[0] == '/' ? fp->fp_rd : fp->fp_wd);
@@ -254,14 +254,14 @@ node_details_t *node;
   if (user_fullpath[0] == '\0') {
 	node->inode_nr = 0;
 #if 0
-	printf("vfs:lookup_rel: returning ENOENT\n");
+	printf("vfs:lookup_rel: returning -ENOENT\n");
 #endif
-	return ENOENT;
+	return -ENOENT;
   }
 
   if(!fp->fp_rd || !fp->fp_wd) {
 	printf("VFS: lookup_rel %d: no rd/wd\n", fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
 
   fs_e = start_node->v_fs_e;
@@ -283,7 +283,7 @@ node_details_t *node;
   /* Issue the request */
   r = req_lookup(fs_e, path_off, dir_ino, root_ino, uid, gid, flags, &res);
 
-  if (r != OK && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
+  if (r != 0 && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
   {
 #if 0
 	printf("vfs:lookup_rel: req_lookup_s failed with %d\n", r);
@@ -303,8 +303,8 @@ node_details_t *node;
 	symloop += res.symloop;
 	if (symloop > SYMLOOP_MAX)
 	{
-		printf("vfs:lookup_rel: returning ELOOP\n");
-		return ELOOP;
+		printf("vfs:lookup_rel: returning -ELOOP\n");
+		return -ELOOP;
 	}
 
 	/* Symlink encountered with absolute path */
@@ -360,7 +360,7 @@ node_details_t *node;
 	r = req_lookup(fs_e, path_off, dir_ino, root_ino, uid, gid, flags,
 		&res);
 
-	if (r != OK && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
+	if (r != 0 && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
 	{
 #if 0
 		printf("vfs:lookup_rel: req_lookup_s failed with %d\n", r);

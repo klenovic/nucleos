@@ -79,7 +79,7 @@ int do_getsysinfo()
   if (!super_user)
   {
 	printf("FS: unauthorized call of do_getsysinfo by proc %d\n", who_e);
-	return(EPERM);	/* only su may call do_getsysinfo. This call may leak
+	return(-EPERM);	/* only su may call do_getsysinfo. This call may leak
 			 * information (and is not stable enough to be part 
 			 * of the API/ABI).
 			 */
@@ -106,13 +106,13 @@ int do_getsysinfo()
   	break; 
 #endif
   default:
-  	return(EINVAL);
+  	return(-EINVAL);
   }
 
   dst_addr = (vir_bytes) m_in.info_where;
-  if (OK != (s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)))
+  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
   	return(s);
-  return(OK);
+  return 0;
 
 }
 
@@ -139,10 +139,10 @@ int do_dup()
   /* Distinguish between dup and dup2. */
   if (m_in.fd == rfd) {			/* bit not on */
 	/* dup(fd) */
-	if ( (r = get_fd(0, 0, &m_in.fd2, &dummy)) != OK) return(r);
+	if ( (r = get_fd(0, 0, &m_in.fd2, &dummy)) != 0) return(r);
   } else {
 	/* dup2(fd, fd2) */
-	if (m_in.fd2 < 0 || m_in.fd2 >= OPEN_MAX) return(EBADF);
+	if (m_in.fd2 < 0 || m_in.fd2 >= OPEN_MAX) return(-EBADF);
 	if (rfd == m_in.fd2) return(m_in.fd2);	/* ignore the call: dup2(x, x) */
 	m_in.fd = m_in.fd2;		/* prepare to close fd2 */
 	(void) do_close();	/* cannot fail */
@@ -179,8 +179,8 @@ int do_fcntl()
   switch (m_in.request) {
      case F_DUPFD:
 	/* This replaces the old dup() system call. */
-	if (m_in.addr < 0 || m_in.addr >= OPEN_MAX) return(EINVAL);
-	if ((r = get_fd(m_in.addr, 0, &new_fd, &dummy)) != OK) return(r);
+	if (m_in.addr < 0 || m_in.addr >= OPEN_MAX) return(-EINVAL);
+	if ((r = get_fd(m_in.addr, 0, &new_fd, &dummy)) != 0) return(r);
 	f->filp_count++;
 	fp->fp_filp[new_fd] = f;
 	return(new_fd);
@@ -195,7 +195,7 @@ int do_fcntl()
 		FD_SET(m_in.fd, &fp->fp_cloexec_set);
 	else
 		FD_CLR(m_in.fd, &fp->fp_cloexec_set);
-	return(OK);
+	return 0;
 
      case F_GETFL:
 	/* Get file status flags (O_NONBLOCK and O_APPEND). */
@@ -206,7 +206,7 @@ int do_fcntl()
 	/* Set file status flags (O_NONBLOCK and O_APPEND). */
 	fl = O_NONBLOCK | O_APPEND | O_REOPEN;
 	f->filp_flags = (f->filp_flags & ~fl) | (m_in.addr & fl);
-	return(OK);
+	return 0;
 
      case F_GETLK:
      case F_SETLK:
@@ -226,16 +226,16 @@ int do_fcntl()
 
 	/* Check if it's a regular file. */
 	if((f->filp_vno->v_mode & I_TYPE) != I_REGULAR) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	if (!(f->filp_mode & W_BIT))
-		return EBADF;
+		return -EBADF;
 
 	/* Copy flock data from userspace. */
 	if((r = sys_datacopy(who_e, (vir_bytes) m_in.name1, 
 	  SELF, (vir_bytes) &flock_arg,
-	  (phys_bytes) sizeof(flock_arg))) != OK)
+	  (phys_bytes) sizeof(flock_arg))) != 0)
 		return r;
 
 	/* Convert starting offset to signed. */
@@ -243,7 +243,7 @@ int do_fcntl()
 
 	/* Figure out starting position base. */
 	switch(flock_arg.l_whence) {
-		case SEEK_SET: start = 0; if(offset < 0) return EINVAL; break;
+		case SEEK_SET: start = 0; if(offset < 0) return -EINVAL; break;
 		case SEEK_CUR:
 			if (ex64hi(f->filp_pos) != 0)
 			{
@@ -253,17 +253,17 @@ int do_fcntl()
 			}
 			start = ex64lo(f->filp_pos); break;
 		case SEEK_END: start = f->filp_vno->v_size; break;
-		default: return EINVAL;
+		default: return -EINVAL;
 	}
 
 	/* Check for overflow or underflow. */
-	if(offset > 0 && start + offset < start) { return EINVAL; }
-	if(offset < 0 && start + offset > start) { return EINVAL; }
+	if(offset > 0 && start + offset < start) { return -EINVAL; }
+	if(offset < 0 && start + offset > start) { return -EINVAL; }
 	start += offset;
 	if(flock_arg.l_len > 0) {
 		end = start + flock_arg.l_len;
 		if(end <= start) {
-			return EINVAL;
+			return -EINVAL;
 		}
 	} 
         else {
@@ -276,7 +276,7 @@ int do_fcntl()
      }
 
      default:
-	return(EINVAL);
+	return(-EINVAL);
   }
 }
 
@@ -293,7 +293,7 @@ int do_sync()
                   req_sync(vmp->m_fs_e);
 	  }
   }
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -305,7 +305,7 @@ int do_fsync()
 
   do_sync();
 
-  return(OK);
+  return 0;
 }
 
 void unmount_all(void)
@@ -323,7 +323,7 @@ void unmount_all(void)
 		if (vmp->m_dev != NO_DEV) {
 			found++;
   			SANITYCHECK;
-			if(unmount(vmp->m_dev) == OK)
+			if(unmount(vmp->m_dev) == 0)
 				worked++;
 			else
 				remain++;
@@ -583,21 +583,21 @@ int do_svrctl()
 	int r, major, proc_nr_n;
 
 	if (fp->fp_effuid != SU_UID && fp->fp_effuid != SERVERS_UID)
-		return(EPERM);
+		return(-EPERM);
 
 	/* Try to copy request structure to FS. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
 		FS_PROC_NR, (vir_bytes) &device,
-		(phys_bytes) sizeof(device))) != OK) 
+		(phys_bytes) sizeof(device))) != 0) 
 	    return(r);
 
-	if (isokendpt(who_e, &proc_nr_n) != OK)
-		return(EINVAL);
+	if (isokendpt(who_e, &proc_nr_n) != 0)
+		return(-EINVAL);
 
 	/* Try to update device mapping. */
 	major = (device.dev >> MAJOR) & BYTE;
 	r=map_driver(major, who_e, device.style, 0 /* !force */);
-	if (r == OK)
+	if (r == 0)
 	{
 		/* If a driver has completed its exec(), it can be announced
 		 * to be up.
@@ -623,14 +623,14 @@ int do_svrctl()
 	/* Try to copy request structure to FS. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
 		FS_PROC_NR, (vir_bytes) &fdu,
-		(phys_bytes) sizeof(fdu))) != OK) 
+		(phys_bytes) sizeof(fdu))) != 0) 
 	    return(r);
 	major = (fdu.dev >> MAJOR) & BYTE;
 	r=map_driver(major, NONE, 0, 0);
 	return(r);
   }
   default:
-	return(EINVAL);
+	return(-EINVAL);
   }
 }
 
@@ -647,5 +647,5 @@ struct mem_map *seg_ptr;
 	okendpt(proc_e, &proc_s);
 	free_proc(&fproc[proc_s], FP_EXITING);
         
-	return OK;
+	return 0;
 }

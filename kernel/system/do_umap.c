@@ -46,7 +46,7 @@ register message *m_ptr;	/* pointer to request message */
 	proc_nr = who_p;
   else
 	if (! isokendpt(endpt, &proc_nr))
-		return(EINVAL);
+		return(-EINVAL);
   targetpr = proc_addr(proc_nr);
 
   okendpt(who_e, &caller_pn);
@@ -56,13 +56,13 @@ register message *m_ptr;	/* pointer to request message */
   switch(seg_type) {
   case LOCAL_SEG:
       phys_addr = lin_addr = umap_local(targetpr, seg_index, offset, count); 
-      if(!lin_addr) return EFAULT;
+      if(!lin_addr) return -EFAULT;
       CHECKRANGE_OR_SUSPEND(targetpr, lin_addr, count, 1);
       naughty = 1;
       break;
   case REMOTE_SEG:
       phys_addr = lin_addr = umap_remote(targetpr, seg_index, offset, count); 
-      if(!lin_addr) return EFAULT;
+      if(!lin_addr) return -EFAULT;
       CHECKRANGE_OR_SUSPEND(targetpr, lin_addr, count, 1);
       naughty = 1;
       break;
@@ -75,15 +75,15 @@ register message *m_ptr;	/* pointer to request message */
 	int new_proc_nr;
 
         if(verify_grant(targetpr->p_endpoint, ANY, offset, count, 0, 0,
-                &newoffset, &newep) != OK) {
+                &newoffset, &newep) != 0) {
                 kprintf("SYSTEM: do_umap: verify_grant in %s, grant %d, bytes 0x%lx, failed, caller %s\n", targetpr->p_name, offset, count, caller->p_name);
 		proc_stacktrace(caller);
-                return EFAULT;
+                return -EFAULT;
         }
 
         if(!isokendpt(newep, &new_proc_nr)) {
                 kprintf("SYSTEM: do_umap: isokendpt failed\n");
-                return EFAULT;
+                return -EFAULT;
         }
 
 	/* New lookup. */
@@ -96,30 +96,30 @@ register message *m_ptr;	/* pointer to request message */
         phys_addr = lin_addr = umap_local(targetpr, seg_index, offset, count); 
       } else {
 	kprintf("SYSTEM: bogus seg type 0x%lx\n", seg_index);
-	return EFAULT;
+	return -EFAULT;
       }
       if(!lin_addr) {
 	kprintf("SYSTEM:do_umap: umap_local failed\n");
-	return EFAULT;
+	return -EFAULT;
       }
       CHECKRANGE_OR_SUSPEND(targetpr, lin_addr, count, 1);
-      if(vm_lookup(targetpr, lin_addr, &phys_addr, NULL) != OK) {
+      if(vm_lookup(targetpr, lin_addr, &phys_addr, NULL) != 0) {
 	kprintf("SYSTEM:do_umap: vm_lookup failed\n");
-	return EFAULT;
+	return -EFAULT;
       }
       if(phys_addr == 0)
 	minix_panic("vm_lookup returned zero physical address", NO_NUM);
       break;
   default:
       if((r=arch_umap(targetpr, offset, count, seg_type, &lin_addr))
-	!= OK)
+	!= 0)
 	return r;
       phys_addr = lin_addr;
   }
 
   if(vm_running && !vm_contiguous(targetpr, lin_addr, count)) {
 	kprintf("SYSTEM:do_umap: not contiguous\n");
-	return EFAULT;
+	return -EFAULT;
   }
 
   m_ptr->CP_DST_ADDR = phys_addr;
@@ -129,7 +129,7 @@ register message *m_ptr;	/* pointer to request message */
 	kprintf("caller stack: ");
 	proc_stacktrace(caller);
   }
-  return (phys_addr == 0) ? EFAULT: OK;
+  return (phys_addr == 0) ? -EFAULT: 0;
 }
 
 #endif /* USE_UMAP */

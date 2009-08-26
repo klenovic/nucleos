@@ -56,7 +56,7 @@ register message *m_ptr;	/* pointer to request message */
 
   /* Check if request vector size is ok. */
   nr_req = (unsigned) m_ptr->VCP_VEC_SIZE;
-  if (nr_req > VCOPY_VEC_SIZE) return(EINVAL);
+  if (nr_req > VCOPY_VEC_SIZE) return(-EINVAL);
   bytes = nr_req * sizeof(struct vir_cp_req);
 
   /* Calculate physical addresses and copy (port,value)-pairs from user. */
@@ -66,7 +66,7 @@ register message *m_ptr;	/* pointer to request message */
   dst.offset = (vir_bytes) vir_cp_req;
   src.offset = (vir_bytes) m_ptr->VCP_VEC_ADDR;
 
-  if((r=virtual_copy_vmcheck(&src, &dst, bytes)) != OK)
+  if((r=virtual_copy_vmcheck(&src, &dst, bytes)) != 0)
 	return r;
 
   /* Assume vector with requests is correct. Try to copy everything. */
@@ -77,12 +77,12 @@ register message *m_ptr;	/* pointer to request message */
 
       /* Check if physical addressing is used without SYS_PHYSVCOPY. */
       if (((req->src.segment | req->dst.segment) & PHYS_SEG) &&
-              m_ptr->m_type != SYS_PHYSVCOPY) return(EPERM);
-      if ((s=virtual_copy_vmcheck(&req->src, &req->dst, req->count)) != OK) 
+              m_ptr->m_type != SYS_PHYSVCOPY) return(-EPERM);
+      if ((s=virtual_copy_vmcheck(&req->src, &req->dst, req->count)) != 0) 
           return(s);
       m_ptr->VCP_NR_OK ++;
   }
-  return(OK);
+  return 0;
 }
 
 #endif /* (USE_VIRVCOPY || USE_PHYSVCOPY) */

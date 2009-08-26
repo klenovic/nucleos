@@ -63,8 +63,8 @@ register message *m_ptr;	/* pointer to request message */
 	proc_nr = who_p;
   else
 	if(!isokendpt(proc_nr_e, &proc_nr))
-		return(EINVAL);
-  if (iskerneln(proc_nr)) return(EPERM);
+		return(-EINVAL);
+  if (iskerneln(proc_nr)) return(-EPERM);
 
   /* Extract direction (in or out) and type (size). */
   req_dir = m_ptr->DIO_REQUEST & _DIO_DIRMASK;
@@ -77,18 +77,18 @@ register message *m_ptr;	/* pointer to request message */
 	(vir_bytes) m_ptr->DIO_VEC_ADDR,
 	(vir_bytes) m_ptr->DIO_OFFSET, count,
 	req_dir == _DIO_INPUT ? CPF_WRITE : CPF_READ)) == 0)
-         return(EPERM);
+         return(-EPERM);
   } else {
      if(proc_nr != who_p)
      {
 	kprintf("do_sdevio: unsafe sdevio by %d in %d denied\n",
 		who_e, proc_nr_e);
-	return EPERM;
+	return -EPERM;
      }
      /* Get and check physical address. */
      if ((phys_buf = umap_virtual(proc_addr(proc_nr), D,
 	 (vir_bytes) m_ptr->DIO_VEC_ADDR, count)) == 0)
-         return(EFAULT);
+         return(-EFAULT);
   }
 
 	switch (io_type)
@@ -122,14 +122,14 @@ register message *m_ptr;	/* pointer to request message */
 		kprintf(
 		"do_sdevio: I/O port check failed for proc %d, port 0x%x\n",
 			m_ptr->m_source, port);
-		return EPERM;
+		return -EPERM;
 	}
   }
 
   if (port & (size-1))
   {
 	kprintf("do_devio: unaligned port 0x%x (size %d)\n", port, size);
-	return EPERM;
+	return -EPERM;
   }
 
   /* Perform device I/O for bytes and words. Longs are not supported. */
@@ -137,19 +137,19 @@ register message *m_ptr;	/* pointer to request message */
       switch (req_type) {
       case _DIO_BYTE: phys_insb(port, phys_buf, count); break; 
       case _DIO_WORD: phys_insw(port, phys_buf, count); break; 
-      default: return(EINVAL);
+      default: return(-EINVAL);
       } 
   } else if (req_dir == _DIO_OUTPUT) { 
       switch (req_type) {
       case _DIO_BYTE: phys_outsb(port, phys_buf, count); break; 
       case _DIO_WORD: phys_outsw(port, phys_buf, count); break; 
-      default: return(EINVAL);
+      default: return(-EINVAL);
       } 
   }
   else {
-      return(EINVAL);
+      return(-EINVAL);
   }
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_SDEVIO */

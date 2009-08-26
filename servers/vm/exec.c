@@ -84,11 +84,11 @@ int do_exec_newmem(message *msg)
 
 	proc_e= msg->VMEN_ENDPOINT;
 
-	if (vm_isokendpt(proc_e, &proc_n) != OK)
+	if (vm_isokendpt(proc_e, &proc_n) != 0)
 	{
 		printf("VM:exec_newmem: bad endpoint %d from %d\n",
 			proc_e, msg->m_source);
-		return ESRCH;
+		return -ESRCH;
 	}
 	vmp= &vmproc[proc_n];
 	ptr= msg->VMEN_ARGSPTR;
@@ -96,14 +96,14 @@ int do_exec_newmem(message *msg)
 	if (msg->VMEN_ARGSSIZE != sizeof(args)) {
 		printf("VM:exec_newmem: args size %d != %ld\n",
 			msg->VMEN_ARGSSIZE, sizeof(args));
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	SANITYCHECK(SCL_DETAIL);
 
 	r= sys_datacopy(msg->m_source, (vir_bytes)ptr,
 		SELF, (vir_bytes)&args, sizeof(args));
-	if (r != OK)
+	if (r != 0)
 		vm_panic("exec_newmem: sys_datacopy failed", r);
 
 	/* Check to see if segment sizes are feasible. */
@@ -112,14 +112,14 @@ int do_exec_newmem(message *msg)
 	totc = (args.tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 	sc = (args.args_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 
-	if (dc >= totc) return(ENOEXEC); /* stack must be at least 1 click */
+	if (dc >= totc) return(-ENOEXEC); /* stack must be at least 1 click */
 
 	dvir = (args.sep_id ? 0 : tc);
 	s_vir = dvir + (totc - sc);
 
-	r = (dvir + dc > s_vir) ? ENOMEM : OK;
+	r = (dvir + dc > s_vir) ? -ENOMEM : 0;
 
-	if (r != OK)
+	if (r != 0)
 		return r;
 
 	/* Can the process' text be shared with that of one already running? */
@@ -134,7 +134,7 @@ int do_exec_newmem(message *msg)
 	 */
 	r = new_mem(vmp, sh_mp, args.text_bytes, args.data_bytes,
 		args.bss_bytes, args.args_bytes, args.tot_bytes);
-	if (r != OK) return(r);
+	if (r != 0) return(r);
 
 	/* Save file identification to allow it to be shared. */
 	vmp->vm_ino = args.st_ino;
@@ -156,7 +156,7 @@ int do_exec_newmem(message *msg)
 	if (!sh_mp)			 /* Load text if sh_mp = NULL */
 		msg->VMEN_FLAGS |= EXC_NM_RF_LOAD_TEXT;
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -197,7 +197,7 @@ phys_bytes tot_bytes;		/* total memory to allocate, including gap */
   stack_clicks = (stk_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
   tot_clicks = (tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
   gap_clicks = tot_clicks - data_clicks - stack_clicks;
-  if ( (int) gap_clicks < 0) return(ENOMEM);
+  if ( (int) gap_clicks < 0) return(-ENOMEM);
 
 SANITYCHECK(SCL_DETAIL);
 
@@ -228,7 +228,7 @@ SANITYCHECK(SCL_DETAIL);
    */
 
   if(vm_paged) {
-	if(pt_new(&rmp->vm_pt) != OK)
+	if(pt_new(&rmp->vm_pt) != 0)
 		vm_panic("exec_newmem: no new pagetable", NO_NUM);
 
 	SANITYCHECK(SCL_DETAIL);
@@ -246,7 +246,7 @@ SANITYCHECK(SCL_DETAIL);
   	phys_clicks new_base;
 
 	new_base = ALLOC_MEM(text_clicks + tot_clicks, 0);
-	if (new_base == NO_MEM) return(ENOMEM);
+	if (new_base == NO_MEM) return(-ENOMEM);
 
 	if (sh_mp != NULL) {
 		/* Share the text segment. */
@@ -262,7 +262,7 @@ SANITYCHECK(SCL_DETAIL);
 			 * part of that click may remain unchanged.
 			 */
 			base = (phys_bytes)(new_base+text_clicks-1) << CLICK_SHIFT;
-			if ((s= sys_memset(0, base, CLICK_SIZE)) != OK)
+			if ((s= sys_memset(0, base, CLICK_SIZE)) != 0)
 				vm_panic("new_mem: sys_memset failed", s);
 		}
   	}
@@ -287,7 +287,7 @@ SANITYCHECK(SCL_DETAIL);
 		(rmp->vm_arch.vm_seg[S].mem_vir + 
 		rmp->vm_arch.vm_seg[S].mem_len) << CLICK_SHIFT;
 
-	  if((r2=sys_newmap(rmp->vm_endpoint, rmp->vm_arch.vm_seg)) != OK) {
+	  if((r2=sys_newmap(rmp->vm_endpoint, rmp->vm_arch.vm_seg)) != 0) {
 		/* report new map to the kernel */
 		vm_panic("sys_newmap failed", r2);
 	  }
@@ -299,18 +299,18 @@ SANITYCHECK(SCL_DETAIL);
 	  base += bss_offset;
 	  bytes -= bss_offset;
 
-	  if ((s=sys_memset(0, base, bytes)) != OK) {
+	  if ((s=sys_memset(0, base, bytes)) != 0) {
 		vm_panic("new_mem can't zero", s);
 	  }
 
 	  /* Tell kernel this thing has no page table. */
-	  if((s=pt_bind(NULL, rmp)) != OK)
+	  if((s=pt_bind(NULL, rmp)) != 0)
 		vm_panic("exec_newmem: pt_bind failed", s);
   }
 
 SANITYCHECK(SCL_FUNCTIONS);
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -363,7 +363,7 @@ int proc_new(struct vmproc *vmp,
 #if 0
 	if(!map_proc_kernel(vmp)) {
 		printf("VM: exec: map_proc_kernel failed\n");
-		return ENOMEM;
+		return -ENOMEM;
 	}
 #endif
 
@@ -383,7 +383,7 @@ int proc_new(struct vmproc *vmp,
 		  VR_ANON | VR_WRITABLE, text_start ? 0 : MF_PREALLOC)) {
 			SANITYCHECK(SCL_DETAIL);
 			printf("VM: proc_new: map_page_region failed (text)\n");
-			return(ENOMEM);
+			return(-ENOMEM);
 		}
 		SANITYCHECK(SCL_DETAIL);
 	}
@@ -397,7 +397,7 @@ int proc_new(struct vmproc *vmp,
 	  data_bytes, data_start ? data_start : MAP_NONE, VR_ANON | VR_WRITABLE,
 		data_start ? 0 : MF_PREALLOC))) {
 		printf("VM: exec: map_page_region for data failed\n");
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	/* Tag the heap so brk() call knows which region to extend. */
@@ -412,7 +412,7 @@ int proc_new(struct vmproc *vmp,
 
 	if(!map_page_region(vmp, vstart + text_bytes + data_bytes + hole_bytes,
 	  0, stack_bytes + gap_bytes, MAP_NONE,
-	  VR_ANON | VR_WRITABLE, 0) != OK) {
+	  VR_ANON | VR_WRITABLE, 0) != 0) {
 	  	vm_panic("map_page_region failed for stack", NO_NUM);
 	}
 
@@ -444,7 +444,7 @@ int proc_new(struct vmproc *vmp,
 
 	vmp->vm_flags |= VMF_HASPT;
 
-	if((s=sys_newmap(vmp->vm_endpoint, vmp->vm_arch.vm_seg)) != OK) {
+	if((s=sys_newmap(vmp->vm_endpoint, vmp->vm_arch.vm_seg)) != 0) {
 		vm_panic("sys_newmap (vm) failed", s);
 	}
 
@@ -452,8 +452,8 @@ int proc_new(struct vmproc *vmp,
 	/* This is the real stack clicks. */
 	vmp->vm_arch.vm_seg[S].mem_len = ABS2CLICK(stack_bytes);
 
-	if((s=pt_bind(&vmp->vm_pt, vmp)) != OK)
+	if((s=pt_bind(&vmp->vm_pt, vmp)) != 0)
 		vm_panic("exec_newmem: pt_bind failed", s);
 
-	return OK;
+	return 0;
 }

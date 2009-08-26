@@ -44,7 +44,7 @@ static void clo_exec(struct fproc *rfp);
  * @param path_len  executable path length (including terminating null)
  * @param frame  frame pointer (arguments and environments)
  * @param frame_len  size of frame
- * @return OK on success
+ * @return 0 on success
  */
 int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes frame_len)
 {
@@ -74,7 +74,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	/* Get the exec file name. */
 	r = fetch_name(path, path_len, 0);
 
-	if (r != OK) {
+	if (r != 0) {
 		printf("pm_exec: fetch_name failed\n");
 		printf("return at %s, %d\n", __FILE__, __LINE__);
 
@@ -86,7 +86,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		printf("pm_exec: bad frame_len\n");
 		printf("return at %s, %d\n", __FILE__, __LINE__);
 
-		return(ENOMEM);	/* stack too big */
+		return(-ENOMEM);	/* stack too big */
 	}
 
 	bfmt_param.ex.args_bytes = frame_len;
@@ -94,7 +94,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 			(phys_bytes)bfmt_param.ex.args_bytes);
 
 	/* can't fetch stack (e.g. bad virtual addr) */
-	if (r != OK) {
+	if (r != 0) {
 		printf("pm_exec: sys_datacopy failed\n");
 		printf("return at %s, %d\n", __FILE__, __LINE__);
 
@@ -117,16 +117,16 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		bfmt_param.ex.progname[PROC_NAME_LEN-1] = '\0';
 
 		/* Request lookup */
-		if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK)
+		if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0)
 			return r;
 
 		if ((vp->v_mode & I_TYPE) != I_REGULAR) {
 			put_vnode(vp);
-			return ENOEXEC;
+			return -ENOEXEC;
 		}
 
 		/* Check access. */
-		if ((r = forbidden(vp, X_BIT, 0 /*!use_realuid*/)) != OK) {
+		if ((r = forbidden(vp, X_BIT, 0 /*!use_realuid*/)) != 0) {
 			put_vnode(vp);
 			return r;
 		}
@@ -134,7 +134,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		/* Get ctime */
 		r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR, (char *)&sb, 0);
 
-		if (r != OK) {
+		if (r != 0) {
 			put_vnode(vp);
 			return r;
 		}
@@ -167,7 +167,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 #ifdef CONFIG_DEBUG_VFS_BINFMT
 			app_dbg("handler ID=0%x\n",bhandler->id);
 #endif
-			r = OK;
+			r = 0;
 			break;
 		}
 #ifdef CONFIG_DEBUG_VFS_BINFMT
@@ -176,7 +176,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		/* Get fresh copy of the file name. */
 		r = fetch_name(path, path_len, 0);
 
-		if (r != OK) {
+		if (r != 0) {
 			printf("pm_exec: 2nd fetch_name failed\n");
 			put_vnode(vp);
 			return(r); /* strange */
@@ -187,23 +187,23 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 		put_vnode(vp);
 
-		if (r != OK) {
+		if (r != 0) {
 			printf("pm_exec: patch stack\n");
 			printf("return at %s, %d\n", __FILE__, __LINE__);
 			return r;
 		}
 	}
 
-	if (r != OK) {
-		printf("pm_exec: returning ENOEXEC, r = %d\n", r);
+	if (r != 0) {
+		printf("pm_exec: returning -ENOEXEC, r = %d\n", r);
 		printf("pm_exec: progname = '%s'\n", bfmt_param.ex.progname);
 		put_vnode(vp);
-		return ENOEXEC;
+		return -ENOEXEC;
 	}
 
 	r = bhandler->load_binary(&bfmt_param);
 
-	if (r != OK) {
+	if (r != 0) {
 		app_err("Can't load binary\n");
 		put_vnode(vp);
 
@@ -218,14 +218,14 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	r = sys_datacopy(SELF, (vir_bytes) mbuf, proc_e, (vir_bytes) vsp,
 			(phys_bytes)bfmt_param.ex.args_bytes);
 
-	if (r != OK) {
+	if (r != 0) {
 		printf("vfs: datacopy returns %d trying to copy to %p\n", r, vsp);
 		panic(__FILE__,"pm_exec stack copy err on", proc_e);
 	}
 
 	put_vnode(vp);
 
-	if (r != OK) {
+	if (r != 0) {
 		printf("return at %s, %d\n", __FILE__, __LINE__);
 		return r;
 	}
@@ -243,7 +243,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	/* Check if this is a driver that can now be useful. */
 	dmap_endpt_up(rfp->fp_endpoint);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -267,7 +267,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 	char buf[_MAX_BLOCK_SIZE];
 
 	/* Make user_fullpath the new argv[0]. */
-	if (!insert_arg(stack, stk_bytes, user_fullpath, REPLACE)) return(ENOMEM);
+	if (!insert_arg(stack, stk_bytes, user_fullpath, REPLACE)) return(-ENOMEM);
 
 	pos = 0;	/* Read from the start of the file */
 
@@ -275,14 +275,14 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(pos),
 			  READING, FS_PROC_NR, buf, _MAX_BLOCK_SIZE, &new_pos, &cum_io_incr);
 
-	if (r != OK) return r;
+	if (r != 0) return r;
 	
 	n = vp->v_size;
 
 	if (n > _MAX_BLOCK_SIZE)
 		n = _MAX_BLOCK_SIZE;
 
-	if (n < 2) return ENOEXEC;
+	if (n < 2) return -ENOEXEC;
 	
 	sp = &(buf[2]);				/* just behind the #! */
 	n -= 2;
@@ -293,7 +293,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 	memcpy(user_fullpath, sp, n);
 
 	if ((sp = memchr(user_fullpath, '\n', n)) == NULL) /* must be a proper line */
-		return(ENOEXEC);
+		return(-ENOEXEC);
 
 	/* Move sp backwards through script[], prepending each string to stack. */
 	for (;;) {
@@ -309,7 +309,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 
 		interp = sp;
 
-		if (!insert_arg(stack, stk_bytes, sp, INSERT)) return(ENOMEM);
+		if (!insert_arg(stack, stk_bytes, sp, INSERT)) return(-ENOMEM);
 	}
 
 	/* Round *stk_bytes up to the size of a pointer for alignment contraints. */
@@ -318,7 +318,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 	if (interp != user_fullpath)
 		memmove(user_fullpath, interp, strlen(interp)+1);
 
-	return(OK);
+	return 0;
 }
 
 /*===========================================================================*

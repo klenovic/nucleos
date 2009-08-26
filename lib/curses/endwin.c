@@ -23,5 +23,5 @@ int endwin()
   delwin(curscr);
   delwin(_cursvar.tmpwin);
   resetty();
-  return(OK);
+  return 0;
 }

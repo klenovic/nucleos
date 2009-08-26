@@ -43,19 +43,19 @@ message *m_ptr;			/* pointer to request message */
       len = MIN(m_ptr->ABRT_MON_LEN, sizeof(paramsbuffer)-1);
 
       if((p=data_copy(m_ptr->ABRT_MON_ENDPT, (vir_bytes) m_ptr->ABRT_MON_ADDR,
-		SYSTEM, (vir_bytes) paramsbuffer, len)) != OK) {
+		SYSTEM, (vir_bytes) paramsbuffer, len)) != 0) {
 		return p;
       }
       paramsbuffer[len] = '\0';
 
       /* Parameters seem ok, copy them and prepare shutting down. */
-      if((p = arch_set_params(paramsbuffer, len+1)) != OK)
+      if((p = arch_set_params(paramsbuffer, len+1)) != 0)
 	return p;
   }
 
   /* Now prepare to shutdown MINIX. */
   prepare_shutdown(how);
-  return(OK);				/* pro-forma (really EDISASTER) */
+  return 0;				/* pro-forma (really EDISASTER) */
 }
 
 #endif /* USE_ABORT */

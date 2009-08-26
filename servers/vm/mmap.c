@@ -49,7 +49,7 @@ int do_mmap(message *m)
 	int mfflags = 0;
 	struct vir_region *vr = NULL;
 
-	if((r=vm_isokendpt(m->m_source, &n)) != OK) {
+	if((r=vm_isokendpt(m->m_source, &n)) != 0) {
 		vm_panic("do_mmap: message from strange source", m->m_source);
 	}
 
@@ -60,7 +60,7 @@ int do_mmap(message *m)
 			m->m_source);
 
 	if(!(vmp->vm_flags & VMF_HASPT))
-		return ENXIO;
+		return -ENXIO;
 
 	if(m->VMM_FD == -1 || (m->VMM_FLAGS & MAP_ANON)) {
 		int s;
@@ -69,7 +69,7 @@ int do_mmap(message *m)
 		size_t len = (vir_bytes) m->VMM_LEN;
 
 		if(m->VMM_FD != -1) {
-			return EINVAL;
+			return -EINVAL;
 		}
 
 		if(m->VMM_FLAGS & MAP_CONTIG) mfflags |= MF_CONTIG;
@@ -82,17 +82,17 @@ int do_mmap(message *m)
 		if(!(vr = map_page_region(vmp,
 			arch_vir2map(vmp, vmp->vm_stacktop), VM_DATATOP, len, MAP_NONE,
 			vrflags, mfflags))) {
-			return ENOMEM;
+			return -ENOMEM;
 		}
 	} else {
-		return ENOSYS;
+		return -ENOSYS;
 	}
 
 	/* Return mapping, as seen from process. */
 	vm_assert(vr);
 	m->VMM_RETADDR = arch_map2vir(vmp, vr->vaddr);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -110,13 +110,13 @@ int do_map_phys(message *m)
 	if(target == SELF)
 		target = m->m_source;
 
-	if((r=vm_isokendpt(target, &n)) != OK)
-		return EINVAL;
+	if((r=vm_isokendpt(target, &n)) != 0)
+		return -EINVAL;
 
 	vmp = &vmproc[n];
 
 	if(!(vmp->vm_flags & VMF_HASPT))
-		return ENXIO;
+		return -ENXIO;
 
 	len = m->VMMP_LEN;
 	if(len % VM_PAGE_SIZE)
@@ -125,12 +125,12 @@ int do_map_phys(message *m)
 	if(!(vr = map_page_region(vmp, arch_vir2map(vmp, vmp->vm_stacktop),
 		VM_DATATOP, len, (vir_bytes)m->VMMP_PHADDR,
 		VR_DIRECT | VR_NOPF | VR_WRITABLE, 0))) {
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	m->VMMP_VADDR_REPLY = (void *) arch_map2vir(vmp, vr->vaddr);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -147,23 +147,23 @@ int do_unmap_phys(message *m)
 	if(target == SELF)
 		target = m->m_source;
 
-	if((r=vm_isokendpt(target, &n)) != OK)
-		return EINVAL;
+	if((r=vm_isokendpt(target, &n)) != 0)
+		return -EINVAL;
 
 	vmp = &vmproc[n];
 
 	if(!(region = map_lookup(vmp,
 	  arch_vir2map(vmp, (vir_bytes) m->VMUM_ADDR)))) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	if(!(region->flags & VR_DIRECT)) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
-	if(map_unmap_region(vmp, region) != OK) {
-		return EINVAL;
+	if(map_unmap_region(vmp, region) != 0) {
+		return -EINVAL;
 	}
 
-	return OK;
+	return 0;
 }

@@ -153,7 +153,7 @@ unsigned long vir2phys( unsigned long x )
    int r;
    unsigned long value;
 
-   if ( (r=sys_umap( SELF, VM_D, x, 4, &value )) != OK ) {
+   if ( (r=sys_umap( SELF, VM_D, x, 4, &value )) != 0 ) {
       printf("lance: umap of 0x%lx failed\n",x );
       panic( "lance", "sys_umap failed", r );
    }
@@ -290,7 +290,7 @@ void main( int argc, char **argv )
 #if LANCE_FKEY
    fkeys = sfkeys = 0;
    bit_set( sfkeys, 7 );
-   if ( (r = fkey_map(&fkeys, &sfkeys)) != OK )
+   if ( (r = fkey_map(&fkeys, &sfkeys)) != 0 )
       printf("Warning: lance couldn't observe Shift+F7 key: %d\n",r);
 #endif
 
@@ -300,9 +300,9 @@ void main( int argc, char **argv )
 
    /* Try to notify inet that we are present (again) */
    r= ds_retrieve_u32("inet", &tasknr);
-   if (r == OK)
+   if (r == 0)
       notify(tasknr);
-   else if (r != ESRCH)
+   else if (r != -ESRCH)
       printf("lance: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
    while (TRUE)
@@ -314,7 +314,7 @@ void main( int argc, char **argv )
             sys_irqenable(&ec->ec_hook);
       }
 
-      if ((r= receive(ANY, &m)) != OK)
+      if ((r= receive(ANY, &m)) != 0)
          panic( "lance", "receive failed", r);
 
       for (i=0;i<EC_PORT_NR_MAX;++i)
@@ -489,7 +489,7 @@ message *mp;
    if (port < 0 || port >= EC_PORT_NR_MAX)
    {
       reply_mess.m_type= DL_CONF_REPLY;
-      reply_mess.m3_i1= ENXIO;
+      reply_mess.m3_i1= -ENXIO;
       mess_reply(mp, &reply_mess);
       return;
    }
@@ -515,7 +515,7 @@ message *mp;
       {
          /* Probe failed, or the device is configured off. */
          reply_mess.m_type= DL_CONF_REPLY;
-         reply_mess.m3_i1= ENXIO;
+         reply_mess.m3_i1= -ENXIO;
          mess_reply(mp, &reply_mess);
          return;
       }
@@ -574,7 +574,7 @@ static void do_int(ec)
 ether_card_t *ec;
 {
    if (ec->flags & (ECF_PACK_SEND | ECF_PACK_RECV))
-      reply(ec, OK, TRUE);
+      reply(ec, 0, TRUE);
 }
 
 
@@ -681,7 +681,7 @@ ether_card_t *ec;
 
    /* Set the interrupt handler */
    ec->ec_hook = ec->ec_irq;
-   if ((r=sys_irqsetpolicy(ec->ec_irq, 0, &ec->ec_hook)) != OK)
+   if ((r=sys_irqsetpolicy(ec->ec_irq, 0, &ec->ec_hook)) != 0)
       printf("lance: error, couldn't set IRQ policy: %d\n", r);
 
    return;
@@ -712,12 +712,12 @@ int may_block;
    reply.DL_STAT  = status | ((u32_t) err << 16);
    reply.DL_COUNT = ec->read_s;
 
-   if ((r=getuptime(&now)) != OK)
+   if ((r=getuptime(&now)) != 0)
       panic("lance", "getuptime() failed:", r);
    reply.DL_CLCK = now;
 
    r = send(ec->client, &reply);
-   if (r == ELOCKED && may_block)
+   if (r == -ELOCKED && may_block)
    {
       return;
    }
@@ -736,7 +736,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-   if (send(req->m_source, reply_mess) != OK)
+   if (send(req->m_source, reply_mess) != 0)
       panic( "lance", "unable to mess_reply", NO_NUM);
 }
 
@@ -1057,7 +1057,7 @@ message *mp;
                         (vir_bytes)ec->read_iovec.iod_iovec,
                         (count > IOVEC_NR ? IOVEC_NR : count) *
                         sizeof(iovec_s_t), D);
-   if (r != OK)
+   if (r != 0)
       panic(__FILE__,
             "do_vread_s: sys_safecopyfrom failed: %d\n", r);
    ec->read_iovec.iod_iovec_s    = count;
@@ -1074,7 +1074,7 @@ message *mp;
 
    if ((ec->flags & (ECF_READING|ECF_STOPPED)) == (ECF_READING|ECF_STOPPED))
       ec_reset(ec);
-   reply(ec, OK, FALSE);
+   reply(ec, 0, FALSE);
 }
 
 /*===========================================================================*
@@ -1168,7 +1168,7 @@ int from_int;
       /* all slots are used, so this message is buffered */
       ec->sendmsg= *mp;
       ec->flags |= ECF_SEND_AVAIL;
-      reply(ec, OK, FALSE);
+      reply(ec, 0, FALSE);
       return;
    }
 
@@ -1177,7 +1177,7 @@ int from_int;
                         (vir_bytes)ec->write_iovec.iod_iovec,
                         (count > IOVEC_NR ? IOVEC_NR : count) *
                         sizeof(iovec_s_t), D);
-   if (r != OK)
+   if (r != 0)
       panic(__FILE__,
             "do_vwrite_s: sys_safecopyfrom failed: %d\n", r);
 
@@ -1216,7 +1216,7 @@ int from_int;
    /* reply by calling do_int() if this function is called from interrupt. */
    if (from_int)
       return;
-   reply(ec, OK, FALSE);
+   reply(ec, 0, FALSE);
 }
 
 
@@ -1253,7 +1253,7 @@ vir_bytes count;
       
       if ( (r=sys_safecopyfrom(iovp->iod_proc_nr,
                                iovp->iod_iovec[i].iov_grant, offset,
-                               nic_addr, bytes, D )) != OK )
+                               nic_addr, bytes, D )) != 0 )
          panic( __FILE__, "ec_user2nic: sys_safecopyfrom failed", r );
 
       count -= bytes;
@@ -1293,7 +1293,7 @@ vir_bytes count;
       if (bytes > count)
          bytes = count;
       if ( (r=sys_safecopyto( iovp->iod_proc_nr, iovp->iod_iovec[i].iov_grant,
-                              offset, nic_addr, bytes, D )) != OK )
+                              offset, nic_addr, bytes, D )) != 0 )
          panic( __FILE__, "ec_nic2user: sys_safecopyto failed: ", r );
       
       count -= bytes;
@@ -1345,7 +1345,7 @@ iovec_dat_t *iovp;
                         (iovp->iod_iovec_s > IOVEC_NR ?
                          IOVEC_NR : iovp->iod_iovec_s) *
                         sizeof(iovec_s_t), D);
-   if (r != OK)
+   if (r != 0)
       panic(__FILE__,
             "ec_next_iovec: sys_safecopyfrom failed: %d\n", r);
 }
@@ -1370,15 +1370,15 @@ message *mp;
    r = sys_safecopyto(mp->DL_PROC, mp->DL_GRANT, 0,
                       (vir_bytes)&ec->eth_stat, sizeof(ec->eth_stat), D);
 
-   if (r != OK)
+   if (r != 0)
       panic(__FILE__,
             "do_getstat_s: sys_safecopyto failed: %d\n", r);
 
    mp->m_type= DL_STAT_REPLY;
    mp->DL_PORT= port;
-   mp->DL_STAT= OK;
+   mp->DL_STAT= 0;
    r= send(mp->m_source, mp);
-   if (r != OK)
+   if (r != 0)
       panic(__FILE__, "do_getstat_s: send failed: %d\n", r);
 }
 
@@ -1583,7 +1583,7 @@ message *mp;
    mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
    mp->m_type= DL_NAME_REPLY;
    r= send(mp->m_source, mp);
-   if (r != OK)
+   if (r != 0)
       panic("LANCE", "do_getname: send failed", r);
 }
 
@@ -1704,7 +1704,7 @@ static u8_t in_byte(port_t port)
 	u32_t value;
 
 	r= sys_inb(port, (unsigned long*)&value);
-	if (r != OK)
+	if (r != 0)
 		panic("lance","sys_inb failed", r);
 	return value;
 }
@@ -1718,7 +1718,7 @@ static u16_t in_word(port_t port)
 	u32_t value;
 
 	r= sys_inw(port, (unsigned long*)&value);
-	if (r != OK)
+	if (r != 0)
 		panic("lance","sys_inw failed", r);
 	return value;
 }
@@ -1731,7 +1731,7 @@ static void out_byte(port_t port, u8_t value)
 	int r;
 
 	r= sys_outb(port, value);
-	if (r != OK)
+	if (r != 0)
 		panic("lance","sys_outb failed", r);
 }
 
@@ -1743,7 +1743,7 @@ static void out_word(port_t port, u16_t value)
 	int r;
 
 	r= sys_outw(port, value);
-	if (r != OK)
+	if (r != 0)
 		panic("lance","sys_outw failed", r);
 }
 

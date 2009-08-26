@@ -254,60 +254,60 @@ int AC97_init( DEV_STRUCT * pCC ) {
 	dev = pCC;
 
     retVal = AC97_write (pCC, AC97_POWERDOWN_CONTROL_STAT,  0x0000U);   
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
         
     /* Mute Line Out & set to 0dB attenuation */
 
     retVal = AC97_write (pCC, AC97_MASTER_VOLUME, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
 
     retVal = AC97_write (pCC, AC97_MONO_VOLUME,   0x8000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
     
     retVal = AC97_write (pCC, AC97_PHONE_VOLUME,  0x8008U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_MIC_VOLUME,    0x0008U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_LINE_IN_VOLUME,   0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_CD_VOLUME,     0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_AUX_IN_VOLUME,    0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_PCM_OUT_VOLUME,    0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_RECORD_GAIN_VOLUME, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
     
     /* Connect Line In to ADC */
     retVal = AC97_write (pCC, AC97_RECORD_SELECT, 0x0404U);  
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = AC97_write (pCC, AC97_GENERAL_PURPOSE, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
 	set_nice_volume();
 
-    return OK;
+    return 0;
 }
 
 
@@ -350,7 +350,7 @@ static int get_volume(u8_t *left, u8_t *right, int cmd) {
 	*left = value>>8;
 	*right = value&0xff;
 
-	return OK;
+	return 0;
 }
 
 
@@ -361,7 +361,7 @@ static int set_volume(int left, int right, int cmd) {
 
 	AC97_write_unsynced(dev, (u16_t)cmd, waarde);
 
-	return OK;
+	return 0;
 }
 
 
@@ -453,7 +453,7 @@ static int AC97_get_volume(struct volume_level *level) {
 		default:     
 			return EINVAL;
 	}
-	return OK;
+	return 0;
 }
 
 
@@ -503,5 +503,5 @@ static int AC97_set_volume(struct volume_level *level) {
 	}
 	set_volume(left, right, cmd);
 
-	return OK;
+	return 0;
 }

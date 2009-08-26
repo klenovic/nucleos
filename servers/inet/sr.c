@@ -151,7 +151,7 @@ mq_t *m;
 		break;
 	case DEV_CLOSE:
 		sr_close(&m->mq_mess);
-		result= OK;
+		result= 0;
 		send_reply= 1;
 		free_mess= 1;
 		break;
@@ -160,7 +160,7 @@ mq_t *m;
 	case DEV_WRITE:
 	case DEV_IOCTL3:
 		result= sr_rwio(m);
-		assert(result == OK || result == SUSPEND);
+		assert(result == 0 || result == SUSPEND);
 		send_reply= (result == SUSPEND);
 		free_mess= 0;
 		break;
@@ -169,14 +169,14 @@ mq_t *m;
 	case DEV_WRITE_S:
 	case DEV_IOCTL_S:
 		result= sr_rwio_s(m);
-		assert(result == OK || result == SUSPEND);
+		assert(result == 0 || result == SUSPEND);
 		send_reply= (result == SUSPEND);
 		free_mess= 0;
 		break;
 	case DEV_CANCEL:
 		result= sr_cancel(&m->mq_mess);
-		assert(result == OK || result == EINTR);
-		send_reply= (result == EINTR);
+		assert(result == 0 || result == -EINTR);
+		send_reply= (result == -EINTR);
 		free_mess= 1;
 		m->mq_mess.m_type= 0;
 		break;
@@ -243,20 +243,20 @@ message *m;
 
 	if (minor<0 || minor>FD_NR)
 	{
-		DBLOCK(1, printf("replying EINVAL\n"));
-		return EINVAL;
+		DBLOCK(1, printf("replying -EINVAL\n"));
+		return -EINVAL;
 	}
 	if (!(sr_fd_table[minor].srf_flags & SFF_MINOR))
 	{
-		DBLOCK(1, printf("replying ENXIO\n"));
-		return ENXIO;
+		DBLOCK(1, printf("replying -ENXIO\n"));
+		return -ENXIO;
 	}
 	for (i=0; i<FD_NR && (sr_fd_table[i].srf_flags & SFF_INUSE); i++);
 
 	if (i>=FD_NR)
 	{
-		DBLOCK(1, printf("replying ENFILE\n"));
-		return ENFILE;
+		DBLOCK(1, printf("replying -ENFILE\n"));
+		return -ENFILE;
 	}
 
 	sr_fd= &sr_fd_table[i];
@@ -364,13 +364,13 @@ mq_t *m;
 		size= (request >> 16) & _IOCPARM_MASK;
 		if (size>MAX_IOCTL_S)
 		{
-			DBLOCK(1, printf("replying EINVAL\n"));
-			r= sr_put_userdata(sr_fd-sr_fd_table, EINVAL, 
+			DBLOCK(1, printf("replying -EINVAL\n"));
+			r= sr_put_userdata(sr_fd-sr_fd_table, -EINVAL, 
 				NULL, 1);
-			assert(r == OK);
+			assert(r == 0);
 			assert(sr_fd->srf_flags & first_flag);
 			sr_fd->srf_flags &= ~first_flag;
-			return OK;
+			return 0;
 		}
 		r= (*sr_fd->srf_ioctl)(sr_fd->srf_fd, request);
 			break;
@@ -382,7 +382,7 @@ mq_t *m;
 	assert(sr_fd->srf_flags & first_flag);
 	sr_fd->srf_flags &= ~first_flag;
 
-	assert(r == OK || r == SUSPEND || 
+	assert(r == 0 || r == SUSPEND || 
 		(printf("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= susp_flag;
@@ -462,13 +462,13 @@ mq_t *m;
 		size= (request >> 16) & _IOCPARM_MASK;
 		if (size>MAX_IOCTL_S)
 		{
-			DBLOCK(1, printf("replying EINVAL\n"));
-			r= sr_put_userdata(sr_fd-sr_fd_table, EINVAL, 
+			DBLOCK(1, printf("replying -EINVAL\n"));
+			r= sr_put_userdata(sr_fd-sr_fd_table, -EINVAL, 
 				NULL, 1);
-			assert(r == OK);
+			assert(r == 0);
 			assert(sr_fd->srf_flags & first_flag);
 			sr_fd->srf_flags &= ~first_flag;
-			return OK;
+			return 0;
 		}
 		r= (*sr_fd->srf_ioctl)(sr_fd->srf_fd, request);
 		break;
@@ -479,7 +479,7 @@ mq_t *m;
 	assert(sr_fd->srf_flags & first_flag);
 	sr_fd->srf_flags &= ~first_flag;
 
-	assert(r == OK || r == SUSPEND || 
+	assert(r == 0 || r == SUSPEND || 
 		(printf("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= susp_flag;
@@ -507,7 +507,7 @@ sr_fd_t *sr_fd;
 	r= (*sr_fd->srf_read)(sr_fd->srf_fd, 
 		mp->mq_mess.NDEV_COUNT);
 
-	assert(r == OK || r == SUSPEND || 
+	assert(r == 0 || r == SUSPEND || 
 		(printf("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_READ_SUSP;
@@ -533,7 +533,7 @@ sr_fd_t *sr_fd;
 	r= (*sr_fd->srf_write)(sr_fd->srf_fd, 
 		mp->mq_mess.NDEV_COUNT);
 
-	assert(r == OK || r == SUSPEND || 
+	assert(r == 0 || r == SUSPEND || 
 		(printf("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_WRITE_SUSP;
@@ -559,7 +559,7 @@ sr_fd_t *sr_fd;
 	r= (*sr_fd->srf_ioctl)(sr_fd->srf_fd, 
 		mp->mq_mess.NDEV_COUNT);
 
-	assert(r == OK || r == SUSPEND || 
+	assert(r == 0 || r == SUSPEND || 
 		(printf("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_IOCTL_SUSP;
@@ -573,7 +573,7 @@ message *m;
 	int result;
 	int proc_nr, ref, operation;
 
-        result=EINTR;
+        result=-EINTR;
 	proc_nr=  m->NDEV_PROC;
 	ref=  (int)m->IO_GRANT;
 	operation= 0;
@@ -584,21 +584,21 @@ message *m;
 		result= walk_queue(sr_fd, &sr_fd->srf_ioctl_q, 
 			&sr_fd->srf_ioctl_q_tail, SR_CANCEL_IOCTL,
 			proc_nr, ref, SFF_IOCTL_FIRST);
-		if (result != EAGAIN)
+		if (result != -EAGAIN)
 			return result;
 	}
 	{
 		result= walk_queue(sr_fd, &sr_fd->srf_read_q, 
 			&sr_fd->srf_read_q_tail, SR_CANCEL_READ,
 			proc_nr, ref, SFF_READ_FIRST);
-		if (result != EAGAIN)
+		if (result != -EAGAIN)
 			return result;
 	}
 	{
 		result= walk_queue(sr_fd, &sr_fd->srf_write_q, 
 			&sr_fd->srf_write_q_tail, SR_CANCEL_WRITE,
 			proc_nr, ref, SFF_WRITE_FIRST);
-		if (result != EAGAIN)
+		if (result != -EAGAIN)
 			return result;
 	}
 	ip_panic((
@@ -656,7 +656,7 @@ message *m;
 
 		mq->mq_mess.m_type= DEV_REVIVE;
 		result= send(mq->mq_mess.m_source, &mq->mq_mess);
-		if (result != OK)
+		if (result != 0)
 			ip_panic(("unable to send"));
 		mq_free(mq);
 
@@ -689,14 +689,14 @@ message *m;
 		m->DEV_SEL_OPS= m_ops;
 
 		result= send(m->m_source, m);
-		if (result != OK)
+		if (result != 0)
 			ip_panic(("unable to send"));
 		return;
 	}
 
 	m->m_type= DEV_NO_STATUS;
 	result= send(m->m_source, m);
-	if (result != OK)
+	if (result != 0)
 		ip_panic(("unable to send"));
 }
 
@@ -726,7 +726,7 @@ int first_flag;
 			sr_fd->srf_flags |= first_flag;
 
 			result= (*sr_fd->srf_cancel)(sr_fd->srf_fd, type);
-			assert(result == OK);
+			assert(result == 0);
 
 			*q_head_ptr= q_ptr->mq_next;
 			mq_free(q_ptr);
@@ -734,15 +734,15 @@ int first_flag;
 			assert(sr_fd->srf_flags & first_flag);
 			sr_fd->srf_flags &= ~first_flag;
 
-			return OK;
+			return 0;
 		}
 		q_ptr_prv->mq_next= q_ptr->mq_next;
 		mq_free(q_ptr);
 		if (!q_ptr_prv->mq_next)
 			*q_tail_ptr= q_ptr_prv;
-		return EINTR;
+		return -EINTR;
 	}
-	return EAGAIN;
+	return -EAGAIN;
 }
 
 static sr_fd_t *sr_getchannel(minor)
@@ -785,14 +785,14 @@ int is_revive;
 	if (is_revive)
 	{
 		notify(mq->mq_mess.m_source);
-		result= ELOCKED;
+		result= -ELOCKED;
 	}
 	else
 	{
 		result= send(mq->mq_mess.m_source, mp);
 	}
 
-	if (result == ELOCKED && is_revive)
+	if (result == -ELOCKED && is_revive)
 	{
 		mq->mq_next= NULL;
 		if (repl_queue)
@@ -802,7 +802,7 @@ int is_revive;
 		repl_queue_tail= mq;
 		return;
 	}
-	if (result != OK)
+	if (result != 0)
 		ip_panic(("unable to send"));
 	if (is_revive)
 		mq_free(mq);
@@ -951,7 +951,7 @@ int for_ioctl;
 				ev_enqueue(evp, sr_event, arg);
 			}
 		}
-		return OK;
+		return 0;
 	}
 
 	m_type= (*head_ptr)->mq_mess.m_type;
@@ -1112,7 +1112,7 @@ int size;
 			i= 0;
 		}
 	}
-	return OK;
+	return 0;
 }
 
 static int cp_b2u (acc_ptr, proc, dest)
@@ -1163,7 +1163,7 @@ char *dest;
 		}
 	}
 	bf_afree(acc_ptr);
-	return OK;
+	return 0;
 }
 
 static int cp_u2b_s(proc, gid, offset, var_acc_ptr, size)
@@ -1226,7 +1226,7 @@ int size;
 			i= 0;
 		}
 	}
-	return OK;
+	return 0;
 }
 
 static int cp_b2u_s(acc_ptr, proc, gid, offset)
@@ -1289,7 +1289,7 @@ vir_bytes offset;
 		}
 	}
 	bf_afree(acc_ptr);
-	return OK;
+	return 0;
 }
 
 static int sr_repl_queue(proc, ref, operation)
@@ -1326,7 +1326,7 @@ int operation;
 	if (m_cancel)
 	{
 		result= send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess);
-		if (result != OK)
+		if (result != 0)
 			ip_panic(("unable to send: %d", result));
 		mq_free(m_cancel);
 		return 1;

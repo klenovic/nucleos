@@ -61,7 +61,7 @@ int do_fork()
   		(procs_in_use >= NR_PROCS-LAST_FEW && rmp->mp_effuid != 0))
   {
   	printf("PM: warning, process table is full!\n");
-  	return(EAGAIN);
+  	return(-EAGAIN);
   }
 
   /* Find a slot in 'mproc' for the child process.  A slot must exist. */
@@ -76,7 +76,7 @@ int do_fork()
 	panic(__FILE__,"do_fork finds wrong child slot", next_child);
 
   /* Memory part of the forking. */
-  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != OK) {
+  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != 0) {
 	printf("PM: vm_fork failed: %d\n", s);
 	return s;
   }
@@ -106,7 +106,7 @@ int do_fork()
 	panic("pm", "do_fork: not idle", rmc->mp_fs_call);
   rmc->mp_fs_call= PM_FORK;
   r= notify(FS_PROC_NR);
-  if (r != OK) panic("pm", "do_fork: unable to notify FS", r);
+  if (r != 0) panic("pm", "do_fork: unable to notify FS", r);
 
   /* Do not reply until FS is ready to process the fork
   * request
@@ -130,7 +130,7 @@ int do_fork_nb()
 
   /* Only system processes are allowed to use fork_nb */
   if (!(mp->mp_flags & PRIV_PROC))
-	return EPERM;
+	return -EPERM;
 
  /* If tables might fill up during FORK, don't even start since recovery half
   * way through is such a nuisance.
@@ -140,7 +140,7 @@ int do_fork_nb()
   		(procs_in_use >= NR_PROCS-LAST_FEW && rmp->mp_effuid != 0))
   {
   	printf("PM: warning, process table is full!\n");
-  	return(EAGAIN);
+  	return(-EAGAIN);
   }
 
   /* Find a slot in 'mproc' for the child process.  A slot must exist. */
@@ -154,7 +154,7 @@ int do_fork_nb()
  || (mproc[next_child].mp_flags & IN_USE))
 	panic(__FILE__,"do_fork finds wrong child slot", next_child);
 
-  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != OK) {
+  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != 0) {
 	printf("PM: vm_fork failed: %d\n", s);
 	return s;
   }
@@ -180,10 +180,10 @@ int do_fork_nb()
 	panic("pm", "do_fork: not idle", rmc->mp_fs_call);
   rmc->mp_fs_call= PM_FORK_NB;
   r= notify(FS_PROC_NR);
-  if (r != OK) panic("pm", "do_fork: unable to notify FS", r);
+  if (r != 0) panic("pm", "do_fork: unable to notify FS", r);
 
   /* Wakeup the newly created process */
-  setreply(rmc-mproc, OK);
+  setreply(rmc-mproc, 0);
 
   return rmc->mp_pid;
 }
@@ -238,7 +238,7 @@ int dump_core;			/* flag indicating whether to dump core */
   if (rmp->mp_flags & ALARM_ON) set_alarm(rmp, (clock_t) 0);
 
   /* Do accounting: fetch usage times and accumulate at parent. */
-  if((r=sys_times(proc_nr_e, &user_time, &sys_time, NULL)) != OK)
+  if((r=sys_times(proc_nr_e, &user_time, &sys_time, NULL)) != 0)
   	panic(__FILE__,"exit_proc: sys_times failed", r);
 
   p_mp = &mproc[rmp->mp_parent];			/* process' parent */
@@ -252,7 +252,7 @@ int dump_core;			/* flag indicating whether to dump core */
    * such as copying to/ from the exiting process, before it is gone.
    */
   sys_nice(proc_nr_e, PRIO_STOP);	/* stop the process */
-  if((r=vm_willexit(proc_nr_e)) != OK) {
+  if((r=vm_willexit(proc_nr_e)) != 0) {
 	panic(__FILE__, "exit_proc: vm_willexit failed", r);
   }
 
@@ -269,7 +269,7 @@ int dump_core;			/* flag indicating whether to dump core */
 		panic(__FILE__, "exit_proc: not idle", rmp->mp_fs_call);
 	rmp->mp_fs_call= dump_core ? PM_DUMPCORE : PM_EXIT;
 	r= notify(FS_PROC_NR);
-	if (r != OK) panic(__FILE__, "exit_proc: unable to notify FS", r);
+	if (r != 0) panic(__FILE__, "exit_proc: unable to notify FS", r);
 
 	if (rmp->mp_flags & PRIV_PROC)
 	{
@@ -277,7 +277,7 @@ int dump_core;			/* flag indicating whether to dump core */
 		 * needed because the system process might be a block device
 		 * driver that FS is blocked waiting on.
 		 */
-		if((r= sys_exit(rmp->mp_endpoint)) != OK)
+		if((r= sys_exit(rmp->mp_endpoint)) != 0)
 			panic(__FILE__, "exit_proc: sys_exit failed", r);
 	}
   }
@@ -343,12 +343,12 @@ int dump_core;			/* flag indicating whether to dump core */
   if (!(rmp->mp_flags & PRIV_PROC))
   {
 	/* destroy the (user) process */
-	if((r=sys_exit(rmp->mp_endpoint)) != OK)
+	if((r=sys_exit(rmp->mp_endpoint)) != 0)
 		panic(__FILE__, "exit_restart: sys_exit failed", r);
   }
 
   /* Release the memory occupied by the child. */
-  if((r=vm_exit(rmp->mp_endpoint)) != OK) {
+  if((r=vm_exit(rmp->mp_endpoint)) != 0) {
   	panic(__FILE__, "exit_restart: vm_exit failed", r);
   }
 
@@ -356,7 +356,7 @@ int dump_core;			/* flag indicating whether to dump core */
   {
 	/* Wake up the parent, completing the ptrace(T_EXIT) call */
 	mproc[rmp->mp_parent].mp_reply.reply_trace = 0;
-	setreply(rmp->mp_parent, OK);
+	setreply(rmp->mp_parent, 0);
   }
 
   /* Clean up if the parent has collected the exit status */
@@ -427,7 +427,7 @@ int do_waitpid()
 	return(SUSPEND);		     /* do not reply, let it wait */
   } else {
 	/* No child even meets the pid test.  Return error immediately. */
-	return(ECHILD);			     /* no - parent has no children */
+	return(-ECHILD);			     /* no - parent has no children */
   }
 }
 

@@ -246,7 +246,7 @@ SYN-SENT:
 					"calling tcp_close_connection\n"));
 
 				tcp_close_connection(tcp_conn,
-					ECONNREFUSED);
+					-ECONNREFUSED);
 			}
 			break;
 		}
@@ -424,7 +424,7 @@ SYN-RECEIVED:
 		{
 			if (!tcp_conn->tc_orglisten)
 			{
-				tcp_close_connection(tcp_conn, ECONNREFUSED);
+				tcp_close_connection(tcp_conn, -ECONNREFUSED);
 				break;
 			}
 
@@ -433,7 +433,7 @@ SYN-RECEIVED:
 			if (connuser->tf_flags & TFF_LISTENQ)
 			{
 				tcp_close_connection (tcp_conn,
-					ECONNREFUSED);
+					-ECONNREFUSED);
 			}
 			else
 			{
@@ -441,7 +441,7 @@ SYN-RECEIVED:
 				tcp_conn->tc_fd= NULL;
 
 				tcp_close_connection (tcp_conn,
-					ECONNREFUSED);
+					-ECONNREFUSED);
 
 				/* Pick a new ISS next time */
 				tcp_conn->tc_ISS= 0;
@@ -614,7 +614,7 @@ TIME-WAIT:
 				tcp_close_connection (tcp_conn, 0);
 			}
 			else
-				tcp_close_connection(tcp_conn, ECONNRESET);
+				tcp_close_connection(tcp_conn, -ECONNRESET);
 			break;
 		}
 /*
@@ -626,7 +626,7 @@ TIME-WAIT:
 		if ((tcp_hdr_flags & THF_SYN) && tcp_GEmod4G(seg_seq,
 			tcp_conn->tc_RCV_NXT))
 		{
-			tcp_close_connection(tcp_conn, ECONNRESET);
+			tcp_close_connection(tcp_conn, -ECONNRESET);
 			break;
 		}
 /*
@@ -1291,7 +1291,7 @@ int enq;					/* Enqueue writes. */
 			}
 			else
 			{
-				tcp_reply_read (tcp_fd, EURG);
+				tcp_reply_read (tcp_fd, -EURG);
 			}
 			return;
 		}
@@ -1304,7 +1304,7 @@ int enq;					/* Enqueue writes. */
 			}
 			else
 			{
-				tcp_reply_read(tcp_fd, ENOURG);
+				tcp_reply_read(tcp_fd, -ENOURG);
 			}
 			return;
 		}

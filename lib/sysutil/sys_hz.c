@@ -26,7 +26,7 @@ sys_hz(void)
 	if(Hz <= 0) {
 		int r;
 		/* Get HZ. */
-		if((r=sys_getinfo(GET_HZ, &Hz, sizeof(Hz), 0, 0)) != OK) {
+		if((r=sys_getinfo(GET_HZ, &Hz, sizeof(Hz), 0, 0)) != 0) {
 			Hz = DEFAULT_HZ;
 			printf("sys_hz: %d: reverting to HZ = %d\n", r, Hz);
 		}

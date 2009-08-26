@@ -66,7 +66,7 @@ int line;
 	}
 
   
-  err_code = ENFILE;
+  err_code = -ENFILE;
   return NIL_VNODE;
 }
 
@@ -131,7 +131,7 @@ void put_vnode(struct vnode *vp)
   }
 
   /* Send request */
-  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count) != OK)
+  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count) != 0)
       printf("VFSput_vnode Warning: inode doesn't exist\n"); 
 
   vp->v_fs_count= 0;
@@ -154,7 +154,7 @@ void vnode_clean_refs(struct vnode *vp)
 
   if (vp->v_fs_count <= 1)
 	return;	/* Nothing to do */
-  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count-1) != OK)
+  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count-1) != 0)
 	printf("vnode_clean_refs: req_putnode failed\n"); 
   vp->v_fs_count= 1;
 }

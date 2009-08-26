@@ -25,5 +25,5 @@ int do_stime(m_ptr)
 register message *m_ptr;	/* pointer to request message */
 {
   boottime= m_ptr->T_BOOTTIME;
-  return(OK);
+  return 0;
 }

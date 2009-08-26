@@ -68,7 +68,7 @@ int vfs_open(struct vmproc *for_who, callback_t callback,
 	m.VMVO_MODE = mode;
 	m.VMVO_ENDPOINT = for_who->vm_endpoint;
 
-	if((r=asynsend(VFS_PROC_NR, &m)) != OK) {
+	if((r=asynsend(VFS_PROC_NR, &m)) != 0) {
 		vm_panic("vfs_open: asynsend failed", r);
 	}
 
@@ -89,7 +89,7 @@ int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
 	m.VMVC_ENDPOINT = for_who->vm_endpoint;
 	m.VMVC_FD = fd;
 
-	if((r=asynsend(VFS_PROC_NR, &m)) != OK) {
+	if((r=asynsend(VFS_PROC_NR, &m)) != 0) {
 		vm_panic("vfs_close: asynsend failed", r);
 	}
 
@@ -111,7 +111,7 @@ int do_vfs_reply(message *m)
 	int procno;
 	callback_t cb;
 	ep = m->VMV_ENDPOINT;
-	if(vm_isokendpt(ep, &procno) != OK) {
+	if(vm_isokendpt(ep, &procno) != 0) {
 		printf("VM:do_vfs_reply: reply %d about invalid endpoint %d\n",
 			m->m_type, ep);
 		vm_panic("do_vfs_reply: invalid endpoint from vfs", NO_NUM);

@@ -44,13 +44,13 @@ message *m_ptr;			/* pointer to request message */
           m_ptr->SIG_MAP = rp->p_pending;	/* pending signals map */
           sigemptyset(&rp->p_pending); 		/* ball is in PM's court */
 	  RTS_LOCK_UNSET(rp, SIGNALED);		/* blocked by SIG_PENDING */
-          return(OK);
+          return 0;
       }
   }
 
   /* No process with pending signals was found. */
   m_ptr->SIG_ENDPT = NONE; 
-  return(OK);
+  return 0;
 }
 #endif /* USE_GETKSIG */
 

@@ -53,22 +53,22 @@ int do_sigaction()
   struct sigaction svec;
   struct sigaction *svp;
 
-  if (m_in.sig_nr == SIGKILL) return(OK);
-  if (m_in.sig_nr < 1 || m_in.sig_nr > _NSIG) return (EINVAL);
+  if (m_in.sig_nr == SIGKILL) return 0;
+  if (m_in.sig_nr < 1 || m_in.sig_nr > _NSIG) return (-EINVAL);
   svp = &mp->mp_sigact[m_in.sig_nr];
   if ((struct sigaction *) m_in.sig_osa != (struct sigaction *) NULL) {
 	r = sys_datacopy(PM_PROC_NR,(vir_bytes) svp,
 		who_e, (vir_bytes) m_in.sig_osa, (phys_bytes) sizeof(svec));
-	if (r != OK) return(r);
+	if (r != 0) return(r);
   }
 
   if ((struct sigaction *) m_in.sig_nsa == (struct sigaction *) NULL) 
-  	return(OK);
+  	return 0;
 
   /* Read in the sigaction structure. */
   r = sys_datacopy(who_e, (vir_bytes) m_in.sig_nsa,
 		PM_PROC_NR, (vir_bytes) &svec, (phys_bytes) sizeof(svec));
-  if (r != OK) return(r);
+  if (r != 0) return(r);
 
   if (svec.sa_handler == SIG_IGN) {
 	sigaddset(&mp->mp_ignore, m_in.sig_nr);
@@ -80,7 +80,7 @@ int do_sigaction()
 	sigdelset(&mp->mp_catch, m_in.sig_nr);
 	sigdelset(&mp->mp_sig2mess, m_in.sig_nr);
   } else if (svec.sa_handler == SIG_MESS) {
-	if (! (mp->mp_flags & PRIV_PROC)) return(EPERM);
+	if (! (mp->mp_flags & PRIV_PROC)) return(-EPERM);
 	sigdelset(&mp->mp_ignore, m_in.sig_nr);
 	sigaddset(&mp->mp_sig2mess, m_in.sig_nr);
 	sigdelset(&mp->mp_catch, m_in.sig_nr);
@@ -97,7 +97,7 @@ int do_sigaction()
   mp->mp_sigact[m_in.sig_nr].sa_mask = svec.sa_mask;
   mp->mp_sigact[m_in.sig_nr].sa_flags = svec.sa_flags;
   mp->mp_sigreturn = (vir_bytes) m_in.sig_ret;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -106,7 +106,7 @@ int do_sigaction()
 int do_sigpending()
 {
   mp->mp_reply.reply_mask = (long) mp->mp_sigpending;
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -158,10 +158,10 @@ int do_sigprocmask()
 	break;
 
       default:
-	return(EINVAL);
+	return(-EINVAL);
 	break;
   }
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -227,13 +227,13 @@ int ksig_pending()
  while (TRUE) {
    int r;
    /* get an arbitrary pending signal */
-   if((r=sys_getksig(&proc_nr_e, &sig_map)) != OK)
+   if((r=sys_getksig(&proc_nr_e, &sig_map)) != 0)
   	panic(__FILE__,"sys_getksig failed", r);
    if (NONE == proc_nr_e) {		/* stop if no more pending signals */
  	break;
    } else {
  	int proc_nr_p;
- 	if(pm_isokendpt(proc_nr_e, &proc_nr_p) != OK)
+ 	if(pm_isokendpt(proc_nr_e, &proc_nr_p) != 0)
   		panic(__FILE__,"sys_getksig strange process", proc_nr_e);
    	handle_ksig(proc_nr_e, sig_map);	/* handle the received signal */
 	/* If the process still exists to the kernel after the signal
@@ -241,7 +241,7 @@ int ksig_pending()
 	 */
         if ((mproc[proc_nr_p].mp_flags & (IN_USE | EXITING)) == IN_USE)
 	{
-	   if((r=sys_endksig(proc_nr_e)) != OK)	/* ... tell kernel it's done */
+	   if((r=sys_endksig(proc_nr_e)) != 0)	/* ... tell kernel it's done */
   		panic(__FILE__,"sys_endksig failed", r);
 	}
    }
@@ -260,7 +260,7 @@ sigset_t sig_map;
   int i, proc_nr;
   pid_t proc_id, id;
 
-  if(pm_isokendpt(proc_nr_e, &proc_nr) != OK || proc_nr < 0) {
+  if(pm_isokendpt(proc_nr_e, &proc_nr) != 0 || proc_nr < 0) {
 	printf("PM: handle_ksig: %d?? not ok\n", proc_nr_e);
 	return;
   }
@@ -395,7 +395,7 @@ int signo;			/* signal to send to process (1 to _NSIG) */
 
 	/* Stop process from running before we fiddle with its stack. */
 	sys_nice(rmp->mp_endpoint, PRIO_STOP);
-	if(vm_push_sig(rmp->mp_endpoint, &cur_sp) != OK)
+	if(vm_push_sig(rmp->mp_endpoint, &cur_sp) != 0)
 		goto doterminate;
 
         rmp->mp_sigmsg.sm_stkptr = cur_sp;
@@ -405,11 +405,11 @@ int signo;			/* signal to send to process (1 to _NSIG) */
 	 */
 	if (rmp->mp_flags & (PAUSED | WAITING | SIGSUSPENDED)) {
 		rmp->mp_flags &= ~(PAUSED | WAITING | SIGSUSPENDED);
-		setreply(slot, EINTR);
+		setreply(slot, -EINTR);
 
 		/* Ask the kernel to deliver the signal */
 		s= sys_sigsend(rmp->mp_endpoint, &rmp->mp_sigmsg);
-		if (s != OK)
+		if (s != 0)
 			panic(__FILE__, "sys_sigsend failed", s);
 
 		/* Done */
@@ -464,16 +464,16 @@ int signo;			/* signal to send to process (0 to _NSIG) */
   int count;			/* count # of signals sent */
   int error_code;
 
-  if (signo < 0 || signo > _NSIG) return(EINVAL);
+  if (signo < 0 || signo > _NSIG) return(-EINVAL);
 
-  /* Return EINVAL for attempts to send SIGKILL to INIT alone. */
-  if (proc_id == INIT_PID && signo == SIGKILL) return(EINVAL);
+  /* Return -EINVAL for attempts to send SIGKILL to INIT alone. */
+  if (proc_id == INIT_PID && signo == SIGKILL) return(-EINVAL);
 
   /* Search the proc table for processes to signal.  
    * (See forkexit.c about pid magic.)
    */
   count = 0;
-  error_code = ESRCH;
+  error_code = -ESRCH;
   for (rmp = &mproc[0]; rmp < &mproc[NR_PROCS]; rmp++) {
 	if (!(rmp->mp_flags & IN_USE)) continue;
 
@@ -493,7 +493,7 @@ int signo;			/* signal to send to process (0 to _NSIG) */
 	    && mp->mp_effuid != rmp->mp_realuid
 	    && mp->mp_realuid != rmp->mp_effuid
 	    && mp->mp_effuid != rmp->mp_effuid) {
-		error_code = EPERM;
+		error_code = -EPERM;
 		continue;
 	}
 
@@ -511,7 +511,7 @@ int signo;			/* signal to send to process (0 to _NSIG) */
 
   /* If the calling process has killed itself, don't reply. */
   if ((mp->mp_flags & (IN_USE | EXITING)) != IN_USE) return(SUSPEND);
-  return(count > 0 ? OK : error_code);
+  return(count > 0 ? 0 : error_code);
 }
 
 /*===========================================================================*
@@ -551,7 +551,7 @@ int pro;			/* which process number */
 int for_trace;			/* for tracing */
 {
 /* A signal is to be sent to a process.  If that process is hanging on a
- * system call, the system call must be terminated with EINTR.  Possible
+ * system call, the system call must be terminated with -EINTR.  Possible
  * calls are PAUSE, WAIT, READ and WRITE, the latter two for pipes and ttys.
  * First check if the process is hanging on an PM call.  If not, tell FS,
  * so it can check for READs and WRITEs from pipes, ttys and the like.
@@ -564,7 +564,7 @@ int for_trace;			/* for tracing */
   /* Check to see if process is hanging on a PAUSE, WAIT or SIGSUSPEND call. */
   if (rmp->mp_flags & (PAUSED | WAITING | SIGSUSPENDED)) {
 	rmp->mp_flags &= ~(PAUSED | WAITING | SIGSUSPENDED);
-	setreply(pro, EINTR);
+	setreply(pro, -EINTR);
 	return;
   }
 
@@ -582,5 +582,5 @@ int for_trace;			/* for tracing */
 	  rmp->mp_fs_call2= PM_UNPAUSE;
   }
   r= notify(FS_PROC_NR);
-  if (r != OK) panic("pm", "unpause: unable to notify FS", r);
+  if (r != 0) panic("pm", "unpause: unable to notify FS", r);
 }

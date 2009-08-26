@@ -32,7 +32,7 @@ struct proc *p;
 	case VMCTL_I386_GETCR3:
 		/* Get process CR3. */
 		m_ptr->SVMCTL_VALUE = p->p_seg.p_cr3;
-		return OK;
+		return 0;
 	case VMCTL_I386_SETCR3:
 		/* Set process CR3. */
 		if(m_ptr->SVMCTL_VALUE) {
@@ -43,16 +43,16 @@ struct proc *p;
 			p->p_misc_flags &= ~MF_FULLVM;
 		}
 		RTS_LOCK_UNSET(p, VMINHIBIT);
-		return OK;
+		return 0;
 	case VMCTL_INCSP:
 		/* Increase process SP. */
 		p->p_reg.sp += m_ptr->SVMCTL_VALUE;
-		return OK;
+		return 0;
         case VMCTL_GET_PAGEFAULT:
 	{
   		struct proc *rp;
 		if(!(rp=pagefaults))
-			return ESRCH;
+			return -ESRCH;
 		pagefaults = rp->p_nextpagefault;
 		if(!RTS_ISSET(rp, PAGEFAULT))
 			minix_panic("non-PAGEFAULT process on pagefault chain",
@@ -60,10 +60,10 @@ struct proc *p;
                 m_ptr->SVMCTL_PF_WHO = rp->p_endpoint;
                 m_ptr->SVMCTL_PF_I386_CR2 = rp->p_pagefault.pf_virtual;
 		m_ptr->SVMCTL_PF_I386_ERR = rp->p_pagefault.pf_flags;
-		return OK;
+		return 0;
 	}
   }
 
   kprintf("arch_do_vmctl: strange param %d\n", m_ptr->SVMCTL_PARAM);
-  return EINVAL;
+  return -EINVAL;
 }

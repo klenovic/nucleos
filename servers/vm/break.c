@@ -58,9 +58,9 @@ int do_brk(message *msg)
  */
 	int proc;
 
-	if(vm_isokendpt(msg->VMB_ENDPOINT, &proc) != OK) {
+	if(vm_isokendpt(msg->VMB_ENDPOINT, &proc) != 0) {
 		printf("VM: bogus endpoint VM_BRK %d\n", msg->VMB_ENDPOINT);
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	return real_brk(&vmproc[proc], (vir_bytes) msg->VMB_ADDR);
@@ -77,7 +77,7 @@ vir_bytes sp;			/* new value of sp */
 /* See if data and stack segments can coexist, adjusting them if need be.
  * Memory is never allocated or freed.  Instead it is added or removed from the
  * gap between data segment and stack segment.  If the gap size becomes
- * negative, the adjustment of data or stack fails and ENOMEM is returned.
+ * negative, the adjustment of data or stack fails and -ENOMEM is returned.
  */
 
   register struct mem_map *mem_sp, *mem_dp;
@@ -94,7 +94,7 @@ vir_bytes sp;			/* new value of sp */
   sp_click = sp >> CLICK_SHIFT;	/* click containing sp */
   if (sp_click >= base_of_stack)
   {
-	return(ENOMEM);	/* sp too high */
+	return(-ENOMEM);	/* sp too high */
   }
 
   /* Compute size of gap between stack and data segments. */
@@ -107,7 +107,7 @@ vir_bytes sp;			/* new value of sp */
   gap_base = mem_dp->mem_vir + data_clicks + SAFETY_CLICKS;
   if (sp_lower < gap_base)
   {
-	return(ENOMEM);	/* data and stack collided */
+	return(-ENOMEM);	/* data and stack collided */
   }
 
   /* Update data length (but not data orgin) on behalf of brk() system call. */
@@ -127,30 +127,30 @@ vir_bytes sp;			/* new value of sp */
 
   /* Do the new data and stack segment sizes fit in the address space? */
   r = (rmp->vm_arch.vm_seg[D].mem_vir + rmp->vm_arch.vm_seg[D].mem_len > 
-          rmp->vm_arch.vm_seg[S].mem_vir) ? ENOMEM : OK;
+          rmp->vm_arch.vm_seg[S].mem_vir) ? -ENOMEM : 0;
 
-  if(r == OK && (rmp->vm_flags & VMF_HASPT) &&
+  if(r == 0 && (rmp->vm_flags & VMF_HASPT) &&
      rmp->vm_endpoint != VM_PROC_NR) {
 	vm_assert(rmp->vm_heap);
 	if(old_clicks < data_clicks) {
 		vir_bytes more;
 		more = (data_clicks - old_clicks) << CLICK_SHIFT;
-		if(map_region_extend(rmp, rmp->vm_heap, more) != OK) {
+		if(map_region_extend(rmp, rmp->vm_heap, more) != 0) {
 			printf("VM: brk: map_region_extend failed\n");
-			return ENOMEM;
+			return -ENOMEM;
 		}
 	} else if(old_clicks > data_clicks) {
 		vir_bytes less;
 		less = (old_clicks - data_clicks) << CLICK_SHIFT;
-		if(map_region_shrink(rmp->vm_heap, less) != OK) {
+		if(map_region_shrink(rmp->vm_heap, less) != 0) {
 			printf("VM: brk: map_region_shrink failed\n");
-			return ENOMEM;
+			return -ENOMEM;
 		}
 	}
   }
 
-  if (r == OK)
-	return(OK);
+  if (r == 0)
+	return 0;
 
   /* New sizes don't fit or require too many page/segment registers. Restore.*/
   if (changed & DATA_CHANGED) mem_dp->mem_len = old_clicks;
@@ -159,7 +159,7 @@ vir_bytes sp;			/* new value of sp */
 	mem_sp->mem_phys += sp_delta;
 	mem_sp->mem_len -= sp_delta;
   }
-  return(ENOMEM);
+  return(-ENOMEM);
 }
 
 /*===========================================================================*
@@ -177,10 +177,10 @@ vir_bytes v;
 	if (new_clicks < vmp->vm_arch.vm_seg[D].mem_vir) {
 		printf("VM: real_brk failed because new_clicks too high: %d\n",
 			new_clicks);
-		return(ENOMEM);
+		return(-ENOMEM);
 	}
 	new_clicks -= vmp->vm_arch.vm_seg[D].mem_vir;
-	if ((r=get_stack_ptr(vmp->vm_endpoint, &new_sp)) != OK)
+	if ((r=get_stack_ptr(vmp->vm_endpoint, &new_sp)) != 0)
   		vm_panic("couldn't get stack pointer", r);
 	r = adjust(vmp, new_clicks, new_sp);
 	return r;

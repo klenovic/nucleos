@@ -41,7 +41,7 @@ message *m_ptr;			/* pointer to request message */
   exp_time = m_ptr->ALRM_EXP_TIME;	/* alarm's expiration time */
   use_abs_time = m_ptr->ALRM_ABS_TIME;	/* flag for absolute time */
   rp = proc_addr(who_p);
-  if (! (priv(rp)->s_flags & SYS_PROC)) return(EPERM);
+  if (! (priv(rp)->s_flags & SYS_PROC)) return(-EPERM);
 
   /* Get the timer structure and set the parameters for this alarm. */
   tp = &(priv(rp)->s_alarm_timer);	
@@ -63,7 +63,7 @@ message *m_ptr;			/* pointer to request message */
       tp->tmr_exp_time = (use_abs_time) ? exp_time : exp_time + get_uptime();
       set_timer(tp, tp->tmr_exp_time, tp->tmr_func);
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*

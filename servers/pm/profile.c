@@ -52,11 +52,11 @@ int do_sprofile(void)
 	return sys_sprof(PROF_STOP,0,0,0,0,0);
 
   default:
-	return EINVAL;
+	return -EINVAL;
   }
 
 #else
-	return ENOSYS;
+	return -ENOSYS;
 #endif
 }
 
@@ -83,11 +83,11 @@ int do_cprofile(void)
 	return sys_cprof(PROF_RESET,0,0,0,0);
 
   default:
-	return EINVAL;
+	return -EINVAL;
   }
 
 #else
-	return ENOSYS;
+	return -ENOSYS;
 #endif
 }
 
@@ -105,13 +105,13 @@ int info_size;
 
   /* Check if supplied pointers point into user process. */
   if ((r = sys_umap(who_e, D, (vir_bytes) m_in.PROF_CTL_PTR,
-	 					 1, &p)) != OK) {
+	 					 1, &p)) != 0) {
 	printf("PM: PROFILE: umap failed for process %d\n", who_e);
 	return r;                                    
   }  
 
   if ((r =sys_umap(who_e, D, (vir_bytes) m_in.PROF_MEM_PTR,
- 					 1, &p)) != OK) {
+ 					 1, &p)) != 0) {
 	printf("PM: PROFILE: umap failed for process %d\n", who_e);
 	return r;                                    
   }  

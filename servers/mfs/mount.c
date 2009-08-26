@@ -39,7 +39,7 @@ int fs_readsuper_s()
   struct inode *root_ip;
   cp_grant_id_t label_gid;
   size_t label_len;
-  int r = OK;
+  int r = 0;
   unsigned long tasknr;
   endpoint_t driver_e;
 
@@ -51,23 +51,23 @@ int fs_readsuper_s()
   if (label_len > sizeof(fs_dev_label))
   {
 	printf("mfs:fs_readsuper: label too long\n");
-	return EINVAL;
+	return -EINVAL;
   }
 
   r= sys_safecopyfrom(fs_m_in.m_source, label_gid, 0, (vir_bytes)fs_dev_label,
 	label_len, D);
-  if (r != OK)
+  if (r != 0)
   {
 	printf("mfs:fs_readsuper: safecopyfrom failed: %d\n", r);
-	return EINVAL;
+	return -EINVAL;
   }
 
   r= ds_retrieve_u32(fs_dev_label, (u32_t*)&tasknr);
-  if (r != OK)
+  if (r != 0)
   {
 	printf("mfs:fs_readsuper: ds_retrieve_u32 failed for '%s': %d\n",
 		fs_dev_label, r);
-	return EINVAL;
+	return -EINVAL;
   }
 
   driver_e= tasknr;
@@ -83,8 +83,8 @@ int fs_readsuper_s()
 
   /* Open the device the file system lives on. */
   if (dev_open(driver_e, fs_dev, driver_e,
-	fs_m_in.REQ_READONLY ? R_BIT : (R_BIT|W_BIT)) != OK) {
-        return(EINVAL);
+	fs_m_in.REQ_READONLY ? R_BIT : (R_BIT|W_BIT)) != 0) {
+        return(-EINVAL);
   }
   
   /* Fill in the super block. */
@@ -92,7 +92,7 @@ int fs_readsuper_s()
   r = read_super(&superblock);
 
   /* Is it recognized as a Minix filesystem? */
-  if (r != OK) {
+  if (r != 0) {
 	superblock.s_dev = NO_DEV;
   	dev_close(driver_e, fs_dev);
 	return(r);
@@ -105,7 +105,7 @@ int fs_readsuper_s()
 	printf("MFS: couldn't get root inode?!\n");
 	superblock.s_dev = NO_DEV;
   	dev_close(driver_e, fs_dev);
-	return EINVAL;
+	return -EINVAL;
   }
   
   if (root_ip != NIL_INODE && root_ip->i_mode == 0) {
@@ -113,7 +113,7 @@ int fs_readsuper_s()
         put_inode(root_ip);
 	superblock.s_dev = NO_DEV;
   	dev_close(driver_e, fs_dev);
-  	return EINVAL;
+  	return -EINVAL;
   }
 
   superblock.s_rd_only = fs_m_in.REQ_READONLY;
@@ -144,7 +144,7 @@ int fs_readsuper_o()
  */
   struct super_block *xp;
   struct inode *root_ip;
-  int r = OK;
+  int r = 0;
   phys_bytes ph;
 
   fs_dev = fs_m_in.REQ_DEV;
@@ -159,7 +159,7 @@ int fs_readsuper_o()
   r = read_super(&superblock);
 
   /* Is it recognized as a Minix filesystem? */
-  if (r != OK) {
+  if (r != 0) {
 	superblock.s_dev = NO_DEV;
 	return(r);
   }
@@ -167,18 +167,18 @@ int fs_readsuper_o()
   set_blocksize(superblock.s_block_size);
   
   /* Get the root inode of the mounted file system. */
-  root_ip = NIL_INODE;		/* if 'r' not OK, make sure this is defined */
-  if (r == OK) {
+  root_ip = NIL_INODE;		/* if 'r' not 0, make sure this is defined */
+  if (r == 0) {
 	if ( (root_ip = get_inode(fs_dev, ROOT_INODE)) == NIL_INODE) 
 		r = err_code;
   }
   
   if (root_ip != NIL_INODE && root_ip->i_mode == 0) {
         put_inode(root_ip);
-  	r = EINVAL;
+  	r = -EINVAL;
   }
 
-  if (r != OK) return r;
+  if (r != 0) return r;
   superblock.s_rd_only = fs_m_in.REQ_READONLY;
   superblock.s_is_root = fs_m_in.REQ_ISROOT;
   
@@ -207,7 +207,7 @@ int fs_mountpoint_o()
  * encounters a mountpoint.
  */
   register struct inode *rip;
-  int r = OK;
+  int r = 0;
   mode_t bits;
   
   /* Get inode */
@@ -217,23 +217,23 @@ int fs_mountpoint_o()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* It may not be busy. */
   if (rip->i_count > 2)
   {
 	printf("mfs:fs_mountpoint: i_count = %d\n", rip->i_count);
-	r = EBUSY;
+	r = -EBUSY;
   }
 
   /* It may not be special. */
   bits = rip->i_mode & I_TYPE;
-  if (bits == I_BLOCK_SPECIAL || bits == I_CHAR_SPECIAL) r = ENOTDIR;
+  if (bits == I_BLOCK_SPECIAL || bits == I_CHAR_SPECIAL) r = -ENOTDIR;
 	
-  if ((rip->i_mode & I_TYPE) != I_DIRECTORY) r = ENOTDIR;
+  if ((rip->i_mode & I_TYPE) != I_DIRECTORY) r = -ENOTDIR;
       
-  if (r != OK) {
+  if (r != 0) {
       put_inode(rip);
       return r;
   }
@@ -258,25 +258,25 @@ int fs_mountpoint_s()
  * the partition can be mounted on the inode or not. 
  */
   register struct inode *rip;
-  int r = OK;
+  int r = 0;
   mode_t bits;
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   if (rip->i_mountpoint)
-	r= EBUSY;
+	r= -EBUSY;
 
   /* It may not be special. */
   bits = rip->i_mode & I_TYPE;
-  if (bits == I_BLOCK_SPECIAL || bits == I_CHAR_SPECIAL) r = ENOTDIR;
+  if (bits == I_BLOCK_SPECIAL || bits == I_CHAR_SPECIAL) r = -ENOTDIR;
 	
   put_inode(rip);
 
-  if (r == OK)
+  if (r == 0)
 	rip->i_mountpoint = TRUE;
   return r;
 }
@@ -296,7 +296,7 @@ int fs_unmount()
   dev_close(driver_endpoints[(fs_dev >> MAJOR) & BYTE].driver_e, fs_dev);
 
   if(superblock.s_dev != fs_dev)
-	return EINVAL;
+	return -EINVAL;
   
   /* See if the mounted device is busy.  Only 1 inode using it should be
    * open -- the root inode -- and that inode only 1 time.
@@ -309,7 +309,7 @@ int fs_unmount()
   }
   
   if (count > 1) {
-      return(EBUSY);	/* can't umount a busy file system */
+      return(-EBUSY);	/* can't umount a busy file system */
   }
 
   /* Sync the disk, and invalidate cache. */
@@ -320,7 +320,7 @@ int fs_unmount()
   
   unmountdone = TRUE;
 
-  return OK;
+  return 0;
 }
 
 

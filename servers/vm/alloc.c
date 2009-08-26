@@ -242,7 +242,7 @@ CHECKHOLES;
 			/* Anything special needs to happen? */
 			if(memflags & PAF_CLEAR) {
 			  if ((s= sys_memset(0, CLICK_SIZE*old_base,
-				CLICK_SIZE*clicks)) != OK)   {
+				CLICK_SIZE*clicks)) != 0)   {
 				vm_panic("alloc_mem: sys_memset failed", s);
 			  }
 			}
@@ -485,7 +485,7 @@ static phys_bytes alloc_pages(int pages, int memflags)
 			/* Clear memory if requested. */
 			if(memflags & PAF_CLEAR) {
 			  int s;
-			  if ((s= sys_memset(0, ret, bytes)) != OK)   {
+			  if ((s= sys_memset(0, ret, bytes)) != 0)   {
 				vm_panic("alloc_pages: sys_memset failed", s);
 			  }
 			}
@@ -690,14 +690,14 @@ int do_adddma(message *msg)
 				dmatab[i].dt_size);
 		}
 		vm_panic("adddma: table full", NO_NUM);
-		return ENOSPC;
+		return -ENOSPC;
 	}
 
 	/* Find target process */
-	if (vm_isokendpt(target_proc_e, &proc_n) != OK)
+	if (vm_isokendpt(target_proc_e, &proc_n) != 0)
 	{
 		printf("vm:do_adddma: endpoint %d not found\n", target_proc_e);
-		return EINVAL;
+		return -EINVAL;
 	}
 	vmp= &vmproc[proc_n];
 	vmp->vm_flags |= VMF_HAS_DMA;
@@ -707,7 +707,7 @@ int do_adddma(message *msg)
 	dmatab[i].dt_base= base;
 	dmatab[i].dt_size= size;
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -740,7 +740,7 @@ int do_deldma(message *msg)
 	if (i >= NR_DMA)
 	{
 		printf("vm:do_deldma: slot not found\n");
-		return ESRCH;
+		return -ESRCH;
 	}
 
 	if (dmatab[i].dt_flags & DTF_RELEASE_SEG)
@@ -767,7 +767,7 @@ int do_deldma(message *msg)
 
 	dmatab[i].dt_flags &= ~DTF_INUSE;
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -795,11 +795,11 @@ int do_getdma(message *msg)
 		msg->VMGD_BASEP= dmatab[i].dt_base;
 		msg->VMGD_SIZEP= dmatab[i].dt_size;
 
-		return OK;
+		return 0;
 	}
 
 	/* Nothing */
-	return EAGAIN;
+	return -EAGAIN;
 }
 
 
@@ -846,7 +846,7 @@ int do_allocmem(message *m)
 	clicks = 1 + ((vir_bytes)m->VMAM_BYTES / CLICK_SIZE);
 
 	if((mem=ALLOC_MEM(clicks, PAF_CLEAR)) == NO_MEM) {
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	m->VMAM_MEMBASE = CLICK2ABS(mem);
@@ -855,6 +855,6 @@ int do_allocmem(message *m)
 	printf("VM: do_allocmem: 0x%lx clicks OK at 0x%lx\n", m->VMAM_CLICKS, mem);
 #endif
 
-	return OK;
+	return 0;
 }
 

@@ -138,7 +138,7 @@ int mountflags;
   m.m1_p3 = (char*) ep;
   r = _syscall(FS, MOUNT, &m);
 
-  if(r != OK) {
+  if(r != 0) {
 	/* If mount() failed, tell RS to shutdown MFS process.
 	 * No error check - won't do anything with this error anyway.
 	 */
@@ -163,7 +163,7 @@ const char *name;
   _loadname(name, &m);
   r = _syscall(FS, UMOUNT, &m);
 
-  if(r == OK) {
+  if(r == 0) {
 	rs_down(label);
   }
 

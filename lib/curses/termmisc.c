@@ -14,22 +14,22 @@
 
 int fixterm()
 {
-  return(OK);
+  return 0;
 }				/* fixterm */
 
 int resetterm()
 {
-  return(OK);
+  return 0;
 }
 
 int saveoldterm()
 {
-  return(OK);
+  return 0;
 }				/* saveoldterm */
 
 int saveterm()
 {
-  return(OK);
+  return 0;
 }				/* saveterm */
 
 int baudrate()
@@ -58,7 +58,7 @@ int killchar()
 
 int savetty()
 {
-  return(OK);
+  return 0;
 }				/* savetty */
 
 /****************************************************************/

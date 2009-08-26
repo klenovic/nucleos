@@ -84,16 +84,16 @@ ioreq_t req;
 		if (new_en_flags & new_di_flags)
 		{
 			bf_afree(data);
-			reply_thr_get (ip_fd, EBADMODE, TRUE);
-			return NW_OK;
+			reply_thr_get (ip_fd, -EBADMODE, TRUE);
+			return 0;
 		}
 
 		/* NWIO_ACC_MASK */
 		if (new_di_flags & NWIO_ACC_MASK)
 		{
 			bf_afree(data);
-			reply_thr_get (ip_fd, EBADMODE, TRUE);
-			return NW_OK;
+			reply_thr_get (ip_fd, -EBADMODE, TRUE);
+			return 0;
 			/* access modes can't be disable */
 		}
 
@@ -154,8 +154,8 @@ ioreq_t req;
 			(NWIO_REMANY|NWIO_PROTOANY|NWIO_HDR_O_ANY)))
 		{
 			bf_afree(data);
-			reply_thr_get(ip_fd, EBADMODE, TRUE);
-			return NW_OK;
+			reply_thr_get(ip_fd, -EBADMODE, TRUE);
+			return 0;
 		}
 
 		if (ip_fd->if_flags & IFF_OPTSET)
@@ -171,7 +171,7 @@ ioreq_t req;
 
 		bf_afree(data);
 		reply_thr_get (ip_fd, result, TRUE);
-		return NW_OK;
+		return 0;
 
 	case NWIOGIPOPT:
 		data= bf_memreq(sizeof(nwio_ipopt_t));
@@ -271,7 +271,7 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -286,7 +286,7 @@ ioreq_t req;
 			bf_afree(data);
 		else
 		{
-			assert(result == NW_OK);
+			assert(result == 0);
 			result= (*ip_fd->if_put_userdata)(ip_fd->if_srfd, 0,
 				data, TRUE);
 		}
@@ -299,13 +299,13 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 		if (!(ip_fd->if_port->ip_flags & IPF_IPADDRSET))
 		{
 			/* Interface is down, no changes allowed */
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EINVAL, NULL, TRUE);
+				-EINVAL, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -327,7 +327,7 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -347,7 +347,7 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -362,7 +362,7 @@ ioreq_t req;
 			bf_afree(data);
 		else
 		{
-			assert(result == NW_OK);
+			assert(result == 0);
 			result= (*ip_fd->if_put_userdata)(ip_fd->if_srfd, 0,
 				data, TRUE);
 		}
@@ -375,13 +375,13 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 		if (!(ip_fd->if_port->ip_flags & IPF_IPADDRSET))
 		{
 			/* Interface is down, no changes allowed */
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EINVAL, NULL, TRUE);
+				-EINVAL, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -404,7 +404,7 @@ ioreq_t req;
 		if (data == NULL)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd,
-				EFAULT, NULL, TRUE);
+				-EFAULT, NULL, TRUE);
 		}
 
 		data= bf_packIffLess (data, sizeof(nwio_route_t) );
@@ -430,7 +430,7 @@ ioreq_t req;
 		if (ip_port->ip_dl_type != IPDL_ETH)
 		{
 			return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, 
-				EBADIOCTL, (acc_t *)0, TRUE);
+				-EBADIOCTL, (acc_t *)0, TRUE);
 		}
 
 		if (!(ip_port->ip_flags & IPF_IPADDRSET))
@@ -451,8 +451,8 @@ ioreq_t req;
 	default:
 		break;
 	}
-	DBLOCK(1, printf("replying EBADIOCTL: 0x%x\n", req));
-	return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, EBADIOCTL,
+	DBLOCK(1, printf("replying -EBADIOCTL: 0x%x\n", req));
+	return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, -EBADIOCTL,
 		(acc_t *)0, TRUE);
 }
 
@@ -521,14 +521,14 @@ nwio_ipconf_t *ipconf;
 	old_ip_flags= ip_port->ip_flags;
 
 	if (ipconf->nwic_flags & ~NWIC_FLAGS)
-		return EBADMODE;
+		return -EBADMODE;
 
 	do_report= 0;
 	if (ipconf->nwic_flags & NWIC_MTU_SET)
 	{
 		mtu= ipconf->nwic_mtu;
 		if (mtu < IP_MIN_MTU || mtu > ip_port->ip_mtu_max)
-			return EINVAL;
+			return -EINVAL;
 		ip_port->ip_mtu= mtu;
 		do_report= 1;
 	}
@@ -626,7 +626,7 @@ ip_fd_t *ip_fd;
 		ip_fd->if_rdbuf_head= pack->acc_ext_link;
 		bf_afree(pack);
 	}
-	return NW_OK;
+	return 0;
 }
 
 static void reply_thr_get(ip_fd, reply, for_ioctl)

@@ -85,7 +85,7 @@ int fs_fstatfs()
 
   if ((rip = find_inode(fs_dev, ROOT_INODE)) == NIL_INODE) {
       printf("mfs:fstatfs: couldn't find inode %d\n", ROOT_INODE);
-      return EINVAL;
+      return -EINVAL;
   }
   
   st.f_bsize = rip->i_sp->s_block_size;
@@ -107,7 +107,7 @@ int fs_stat()
 
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_stat() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   r = stat_inode(rip, 0, fs_m_in.m_source, fs_m_in.REQ_GRANT);

@@ -27,5 +27,5 @@ char *str;
 	return ERR;
   }
   *str = '\0';
-  return OK;
+  return 0;
 }

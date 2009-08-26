@@ -45,17 +45,17 @@ int optlen;
 		switch (*opt)
 		{
 		case IP_OPT_EOL:	/* End of Option list */
-			return NW_OK;
+			return 0;
 		case IP_OPT_NOP:	/* No Operation */
 			i++;
 			opt++;
 			break;
 		case IP_OPT_SEC:	/* Security */
 			if (security_present)
-				return EINVAL;
+				return -EINVAL;
 			security_present= TRUE;
 			if (opt[1] != 11)
-				return EINVAL;
+				return -EINVAL;
 			i += opt[1];
 			opt += opt[1];
 			break;
@@ -63,42 +63,42 @@ int optlen;
 			if (lose_source_present)
 			{
 				DBLOCK(1, printf("2nd lose soruce route\n"));
-				return EINVAL;
+				return -EINVAL;
 			}
 			lose_source_present= TRUE;
 			if (opt[1]<3)
 			{
 				DBLOCK(1,
 				printf("wrong length in source route\n"));
-				return EINVAL;
+				return -EINVAL;
 			}
 			i += opt[1];
 			opt += opt[1];
 			break;
 		case IP_OPT_SSRR:	/* Strict Source and Record Route */
 			if (strict_source_present)
-				return EINVAL;
+				return -EINVAL;
 			strict_source_present= TRUE;
 			if (opt[1]<3)
-				return EINVAL;
+				return -EINVAL;
 			i += opt[1];
 			opt += opt[1];
 			break;
 		case IP_OPT_RR:		/* Record Route */
 			if (record_route_present)
-				return EINVAL;
+				return -EINVAL;
 			record_route_present= TRUE;
 			if (opt[1]<3)
-				return EINVAL;
+				return -EINVAL;
 			i += opt[1];
 			opt += opt[1];
 			break;
 		case IP_OPT_TS:		/* Timestamp */
 			if (timestamp_present)
-				return EINVAL;
+				return -EINVAL;
 			timestamp_present= TRUE;
 			if (opt[1] != 4)
-				return EINVAL;
+				return -EINVAL;
 			switch (opt[3] & 0xff)
 			{
 			case 0:
@@ -106,27 +106,27 @@ int optlen;
 			case 3:
 				break;
 			default:
-				return EINVAL;
+				return -EINVAL;
 			}
 			i += opt[1];
 			opt += opt[1];
 			break;
 		case IP_OPT_RTRALT:
 			if (opt[1] != 4)
-				return EINVAL;
+				return -EINVAL;
 			i += opt[1];
 			opt += opt[1];
 			break;
 		default:
-			return EINVAL;
+			return -EINVAL;
 		}
 	}
 	if (i > optlen)
 	{
 		DBLOCK(1, printf("option of wrong length\n"));
-		return EINVAL;
+		return -EINVAL;
 	}
-	return NW_OK;
+	return 0;
 }
 
 void ip_print_frags(acc)

@@ -67,7 +67,7 @@ register message *m_ptr;    /* pointer to request message */
 	}
 	kprintf("\n");
 	
-	return OK;
+	return 0;
 
   case PROF_GET:
 
@@ -79,7 +79,7 @@ register message *m_ptr;    /* pointer to request message */
 	 */
 
 	if(!isokendpt(m_ptr->PROF_ENDPT, &proc_nr))
-		return EINVAL;
+		return -EINVAL;
 
 	cprof_mem_size = m_ptr->PROF_MEM_SIZE;
 
@@ -127,7 +127,7 @@ register message *m_ptr;    /* pointer to request message */
 		sizeof(cprof_info));
 
 	/* If there is no space or errors occurred, don't bother copying. */
-	if (cprof_info.mem_used == -1 || cprof_info.err) return OK;
+	if (cprof_info.mem_used == -1 || cprof_info.err) return 0;
 
 	/* For each profiled process, copy its name, slots_used and profiling
 	 * table to the user process. */
@@ -151,10 +151,10 @@ register message *m_ptr;    /* pointer to request message */
 		vir_dst += len;
 	}
 
-	return OK;
+	return 0;
 
   default:
-	return EINVAL;
+	return -EINVAL;
   }
 }
 

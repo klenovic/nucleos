@@ -19,8 +19,8 @@ int sys_umap_data_fb(endpoint_t ep, vir_bytes buf, vir_bytes len, phys_bytes *ph
 {
 	int r;
 
-        if((r=sys_umap(ep, VM_D, buf, len, phys)) != OK) {
-		if(r != EINVAL)
+        if((r=sys_umap(ep, VM_D, buf, len, phys)) != 0) {
+		if(r != -EINVAL)
 			return r;
         	r = sys_umap(ep, D, buf, len, phys);
 	}
@@ -49,14 +49,14 @@ void *alloc_contig(size_t len, int flags, phys_bytes *phys)
 	buf = (vir_bytes) mmap(0, len, PROT_READ|PROT_WRITE, mmapflags, -1, 0);
 
 	/* If that failed, maybe we're not running in paged mode.
-	 * If that's the case, ENXIO will be returned.
+	 * If that's the case, -ENXIO will be returned.
 	 * Memory returned with malloc() will be preallocated and 
 	 * contiguous, so fallback on that, and ask for a little extra
 	 * so we can page align it ourselves.
 	 */
 	if(buf == (vir_bytes) MAP_FAILED) {
 		u32_t align = 0;
-		if(errno != (_SIGN ENXIO)) {
+		if(errno != ENXIO) {
 			return NULL;
 		}
 		if(flags & AC_ALIGN4K)
@@ -74,7 +74,7 @@ void *alloc_contig(size_t len, int flags, phys_bytes *phys)
 	}
 
 	/* Get physical address. */
-        if(sys_umap_data_fb(SELF, buf, len, phys) != OK)
+        if(sys_umap_data_fb(SELF, buf, len, phys) != 0)
 		panic("alloc_contig.c", "sys_umap_data_fb failed", NO_NUM);
 
 	return (void *) buf;

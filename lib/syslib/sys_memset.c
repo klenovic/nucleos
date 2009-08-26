@@ -14,7 +14,7 @@ int sys_memset(unsigned long pattern, phys_bytes base, phys_bytes bytes)
 /* Zero a block of data.  */
   message mess;
 
-  if (bytes == 0L) return(OK);
+  if (bytes == 0L) return 0;
 
   mess.MEM_PTR = (char *) base;
   mess.MEM_COUNT   = bytes;

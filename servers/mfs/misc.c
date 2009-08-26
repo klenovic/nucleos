@@ -38,7 +38,7 @@ int fs_sync()
 	if (bp->b_dev != NO_DEV && bp->b_dirt == DIRTY) 
             flushall(bp->b_dev);
 
-  return(OK);		/* sync() can't fail */
+  return 0;		/* sync() can't fail */
 }
 
 
@@ -55,12 +55,12 @@ int fs_flush()
   dev= fs_m_in.REQ_DEV;
   if (dev == fs_dev)
   {
-	return EBUSY;
+	return -EBUSY;
   }
   flushall(dev);
   invalidate(dev);
 
-  return(OK);
+  return 0;
 }
 
 

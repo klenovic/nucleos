@@ -46,9 +46,9 @@ int sys_whoami(endpoint_t *who_ep, char *who_name, int len)
 	m.I_REQUEST = GET_WHOAMI;
 
 	if(len < 2)
-		return EINVAL;
+		return -EINVAL;
 
-	if((r = _taskcall(SYSTASK, SYS_GETINFO, &m)) != OK)
+	if((r = _taskcall(SYSTASK, SYS_GETINFO, &m)) != 0)
 		return r;
 
 	lenmin = MIN(len, sizeof(m.GIWHO_NAME)) - 1;
@@ -57,6 +57,6 @@ int sys_whoami(endpoint_t *who_ep, char *who_name, int len)
 	who_name[lenmin] = '\0';
 	*who_ep = m.GIWHO_EP;
 
-	return OK;
+	return 0;
 }
 

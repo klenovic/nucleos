@@ -75,7 +75,7 @@ int mine;
       phys_copy(BIOS_VECTOR(8) * 4L, VECTOR(8) * 4L, 8 * 4L);
 #endif
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*

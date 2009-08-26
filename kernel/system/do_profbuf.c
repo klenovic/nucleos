@@ -38,10 +38,10 @@ register message *m_ptr;    /* pointer to request message */
 
   /* Store process name, control struct, table locations. */
   if(!isokendpt(m_ptr->m_source, &proc_nr))
-	return EDEADSRCDST;
+	return -EDEADSRCDST;
 
   if(cprof_procs_no >= NR_SYS_PROCS)
-	return ENOSPC;
+	return -ENOSPC;
 
   rp = proc_addr(proc_nr);
 
@@ -53,7 +53,7 @@ register message *m_ptr;    /* pointer to request message */
 
   cprof_procs_no++;
 
-  return OK;
+  return 0;
 }
 
 

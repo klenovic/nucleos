@@ -286,14 +286,14 @@ int arch_get_params(char *params, int maxsize)
 	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params),
 		MIN(maxsize, params_size));
 	params[maxsize-1] = '\0';
-	return OK;
+	return 0;
       }
 
 int arch_set_params(char *params, int size)
 {
 	if(size > params_size)
-		return E2BIG;
+		return -E2BIG;
 	phys_copy(vir2phys(params), seg2phys(mon_ds) + params_offset, size);
-	return OK;
+	return 0;
 }
 

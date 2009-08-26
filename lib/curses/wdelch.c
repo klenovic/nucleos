@@ -33,5 +33,5 @@ WINDOW *win;
   win->_maxchng[y] = maxx;
   if (win->_minchng[y] == _NO_CHANGE || win->_minchng[y] > x)
 	win->_minchng[y] = x;
-  return(OK);
+  return 0;
 }

@@ -59,15 +59,15 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 	 */
 	if(!isokendpt(granter, &proc_nr) || !GRANT_VALID(grant)) {
 		kprintf("grant verify failed: invalid granter or grant\n");
-		return(EINVAL);
+		return(-EINVAL);
 	}
 	granter_proc = proc_addr(proc_nr);
 
 	/* If there is no priv. structure, or no grant table in the
 	 * priv. structure, or the grant table in the priv. structure
-	 * is too small for the grant, return EPERM.
+	 * is too small for the grant, return -EPERM.
 	 */
-	if(!HASGRANTTABLE(granter_proc)) return EPERM;
+	if(!HASGRANTTABLE(granter_proc)) return -EPERM;
 
 	if(priv(granter_proc)->s_grant_entries <= grant) {
 		static int curr= 0, limit= 100, extra= 20;
@@ -86,19 +86,19 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		else if (curr == 2*limit-1)
 			limit *= 2;
 		curr++;
-		return(EPERM);
+		return(-EPERM);
 	}
 
 	/* Copy the grant entry corresponding to this id to see what it
 	 * looks like. If it fails, hide the fact that granter has
 	 * (presumably) set an invalid grant table entry by returning
-	 * EPERM, just like with an invalid grant id.
+	 * -EPERM, just like with an invalid grant id.
 	 */
 	if((r=data_copy(granter,
 		priv(granter_proc)->s_grant_table + sizeof(g)*grant,
-		SYSTEM, (vir_bytes) &g, sizeof(g))) != OK) {
+		SYSTEM, (vir_bytes) &g, sizeof(g))) != 0) {
 		kprintf("verify_grant: grant verify: data_copy failed\n");
-		return EPERM;
+		return -EPERM;
 	}
 
 	/* Check validity. */
@@ -106,7 +106,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		kprintf(
 		"verify_grant: grant failed: invalid (%d flags 0x%lx)\n",
 			grant, g.cp_flags);
-		return EPERM;
+		return -EPERM;
 	}
 
 	/* Check access of grant. */
@@ -114,7 +114,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		kprintf(
 	"verify_grant: grant verify failed: access invalid; want 0x%x, have 0x%x\n",
 			access, g.cp_flags);
-		return EPERM;
+		return -EPERM;
 	}
 
 	if((g.cp_flags & CPF_DIRECT)) {
@@ -125,14 +125,14 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 			g.cp_u.cp_direct.cp_start - 1) {
 			kprintf(
 		"verify_grant: direct grant verify failed: len too long\n");
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify actual grantee. */
 		if(g.cp_u.cp_direct.cp_who_to != grantee && grantee != ANY) {
 			kprintf(
 		"verify_grant: direct grant verify failed: bad grantee\n");
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify actual copy range. */
@@ -144,7 +144,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 				g.cp_u.cp_direct.cp_len,
 				g.cp_u.cp_direct.cp_start,
 				bytes, offset_in);
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify successful - tell caller what address it is. */
@@ -158,14 +158,14 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 			kprintf(
 		"verify_grant: magic grant verify failed: granter (%d) "
 		"is not FS (%d)\n", granter, FS_PROC_NR);
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify actual grantee. */
 		if(g.cp_u.cp_magic.cp_who_to != grantee && grantee != ANY) {
 			kprintf(
 		"verify_grant: magic grant verify failed: bad grantee\n");
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify actual copy range. */
@@ -177,7 +177,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 				g.cp_u.cp_magic.cp_len,
 				g.cp_u.cp_magic.cp_start,
 				bytes, offset_in);
-			return EPERM;
+			return -EPERM;
 		}
 
 		/* Verify successful - tell caller what address it is. */
@@ -186,10 +186,10 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 	} else {
 		kprintf(
 		"verify_grant: grant verify failed: unknown grant type\n");
-		return EPERM;
+		return -EPERM;
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -213,8 +213,8 @@ int access;			/* CPF_READ for a copy from granter to grantee, CPF_WRITE
 	struct proc *granter_p;
 
 	/* See if there is a reasonable grant table. */
-	if(!(granter_p = endpoint_lookup(granter))) return EINVAL;
-	if(!HASGRANTTABLE(granter_p)) return EPERM;
+	if(!(granter_p = endpoint_lookup(granter))) return -EINVAL;
+	if(!HASGRANTTABLE(granter_p)) return -EPERM;
 
 	/* Decide who is src and who is dst. */
 	if(access & CPF_READ) {
@@ -227,7 +227,7 @@ int access;			/* CPF_READ for a copy from granter to grantee, CPF_WRITE
 
 	/* Verify permission exists. */
 	if((r=verify_grant(granter, grantee, grantid, bytes, access,
-	    g_offset, &v_offset, &new_granter)) != OK) {
+	    g_offset, &v_offset, &new_granter)) != 0) {
 		static int curr= 0, limit= 100, extra= 20;
 
 		if (curr < limit+extra)
@@ -325,7 +325,7 @@ register message *m_ptr;	/* pointer to request message */
 	bytes = els * sizeof(struct vscp_vec);
 
 	/* Obtain vector of copies. */
-	if((r=virtual_copy_vmcheck(&src, &dst, bytes)) != OK)
+	if((r=virtual_copy_vmcheck(&src, &dst, bytes)) != 0)
 		return r;
 
 	/* Perform safecopies. */
@@ -341,17 +341,17 @@ register message *m_ptr;	/* pointer to request message */
 		} else {
 			kprintf("vsafecopy: %d: element %d/%d: no SELF found\n",
 				who_e, i, els);
-			return EINVAL;
+			return -EINVAL;
 		}
 
 		/* Do safecopy for this element. */
 		if((r=safecopy(granter, who_e, vec[i].v_gid, D, D,
 			vec[i].v_bytes, vec[i].v_offset,
-			vec[i].v_addr, access)) != OK) {
+			vec[i].v_addr, access)) != 0) {
 			return r;
 		}
 	}
 
-	return OK;
+	return 0;
 }
 

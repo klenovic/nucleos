@@ -57,7 +57,7 @@ int fs_clone_opcl(void)
   fs_m_out.m_source = ip->i_dev;
   fs_m_out.RES_INODE_NR = ip->i_num;
   fs_m_out.RES_MODE = ip->i_mode;
-  return OK;
+  return 0;
 }
 
 
@@ -69,7 +69,7 @@ int fs_new_driver(void)
  /* New driver endpoint for this device */
   driver_endpoints[(fs_m_in.REQ_DEV >> MAJOR) & BYTE].driver_e =
       fs_m_in.REQ_DRIVER_E;
-  return OK;
+  return 0;
 }
 
 
@@ -216,7 +216,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   /* See if driver is roughly valid. */
   if (driver_e == NONE) {
       printf("MFS(%d) block_dev_io: no driver for dev %x\n", SELF_E, dev);
-      return EDSTDIED;
+      return -EDSTDIED;
   }
   
   /* The io vector copying relies on this I/O being for FS itself. */
@@ -257,15 +257,15 @@ int flags;			/* special flags, like O_NONBLOCK */
    * - VFS unmaps it, waits for new driver
    * - VFS sends the new driver endp for the FS proc and the request again 
    */
-  if (r != OK) {
-      if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+  if (r != 0) {
+      if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           printf("MFS(%d) dead driver %d\n", SELF_E, driver_e);
           driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = NONE;
           return r;
           /*dmap_unmap_by_endpt(task_nr);    <- in the VFS proc...  */
       }
-      else if (r == ELOCKED) {
-          printf("MFS(%d) ELOCKED talking to %d\n", SELF_E, driver_e);
+      else if (r == -ELOCKED) {
+          printf("MFS(%d) -ELOCKED talking to %d\n", SELF_E, driver_e);
           return r;
       }
       else 
@@ -275,7 +275,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       /* Did the process we did the sendrec() for get a result? */
       if (m.REP_ENDPT != proc_e) {
           printf("MFS(%d) strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n", SELF_E, m.m_source, m.m_type, proc_e, m.REP_ENDPT);
-          r = EIO;
+          r = -EIO;
       }
   }
 
@@ -284,7 +284,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       panic(__FILE__, "MFS block_dev_io: driver returned SUSPEND", NO_NUM);
   }
 
-  if(buf != buf_used && r == OK) {
+  if(buf != buf_used && r == 0) {
       memcpy(buf, buf_used, bytes * sizeof(iovec_t));
   }
 
@@ -366,16 +366,16 @@ message *mess_ptr;		/* pointer to message for task */
   proc_e = mess_ptr->IO_ENDPT;
 
   r = sendrec(task_nr, mess_ptr);
-	if (r != OK) {
-		if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+	if (r != 0) {
+		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
 			panic(__FILE__, "should handle crashed drivers",
 				NO_NUM);
 			/* dmap_unmap_by_endpt(task_nr); */
 			return r;
 		}
-		if (r == ELOCKED) {
-			printf("fs: ELOCKED talking to %d\n", task_nr);
+		if (r == -ELOCKED) {
+			printf("fs: -ELOCKED talking to %d\n", task_nr);
 			return r;
 		}
 		panic(__FILE__,"call_task: can't send/receive", r);
@@ -389,9 +389,9 @@ message *mess_ptr;		/* pointer to message for task */
 			mess_ptr->m_type,
 			proc_e,
 			mess_ptr->REP_ENDPT);
-		return EIO;
+		return -EIO;
 	}
 
-  return OK;
+  return 0;
 }
 

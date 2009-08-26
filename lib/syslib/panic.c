@@ -35,7 +35,7 @@ int num;			/* number to go with format string */
   if(panicing) return;
   panicing= 1;
 
-  if(sys_whoami(&me, name, sizeof(name)) == OK && me != NONE)
+  if(sys_whoami(&me, name, sizeof(name)) == 0 && me != NONE)
 	printf("%s(%d): ", name, me);
   else
 	printf("(sys_whoami failed): ");

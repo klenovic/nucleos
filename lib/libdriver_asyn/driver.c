@@ -93,7 +93,7 @@ struct driver *dp;	/* Device dependent entry points. */
 	} else {
 		int s;
 		/* Wait for a request to read or write a disk block. */
-		if ((s=receive(ANY, &mess)) != OK)
+		if ((s=receive(ANY, &mess)) != 0)
         		panic((*dp->dr_name)(),"receive() failed", s);
 	}
 
@@ -166,7 +166,7 @@ struct driver *dp;	/* Device dependent entry points. */
 		if(dp->dr_other)
 			r = (*dp->dr_other)(dp, &mess, 0);
 		else	
-			r = EINVAL;
+			r = -EINVAL;
 		break;
 	}
 
@@ -174,7 +174,7 @@ struct driver *dp;	/* Device dependent entry points. */
 	(*dp->dr_cleanup)();
 
 	/* Finally, prepare and send the reply message. */
-	if (r != EDONTREPLY) {
+	if (r != -EDONTREPLY) {
 		if (mess.m_type == DEV_OPEN)
 		{
 			reply_mess.m_type = DEV_REVIVE;
@@ -225,7 +225,7 @@ struct driver *dp;	/* Device dependent entry points. */
 			reply_mess.REP_STATUS = r;	
 		}
 		r= asynsend(device_caller, &reply_mess);
-		if (r != OK)
+		if (r != 0)
 		{
 			printf("driver_task: unable to asynsend to %d: %d\n",
 				device_caller, r);
@@ -267,16 +267,16 @@ int safe;			/* use safecopies? */
   u64_t position;
 
   /* Disk address?  Address and length of the user buffer? */
-  if (mp->COUNT < 0) return(EINVAL);
+  if (mp->COUNT < 0) return(-EINVAL);
 
   /* Check the user buffer (not relevant for safe copies). */
   if(!safe) {
 	  sys_umap(mp->IO_ENDPT, D, (vir_bytes) mp->ADDRESS, mp->COUNT, &phys_addr);
-	  if (phys_addr == 0) return(EFAULT);
+	  if (phys_addr == 0) return(-EFAULT);
   }
 
   /* Prepare for I/O. */
-  if ((*dp->dr_prepare)(mp->DEVICE) == NIL_DEV) return(ENXIO);
+  if ((*dp->dr_prepare)(mp->DEVICE) == NIL_DEV) return(-ENXIO);
 
   /* Create a one element scatter/gather vector for the buffer. */
   if(
@@ -294,7 +294,7 @@ int safe;			/* use safecopies? */
   r = (*dp->dr_transfer)(mp->IO_ENDPT, opcode, position, &iovec1, 1, safe);
 
   /* Return the number of bytes transferred or an error code. */
-  return(r == OK ? (mp->COUNT - iovec1.iov_size) : r);
+  return(r == 0 ? (mp->COUNT - iovec1.iov_size) : r);
 }
 
 /*==========================================================================*
@@ -324,13 +324,13 @@ int safe;		/* use safecopies? */
     iovec_size = (phys_bytes) (nr_req * sizeof(iovec[0]));
 
     if(safe) {
-	    if (OK != sys_safecopyfrom(mp->m_source, (vir_bytes) mp->IO_GRANT, 
-    			0, (vir_bytes) iovec, iovec_size, D)) {
+	    if (sys_safecopyfrom(mp->m_source, (vir_bytes) mp->IO_GRANT, 
+    			0, (vir_bytes) iovec, iovec_size, D) != 0) {
         	panic((*dp->dr_name)(),"bad (safe) I/O vector by", mp->m_source);
 	    }
     } else {
-	    if (OK != sys_datacopy(mp->m_source, (vir_bytes) mp->ADDRESS, 
-    			SELF, (vir_bytes) iovec, iovec_size)) {
+	    if (sys_datacopy(mp->m_source, (vir_bytes) mp->ADDRESS, 
+    			SELF, (vir_bytes) iovec, iovec_size) != 0) {
         	panic((*dp->dr_name)(),"bad I/O vector by", mp->m_source);
 	    }
     }
@@ -339,7 +339,7 @@ int safe;		/* use safecopies? */
   }
 
   /* Prepare for I/O. */
-  if ((*dp->dr_prepare)(mp->DEVICE) == NIL_DEV) return(ENXIO);
+  if ((*dp->dr_prepare)(mp->DEVICE) == NIL_DEV) return(-ENXIO);
 
   /* Transfer bytes from/to the device. */
   opcode = mp->m_type;
@@ -349,8 +349,8 @@ int safe;		/* use safecopies? */
 
   /* Copy the I/O vector back to the caller. */
   if(safe) {
-    if (OK != sys_safecopyto(mp->m_source, (vir_bytes) mp->IO_GRANT, 
-    		0, (vir_bytes) iovec, iovec_size, D)) {
+    if (sys_safecopyto(mp->m_source, (vir_bytes) mp->IO_GRANT, 
+    		0, (vir_bytes) iovec, iovec_size, D) != 0) {
         panic((*dp->dr_name)(),"couldn't return I/O vector", mp->m_source);
     }
   } else {
@@ -386,13 +386,13 @@ message *mp;
 /* Nothing there, or nothing to do. */
 
   switch (mp->m_type) {
-  case DEV_OPEN:	return(ENODEV);
-  case DEV_CLOSE:	return(OK);
+  case DEV_OPEN:	return(-ENODEV);
+  case DEV_CLOSE:	return 0;
   case DEV_IOCTL_S:	
 #ifdef DEV_IOCTL
-  case DEV_IOCTL:	return(ENOTTY);
+  case DEV_IOCTL:	return(-ENOTTY);
 #endif
-  default:		printf("nop: ignoring code %d\n", mp->m_type); return(EIO);
+  default:		printf("nop: ignoring code %d\n", mp->m_type); return(-EIO);
   }
 }
 
@@ -404,7 +404,7 @@ struct driver *dp;
 message *mp;
 int safe;
 {
-  return(ENOTTY);
+  return(-ENOTTY);
 }
 
 /*============================================================================*
@@ -450,7 +450,7 @@ void nop_cleanup()
 int nop_cancel(struct driver *dr, message *m)
 {
 /* Nothing to do for cancel. */
-   return(OK);
+   return 0;
 }
 
 /*===========================================================================*
@@ -459,7 +459,7 @@ int nop_cancel(struct driver *dr, message *m)
 int nop_select(struct driver *dr, message *m)
 {
 /* Nothing to do for select. */
-   return(OK);
+   return 0;
 }
 
 /*============================================================================*
@@ -478,11 +478,11 @@ int safe;			/* addresses or grants? */
   if (mp->REQUEST != DIOCSETP && mp->REQUEST != DIOCGETP) {
   	if(dp->dr_other) {
   		return dp->dr_other(dp, mp, safe);
-  	} else return(ENOTTY);
+  	} else return(-ENOTTY);
   }
 
   /* Decode the message parameters. */
-  if ((dv = (*dp->dr_prepare)(mp->DEVICE)) == NIL_DEV) return(ENXIO);
+  if ((dv = (*dp->dr_prepare)(mp->DEVICE)) == NIL_DEV) return(-ENXIO);
 
   if (mp->REQUEST == DIOCSETP) {
 	/* Copy just this one partition table entry. */
@@ -493,7 +493,7 @@ int safe;			/* addresses or grants? */
 	  s=sys_datacopy(mp->IO_ENDPT, (vir_bytes) mp->ADDRESS,
 		SELF, (vir_bytes) &entry, sizeof(entry));
 	}
-	if(s != OK)
+	if(s != 0)
 	    return s;
 	dv->dv_base = entry.base;
 	dv->dv_size = entry.size;
@@ -509,10 +509,10 @@ int safe;			/* addresses or grants? */
 	  s=sys_datacopy(SELF, (vir_bytes) &entry,
 		mp->IO_ENDPT, (vir_bytes) mp->ADDRESS, sizeof(entry));
 	}
-        if (OK != s) 
+        if (s != 0) 
 	    return s;
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -534,7 +534,7 @@ int mq_queue(message *m)
 		mi->mq_next = mq;
 	}
 
-	return OK;
+	return 0;
 }
 
 #if 0
@@ -556,7 +556,7 @@ message *mp;
 		flags= msgtable[first_slot].flags;
 		if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
 		{
-			if (msgtable[first_slot].result != OK)
+			if (msgtable[first_slot].result != 0)
 			{
 				printf(
 			"asynsend: found completed entry %d with error %d\n",
@@ -579,7 +579,7 @@ message *mp;
 	{
 		/* Tell the kernel to stop processing */
 		r= senda(NULL, 0);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "asynsend: senda failed", r);
 
 		dst_ind= 0;
@@ -589,7 +589,7 @@ message *mp;
 			if ((flags & (AMF_VALID|AMF_DONE)) ==
 				(AMF_VALID|AMF_DONE))
 			{
-				if (msgtable[src_ind].result != OK)
+				if (msgtable[src_ind].result != 0)
 				{
 					printf(
 			"asynsend: found completed entry %d with error %d\n",

@@ -96,7 +96,7 @@ int main()
 			result= SUSPEND;		/* don't reply */
 		}
 		else
-			result= ENOSYS;
+			result= -ENOSYS;
 		break;
 	case PM_EXIT_REPLY:
 	case PM_REBOOT_REPLY:
@@ -108,7 +108,7 @@ int main()
 			result= SUSPEND;		/* don't reply */
 	}
 		else
-			result= ENOSYS;
+			result= -ENOSYS;
 		break;
 	case ALLOCMEM:
 		result= do_allocmem();
@@ -136,7 +136,7 @@ int main()
 		 * call.
 		 */
 		if ((unsigned) call_nr >= NCALLS) {
-		result = ENOSYS;
+		result = -ENOSYS;
 	} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 			calls_stats[call_nr]++;
@@ -163,7 +163,7 @@ int main()
 		if ((rmp->mp_flags & (REPLY | IN_USE | EXITING)) ==
 		   (REPLY | IN_USE)) {
 			s=sendnb(rmp->mp_endpoint, &rmp->mp_reply);
-			if (s != OK) {
+			if (s != 0) {
 				printf("PM can't reply to %d (%s): %d\n",
 					rmp->mp_endpoint, rmp->mp_name, s);
 			}
@@ -171,7 +171,7 @@ int main()
 		}
 	}
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -180,11 +180,11 @@ int main()
 static void get_work()
 {
 /* Wait for the next message and extract useful information from it. */
-  if (receive(ANY, &m_in) != OK)
+  if (receive(ANY, &m_in) != 0)
 	panic(__FILE__,"PM receive error", NO_NUM);
   who_e = m_in.m_source;	/* who sent the message */
 
-  if(pm_isokendpt(who_e, &who_p) != OK)
+  if(pm_isokendpt(who_e, &who_p) != 0)
 	  panic(__FILE__, "PM got message from invalid endpoint", who_e);
 
   call_nr = m_in.m_type;	/* system call number */
@@ -205,7 +205,7 @@ static void get_work()
  *===========================================================================*/
 void setreply(proc_nr, result)
 int proc_nr;			/* process to reply to */
-int result;			/* result of call (usually OK or error #) */
+int result;			/* result of call (usually 0 or error #) */
 {
 /* Fill in a reply message to be sent later to a user process.  System calls
  * may occasionally fill in other fields, this is only for the main return
@@ -272,15 +272,15 @@ static void pm_init()
    * Parse the list of free memory chunks. This list is what the boot monitor 
    * reported, but it must be corrected for the kernel and system processes.
    */
-  if ((s=sys_getmonparams(monitor_params, sizeof(monitor_params))) != OK)
+  if ((s=sys_getmonparams(monitor_params, sizeof(monitor_params))) != 0)
       panic(__FILE__,"get monitor params failed",s);
-  if ((s=sys_getkinfo(&kinfo)) != OK)
+  if ((s=sys_getkinfo(&kinfo)) != 0)
       panic(__FILE__,"get kernel info failed",s);
 
   /* Initialize PM's process table. Request a copy of the system image table 
    * that is defined at the kernel level to see which slots to fill in.
    */
-  if (OK != (s=sys_getimage(image))) 
+  if ((s=sys_getimage(image)) != 0) 
   	panic(__FILE__,"couldn't get image table: %d\n", s);
   procs_in_use = 0;				/* start populating table */
   for (ip = &image[0]; ip < &image[NR_BOOT_PROCS]; ip++) {		
@@ -318,12 +318,12 @@ static void pm_init()
 		mess.PR_SLOT = ip->proc_nr;
 		mess.PR_PID = rmp->mp_pid;
 		mess.PR_ENDPT = rmp->mp_endpoint;
-  		if (OK != (s=send(FS_PROC_NR, &mess)))
+  		if ((s=send(FS_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"can't sync up with FS", s);
 
 		/* Register proces with ds */
 		s= ds_publish_u32(rmp->mp_name, rmp->mp_endpoint);
-		if (s != OK)
+		if (s != 0)
 			failed++;
   	}
   }
@@ -341,7 +341,7 @@ static void pm_init()
 
   /* Tell FS that no more system processes follow and synchronize. */
   mess.PR_ENDPT = NONE;
-  if (sendrec(FS_PROC_NR, &mess) != OK || mess.m_type != OK)
+  if (sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
 	panic(__FILE__,"can't sync up with FS", NO_NUM);
 
 #ifdef CONFIG_X86_32
@@ -380,7 +380,7 @@ void checkme(char *str, int line)
 		if ((trmp->mp_flags & (REPLY | IN_USE | EXITING)) ==
 		   (REPLY | IN_USE)) {
 			int tp;
-			if(pm_isokendpt(trmp->mp_endpoint, &tp) != OK) {
+			if(pm_isokendpt(trmp->mp_endpoint, &tp) != 0) {
 			   printf("PM: %s:%d: reply %d to %s is bogus endpoint %d after call %d by %d\n",
 				str, line, trmp->mp_reply.m_type,
 				trmp->mp_name, trmp->mp_endpoint, call_nr, who_e);
@@ -431,7 +431,7 @@ static void send_work()
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the original caller */
-			setreply(rmp-mproc, OK);
+			setreply(rmp-mproc, 0);
 			break;
 
 		case PM_SETUID:
@@ -444,7 +444,7 @@ static void send_work()
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the original caller */
-			setreply(rmp-mproc, OK);
+			setreply(rmp-mproc, 0);
 			break;
 
 		case PM_FORK:
@@ -464,7 +464,7 @@ static void send_work()
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the newly created process */
-			setreply(rmp-mproc, OK);
+			setreply(rmp-mproc, 0);
 
 			/* Wakeup the parent */
 			setreply(parent_mp-mproc, rmp->mp_pid);
@@ -490,7 +490,7 @@ static void send_work()
 			/* Ask the kernel to deliver the signal */
 			r= sys_sigsend(rmp->mp_endpoint,
 				&rmp->mp_sigmsg);
-			if (r != OK) {
+			if (r != 0) {
 #if 0
 				panic(__FILE__,"sys_sigsend failed",r);
 #else
@@ -571,7 +571,7 @@ static void send_work()
 		report_reboot= FALSE;
 	}
 	r= send(FS_PROC_NR, &m);
-	if (r != OK) panic("pm", "send_work: send failed", r);
+	if (r != 0) panic("pm", "send_work: send failed", r);
 }
 
 static void handle_fs_reply(m_ptr)
@@ -585,7 +585,7 @@ message *m_ptr;
 	case PM_EXIT_REPLY:
 		proc_e= m_ptr->PM_EXIT_PROC;
 
-		if (pm_isokendpt(proc_e, &proc_n) != OK)
+		if (pm_isokendpt(proc_e, &proc_n) != 0)
 			panic(__FILE__,	"PM_EXIT_REPLY: got bad endpoint from FS", proc_e);
 
 		rmp= &mproc[proc_n];
@@ -614,7 +614,7 @@ message *m_ptr;
 
 	case PM_EXEC_REPLY:
 		proc_e= m_ptr->PM_EXEC_PROC;
-		if (pm_isokendpt(proc_e, &proc_n) != OK)
+		if (pm_isokendpt(proc_e, &proc_n) != 0)
 		{
 			panic(__FILE__,
 				"PM_EXIT_REPLY: got bad endpoint from FS",
@@ -635,12 +635,12 @@ message *m_ptr;
 	{
 		proc_e= m_ptr->PM_CORE_PROC;
 
-		if (pm_isokendpt(proc_e, &proc_n) != OK)
+		if (pm_isokendpt(proc_e, &proc_n) != 0)
 			panic(__FILE__, "PM_EXIT_REPLY: got bad endpoint from FS", proc_e);
 
 		rmp= &mproc[proc_n];
 
-		if (m_ptr->PM_CORE_STATUS == OK)
+		if (m_ptr->PM_CORE_STATUS == 0)
 			rmp->mp_sigstatus |= DUMPED;
 
 		/* Call is finished */

@@ -57,7 +57,7 @@ int mixer_init() {
 
 	dprint("Mixer detected\n");
 
-	return OK;
+	return 0;
 }
 
 
@@ -131,7 +131,7 @@ static int get_set_volume(struct volume_level *level, int flag) {
 		level->right >>= shift;
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -185,7 +185,7 @@ static int get_set_input(struct inout_ctrl *input, int flag, int channel) {
 		}
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -233,7 +233,7 @@ static int get_set_output(struct inout_ctrl *output, int flag) {
 		}
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -245,7 +245,7 @@ int mixer_set(int reg, int data) {
 	for(i = 0; i < 100; i++);
 	sb16_outb(MIXER_DATA, data);
 
-	return OK;
+	return 0;
 }
 
 

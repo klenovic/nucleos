@@ -145,7 +145,7 @@ icmp_port_t *icmp_port;
 			icmp_port->icp_flags |= ICPF_SUSPEND;
 			break;
 		}
-		assert(result == NW_OK);
+		assert(result == 0);
 
 		/* falls through */
 	case ICPS_IPOPT:
@@ -193,7 +193,7 @@ int for_ioctl;
 				ev_enqueue(&icmp_port->icp_event, icmp_write,
 					ev_arg);
 			}
-			return NW_OK;
+			return 0;
 		}
 		return bf_cut(icmp_port->icp_write_pack, offset, count);
 	}
@@ -203,7 +203,7 @@ int for_ioctl;
 		if (!count)
 		{
 			result= (int)offset;
-			assert(result == NW_OK);
+			assert(result == 0);
 			if (result < 0)
 			{
 				icmp_port->icp_state= ICPS_ERROR;
@@ -211,7 +211,7 @@ int for_ioctl;
 			}
 			if (icmp_port->icp_flags & ICPF_SUSPEND)
 				icmp_main(icmp_port);
-			return NW_OK;
+			return 0;
 		}
 
 		data= bf_memreq (sizeof (*ipopt));
@@ -256,10 +256,10 @@ int for_ioctl;
 					~(ICPF_READ_IP|ICPF_READ_SP);
 				icmp_read (icmp_port);
 			}
-			return NW_OK;
+			return 0;
 		}
 		process_data(icmp_port, data);
-		return NW_OK;
+		return 0;
 	}
 	switch (icmp_port->icp_state)
 	{
@@ -794,9 +794,9 @@ ev_arg_t ev_arg;
 
 		result= ip_send(icmp_port->icp_ipfd, data,
 			bf_bufsize(data));
-		if (result != NW_WOULDBLOCK)
+		if (result != -EWOULDBLOCK)
 		{
-			if (result == NW_OK)
+			if (result == 0)
 				continue;
 			DBLOCK(1, printf("icmp_write: error %d\n", result););
 			continue;

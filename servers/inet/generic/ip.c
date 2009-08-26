@@ -95,14 +95,14 @@ void ip_init()
 			result= ipeth_init(ip_port);
 			if (result == -1)
 				continue;
-			assert(result == NW_OK);
+			assert(result == 0);
 			break;
 		case IPDL_PSIP:
 			ip_port->ip_dl.dl_ps.ps_port= icp->ic_port;
 			result= ipps_init(ip_port);
 			if (result == -1)
 				continue;
-			assert(result == NW_OK);
+			assert(result == 0);
 			break;
 		default:
 			ip_panic(( "unknown ip_dl_type %d", 
@@ -160,14 +160,14 @@ int which_operation;
 		assert (ip_fd->if_flags & IFF_IOCTL_IP);
 		ip_fd->if_flags &= ~IFF_IOCTL_IP;
 		repl_res= (*ip_fd->if_get_userdata)(ip_fd->if_srfd, 
-			(size_t)EINTR, (size_t)0, TRUE);
+			(size_t)-EINTR, (size_t)0, TRUE);
 		assert (!repl_res);
 		break;
 	case SR_CANCEL_READ:
 		assert (ip_fd->if_flags & IFF_READ_IP);
 		ip_fd->if_flags &= ~IFF_READ_IP;
 		result= (*ip_fd->if_put_userdata)(ip_fd->if_srfd, 
-			(size_t)EINTR, (acc_t *)0, FALSE);
+			(size_t)-EINTR, (acc_t *)0, FALSE);
 		assert (!result);
 		break;
 #if 0
@@ -176,7 +176,7 @@ int which_operation;
 		assert (ip_fd->if_flags & IFF_WRITE_MASK);
 		ip_fd->if_flags &= ~IFF_WRITE_MASK;
 		repl_res= (*ip_fd->if_get_userdata)(ip_fd->if_srfd, 
-			(size_t)EINTR, (size_t)0, FALSE);
+			(size_t)-EINTR, (size_t)0, FALSE);
 		assert (!repl_res);
 		break;
 #endif
@@ -184,7 +184,7 @@ int which_operation;
 		ip_panic(( "unknown cancel request" ));
 		break;
 	}
-	return NW_OK;
+	return 0;
 }
 
 static int ip_select(fd, operations)
@@ -210,7 +210,7 @@ select_res_t select_res;
 
 	ip_port= &ip_port_table[port];
 	if (!(ip_port->ip_flags & IPF_CONFIGURED))
-		return ENXIO;
+		return -ENXIO;
 
 	for (i=0; i<IP_FD_NR && (ip_fd_table[i].if_flags & IFF_INUSE);
 		i++);
@@ -218,7 +218,7 @@ select_res_t select_res;
 	if (i>=IP_FD_NR)
 	{
 		DBLOCK(1, printf("out of fds\n"));
-		return EAGAIN;
+		return -EAGAIN;
 	}
 
 	ip_fd= &ip_fd_table[i];

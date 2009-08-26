@@ -451,7 +451,7 @@ int main(int argc, char *argv[])
   init_params();
   signal(SIGTERM, SIG_IGN);
   driver_task(&w_dtab);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -520,7 +520,7 @@ static void init_params()
   if (w_instance == 0) {
 	  /* Get the number of drives from the BIOS data area */
 	  s=sys_readbios(NR_HD_DRIVES_ADDR, params, NR_HD_DRIVES_SIZE);
-	  if (s != OK)
+	  if (s != 0)
   		panic(w_name(), "Couldn't read BIOS", s);
 	  if ((nr_drives = params[0]) > 2) nr_drives = 2;
 
@@ -532,13 +532,13 @@ static void init_params()
 		    size = (drive == 0) ? BIOS_HD0_PARAMS_SIZE :
 			BIOS_HD1_PARAMS_SIZE;
 		    s=sys_readbios(vector, parv, size);
-		    if (s != OK)
+		    if (s != 0)
 			panic(w_name(), "Couldn't read BIOS", s);
 	
 		    /* Calculate the address of the parameters and copy them */
 		    s=sys_readbios(hclick_to_physb(parv[1]) + parv[0],
 			params, 16L);
-		    if (s != OK)
+		    if (s != 0)
 			panic(w_name(),"Couldn't copy parameters", s);
 	
 		    /* Copy the parameters to the structures of the drive */
@@ -673,17 +673,17 @@ static void init_params_pci(int skip)
   			skip--;
   			continue;
   		}
-		if(pci_reserve_ok(devind) != OK) {
+		if(pci_reserve_ok(devind) != 0) {
 			printf("at_wini%d: pci_reserve %d failed - "
 				"ignoring controller!\n",
 				w_instance, devind);
 			continue;
 		}
-  		if ((s=sys_irqsetpolicy(irq, 0, &irq_hook)) != OK) {
+  		if ((s=sys_irqsetpolicy(irq, 0, &irq_hook)) != 0) {
 		  	printf("atapci: couldn't set IRQ policy %d\n", irq);
 		  	continue;
 		}
-		if ((s=sys_irqenable(&irq_hook)) != OK) {
+		if ((s=sys_irqenable(&irq_hook)) != 0) {
 			printf("atapci: couldn't enable IRQ line %d\n", irq);
 		  	continue;
 		}
@@ -762,7 +762,7 @@ static void init_params_pci(int skip)
 	}
 
 	if(pci_compat) {
-		if(pci_reserve_ok(devind) != OK) {
+		if(pci_reserve_ok(devind) != 0) {
 			printf("at_wini%d (compat): pci_reserve %d failed!\n",
 				w_instance, devind);
 		}
@@ -781,40 +781,40 @@ message *m_ptr;
 
   struct wini *wn;
 
-  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
 
   wn = w_wn;
 
   /* If we've probed it before and it failed, don't probe it again. */
-  if (wn->state & IGNORING) return ENXIO;
+  if (wn->state & IGNORING) return -ENXIO;
 
   /* If we haven't identified it yet, or it's gone deaf, 
    * (re-)identify it.
    */
   if (!(wn->state & IDENTIFIED) || (wn->state & DEAF)) {
 	/* Try to identify the device. */
-	if (w_identify() != OK) {
+	if (w_identify() != 0) {
 #if VERBOSE
   		printf("%s: probe failed\n", w_name());
 #endif
 		if (wn->state & DEAF) w_reset();
 		wn->state = IGNORING;
-		return(ENXIO);
+		return(-ENXIO);
 	}
 	  /* Do a test transaction unless it's a CD drive (then
 	   * we can believe the controller, and a test may fail
 	   * due to no CD being in the drive). If it fails, ignore
 	   * the device forever.
 	   */
-	  if (!(wn->state & ATAPI) && w_io_test() != OK) {
+	  if (!(wn->state & ATAPI) && w_io_test() != 0) {
   		wn->state |= IGNORING;
-	  	return(ENXIO);
+	  	return(-ENXIO);
 	  }
   }
 
 #if ENABLE_ATAPI
    if ((wn->state & ATAPI) && (m_ptr->COUNT & W_BIT))
-	return(EACCES);
+	return(-EACCES);
 #endif
 
   /* Partition the drive if it's being opened for the first time,
@@ -824,7 +824,7 @@ message *m_ptr;
 #if ENABLE_ATAPI
 	if (wn->state & ATAPI) {
 		int r;
-		if ((r = atapi_open()) != OK) return(r);
+		if ((r = atapi_open()) != 0) return(r);
 	}
 #endif
 
@@ -832,7 +832,7 @@ message *m_ptr;
 	partition(&w_dtab, w_drive * DEV_PER_DRIVE, P_PRIMARY, wn->state & ATAPI);
   }
   wn->open_ct++;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -900,11 +900,11 @@ static int w_identify()
   wakeup_ticks = w_identify_wakeup_ticks;
   r = com_simple(&cmd);
 
-  if (r == OK && w_waitfor(STATUS_DRQ, STATUS_DRQ) &&
+  if (r == 0 && w_waitfor(STATUS_DRQ, STATUS_DRQ) &&
 	!(wn->w_status & (STATUS_ERR|STATUS_WF))) {
 
 	/* Device information. */
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, SECTOR_SIZE)) != OK)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, SECTOR_SIZE)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 
 #if 0
@@ -965,7 +965,7 @@ static int w_identify()
 		dma_base= wn->base_dma;
 		if (dma_base)
 		{
-			if (sys_inb(dma_base + DMA_STATUS, (u32_t*)&dma_status) != OK)
+			if (sys_inb(dma_base + DMA_STATUS, (u32_t*)&dma_status) != 0)
 			{
 				panic(w_name(),
 					"unable to read DMA status register",
@@ -1060,13 +1060,13 @@ static int w_identify()
 #if ENABLE_ATAPI
   } else
   if (cmd.command = ATAPI_IDENTIFY,
-	com_simple(&cmd) == OK && w_waitfor(STATUS_DRQ, STATUS_DRQ) &&
+	com_simple(&cmd) == 0 && w_waitfor(STATUS_DRQ, STATUS_DRQ) &&
 	!(wn->w_status & (STATUS_ERR|STATUS_WF))) {
 	/* An ATAPI device. */
 	wn->state |= ATAPI;
 
 	/* Device information. */
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, 512)) != OK)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, 512)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 
 	size = 0;	/* Size set later. */
@@ -1094,7 +1094,7 @@ static int w_identify()
   wn->part[0].dv_size = mul64u(size, SECTOR_SIZE);
 
   /* Reset/calibrate (where necessary) */
-  if (w_specify() != OK && w_specify() != OK) {
+  if (w_specify() != 0 && w_specify() != 0) {
   	return(ERR);
   }
 
@@ -1102,13 +1102,13 @@ static int w_identify()
 	  /* Everything looks OK; register IRQ so we can stop polling. */
 	  wn->irq = w_drive < 2 ? AT_WINI_0_IRQ : AT_WINI_1_IRQ;
 	  wn->irq_hook_id = wn->irq;	/* id to be returned if interrupt occurs */
-	  if ((s=sys_irqsetpolicy(wn->irq, IRQ_REENABLE, &wn->irq_hook_id)) != OK) 
+	  if ((s=sys_irqsetpolicy(wn->irq, IRQ_REENABLE, &wn->irq_hook_id)) != 0) 
 	  	panic(w_name(), "couldn't set IRQ policy", s);
-	  if ((s=sys_irqenable(&wn->irq_hook_id)) != OK)
+	  if ((s=sys_irqenable(&wn->irq_hook_id)) != 0)
 	  	panic(w_name(), "couldn't enable IRQ line", s);
   }
   wn->state |= IDENTIFIED;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1175,13 +1175,13 @@ static int w_io_test(void)
 	w_testing = 0;
 
  	/* Test if everything worked. */
-	if (r != OK || iov.iov_size != 0) {
+	if (r != 0 || iov.iov_size != 0) {
 		return ERR;
 	}
 
 	/* Everything worked. */
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -1194,7 +1194,7 @@ static int w_specify()
   struct wini *wn = w_wn;
   struct command cmd;
 
-  if ((wn->state & DEAF) && w_reset() != OK) {
+  if ((wn->state & DEAF) && w_reset() != 0) {
   	return(ERR);
   }
 
@@ -1206,7 +1206,7 @@ static int w_specify()
 	cmd.command = CMD_SPECIFY;		/* Specify some parameters */
 
 	/* Output command block and see if controller accepts the parameters. */
-	if (com_simple(&cmd) != OK) return(ERR);
+	if (com_simple(&cmd) != 0) return(ERR);
 
 	if (!(wn->state & SMART)) {
 		/* Calibrate an old disk. */
@@ -1216,11 +1216,11 @@ static int w_specify()
 		cmd.ldh     = w_wn->ldhpref;
 		cmd.command = CMD_RECALIBRATE;
 
-		if (com_simple(&cmd) != OK) return(ERR);
+		if (com_simple(&cmd) != 0) return(ERR);
 	}
   }
   wn->state |= INITIALIZED;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1245,7 +1245,7 @@ static int do_transfer(struct wini *wn, unsigned int precomp,
 		else if (sector > LBA_MAX_SIZE || sector_high != 0)
 		{
 			/* Strange sector count for LBA device */
-			return EIO;
+			return -EIO;
 		}
 	}
 
@@ -1326,7 +1326,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 #endif
 
   /* Check disk address. */
-  if (rem64u(position, SECTOR_SIZE) != 0) return(EINVAL);
+  if (rem64u(position, SECTOR_SIZE) != 0) return(-EINVAL);
 
   errors = 0;
 
@@ -1334,10 +1334,10 @@ int safe;			/* iov contains addresses (0) or grants? */
 	/* How many bytes to transfer? */
 	nbytes = 0;
 	for (iop = iov; iop < iov_end; iop++) nbytes += iop->iov_size;
-	if ((nbytes & SECTOR_MASK) != 0) return(EINVAL);
+	if ((nbytes & SECTOR_MASK) != 0) return(-EINVAL);
 
 	/* Which block on disk and how close to EOF? */
-	if (cmp64(position, dv_size) >= 0) return(OK);		/* At EOF */
+	if (cmp64(position, dv_size) >= 0) return 0;		/* At EOF */
 	if (cmp64(add64ul(position, nbytes), dv_size) > 0)
 		nbytes = diff64(dv_size, position);
 	block = div64u(add64(w_dv->dv_base, position), SECTOR_SIZE);
@@ -1351,7 +1351,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 	}
 
 	/* First check to see if a reinitialization is needed. */
-	if (!(wn->state & INITIALIZED) && w_specify() != OK) return(EIO);
+	if (!(wn->state & INITIALIZED) && w_specify() != 0) return(-EIO);
 
 	if (do_dma)
 	{
@@ -1371,7 +1371,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 		 * Reading the alternate status register is the suggested 
 		 * way to implement this wait.
 		 */
-		if (sys_inb((wn->base_ctl+REG_CTL_ALTSTAT), (u32_t*)&w_status) != OK)
+		if (sys_inb((wn->base_ctl+REG_CTL_ALTSTAT), (u32_t*)&w_status) != 0)
 			panic(w_name(), "couldn't get status", NO_NUM);
 	}
 
@@ -1381,14 +1381,14 @@ int safe;			/* iov contains addresses (0) or grants? */
 		 * copy out.
 		 */
 
-		if ((r = at_intr_wait()) != OK) 
+		if ((r = at_intr_wait()) != 0) 
 		{
 			/* Don't retry if sector marked bad or too many
 			 * errors.
 			 */
 			if (r == ERR_BAD_SECTOR || ++errors == max_errors) {
 				w_command = CMD_IDLE;
-				return(EIO);
+				return(-EIO);
 			}
 			continue;
 		}
@@ -1428,7 +1428,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 		}
 
 		dma_buf_offset= 0;
-		while (r == OK && nbytes > 0)
+		while (r == 0 && nbytes > 0)
 		{
 			n= iov->iov_size;
 			if (n > nbytes)
@@ -1446,7 +1446,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 					proc_nr, D,
 					iov->iov_addr + addr_offset, n);
 				}
-				if (s != OK)
+				if (s != 0)
 				{
 					panic(w_name(),
 					"w_transfer: sys_vircopy failed",
@@ -1465,7 +1465,7 @@ int safe;			/* iov contains addresses (0) or grants? */
 		}
 	}
 
-	while (r == OK && nbytes > 0) {
+	while (r == 0 && nbytes > 0) {
 		/* For each sector, wait for an interrupt and fetch the data
 		 * (read), or supply data to the controller and wait for an
 		 * interrupt (write).
@@ -1473,12 +1473,12 @@ int safe;			/* iov contains addresses (0) or grants? */
 
 		if (opcode == DEV_GATHER_S) {
 			/* First an interrupt, then data. */
-			if ((r = at_intr_wait()) != OK) {
+			if ((r = at_intr_wait()) != 0) {
 				/* An error, send data to the bit bucket. */
 				if (w_wn->w_status & STATUS_DRQ) {
 					if ((s=sys_insw(wn->base_cmd+REG_DATA,
 						SELF, tmp_buf,
-						SECTOR_SIZE)) != OK)
+						SECTOR_SIZE)) != 0)
 					{
 						panic(w_name(),
 						"Call to sys_insw() failed",
@@ -1501,14 +1501,14 @@ int safe;			/* iov contains addresses (0) or grants? */
 			s=sys_safe_insw(wn->base_cmd + REG_DATA, proc_nr, 
 				(void *) (iov->iov_addr), addr_offset,
 					SECTOR_SIZE);
-		   if(s != OK) {
+		   if(s != 0) {
 			panic(w_name(),"Call to sys_safe_insw() failed", s);
 		   }
 		   } else {
 			s=sys_insw(wn->base_cmd + REG_DATA, proc_nr, 
 				(void *) (iov->iov_addr + addr_offset),
 					SECTOR_SIZE);
-		   if(s != OK) {
+		   if(s != 0) {
 			panic(w_name(),"Call to sys_insw() failed", s);
 		   }
 		   }
@@ -1523,13 +1523,13 @@ int safe;			/* iov contains addresses (0) or grants? */
 				SECTOR_SIZE);
 		   }
 
-		   if(s != OK) {
+		   if(s != 0) {
 		  	panic(w_name(),"Call to sys_outsw() failed",
 			  	s);
 		   }
 
 			/* Data sent, wait for an interrupt. */
-			if ((r = at_intr_wait()) != OK) break;
+			if ((r = at_intr_wait()) != 0) break;
 		}
 
 		/* Book the bytes successfully transferred. */
@@ -1544,17 +1544,17 @@ int safe;			/* iov contains addresses (0) or grants? */
 	}
 
 	/* Any errors? */
-	if (r != OK) {
+	if (r != 0) {
 		/* Don't retry if sector marked bad or too many errors. */
 		if (r == ERR_BAD_SECTOR || ++errors == max_errors) {
 			w_command = CMD_IDLE;
-			return(EIO);
+			return(-EIO);
 		}
 	}
   }
 
   w_command = CMD_IDLE;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1579,7 +1579,7 @@ struct command *cmd;		/* Command block */
   }
 
   /* Select drive. */
-  if ((s=sys_outb(base_cmd + REG_LDH, cmd->ldh)) != OK)
+  if ((s=sys_outb(base_cmd + REG_LDH, cmd->ldh)) != 0)
   	panic(w_name(),"Couldn't write register to select drive",s);
 
   if (!w_waitfor(STATUS_BSY, 0)) {
@@ -1604,9 +1604,9 @@ struct command *cmd;		/* Command block */
   pv_set(outbyte[4], base_cmd + REG_CYL_LO, cmd->cyl_lo);
   pv_set(outbyte[5], base_cmd + REG_CYL_HI, cmd->cyl_hi);
   pv_set(outbyte[6], base_cmd + REG_COMMAND, cmd->command);
-  if ((s=sys_voutb(outbyte,7)) != OK)
+  if ((s=sys_voutb(outbyte,7)) != 0)
   	panic(w_name(),"Couldn't write registers with sys_voutb()",s);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1632,7 +1632,7 @@ struct command *cmd;		/* Command block */
   }
 
   /* Select drive. */
-  if ((s=sys_outb(base_cmd + REG_LDH, cmd->ldh)) != OK)
+  if ((s=sys_outb(base_cmd + REG_LDH, cmd->ldh)) != 0)
   	panic(w_name(),"Couldn't write register to select drive",s);
 
   if (!w_waitfor(STATUS_BSY, 0)) {
@@ -1660,10 +1660,10 @@ struct command *cmd;		/* Command block */
   pv_set(outbyte[7], base_cmd + REG_CYL_LO, cmd->cyl_lo);
   pv_set(outbyte[8], base_cmd + REG_CYL_HI, cmd->cyl_hi);
   pv_set(outbyte[9], base_cmd + REG_COMMAND, cmd->command);
-  if ((s=sys_voutb(outbyte, 10)) != OK)
+  if ((s=sys_voutb(outbyte, 10)) != 0)
   	panic(w_name(),"Couldn't write registers with sys_voutb()",s);
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1807,7 +1807,7 @@ int safe;
 					iov->iov_addr+addr_offset, SELF, D,
 					(vir_bytes)dma_buf+offset, n);
 				}
-				if (r != OK)
+				if (r != 0)
 				{
 					panic(w_name(),
 					"setup_dma: sys_vircopy failed",
@@ -1935,12 +1935,12 @@ message *m_ptr;
 {
 /* Device close: Release a device. */
   if (w_prepare(m_ptr->DEVICE) == NIL_DEV)
-  	return(ENXIO);
+  	return(-ENXIO);
   w_wn->open_ct--;
 #if ENABLE_ATAPI
   if (w_wn->open_ct == 0 && (w_wn->state & ATAPI)) atapi_close();
 #endif
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -1954,7 +1954,7 @@ struct command *cmd;		/* Command block */
 
   if (w_wn->state & IGNORING) return ERR;
 
-  if ((r = com_out(cmd)) == OK) r = at_intr_wait();
+  if ((r = com_out(cmd)) == 0) r = at_intr_wait();
   w_command = CMD_IDLE;
   return(r);
 }
@@ -2010,10 +2010,10 @@ static int w_reset()
   tickdelay(RECOVERY_TICKS);
 
   /* Strobe reset bit */
-  if ((s=sys_outb(wn->base_ctl + REG_CTL, CTL_RESET)) != OK)
+  if ((s=sys_outb(wn->base_ctl + REG_CTL, CTL_RESET)) != 0)
   	panic(w_name(),"Couldn't strobe reset bit",s);
   tickdelay(DELAY_TICKS);
-  if ((s=sys_outb(wn->base_ctl + REG_CTL, 0)) != OK)
+  if ((s=sys_outb(wn->base_ctl + REG_CTL, 0)) != 0)
   	panic(w_name(),"Couldn't strobe reset bit",s);
   tickdelay(DELAY_TICKS);
 
@@ -2036,7 +2036,7 @@ static int w_reset()
   }
 		
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -2056,7 +2056,7 @@ static void w_intr_wait()
 	 */
 	while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
 		int rr;
-		if((rr=receive(ANY, &m)) != OK)
+		if((rr=receive(ANY, &m)) != 0)
 			panic("at_wini", "receive(ANY) failed", rr);
 		switch(m.m_type) {
 		  case SYN_ALARM:
@@ -2099,9 +2099,9 @@ static int at_intr_wait()
 
   w_intr_wait();
   if ((w_wn->w_status & (STATUS_BSY | STATUS_WF | STATUS_ERR)) == 0) {
-	r = OK;
+	r = 0;
   } else {
-  	if ((s=sys_inb(w_wn->base_cmd + REG_ERROR, (u32_t*)&inbval)) != OK)
+  	if ((s=sys_inb(w_wn->base_cmd + REG_ERROR, (u32_t*)&inbval)) != 0)
   		panic(w_name(),"Couldn't read register",s);
   	if ((w_wn->w_status & STATUS_ERR) && (inbval & ERROR_BB)) {
   		r = ERR_BAD_SECTOR;	/* sector marked bad, retries won't help */
@@ -2131,14 +2131,14 @@ int value;			/* required status */
 
   getuptime(&t0);
   do {
-	if ((s=sys_inb(w_wn->base_cmd + REG_STATUS, (u32_t*)&w_status)) != OK)
+	if ((s=sys_inb(w_wn->base_cmd + REG_STATUS, (u32_t*)&w_status)) != 0)
 		panic(w_name(),"Couldn't read register",s);
 	w_wn->w_status= w_status;
 	if ((w_wn->w_status & mask) == value) {
         	return 1;
 	}
-  } while ((s=getuptime(&t1)) == OK && (t1-t0) < timeout_ticks );
-  if (OK != s) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
+  } while ((s=getuptime(&t1)) == 0 && (t1-t0) < timeout_ticks );
+  if (s != 0) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
 
   w_need_reset();			/* controller gone deaf */
   return(0);
@@ -2162,13 +2162,13 @@ int value;			/* required status */
 
   getuptime(&t0);
   do {
-	if ((s=sys_inb(w_wn->base_dma + DMA_STATUS, (u32_t*)&w_status)) != OK)
+	if ((s=sys_inb(w_wn->base_dma + DMA_STATUS, (u32_t*)&w_status)) != 0)
 		panic(w_name(),"Couldn't read register",s);
 	if ((w_status & mask) == value) {
         	return 1;
 	}
-  } while ((s=getuptime(&t1)) == OK && (t1-t0) < timeout_ticks );
-  if (OK != s) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
+  } while ((s=getuptime(&t1)) == 0 && (t1-t0) < timeout_ticks );
+  if (s != 0) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
 
   return(0);
 }
@@ -2203,7 +2203,7 @@ static int atapi_open()
  * SCSI layer that does all this stuff for ATAPI and SCSI devices (kjb). (XXX)
  */
   w_wn->part[0].dv_size = mul64u(800L*1024, 1024);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -2233,10 +2233,10 @@ void sense_request(void)
 
 	for(i = 0; i < SENSE_PACKETSIZE; i++) sense[i] = 0xff;
 	r = atapi_sendpacket(packet, SENSE_PACKETSIZE);
-	if (r != OK) { printf("request sense command failed\n"); return; }
+	if (r != 0) { printf("request sense command failed\n"); return; }
 	if (atapi_intr_wait() <= 0) { printf("WARNING: request response failed\n"); }
 
-	if (sys_insw(w_wn->base_cmd + REG_DATA, SELF, (void *) sense, SENSE_PACKETSIZE) != OK)
+	if (sys_insw(w_wn->base_cmd + REG_DATA, SELF, (void *) sense, SENSE_PACKETSIZE) != 0)
 		printf("WARNING: sense reading failed\n");
 
 	printf("sense data:");
@@ -2286,10 +2286,10 @@ int safe;			/* use safecopies? */
 	if (count != 0) nbytes = count;
 
 	/* Data comes in as words, so we have to enforce even byte counts. */
-	if ((before | nbytes) & 1) return(EINVAL);
+	if ((before | nbytes) & 1) return(-EINVAL);
 
 	/* Which block on disk and how close to EOF? */
-	if (cmp64(position, dv_size) >= 0) return(OK);		/* At EOF */
+	if (cmp64(position, dv_size) >= 0) return 0;		/* At EOF */
 	if (cmp64(add64ul(position, nbytes), dv_size) > 0)
 		nbytes = diff64(dv_size, position);
 
@@ -2300,7 +2300,7 @@ int safe;			/* use safecopies? */
 	}
 
 	/* First check to see if a reinitialization is needed. */
-	if (!(wn->state & INITIALIZED) && w_specify() != OK) return(EIO);
+	if (!(wn->state & INITIALIZED) && w_specify() != 0) return(-EIO);
 
 	/* Build an ATAPI command packet. */
 	packet[0] = SCSI_READ10;
@@ -2318,7 +2318,7 @@ int safe;			/* use safecopies? */
 
 	/* Tell the controller to execute the packet command. */
 	r = atapi_sendpacket(packet, nblocks * CD_SECTOR_SIZE);
-	if (r != OK) goto err;
+	if (r != 0) goto err;
 
 	/* Read chunks of data. */
 	while ((r = atapi_intr_wait()) > 0) {
@@ -2333,7 +2333,7 @@ int safe;			/* use safecopies? */
 			chunk = before;
 			if (chunk > count) chunk = count;
 			if (chunk > DMA_BUF_SIZE) chunk = DMA_BUF_SIZE;
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, chunk)) != OK)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, chunk)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 			before -= chunk;
 			count -= chunk;
@@ -2350,7 +2350,7 @@ int safe;			/* use safecopies? */
 				s=sys_insw(wn->base_cmd + REG_DATA, proc_nr,
 					(void *) (iov->iov_addr + addr_offset), chunk);
 			}
-			if (s != OK)
+			if (s != 0)
 				panic(w_name(),"Call to sys_insw() failed", s);
 			position= add64ul(position, chunk);
 			nbytes -= chunk;
@@ -2368,7 +2368,7 @@ int safe;			/* use safecopies? */
 		while (count > 0) {		/* Excess data. */
 			chunk = count;
 			if (chunk > DMA_BUF_SIZE) chunk = DMA_BUF_SIZE;
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, chunk)) != OK)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, chunk)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 			count -= chunk;
 		}
@@ -2380,14 +2380,14 @@ int safe;			/* use safecopies? */
 		if (++errors == max_errors) {
 			w_command = CMD_IDLE;
 			if (atapi_debug) printf("giving up (%d)\n", errors);
-			return(EIO);
+			return(-EIO);
 		}
 		if (atapi_debug) printf("retry (%d)\n", errors);
 	}
   }
 
   w_command = CMD_IDLE;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -2405,7 +2405,7 @@ unsigned cnt;
   if (wn->state & IGNORING) return ERR;
 
   /* Select Master/Slave drive */
-  if ((s=sys_outb(wn->base_cmd + REG_DRIVE, wn->ldhpref)) != OK)
+  if ((s=sys_outb(wn->base_cmd + REG_DRIVE, wn->ldhpref)) != 0)
   	panic(w_name(),"Couldn't select master/ slave drive",s);
 
   if (!w_waitfor(STATUS_BSY | STATUS_DRQ, 0)) {
@@ -2431,7 +2431,7 @@ unsigned cnt;
   pv_set(outbyte[4], wn->base_cmd + REG_CNT_HI, (cnt >> 8) & 0xFF);
   pv_set(outbyte[5], wn->base_cmd + REG_COMMAND, w_command);
   if (atapi_debug) printf("cmd: %x  ", w_command);
-  if ((s=sys_voutb(outbyte,6)) != OK)
+  if ((s=sys_voutb(outbyte,6)) != 0)
   	panic(w_name(),"Couldn't write registers with sys_voutb()",s);
 
   if (!w_waitfor(STATUS_BSY | STATUS_DRQ, STATUS_DRQ)) {
@@ -2441,7 +2441,7 @@ unsigned cnt;
   wn->w_status |= STATUS_ADMBSY;		/* Command not at all done yet. */
 
   /* Send the command packet to the device. */
-  if ((s=sys_outsw(wn->base_cmd + REG_DATA, SELF, packet, ATAPI_PACKETSIZE)) != OK)
+  if ((s=sys_outsw(wn->base_cmd + REG_DATA, SELF, packet, ATAPI_PACKETSIZE)) != 0)
 	panic(w_name(),"sys_outsw() failed", s);
 
  {
@@ -2452,7 +2452,7 @@ unsigned cnt;
 	 printf("\n");
 	}
  }
-  return(OK);
+  return 0;
 }
 
 
@@ -2469,7 +2469,7 @@ int safe;
 	int r, timeout, prev;
 
 	if (m->m_type != DEV_IOCTL_S )
-		return EINVAL;
+		return -EINVAL;
 
 	if (m->REQUEST == DIOCTIMEOUT) {
 		if(safe) {
@@ -2480,7 +2480,7 @@ int safe;
 			SELF, (vir_bytes)&timeout, sizeof(timeout));
 		}
 
-		if(r != OK)
+		if(r != 0)
 		    return r;
 	
 		if (timeout == 0) {
@@ -2490,7 +2490,7 @@ int safe;
 			wakeup_ticks = WAKEUP_TICKS;
 			w_silent = 0;
 		} else if (timeout < 0) {
-			return EINVAL;
+			return -EINVAL;
 		} else  {
 			prev = wakeup_ticks;
 	
@@ -2516,14 +2516,14 @@ int safe;
 				sizeof(prev));
 			}
 
-			if(r != OK)
+			if(r != 0)
 				return r;
 		}
 	
-		return OK;
+		return 0;
 	} else  if (m->REQUEST == DIOCOPENCT) {
 		int count;
-		if (w_prepare(m->DEVICE) == NIL_DEV) return ENXIO;
+		if (w_prepare(m->DEVICE) == NIL_DEV) return -ENXIO;
 		count = w_wn->open_ct;
 		if(safe) {
 		    r= sys_safecopyto(m->IO_ENDPT, (vir_bytes) m->IO_GRANT,
@@ -2533,12 +2533,12 @@ int safe;
 			m->IO_ENDPT, (vir_bytes)m->ADDRESS, sizeof(count));
 		} 
 
-		if(r != OK)
+		if(r != 0)
 			return r;
 
-		return OK;
+		return 0;
 	}
-	return EINVAL;
+	return -EINVAL;
 }
 
 /*===========================================================================*
@@ -2551,7 +2551,7 @@ message *m;
   /* Leftover interrupt(s) received; ack it/them. */
   ack_irqs(m->NOTIFY_ARG);
 
-  return OK;
+  return 0;
 }
 
 
@@ -2567,13 +2567,13 @@ static void ack_irqs(unsigned int irqs)
   	if (!(wini[drive].state & IGNORING) && wini[drive].irq_need_ack &&
 		(wini[drive].irq_mask & irqs)) {
 		if (sys_inb((wini[drive].base_cmd + REG_STATUS),
-			(u32_t*)&w_status) != OK)
+			(u32_t*)&w_status) != 0)
 		{
 		  	panic(w_name(), "couldn't ack irq on drive %d\n",
 				drive);
 		}
 		wini[drive].w_status= w_status;
-	 	if (sys_irqenable(&wini[drive].irq_hook_id) != OK)
+	 	if (sys_irqenable(&wini[drive].irq_hook_id) != 0)
 		  	printf("couldn't re-enable drive %d\n", drive);
 		irqs &= ~wini[drive].irq_mask;
 	}
@@ -2639,7 +2639,7 @@ static int atapi_intr_wait()
   inbyte[1].port = wn->base_cmd + REG_CNT_LO;
   inbyte[2].port = wn->base_cmd + REG_CNT_HI;
   inbyte[3].port = wn->base_cmd + REG_IRR;
-  if ((s=sys_vinb(inbyte, 4)) != OK)
+  if ((s=sys_vinb(inbyte, 4)) != 0)
   	panic(w_name(),"ATAPI failed sys_vinb()", s);
   e = inbyte[0].value;
   len = inbyte[1].value;
@@ -2661,7 +2661,7 @@ static int atapi_intr_wait()
   switch (phase) {
   case IRR_COD | IRR_IO:
 	if (ATAPI_DEBUG) printf("ACD: Phase Command Complete\n");
-	r = OK;
+	r = 0;
 	break;
   case 0:
 	if (ATAPI_DEBUG) printf("ACD: Phase Command Aborted\n");
@@ -2703,8 +2703,8 @@ static int atapi_intr_wait()
 static int at_voutb(int line, pvb_pair_t *pvb, int n)
 {
   int s, i;
-  if ((s=sys_voutb(pvb,n)) == OK)
-	return OK;
+  if ((s=sys_voutb(pvb,n)) == 0)
+	return 0;
   printf("at_wini%d: sys_voutb failed: %d pvb (%d):\n", w_instance, s, n);
   for(i = 0; i < n; i++)
 	printf("%2d: %4x -> %4x\n", i, pvb[i].value, pvb[i].port);
@@ -2714,8 +2714,8 @@ static int at_voutb(int line, pvb_pair_t *pvb, int n)
 static int at_vinb(int line, pvb_pair_t *pvb, int n)
 {
   int s, i;
-  if ((s=sys_vinb(pvb,n)) == OK)
-	return OK;
+  if ((s=sys_vinb(pvb,n)) == 0)
+	return 0;
   printf("at_wini%d: sys_vinb failed: %d pvb (%d):\n", w_instance, s, n);
   for(i = 0; i < n; i++)
 	printf("%2d: %4x\n", i, pvb[i].port);
@@ -2727,8 +2727,8 @@ static int at_out(int line, u32_t port, u32_t value,
 {
 	int s;
 	s = sys_out(port, value, type);
-	if(s == OK)
-		return OK;
+	if(s == 0)
+		return 0;
 	printf("at_wini%d: line %d: %s failed: %d; %x -> %x\n", 
 		w_instance, line, typename, s, value, port);
         panic(w_name(), "sys_out failed", NO_NUM);
@@ -2740,8 +2740,8 @@ static int at_in(int line, u32_t port, u32_t *value,
 {
 	int s;
 	s = sys_in(port, (unsigned long*)value, type);
-	if(s == OK)
-		return OK;
+	if(s == 0)
+		return 0;
 	printf("at_wini%d: line %d: %s failed: %d; port %x\n", 
 		w_instance, line, typename, s, value, port);
         panic(w_name(), "sys_in failed", NO_NUM);

@@ -38,7 +38,7 @@ int arch_init_clock(void)
 	outb(TIMER0, (TIMER_COUNT & 0xff)); /* timer low byte */
 	outb(TIMER0, TIMER_COUNT >> 8); /* timer high byte */ 
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*

@@ -74,7 +74,7 @@ int flags;			/* mode bits and flags */
   if (major >= NR_DEVICES) major = 0;
   dp = &dmap[major];
   if (dp->dmap_driver == NONE) 
-	return ENXIO;
+	return -ENXIO;
   r = (*dp->dmap_opcl)(DEV_OPEN, dev, proc, flags);
   return(r);
 }
@@ -99,10 +99,10 @@ int flags;			/* mode bits and flags */
   if (major >= NR_DEVICES) major = 0;
   dp = &dmap[major];
   if (dp->dmap_driver == NONE) 
-	return ENXIO;
+	return -ENXIO;
   r = (*dp->dmap_opcl)(DEV_REOPEN, dev, filp_no, flags);
-  if (r == OK) panic(__FILE__,"OK on reopen from", dp->dmap_driver);
-  if (r == SUSPEND) r= OK;
+  if (r == 0) panic(__FILE__,"OK on reopen from", dp->dmap_driver);
+  if (r == SUSPEND) r= 0;
   return(r);
 }
 
@@ -118,7 +118,7 @@ int filp_no;
 
   /* See if driver is roughly valid. */
   if (dmap[(dev >> MAJOR)].dmap_driver == NONE) {
-	return ENXIO;
+	return -ENXIO;
   }
   r= (*dmap[(dev >> MAJOR) & BYTE].dmap_opcl)(DEV_CLOSE, dev, filp_no, 0);
   return r;
@@ -173,11 +173,11 @@ void dev_status(message *m)
 	do {
 		int r;
 		st.m_type = DEV_STATUS;
-		if ((r=sendrec(m->m_source, &st)) != OK) {
+		if ((r=sendrec(m->m_source, &st)) != 0) {
 			printf("DEV_STATUS failed to %d: %d\n", m->m_source, r);
-			if (r == EDEADSRCDST) return;
-			if (r == EDSTDIED) return;
-			if (r == ESRCDIED) return;
+			if (r == -EDEADSRCDST) return;
+			if (r == -EDSTDIED) return;
+			if (r == -ESRCDIED) return;
 			panic(__FILE__,"couldn't sendrec for DEV_STATUS", r);
 		}
 
@@ -385,7 +385,7 @@ int suspend_reopen;		/* Just suspend the process */
   /* See if driver is roughly valid. */
   if (dp->dmap_driver == NONE) {
 	printf("FS: dev_io: no driver for dev %x\n", dev);
-	return ENXIO;
+	return -ENXIO;
   }
 
   if (suspend_reopen)
@@ -398,10 +398,10 @@ int suspend_reopen;		/* Just suspend the process */
 	return(SUSPEND);
   }
 
-  if(isokendpt(dp->dmap_driver, &dummyproc) != OK) {
+  if(isokendpt(dp->dmap_driver, &dummyproc) != 0) {
 	printf("FS: dev_io: old driver for dev %x (%d)\n",
 		dev, dp->dmap_driver);
-	return ENXIO;
+	return -ENXIO;
   }
 
   /* By default, these are right. */
@@ -439,7 +439,7 @@ int suspend_reopen;		/* Just suspend the process */
   	/* Driver has vanished. */
 	printf("Driver gone?\n");
 	if(safe) safe_io_cleanup(gid, gids, vec_grants);
-	return EIO;
+	return -EIO;
   }
 
   /* Task has completed.  See if call completed. */
@@ -465,7 +465,7 @@ int suspend_reopen;		/* Just suspend the process */
 		else if(call_nr == WRITE)	dev_mess.COUNT = W_BIT;
 		dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 		(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
-		if (dev_mess.REP_STATUS == EINTR) dev_mess.REP_STATUS = EAGAIN;
+		if (dev_mess.REP_STATUS == -EINTR) dev_mess.REP_STATUS = -EAGAIN;
 	} else {
 		/* select() will do suspending itself. */
 		if(op != DEV_SELECT) {
@@ -491,7 +491,7 @@ int suspend_reopen;		/* Just suspend the process */
 			dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 			(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 
-			/* Should do something about EINTR -> EAGAIN mapping */
+			/* Should do something about -EINTR -> -EAGAIN mapping */
 		}
 		return(SUSPEND);
 	}
@@ -527,12 +527,12 @@ int flags;			/* mode bits and flags */
 
   if (dp->dmap_driver == NONE) {
 	printf("FS: gen_opcl: no driver for dev %x\n", dev);
-	return ENXIO;
+	return -ENXIO;
   }
 
   /* Call the task. */
   r= (*dp->dmap_io)(dp->dmap_driver, &dev_mess);
-  if (r != OK) return r;
+  if (r != 0) return r;
 
   return(dev_mess.REP_STATUS);
 }
@@ -569,7 +569,7 @@ int flags;			/* mode bits and flags */
   /* Did this call make the tty the controlling tty? */
   if (r == 1) {
 	fp->fp_tty = dev;
-	r = OK;
+	r = 0;
   }
   return(r);
 }
@@ -587,7 +587,7 @@ int flags;			/* mode bits and flags */
  * /dev/tty, the magic device that translates to the controlling tty.
  */
  
-  return(fp->fp_tty == 0 ? ENXIO : OK);
+  return(fp->fp_tty == 0 ? -ENXIO : 0);
 }
 
 /*===========================================================================*
@@ -624,7 +624,7 @@ int do_ioctl()
   if ( (f = get_filp(m_in.ls_fd)) == NIL_FILP) return(err_code);
   vp = f->filp_vno;		/* get vnode pointer */
   if ( (vp->v_mode & I_TYPE) != I_CHAR_SPECIAL
-	&& (vp->v_mode & I_TYPE) != I_BLOCK_SPECIAL) return(ENOTTY);
+	&& (vp->v_mode & I_TYPE) != I_BLOCK_SPECIAL) return(-ENOTTY);
   suspend_reopen= (f->filp_state != FS_NORMAL);
   dev = (dev_t) vp->v_sdev;
 
@@ -652,14 +652,14 @@ message *mess_ptr;		/* pointer to message for task */
   proc_e = mess_ptr->IO_ENDPT;
 
   r = sendrec(task_nr, mess_ptr);
-	if (r != OK) {
-		if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+	if (r != 0) {
+		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
 			dmap_unmap_by_endpt(task_nr);
 			return r;
 		}
-		if (r == ELOCKED) {
-			printf("fs: ELOCKED talking to %d\n", task_nr);
+		if (r == -ELOCKED) {
+			printf("fs: -ELOCKED talking to %d\n", task_nr);
 			return r;
 		}
 		panic(__FILE__,"call_task: can't send/receive", r);
@@ -673,10 +673,10 @@ message *mess_ptr;		/* pointer to message for task */
 			mess_ptr->m_type,
 			proc_e,
 			mess_ptr->REP_ENDPT);
-		return EIO;
+		return -EIO;
 	}
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -695,12 +695,12 @@ message *mess_ptr;		/* pointer to message for task */
   proc_e = mess_ptr->IO_ENDPT;
 
   r= asynsend(task_nr, mess_ptr);
-  if (r != OK)
+  if (r != 0)
 	panic(__FILE__, "asyn_io: asynsend failed", r);
 
   /* Fake a SUSPEND */
   mess_ptr->REP_STATUS= SUSPEND;
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -719,7 +719,7 @@ message *mess_ptr;		/* pointer to message for task */
 
   if (fp->fp_tty == 0) {
 	/* No controlling tty present anymore, return an I/O error. */
-	mess_ptr->REP_STATUS = EIO;
+	mess_ptr->REP_STATUS = -EIO;
   } else {
 	/* Substitute the controlling terminal device. */
 	dp = &dmap[(fp->fp_tty >> MAJOR) & BYTE];
@@ -727,18 +727,18 @@ message *mess_ptr;		/* pointer to message for task */
 
   if (dp->dmap_driver == NONE) {
 	printf("FS: ctty_io: no driver for dev\n");
-	return EIO;
+	return -EIO;
   }
 
-	if(isokendpt(dp->dmap_driver, &dummyproc) != OK) {
+	if(isokendpt(dp->dmap_driver, &dummyproc) != 0) {
 		printf("FS: ctty_io: old driver %d\n",
 			dp->dmap_driver);
-		return EIO;
+		return -EIO;
 	}
 
 	(*dp->dmap_io)(dp->dmap_driver, mess_ptr);
   }
-  return OK;
+  return 0;
 }
 
 
@@ -752,7 +752,7 @@ int proc;			/* process to open/close for */
 int flags;			/* mode bits and flags */
 {
 /* Called when opening a nonexistent device. */
-  return(ENODEV);
+  return(-ENODEV);
 }
 
 /*===========================================================================*
@@ -762,7 +762,7 @@ int no_dev_io(int proc, message *m)
 {
 /* Called when doing i/o on a nonexistent device. */
   printf("VFS: I/O on unmapped device number\n");
-  return EIO;
+  return -EIO;
 }
 
   
@@ -797,18 +797,18 @@ int flags;			/* mode bits and flags */
 
   if (dp->dmap_driver == NONE) {
 	printf("vfs:clone_opcl: no driver for dev %x\n", dev);
-	return ENXIO;
+	return -ENXIO;
   }
 
-  if(isokendpt(dp->dmap_driver, &dummyproc) != OK) {
+  if(isokendpt(dp->dmap_driver, &dummyproc) != 0) {
   	printf("vfs:clone_opcl: bad driver endpoint for dev %x (%d)\n",
   		dev, dp->dmap_driver);
-  	return ENXIO;
+  	return -ENXIO;
   }
 
   /* Call the task. */
   r= (*dp->dmap_io)(dp->dmap_driver, &dev_mess);
-  if (r != OK)
+  if (r != 0)
 	return r;
 
   if (op == DEV_OPEN && dev_mess.REP_STATUS >= 0) {
@@ -829,7 +829,7 @@ int flags;			/* mode bits and flags */
                 /* Issue request */
                 r = req_newnode(ROOT_FS_E, fp->fp_effuid, fp->fp_effgid,
 			ALL_MODES | I_CHAR_SPECIAL, dev, &res);
-                if (r != OK) {
+                if (r != 0) {
                     (void) clone_opcl(DEV_CLOSE, dev, proc_e, 0);
                     return r;
                 }
@@ -859,7 +859,7 @@ int flags;			/* mode bits and flags */
                 vp->v_ref_count = 1;
 		fp->fp_filp[m_in.fd]->filp_vno = vp;
 	}
-	dev_mess.REP_STATUS = OK;
+	dev_mess.REP_STATUS = 0;
   }
   return(dev_mess.REP_STATUS);
 }
@@ -893,13 +893,13 @@ void dev_up(int maj)
 	minor = ((vmp->m_dev >> MINOR) & BYTE);
 
 	if ((r = dev_open(vmp->m_dev, FS_PROC_NR,
-		vmp->m_flags ? R_BIT : (R_BIT|W_BIT))) != OK) {
+		vmp->m_flags ? R_BIT : (R_BIT|W_BIT))) != 0) {
 		printf("VFS: mounted dev %d/%d re-open failed: %d.\n",
 			maj, minor, r);
 	}
 
 	/* Send new driver endpoint */
-	if (OK != req_newdriver(vmp->m_fs_e, vmp->m_dev, new_driver_e))
+	if (req_newdriver(vmp->m_fs_e, vmp->m_dev, new_driver_e) != 0)
 		printf(
 	"VFSdev_up: error sending new driver endpoint. FS_e: %d req_nr: %d\n", 
 			vmp->m_fs_e, REQ_NEW_DRIVER);
@@ -984,7 +984,7 @@ int maj;
 	minor = ((vp->v_sdev >> MINOR) & BYTE);
 
 	r = dev_reopen(vp->v_sdev, fp-filp, vp->v_mode & (R_BIT|W_BIT));
-	if (r == OK)
+	if (r == 0)
 		return;
 
 	/* This function will set the fp_filp[]s of processes
@@ -1015,7 +1015,7 @@ int maj;
 	{
 		rfp->fp_flags &= ~SUSP_REOPEN;
 		rfp->fp_suspended = NOT_SUSPENDED;
-		reply(rfp->fp_endpoint, ERESTART);
+		reply(rfp->fp_endpoint, -ERESTART);
 	}
   }
 
@@ -1040,7 +1040,7 @@ int maj;
 		/* Open failed, and automatic reopen was not requested */
 		rfp->fp_suspended = NOT_SUSPENDED;
 		FD_CLR(fd_nr, &rfp->fp_filp_inuse);
-		reply(rfp->fp_endpoint, EIO);
+		reply(rfp->fp_endpoint, -EIO);
 		continue;
 	}
 
@@ -1119,7 +1119,7 @@ void reopen_reply()
 		return;
 	}
 
-	if (status == OK)
+	if (status == 0)
 	{
 		fp->filp_state= FS_NORMAL;
 	}
@@ -1149,7 +1149,7 @@ message *mp;
 		flags= msgtable[first_slot].flags;
 		if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
 		{
-			if (msgtable[first_slot].result != OK)
+			if (msgtable[first_slot].result != 0)
 			{
 				printf(
 			"asynsend: found completed entry %d with error %d\n",
@@ -1172,7 +1172,7 @@ message *mp;
 	{
 		/* Tell the kernel to stop processing */
 		r= senda(NULL, 0);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "asynsend: senda failed", r);
 
 		dst_ind= 0;
@@ -1182,7 +1182,7 @@ message *mp;
 			if ((flags & (AMF_VALID|AMF_DONE)) ==
 				(AMF_VALID|AMF_DONE))
 			{
-				if (msgtable[src_ind].result != OK)
+				if (msgtable[src_ind].result != 0)
 				{
 					printf(
 			"asynsend: found completed entry %d with error %d\n",

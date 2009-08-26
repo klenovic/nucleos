@@ -48,11 +48,11 @@ int do_chmod()
     
   if (call_nr == CHMOD) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name, m_in.name_length, M3) != OK) return(err_code);
+      if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
 
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
-      if (r != OK) return r;
+      if (r != 0) return r;
   } 
   else if (call_nr == FCHMOD) {
       if (!(flp = get_filp(m_in.m3_i1))) return err_code;
@@ -68,12 +68,12 @@ int do_chmod()
    * No one may change the mode of a file on a read-only file system.
    */
   if (vp->v_uid != uid && uid != SU_UID)
-	r = EPERM;
+	r = -EPERM;
   else
 	r = read_only(vp);
 
   /* If error, return inode. */
-  if (r != OK)	{
+  if (r != 0)	{
 	put_vnode(vp);
 	return(r);
   }
@@ -85,11 +85,11 @@ int do_chmod()
   /* Issue request */
   r = req_chmod(vp->v_fs_e, vp->v_inode_nr, m_in.mode, &new_mode);
 
-  if (r == OK)
+  if (r == 0)
   	vp->v_mode = new_mode;
   put_vnode(vp);
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -108,11 +108,11 @@ int do_chown()
   
   if (call_nr == CHOWN) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+      if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
       
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
-      if (r != OK) return r;
+      if (r != 0) return r;
   } 
   else if (call_nr == FCHOWN) {
       if (!(flp = get_filp(m_in.m1_i1))) return err_code;
@@ -124,23 +124,23 @@ int do_chown()
   uid= fp->fp_effuid;
   gid= fp->fp_effgid;
 
-  r= OK;
+  r= 0;
   if (uid == SU_UID) {
 	/* The super user can do anything. */
   } else {
 	/* Regular users can only change groups of their own files. */
 	if (vp->v_uid != uid)
-		r = EPERM;	/* File does not belong to the caller */
+		r = -EPERM;	/* File does not belong to the caller */
 	if (vp->v_uid != m_in.owner) 
-		r = EPERM;	/* no giving away */
+		r = -EPERM;	/* no giving away */
 	if (gid != m_in.group)
-		r = EPERM;	/* only change to the current gid */
+		r = -EPERM;	/* only change to the current gid */
   }
 
-  if (r == OK)
+  if (r == 0)
   	r = read_only(vp);
 
-  if (r != OK) {
+  if (r != 0) {
 	put_vnode(vp);
 	return r;
   }
@@ -148,7 +148,7 @@ int do_chown()
   /* Issue request */
   r = req_chown(vp->v_fs_e, vp->v_inode_nr, m_in.owner, m_in.group, &new_mode);
 
-  if(r == OK) {
+  if(r == 0) {
   	vp->v_uid = m_in.owner;
   	vp->v_gid = m_in.group;
   	vp->v_mode = new_mode;
@@ -185,13 +185,13 @@ int do_access()
     
   /* First check to see if the mode is correct. */
   if ( (m_in.mode & ~(R_OK | W_OK | X_OK)) != 0 && m_in.mode != F_OK)
-	return(EINVAL);
+	return(-EINVAL);
 
-  if (fetch_name(m_in.name, m_in.name_length, M3) != OK) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
 
   /* Request lookup */
   r = lookup_vp(0 /*flags*/, TRUE /*use_realuid*/, &vp);
-  if (r != OK) return r;
+  if (r != 0) return r;
 
   r= forbidden(vp, m_in.mode, 1 /*use_realuid*/);
   put_vnode(vp);
@@ -206,8 +206,8 @@ int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
 {
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
- * caller's uid in the 'fproc' table.  If access is allowed, OK is returned
- * if it is forbidden, EACCES is returned.
+ * caller's uid in the 'fproc' table.  If access is allowed, 0 is returned
+ * if it is forbidden, -EACCES is returned.
  */
 
   register struct super_block *sp;
@@ -221,7 +221,7 @@ int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
 	printf("forbidden: bad uid/gid in vnode: inode %d on dev 0x%x\n",
 		vp->v_inode_nr, vp->v_dev);
 	printf("forbidden: last allocated at %s, %d\n", vp->v_file, vp->v_line);
-	return EACCES;
+	return -EACCES;
   }
 
   /* Isolate the relevant rwx bits from the mode. */
@@ -254,15 +254,15 @@ int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid)
   }
 
   /* If access desired is not a subset of what is allowed, it is refused. */
-  r = OK;
+  r = 0;
   if ((perm_bits | access_desired) != perm_bits) {
-  	r = EACCES;
+  	r = -EACCES;
   	}
 
   /* Check to see if someone is trying to write on a file system that is
    * mounted read-only.
    */
-  if (r == OK)
+  if (r == 0)
 	if (access_desired & W_BIT)
 	 	r = read_only(vp);
 
@@ -277,12 +277,12 @@ int read_only(vp)
 struct vnode *vp;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted
- * read only.  If so, return EROFS, else return OK.
+ * read only.  If so, return -EROFS, else return 0.
  */
   register struct vmnt *mp;
 
   mp = vp->v_vmnt;
-  return(mp->m_flags ? EROFS : OK);
+  return(mp->m_flags ? -EROFS : 0);
 }
 
 

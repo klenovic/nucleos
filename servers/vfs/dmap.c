@@ -76,7 +76,7 @@ int do_devctl()
 	{
 		printf("FS: unauthorized call of do_devctl by proc %d\n",
 			who_e);
-		return(EPERM);	/* only su (should be only RS or some drivers)
+		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_devctl.
 				 */
 	}
@@ -101,13 +101,13 @@ int force;
       if (!force)
       {
 	/* Check process number of new driver. */
-	if (isokendpt(proc_nr_e, &proc_nr_n) != OK)
-		return(EINVAL);
+	if (isokendpt(proc_nr_e, &proc_nr_n) != 0)
+		return(-EINVAL);
       }
 
       /* Try to update device mapping. */
       result = map_driver(dev, proc_nr_e, style, force);
-      if (result == OK)
+      if (result == 0)
       {
 	/* If a driver has completed its exec(), it can be announced to be
 	 * up.
@@ -123,7 +123,7 @@ int force;
       result = map_driver(dev, NONE, 0, 0);
       break;
   default:
-      result = EINVAL;
+      result = -EINVAL;
   }
   return(result);
 }
@@ -144,7 +144,7 @@ int do_mapdriver()
 	{
 		printf("FS: unauthorized call of do_mapdriver by proc %d\n",
 			who_e);
-		return(EPERM);	/* only su (should be only RS or some drivers)
+		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_mapdriver.
 				 */
 	}
@@ -156,37 +156,37 @@ int do_mapdriver()
 	if (label_len+1 > sizeof(label))
 	{
 		printf("vfs:do_mapdriver: label too long\n");
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	r= sys_vircopy(who_e, D, label_vir, SELF, D, (vir_bytes)label,
 		label_len);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("vfs:do_mapdriver: sys_vircopy failed: %d\n", r);
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	label[label_len]= '\0';
 
 	r= ds_retrieve_u32(label, (u32_t*)&tasknr);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("vfs:do_mapdriver: ds doesn't know '%s'\n", label);
-		return EINVAL;
+		return -EINVAL;
 	}
 
-	if (isokendpt(tasknr, &proc_nr_n) != OK)
+	if (isokendpt(tasknr, &proc_nr_n) != 0)
 	{
 		printf("vfs:do_mapdriver: bad endpoint %d\n", tasknr);
-		return(EINVAL);
+		return(-EINVAL);
 	}
 
 	/* Try to update device mapping. */
 	major= m_in.md_major;
 	force= m_in.md_force;
 	r= map_driverX(label, major, tasknr, m_in.md_style, force);
-	if (r == OK)
+	if (r == 0)
 	{
 		/* If a driver has completed its exec(), it can be announced
 		 * to be up.
@@ -223,7 +223,7 @@ int force;
   int proc_nr_n;
 
   /* Get pointer to device entry in the dmap table. */
-  if (major < 0 || major >= NR_DEVICES) return(ENODEV);
+  if (major < 0 || major >= NR_DEVICES) return(-ENODEV);
   dp = &dmap[major];		
 
   /* Check if we're supposed to unmap it. If so, do it even
@@ -235,18 +235,18 @@ int force;
 	dp->dmap_io = no_dev_io;
 	dp->dmap_driver = NONE;
 	dp->dmap_flags = DMAP_MUTABLE;	/* When gone, not busy or reserved. */
-	return(OK);
+	return 0;
   }
 	
   /* See if updating the entry is allowed. */
-  if (! (dp->dmap_flags & DMAP_MUTABLE))  return(EPERM);
-  if (dp->dmap_flags & DMAP_BUSY)  return(EBUSY);
+  if (! (dp->dmap_flags & DMAP_MUTABLE))  return(-EPERM);
+  if (dp->dmap_flags & DMAP_BUSY)  return(-EBUSY);
 
   if (!force)
   {
 	/* Check process number of new driver. */
-	if (isokendpt(proc_nr_e, &proc_nr_n) != OK)
-		return(EINVAL);
+	if (isokendpt(proc_nr_e, &proc_nr_n) != 0)
+		return(-EINVAL);
   }
 
   /* Try to update the entry. */
@@ -254,12 +254,12 @@ int force;
   case STYLE_DEV:	dp->dmap_opcl = gen_opcl;	break;
   case STYLE_TTY:	dp->dmap_opcl = tty_opcl;	break;
   case STYLE_CLONE:	dp->dmap_opcl = clone_opcl;	break;
-  default:		return(EINVAL);
+  default:		return(-EINVAL);
   }
   dp->dmap_io = gen_io;
   dp->dmap_driver = proc_nr_e;
 
-  return(OK); 
+  return 0; 
 }
 
 
@@ -286,7 +286,7 @@ int force;
   struct dmap *dp;
 
   /* Get pointer to device entry in the dmap table. */
-  if (major < 0 || major >= NR_DEVICES) return(ENODEV);
+  if (major < 0 || major >= NR_DEVICES) return(-ENODEV);
   dp = &dmap[major];		
 
   /* Check if we're supposed to unmap it. If so, do it even
@@ -298,18 +298,18 @@ int force;
 	dp->dmap_io = no_dev_io;
 	dp->dmap_driver = NONE;
 	dp->dmap_flags = DMAP_MUTABLE;	/* When gone, not busy or reserved. */
-	return(OK);
+	return 0;
   }
 	
   /* See if updating the entry is allowed. */
-  if (! (dp->dmap_flags & DMAP_MUTABLE))  return(EPERM);
-  if (dp->dmap_flags & DMAP_BUSY)  return(EBUSY);
+  if (! (dp->dmap_flags & DMAP_MUTABLE))  return(-EPERM);
+  if (dp->dmap_flags & DMAP_BUSY)  return(-EBUSY);
 
   if (!force)
   {
 	/* Check process number of new driver. */
-	if (isokendpt(proc_nr_e, &proc_nr_n) != OK)
-		return(EINVAL);
+	if (isokendpt(proc_nr_e, &proc_nr_n) != 0)
+		return(-EINVAL);
   }
 
   len= strlen(label);
@@ -322,7 +322,7 @@ int force;
   case STYLE_DEV:	dp->dmap_opcl = gen_opcl;	break;
   case STYLE_TTY:	dp->dmap_opcl = tty_opcl;	break;
   case STYLE_CLONE:	dp->dmap_opcl = clone_opcl;	break;
-  default:		return(EINVAL);
+  default:		return(-EINVAL);
   }
   dp->dmap_io = gen_io;
   dp->dmap_driver = proc_nr_e;
@@ -330,7 +330,7 @@ int force;
   if (dp->dmap_async_driver)
 	dp->dmap_io= asyn_io;
 
-  return(OK); 
+  return 0; 
 }
 
 /*===========================================================================*
@@ -341,7 +341,7 @@ void dmap_unmap_by_endpt(int proc_nr_e)
 	int i, r;
 	for (i=0; i<NR_DEVICES; i++)
 	  if(dmap[i].dmap_driver && dmap[i].dmap_driver == proc_nr_e)
-	    if((r=map_driver(i, NONE, 0, 0)) != OK)
+	    if((r=map_driver(i, NONE, 0, 0)) != 0)
 		printf("FS: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
 
 	return;

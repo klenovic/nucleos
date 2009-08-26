@@ -70,7 +70,7 @@ int main(void)
 {
   r_init();			/* initialize the memory driver */
   driver_task(&r_dtab);		/* start driver's main loop */
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -131,7 +131,7 @@ int safe;			/* safe copies? */
 	/* Random number generator. Character instead of block device. */
 	case RANDOM_DEV:
 	    if (opcode == DEV_GATHER_S && !random_isseeded())
-		    return(EAGAIN);
+		    return(-EAGAIN);
 	    left = count;
 	    while (left > 0) {
 	    	chunk = (left > RANDOM_BUF_SIZE) ? RANDOM_BUF_SIZE : left;
@@ -140,7 +140,7 @@ int safe;			/* safe copies? */
 		    if(safe) {
 			r= sys_safecopyto(proc_nr, user_vir, vir_offset,
 				(vir_bytes) random_buf, chunk, D);
-			if (r != OK)
+			if (r != 0)
 			{
 				printf(
 		"random: sys_safecopyto failed for proc %d, grant %d\n",
@@ -155,7 +155,7 @@ int safe;			/* safe copies? */
 		    if(safe) {
 			r= sys_safecopyfrom(proc_nr, user_vir, vir_offset,
 				(vir_bytes) random_buf, chunk, D);
-			if (r != OK)
+			if (r != 0)
 			{
 				printf(
 		"random: sys_safecopyfrom failed for proc %d, grant %d\n",
@@ -175,7 +175,7 @@ int safe;			/* safe copies? */
 
 	/* Unknown (illegal) minor device. */
 	default:
-	    return(EINVAL);
+	    return(-EINVAL);
 	}
 
 	/* Book the number of bytes transferred. */
@@ -183,7 +183,7 @@ int safe;			/* safe copies? */
   	if ((iov->iov_size -= count) == 0) { iov++; nr_req--; vir_offset = 0; }
 
   }
-  return(OK);
+  return 0;
 }
 
 /*============================================================================*
@@ -195,9 +195,9 @@ message *m_ptr;
 {
 /* Check device number on open.  
  */
-  if (r_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (r_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -212,7 +212,7 @@ static void r_init()
   r_random(NULL, NULL);				/* also set periodic timer */
 
   /* Retrieve first randomness buffer with parameters. */
-  if (OK != (s=sys_getrandomness(&krandom))) {
+  if ((s=sys_getrandomness(&krandom)) != 0) {
   	report("RANDOM", "sys_getrandomness failed", s);
 	exit(1);
   }
@@ -240,14 +240,14 @@ message *m_ptr;				/* pointer to control message */
 int safe;				/* safe i/o? */
 {
   struct device *dv;
-  if ((dv = r_prepare(m_ptr->DEVICE)) == NIL_DEV) return(ENXIO);
+  if ((dv = r_prepare(m_ptr->DEVICE)) == NIL_DEV) return(-ENXIO);
 
   switch (m_ptr->REQUEST) {
 
     default:
   	return(do_diocntl(&r_dtab, m_ptr, safe));
   }
-  return(OK);
+  return 0;
 }
 
 #define UPDATE(binnumber, bp, startitem, elems) 	{	\
@@ -305,7 +305,7 @@ message *m_ptr;				/* pointer to alarm message */
 
   bin = (bin+1) % RANDOM_SOURCES;
 
-  if(sys_getrandom_bin(&krandom_bin, bin) == OK)
+  if(sys_getrandom_bin(&krandom_bin, bin) == 0)
 	r_updatebin(bin, &krandom_bin);
 
   /* Add our own timing source. */
@@ -314,7 +314,7 @@ message *m_ptr;				/* pointer to alarm message */
   random_update(RND_TIMING, &r, 1);
 
   /* Schedule new alarm for next m_random call. */
-  if (OK != (s=sys_setalarm(KRANDOM_PERIOD, 0)))
+  if ((s=sys_setalarm(KRANDOM_PERIOD, 0)) != 0)
   	report("RANDOM", "sys_setalarm failed", s);
 }
 

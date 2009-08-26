@@ -42,7 +42,7 @@ long min, max;		/* minimum and maximum values for the parameter */
   int s, i, radix, r;
 
   if ((s=env_get_param(env, value, sizeof(value))) != 0) { 
-      if (s == ESRCH) return(EP_UNSET);		/* only error allowed */ 
+      if (s == -ESRCH) return(EP_UNSET);		/* only error allowed */ 
       printf("WARNING: env_get_param() failed in env_parse(): %d\n",s);
       return(EP_EGETKENV);
   }
@@ -123,7 +123,7 @@ int maxchunks;			/* how many were found */
    * b1:s1 is mem between 1M and 16M, b2:s2 is mem above 16M. Pairs b1:s1 
    * and b2:s2 are combined if the memory is adjacent. 
    */
-  if(env_get_param("memory", memstr, sizeof(memstr)-1) != OK)
+  if(env_get_param("memory", memstr, sizeof(memstr)-1) != 0)
 	return -1;
   s = memstr;
   for (i = 0; i < maxchunks && !done; i++) {
@@ -146,5 +146,5 @@ int maxchunks;			/* how many were found */
 	memp->size = size;
   }
 
-  return OK;
+  return 0;
 }

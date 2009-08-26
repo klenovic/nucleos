@@ -41,5 +41,5 @@ WINDOW *win;
 	if (win->_maxchng[y] < maxx - win->_line[y])
 		win->_maxchng[y] = maxx - win->_line[y];
   }
-  return(OK);
+  return 0;
 }

@@ -127,11 +127,11 @@ static void reply(dpeth_t * dep, int err, int m_type)
 
   DEBUG(printf("\t reply %d (%ld)\n", reply.m_type, reply.DL_STAT));
 
-  if ((status = send(dep->de_client, &reply)) == OK) {
+  if ((status = send(dep->de_client, &reply)) == 0) {
 	dep->de_read_s = 0;
 	dep->de_flags &= NOT(DEF_ACK_SEND | DEF_ACK_RECV);
 
-  } else if (status != ELOCKED || err == OK)
+  } else if (status != ELOCKED || err == 0)
 	panic(dep->de_name, SendErrMsg, status);
 
   return;
@@ -249,7 +249,7 @@ static void get_userdata_s(int user_proc, cp_grant_id_t grant,
   vir_bytes len;
 
   len = (count > IOVEC_NR ? IOVEC_NR : count) * sizeof(iovec_t);
-  if ((rc = sys_safecopyfrom(user_proc, grant, 0, (vir_bytes)loc_addr, len, D)) != OK)
+  if ((rc = sys_safecopyfrom(user_proc, grant, 0, (vir_bytes)loc_addr, len, D)) != 0)
 	panic(DevName, CopyErrMsg, rc);
   return;
 }
@@ -360,7 +360,7 @@ static void do_init(message * mp)
   reply_mess.m3_i1 = port;
   reply_mess.m3_i2 = DE_PORT_NR;
   DEBUG(printf("\t reply %d\n", reply_mess.m_type));
-  if (send(mp->m_source, &reply_mess) != OK)	/* Can't send */
+  if (send(mp->m_source, &reply_mess) != 0)	/* Can't send */
 	panic(dep->de_name, SendErrMsg, mp->m_source);
 
   return;
@@ -504,7 +504,7 @@ static void do_getstat_s(message * mp)
   if (dep->de_mode == DEM_ENABLED) (*dep->de_getstatsf) (dep);
   if ((rc = sys_safecopyto(mp->DL_PROC, mp->DL_GRANT, 0,
 			(vir_bytes)&dep->de_stat,
-			(vir_bytes) sizeof(dep->de_stat), 0)) != OK)
+			(vir_bytes) sizeof(dep->de_stat), 0)) != 0)
         panic(DevName, CopyErrMsg, rc);
   reply(dep, OK, DL_STAT_REPLY);
   return;
@@ -519,7 +519,7 @@ message *mp;
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
 	r= send(mp->m_source, mp);
-	if (r != OK)
+	if (r != 0)
 		panic("dpeth", "do_getname: send failed: %d\n", r);
 }
 
@@ -570,7 +570,7 @@ int main(int argc, char **argv)
 
   /* Request function key for debug dumps */
   fkeys = sfkeys = 0; bit_set(sfkeys, 8);
-  if ((fkey_map(&fkeys, &sfkeys)) != OK) 
+  if ((fkey_map(&fkeys, &sfkeys)) != 0) 
 	printf("%s: couldn't program Shift+F8 key (%d)\n", DevName, errno);
 
 #ifdef ETH_IGN_PROTO
@@ -585,11 +585,11 @@ int main(int argc, char **argv)
 
   /* Try to notify inet that we are present (again) */
   rc = _pm_findproc("inet", &tasknr);
-  if (rc == OK)
+  if (rc == 0)
 	notify(tasknr);
 
   while (TRUE) {
-	if ((rc = receive(ANY, &m)) != OK) panic(dep->de_name, RecvErrMsg, rc);
+	if ((rc = receive(ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
 
 	DEBUG(printf("eth: got message %d, ", m.m_type));
 
@@ -654,7 +654,7 @@ int main(int argc, char **argv)
 		break;
 	}
   }
-  return OK;			/* Never reached, but keeps compiler happy */
+  return 0;			/* Never reached, but keeps compiler happy */
 }
 
 /** dp.c **/

@@ -27,7 +27,7 @@ phys_bytes bytes;		/* how many bytes */
 
   message copy_mess;
 
-  if (bytes == 0L) return(OK);
+  if (bytes == 0L) return 0;
   copy_mess.CP_SRC_ENDPT = src_proc;
   copy_mess.CP_SRC_SPACE = src_seg;
   copy_mess.CP_SRC_ADDR = (long) src_vir;

@@ -249,14 +249,14 @@ int do_select(void)
 	nfds = m_in.SEL_NFDS;
 
 	if (nfds < 0 || nfds > OPEN_MAX)
-		return EINVAL;
+		return -EINVAL;
 
 	for(s = 0; s < MAXSELECTS; s++)
 		if (!selecttab[s].requestor)
 			break;
 
 	if (s >= MAXSELECTS)
-		return ENOSPC;
+		return -ENOSPC;
 
 	selecttab[s].deferred= FALSE;
 	selecttab[s].req_endpt = who_e;
@@ -286,29 +286,29 @@ int do_select(void)
 
 	if (selecttab[s].vir_readfds
 	 && (r=sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_READFDS,
-		SELF, D, (vir_bytes) &selecttab[s].readfds, fd_setsize)) != OK)
+		SELF, D, (vir_bytes) &selecttab[s].readfds, fd_setsize)) != 0)
 		return r;
 
 	if (selecttab[s].vir_writefds
 	 && (r=sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_WRITEFDS,
-		SELF, D, (vir_bytes) &selecttab[s].writefds, fd_setsize)) != OK)
+		SELF, D, (vir_bytes) &selecttab[s].writefds, fd_setsize)) != 0)
 		return r;
 
 	if (selecttab[s].vir_errorfds
 	 && (r=sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_ERRORFDS,
-		SELF, D, (vir_bytes) &selecttab[s].errorfds, fd_setsize)) != OK)
+		SELF, D, (vir_bytes) &selecttab[s].errorfds, fd_setsize)) != 0)
 		return r;
 
 	if (!m_in.SEL_TIMEOUT)
 		is_timeout = nonzero_timeout = 0;
 	else
 		if ((r=sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_TIMEOUT,
-			SELF, D, (vir_bytes) &timeout, sizeof(timeout))) != OK)
+			SELF, D, (vir_bytes) &timeout, sizeof(timeout))) != 0)
 			return r;
 
 	/* No nonsense in the timeval please. */
 	if (is_timeout && (timeout.tv_sec < 0 || timeout.tv_usec < 0))
-		return EINVAL;
+		return -EINVAL;
 
 	/* if is_timeout if 0, we block forever. otherwise, if nonzero_timeout
 	 * is 0, we do a poll (don't block). otherwise, we block up to the
@@ -335,13 +335,13 @@ int do_select(void)
 			continue;
 		filp = selecttab[s].filps[fd] = get_filp(fd);
 		if (filp == NULL) {
-			if (err_code == EBADF) {
+			if (err_code == -EBADF) {
 				select_cancel_all(&selecttab[s]);
-				return EBADF;
+				return -EBADF;
 			}
 
-			/* File descriptor is 'ready' to return EIO */
-			printf("vfs:do_select: EIO after driver failure\n");
+			/* File descriptor is 'ready' to return -EIO */
+			printf("vfs:do_select: -EIO after driver failure\n");
 			ops2tab(SEL_RD|SEL_WR|SEL_ERR, fd, &selecttab[s]);
 			continue;
 		}
@@ -376,7 +376,7 @@ int do_select(void)
 #if DEBUG_SELECT
 			printf("do_select: bad type\n");
 #endif
-			return EBADF;
+			return -EBADF;
 		}
 
 		selecttab[s].type[fd] = type;
@@ -406,7 +406,7 @@ int do_select(void)
 				select_cancel_all(&selecttab[s]);
 				printf(
 				"select: select_request returned error\n");
-				return EINVAL;
+				return -EINVAL;
 			}
 			if (wantops) {
 				if (wantops & ops) {
@@ -646,7 +646,7 @@ int select_notified(int major, int minor, int selected_ops)
 #if DEBUG_SELECT
 		printf("select callback: no fdtype found for device %d\n", major);
 #endif
-		return OK;
+		return 0;
 	}
 
 	/* We have a select callback from major device no.
@@ -672,7 +672,7 @@ int select_notified(int major, int minor, int selected_ops)
 		}
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -769,7 +769,7 @@ void select_unsuspend_by_endpt(int proc_e)
 		continue;
 	    maj = (selecttab[s].filps[fd]->filp_vno->v_sdev >> MAJOR)&BYTE;
 	    if(dmap_driver_match(proc_e, maj)) {
-			select_return(&selecttab[s], EAGAIN);
+			select_return(&selecttab[s], -EAGAIN);
 	    }
 	  }
 	}

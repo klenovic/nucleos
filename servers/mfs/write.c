@@ -71,7 +71,7 @@ int op;				/* special actions */
 	} else {
 		rip->i_zone[zindex] = new_zone;
 	}
-	return(OK);
+	return 0;
   }
 
   /* It is not in the inode, so it must be single or double indirect. */
@@ -101,7 +101,7 @@ int op;				/* special actions */
 	excess -= nr_indirects;	/* single indirect doesn't count */
 	ind_ex = (int) (excess / nr_indirects);
 	excess = excess % nr_indirects;
-	if (ind_ex >= nr_indirects) return(EFBIG);
+	if (ind_ex >= nr_indirects) return(-EFBIG);
 
 	if(z == NO_ZONE) {
 		/* WMAP_FREE and no double indirect block - then no
@@ -187,7 +187,7 @@ int op;				/* special actions */
 
   put_block(bp_dindir, INDIRECT_BLOCK);	/* release double indirect blk */
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -313,7 +313,7 @@ off_t position;			/* file pointer */
 	}
 	if ( (z = alloc_zone(rip->i_dev, z)) == NO_ZONE) return(NIL_BUF);
 	rip->i_zsearch = z;	/* store for next lookup */
-	if ( (r = write_map(rip, position, z, 0)) != OK) {
+	if ( (r = write_map(rip, position, z, 0)) != 0) {
 		free_zone(rip->i_dev, z);
 		err_code = r;
 		return(NIL_BUF);

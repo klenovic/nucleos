@@ -39,7 +39,7 @@ void pm_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 	int r;
 	clock_t now, prev_time = 0, next_time;
 
-	if ((r = getuptime(&now)) != OK)
+	if ((r = getuptime(&now)) != 0)
 		panic(__FILE__, "PM couldn't get uptime", NO_NUM);
 
 	/* Set timer argument and add timer to the list. */
@@ -48,7 +48,7 @@ void pm_set_timer(timer_t *tp, int ticks, tmr_func_t watchdog, int arg)
 
 	/* Reschedule our synchronous alarm if necessary. */
 	if (pm_expiring == 0 && (! prev_time || prev_time > next_time)) {
-		if (sys_setalarm(next_time, 1) != OK)
+		if (sys_setalarm(next_time, 1) != 0)
 			panic(__FILE__, "PM set timer couldn't set alarm.", NO_NUM);
 	}
 
@@ -72,7 +72,7 @@ void pm_expire_timers(clock_t now)
 
 	/* Reschedule an alarm if necessary. */
 	if (next_time > 0) {
-		if (sys_setalarm(next_time, 1) != OK)
+		if (sys_setalarm(next_time, 1) != 0)
 			panic(__FILE__, "PM expire timer couldn't set alarm.", NO_NUM);
 	}
 }
@@ -90,7 +90,7 @@ void pm_cancel_timer(timer_t *tp)
      * been cancelled (next_time will be 0 then).
 	 */
 	if (pm_expiring == 0 && (prev_time < next_time || ! next_time)) {
-		if (sys_setalarm(next_time, 1) != OK)
+		if (sys_setalarm(next_time, 1) != 0)
 			panic(__FILE__, "PM expire timer couldn't set alarm.", NO_NUM);
 	}
 }

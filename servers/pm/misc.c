@@ -68,7 +68,7 @@ int do_allocmem()
 	phys_bytes retmembase;
 
 	r = vm_allocmem(m_in.memsize, (phys_clicks *)&retmembase);
-	if(r == OK)
+	if(r == 0)
 		mp->mp_reply.membase = retmembase;
 	return r;
 }
@@ -79,7 +79,7 @@ int do_allocmem()
 int do_freemem()
 {
 #if 1
-	return ENOSYS;
+	return -ENOSYS;
 #else
   vir_clicks mem_clicks;
   phys_clicks mem_base;
@@ -92,13 +92,13 @@ int do_freemem()
 	printf("PM: unauthorized call of do_freemem by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
-	return EPERM;
+	return -EPERM;
   }
 
   mem_clicks = (m_in.memsize + CLICK_SIZE -1 ) >> CLICK_SHIFT;
   mem_base = (m_in.membase + CLICK_SIZE -1 ) >> CLICK_SHIFT;
   free_mem(mem_base, mem_clicks);
-  return(OK);
+  return 0;
 #endif
 }
 
@@ -120,7 +120,7 @@ int do_procstat()
 	printf("PM: unauthorized call of do_procstat by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
-	return EPERM;
+	return -EPERM;
   }
 
   if (m_in.stat_nr == SELF) {
@@ -128,9 +128,9 @@ int do_procstat()
       sigemptyset(&mp->mp_sigpending);
   } 
   else {
-      return(ENOSYS);
+      return(-ENOSYS);
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -157,11 +157,11 @@ int do_sysuname()
   };
 #endif
 
-  if ((unsigned) m_in.sysuname_field >= _UTS_MAX) return(EINVAL);
+  if ((unsigned) m_in.sysuname_field >= _UTS_MAX) return(-EINVAL);
 
   string = uts_tbl[m_in.sysuname_field];
   if (string == NULL)
-	return EINVAL;	/* Unsupported field */
+	return -EINVAL;	/* Unsupported field */
 
   switch (m_in.sysuname_req) {
   case _UTS_GET:
@@ -178,9 +178,9 @@ int do_sysuname()
   case _UTS_SET:
 	/* Set an uname string, needs root power. */
 	len = sizes[m_in.sysuname_field];
-	if (mp->mp_effuid != 0 || len == 0) return(EPERM);
+	if (mp->mp_effuid != 0 || len == 0) return(-EPERM);
 	n = len < m_in.sysuname_len ? len : m_in.sysuname_len;
-	if (n <= 0) return(EINVAL);
+	if (n <= 0) return(-EINVAL);
 	r = sys_vircopy(mp->mp_endpoint, D, (phys_bytes) m_in.sysuname_value,
 		SELF, D, (phys_bytes) tmp, (phys_bytes) n);
 	if (r < 0) return(r);
@@ -190,7 +190,7 @@ int do_sysuname()
 #endif
 
   default:
-	return(EINVAL);
+	return(-EINVAL);
   }
   /* Return the number of bytes moved. */
   return(n);
@@ -219,7 +219,7 @@ int do_getsysinfo()
 		mp->mp_endpoint, mp->mp_name);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
 	sig_proc(mp, SIGEMT);
-	return EPERM;
+	return -EPERM;
   }
 
   switch(m_in.info_what) {
@@ -238,7 +238,7 @@ int do_getsysinfo()
         len = sizeof(struct mproc) * NR_PROCS;
         break;
   case SI_KPROC_TAB:			/* copy entire process table */
-	if((r=sys_getproctab(proctab)) != OK)
+	if((r=sys_getproctab(proctab)) != 0)
 		return r;
 	src_addr = (vir_bytes) proctab;
 	len = sizeof(proctab);
@@ -255,13 +255,13 @@ int do_getsysinfo()
   	break; 
 #endif
   default:
-  	return(EINVAL);
+  	return(-EINVAL);
   }
 
   dst_addr = (vir_bytes) m_in.info_where;
-  if (OK != (s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)))
+  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
   	return(s);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -285,7 +285,7 @@ int do_getsysinfo_up()
         real_len = sizeof(system_hz);
 	break;
   default:
-  	return(EINVAL);
+  	return(-EINVAL);
   }
 
   /* Let application know what the length was. */
@@ -294,7 +294,7 @@ int do_getsysinfo_up()
 	len = m_in.SIU_LEN;
 
   dst_addr = (vir_bytes) m_in.SIU_WHERE;
-  if (OK != (s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)))
+  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
   	return(s);
   return(real_len);
 }
@@ -315,7 +315,7 @@ int do_getprocnr()
 	printf("PM: unauthorized call of do_getprocnr by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
-	return EPERM;
+	return -EPERM;
   }
 
 #if 0
@@ -330,14 +330,14 @@ int do_getprocnr()
 #if 0
   			printf("PM: pid result: %d\n", rmp->mp_endpoint);
 #endif
-  			return(OK);
+  			return 0;
 		} 
 	}
-  	return(ESRCH);			
+  	return(-ESRCH);			
   } else if (m_in.namelen > 0) {	/* lookup process by name */
   	key_len = MIN(m_in.namelen, PROC_NAME_LEN);
- 	if (OK != (s=sys_datacopy(who_e, (vir_bytes) m_in.addr, 
- 			SELF, (vir_bytes) search_key, key_len))) 
+ 	if ((s=sys_datacopy(who_e, (vir_bytes) m_in.addr, 
+ 			SELF, (vir_bytes) search_key, key_len)) != 0) 
  		return(s);
  	search_key[key_len] = '\0';	/* terminate for safety */
   	for (rmp = &mproc[0]; rmp < &mproc[NR_PROCS]; rmp++) {
@@ -346,11 +346,11 @@ int do_getprocnr()
   			mp->mp_reply.endpt = rmp->mp_endpoint;
   			printf("PM: name %s result: %d\n", search_key, 
 					rmp->mp_endpoint);
-  			return(OK);
+  			return 0;
 		} 
 	}
-	printf("PM: name %s result: ESRCH\n", search_key);
-  	return(ESRCH);			
+	printf("PM: name %s result: -ESRCH\n", search_key);
+  	return(-ESRCH);			
   } else {			/* return own/parent process number */
 #if 0
 	printf("PM: endpt result: %d\n", mp->mp_reply.endpt);
@@ -359,7 +359,7 @@ int do_getprocnr()
 	mp->mp_reply.pendpt = mproc[mp->mp_parent].mp_endpoint;
   }
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -376,7 +376,7 @@ int do_getpuid()
 	printf("PM: unauthorized call of do_getpuid by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
-	return EPERM;
+	return -EPERM;
   }
 
   ep= m_in.endpt;
@@ -389,7 +389,7 @@ int do_getpuid()
   } 
 
   /* Process not found */
-  return(ESRCH);			
+  return(-ESRCH);			
 }
 
 /*===========================================================================*
@@ -400,17 +400,17 @@ int do_reboot()
   int r;
 
   /* Check permission to abort the system. */
-  if (mp->mp_effuid != SUPER_USER) return(EPERM);
+  if (mp->mp_effuid != SUPER_USER) return(-EPERM);
 
   /* See how the system should be aborted. */
   abort_flag = (unsigned) m_in.reboot_flag;
-  if (abort_flag >= RBT_INVALID) return(EINVAL); 
+  if (abort_flag >= RBT_INVALID) return(-EINVAL); 
   if (RBT_MONITOR == abort_flag) {
 	int r;
 	if(m_in.reboot_strlen >= sizeof(monitor_code))
-		return EINVAL;
+		return -EINVAL;
 	if((r = sys_datacopy(who_e, (vir_bytes) m_in.reboot_code,
-		SELF, (vir_bytes) monitor_code, m_in.reboot_strlen)) != OK)
+		SELF, (vir_bytes) monitor_code, m_in.reboot_strlen)) != 0)
 		return r;
 	monitor_code[m_in.reboot_strlen] = '\0';
   }
@@ -427,7 +427,7 @@ int do_reboot()
 
   report_reboot= 1;
   r= notify(FS_PROC_NR);
-  if (r != OK) panic("pm", "do_reboot: unable to notify FS", r);
+  if (r != 0) panic("pm", "do_reboot: unable to notify FS", r);
   
   return(SUSPEND);			/* don't reply to caller */
 }
@@ -449,19 +449,19 @@ int do_getsetpriority()
 
 	/* Only support PRIO_PROCESS for now. */
 	if (arg_which != PRIO_PROCESS)
-		return(EINVAL);
+		return(-EINVAL);
 
 	if (arg_who == 0)
 		rmp_nr = who_p;
 	else
 		if ((rmp_nr = proc_from_pid(arg_who)) < 0)
-			return(ESRCH);
+			return(-ESRCH);
 
 	rmp = &mproc[rmp_nr];
 
 	if (mp->mp_effuid != SUPER_USER &&
 	   mp->mp_effuid != rmp->mp_effuid && mp->mp_effuid != rmp->mp_realuid)
-		return EPERM;
+		return -EPERM;
 
 	/* If GET, that's it. */
 	if (call_nr == GETPRIORITY) {
@@ -470,7 +470,7 @@ int do_getsetpriority()
 
 	/* Only root is allowed to reduce the nice level. */
 	if (rmp->mp_nice > arg_pri && mp->mp_effuid != SUPER_USER)
-		return(EACCES);
+		return(-EACCES);
 	
 	/* We're SET, and it's allowed. Do it and tell kernel. */
 	rmp->mp_nice = arg_pri;
@@ -495,7 +495,7 @@ int do_svrctl()
   ptr = (vir_bytes) m_in.svrctl_argp;
 
   /* Is the request indeed for the MM? */
-  if (((req >> 8) & 0xFF) != 'M') return(EINVAL);
+  if (((req >> 8) & 0xFF) != 'M') return(-EINVAL);
 
   /* Control operations local to the PM. */
   switch(req) {
@@ -509,33 +509,33 @@ int do_svrctl()
 
       /* Copy sysgetenv structure to PM. */
       if (sys_datacopy(who_e, ptr, SELF, (vir_bytes) &sysgetenv, 
-              sizeof(sysgetenv)) != OK) return(EFAULT);  
+              sizeof(sysgetenv)) != 0) return(-EFAULT);  
 
       /* Set a param override? */
       if (req == MMSETPARAM) {
-  	if (local_params >= MAX_LOCAL_PARAMS) return ENOSPC;
+  	if (local_params >= MAX_LOCAL_PARAMS) return -ENOSPC;
   	if (sysgetenv.keylen <= 0
   	 || sysgetenv.keylen >=
   	 	 sizeof(local_param_overrides[local_params].name)
   	 || sysgetenv.vallen <= 0
   	 || sysgetenv.vallen >=
   	 	 sizeof(local_param_overrides[local_params].value))
-  		return EINVAL;
+  		return -EINVAL;
   		
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
             SELF, (vir_bytes) local_param_overrides[local_params].name,
-               sysgetenv.keylen)) != OK)
+               sysgetenv.keylen)) != 0)
                	return s;
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.val,
             SELF, (vir_bytes) local_param_overrides[local_params].value,
-              sysgetenv.vallen)) != OK)
+              sysgetenv.vallen)) != 0)
                	return s;
             local_param_overrides[local_params].name[sysgetenv.keylen] = '\0';
             local_param_overrides[local_params].value[sysgetenv.vallen] = '\0';
 
   	local_params++;
 
-  	return OK;
+  	return 0;
       }
 
       if (sysgetenv.keylen == 0) {	/* copy all parameters */
@@ -545,9 +545,9 @@ int do_svrctl()
       else {				/* lookup value for key */
       	  int p;
           /* Try to get a copy of the requested key. */
-          if (sysgetenv.keylen > sizeof(search_key)) return(EINVAL);
+          if (sysgetenv.keylen > sizeof(search_key)) return(-EINVAL);
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
-                  SELF, (vir_bytes) search_key, sysgetenv.keylen)) != OK)
+                  SELF, (vir_bytes) search_key, sysgetenv.keylen)) != 0)
               return(s);
 
           /* Make sure key is null-terminated and lookup value.
@@ -561,25 +561,25 @@ int do_svrctl()
           	}
           }
           if (p >= local_params && (val_start = find_param(search_key)) == NULL)
-               return(ESRCH);
+               return(-ESRCH);
           val_len = strlen(val_start) + 1;
       }
 
       /* See if it fits in the client's buffer. */
       if (val_len > sysgetenv.vallen)
-      	return E2BIG;
+      	return -E2BIG;
 
       /* Value found, make the actual copy (as far as possible). */
       copy_len = MIN(val_len, sysgetenv.vallen); 
       if ((s=sys_datacopy(SELF, (vir_bytes) val_start, 
-              who_e, (vir_bytes) sysgetenv.val, copy_len)) != OK)
+              who_e, (vir_bytes) sysgetenv.val, copy_len)) != 0)
           return(s);
 
-      return OK;
+      return 0;
   }
 
   default:
-	return(EINVAL);
+	return(-EINVAL);
   }
 }
 
@@ -593,7 +593,7 @@ char *brk_addr;
 {
 	int r;
 /* PM wants to call brk() itself. */
-	if((r=vm_brk(PM_PROC_NR, brk_addr)) != OK) {
+	if((r=vm_brk(PM_PROC_NR, brk_addr)) != 0) {
 #if 0
 		printf("PM: own brk(%p) failed: vm_brk() returned %d\n",
 			brk_addr, r);

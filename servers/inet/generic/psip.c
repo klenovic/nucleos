@@ -136,7 +136,7 @@ int ip_port_nr;
 		port_nr, psip_open, psip_close, psip_read,
 		psip_write, psip_ioctl, psip_cancel, psip_select);
 
-	return NW_OK;
+	return 0;
 }
 
 int psip_send(port_nr, dest, pack)
@@ -157,7 +157,7 @@ acc_t *pack;
 	if (psip_port->pp_opencnt == 0)
 	{
 		bf_afree(pack);
-		return NW_OK;
+		return 0;
 	}
 
 	for(;;)
@@ -236,18 +236,18 @@ acc_t *pack;
 
 			result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd, 
 				(size_t)0, pack, FALSE);
-			if (result == NW_OK)
+			if (result == 0)
 				result= buf_size;
 		}
 		else
-			result= EPACKSIZE;
+			result= -EPACKSIZE;
 
 		result1= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd,
 				(size_t)result, NULL, FALSE);
-		assert(result1 == NW_OK);
-		if (result == EPACKSIZE)
+		assert(result1 == 0);
+		if (result == -EPACKSIZE)
 			continue;
-		return NW_OK;
+		return 0;
 	}
 	return NW_SUSPEND;
 }
@@ -269,7 +269,7 @@ select_res_t select_res;
 	psip_port= &psip_port_table[port];
 
 	if (!(psip_port->pp_flags & PPF_ENABLED))
-		return ENXIO;
+		return -ENXIO;
 
 	for (i= 0, psip_fd= psip_fd_table; i<PSIP_FD_NR; i++, psip_fd++)
 	{
@@ -278,7 +278,7 @@ select_res_t select_res;
 		break;
 	}
 	if (i == PSIP_FD_NR)
-		return ENFILE;
+		return -ENFILE;
 	psip_fd->pf_flags |= PFF_INUSE;
 	psip_fd->pf_srfd= srfd;
 	psip_fd->pf_port= psip_port;
@@ -309,7 +309,7 @@ ioreq_t req;
 			sizeof(*ipconfp), TRUE);
 		if (!data)
 		{
-			result= EFAULT;
+			result= -EFAULT;
 			break;
 		}
 		data= bf_packIffLess(data, sizeof(*ipconfp));
@@ -325,7 +325,7 @@ ioreq_t req;
 			sizeof(*psip_opt), TRUE);
 		if (!data)
 		{
-			result= EFAULT;
+			result= -EFAULT;
 			break;
 		}
 		data= bf_packIffLess(data, sizeof(*psip_opt));
@@ -334,7 +334,7 @@ ioreq_t req;
 		newoptp= (nwio_psipopt_t *)ptr2acc_data(data);
 		result= psip_setopt(psip_fd, newoptp);
 		bf_afree(data);
-		if (result == NW_OK)
+		if (result == 0)
 		{
 			if (psip_fd->pf_psipopt.nwpo_flags & NWPO_EN_PROMISC)
 			{
@@ -364,14 +364,14 @@ ioreq_t req;
 		*psip_opt= psip_fd->pf_psipopt;
 		result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd, 0,
 			data, TRUE);
-		if (result == NW_OK)
-			reply_thr_put(psip_fd, NW_OK, TRUE);
+		if (result == 0)
+			reply_thr_put(psip_fd, 0, TRUE);
 		break;
 	default:
-		reply_thr_put(psip_fd, ENOTTY, TRUE);
+		reply_thr_put(psip_fd, -ENOTTY, TRUE);
 		break;
 	}
-	return NW_OK;
+	return 0;
 }
 
 static int psip_read(fd, count)
@@ -398,16 +398,16 @@ size_t count;
 			psip_port->pp_promisc_head= pack->acc_ext_link;
 			result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd, 
 				(size_t)0, pack, FALSE);
-			if (result == NW_OK)
+			if (result == 0)
 				result= buf_size;
 		}
 		else
-			result= EPACKSIZE;
+			result= -EPACKSIZE;
 
 		result1= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd,
 				(size_t)result, NULL, FALSE);
-		assert(result1 == NW_OK);
-		return NW_OK;
+		assert(result1 == 0);
+		return 0;
 	}
 
 	psip_fd->pf_rd_count= count;
@@ -423,7 +423,7 @@ size_t count;
 		ipps_get(psip_port->pp_ipdev);
 	if (psip_fd->pf_flags & PFF_READ_IP)
 		return NW_SUSPEND;
-	return NW_OK;
+	return 0;
 }
 
 static int psip_write(fd, count)
@@ -446,9 +446,9 @@ size_t count;
 	if (pack == NULL)
 	{
 		pack= (*psip_fd->pf_get_userdata)(psip_fd->pf_srfd, 
-			(size_t)EFAULT, (size_t)0, FALSE);
+			(size_t)-EFAULT, (size_t)0, FALSE);
 		assert(pack == NULL);
-		return NW_OK;
+		return 0;
 	}
 
 	if (psip_fd->pf_flags & PFF_NEXTHOP)
@@ -459,9 +459,9 @@ size_t count;
 			/* Something strange */
 			bf_afree(pack); pack= NULL;
 			pack= (*psip_fd->pf_get_userdata)(psip_fd->pf_srfd,
-				(size_t)EPACKSIZE, (size_t)0, FALSE);
+				(size_t)-EPACKSIZE, (size_t)0, FALSE);
 			assert(pack == NULL);
-			return NW_OK;
+			return 0;
 		}
 		pack= bf_packIffLess(pack, sizeof(nexthop));
 		nexthop= *(ipaddr_t *)ptr2acc_data(pack);
@@ -508,7 +508,7 @@ size_t count;
 	pack= (*psip_fd->pf_get_userdata)(psip_fd->pf_srfd, (size_t)count,
 		(size_t)0, FALSE);
 	assert(pack == NULL);
-	return NW_OK;
+	return 0;
 }
 
 static int psip_select(fd, operations)
@@ -580,15 +580,15 @@ int which_operation;
 			psip_port->pp_rd_tail= prev_fd;
 		psip_fd->pf_flags &= ~PFF_READ_IP;
 		result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd,
-						(size_t)EINTR, NULL, FALSE);
-		assert(result == NW_OK);
+						(size_t)-EINTR, NULL, FALSE);
+		assert(result == 0);
 		break;
 	case SR_CANCEL_WRITE:
 		ip_panic(( "should not be here" ));
 	default:
 		ip_panic(( "invalid operation for cancel" ));
 	}
-	return NW_OK;
+	return 0;
 }
 
 static void promisc_restart_read(psip_port)
@@ -630,20 +630,20 @@ again:
 			psip_port->pp_promisc_head= pack->acc_ext_link;
 			result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd, 
 				(size_t)0, pack, FALSE);
-			if (result == NW_OK)
+			if (result == 0)
 				result= buf_size;
 		}
 		else
-			result= EPACKSIZE;
+			result= -EPACKSIZE;
 
 		result1= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd,
 				(size_t)result, NULL, FALSE);
-		assert(result1 == NW_OK);
+		assert(result1 == 0);
 
 		if (psip_port->pp_promisc_head)
 		{
 			/* Restart from the beginning */
-			assert(result == EPACKSIZE);
+			assert(result == -EPACKSIZE);
 			psip_fd= psip_port->pp_rd_head;
 			prev= NULL;
 			goto again;
@@ -669,7 +669,7 @@ nwio_psipopt_t *newoptp;
 	new_di_flags= (newoptp->nwpo_flags >> 16) & 0xffff;
 
 	if (new_en_flags & new_di_flags)
-		return EBADMODE;
+		return -EBADMODE;
 
 	/* NWUO_LOCADDR_MASK */
 	if (!((new_en_flags | new_di_flags) & NWPO_PROMISC_MASK))
@@ -682,17 +682,17 @@ nwio_psipopt_t *newoptp;
 	if ((new_flags & NWPO_EN_PROMISC) &&
 		(psip_fd->pf_port->pp_flags & PPF_PROMISC))
 	{
-		printf("psip_setopt: EBUSY for port %d, flags 0x%x\n",
+		printf("psip_setopt: -EBUSY for port %d, flags 0x%x\n",
 			psip_fd->pf_port - psip_port_table,
 			psip_fd->pf_port->pp_flags);
 		/* We can support only one at a time. */
-		return EBUSY;
+		return -EBUSY;
 	}
 
 	psip_fd->pf_psipopt= *newoptp;
 	psip_fd->pf_psipopt.nwpo_flags= new_flags;
 
-	return NW_OK;
+	return 0;
 }
 
 static void check_promisc(psip_port)
@@ -798,7 +798,7 @@ int for_ioctl;
 
 	result= (*psip_fd->pf_put_userdata)(psip_fd->pf_srfd, reply,
 		(acc_t *)0, for_ioctl);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 /*

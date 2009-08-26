@@ -198,12 +198,12 @@ void proc_stacktrace(struct proc *proc)
 
 	while(v_bp) {
 	        if(data_copy(proc->p_endpoint, v_bp,
-			SYSTEM, (vir_bytes) &v_hbp, sizeof(v_hbp)) != OK) {
+			SYSTEM, (vir_bytes) &v_hbp, sizeof(v_hbp)) != 0) {
 			kprintf("(v_bp 0x%lx ?)", v_bp);
 			break;
 		}
 		if(data_copy(proc->p_endpoint, v_bp + sizeof(v_pc),
-			SYSTEM, (vir_bytes) &v_pc, sizeof(v_pc)) != OK) {
+			SYSTEM, (vir_bytes) &v_pc, sizeof(v_pc)) != 0) {
 			kprintf("(v_pc 0x%lx ?)", v_pc);
 			break;
 		}

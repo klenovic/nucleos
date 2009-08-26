@@ -28,7 +28,7 @@ int no_sys()
 {
 /* Somebody has used an illegal system call number */
   printf("no_sys: invalid call %d\n", req_nr);
-  return(EINVAL);
+  return(-EINVAL);
 }
 
 /*===========================================================================*
@@ -76,12 +76,12 @@ time_t clock_time()
 
   if (use_getuptime2)
   {
-	if ( (k=getuptime2(&uptime,&boottime)) != OK)
+	if ( (k=getuptime2(&uptime,&boottime)) != 0)
 		panic(__FILE__,"clock_time: getuptme2 failed", k);
   }
   else
   {
-	if ( (k=getuptime(&uptime)) != OK)
+	if ( (k=getuptime(&uptime)) != 0)
 		panic(__FILE__,"clock_time err", k);
   }
   return( (time_t) (boottime + (uptime/sys_hz())));

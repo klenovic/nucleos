@@ -41,7 +41,7 @@ unsigned int inb(unsigned short port)
   unsigned long value;
   int rc;
 
-  if ((rc = sys_inb(port, &value)) != OK) warning("inb", rc);
+  if ((rc = sys_inb(port, &value)) != 0) warning("inb", rc);
   return value;
 }
 
@@ -54,7 +54,7 @@ unsigned int inw(unsigned short port)
   unsigned long value;
   int rc;
 
-  if ((rc = sys_inw(port, &value)) != OK) warning("inw", rc);
+  if ((rc = sys_inw(port, &value)) != 0) warning("inw", rc);
   return value;
 }
 
@@ -66,7 +66,7 @@ void insb(unsigned short int port, int proc_nr, void *buffer, int count)
 {
   int rc;
 
-  if ((rc = sys_insb(port, proc_nr, buffer, count)) != OK)
+  if ((rc = sys_insb(port, proc_nr, buffer, count)) != 0)
 	warning("insb", rc);
   return;
 }
@@ -79,7 +79,7 @@ void insw(unsigned short int port, int proc_nr, void *buffer, int count)
 {
   int rc;
 
-  if ((rc = sys_insw(port, proc_nr, buffer, count)) != OK)
+  if ((rc = sys_insw(port, proc_nr, buffer, count)) != 0)
 	warning("insw", rc);
   return;
 }
@@ -92,7 +92,7 @@ void outb(unsigned short port, unsigned long value)
 {
   int rc;
 
-  if ((rc = sys_outb(port, value)) != OK) warning("outb", rc);
+  if ((rc = sys_outb(port, value)) != 0) warning("outb", rc);
   return;
 }
 
@@ -104,7 +104,7 @@ void outw(unsigned short port, unsigned long value)
 {
   int rc;
 
-  if ((rc = sys_outw(port, value)) != OK) warning("outw", rc);
+  if ((rc = sys_outw(port, value)) != 0) warning("outw", rc);
   return;
 }
 
@@ -116,7 +116,7 @@ void outsb(unsigned short port, int proc_nr, void *buffer, int count)
 {
   int rc;
 
-  if ((rc = sys_outsb(port, proc_nr, buffer, count)) != OK)
+  if ((rc = sys_outsb(port, proc_nr, buffer, count)) != 0)
 	warning("outsb", rc);
   return;
 }
@@ -129,7 +129,7 @@ void outsw(unsigned short port, int proc_nr, void *buffer, int count)
 {
   int rc;
 
-  if ((rc = sys_outsw(port, proc_nr, buffer, count)) != OK)
+  if ((rc = sys_outsw(port, proc_nr, buffer, count)) != 0)
 	warning("outsw", rc);
   return;
 }

@@ -45,7 +45,7 @@ time_t get_time()
 	if (!curr_time)
 	{
 		int s;
-		if ((s=getuptime(&curr_time)) != OK)
+		if ((s=getuptime(&curr_time)) != 0)
 			ip_panic(("can't read clock"));
 
 		assert(curr_time >= prev_time);
@@ -163,7 +163,7 @@ static void set_timer()
 		next_timeout= new_time;
 		new_time -= curr_time;
 
-		if (sys_setalarm(new_time, 0) != OK)
+		if (sys_setalarm(new_time, 0) != 0)
   			ip_panic(("can't set timer"));
 	}
 }

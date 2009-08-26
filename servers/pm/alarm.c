@@ -111,7 +111,7 @@ int do_itimer()
 
   /* Make sure 'which' is one of the defined timers. */
   if (m_in.which_timer < 0 || m_in.which_timer >= NR_ITIMERS)
-  	return(EINVAL);
+  	return(-EINVAL);
 
   /* Determine whether to set and/or return the given timer value, based on
    * which of the new_val and old_val parameters are nonzero. At least one of
@@ -120,7 +120,7 @@ int do_itimer()
   setval = (m_in.new_val != NULL);
   getval = (m_in.old_val != NULL);
 
-  if (!setval && !getval) return(EINVAL);
+  if (!setval && !getval) return(-EINVAL);
 
   /* If we're setting a new value, copy the new timer from user space.
    * Also, make sure its fields have sane values.
@@ -128,11 +128,11 @@ int do_itimer()
   if (setval) {
   	r = sys_datacopy(who_e, (vir_bytes) m_in.new_val,
   		PM_PROC_NR, (vir_bytes) &value, (phys_bytes) sizeof(value));
-  	if (r != OK) return(r);
+  	if (r != 0) return(r);
 
   	if (!is_sane_timeval(&value.it_value) ||
   	    !is_sane_timeval(&value.it_interval))
-  		return(EINVAL);
+  		return(-EINVAL);
   }
 
   switch (m_in.which_timer) {
@@ -141,7 +141,7 @@ int do_itimer()
 
   		if (setval) set_realtimer(mp, &value);
 
-  		r = OK;
+  		r = 0;
   		break;
 
   	case ITIMER_VIRTUAL :
@@ -150,12 +150,12 @@ int do_itimer()
   				(setval) ? &value : NULL,
   				(getval) ? &ovalue : NULL);
 
-  		r = OK;
+  		r = 0;
   		break;
   }
 
   /* If requested, copy the old interval timer to user space. */
-  if (r == OK && getval) {
+  if (r == 0 && getval) {
   	r = sys_datacopy(PM_PROC_NR, (vir_bytes) &ovalue,
   		who_e, (vir_bytes) m_in.old_val, (phys_bytes) sizeof(ovalue));
   }
@@ -239,7 +239,7 @@ struct itimerval *ovalue;
   /* Make the kernel call. If requested, also retrieve and store
    * the old timer value.
    */
-  if ((r = sys_vtimer(rmp->mp_endpoint, num, nptr, optr)) != OK)
+  if ((r = sys_vtimer(rmp->mp_endpoint, num, nptr, optr)) != 0)
   	panic(__FILE__, "sys_vtimer failed", r);
 
   if (ovalue != NULL) {
@@ -292,7 +292,7 @@ struct itimerval *value;
 
   /* First determine remaining time, in ticks, of previous alarm, if set. */
   if (rmp->mp_flags & ALARM_ON) {
-  	if ( (s = getuptime(&uptime)) != OK)
+  	if ( (s = getuptime(&uptime)) != 0)
   		panic(__FILE__, "get_realtimer couldn't get uptime", s);
   	exptime = *tmr_exp_time(&rmp->mp_timer);
 
@@ -361,7 +361,7 @@ struct timer *tp;
   register struct mproc *rmp;
 
   /* get process from timer */
-  if(pm_isokendpt(tmr_arg(tp)->ta_int, &proc_nr_n) != OK) {
+  if(pm_isokendpt(tmr_arg(tp)->ta_int, &proc_nr_n) != 0) {
   	printf("PM: ignoring timer for invalid endpoint %d\n",
   		tmr_arg(tp)->ta_int);
   	return;

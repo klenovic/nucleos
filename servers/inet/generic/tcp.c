@@ -216,7 +216,7 @@ tcp_port_t *tcp_port;
 		tcp_conn->tc_max_mtu= tcp_port->tp_mtu;
 		tcp_conn->tc_mtu= tcp_conn->tc_max_mtu;
 		tcp_conn->tc_mtutim= 0;
-		tcp_conn->tc_error= NW_OK;
+		tcp_conn->tc_error= 0;
 		tcp_conn->tc_snd_wnd= TCP_MAX_SND_WND_SIZE;
 		tcp_conn->tc_snd_cinc=
 			(long)TCP_DEF_MSS*TCP_DEF_MSS/TCP_MAX_SND_WND_SIZE+1;
@@ -368,7 +368,7 @@ int for_ioctl;
 			tcp_port->tp_state= TPS_GETCONF;
 			if (tcp_port->tp_flags & TPF_SUSPEND)
 				tcp_main(tcp_port);
-			return NW_OK;
+			return 0;
 		}
 assert (!offset);
 assert (count == sizeof(struct nwio_ipopt));
@@ -392,7 +392,7 @@ assert (count == sizeof(struct nwio_ipopt));
 			result= (int)offset;
 			if (result<0)
 			{
-				if (result == EDSTNOTRCH)
+				if (result == -EDSTNOTRCH)
 				{
 					if (tcp_port->tp_snd_head)
 					{
@@ -432,7 +432,7 @@ assert (count == sizeof(struct nwio_ipopt));
 			port, offset, count, tcp_port->tp_state);
 		break;
 	}
-	return NW_OK;
+	return 0;
 }
 
 static int tcp_put_data (fd, offset, data, for_ioctl)
@@ -455,7 +455,7 @@ int for_ioctl;
 			if (result<0)
 			{
 				tcp_port->tp_state= TPS_ERROR;
-				return NW_OK;
+				return 0;
 			}
 			tcp_port->tp_state= TPS_MAIN;
 			if (tcp_port->tp_flags & TPF_SUSPEND)
@@ -505,7 +505,7 @@ assert (ipconf->nwic_flags & NWIC_IPADDR_SET);
 			fd, offset, data, tcp_port->tp_state);
 		break;
 	}
-	return NW_OK;
+	return 0;
 }
 
 /*
@@ -727,7 +727,7 @@ select_res_t select_res;
 		i++);
 	if (i>=TCP_FD_NR)
 	{
-		return EAGAIN;
+		return -EAGAIN;
 	}
 
 	tcp_fd= &tcp_fd_table[i];
@@ -790,8 +790,8 @@ ioreq_t req;
 			(tcp_fd->tf_flags & TFF_LISTENQ))
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, EISCONN, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -EISCONN, TRUE);
+			result= 0;
 			break;
 		}
 		result= tcp_setconf(tcp_fd);
@@ -814,7 +814,7 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			0, conf_acc, TRUE);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		reply_thr_put(tcp_fd, result, TRUE);
-		result= NW_OK;
+		result= 0;
 		break;
 	case NWIOSTCPOPT:
 		result= tcp_setopt(tcp_fd);
@@ -829,25 +829,25 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			0, opt_acc, TRUE);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		reply_thr_put(tcp_fd, result, TRUE);
-		result= NW_OK;
+		result= 0;
 		break;
 	case NWIOTCPCONN:
 		if (tcp_fd->tf_flags & TFF_CONNECTING)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, EALREADY, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -EALREADY, TRUE);
+			result= 0;
 			break;
 		}
 		if (tcp_fd->tf_flags & TFF_CONNECTED)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, EISCONN, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -EISCONN, TRUE);
+			result= 0;
 			break;
 		}
 		result= tcp_connect(tcp_fd);
-		if (result == NW_OK)
+		if (result == 0)
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		break;
 	case NWIOTCPLISTEN:
@@ -857,8 +857,8 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			(tcp_fd->tf_flags & TFF_CONNECTING))
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, EISCONN, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -EISCONN, TRUE);
+			result= 0;
 			break;
 		}
 		result= tcp_listen(tcp_fd, (req == NWIOTCPLISTENQ));
@@ -867,8 +867,8 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 		if (!(tcp_fd->tf_flags & TFF_CONNECTED))
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, ENOTCONN, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -ENOTCONN, TRUE);
+			result= 0;
 			break;
 		}
 		tcp_fd->tf_flags |= TFF_IOCTL_IP;
@@ -880,7 +880,7 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 		tcp_conn->tc_busy--;
 		tcp_conn_write(tcp_conn, 0);
 		if (!(tcp_fd->tf_flags & TFF_IOCTL_IP))
-			result= NW_OK;
+			result= 0;
 		else
 			result= NW_SUSPEND;
 		break;
@@ -888,8 +888,8 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 		if (!(tcp_fd->tf_flags & TFF_CONNECTED))
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get (tcp_fd, ENOTCONN, TRUE);
-			result= NW_OK;
+			reply_thr_get (tcp_fd, -ENOTCONN, TRUE);
+			result= 0;
 			break;
 		}
 		tcp_conn= tcp_fd->tf_conn;
@@ -903,8 +903,8 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 
 		tcp_conn_write(tcp_conn, 0);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get (tcp_fd, NW_OK, TRUE);
-		result= NW_OK;
+		reply_thr_get (tcp_fd, 0, TRUE);
+		result= 0;
 		break;
 	case NWIOGTCPCOOKIE:
 		if (!(tcp_fd->tf_flags & TFF_COOKIE))
@@ -925,7 +925,7 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			0, acc, TRUE);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		reply_thr_put(tcp_fd, result, TRUE);
-		result= NW_OK;
+		result= 0;
 		break;
 	case NWIOTCPACCEPTTO:
 		result= tcp_acceptto(tcp_fd);
@@ -938,7 +938,7 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			0, acc, TRUE);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		reply_thr_put(tcp_fd, result, TRUE);
-		result= NW_OK;
+		result= 0;
 		break;
 
 	case NWIOTCPGERROR:
@@ -952,13 +952,13 @@ assert (conf_acc->acc_length == sizeof(*tcp_conf));
 			0, acc, TRUE);
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
 		reply_thr_put(tcp_fd, result, TRUE);
-		result= NW_OK;
+		result= 0;
 		break;
 
 	default:
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADIOCTL, TRUE);
-		result= NW_OK;
+		reply_thr_get(tcp_fd, -EBADIOCTL, TRUE);
+		result= 0;
 		break;
 	}
 	return result;
@@ -985,7 +985,7 @@ tcp_fd_t *tcp_fd;
 		sizeof(nwio_tcpconf_t), TRUE);
 
 	if (!data)
-		return EFAULT;
+		return -EFAULT;
 
 	data= bf_packIffLess(data, sizeof(nwio_tcpconf_t));
 assert (data->acc_length == sizeof(nwio_tcpconf_t));
@@ -1003,18 +1003,18 @@ assert (data->acc_length == sizeof(nwio_tcpconf_t));
 	if (new_en_flags & new_di_flags)
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADMODE, TRUE);
+		reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 		bf_afree(data);
-		return NW_OK;
+		return 0;
 	}
 
 	/* NWTC_ACC_MASK */
 	if (new_di_flags & NWTC_ACC_MASK)
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADMODE, TRUE);
+		reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 		bf_afree(data);
-		return NW_OK;
+		return 0;
 		/* access modes can't be disabled */
 	}
 
@@ -1025,9 +1025,9 @@ assert (data->acc_length == sizeof(nwio_tcpconf_t));
 	if (new_di_flags & NWTC_LOCPORT_MASK)
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADMODE, TRUE);
+		reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 		bf_afree(data);
-		return NW_OK;
+		return 0;
 		/* the loc ports can't be disabled */
 	}
 	if (!(new_en_flags & NWTC_LOCPORT_MASK))
@@ -1046,9 +1046,9 @@ assert (data->acc_length == sizeof(nwio_tcpconf_t));
 		if (!newconf.nwtc_locport)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get(tcp_fd, EBADMODE, TRUE);
+			reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 			bf_afree(data);
-			return NW_OK;
+			return 0;
 		}
 	}
 	
@@ -1067,9 +1067,9 @@ assert (data->acc_length == sizeof(nwio_tcpconf_t));
 		if (!newconf.nwtc_remaddr)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get(tcp_fd, EBADMODE, TRUE);
+			reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 			bf_afree(data);
-			return NW_OK;
+			return 0;
 		}
 	}
 	else
@@ -1093,9 +1093,9 @@ assert (new_di_flags & NWTC_REMADDR_MASK);
 		if (!newconf.nwtc_remport)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get(tcp_fd, EBADMODE, TRUE);
+			reply_thr_get(tcp_fd, -EBADMODE, TRUE);
 			bf_afree(data);
-			return NW_OK;
+			return 0;
 		}
 	}
 	else
@@ -1130,9 +1130,9 @@ assert (new_di_flags & NWTC_REMPORT_MASK);
 				(all_flags & NWTC_ACC_MASK) == NWTC_EXCL)
 			{
 				tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-				reply_thr_get(tcp_fd, EADDRINUSE, TRUE);
+				reply_thr_get(tcp_fd, -EADDRINUSE, TRUE);
 				bf_afree(data);
-				return NW_OK;
+				return 0;
 			}
 		}
 	}
@@ -1151,8 +1151,8 @@ assert (new_di_flags & NWTC_REMPORT_MASK);
 	}
 	bf_afree(data);
 	tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-	reply_thr_get(tcp_fd, NW_OK, TRUE);
-	return NW_OK;
+	reply_thr_get(tcp_fd, 0, TRUE);
+	return 0;
 }
 
 
@@ -1173,7 +1173,7 @@ tcp_fd_t *tcp_fd;
 		sizeof(nwio_tcpopt_t), TRUE);
 
 	if (!data)
-		return EFAULT;
+		return -EFAULT;
 
 	data= bf_packIffLess(data, sizeof(nwio_tcpopt_t));
 assert (data->acc_length == sizeof(nwio_tcpopt_t));
@@ -1189,8 +1189,8 @@ assert (data->acc_length == sizeof(nwio_tcpopt_t));
 	if (new_en_flags & new_di_flags)
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(tcp_fd, -EBADMODE, TRUE);
+		return 0;
 	}
 
 	/* NWTO_SND_URG_MASK */
@@ -1219,8 +1219,8 @@ assert (data->acc_length == sizeof(nwio_tcpopt_t));
 		{
 			bf_afree(data);
 			tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-			reply_thr_get(tcp_fd, EINVAL, TRUE);
-			return NW_OK;
+			reply_thr_get(tcp_fd, -EINVAL, TRUE);
+			return 0;
 		}
 	}
 
@@ -1271,8 +1271,8 @@ assert (data->acc_length == sizeof(nwio_tcpopt_t));
 
 	bf_afree(data);
 	tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-	reply_thr_get(tcp_fd, NW_OK, TRUE);
-	return NW_OK;
+	reply_thr_get(tcp_fd, 0, TRUE);
+	return 0;
 }
 
 
@@ -1372,8 +1372,8 @@ int do_listenq;
 	if (do_listenq)
 	{
 		tcp_fd->tf_flags |= TFF_LISTENQ;
-		tcp_reply_ioctl(tcp_fd, NW_OK);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, 0);
+		return 0;
 	}
 	return NW_SUSPEND;
 }
@@ -1409,7 +1409,7 @@ static tcp_conn_t *find_empty_conn()
 			continue;
 		if (tcp_conn->tc_state != TCS_CLOSED)
 		{
-			 tcp_close_connection (tcp_conn, ENOCONN);
+			 tcp_close_connection (tcp_conn, -ENOCONN);
 		}
 		tcp_conn->tc_flags= 0;
 		return tcp_conn;
@@ -1454,7 +1454,7 @@ ipaddr_t remaddr;
 		state= tcp_conn->tc_state;
 		if (state != TCS_CLOSED)
 		{
-			tcp_close_connection(tcp_conn, ENOCONN);
+			tcp_close_connection(tcp_conn, -ENOCONN);
 		}
 		return tcp_conn;
 	}
@@ -1475,7 +1475,7 @@ tcp_port_t *tcp_port;
 			tcp_port->tp_flags |= TPF_READ_SP;
 			return;
 		}
-		assert(result == NW_OK);
+		assert(result == 0);
 		tcp_port->tp_flags &= ~TPF_READ_IP;
 	} while(!(tcp_port->tp_flags & TPF_READ_IP));
 }
@@ -1638,7 +1638,7 @@ tcp_hdr_t *tcp_hdr;
 			 tcp_fd->tf_conn == listen_conn);
 
 		if (best_conn->tc_state != TCS_CLOSED)
-			tcp_close_connection(best_conn, ENOCONN);
+			tcp_close_connection(best_conn, -ENOCONN);
 
 		listen_conn->tc_ISS= best_conn->tc_ISS;
 		if (best_conn->tc_senddis > listen_conn->tc_senddis)
@@ -1775,19 +1775,19 @@ size_t count;
 
 	if (!(tcp_fd->tf_flags & TFF_CONNECTED))
 	{
-		reply_thr_get (tcp_fd, ENOTCONN, FALSE);
-		return NW_OK;
+		reply_thr_get (tcp_fd, -ENOTCONN, FALSE);
+		return 0;
 	}
 	tcp_conn= tcp_fd->tf_conn;
 	if (tcp_conn->tc_state == TCS_CLOSED)
 	{
 		reply_thr_get(tcp_fd, tcp_conn->tc_error, FALSE);
-		return NW_OK;
+		return 0;
 	}
 	if (tcp_conn->tc_flags & TCF_FIN_SENT)
 	{
-		reply_thr_get (tcp_fd, ESHUTDOWN, FALSE);
-		return NW_OK;
+		reply_thr_get (tcp_fd, -ESHUTDOWN, FALSE);
+		return 0;
 	}
 
 	tcp_fd->tf_flags |= TFF_WRITE_IP;
@@ -1810,7 +1810,7 @@ size_t count;
 	tcp_conn_write(tcp_conn, 0);
 
 	if (!(tcp_fd->tf_flags & TFF_WRITE_IP))
-		return NW_OK;
+		return 0;
 	else
 		return NW_SUSPEND;
 }
@@ -1829,8 +1829,8 @@ size_t count;
 
 	if (!(tcp_fd->tf_flags & TFF_CONNECTED))
 	{
-		reply_thr_put (tcp_fd, ENOTCONN, FALSE);
-		return NW_OK;
+		reply_thr_put (tcp_fd, -ENOTCONN, FALSE);
+		return 0;
 	}
 	tcp_conn= tcp_fd->tf_conn;
 
@@ -1843,7 +1843,7 @@ size_t count;
 	tcp_fd_read(tcp_conn, 0);
 	tcp_conn->tc_busy--;
 	if (!(tcp_fd->tf_flags & TFF_READ_IP))
-		return NW_OK;
+		return 0;
 	else
 		return NW_SUSPEND;
 }
@@ -1898,7 +1898,7 @@ tcp_conn_t *tcp_conn;
 	else
 	{
 		tcp_fd->tf_flags |= TFF_CONNECTED;
-		reply= NW_OK;
+		reply= 0;
 	}
 
 	if (tcp_fd->tf_flags & TFF_CONNECTING)
@@ -1958,7 +1958,7 @@ int fd;
 			if (tcp_conn->tc_connInprogress)
 			{
 				tcp_conn->tc_connInprogress= 0;
-				tcp_close_connection(tcp_conn, ENOCONN);
+				tcp_close_connection(tcp_conn, -ENOCONN);
 				continue;
 			}
 
@@ -1971,7 +1971,7 @@ int fd;
 
 			/* If all data has been acknowledged, close the connection. */
 			if (tcp_conn->tc_SND_UNA == tcp_conn->tc_SND_NXT)
-				tcp_close_connection(tcp_conn, ENOTCONN);
+				tcp_close_connection(tcp_conn, -ENOTCONN);
 		}
 
 		tcp_conn= tcp_fd->tf_conn;
@@ -1980,7 +1980,7 @@ int fd;
 		tcp_conn->tc_connInprogress= 0;
 		tcp_conn->tc_fd= NULL;
 		tcp_fd->tf_conn= NULL;
-		tcp_close_connection(tcp_conn, ENOCONN);
+		tcp_close_connection(tcp_conn, -ENOCONN);
 	}
 	for (i= 0; i<TFL_LISTEN_MAX; i++)
 	{
@@ -1996,7 +1996,7 @@ int fd;
 		tcp_conn->tc_connInprogress= 0;
 		tcp_conn->tc_fd= NULL;
 		tcp_fd->tf_conn= NULL;
-		tcp_close_connection(tcp_conn, ENOCONN);
+		tcp_close_connection(tcp_conn, -ENOCONN);
 
 		tcp_fd->tf_flags &= ~TFF_CONNECTING;
 	}
@@ -2023,7 +2023,7 @@ int fd;
 
 	/* If all data has been acknowledged, close the connection. */
 	if (tcp_conn->tc_SND_UNA == tcp_conn->tc_SND_NXT)
-		tcp_close_connection(tcp_conn, ENOTCONN);
+		tcp_close_connection(tcp_conn, -ENOTCONN);
 }
 
 int tcp_cancel(fd, which_operation)
@@ -2048,7 +2048,7 @@ int which_operation;
 		if (tcp_fd->tf_write_offset)
 			reply_thr_get (tcp_fd, tcp_fd->tf_write_offset, FALSE);
 		else
-			reply_thr_get (tcp_fd, EINTR, FALSE);
+			reply_thr_get (tcp_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_READ:
 		assert (tcp_fd->tf_flags & TFF_READ_IP);
@@ -2056,7 +2056,7 @@ int which_operation;
 		if (tcp_fd->tf_read_offset)
 			reply_thr_put (tcp_fd, tcp_fd->tf_read_offset, FALSE);
 		else
-			reply_thr_put (tcp_fd, EINTR, FALSE);
+			reply_thr_put (tcp_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_IOCTL:
 assert (tcp_fd->tf_flags & TFF_IOCTL_IP);
@@ -2065,18 +2065,18 @@ assert (tcp_fd->tf_flags & TFF_IOCTL_IP);
 		if (tcp_fd->tf_flags & TFF_IOC_INIT_SP)
 		{
 			tcp_fd->tf_flags &= ~TFF_IOC_INIT_SP;
-			reply_thr_put (tcp_fd, EINTR, TRUE);
+			reply_thr_put (tcp_fd, -EINTR, TRUE);
 			break;
 		}
 
 		switch (tcp_fd->tf_ioreq)
 		{
 		case NWIOGTCPCONF:
-			reply_thr_put (tcp_fd, EINTR, TRUE);
+			reply_thr_put (tcp_fd, -EINTR, TRUE);
 			break;
 		case NWIOSTCPCONF:
 		case NWIOTCPSHUTDOWN:
-			reply_thr_get (tcp_fd, EINTR, TRUE);
+			reply_thr_get (tcp_fd, -EINTR, TRUE);
 			break;
 		case NWIOTCPCONN:
 		case NWIOTCPLISTEN:
@@ -2084,13 +2084,13 @@ assert (tcp_fd->tf_flags & TFF_IOCTL_IP);
 			tcp_conn->tc_connInprogress= 0;
 			tcp_conn->tc_fd= NULL;
 			tcp_fd->tf_conn= NULL;
-			tcp_close_connection(tcp_conn, ENOCONN);
-			reply_thr_get (tcp_fd, EINTR, TRUE);
+			tcp_close_connection(tcp_conn, -ENOCONN);
+			reply_thr_get (tcp_fd, -EINTR, TRUE);
 			break;
 		default:
 			ip_warning(( "unknown ioctl inprogress: 0x%x",
 				tcp_fd->tf_ioreq ));
-			reply_thr_get (tcp_fd, EINTR, TRUE);
+			reply_thr_get (tcp_fd, -EINTR, TRUE);
 			break;
 		}
 		break;
@@ -2098,7 +2098,7 @@ assert (tcp_fd->tf_flags & TFF_IOCTL_IP);
 		ip_panic(( "unknown cancel request" ));
 		break;
 	}
-	return NW_OK;
+	return 0;
 }
 
 /*
@@ -2116,8 +2116,8 @@ tcp_fd_t *tcp_fd;
 
 	if (!(tcp_fd->tf_flags & TFF_CONF_SET))
 	{
-		tcp_reply_ioctl(tcp_fd, EBADMODE);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EBADMODE);
+		return 0;
 	}
 	assert (!(tcp_fd->tf_flags & TFF_CONNECTED) &&
 		!(tcp_fd->tf_flags & TFF_CONNECTING) &&
@@ -2125,14 +2125,14 @@ tcp_fd_t *tcp_fd;
 	if ((tcp_fd->tf_tcpconf.nwtc_flags & (NWTC_SET_RA|NWTC_SET_RP))
 		!= (NWTC_SET_RA|NWTC_SET_RP))
 	{
-		tcp_reply_ioctl(tcp_fd, EBADMODE);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EBADMODE);
+		return 0;
 	}
 
 	data= (*tcp_fd->tf_get_userdata) (tcp_fd->tf_srfd, 0,
 		sizeof(*tcpcl), TRUE);
 	if (!data)
-		return EFAULT;
+		return -EFAULT;
 
 	data= bf_packIffLess(data, sizeof(*tcpcl));
 	assert (data->acc_length == sizeof(*tcpcl));
@@ -2147,8 +2147,8 @@ tcp_fd_t *tcp_fd;
 		do_asynch= 0;
 	else
 	{
-		tcp_reply_ioctl(tcp_fd, EINVAL);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EINVAL);
+		return 0;
 	}
 
 	assert(!tcp_fd->tf_conn);
@@ -2160,8 +2160,8 @@ tcp_fd_t *tcp_fd;
 	{
 		if (tcp_conn->tc_fd)
 		{
-			tcp_reply_ioctl(tcp_fd, EADDRINUSE);
-			return NW_OK;
+			tcp_reply_ioctl(tcp_fd, -EADDRINUSE);
+			return 0;
 		}
 	}
 	else
@@ -2169,8 +2169,8 @@ tcp_fd_t *tcp_fd;
 		tcp_conn= find_empty_conn();
 		if (!tcp_conn)
 		{
-			tcp_reply_ioctl(tcp_fd, EAGAIN);
-			return NW_OK;
+			tcp_reply_ioctl(tcp_fd, -EAGAIN);
+			return 0;
 		}
 	}
 	tcp_fd->tf_conn= tcp_conn;
@@ -2179,8 +2179,8 @@ tcp_fd_t *tcp_fd;
 	if (r == NW_SUSPEND && do_asynch)
 	{
 		tcp_fd->tf_flags |= TFF_CONNECTING;
-		tcp_reply_ioctl(tcp_fd, EINPROGRESS);
-		r= NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EINPROGRESS);
+		r= 0;
 	}
 	return r;
 }
@@ -2220,7 +2220,7 @@ tcp_fd_t *tcp_fd;
 	if (tcp_conn->tc_connInprogress)
 		return NW_SUSPEND;
 	else
-		return NW_OK;
+		return 0;
 }
 
 
@@ -2237,8 +2237,8 @@ int do_listenq;
 	if (!(tcp_fd->tf_flags & TFF_CONF_SET))
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get(tcp_fd, EBADMODE, TRUE);
-		return NW_OK;
+		reply_thr_get(tcp_fd, -EBADMODE, TRUE);
+		return 0;
 	}
 	assert (!(tcp_fd->tf_flags & TFF_CONNECTED) &&
 		!(tcp_fd->tf_flags & TFF_CONNECTING) &&
@@ -2259,8 +2259,8 @@ int do_listenq;
 			if (tcp_conn->tc_fd)
 			{
 				tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-				reply_thr_get (tcp_fd, EADDRINUSE, TRUE);
-				return NW_OK;
+				reply_thr_get (tcp_fd, -EADDRINUSE, TRUE);
+				return 0;
 			}
 			tcp_fd->tf_conn= tcp_conn;
 			return tcp_su4listen(tcp_fd, tcp_conn, do_listenq);
@@ -2270,8 +2270,8 @@ int do_listenq;
 	if (!tcp_conn)
 	{
 		tcp_fd->tf_flags &= ~TFF_IOCTL_IP;
-		reply_thr_get (tcp_fd, EAGAIN, TRUE);
-		return NW_OK;
+		reply_thr_get (tcp_fd, -EAGAIN, TRUE);
+		return 0;
 	}
 	tcp_fd->tf_conn= tcp_conn;
 	return tcp_su4listen(tcp_fd, tcp_conn, do_listenq);
@@ -2293,8 +2293,8 @@ tcp_fd_t *tcp_fd;
 
 	if (!(tcp_fd->tf_flags & TFF_LISTENQ))
 	{
-		tcp_reply_ioctl(tcp_fd, EINVAL);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EINVAL);
+		return 0;
 	}
 	for (i= 0; i<TFL_LISTEN_MAX; i++)
 	{
@@ -2311,7 +2311,7 @@ tcp_fd_t *tcp_fd;
 	data= (*tcp_fd->tf_get_userdata) (tcp_fd->tf_srfd, 0,
 		sizeof(*cookiep), TRUE);
 	if (!data)
-		return EFAULT;
+		return -EFAULT;
 
 	data= bf_packIffLess(data, sizeof(*cookiep));
 	cookiep= (tcp_cookie_t *)ptr2acc_data(data);
@@ -2323,8 +2323,8 @@ tcp_fd_t *tcp_fd;
 	if (dst_nr < 0 || dst_nr >= TCP_FD_NR)
 	{
 		printf("tcp_acceptto: bad fd %d\n", dst_nr);
-		tcp_reply_ioctl(tcp_fd, EINVAL);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EINVAL);
+		return 0;
 	}
 	dst_fd= &tcp_fd_table[dst_nr];
 	if (!(dst_fd->tf_flags & TFF_INUSE) ||
@@ -2334,13 +2334,13 @@ tcp_fd_t *tcp_fd;
 	{
 		printf("tcp_acceptto: bad flags 0x%x or conn %p for fd %d\n",
 			dst_fd->tf_flags, dst_fd->tf_conn, dst_nr);
-		tcp_reply_ioctl(tcp_fd, EINVAL);
-		return NW_OK;
+		tcp_reply_ioctl(tcp_fd, -EINVAL);
+		return 0;
 	}
 	if (memcmp(&cookie, &dst_fd->tf_cookie, sizeof(cookie)) != 0)
 	{
 		printf("tcp_acceptto: bad cookie\n");
-		return NW_OK;
+		return 0;
 	}
 
 	/* Move connection */
@@ -2349,8 +2349,8 @@ tcp_fd_t *tcp_fd;
 	dst_fd->tf_conn= tcp_conn;
 	dst_fd->tf_flags |= TFF_CONNECTED;
 
-	tcp_reply_ioctl(tcp_fd, NW_OK);
-	return NW_OK;
+	tcp_reply_ioctl(tcp_fd, 0);
+	return 0;
 }
 
 
@@ -2411,7 +2411,7 @@ int priority;
 			{
 				continue;
 			}
-			tcp_close_connection (tcp_conn, EOUTOFBUFS);
+			tcp_close_connection (tcp_conn, -EOUTOFBUFS);
 		}
 	}
 
@@ -2431,7 +2431,7 @@ int priority;
 			{
 				continue;
 			}
-			tcp_close_connection (tcp_conn, EOUTOFBUFS);
+			tcp_close_connection (tcp_conn, -EOUTOFBUFS);
 		}
 	}
 }
@@ -2476,7 +2476,7 @@ tcp_conn_t *tcp_conn;
 	if (new_ttl == IP_MAX_TTL)
 	{
 		if (tcp_conn->tc_state == TCS_SYN_SENT)
-			tcp_close_connection(tcp_conn, EDSTNOTRCH);
+			tcp_close_connection(tcp_conn, -EDSTNOTRCH);
 		return;
 	}
 	else if (new_ttl < TCP_DEF_TTL_NEXT)
@@ -2693,7 +2693,7 @@ tcp_conn_t *tcp_conn;
 	tcp_conn->tc_max_mtu= tcp_conn->tc_port->tp_mtu;
 	tcp_conn->tc_mtu= tcp_conn->tc_max_mtu;
 	tcp_conn->tc_mtutim= 0;
-	tcp_conn->tc_error= NW_OK;
+	tcp_conn->tc_error= 0;
 	mss= tcp_conn->tc_mtu-IP_TCP_MIN_HDR_SIZE;
 	tcp_conn->tc_snd_cwnd= tcp_conn->tc_SND_UNA + 2*mss;
 	tcp_conn->tc_snd_cthresh= TCP_MAX_SND_WND_SIZE;

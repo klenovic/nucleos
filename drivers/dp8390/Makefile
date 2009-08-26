@@ -1,40 +1,17 @@
-# Makefile for dp8390 driver
-DRIVER = dp8390
+app-y := dp8390.elf32
+dp8390.elf32-type := driver
+dp8390.elf32-obj-y := 3c503.o dp8390.o ne2000.o rtl8029.o wdeth.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_dp8390.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i $(CPROFILE)
-LDFLAGS = -i 
-LIBS = -lsys -ltimers
+$(src)/dp8390.elf32: drivers/driver_32.lds
 
-OBJ = 3c503.o dp8390.o ne2000.o rtl8029.o wdeth.o
+# Create in minix3's aout format
+dp8390_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+dp8390_a_hdrlen  := 0x20
+dp8390_a_cpu     := i386
+dp8390_stackheap := 64k
 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ) 
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-	install -S 64k $(DRIVER)
-
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak $(DRIVER)
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := dp8390.elf32,dp8390

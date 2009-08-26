@@ -100,7 +100,7 @@ int ip_port_nr;
 		result= psip_send(ip_port->ip_dl.dl_ps.ps_port, dest, pack);
 		if (result != NW_SUSPEND)
 		{
-			assert(result == NW_OK);
+			assert(result == 0);
 			continue;
 		}
 
@@ -189,7 +189,7 @@ int type;
 		ip_port->ip_dl.dl_ps.ps_send_tail->acc_ext_link= pack;
 		ip_port->ip_dl.dl_ps.ps_send_tail= pack;
 
-		return NW_OK;
+		return 0;
 	}
 
 	while (pack)
@@ -201,7 +201,7 @@ int type;
 				ip_port->ip_mtu);
 			if (pack == NULL)
 			{
-				return NW_OK;
+				return 0;
 			}
 
 			/* Prepend nexthop address */
@@ -231,7 +231,7 @@ int type;
 				ip_port->ip_dl.dl_ps.ps_send_tail= pack;
 			break;
 		}
-		assert(result == NW_OK);
+		assert(result == 0);
 		pack= ip_port->ip_dl.dl_ps.ps_send_head;
 		if (!pack)
 			break;
@@ -243,7 +243,7 @@ int type;
 		pack= bf_delhead(pack, sizeof(dest));
 	}
 
-	return NW_OK;
+	return 0;
 }
 
 #if 0

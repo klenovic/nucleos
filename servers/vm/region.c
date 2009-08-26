@@ -192,12 +192,12 @@ int map_ph_writept(struct vmproc *vmp, struct vir_region *vr,
 
 	if(pt_writemap(&vmp->vm_pt, vr->vaddr + pb->offset,
 	  pb->phys, pb->length, PTF_PRESENT | PTF_USER | rw,
-		WMF_OVERWRITE) != OK) {
+		WMF_OVERWRITE) != 0) {
 	    printf("VM: map_writept: pt_writemap failed\n");
-	    return ENOMEM;
+	    return -ENOMEM;
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -308,14 +308,14 @@ int mapflags;
 		vm_assert(!(startv % VM_PAGE_SIZE));
 		vm_assert(!newregion->first);
 		vm_assert(!(mapflags & MF_PREALLOC));
-		if(map_new_physblock(vmp, newregion, 0, length, what, NULL) != OK) {
+		if(map_new_physblock(vmp, newregion, 0, length, what, NULL) != 0) {
 			printf("VM: map_new_physblock failed\n");
 			SLABFREE(newregion);
 			return NULL;
 		}
 		vm_assert(newregion->first);
 		vm_assert(!newregion->first->next);
-		if(map_ph_writept(vmp, newregion, newregion->first->ph, NULL, NULL) != OK) {
+		if(map_ph_writept(vmp, newregion, newregion->first->ph, NULL, NULL) != 0) {
 			printf("VM: map_region_writept failed\n");
 			SLABFREE(newregion);
 			return NULL;
@@ -323,7 +323,7 @@ int mapflags;
 	}
 
 	if((flags & VR_ANON) && (mapflags & MF_PREALLOC)) {
-		if(map_handle_memory(vmp, newregion, 0, length, 1) != OK) {
+		if(map_handle_memory(vmp, newregion, 0, length, 1) != 0) {
 			printf("VM:map_page_region: prealloc failed\n");
 			SLABFREE(newregion);
 			return NULL;
@@ -416,7 +416,7 @@ void pb_unreferenced(struct vir_region *region, struct phys_region *pr)
 			SLABSANE(pb->firstregion);
 			SLABSANE(pb->firstregion->parent);
 			if(map_ph_writept(pb->firstregion->parent->parent,
-				pb->firstregion->parent, pb, NULL, NULL) != OK) {
+				pb->firstregion->parent, pb, NULL, NULL) != 0) {
 				vm_panic("pb_unreferenced: writept", NO_NUM);
 			}
 		}
@@ -458,7 +458,7 @@ static int map_free(struct vir_region *region)
 
 	SLABFREE(region);
 
-	return OK;
+	return 0;
 }
 
 /*========================================================================*
@@ -489,7 +489,7 @@ struct vmproc *vmp;
 
 	SANITYCHECK(SCL_FUNCTIONS);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -540,10 +540,10 @@ struct phys_region *physhint;
 
 	/* Allocate things necessary for this chunk of memory. */
 	if(!SLABALLOC(newphysr))
-		return ENOMEM;
+		return -ENOMEM;
 	if(!SLABALLOC(newpb)) {
 		SLABFREE(newphysr);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	/* Memory for new physical block. */
@@ -555,7 +555,7 @@ struct phys_region *physhint;
 		if((mem_clicks = ALLOC_MEM(clicks, af)) == NO_MEM) {
 			SLABFREE(newpb);
 			SLABFREE(newphysr);
-			return ENOMEM;
+			return -ENOMEM;
 		}
 		mem = CLICK2ABS(mem_clicks);
 	} else {
@@ -580,12 +580,12 @@ struct phys_region *physhint;
 	vm_assert(!(length % VM_PAGE_SIZE));
 	vm_assert(!(newpb->length % VM_PAGE_SIZE));
 	SANITYCHECK(SCL_DETAIL);
-	if(map_ph_writept(vmp, region, newpb, NULL, NULL) != OK) {
+	if(map_ph_writept(vmp, region, newpb, NULL, NULL) != 0) {
 		if(what_mem == MAP_NONE)
 			FREE_MEM(mem_clicks, clicks);
 		SLABFREE(newpb);
 		SLABFREE(newphysr);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	if(!region->first || offset < region->first->ph->offset) {
@@ -611,7 +611,7 @@ struct phys_region *physhint;
 
 	SANITYCHECK(SCL_FUNCTIONS);
 
-	return OK;
+	return 0;
 }
 
 
@@ -637,7 +637,7 @@ struct phys_region *ph;
 	if(!SLABALLOC(newpb)) {
 		printf("VM: map_copy_ph_block: couldn't allocate newpb\n");
 		SANITYCHECK(SCL_FUNCTIONS);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	clicks = CLICKSPERPAGE * ph->ph->length / VM_PAGE_SIZE;
@@ -646,7 +646,7 @@ struct phys_region *ph;
 		af |= PAF_ALIGN64K;
 	if((newmem_cl = ALLOC_MEM(clicks, af)) == NO_MEM) {
 		SLABFREE(newpb);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 	newmem = CLICK2ABS(newmem_cl);
 	vm_assert(ABS2CLICK(newmem) == newmem_cl);
@@ -663,7 +663,7 @@ struct phys_region *ph;
 	ph->next_ph_list = NULL;
 
 	/* Copy old memory to new memory. */
-	if((r=sys_abscopy(ph->ph->phys, newpb->phys, newpb->length)) != OK) {
+	if((r=sys_abscopy(ph->ph->phys, newpb->phys, newpb->length)) != 0) {
 		printf("VM: map_copy_ph_block: sys_abscopy failed\n");
 		SANITYCHECK(SCL_FUNCTIONS);
 		return r;
@@ -683,12 +683,12 @@ struct phys_region *ph;
 	 * This will also make it writable.
 	 */
 	r = map_ph_writept(vmp, region, ph->ph, NULL, NULL);
-	if(r != OK)
+	if(r != 0)
 		vm_panic("map_copy_ph_block: map_ph_writept failed", r);
 
 	SANITYCHECK(SCL_FUNCTIONS);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -740,7 +740,7 @@ int write;
 			MAP_NONE, region->first);
 	}
 
-	if(r != OK)
+	if(r != 0)
 		printf("VM: map_pf: failed (%d)\n", r);
 
 	SANITYCHECK(SCL_FUNCTIONS);
@@ -769,7 +769,7 @@ int write;
 		int r;							\
 		SANITYCHECK(SCL_DETAIL);				\
 		if((r=map_new_physblock(vmp, region, start,		\
-			end-start, MAP_NONE, r1 ? r1 : r2)) != OK) {	\
+			end-start, MAP_NONE, r1 ? r1 : r2)) != 0) {	\
 			SANITYCHECK(SCL_DETAIL);			\
 			return r;					\
 		}							\
@@ -796,7 +796,7 @@ int write;
 		  if(physr->ph->refcount > 1) {
 			SANITYCHECK(SCL_DETAIL);
 			r = map_copy_ph_block(vmp, region, physr);
-			if(r != OK) {
+			if(r != 0) {
 				printf("VM: map_handle_memory: no copy\n");
 				return r;
 			}
@@ -804,7 +804,7 @@ int write;
 			SANITYCHECK(SCL_DETAIL);
 		  } else {
 			SANITYCHECK(SCL_DETAIL);
-			if((r=map_ph_writept(vmp, region, physr->ph, NULL, NULL)) != OK) {
+			if((r=map_ph_writept(vmp, region, physr->ph, NULL, NULL)) != 0) {
 				printf("VM: map_ph_writept failed\n");
 				return r;
 			}
@@ -826,7 +826,7 @@ int write;
 	}
 #endif
 
-	return OK;
+	return 0;
 }
 
 #if SANITYCHECKS
@@ -905,7 +905,7 @@ int map_writept(struct vmproc *vmp)
 			map_ph_writept(vmp, vr, ph->ph, &ropages, &rwpages);
 		}
 
-	return OK;
+	return 0;
 }
 
 /*========================================================================*
@@ -926,7 +926,7 @@ struct vmproc *src;
 		if(!(newvr = map_copy_region(vr))) {
 			map_free_proc(dst);
 	SANITYCHECK(SCL_FUNCTIONS);
-			return ENOMEM;
+			return -ENOMEM;
 		}
 		SANITYCHECK(SCL_DETAIL);
 		newvr->parent = dst;
@@ -969,7 +969,7 @@ struct vmproc *src;
 	map_writept(dst);
 
 	SANITYCHECK(SCL_FUNCTIONS);
-	return OK;
+	return 0;
 }
 
 /*========================================================================*
@@ -1012,23 +1012,23 @@ int map_region_extend(struct vmproc *vmp, struct vir_region *vr,
 	vm_assert(vr->flags & VR_ANON);
 	vm_assert(!(delta % VM_PAGE_SIZE));
 
-	if(!delta) return OK;
+	if(!delta) return 0;
 	end = vr->vaddr + vr->length;
 	vm_assert(end >= vr->vaddr);
 
 	if(end + delta <= end) {
 		printf("VM: strange delta 0x%lx\n", delta);
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	if(!vr->next || end + delta <= vr->next->vaddr) {
 		vr->length += delta;
-		return OK;
+		return 0;
 	}
 
 	map_printmap(vmp);
 
-	return ENOMEM;
+	return -ENOMEM;
 }
 
 /*========================================================================*
@@ -1044,7 +1044,7 @@ int map_region_shrink(struct vir_region *vr, vir_bytes delta)
 	printf("VM: ignoring region shrink\n");
 #endif
 
-	return OK;
+	return 0;
 }
 
 struct vir_region *map_region_lookup_tag(vmp, tag)
@@ -1100,12 +1100,12 @@ int map_unmap_region(struct vmproc *vmp, struct vir_region *region)
 	SANITYCHECK(SCL_DETAIL);
 
 	if(pt_writemap(&vmp->vm_pt, r->vaddr,
-	  MAP_NONE, r->length, 0, WMF_OVERWRITE) != OK) {
+	  MAP_NONE, r->length, 0, WMF_OVERWRITE) != 0) {
 	    printf("VM: map_unmap_region: pt_writemap failed\n");
-	    return ENOMEM;
+	    return -ENOMEM;
 	}
 
 	SANITYCHECK(SCL_FUNCTIONS);
 
-	return OK;
+	return 0;
 }

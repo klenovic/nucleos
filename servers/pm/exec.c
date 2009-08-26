@@ -63,7 +63,7 @@ int do_exec()
 	mp->mp_fs_call = PM_EXEC;
 	r = notify(FS_PROC_NR);
 
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "do_getset: unable to notify FS", r);
 
 	/* Do not reply */
@@ -83,11 +83,11 @@ int exec_newmem()
 	char *stack_top;
 
 	if (who_e != FS_PROC_NR && who_e != RS_PROC_NR)
-		return EPERM;
+		return -EPERM;
 
 	proc_e = m_in.EXC_NM_PROC;
 
-	if (pm_isokendpt(proc_e, &proc_n) != OK) {
+	if (pm_isokendpt(proc_e, &proc_n) != 0) {
 		panic(__FILE__, "exec_newmem: got bad endpoint",
 			proc_e);
 	}
@@ -99,10 +99,10 @@ int exec_newmem()
 	r = sys_datacopy(who_e, (vir_bytes)ptr,
 		SELF, (vir_bytes)&args, sizeof(args));
 
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "exec_newmem: sys_datacopy failed", r);
 
-	if ((r = vm_exec_newmem(proc_e, &args, sizeof(args), &stack_top, &flags)) == OK) {
+	if ((r = vm_exec_newmem(proc_e, &args, sizeof(args), &stack_top, &flags)) == 0) {
 		allow_setuid = 0; /* Do not allow setuid execution */
 
 		if ((rmp->mp_flags & TRACED) == 0) {
@@ -143,11 +143,11 @@ int do_execrestart()
 	struct mproc *rmp;
 
 	if (who_e != RS_PROC_NR)
-		return EPERM;
+		return -EPERM;
 
 	proc_e= m_in.EXC_RS_PROC;
 
-	if (pm_isokendpt(proc_e, &proc_n) != OK) {
+	if (pm_isokendpt(proc_e, &proc_n) != 0) {
 		panic(__FILE__, "do_execrestart: got bad endpoint",
 			proc_e);
 	}
@@ -157,7 +157,7 @@ int do_execrestart()
 
 	exec_restart(rmp, result);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -170,7 +170,7 @@ int result;
 	int r, sn;
 	char *new_sp;
 
-	if (result != OK)
+	if (result != 0)
 	{
 		if (rmp->mp_flags & PARTIAL_EXEC)
 		{
@@ -204,7 +204,7 @@ int result;
 
 	r = sys_exec(rmp->mp_endpoint, new_sp, rmp->mp_name, rmp->entry_point);
 
-	if (r != OK) panic(__FILE__, "sys_exec failed", r);
+	if (r != 0) panic(__FILE__, "sys_exec failed", r);
 
 	/* Cause a signal if this process is traced. */
 	if (rmp->mp_flags & TRACED) check_sig(rmp->mp_pid, SIGTRAP);

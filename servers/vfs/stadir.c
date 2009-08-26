@@ -51,7 +51,7 @@ int do_fchdir()
   if(!fp->fp_wd || !fp->fp_rd) {
 	printf("VFS: do_fchdir: %d: no rd/wd\n",
 		fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
 
   /* Is the file descriptor valid? */
@@ -59,11 +59,11 @@ int do_fchdir()
 
   /* Is it a dir? */
   if ((rfilp->filp_vno->v_mode & I_TYPE) != I_DIRECTORY)
-      return ENOTDIR;
+      return -ENOTDIR;
   
   /* Issue request and handle error */
   r = forbidden(rfilp->filp_vno, X_BIT, 0 /*!use_realuid*/);
-  if (r != OK) return r;
+  if (r != 0) return r;
   
   rfilp->filp_vno->v_ref_count++;	/* change_into expects a reference  */
   
@@ -85,18 +85,18 @@ int do_chdir()
   if(!fp->fp_wd || !fp->fp_rd) {
 	printf("VFS: do_chdir: %d: no rd/wd\n",
 		fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
 
   if (who_e == PM_PROC_NR) {
 	int slot;
-	if(isokendpt(m_in.endpt1, &slot) != OK)
-		return EINVAL;
+	if(isokendpt(m_in.endpt1, &slot) != 0)
+		return -EINVAL;
 	rfp = &fproc[slot];
 
 	if(!rfp->fp_wd || !rfp->fp_rd) {
 		printf("VFS: do_chdir: %d: no other rd/wd\n", fp->fp_endpoint);
-		return ENOENT;
+		return -ENOENT;
 	}
         
         put_vnode(fp->fp_rd);
@@ -114,7 +114,7 @@ int do_chdir()
 	fp->fp_realgid =
 	fp->fp_effgid = rfp->fp_effgid;
 	fp->fp_umask = rfp->fp_umask;
-	return(OK);
+	return 0;
   }
 
   /* Perform the chdir(name) system call. */
@@ -131,12 +131,12 @@ int do_chroot()
 
   register int r;
 
-  if (!super_user) return(EPERM);	/* only su may chroot() */
+  if (!super_user) return(-EPERM);	/* only su may chroot() */
 
   if(!fp->fp_wd || !fp->fp_rd) {
 	printf("VFS: do_chroot: %d: no rd/wd\n",
 		fp->fp_endpoint);
-	return ENOENT;
+	return -ENOENT;
   }
   
   r = change(&fp->fp_rd, m_in.name, m_in.name_length);
@@ -156,21 +156,21 @@ int len;			/* length of the directory name string */
   struct vnode *vp;
   int r;
 
-  if (fetch_name(name_ptr, len, M3) != OK) return(err_code);
+  if (fetch_name(name_ptr, len, M3) != 0) return(err_code);
   
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK) return r;
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
 
   /* Is it a dir? */
   if ((vp->v_mode & I_TYPE) != I_DIRECTORY)
   {
       put_vnode(vp);
-      return ENOTDIR;
+      return -ENOTDIR;
   }
 
   /* Access check */
   r = forbidden(vp, X_BIT, 0 /*!use_realuid*/);
-  if (r != OK) {
+  if (r != 0) {
         put_vnode(vp);
 	return r;
   }
@@ -190,7 +190,7 @@ struct vnode *vp;		/* this is what the inode has to become */
   put_vnode(*iip);		/* release the old directory */
   *iip = vp;			/* acquire the new one */
 
-  return(OK);
+  return 0;
 }
 
 
@@ -203,10 +203,10 @@ int do_stat()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
   
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK)
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0)
 	return r;
 
   /* Issue request */
@@ -276,10 +276,10 @@ int do_lstat()
   struct vnode *vp;
   int r;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
   
   /* Request lookup */
-  if ((r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp)) != OK)
+  if ((r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp)) != 0)
 	return r;
 
   /* Issue request */

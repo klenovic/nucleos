@@ -49,7 +49,7 @@ message *mp;
                 flags= msgtable[i].flags;
                 if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
                 {
-                        if (msgtable[i].result != OK)
+                        if (msgtable[i].result != 0)
                         {
                                 printf(
                       "VM: asynsend: found completed entry %d with error %d\n",

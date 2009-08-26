@@ -228,7 +228,7 @@ static void pio_nic2user(dpeth_t *dep, int pageno, int pktsize)
 		bytes = dep->de_stoppage * DP_PAGESIZE - offset;
 		r= sys_safe_insb(dep->de_data_port, iovp->iod_proc_nr, 
 			iovp->iod_iovec[ix].iov_grant, iov_offset, bytes);
-		if (r != OK)
+		if (r != 0)
 		{
 			panic(__FILE__, "pio_nic2user: sys_safe_insb failed",
 				r);
@@ -242,7 +242,7 @@ static void pio_nic2user(dpeth_t *dep, int pageno, int pktsize)
 	}
 	r= sys_safe_insb(dep->de_data_port, iovp->iod_proc_nr,
 		iovp->iod_iovec[ix].iov_grant, iov_offset, bytes);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "pio_nic2user: sys_safe_insb failed", r);
 	offset += bytes;
 
@@ -275,7 +275,7 @@ static void pio_user2nic(dpeth_t *dep, int pageno, int pktsize)
 	if (bytes > pktsize) bytes = pktsize;
 	r= sys_safe_outsb(dep->de_data_port, iovp->iod_proc_nr,
 	      iovp->iod_iovec[ix].iov_grant, 0, bytes);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "pio_user2nic: sys_safe_outsb failed", r);
 
 	if (++ix >= IOVEC_NR) {	/* Next buffer of I/O vector */

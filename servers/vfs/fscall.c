@@ -56,7 +56,7 @@ static int push_globals()
  */
 
   if (depth == MAX_DEPTH)
-	return EPERM;
+	return -EPERM;
 
   globals[depth].g_fp = fp;
   globals[depth].g_m_in = m_in;
@@ -75,7 +75,7 @@ static int push_globals()
 
   depth++;
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -132,7 +132,7 @@ message *m;				/* request/reply message pointer */
   int r;
 
   /* Save global variables of the current call */
-  if ((r = push_globals()) != OK) {
+  if ((r = push_globals()) != 0) {
 	printf("VFS: error saving global variables in call %d from FS %d\n",
 		m->m_type, m->m_source);
   } else {
@@ -144,7 +144,7 @@ message *m;				/* request/reply message pointer */
 		printf("VFS: invalid nested call %d from FS %d\n", call_nr,
 			who_e);
 
-		r = ENOSYS;
+		r = -ENOSYS;
 	} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 		calls_stats[call_nr]++;

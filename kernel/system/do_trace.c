@@ -65,7 +65,7 @@ register message *m_ptr;
 	toaddr.offset = (addr);				\
 	fromaddr.segment = D;				\
 	toaddr.segment = (seg);				\
-	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != OK) { \
+	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != 0) { \
 		printf("Can't copy in sys_trace: %d\n", r);\
 		return r;\
 	}  \
@@ -80,22 +80,22 @@ register message *m_ptr;
 	toaddr.offset = (myaddr);			\
 	fromaddr.segment = (seg);			\
 	toaddr.segment = D;				\
-	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != OK) { \
+	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != 0) { \
 		printf("Can't copy in sys_trace: %d\n", r);\
 		return r;\
 	}  \
 }
 
-  if(!isokendpt(tr_proc_nr_e, &tr_proc_nr)) return(EINVAL);
-  if (iskerneln(tr_proc_nr)) return(EPERM);
+  if(!isokendpt(tr_proc_nr_e, &tr_proc_nr)) return(-EINVAL);
+  if (iskerneln(tr_proc_nr)) return(-EPERM);
 
   rp = proc_addr(tr_proc_nr);
-  if (isemptyp(rp)) return(EIO);
+  if (isemptyp(rp)) return(-EIO);
   switch (tr_request) {
   case T_STOP:			/* stop process */
 	RTS_LOCK_SET(rp, P_STOP);
 	rp->p_reg.psw &= ~TRACEBIT;	/* clear trace bit */
-	return(OK);
+	return 0;
 
   case T_GETINS:		/* return value from instruction space */
 	if (rp->p_memmap[T].mem_len != 0) {
@@ -113,7 +113,7 @@ register message *m_ptr;
   case T_GETUSER:		/* return value from process table */
 	if ((tr_addr & (sizeof(long) - 1)) != 0 ||
 	    tr_addr > sizeof(struct proc) - sizeof(long))
-		return(EIO);
+		return(-EIO);
 	m_ptr->CTL_DATA = *(long *) ((char *) rp + (int) tr_addr);
 	break;
 
@@ -133,7 +133,7 @@ register message *m_ptr;
   case T_SETUSER:			/* set value in process table */
 	if ((tr_addr & (sizeof(reg_t) - 1)) != 0 ||
 	     tr_addr > sizeof(struct stackframe_s) - sizeof(reg_t))
-		return(EIO);
+		return(-EIO);
 	i = (int) tr_addr;
 #ifdef CONFIG_X86_32
 	/* Altering segment registers might crash the kernel when it
@@ -146,7 +146,7 @@ register message *m_ptr;
 	    i == (int) &((struct proc *) 0)->p_reg.gs ||
 	    i == (int) &((struct proc *) 0)->p_reg.fs ||
 	    i == (int) &((struct proc *) 0)->p_reg.ss)
-		return(EIO);
+		return(-EIO);
 #endif /* CONFIG_X86_32 */
 	if (i == (int) &((struct proc *) 0)->p_reg.psw)
 		/* only selected bits are changeable */
@@ -178,9 +178,9 @@ register message *m_ptr;
 	break;
 
   default:
-	return(EIO);
+	return(-EIO);
   }
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_TRACE */

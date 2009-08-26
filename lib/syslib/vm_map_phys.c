@@ -27,7 +27,7 @@ void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)
 
 	r = _taskcall(VM_PROC_NR, VM_MAP_PHYS, &m);
 
-	if(r != OK) return MAP_FAILED;
+	if(r != 0) return MAP_FAILED;
 
 	return (void *) m.VMMP_VADDR_REPLY;
 }

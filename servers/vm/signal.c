@@ -46,13 +46,13 @@ int do_push_sig(message *msg)
 
 	ep = msg->VMPS_ENDPOINT;
 
-	if((r=vm_isokendpt(ep, &n)) != OK) {
+	if((r=vm_isokendpt(ep, &n)) != 0) {
 		printf("VM: bogus endpoint %d from %d\n", ep, msg->m_source);
 		return r;
 	}
 	vmp = &vmproc[n];
 
-        if ((r=get_stack_ptr(ep, &sp)) != OK)
+        if ((r=get_stack_ptr(ep, &sp)) != 0)
                 vm_panic("couldn't get new stack pointer (for sig)",r);
 	
 	/* Save old SP for caller */
@@ -62,11 +62,11 @@ int do_push_sig(message *msg)
         sp -= sizeof(struct sigcontext)
                                  + 3 * sizeof(char *) + 2 * sizeof(int);
 
-        if ((r=adjust(vmp, vmp->vm_arch.vm_seg[D].mem_len, sp)) != OK) {
+        if ((r=adjust(vmp, vmp->vm_arch.vm_seg[D].mem_len, sp)) != 0) {
 		printf("VM: do_push_sig: adjust() failed: %d\n", r);
 		return r;
 	}
 
-	return OK;
+	return 0;
 }
 

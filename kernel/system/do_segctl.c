@@ -50,11 +50,11 @@ register message *m_ptr;	/* pointer to request message */
           break;
       }
   }
-  if (index < 0) return(ENOSPC);
+  if (index < 0) return(-ENOSPC);
 
        offset = alloc_remote_segment(&selector, &rp->p_seg,
 		i, phys, size, USER_PRIVILEGE);
-       result = OK;          
+       result = 0;          
 
   /* Request successfully done. Now return the result. */
   m_ptr->SEG_INDEX = index | REMOTE_SEG;

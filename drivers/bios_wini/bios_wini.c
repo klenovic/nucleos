@@ -123,7 +123,7 @@ int main(void)
 
 /* Set special disk parameters then call the generic main loop. */
   driver_task(&w_dtab);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -183,7 +183,7 @@ size_t size;
 	if(from_seg == GRANT_SEG) {
   		if((r=sys_umap(from_proc, GRANT_SEG,
 			(vir_bytes)from_vir, (phys_bytes)size+grant_offset,
-  			&addr)) != OK) {
+  			&addr)) != 0) {
 			panic(ME, "sys_umap in my_vircopy failed", r);
 		}
 		from_seg = PHYS_SEG;
@@ -193,7 +193,7 @@ size_t size;
 	if(to_seg == GRANT_SEG) {
   		if((r=sys_umap(to_proc, GRANT_SEG,
 			(vir_bytes)to_vir, (phys_bytes)size+grant_offset,
-  			&addr)) != OK) {
+  			&addr)) != 0) {
 			panic(ME, "sys_umap in my_vircopy failed", r);
 		}
 		to_seg = PHYS_SEG;
@@ -239,7 +239,7 @@ int safe;			/* use safecopies? */
   position= ex64lo(pos64);
 
   /* Check disk address. */
-  if ((position & SECTOR_MASK) != 0) return(EINVAL);
+  if ((position & SECTOR_MASK) != 0) return(-EINVAL);
 
   errors = 0;
 
@@ -258,10 +258,10 @@ int safe;			/* use safecopies? */
 		}
 		nbytes += iop->iov_size;
 	}
-	if ((nbytes & SECTOR_MASK) != 0) return(EINVAL);
+	if ((nbytes & SECTOR_MASK) != 0) return(-EINVAL);
 
 	/* Which block on disk and how close to EOF? */
-	if (position >= dv_size) return(OK);		/* At EOF */
+	if (position >= dv_size) return 0;		/* At EOF */
 	if (position + nbytes > dv_size) nbytes = dv_size - position;
 	block = div64u(add64ul(w_dv->dv_base, position), SECTOR_SIZE);
 
@@ -279,7 +279,7 @@ int safe;			/* use safecopies? */
 				(vir_bytes) iop->iov_addr,
 				SYSTEM, D, bios_buf_vir+count, 
 				vir_offset, chunk);
-			if (r != OK)
+			if (r != 0)
 				panic(ME, "copy failed", r);
 			count += chunk;
 		}
@@ -297,7 +297,7 @@ int safe;			/* use safecopies? */
 		r= sys_vircopy(SELF, D, (vir_bytes)&i13e_rw,
 			SYSTEM, D, (bios_buf_vir+i13e_rw_off), 
 			sizeof(i13e_rw));
-		if (r != OK)
+		if (r != 0)
 			panic(ME, "sys_vircopy failed", r);
 
 		/* Set up an extended read or write BIOS call. */
@@ -324,12 +324,12 @@ int safe;			/* use safecopies? */
 	}
 
 	r= sys_int86(&reg86);
-	if (r != OK)
+	if (r != 0)
 		panic(ME, "BIOS call failed", r);
 
 	if (reg86.u.w.f & 0x0001) {
 		/* An error occurred, try again sector by sector unless */
-		if (++errors == 2) return(EIO);
+		if (++errors == 2) return(-EIO);
 		continue;
 	}
 
@@ -343,7 +343,7 @@ int safe;			/* use safecopies? */
 			r = my_vircopy(SYSTEM, D, bios_buf_vir+count, 
 				proc_nr, safe ? GRANT_SEG : D,
 				iop->iov_addr, vir_offset, chunk);
-			if (r != OK)
+			if (r != 0)
 				panic(ME, "sys_vircopy failed", r);
 			count += chunk;
 		}
@@ -365,13 +365,13 @@ int safe;			/* use safecopies? */
 			/* The rest is optional, so we return to give FS a
 			 * chance to think it over.
 			 */
-			return(OK);
+			return 0;
 		}
 		iov++;
 		nr_req--;
 	}
   }
-  return(OK);
+  return 0;
 }
 
 /*============================================================================*
@@ -387,13 +387,13 @@ message *m_ptr;
 
   if (!init_done) { w_init(); init_done = TRUE; }
 
-  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
 
   if (w_wn->open_ct++ == 0) {
 	/* Partition the disk. */
 	partition(&w_dtab, w_drive * DEV_PER_DRIVE, P_PRIMARY, 0);
   }
-  return(OK);
+  return 0;
 }
 
 /*============================================================================*
@@ -405,9 +405,9 @@ message *m_ptr;
 {
 /* Device close: Release a device. */
 
-  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (w_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
   w_wn->open_ct--;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -434,7 +434,7 @@ static void w_init()
 
   /* Ask the system task for a suitable buffer */
   r= sys_getbiosbuffer(&bios_buf_vir, &bios_buf_size);
-  if (r != OK)
+  if (r != 0)
   	panic(ME, "sys_getbiosbuffer failed", r);
 
   if(bios_buf_size >= sizeof(my_bios_buf)) {
@@ -445,7 +445,7 @@ static void w_init()
 
   r= sys_umap(SYSTEM, D, (vir_bytes)bios_buf_vir, (phys_bytes)bios_buf_size,
   	&bios_buf_phys);
-  if (r != OK)
+  if (r != 0)
   	panic(ME, "sys_umap failed", r);
   if (bios_buf_phys+bios_buf_size > 0x100000)
   	panic(ME, "bad BIOS buffer, phys", bios_buf_phys);
@@ -474,7 +474,7 @@ static void w_init()
 	reg86.u.b.ah = 0x08;	/* Get drive parameters. */
 	reg86.u.b.dl = drive_id;
 	r= sys_int86(&reg86);
-	if (r != OK)
+	if (r != 0)
 		panic(ME, "BIOS call failed", r);
 
 	nr_drives = !(reg86.u.w.f & 0x0001) ? reg86.u.b.dl : drive;
@@ -494,7 +494,7 @@ static void w_init()
 
 	if (pc_at) {
 		r= sys_int86(&reg86);
-		if (r != OK)
+		if (r != 0)
 			panic(ME, "BIOS call failed", r);
 	}
 
@@ -505,7 +505,7 @@ static void w_init()
 		r= sys_vircopy(SELF, D, (vir_bytes)&i13e_par,
 			SYSTEM, D, bios_buf_vir, 
 			sizeof(i13e_par));
-		if (r != OK)
+		if (r != 0)
 			panic(ME, "sys_vircopy failed\n", r);
 		reg86.u.b.intno = 0x13;
 		reg86.u.b.ah = 0x48;	/* Ext. Get drive parameters. */
@@ -514,13 +514,13 @@ static void w_init()
 		reg86.u.w.ds = bios_buf_phys / HCLICK_SIZE;
 
 		r= sys_int86(&reg86);
-		if (r != OK)
+		if (r != 0)
 			panic(ME, "BIOS call failed", r);
 
 		r= sys_vircopy(SYSTEM, D, bios_buf_vir,
 			 SELF, D, (vir_bytes)&i13e_par,
 			sizeof(i13e_par));
-		if (r != OK)
+		if (r != 0)
 			panic(ME, "sys_vircopy failed\n", r);
 
 		if (!(reg86.u.w.f & 0x0001)) {
@@ -562,11 +562,11 @@ int safe;
         int r, timeout, prev;
 
         if (m->m_type != DEV_IOCTL_S )
-                return EINVAL;
+                return -EINVAL;
 
 	if (m->REQUEST == DIOCOPENCT) {
                 int count;
-                if (w_prepare(m->DEVICE) == NIL_DEV) return ENXIO;
+                if (w_prepare(m->DEVICE) == NIL_DEV) return -ENXIO;
                 count = w_wn->open_ct;
 		if(safe) {
 		   r=sys_safecopyto(m->IO_ENDPT, (vir_bytes)m->ADDRESS,
@@ -576,11 +576,11 @@ int safe;
                         m->IO_ENDPT, (vir_bytes)m->ADDRESS, sizeof(count));
 		}
 
-		if(r != OK)
+		if(r != 0)
                         return r;
-                return OK;
+                return 0;
         }
 
-        return EINVAL;
+        return -EINVAL;
 }
 

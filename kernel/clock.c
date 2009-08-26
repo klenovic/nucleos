@@ -84,7 +84,7 @@ void clock_task()
 	/* Go get a message. */
 	result = receive(ANY, &m);
 
-	if(result != OK)
+	if(result != 0)
 		minix_panic("receive() failed", result);
 
 	/* Handle the request. Only clock ticks are expected. */

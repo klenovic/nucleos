@@ -202,15 +202,15 @@ ipaddr_t *nexthop;
 
 	oroute= oroute_find_ent(port_nr, dest);
 	if (!oroute || oroute->ort_dist > ttl)
-		return EDSTNOTRCH;
+		return -EDSTNOTRCH;
 	if (msgsize && oroute->ort_mtu && 
 		oroute->ort_mtu < msgsize)
 	{
-		return EPACKSIZE;
+		return -EPACKSIZE;
 	}
 
 	*nexthop= oroute->ort_gateway;
-	return NW_OK;
+	return 0;
 }
 
 
@@ -255,13 +255,13 @@ oroute_t **oroute_p;
 	{
 		DBLOCK(1, printf("ip[%d]: (ipr_add_oroute) invalid gateway: ",
 			port_nr); writeIpAddr(gateway); printf("\n"));
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	if (static_route)
 	{
 		if (static_oroute_nr >= OROUTE_STATIC_NR)
-			return ENOMEM;
+			return -ENOMEM;
 		static_oroute_nr++;
 	}
 	else
@@ -412,7 +412,7 @@ oroute_t **oroute_p;
 		oroute_uncache_nw(nw_route->ort_dest, nw_route->ort_subnetmask);
 	if (oroute_p != NULL)
 		*oroute_p= oldest_route;
-	return NW_OK;
+	return 0;
 }
 
 int ipr_del_oroute(port_nr, dest, subnetmask, gateway, static_route)
@@ -442,14 +442,14 @@ int static_route;
 	}
 
 	if (i == OROUTE_NR)
-		return ESRCH;
+		return -ESRCH;
 
 	if (static_route)
 		static_oroute_nr--;
 
 	oroute_del(oroute);
 	oroute->ort_flags &= ~ORTF_INUSE;
-	return NW_OK;
+	return 0;
 }
 
 
@@ -525,7 +525,7 @@ time_t timeout;
 			route_ind->ort_subnetmask, gateway, 
 			timeout, ORTD_UNREACHABLE, route_ind->ort_mtu,
 			FALSE, 0, NULL);
-		assert(result == NW_OK);
+		assert(result == 0);
 	}
 }
 
@@ -551,7 +551,7 @@ time_t timeout;
 	}
 	result= ipr_add_oroute(port_nr, dest, netmask, oroute->ort_gateway, 
 		timeout, ORTD_UNREACHABLE, oroute->ort_mtu, FALSE, 0, NULL);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 
@@ -610,11 +610,11 @@ time_t timeout;
 		result= ipr_add_oroute(port_nr, dest, netmask, 
 			oroute->ort_gateway, HZ, ORTD_UNREACHABLE, 
 			oroute->ort_mtu, FALSE, 0, NULL);
-		assert(result == NW_OK);
+		assert(result == 0);
 	}
 	result= ipr_add_oroute(port_nr, dest, netmask, new_gateway,
 		timeout, 1, oroute->ort_mtu, FALSE, 0, NULL);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 
@@ -655,7 +655,7 @@ time_t timeout;
 
 	result= ipr_add_oroute(port_nr, dest, netmask, oroute->ort_gateway, 
 		timeout, new_dist, oroute->ort_mtu, FALSE, 0, NULL);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 void ipr_mtu(port_nr, dest, mtu, timeout)
@@ -685,7 +685,7 @@ time_t timeout;
 	result= ipr_add_oroute(port_nr, dest, HTONL(0xffffffff),
 		oroute->ort_gateway, timeout, oroute->ort_dist, mtu,
 		FALSE, 0, NULL);
-	assert(result == NW_OK);
+	assert(result == 0);
 }
 
 
@@ -696,7 +696,7 @@ nwio_route_t *route_ent;
 	oroute_t *oroute;
 
 	if (ent_no<0 || ent_no>= OROUTE_NR)
-		return ENOENT;
+		return -ENOENT;
 
 	oroute= &oroute_table[ent_no];
 	if ((oroute->ort_flags & ORTF_INUSE) && oroute->ort_exp_tim &&
@@ -722,7 +722,7 @@ nwio_route_t *route_ent;
 	route_ent->nwr_pref= oroute->ort_pref;
 	route_ent->nwr_mtu= oroute->ort_mtu;
 	route_ent->nwr_ifaddr= ip_get_ifaddr(oroute->ort_port);
-	return NW_OK;
+	return 0;
 }
 
 
@@ -1015,7 +1015,7 @@ nwio_route_t *route_ent;
 	iroute_t *iroute;
 
 	if (ent_no<0 || ent_no>= IROUTE_NR)
-		return ENOENT;
+		return -ENOENT;
 
 	iroute= &iroute_table[ent_no];
 
@@ -1037,7 +1037,7 @@ nwio_route_t *route_ent;
 	route_ent->nwr_pref= 0;
 	route_ent->nwr_mtu= iroute->irt_mtu;
 	route_ent->nwr_ifaddr= ip_get_ifaddr(iroute->irt_port);
-	return NW_OK;
+	return 0;
 }
 
 
@@ -1065,7 +1065,7 @@ iroute_t **iroute_p;
 		DBLOCK(1, printf("ip[%d] (ipr_add_iroute): invalid gateway: ",
 			port_nr);
 			writeIpAddr(gateway); printf("\n"));
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	unused_route= NULL;
@@ -1110,7 +1110,7 @@ iroute_t **iroute_p;
 	}
 
 	if (unused_route == NULL)
-		return ENOMEM;
+		return -ENOMEM;
 	iroute= unused_route;
 
 	iroute->irt_port= port_nr;
@@ -1126,7 +1126,7 @@ iroute_t **iroute_p;
 	iroute_uncache_nw(iroute->irt_dest, iroute->irt_subnetmask);
 	if (iroute_p != NULL)
 		*iroute_p= iroute;
-	return NW_OK;
+	return 0;
 }
 
 
@@ -1160,11 +1160,11 @@ int static_route;
 	}
 
 	if (i == IROUTE_NR)
-		return ESRCH;
+		return -ESRCH;
 
 	iroute_uncache_nw(iroute->irt_dest, iroute->irt_subnetmask);
 	iroute->irt_flags= IRTF_EMPTY;
-	return NW_OK;
+	return 0;
 }
 
 

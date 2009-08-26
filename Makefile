@@ -154,8 +154,8 @@ KBUILD_ARFLAGS := rcs
 # includes only common headers files for all architectures,
 #  specific architecture headers are done by macros
 NUCLEOSINCLUDE := -Iinclude \
-	          -Iarch/$(SRCARCH)/include \
-	          -include include/nucleos/autoconf.h
+		  -Iarch/$(SRCARCH)/include \
+		  -include include/nucleos/autoconf.h
 
 # shell used by build system
 CONFIG_SHELL := $(shell if [ -x "$BASH" ]; then echo $BASH; \

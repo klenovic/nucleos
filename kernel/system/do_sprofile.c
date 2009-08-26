@@ -50,12 +50,12 @@ register message *m_ptr;    /* pointer to request message */
 	 */
 	if (sprofiling) {
 		kprintf("SYSTEM: start s-profiling: already started\n");
-		return EBUSY;
+		return -EBUSY;
 	}
 
 	/* Test endpoint number. */
 	if(!isokendpt(m_ptr->PROF_ENDPT, &proc_nr))
-		return EINVAL;
+		return -EINVAL;
 
 	/* Set parameters for statistical profiler. */
 	sprof_ep = m_ptr->PROF_ENDPT;
@@ -74,7 +74,7 @@ register message *m_ptr;    /* pointer to request message */
 	
 	sprofiling = 1;
 
-  	return OK;
+  	return 0;
 
   case PROF_STOP:
 	/* Stopping profiling.
@@ -84,7 +84,7 @@ register message *m_ptr;    /* pointer to request message */
 	 */
 	if (!sprofiling) {
 		kprintf("SYSTEM: stop s-profiling: not started\n");
-		return EBUSY;
+		return -EBUSY;
 	}
 
 	sprofiling = 0;
@@ -94,10 +94,10 @@ register message *m_ptr;    /* pointer to request message */
 	data_copy(SYSTEM, (vir_bytes) &sprof_info,
 		sprof_ep, sprof_info_addr_vir, sizeof(sprof_info));
 
-  	return OK;
+  	return 0;
 
   default:
-	return EINVAL;
+	return -EINVAL;
   }
 }
 

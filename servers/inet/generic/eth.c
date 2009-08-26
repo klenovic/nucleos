@@ -145,7 +145,7 @@ select_res_t select_res;
 		(unsigned long)get_userdata, (unsigned long)put_userdata));
 	eth_port= &eth_port_table[port];
 	if (!(eth_port->etp_flags & EPF_ENABLED))
-		return EGENERIC;
+		return -EGENERIC;
 
 	for (i=0; i<ETH_FD_NR && (eth_fd_table[i].ef_flags & EFF_INUSE);
 		i++);
@@ -153,7 +153,7 @@ select_res_t select_res;
 	if (i>=ETH_FD_NR)
 	{
 		DBLOCK(1, printf("out of fds\n"));
-		return EAGAIN;
+		return -EAGAIN;
 	}
 
 	eth_fd= &eth_fd_table[i];
@@ -209,16 +209,16 @@ ioreq_t req;
 			if (new_en_flags & new_di_flags)
 			{
 				bf_afree(data);
-				reply_thr_get (eth_fd, EBADMODE, TRUE);
-				return NW_OK;
+				reply_thr_get (eth_fd, -EBADMODE, TRUE);
+				return 0;
 			}	
 
 			/* NWEO_ACC_MASK */
 			if (new_di_flags & NWEO_ACC_MASK)
 			{
 				bf_afree(data);
-				reply_thr_get (eth_fd, EBADMODE, TRUE);
-				return NW_OK;
+				reply_thr_get (eth_fd, -EBADMODE, TRUE);
+				return 0;
 			}	
 					/* you can't disable access modes */
 
@@ -309,7 +309,7 @@ ioreq_t req;
 
 			bf_afree(data);
 			reply_thr_get (eth_fd, result, TRUE);
-			return NW_OK;	
+			return 0;	
 		}
 
 	case NWIOGETHOPT:
@@ -327,7 +327,7 @@ ioreq_t req;
 			result= (*eth_fd->ef_put_userdata)(eth_fd->
 				ef_srfd, 0, acc, TRUE);
 			if (result >= 0)
-				reply_thr_put(eth_fd, NW_OK, TRUE);
+				reply_thr_put(eth_fd, 0, TRUE);
 			return result;
 		}
 	case NWIOGETHSTAT:
@@ -341,8 +341,8 @@ ioreq_t req;
 			eth_port= eth_fd->ef_port;
 			if (!(eth_port->etp_flags & EPF_ENABLED))
 			{
-				reply_thr_put(eth_fd, EGENERIC, TRUE);
-				return NW_OK;
+				reply_thr_put(eth_fd, -EGENERIC, TRUE);
+				return 0;
 			}
 
 			if (!(eth_port->etp_flags & EPF_GOT_ADDR))
@@ -395,11 +395,11 @@ printf("eth_ioctl: setting etp_getstat in port %d to %p\n",
 					acc= NULL;
 					return NW_SUSPEND;
 				}
-				if (result != NW_OK)
+				if (result != 0)
 				{
 					bf_afree(acc);
 					reply_thr_put(eth_fd, result, TRUE);
-					return NW_OK;
+					return 0;
 				}
 			}
 			else
@@ -412,14 +412,14 @@ printf("eth_ioctl: setting etp_getstat in port %d to %p\n",
 			result= (*eth_fd->ef_put_userdata)(eth_fd->
 				ef_srfd, 0, acc, TRUE);
 			if (result >= 0)
-				reply_thr_put(eth_fd, NW_OK, TRUE);
+				reply_thr_put(eth_fd, 0, TRUE);
 			return result;
 		}
 	default:
 		break;
 	}
-	reply_thr_put(eth_fd, EBADIOCTL, TRUE);
-	return NW_OK;
+	reply_thr_put(eth_fd, -EBADIOCTL, TRUE);
+	return 0;
 }
 
 int eth_write(fd, count)
@@ -436,8 +436,8 @@ size_t count;
 
 	if (!(eth_fd->ef_flags & EFF_OPTSET))
 	{
-		reply_thr_get (eth_fd, EBADMODE, FALSE);
-		return NW_OK;
+		reply_thr_get (eth_fd, -EBADMODE, FALSE);
+		return 0;
 	}
 
 	assert (!(eth_fd->ef_flags & EFF_WRITE_IP));
@@ -449,8 +449,8 @@ size_t count;
 	if (count<ETH_MIN_PACK_SIZE || count>ETH_MAX_PACK_SIZE)
 	{
 		DBLOCK(1, printf("illegal packetsize (%d)\n",count));
-		reply_thr_get (eth_fd, EPACKSIZE, FALSE);
-		return NW_OK;
+		reply_thr_get (eth_fd, -EPACKSIZE, FALSE);
+		return 0;
 	}
 	eth_fd->ef_flags |= EFF_WRITE_IP;
 
@@ -474,15 +474,15 @@ size_t count;
 	if (!user_data)
 	{
 		eth_fd->ef_flags &= ~EFF_WRITE_IP;
-		reply_thr_get (eth_fd, EFAULT, FALSE);
-		return NW_OK;
+		reply_thr_get (eth_fd, -EFAULT, FALSE);
+		return 0;
 	}
 	r= eth_send(fd, user_data, eth_fd->ef_write_count);
-	assert(r == NW_OK);
+	assert(r == 0);
 
 	eth_fd->ef_flags &= ~EFF_WRITE_IP;
 	reply_thr_get(eth_fd, eth_fd->ef_write_count, FALSE);
-	return NW_OK;
+	return 0;
 }
 
 int eth_send(fd, data, data_len)
@@ -502,7 +502,7 @@ size_t data_len;
 	eth_port= eth_fd->ef_port;
 
 	if (!(eth_fd->ef_flags & EFF_OPTSET))
-		return EBADMODE;
+		return -EBADMODE;
 
 	count= data_len;
 	if (eth_fd->ef_ethopt.nweo_flags & NWEO_RWDATONLY)
@@ -511,14 +511,14 @@ size_t data_len;
 	if (count<ETH_MIN_PACK_SIZE || count>ETH_MAX_PACK_SIZE)
 	{
 		DBLOCK(1, printf("illegal packetsize (%d)\n",count));
-		return EPACKSIZE;
+		return -EPACKSIZE;
 	}
 	rep= eth_port->etp_vlan_port;
 	if (!rep)
 		rep= eth_port;
 
 	if (rep->etp_wr_pack)
-		return NW_WOULDBLOCK;
+		return -EWOULDBLOCK;
 	
 	nweo_flags= eth_fd->ef_ethopt.nweo_flags;
 	if (nweo_flags & NWEO_RWDATONLY)
@@ -538,7 +538,7 @@ size_t data_len;
 	{
 		/* No device, discard packet */
 		bf_afree(eth_pack);
-		return NW_OK;
+		return 0;
 	}
 
 	if (!(nweo_flags & NWEO_EN_PROMISC))
@@ -553,7 +553,7 @@ size_t data_len;
 		eth_port->etp_wr_pack= eth_pack;
 		ev_arg.ev_ptr= eth_port;
 		ev_enqueue(&eth_port->etp_sendev, eth_loop_ev, ev_arg);
-		return NW_OK;
+		return 0;
 	}
 
 	if (rep != eth_port)
@@ -562,12 +562,12 @@ size_t data_len;
 		if (!eth_pack)
 		{
 			/* Packet is silently discarded */
-			return NW_OK;
+			return 0;
 		}
 	}
 
 	eth_write_port(rep, eth_pack);
-	return NW_OK;
+	return 0;
 }
 
 int eth_read (fd, count)
@@ -580,13 +580,13 @@ size_t count;
 	eth_fd= &eth_fd_table[fd];
 	if (!(eth_fd->ef_flags & EFF_OPTSET))
 	{
-		reply_thr_put(eth_fd, EBADMODE, FALSE);
-		return NW_OK;
+		reply_thr_put(eth_fd, -EBADMODE, FALSE);
+		return 0;
 	}
 	if (count < ETH_MAX_PACK_SIZE)
 	{
-		reply_thr_put(eth_fd, EPACKSIZE, FALSE);
-		return NW_OK;
+		reply_thr_put(eth_fd, -EPACKSIZE, FALSE);
+		return 0;
 	}
 
 	assert(!(eth_fd->ef_flags & EFF_READ_IP));
@@ -600,7 +600,7 @@ size_t count;
 		{
 			packet2user(eth_fd, pack, eth_fd->ef_exp_time);
 			if (!(eth_fd->ef_flags & EFF_READ_IP))
-				return NW_OK;
+				return 0;
 		}
 		else
 			bf_afree(pack);
@@ -623,7 +623,7 @@ int which_operation;
 	case SR_CANCEL_READ:
 		assert (eth_fd->ef_flags & EFF_READ_IP);
 		eth_fd->ef_flags &= ~EFF_READ_IP;
-		reply_thr_put(eth_fd, EINTR, FALSE);
+		reply_thr_put(eth_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_WRITE:
 		assert (eth_fd->ef_flags & EFF_WRITE_IP);
@@ -647,17 +647,17 @@ int which_operation;
 		if (loc_fd->ef_send_next == NULL)
 			eth_port->etp_sendq_tail= prev;
 			
-		reply_thr_get(eth_fd, EINTR, FALSE);
+		reply_thr_get(eth_fd, -EINTR, FALSE);
 		break;
 	case SR_CANCEL_IOCTL:
 		assert (eth_fd->ef_flags & EFF_IOCTL_IP);
 		eth_fd->ef_flags &= ~EFF_IOCTL_IP;
-		reply_thr_get(eth_fd, EINTR, TRUE);
+		reply_thr_get(eth_fd, -EINTR, TRUE);
 		break;
 	default:
 		ip_panic(( "got unknown cancel request" ));
 	}
-	return NW_OK;
+	return 0;
 }
 
 int eth_select(fd, operations)
@@ -775,7 +775,7 @@ eth_fd_t *eth_fd;
 		bf_afree(pack);
 	}
 
-	return NW_OK;
+	return 0;
 }
 
 static void hash_fd(eth_fd)
@@ -850,7 +850,7 @@ eth_port_t *eth_port;
 		assert(eth_fd->ef_flags & EFF_WRITE_IP);
 		eth_fd->ef_flags &= ~EFF_WRITE_IP;
 		r= eth_write(eth_fd-eth_fd_table, eth_fd->ef_write_count);
-		assert(r == NW_OK);
+		assert(r == 0);
 	}
 }
 
@@ -1096,7 +1096,7 @@ printf("eth_restart_ioctl: etp_getstat in port %d is %p\n",
 			r= (*eth_fd->ef_put_userdata)(eth_fd->ef_srfd, 0,
 				acc, TRUE);
 			if (r >= 0)
-				reply_thr_put(eth_fd, NW_OK, TRUE);
+				reply_thr_put(eth_fd, 0, TRUE);
 			eth_fd->ef_flags &= ~EFF_IOCTL_IP;
 			continue;
 		}
@@ -1328,7 +1328,7 @@ int for_ioctl;
 
 	error= (*eth_fd->ef_put_userdata)(eth_fd->ef_srfd, result, (acc_t *)0,
 		for_ioctl);
-	assert(error == NW_OK);
+	assert(error == 0);
 }
 
 static acc_t *insert_vlan_hdr(eth_port, pack)

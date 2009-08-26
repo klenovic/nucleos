@@ -114,7 +114,7 @@ static void pick_proc(void);
 	}						\
 			\
 	if(vm_running &&	\
-	 (r=vm_checkrange((dp), (dp), dstlin, sizeof(message), 1, 0)) != OK) { \
+	 (r=vm_checkrange((dp), (dp), dstlin, sizeof(message), 1, 0)) != 0) { \
 		if(r != VMSUSPEND) 			\
 		  minix_panic("CopyMess: vm_checkrange error", __LINE__); \
 		(dp)->p_vmrequest.saved.msgcopy.dst = (dp);	\
@@ -122,7 +122,7 @@ static void pick_proc(void);
   		if(data_copy((sp)->p_endpoint,	\
 			(vir_bytes) (sm), SYSTEM,	\
 			(vir_bytes) &(dp)->p_vmrequest.saved.msgcopy.msgbuf, \
-			sizeof(message)) != OK) {		\
+			sizeof(message)) != 0) {		\
 				minix_panic("CopyMess: data_copy failed", __LINE__);\
 			}				\
 			(dp)->p_vmrequest.saved.msgcopy.msgbuf.m_source = e; \
@@ -133,14 +133,14 @@ static void pick_proc(void);
 		src.segment = dst.segment = D;			\
 		src.offset = (vir_bytes) (sm);			\
 		dst.offset = (vir_bytes) (dm);			\
-		if(virtual_copy(&src, &dst, sizeof(message)) != OK) {	\
+		if(virtual_copy(&src, &dst, sizeof(message)) != 0) {	\
 			kprintf("copymess: copy %d:%lx to %d:%lx failed\n",\
 				(sp)->p_endpoint, (sm), (dp)->p_endpoint, dm);\
 			minix_panic("CopyMess: virtual_copy (1) failed", __LINE__); \
 		}		\
 		src.proc_nr_e = SYSTEM;				\
 		src.offset = (vir_bytes) &e;			\
-		if(virtual_copy(&src, &dst, sizeof(e)) != OK) {		\
+		if(virtual_copy(&src, &dst, sizeof(e)) != 0) {		\
 			kprintf("copymess: copy %d:%lx to %d:%lx\n",	\
 				(sp)->p_endpoint, (sm), (dp)->p_endpoint, dm);\
 			minix_panic("CopyMess: virtual_copy (2) failed", __LINE__); \
@@ -191,7 +191,7 @@ long bit_map;			/* notification event set or flags */
 	kprintf("called by the dead?!?\n");
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.deadproc++;
-	return EINVAL;
+	return -EINVAL;
   }
 #endif
 
@@ -216,7 +216,7 @@ long bit_map;			/* notification event set or flags */
 #endif
   		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.bad_endpoint++;
-		return EINVAL;
+		return -EINVAL;
 	}
 	src_dst_p = src_dst_e;
   }
@@ -230,7 +230,7 @@ long bit_map;			/* notification event set or flags */
 #endif
   		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.bad_endpoint++;
-		return EDEADSRCDST;
+		return -EDEADSRCDST;
 	}
 
 	/* If the call is to send to a process, i.e., for SEND, SENDNB,
@@ -247,7 +247,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 			if (caller_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.dst_not_allowed++;
-			return(ECALLDENIED);	/* call denied by ipc mask */
+			return(-ECALLDENIED);	/* call denied by ipc mask */
 		}
 	}
   }
@@ -261,7 +261,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.bad_call++;
-	return(ETRAPDENIED);		/* trap denied by mask or kernel */
+	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
   }
 
   /* Check if the process has privileges for the requested call. Calls to the 
@@ -275,7 +275,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.call_not_allowed++;
-	return(ETRAPDENIED);		/* trap denied by mask or kernel */
+	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
   }
 
   if ((iskerneln(src_dst_p) && call_nr != SENDREC && call_nr != RECEIVE)) {
@@ -285,7 +285,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.call_not_allowed++;
-	return(ETRAPDENIED);		/* trap denied by mask or kernel */
+	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
   }
 
   /* Get and check the size of the argument in bytes.
@@ -299,7 +299,7 @@ long bit_map;			/* notification event set or flags */
 	 * times the number of process table entries.
 	 */
 	if (msg_size > 16*(NR_TASKS + NR_PROCS))
-		return EDOM;
+		return -EDOM;
 	msg_size *= sizeof(asynmsg_t);	/* convert to bytes */
   } else {
 	msg_size = sizeof(*m_ptr);
@@ -323,7 +323,7 @@ long bit_map;			/* notification event set or flags */
 		kprintf("umap_local failed for %s / %d on 0x%lx size %d\n",
 			caller_ptr->p_name, caller_ptr->p_endpoint,
 			m_ptr, msg_size);
-		return EFAULT;
+		return -EFAULT;
 	}
 
 	/* Check if message pages in calling process are mapped.
@@ -336,7 +336,7 @@ long bit_map;			/* notification event set or flags */
 	 */
 
 	if(vm_running && msg_size > 0 &&
-	 (r=vm_checkrange(caller_ptr, caller_ptr, lin, msg_size, 1, 0)) != OK) {
+	 (r=vm_checkrange(caller_ptr, caller_ptr, lin, msg_size, 1, 0)) != 0) {
 		if(r != VMSUSPEND) {
 			kprintf("SYSTEM:sys_call:vm_checkrange: err %d\n", r);
 			return r;
@@ -355,7 +355,7 @@ long bit_map;			/* notification event set or flags */
 			caller_ptr->p_name, caller_ptr->p_endpoint, call_nr, m_ptr, msg_size);
 
 		/* vm_checkrange() will have suspended caller with VMREQUEST. */
-		return OK;
+		return 0;
 	}
 
   } 
@@ -369,7 +369,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.deadlock++;
-        return(ELOCKED);
+        return(-ELOCKED);
       }
   }
 
@@ -388,7 +388,7 @@ long bit_map;			/* notification event set or flags */
 	/* fall through */
   case SEND:			
 	result = mini_send(caller_ptr, src_dst_e, m_ptr, 0);
-	if (call_nr == SEND || result != OK)
+	if (call_nr == SEND || result != 0)
 		break;				/* done, or SEND failed */
 	/* fall through for SENDREC */
   case RECEIVE:			
@@ -406,7 +406,7 @@ long bit_map;			/* notification event set or flags */
 	result = mini_senda(caller_ptr, (asynmsg_t *)m_ptr, (size_t)src_dst_e);
 	break;
   default:
-	result = EBADCALL;			/* illegal system call */
+	result = -EBADCALL;			/* illegal system call */
   }
 
   /* Now, return the result of the system call to the caller. */
@@ -522,7 +522,7 @@ int flags;
   {
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.dst_died++;
-	return EDSTDIED;
+	return -EDSTDIED;
   }
 
   /* Check if 'dst' is blocked waiting for this message. The destination's 
@@ -537,7 +537,7 @@ int flags;
 	if(flags & NON_BLOCKING) {
 		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.not_ready++;
-		return(ENOTREADY);
+		return(-ENOTREADY);
 	}
 
 	/* Destination is not waiting.  Block and dequeue caller. */
@@ -551,7 +551,7 @@ int flags;
 	*xpp = caller_ptr;			/* add caller to end */
 	caller_ptr->p_q_link = NIL_PROC;	/* mark new end of list */
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -583,7 +583,7 @@ int flags;
 	{
 		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.src_died++;
-		return ESRCDIED;
+		return -ESRCDIED;
 	}
   }
 
@@ -617,7 +617,7 @@ int flags;
             /* Found a suitable source, deliver the notification message. */
 	    BuildMess(&m, src_proc_nr, caller_ptr);	/* assemble message */
             CopyMess(src_proc_nr, proc_addr(HARDWARE), &m, caller_ptr, m_ptr);
-            return(OK);					/* report success */
+            return 0;					/* report success */
         }
     }
 
@@ -633,7 +633,7 @@ int flags;
 			(*xpp)->p_name);
 		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.deadproc++;
-		return EINVAL;
+		return -EINVAL;
 	    }
 #endif
 
@@ -641,7 +641,7 @@ int flags;
 	    CopyMess((*xpp)->p_nr, *xpp, (*xpp)->p_messbuf, caller_ptr, m_ptr);
 	    RTS_UNSET(*xpp, SENDING);
             *xpp = (*xpp)->p_q_link;		/* remove from queue */
-            return(OK);				/* report success */
+            return 0;				/* report success */
 	}
 	xpp = &(*xpp)->p_q_link;		/* proceed to next */
     }
@@ -653,15 +653,15 @@ int flags;
 #if 0
 		kprintf("mini_receive: should try async from %d\n", src_e);
 #endif
-		r= EAGAIN;
+		r= -EAGAIN;
 	}
 	else
 	{
 		caller_ptr->p_messbuf = m_ptr;
 		r= try_async(caller_ptr);
 	}
-	if (r == OK)
-		return OK;	/* Got a message */
+	if (r == 0)
+		return 0;	/* Got a message */
     }
   }
 
@@ -672,11 +672,11 @@ int flags;
       caller_ptr->p_getfrom_e = src_e;		
       caller_ptr->p_messbuf = m_ptr;
       RTS_SET(caller_ptr, RECEIVING);
-      return(OK);
+      return 0;
   } else {
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		ipc_stats.not_ready++;
-	return(ENOTREADY);
+	return(-ENOTREADY);
   }
 }
 
@@ -704,7 +704,7 @@ int dst;				/* which process to notify */
       CopyMess(proc_nr(caller_ptr), proc_addr(HARDWARE), &m, 
           dst_ptr, dst_ptr->p_messbuf);
       RTS_UNSET(dst_ptr, RECEIVING);
-      return(OK);
+      return 0;
   } 
 
   /* Destination is not ready to receive the notification. Add it to the 
@@ -713,7 +713,7 @@ int dst;				/* which process to notify */
    */ 
   src_id = priv(caller_ptr)->s_id;
   set_sys_bit(priv(dst_ptr)->s_notify_pending, src_id); 
-  return(OK);
+  return 0;
 }
 
 #define ASCOMPLAIN(caller, entry, field)	\
@@ -725,18 +725,18 @@ field, caller->p_name, entry, priv(caller)->s_asynsize, priv(caller)->s_asyntab)
   if(data_copy(caller_ptr->p_endpoint,	\
 	 table_v + (entry)*sizeof(asynmsg_t) + offsetof(struct asynmsg,field),\
 		SYSTEM, (vir_bytes) &tabent.field,	\
-			sizeof(tabent.field)) != OK) {\
+			sizeof(tabent.field)) != 0) {\
 		ASCOMPLAIN(caller_ptr, entry, #field);	\
-		return EFAULT; \
+		return -EFAULT; \
 	}
 
 #define A_INSERT(entry, field)	\
   if(data_copy(SYSTEM, (vir_bytes) &tabent.field, \
 	caller_ptr->p_endpoint,	\
  	table_v + (entry)*sizeof(asynmsg_t) + offsetof(struct asynmsg,field),\
-		sizeof(tabent.field)) != OK) {\
+		sizeof(tabent.field)) != 0) {\
 		ASCOMPLAIN(caller_ptr, entry, #field);	\
-		return EFAULT; \
+		return -EFAULT; \
 	}
 
 /*===========================================================================*
@@ -762,7 +762,7 @@ size_t size;
 		"mini_senda: warning caller has no privilege structure\n");
 		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.no_priv++;
-		return EPERM;
+		return -EPERM;
 	}
 
 	/* Clear table */
@@ -772,7 +772,7 @@ size_t size;
 	if (size == 0)
 	{
 		/* Nothing to do, just return */
-		return OK;
+		return 0;
 	}
 
 	/* Limit size to something reasonable. An arbitrary choice is 16
@@ -785,7 +785,7 @@ size_t size;
 	{
 		if (caller_ptr->p_endpoint == ipc_stats_target)
 			ipc_stats.bad_size++;
-		return EDOM;
+		return -EDOM;
 	}
 	
 	/* Scan the table */
@@ -808,7 +808,7 @@ size_t size;
 		{
 			if (caller_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.bad_senda++;
-			return EINVAL;
+			return -EINVAL;
 		}
 
 		/* Skip entry if AMF_DONE is already set */
@@ -824,7 +824,7 @@ size_t size;
   			if (caller_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.bad_endpoint++;
 
-			tabent.result= EDEADSRCDST;
+			tabent.result= -EDEADSRCDST;
 			A_INSERT(i, result);
 			tabent.flags= flags | AMF_DONE;
 			A_INSERT(i, flags);
@@ -840,7 +840,7 @@ size_t size;
 			if (caller_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.dst_not_allowed++;
 
-			tabent.result= ECALLDENIED;
+			tabent.result= -ECALLDENIED;
 			A_INSERT(i, result);
 			tabent.flags= flags | AMF_DONE;
 			A_INSERT(i, flags);
@@ -863,7 +863,7 @@ size_t size;
 			if (caller_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.dst_died++;
 
-			tabent.result= EDSTDIED;
+			tabent.result= -EDSTDIED;
 			A_INSERT(i, result);
 			tabent.flags= flags | AMF_DONE;
 			A_INSERT(i, flags);
@@ -891,7 +891,7 @@ size_t size;
 
 			RTS_UNSET(dst_ptr, RECEIVING);
 
-			tabent.result= OK;
+			tabent.result= 0;
 			A_INSERT(i, result);
 			tabent.flags= flags | AMF_DONE;
 			A_INSERT(i, flags);
@@ -922,7 +922,7 @@ size_t size;
 		}
 #endif
 	}
-	return OK;
+	return 0;
 }
 
 
@@ -951,14 +951,14 @@ struct proc *caller_ptr;
 		if (!may_send_to(src_ptr, proc_nr(caller_ptr)))
 			continue;
 		r= try_one(src_ptr, caller_ptr);
-		if (r == OK)
+		if (r == 0)
 			return r;
 	}
 
 	/* Nothing found, clear MF_ASYNMSG */
 	caller_ptr->p_misc_flags &= ~MF_ASYNMSG;
 
-	return ESRCH;
+	return -ESRCH;
 }
 
 
@@ -1010,7 +1010,7 @@ struct proc *dst_ptr;
 			privp->s_asynsize= 0;
 			if (src_ptr->p_endpoint == ipc_stats_target)
 				ipc_stats.bad_senda++;
-			return EINVAL;
+			return -EINVAL;
 		}
 
 		/* Skip entry is AMF_DONE is already set */
@@ -1040,7 +1040,7 @@ struct proc *dst_ptr;
 		CopyMess(src_ptr->p_nr, src_ptr, m_ptr, dst_ptr,
 			dst_ptr->p_messbuf);
 
-		tabent.result= OK;
+		tabent.result= 0;
 		A_INSERT(i, result);
 		tabent.flags= flags | AMF_DONE;
 		A_INSERT(i, flags);
@@ -1049,11 +1049,11 @@ struct proc *dst_ptr;
 		{
 			kprintf("try_one: should notify caller\n");
 		}
-		return OK;
+		return 0;
 	}
 	if (done)
 		privp->s_asynsize= 0;
-	return EAGAIN;
+	return -EAGAIN;
 }
 
 /*===========================================================================*
@@ -1072,7 +1072,7 @@ int dst_e;			/* (endpoint) who is to be notified */
   int result, src, dst;
 
   if(!isokendpt(src_e, &src) || !isokendpt(dst_e, &dst))
-	return EDEADSRCDST;
+	return -EDEADSRCDST;
 
   /* Exception or interrupt occurred, thus already locked. */
   if (k_reenter >= 0) {
@@ -1122,7 +1122,7 @@ int dst_e;			/* (endpoint) who is to be notified */
 
 	if(u) { unlock; }
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*

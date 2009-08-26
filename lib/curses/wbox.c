@@ -70,5 +70,5 @@ unsigned int h;
 		win->_maxchng[i] = max(win->_maxchng[i], xmax);
 	}
   }
-  return(OK);
+  return 0;
 }

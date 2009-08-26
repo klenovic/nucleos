@@ -36,13 +36,13 @@ register message *m_ptr;	/* pointer to request message */
   int proc;
 
   if(!isokendpt(m_ptr->PR_ENDPT, &proc))
-	return EINVAL;
+	return -EINVAL;
 
   rp = proc_addr(proc);
 
   /* Save command name for debugging, ps(1) output, etc. */
   if(data_copy(who_e, (vir_bytes) m_ptr->PR_NAME_PTR,
-	SYSTEM, (vir_bytes) rp->p_name, (phys_bytes) P_NAME_LEN - 1) != OK)
+	SYSTEM, (vir_bytes) rp->p_name, (phys_bytes) P_NAME_LEN - 1) != 0)
   	strncpy(rp->p_name, "<unset>", P_NAME_LEN);
 
   /* Do architecture-specific exec() stuff. */
@@ -51,7 +51,7 @@ register message *m_ptr;	/* pointer to request message */
   /* No reply to EXEC call */
   RTS_LOCK_UNSET(rp, RECEIVING);
 
-  return(OK);
+  return 0;
 }
 #endif /* USE_EXEC */
 

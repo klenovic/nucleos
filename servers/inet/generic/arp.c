@@ -233,7 +233,7 @@ arp_port_t *arp_port;
 			arp_port->ap_flags |= APF_SUSPEND;
 			return;
 		}
-		assert(result == NW_OK);
+		assert(result == 0);
 
 		/* fall through */
 	case APS_GETADDR:
@@ -252,7 +252,7 @@ arp_port_t *arp_port;
 			arp_port->ap_flags |= APF_SUSPEND;
 			return;
 		}
-		assert(result == NW_OK);
+		assert(result == 0);
 
 		/* fall through */
 	case APS_ARPPROTO:
@@ -296,7 +296,7 @@ int for_ioctl;
 				arp_port->ap_flags &= ~APF_SUSPEND;
 				arp_main(arp_port);
 			}
-			return NW_OK;
+			return 0;
 		}
 		assert ((!offset) && (count == sizeof(struct nwio_ethopt)));
 		{
@@ -333,7 +333,7 @@ int for_ioctl;
 			arp_port->ap_flags &= ~APF_ARP_WR_IP;
 			if (arp_port->ap_flags & APF_ARP_WR_SP)
 				setup_write(arp_port);
-			return NW_OK;
+			return 0;
 		}
 		assert (offset+count <= sizeof(arp46_t));
 		data= arp_port->ap_sendpkt;
@@ -374,7 +374,7 @@ int for_ioctl;
 				"arp[%d]: read error on port %d: error %d\n",
 					fd, arp_port->ap_eth_fd, result));
 
-				return NW_OK;
+				return 0;
 			}
 			if (arp_port->ap_flags & APF_ARP_RD_SP)
 			{
@@ -385,7 +385,7 @@ int for_ioctl;
 			else
 				arp_port->ap_flags &= ~(APF_ARP_RD_IP|
 					APF_ARP_RD_SP);
-			return NW_OK;
+			return 0;
 		}
 		assert (!offset);
 		/* Warning: the above assertion is illegal; puts and gets of
@@ -414,7 +414,7 @@ int for_ioctl;
 		}
 		else
 			bf_afree(data);
-		return NW_OK;
+		return 0;
 	}
 	switch (arp_port->ap_state)
 	{
@@ -432,7 +432,7 @@ int for_ioctl;
 				arp_port->ap_flags &= ~APF_SUSPEND;
 				arp_main(arp_port);
 			}
-			return NW_OK;
+			return 0;
 		}
 		compare (bf_bufsize(data), ==, sizeof(*ethstat));
 		data= bf_packIffLess(data, sizeof(*ethstat));
@@ -440,13 +440,13 @@ int for_ioctl;
 		ethstat= (struct nwio_ethstat *)ptr2acc_data(data);
 		arp_port->ap_ethaddr= ethstat->nwes_addr;
 		bf_afree(data);
-		return NW_OK;
+		return 0;
 	default:
 		printf("arp_putdata(%d, 0x%d, 0x%lx) called but ap_state=0x%x\n",
 			fd, offset, (unsigned long)data, arp_port->ap_state);
 		break;
 	}
-	return EGENERIC;
+	return -EGENERIC;
 }
 
 static void setup_read(arp_port)
@@ -463,7 +463,7 @@ arp_port_t *arp_port;
 			arp_port->ap_flags |= APF_ARP_RD_SP;
 			return;
 		}
-		DIFBLOCK(1, (result != NW_OK),
+		DIFBLOCK(1, (result != 0),
 			printf("arp[%d]: eth_read(..,%d)=%d\n",
 			arp_port-arp_port_table, ETH_MAX_PACK_SIZE, result));
 	}
@@ -843,7 +843,7 @@ arp_func_t arp_func;
 
 	assert(eth_port >= 0);
 	if (eth_port >= eth_conf_nr)
-		return ENXIO;
+		return -ENXIO;
 
 	arp_port= &arp_port_table[eth_port];
 	arp_port->ap_eth_port= eth_port;
@@ -860,7 +860,7 @@ arp_func_t arp_func;
 
 	arp_main(arp_port);
 
-	return NW_OK;
+	return 0;
 }
 
 int arp_ip_eth (eth_port, ipaddr, ethaddr)
@@ -920,10 +920,10 @@ ether_addr_t *ethaddr;
 		if (ce->ac_state == ACS_VALID)
 		{
 			*ethaddr= ce->ac_ethaddr;
-			return NW_OK;
+			return 0;
 		}
 		if (ce->ac_state == ACS_UNREACHABLE)
-			return EDSTNOTRCH;
+			return -EDSTNOTRCH;
 		assert(ce->ac_state == ACS_INCOMPLETE);
 
 		return NW_SUSPEND;
@@ -988,7 +988,7 @@ put_userdata_t put_userdata;
 	case NWIOARPGIP:
 		data= (*get_userdata)(fd, 0, sizeof(*arp_iop), TRUE);
 		if (data == NULL)
-			return EFAULT;
+			return -EFAULT;
 		data= bf_packIffLess(data, sizeof(*arp_iop));
 		arp_iop= (nwio_arp_t *)ptr2acc_data(data);
 		ipaddr= arp_iop->nwa_ipaddr;
@@ -1010,7 +1010,7 @@ put_userdata_t put_userdata;
 			if (ipaddr != arp_port->ap_ipaddr)
 			{
 				bf_afree(data);
-				return ENOENT;
+				return -ENOENT;
 			}
 			arp_iop->nwa_entno= arp_cache_nr;
 			arp_iop->nwa_ipaddr= ipaddr;
@@ -1039,7 +1039,7 @@ put_userdata_t put_userdata;
 	case NWIOARPGNEXT:
 		data= (*get_userdata)(fd, 0, sizeof(*arp_iop), TRUE);
 		if (data == NULL)
-			return EFAULT;
+			return -EFAULT;
 		data= bf_packIffLess(data, sizeof(*arp_iop));
 		arp_iop= (nwio_arp_t *)ptr2acc_data(data);
 		entno= arp_iop->nwa_entno;
@@ -1059,7 +1059,7 @@ put_userdata_t put_userdata;
 		if (entno == arp_cache_nr)
 		{
 			bf_afree(data);
-			return ENOENT;
+			return -ENOENT;
 		}
 		arp_iop->nwa_entno= entno+1;
 		arp_iop->nwa_ipaddr= ce->ac_ipaddr;
@@ -1080,14 +1080,14 @@ put_userdata_t put_userdata;
 	case NWIOARPSIP:
 		data= (*get_userdata)(fd, 0, sizeof(*arp_iop), TRUE);
 		if (data == NULL)
-			return EFAULT;
+			return -EFAULT;
 		data= bf_packIffLess(data, sizeof(*arp_iop));
 		arp_iop= (nwio_arp_t *)ptr2acc_data(data);
 		ipaddr= arp_iop->nwa_ipaddr;
 		if (find_cache_ent(arp_port, ipaddr))
 		{
 			bf_afree(data);
-			return EEXIST;
+			return -EEXIST;
 		}
 
 		flags= arp_iop->nwa_flags;
@@ -1102,7 +1102,7 @@ put_userdata_t put_userdata;
 		if (ce == NULL)
 		{
 			bf_afree(data);
-			return ENOMEM;
+			return -ENOMEM;
 		}
 
 		ce->ac_flags= ac_flags;
@@ -1121,16 +1121,16 @@ put_userdata_t put_userdata;
 	case NWIOARPDIP:
 		data= (*get_userdata)(fd, 0, sizeof(*arp_iop), TRUE);
 		if (data == NULL)
-			return EFAULT;
+			return -EFAULT;
 		data= bf_packIffLess(data, sizeof(*arp_iop));
 		arp_iop= (nwio_arp_t *)ptr2acc_data(data);
 		ipaddr= arp_iop->nwa_ipaddr;
 		bf_afree(data); data= NULL;
 		ce= find_cache_ent(arp_port, ipaddr);
 		if (!ce)
-			return ENOENT;
+			return -ENOENT;
 		if (ce->ac_state == ACS_INCOMPLETE)
-			return EINVAL;
+			return -EINVAL;
 
 		ac_flags= ce->ac_flags;
 		if (ac_flags & ACF_PUB)

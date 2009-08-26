@@ -63,12 +63,12 @@ void do_pagefaults(void)
 	struct vmproc *vmp;
 	int r, s;
 
-	while((r=arch_get_pagefault(&ep, (vir_bytes*)&addr, &err)) == OK) {
+	while((r=arch_get_pagefault(&ep, (vir_bytes*)&addr, &err)) == 0) {
 		struct vir_region *region;
 		vir_bytes offset;
 		int p, wr = PFERR_WRITE(err);
 
-		if(vm_isokendpt(ep, &p) != OK)
+		if(vm_isokendpt(ep, &p) != 0)
 			vm_panic("do_pagefaults: endpoint wrong", ep);
 
 		vmp = &vmproc[p];
@@ -80,7 +80,7 @@ void do_pagefaults(void)
 			printf("VM: pagefault: SIGSEGV %d bad addr 0x%lx %s\n", 
 				ep, arch_map2vir(vmp, addr), pf_errstr(err));
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
-			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != OK)
+			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
 				vm_panic("sys_kill failed", s);
 			continue;
 		}
@@ -95,7 +95,7 @@ void do_pagefaults(void)
 			printf("VM: pagefault: SIGSEGV %d ro map 0x%lx %s\n", 
 				ep, arch_map2vir(vmp, addr), pf_errstr(err));
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
-			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != OK)
+			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
 				vm_panic("sys_kill failed", s);
 			continue;
 		}
@@ -104,16 +104,16 @@ void do_pagefaults(void)
 		offset = addr - region->vaddr;
 
 		/* Access is allowed; handle it. */
-		if((r=map_pf(vmp, region, offset, wr)) != OK) {
+		if((r=map_pf(vmp, region, offset, wr)) != 0) {
 			printf("VM: pagefault: SIGSEGV %d pagefault not handled\n", ep);
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
-			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != OK)
+			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
 				vm_panic("sys_kill failed", s);
 			continue;
 		}
 
 		/* Pagefault is handled, so now reactivate the process. */
-		if((s=sys_vmctl(ep, VMCTL_CLEAR_PAGEFAULT, r)) != OK)
+		if((s=sys_vmctl(ep, VMCTL_CLEAR_PAGEFAULT, r)) != 0)
 			vm_panic("do_pagefaults: sys_vmctl failed", ep);
 	}
 
@@ -131,13 +131,13 @@ void do_memory(void)
 	vir_bytes len;
 	int wrflag;
 
-	while((r=sys_vmctl_get_memreq(&who, &mem, &len, &wrflag)) == OK) {
-		int p, r = OK;
+	while((r=sys_vmctl_get_memreq(&who, &mem, &len, &wrflag)) == 0) {
+		int p, r = 0;
 		struct vir_region *region;
 		struct vmproc *vmp;
 		vir_bytes o;
 
-		if(vm_isokendpt(who, &p) != OK)
+		if(vm_isokendpt(who, &p) != 0)
 			vm_panic("do_memory: endpoint wrong", who);
 		vmp = &vmproc[p];
 
@@ -150,13 +150,13 @@ void do_memory(void)
 
 		if(!(region = map_lookup(vmp, mem))) {
 			printf("VM: do_memory: memory doesn't exist\n");
-			r = EFAULT;
+			r = -EFAULT;
 		} else if(mem + len > region->vaddr + region->length) {
 			vm_assert(region->vaddr <= mem);
 			vm_panic("do_memory: not contained", NO_NUM);
 		} else if(!(region->flags & VR_WRITABLE) && wrflag) {
 			printf("VM: do_memory: write to unwritable map\n");
-			r = EFAULT;
+			r = -EFAULT;
 		} else {
 			vir_bytes offset;
 			vm_assert(region->vaddr <= mem);
@@ -167,13 +167,13 @@ void do_memory(void)
 			r = map_handle_memory(vmp, region, offset, len, wrflag);
 		}
 
-		if(r != OK) {
+		if(r != 0) {
 			printf("VM: memory range 0x%lx-0x%lx not available in %d\n",
 				arch_map2vir(vmp, mem), arch_map2vir(vmp, mem+len),
 				vmp->vm_endpoint);
 		}
 
-		if(sys_vmctl(who, VMCTL_MEMREQ_REPLY, r) != OK)
+		if(sys_vmctl(who, VMCTL_MEMREQ_REPLY, r) != 0)
 			vm_panic("do_memory: sys_vmctl failed", r);
 	}
 }

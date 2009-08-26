@@ -82,7 +82,7 @@ int drv_init_hw(void) {
 	int DspVersion[2];
 	dprint("drv_init_hw():\n");
 
-	if(drv_reset () != OK) { 
+	if(drv_reset () != 0) { 
 		dprint("sb16: No SoundBlaster card detected\n");
 		return -1;
 	}
@@ -114,7 +114,7 @@ int drv_init_hw(void) {
 
 	DspFragmentSize = sub_dev[AUDIO].DmaSize / sub_dev[AUDIO].NrOfDmaFragments;
 
-	return OK;
+	return 0;
 }
 
 
@@ -131,7 +131,7 @@ int drv_reset(void) {
 	
 	if(sb16_inb(DSP_READ) != 0xAA) return EIO; /* No SoundBlaster */
 
-	return OK;
+	return 0;
 }
 
 
@@ -178,7 +178,7 @@ int drv_start(int channel, int DmaMode) {
 
 	running = TRUE;
 
-	return OK;
+	return 0;
 }
 
 
@@ -190,7 +190,7 @@ int drv_stop(int sub_dev) {
 		running = FALSE;
 		drv_reenable_int(sub_dev);
 	}
-	return OK;
+	return 0;
 }
 
 
@@ -198,7 +198,7 @@ int drv_stop(int sub_dev) {
 int drv_set_dma(u32_t dma, u32_t length, int chan) {
 	dprint("drv_set_dma():\n");
 	DmaPhys = dma;
-	return OK;
+	return 0;
 }
 
 
@@ -206,7 +206,7 @@ int drv_set_dma(u32_t dma, u32_t length, int chan) {
 int drv_reenable_int(int chan) {
 	dprint("drv_reenable_int()\n");
 	sb16_inb((DspBits == 8 ? DSP_DATA_AVL : DSP_DATA16_AVL));
-	return OK;
+	return 0;
 }
 
 
@@ -225,14 +225,14 @@ int drv_int(int sub_dev) {
 
 int drv_pause(int chan) {
 	drv_stop(chan);
-	return OK;
+	return 0;
 }
 
 
 
 int drv_resume(int chan) {
 	dsp_command((DspBits == 8 ? DSP_CMD_DMA8CONT : DSP_CMD_DMA16CONT));
-	return OK;
+	return 0;
 }
 
 
@@ -254,7 +254,7 @@ int drv_io_ctl(int request, void *val, int *len, int sub_dev) {
 int drv_get_irq(char *irq) {
 	dprint("drv_get_irq():\n");
 	*irq = SB_IRQ;
-	return OK;
+	return 0;
 }
 
 
@@ -262,7 +262,7 @@ int drv_get_irq(char *irq) {
 int drv_get_frag_size(u32_t *frag_size, int sub_dev) {
 	dprint("drv_get_frag_size():\n");
 	*frag_size = DspFragmentSize;
-	return OK;
+	return 0;
 }
 
 
@@ -341,7 +341,7 @@ static int dsp_set_size(unsigned int size) {
 
 	DspFragmentSize = size; 
 
-	return OK;
+	return 0;
 }
 
 
@@ -369,7 +369,7 @@ static int dsp_set_speed(unsigned int speed) {
 
 	DspSpeed = speed;
 
-	return OK;
+	return 0;
 }
 
 
@@ -381,7 +381,7 @@ static int dsp_set_stereo(unsigned int stereo) {
 		DspStereo = 0;
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -394,7 +394,7 @@ static int dsp_set_bits(unsigned int bits) {
 
 	DspBits = bits; 
 
-	return OK;
+	return 0;
 }
 
 
@@ -404,7 +404,7 @@ static int dsp_set_sign(unsigned int sign) {
 
 	DspSign = (sign > 0 ? 1 : 0); 
 
-	return OK;
+	return 0;
 }
 
 
@@ -412,7 +412,7 @@ static int dsp_set_sign(unsigned int sign) {
 static int dsp_get_max_frag_size(u32_t *val, int *len) {
 	*len = sizeof(*val);
 	*val = sub_dev[AUDIO].DmaSize / sub_dev[AUDIO].NrOfDmaFragments;
-	return OK;
+	return 0;
 }
 
 
@@ -423,7 +423,7 @@ int dsp_command(int value) {
 	for (i = 0; i < SB_TIMEOUT; i++) {
 		if((sb16_inb(DSP_STATUS) & 0x80) == 0) {
 			sb16_outb(DSP_COMMAND, value);
-			return OK;
+			return 0;
 		}
 	}
 
@@ -436,7 +436,7 @@ int dsp_command(int value) {
 int sb16_inb(int port) {	
 	int s, value = -1;
 
-	if ((s=sys_inb(port, &value)) != OK)
+	if ((s=sys_inb(port, &value)) != 0)
 		panic("SB16DSP","sys_inb() failed", s);
 	
 	return value;
@@ -447,6 +447,6 @@ int sb16_inb(int port) {
 void sb16_outb(int port, int value) {
 	int s;
 	
-	if ((s=sys_outb(port, value)) != OK)
+	if ((s=sys_outb(port, value)) != 0)
 		panic("SB16DSP","sys_outb() failed", s);
 }

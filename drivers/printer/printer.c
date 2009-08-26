@@ -217,7 +217,7 @@ int safe;			/* use virtual addresses or grant id's? */
 
         retries = MAX_ONLINE_RETRIES + 1;  
         while (--retries > 0) {
-            if(sys_inb(port_base + 1, &status) != OK) {
+            if(sys_inb(port_base + 1, &status) != 0) {
 		printf("printer: sys_inb of %x failed\n", port_base+1);
 		panic(__FILE__,"sys_inb failed", NO_NUM);
 	    }
@@ -245,7 +245,7 @@ static void output_done()
     register int status;
 
     if (!writing) return;	  	/* probably leftover interrupt */
-    if (done_status != OK) {      	/* printer error occurred */
+    if (done_status != 0) {      	/* printer error occurred */
         status = EIO;
 	if ((done_status & ON_LINE) == 0) { 
 	    printf("Printer is not on line\n");
@@ -344,21 +344,21 @@ static void do_initialize()
   
   /* Get the base port for first printer.  */
   if(sys_vircopy(SELF, BIOS_SEG, LPT1_IO_PORT_ADDR, 
-  	SELF, D, (vir_bytes) &port_base, LPT1_IO_PORT_SIZE) != OK) {
+  	SELF, D, (vir_bytes) &port_base, LPT1_IO_PORT_SIZE) != 0) {
 	panic(__FILE__, "do_initialize: sys_vircopy failed", NO_NUM);
   }
-  if(sys_outb(port_base + 2, INIT_PRINTER) != OK) {
+  if(sys_outb(port_base + 2, INIT_PRINTER) != 0) {
 	printf("printer: sys_outb of %x failed\n", port_base+2);
 	panic(__FILE__, "do_initialize: sys_outb init failed", NO_NUM);
   }
   micro_delay(1000000/20);	/* easily satisfies Centronics minimum */
-  if(sys_outb(port_base + 2, PR_SELECT) != OK) {
+  if(sys_outb(port_base + 2, PR_SELECT) != 0) {
 	printf("printer: sys_outb of %x failed\n", port_base+2);
 	panic(__FILE__, "do_initialize: sys_outb select failed", NO_NUM);
   }
   irq_hook_id = 0;
-  if(sys_irqsetpolicy(PRINTER_IRQ, 0, &irq_hook_id) != OK ||
-     sys_irqenable(&irq_hook_id) != OK) {
+  if(sys_irqsetpolicy(PRINTER_IRQ, 0, &irq_hook_id) != 0 ||
+     sys_irqenable(&irq_hook_id) != 0) {
 	panic(__FILE__, "do_initialize: irq enabling failed", NO_NUM);
   }
 }
@@ -380,7 +380,7 @@ static void prepare_output()
     s=sys_datacopy(proc_nr, user_vir_g, SELF, (vir_bytes) obuf, chunk);
   }
 
-  if(s != OK) {
+  if(s != 0) {
   	done_status = EFAULT;
   	output_done();
   	return;
@@ -409,11 +409,11 @@ static void do_printer_output()
 	 * when the printer is busy with a previous character, because the
 	 * interrupt status does not affect the printer.
 	 */
-	if(sys_outb(port_base + 2, PR_SELECT) != OK) {
+	if(sys_outb(port_base + 2, PR_SELECT) != 0) {
 		printf("printer: sys_outb of %x failed\n", port_base+2);
 		panic(__FILE__,"sys_outb failed", NO_NUM);
 	}
-	if(sys_irqenable(&irq_hook_id) != OK) {
+	if(sys_irqenable(&irq_hook_id) != 0) {
 		panic(__FILE__,"sys_irqenable failed", NO_NUM);
 	}
 	return;
@@ -423,7 +423,7 @@ static void do_printer_output()
 	/* Loop to handle fast (buffered) printers.  It is important that
 	 * processor interrupts are not disabled here, just printer interrupts.
 	 */
-	if(sys_inb(port_base + 1, &status) != OK) {
+	if(sys_inb(port_base + 1, &status) != 0) {
 		printf("printer: sys_inb of %x failed\n", port_base+1);
 		panic(__FILE__,"sys_inb failed", NO_NUM);
 	}
@@ -434,7 +434,7 @@ static void do_printer_output()
 		 * pr_restart, since they are not synchronized with printer
 		 * interrupts.  It may happen after a spurious interrupt.
 		 */
-		if(sys_irqenable(&irq_hook_id) != OK) {
+		if(sys_irqenable(&irq_hook_id) != 0) {
 			panic(__FILE__, "sys_irqenable failed\n", NO_NUM);
 		}
 		return;
@@ -445,7 +445,7 @@ static void do_printer_output()
 		optr++;
 		pv_set(char_out[1], port_base+2, ASSERT_STROBE);
 		pv_set(char_out[2], port_base+2, NEGATE_STROBE);
-		if(sys_voutb(char_out, 3) != OK) {
+		if(sys_voutb(char_out, 3) != 0) {
 			/* request series of port outb */
 			panic(__FILE__, "sys_voutb failed\n", NO_NUM);
 		}
@@ -456,7 +456,7 @@ static void do_printer_output()
 		/* Error.  This would be better ignored (treat as busy). */
 		done_status = status;
 		output_done();
-		if(sys_irqenable(&irq_hook_id) != OK) {
+		if(sys_irqenable(&irq_hook_id) != 0) {
 			panic(__FILE__, "sys_irqenable failed\n", NO_NUM);
 		}
 		return;
@@ -467,7 +467,7 @@ static void do_printer_output()
   /* Finished printing chunk OK. */
   done_status = OK;
   output_done();
-  if(sys_irqenable(&irq_hook_id) != OK) {
+  if(sys_irqenable(&irq_hook_id) != 0) {
 	panic(__FILE__, "sys_irqenable failed\n", NO_NUM);
   }
 }

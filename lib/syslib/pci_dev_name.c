@@ -48,7 +48,7 @@ u16_t did;
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_dev_name: can't talk to PCI", r);
 
-	if (m.m_type == ENOENT)
+	if (m.m_type == -ENOENT)
 	{
 		printf("pci_dev_name: got no name\n");
 		return NULL;	/* No name for this device */

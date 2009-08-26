@@ -43,7 +43,7 @@ size_t count;
 	ip_fd= &ip_fd_table[fd];
 	if (!(ip_fd->if_flags & IFF_OPTSET))
 	{
-		return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, EBADMODE,
+		return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, -EBADMODE,
 			(acc_t *)0, FALSE);
 	}
 
@@ -59,7 +59,7 @@ size_t count;
 			ip_packet2user (ip_fd, pack, ip_fd->if_exp_time,
 				bf_bufsize(pack));
 			assert(!(ip_fd->if_flags & IFF_READ_IP));
-			return NW_OK;
+			return 0;
 		}
 		while (ip_fd->if_rdbuf_head)
 		{
@@ -439,7 +439,7 @@ size_t data_len;
 	if (result >= 0)
 	{
 		if (data_len > transf_size)
-			result= EPACKSIZE;
+			result= -EPACKSIZE;
 		else
 			result= transf_size;
 	}
@@ -827,7 +827,7 @@ ev_arg_t ev_arg;
 				r= next_port->ip_dev_send(next_port,
 					iroute->irt_gateway,
 					pack, IP_LT_NORMAL);
-				if (r == EDSTNOTRCH)
+				if (r == -EDSTNOTRCH)
 				{
 					printf("ip[%d]: gw ",
 						ip_port-ip_port_table);
@@ -899,7 +899,7 @@ ev_arg_t ev_arg;
 			/* Just send the packet to it's destination */
 			pack->acc_linkC++; /* Extra ref for ICMP */
 			r= next_port->ip_dev_send(next_port, dest, pack, type);
-			if (r == EDSTNOTRCH)
+			if (r == -EDSTNOTRCH)
 			{
 				DBLOCK(1, printf("ip[%d]: next hop ",
 					ip_port-ip_port_table);

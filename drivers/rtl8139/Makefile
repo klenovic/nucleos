@@ -1,41 +1,18 @@
-# Makefile for the Realtek RTL8139 ethernet driver (RTL8139)
-DRIVER = rtl8139
+# Makefile for the AT disk driver (AT_WINI)
+app-y := rtl8139.elf32
+rtl8139.elf32-type := driver
+rtl8139.elf32-obj-y := rtl8139.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_rtl8139.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-MAKE = exec make
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS = -lsys -lsysutil -ltimers
+$(src)/rtl8139.elf32: drivers/driver_32.lds
 
-OBJ = rtl8139.o 
+# Create in minix3's aout format
+rtl8139_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+rtl8139_a_hdrlen  := 0x20
+rtl8139_a_cpu     := i386
+rtl8139_stackheap := 64kw
 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ) 
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-	install -S 50kw $(DRIVER)
-
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f $(DRIVER) *.o *.bak 
-
-depend: 
-	/usr/bin/mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := rtl8139.elf32,rtl8139

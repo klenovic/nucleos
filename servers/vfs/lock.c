@@ -48,16 +48,16 @@ int req;			/* either F_SETLK or F_SETLKW */
   user_flock = (vir_bytes) m_in.name1;
   r = sys_datacopy(who_e, (vir_bytes) user_flock,
 	FS_PROC_NR, (vir_bytes) &flock, (phys_bytes) sizeof(flock));
-  if (r != OK) return(EINVAL);
+  if (r != 0) return(-EINVAL);
 
   /* Make some error checks. */
   ltype = flock.l_type;
   mo = f->filp_mode;
-  if (ltype != F_UNLCK && ltype != F_RDLCK && ltype != F_WRLCK) return(EINVAL);
-  if (req == F_GETLK && ltype == F_UNLCK) return(EINVAL);
-  if ( (f->filp_vno->v_mode & I_TYPE) != I_REGULAR) return(EINVAL);
-  if (req != F_GETLK && ltype == F_RDLCK && (mo & R_BIT) == 0) return(EBADF);
-  if (req != F_GETLK && ltype == F_WRLCK && (mo & W_BIT) == 0) return(EBADF);
+  if (ltype != F_UNLCK && ltype != F_RDLCK && ltype != F_WRLCK) return(-EINVAL);
+  if (req == F_GETLK && ltype == F_UNLCK) return(-EINVAL);
+  if ( (f->filp_vno->v_mode & I_TYPE) != I_REGULAR) return(-EINVAL);
+  if (req != F_GETLK && ltype == F_RDLCK && (mo & R_BIT) == 0) return(-EBADF);
+  if (req != F_GETLK && ltype == F_WRLCK && (mo & W_BIT) == 0) return(-EBADF);
 
   /* Compute the first and last bytes in the lock region. */
   switch (flock.l_whence) {
@@ -70,17 +70,17 @@ int req;			/* either F_SETLK or F_SETLKW */
 		}
 		first = ex64lo(f->filp_pos); break;
 	case SEEK_END:	first = f->filp_vno->v_size; break;
-	default:	return(EINVAL);
+	default:	return(-EINVAL);
   }
   /* Check for overflow. */
   if (((long)flock.l_start > 0) && ((first + flock.l_start) < first))
-	return(EINVAL);
+	return(-EINVAL);
   if (((long)flock.l_start < 0) && ((first + flock.l_start) > first))
-	return(EINVAL);
+	return(-EINVAL);
   first = first + flock.l_start;
   last = first + flock.l_len - 1;
   if (flock.l_len == 0) last = MAX_FILE_POS;
-  if (last < first) return(EINVAL);
+  if (last < first) return(-EINVAL);
 
   /* Check if this region conflicts with any existing lock. */
   empty = (struct file_lock *) 0;
@@ -103,7 +103,7 @@ int req;			/* either F_SETLK or F_SETLKW */
 	if (ltype == F_RDLCK || ltype == F_WRLCK) {
 		if (req == F_SETLK) {
 			/* For F_SETLK, just report back failure. */
-			return(EAGAIN);
+			return(-EAGAIN);
 		} else {
 			/* For F_SETLKW, suspend the process. */
 			suspend(XLOCK);
@@ -131,7 +131,7 @@ int req;			/* either F_SETLK or F_SETLKW */
 	}
 	
 	/* Bad luck. A lock has been split in two by unlocking the middle. */
-	if (nr_locks == NR_LOCKS) return(ENOLCK);
+	if (nr_locks == NR_LOCKS) return(-ENOLCK);
 	for (i = 0; i < NR_LOCKS; i++)
 		if (file_lock[i].lock_type == 0) break;
 	flp2 = &file_lock[i];
@@ -165,17 +165,17 @@ int req;			/* either F_SETLK or F_SETLKW */
 	return(r);
   }
 
-  if (ltype == F_UNLCK) return(OK);	/* unlocked a region with no locks */
+  if (ltype == F_UNLCK) return 0;	/* unlocked a region with no locks */
 
   /* There is no conflict.  If space exists, store new lock in the table. */
-  if (empty == (struct file_lock *) 0) return(ENOLCK);	/* table full */
+  if (empty == (struct file_lock *) 0) return(-ENOLCK);	/* table full */
   empty->lock_type = ltype;
   empty->lock_pid = fp->fp_pid;
   empty->lock_vnode = f->filp_vno;
   empty->lock_first = first;
   empty->lock_last = last;
   nr_locks++;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*

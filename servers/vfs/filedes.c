@@ -53,7 +53,7 @@ int get_fd(int start, mode_t bits, int *k, struct filp **fpt)
   }
 
   /* Check to see if a file descriptor has been found. */
-  if (i >= OPEN_MAX) return(EMFILE);
+  if (i >= OPEN_MAX) return(-EMFILE);
 
   /* Now that a file descriptor has been found, look for a free filp slot. */
   for (f = &filp[0]; f < &filp[NR_FILPS]; f++) {
@@ -68,12 +68,12 @@ int get_fd(int start, mode_t bits, int *k, struct filp **fpt)
 		f->filp_state = FS_NORMAL;
 		f->filp_select_flags = 0;
 		*fpt = f;
-		return(OK);
+		return 0;
 	}
   }
 
   /* If control passes here, the filp table must be full.  Report that back. */
-  return(ENFILE);
+  return(-ENFILE);
 }
 
 /*===========================================================================*
@@ -96,13 +96,13 @@ int fild;			/* file descriptor */
 {
 /* See if 'fild' refers to a valid file descr.  If so, return its filp ptr. */
 
-  err_code = EBADF;
+  err_code = -EBADF;
   if (fild < 0 || fild >= OPEN_MAX ) return(NIL_FILP);
   if (rfp->fp_filp[fild] == NIL_FILP && FD_ISSET(fild, &rfp->fp_filp_inuse))
   {
-	printf("get_filp2: setting err_code to EIO for proc %d fd %d\n",
+	printf("get_filp2: setting err_code to -EIO for proc %d fd %d\n",
 		rfp->fp_endpoint, fild);
-	err_code = EIO;	/* The filedes is not there, but is not closed either.
+	err_code = -EIO;	/* The filedes is not there, but is not closed either.
 			 */
   }
   return(rfp->fp_filp[fild]);	/* may also be NIL_FILP */

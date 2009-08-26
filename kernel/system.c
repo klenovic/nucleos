@@ -99,7 +99,7 @@ void sys_task()
 	/* Get work. Block and wait until a request message arrives. */
 	if(softnotify)
 		minix_panic("softnotify non-NULL before receive (2)", NO_NUM);
-	if((r=receive(ANY, &m)) != OK)
+	if((r=receive(ANY, &m)) != 0)
 		minix_panic("receive() failed", r);
 	if(m.m_source == SYSTEM)
 		continue;
@@ -124,7 +124,7 @@ void sys_task()
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		sys_stats.bad_req++;
-	  result = EBADREQUEST;			/* illegal message type */
+	  result = -EBADREQUEST;			/* illegal message type */
       } 
       else if (!GET_BIT(priv(caller_ptr)->s_k_call_mask, call_nr)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
@@ -144,7 +144,7 @@ void sys_task()
 #endif
 	if (caller_ptr->p_endpoint == ipc_stats_target)
 		sys_stats.not_allowed++;
-	  result = ECALLDENIED;			/* illegal message type */
+	  result = -ECALLDENIED;			/* illegal message type */
       }
       else {
           result = (*call_vec[call_nr])(&m); /* handle the system call */
@@ -157,7 +157,7 @@ void sys_task()
 	 */
 	memcpy(&caller_ptr->p_vmrequest.saved.reqmsg, &m, sizeof(m));
 	caller_ptr->p_vmrequest.type = VMSTYPE_SYS_MESSAGE;
-      } else if (result != EDONTREPLY) {
+      } else if (result != -EDONTREPLY) {
 	/* Send a reply, unless inhibited by a handler function.
 	 * Use the kernel function lock_send() to prevent a system
 	 * call trap.
@@ -166,7 +166,7 @@ void sys_task()
 			RTS_LOCK_UNSET(restarting, VMREQUEST);
 		m.m_type = result;		/* report status of call */
 		if(WILLRECEIVE(caller_ptr, SYSTEM)) {
-		  if (OK != (s=lock_send(m.m_source, &m))) {
+		  if ((s=lock_send(m.m_source, &m)) != 0) {
 			kprintf("SYSTEM, reply to %d failed: %d\n",
 			m.m_source, s);
 		  }
@@ -285,7 +285,7 @@ int proc_type;				/* system or user process flag */
   if (proc_type == SYS_PROC) {			/* find a new slot */
       for (sp = BEG_PRIV_ADDR; sp < END_PRIV_ADDR; ++sp) 
           if (sp->s_proc_nr == NONE && sp->s_id != USER_PRIV_ID) break;	
-      if (sp >= END_PRIV_ADDR) return(ENOSPC);
+      if (sp >= END_PRIV_ADDR) return(-ENOSPC);
       rc->p_priv = sp;				/* assign new slot */
       rc->p_priv->s_proc_nr = proc_nr(rc);	/* set association */
       rc->p_priv->s_flags = SYS_PROC;		/* mark as privileged */
@@ -299,7 +299,7 @@ int proc_type;				/* system or user process flag */
 
       /* s_flags of this shared structure are to be once at system startup. */
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -443,7 +443,7 @@ vir_bytes bytes;                /* size */
          * Then convert that process to a slot number.
          */
         if(verify_grant(rp->p_endpoint, ANY, grant, bytes, 0, 0,
-                &offset, &granter) != OK) {
+                &offset, &granter) != 0) {
 		kprintf("SYSTEM: umap_grant: verify_grant failed\n");
                 return 0;
         }
@@ -534,7 +534,7 @@ register struct proc *rc;		/* slot of process to clean up */
 
       /* Check if process is receiving from exiting process. */
       if (RTS_ISSET(rp, RECEIVING) && rp->p_getfrom_e == rc->p_endpoint) {
-          rp->p_reg.retreg = ESRCDIED;		/* report source died */
+          rp->p_reg.retreg = -ESRCDIED;		/* report source died */
 	  RTS_LOCK_UNSET(rp, RECEIVING);	/* no longer receiving */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s receiving from dead src ep %d / %s\n",
@@ -543,7 +543,7 @@ register struct proc *rc;		/* slot of process to clean up */
       } 
       if (RTS_ISSET(rp, SENDING) &&
 	  rp->p_sendto_e == rc->p_endpoint) {
-          rp->p_reg.retreg = EDSTDIED;		/* report destination died */
+          rp->p_reg.retreg = -EDSTDIED;		/* report destination died */
 	  RTS_LOCK_UNSET(rp, SENDING);
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s send to dying dst ep %d (%s)\n",
@@ -582,7 +582,7 @@ int access;                     /* does grantee want to CPF_READ or _WRITE? */
          * Then convert that process to a slot number.
          */
         if(verify_grant(rp->p_endpoint, grantee, grant, bytes, access, offset, 
-                &v_offset, &granter) != OK
+                &v_offset, &granter) != 0
            || !isokendpt(granter, &proc_nr)) {
                 return 0;
         }
@@ -674,7 +674,7 @@ static struct proc *vmrestart_check(message *m)
 				(vir_bytes) &restarting->p_vmrequest.saved.msgcopy.msgbuf,
 				restarting->p_vmrequest.saved.msgcopy.dst->p_endpoint,
 				(vir_bytes) restarting->p_vmrequest.saved.msgcopy.dst_v,
-				sizeof(message))) != OK) {
+				sizeof(message))) != 0) {
 	   			minix_panic("SYSTEM: delayed msgcopy failed", r);
 			}
 			RTS_LOCK_UNSET(restarting, VMREQUEST);

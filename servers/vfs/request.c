@@ -78,13 +78,13 @@ unsigned int *cum_iop;
 
     cpf_revoke(gid);
 
-    if (r != OK) return r;
+    if (r != 0) return r;
 
     /* Fill in response structure */
     *new_posp = make64(m.RES_XFD_POS_LO, m.RES_XFD_POS_HI);
     *cum_iop = m.RES_XFD_CUM_IO;
 
-    return OK;
+    return 0;
 }
 
 
@@ -184,7 +184,7 @@ node_details_t *res;
 
     cpf_revoke(grant_id);
 
-    if (r != OK) return r;
+    if (r != 0) return r;
 
     /* Fill in response structure */
     res->fs_e = m.m_source;
@@ -196,7 +196,7 @@ node_details_t *res;
     res->dev = m.RES_DEV;
     res->inode_index = m.RES_INODE_INDEX;
 
-    return OK;
+    return 0;
 }
 
 
@@ -292,10 +292,10 @@ off_t *pos_change;
 
 	r = fs_sendrec(fs_e, &m);
 
-	if (r != ENOSYS && r != EINVAL) {
+	if (r != -ENOSYS && r != -EINVAL) {
 		*pos_change= m.RES_GDE_POS_CHANGE;
 
-		if (r == OK)
+		if (r == 0)
 			r = m.RES_GDE_CUM_IO;
 
 		return r;
@@ -417,7 +417,7 @@ lookup_res_t *res;
     /* Fill in response according to the return value */
     res->fs_e = m.m_source;
     switch (r) {
-        case OK:
+        case 0:
             res->inode_nr = m.RES_INODE_NR;
             res->fmode = m.RES_MODE;
             res->fsize = m.RES_FILE_SIZE;
@@ -603,13 +603,13 @@ endpoint_t driver_e;
     m.REQ_DRIVER_E = driver_e;
 
     /* Issue request */
-    if ((r = sendrec(fs_e, &m)) != OK) {
+    if ((r = sendrec(fs_e, &m)) != 0) {
         printf("VFSreq_newdriver: error sending message to %d: %d\n", fs_e, r);
 	util_stacktrace();
         return r;
     }
 
-    return OK;
+    return 0;
 }
 
 
@@ -661,10 +661,10 @@ size_t len;
     /* Send/rec request */
     r= fs_sendrec(fs_e, &m);
 
-    if (r != ENOSYS && r != EINVAL) {
+    if (r != -ENOSYS && r != -EINVAL) {
         cpf_revoke(gid);
 
-        if (r == OK)
+        if (r == 0)
             r = m.RES_RDL_LENGTH;
 
         return r;
@@ -718,7 +718,7 @@ struct node_details *res_nodep;
 
     cpf_revoke(gid);
 
-    if(r != OK) return r;
+    if(r != 0) return r;
 
     /* Fill in response structure */
     res_nodep->fs_e = m.m_source;
@@ -728,7 +728,7 @@ struct node_details *res_nodep;
     res_nodep->uid = m.RES_UID;
     res_nodep->gid = m.RES_GID;
 
-    return OK;
+    return 0;
 }
 
 
@@ -773,13 +773,13 @@ unsigned int *cum_iop;
 
     cpf_revoke(gid);
 
-    if (r != OK) return r;
+    if (r != 0) return r;
 
     /* Fill in response structure */
     *new_posp = cvul64(m.RES_FD_POS);
     *cum_iop = m.RES_FD_CUM_IO;
 
-    return OK;
+    return 0;
 }
 
 
@@ -952,7 +952,7 @@ int pos;
 
   cpf_revoke(gid);
 
-  if (r == OK && pos != 0)
+  if (r == 0 && pos != 0)
   {
 	sb.st_size -= pos;
 	r= sys_vircopy(SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf, 
@@ -1084,14 +1084,14 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
    */
   for (;;) {
       /* Do the actual send, receive */
-      if (OK != (r=sendrec(fs_e, reqm))) {
+      if ((r=sendrec(fs_e, reqm)) != 0) {
           printf("VFS:fs_sendrec:%s:%d: error sending message. FS_e: %d req_nr: %d err: %d\n", 
                   file, line, fs_e, reqm->m_type, r);
 	  util_stacktrace();
 	  return r;
       }
 
-      /* If the type field is 0 (OK) or negative (E*), this is a reply. If it
+      /* If the type field is 0 OK or negative (E*), this is a reply. If it
        * contains a positive nonzero value, this is a request.
        */
       if (reqm->m_type <= 0)
@@ -1114,12 +1114,12 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
   }
 
 #if 0
-      if(r == OK) {
+      if(r == 0) {
       	/* Sendrec was okay */
       	break;
       }
       /* Dead driver */
-      if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+      if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           old_driver_e = NONE;
           /* Find old driver by endpoint */
           for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp) {
@@ -1141,7 +1141,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
               new_driver_e = 0;
               printf("VFSdead_driver: waiting for new driver\n");
               r = receive(RS_PROC_NR, &m);
-              if (r != OK) {
+              if (r != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to receive from RS", 
 				  r);
               }
@@ -1149,7 +1149,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
                   /* Map new driver */
                   r = fs_devctl(m.ctl_req, m.dev_nr, m.driver_nr,
                           m.dev_style, m.m_force);
-                  if (m.ctl_req == DEV_MAP && r == OK) {
+                  if (m.ctl_req == DEV_MAP && r == 0) {
                       new_driver_e = m.driver_nr;
                       printf("VFSdead_driver: new driver endpoint: %d\n",
                               new_driver_e);
@@ -1160,7 +1160,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
                           m.m_type);
               }
               m.m_type = r;
-              if ((r = send(RS_PROC_NR, &m)) != OK) {
+              if ((r = send(RS_PROC_NR, &m)) != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to send to RS",
                           r);
               }

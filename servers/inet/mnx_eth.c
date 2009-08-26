@@ -111,13 +111,13 @@ void osdep_eth_init()
 		eth_port->etp_osdep.etp_rd_vec_grant= gid;
 
 		r= ds_retrieve_u32(ecp->ec_task, &tasknr);
-		if (r != OK && r != ESRCH)
+		if (r != 0 && r != -ESRCH)
 		{
 			printf("inet: ds_retrieve_u32 failed for '%s': %d\n",
 				ecp->ec_task, r);
 		}
 
-		if (r != OK)
+		if (r != 0)
 		{
 			/* Eventually, we expect ethernet drivers to be
 			 * started after INET. So we always end up here. And
@@ -139,12 +139,12 @@ void osdep_eth_init()
 		mess.DL_MODE= DL_NOMODE;
 
 		if (tasknr == ANY)
-			r= ENXIO;
+			r= -ENXIO;
 		else
 		{
 			assert(eth_port->etp_osdep.etp_state == OEPS_INIT);
 			r= asynsend(eth_port->etp_osdep.etp_task, &mess);
-		if (r == OK)
+		if (r == 0)
 				eth_port->etp_osdep.etp_state= OEPS_CONF_SENT;
 			else
 			{
@@ -154,7 +154,7 @@ void osdep_eth_init()
 			}
 		}
 
-		r= ENXIO;
+		r= -ENXIO;
 			
 		sr_add_minor(if2minor(ecp->ec_ifno, ETH_DEV_OFF),
 			i, eth_open, eth_close, eth_read, 
@@ -165,7 +165,7 @@ void osdep_eth_init()
 		eth_port->etp_vlan_port= NULL;
 		eth_port->etp_wr_pack= 0;
 		eth_port->etp_rd_pack= 0;
-		if (r == OK)
+		if (r == 0)
 		{
 			eth_port->etp_ethaddr= *(ether_addr_t *)mess.m3_ca1;
 			printf("osdep_eth_init: setting EPF_GOT_ADDR\n");
@@ -323,7 +323,7 @@ message *m;
 		}
 
 		r= m->m3_i1;
-		if (r == ENXIO)
+		if (r == -ENXIO)
 			{
 				printf(
 	"eth_rec(conf_reply): no ethernet device at task=%d,port=%d\n",
@@ -395,7 +395,7 @@ message *m;
 }
 
 		r= m->DL_STAT;
-		if (r != OK)
+		if (r != 0)
 {
 			ip_warning(("eth_rec: DL_STAT returned error %d\n",
 				r));
@@ -507,7 +507,7 @@ message *m;
 
 	m->m_type= DL_GETNAME;
 	r= asynsend(tasknr, m);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("eth_check_drivers: asynsend to %d failed: %d\n",
 			tasknr, r);
@@ -1013,7 +1013,7 @@ eth_port_t *eth_port;
 	r= asynsend(eth_port->etp_osdep.etp_task, &mess);
 	eth_port->etp_osdep.etp_state= OEPS_GETSTAT_SENT;
 
-	if (r != OK)
+	if (r != 0)
 		ip_panic(( "eth_get_stat: asynsend failed: %d", r));
 	}
 
@@ -1043,7 +1043,7 @@ message *mp;
 		flags= msgtable[i].flags;
 		if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
 		{
-			if (msgtable[i].result != OK)
+			if (msgtable[i].result != 0)
 			{
 				printf(
 			"asynsend: found completed entry %d with error %d\n",

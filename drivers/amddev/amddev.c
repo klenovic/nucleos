@@ -81,7 +81,7 @@ int main(void)
 		report_exceptions();
 
 		r= receive(ANY, &m);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "receive failed", r);
 		switch(m.m_type)
 		{
@@ -294,7 +294,7 @@ static int do_add(message *m)
 		return EINVAL;
 	}
 	r= sys_umap(proc, VM_D, (vir_bytes)start, size, &busaddr);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("amddev`do_add: umap failed for 0x%x@0x%x, proc %d\n",
 			size, start, proc);
@@ -336,7 +336,7 @@ static int do_add_phys(message *m)
 	{
 		if (read_reg(DEVF_CR, 0) & 0x10)
 			continue;
-		return OK;
+		return 0;
 	}
 	return EBUSY;
 }
@@ -369,7 +369,7 @@ static int do_del_phys(message *m)
 
 	write_reg(DEVF_CR, 0, 0x10);
 
-	return OK;
+	return 0;
 }
 
 static int do_add4pci(message *m)
@@ -407,7 +407,7 @@ static int do_add4pci(message *m)
 	printf("amddev`do_add4pci: should check with PCI\n");
 
 	r= sys_umap(proc, VM_D, (vir_bytes)start, size, &busaddr);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf(
 		"amddev`do_add4pci: umap failed for 0x%x@0x%x, proc %d: %d\n",
@@ -427,7 +427,7 @@ static int do_add4pci(message *m)
 
 	add_range(busaddr, size);
 
-	return OK;
+	return 0;
 }
 
 

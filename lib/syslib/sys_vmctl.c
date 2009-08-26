@@ -29,7 +29,7 @@ int sys_vmctl_get_pagefault_i386(endpoint_t *who, u32_t *cr2, u32_t *err)
   m.SVMCTL_WHO = SELF;
   m.SVMCTL_PARAM = VMCTL_GET_PAGEFAULT;
   r = _taskcall(SYSTASK, SYS_VMCTL, &m);
-  if(r == OK) {
+  if(r == 0) {
 	*who = m.SVMCTL_PF_WHO;
 	*cr2 = m.SVMCTL_PF_I386_CR2;
 	*err = m.SVMCTL_PF_I386_ERR;
@@ -45,7 +45,7 @@ int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3)
   m.SVMCTL_WHO = who;
   m.SVMCTL_PARAM = VMCTL_I386_GETCR3;
   r = _taskcall(SYSTASK, SYS_VMCTL, &m);
-  if(r == OK) {
+  if(r == 0) {
 	*cr3 = m.SVMCTL_VALUE;
   }
   return(r);
@@ -60,7 +60,7 @@ int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem,
   m.SVMCTL_WHO = SELF;
   m.SVMCTL_PARAM = VMCTL_MEMREQ_GET;
   r = _taskcall(SYSTASK, SYS_VMCTL, &m);
-  if(r == OK) {
+  if(r == 0) {
 	*who = m.SVMCTL_MRG_EP;
 	*mem = (vir_bytes) m.SVMCTL_MRG_ADDR;
 	*len = m.SVMCTL_MRG_LEN;

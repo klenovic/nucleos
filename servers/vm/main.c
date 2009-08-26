@@ -121,7 +121,7 @@ int main(void)
 #endif
 	SANITYCHECK(SCL_DETAIL);
 
-  	if ((r=receive(ANY, &msg)) != OK)
+  	if ((r=receive(ANY, &msg)) != 0)
 		vm_panic("receive() error", r);
 
 	SANITYCHECK(SCL_DETAIL);
@@ -155,7 +155,7 @@ int main(void)
 	}
 	who_e = msg.m_source;
 	c = msg.m_type - VM_RQ_BASE;
-	result = ENOSYS; /* Out of range or restricted calls return this. */
+	result = -ENOSYS; /* Out of range or restricted calls return this. */
 	if((c=CALLNUMBER(msg.m_type)) < 0 || !vm_calls[c].vmc_func) {
 		printf("VM: out of range or missing callnr %d from %d\n",
 			msg.m_type, msg.m_source);
@@ -175,7 +175,7 @@ int main(void)
 	if(result != SUSPEND) {
 	SANITYCHECK(SCL_DETAIL);
 		msg.m_type = result;
-		if((r=send(who_e, &msg)) != OK) {
+		if((r=send(who_e, &msg)) != 0) {
 			printf("VM: couldn't send %d to %d (err %d)\n",
 				msg.m_type, who_e, r);
 			vm_panic("send() error", NO_NUM);
@@ -184,7 +184,7 @@ int main(void)
 	}
 	SANITYCHECK(SCL_DETAIL);
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -204,7 +204,7 @@ static void vm_init(void)
 	 * image table that is defined at the kernel level to see which
 	 * slots to fill in.
 	 */
-	if (OK != (s=sys_getimage(image)))
+	if ((s=sys_getimage(image)) != 0)
 		vm_panic("couldn't get image table: %d\n", s);
 
 	/* Set table to 0. This invalidates all slots (clear VMF_INUSE). */
@@ -241,7 +241,7 @@ static void vm_init(void)
 		clear_proc(vmp);
 
 		/* Get memory map for this process from the kernel. */
-		if ((s=get_mem_map(ip->proc_nr, vmp->vm_arch.vm_seg)) != OK)
+		if ((s=get_mem_map(ip->proc_nr, vmp->vm_arch.vm_seg)) != 0)
 			vm_panic("couldn't get process mem_map",s);
 
 		/* Remove this memory from the free list. */
@@ -277,7 +277,7 @@ static void vm_init(void)
 	 * (future mappings of SYSTEM into other processes will not include
 	 * first pages), and free the first pages.
 	 */
-	if(vm_paged && sys_vmctl(SELF, VMCTL_NOPAGEZERO, 0) == OK) {
+	if(vm_paged && sys_vmctl(SELF, VMCTL_NOPAGEZERO, 0) == 0) {
 	  	struct vmproc *vmp;
 		vmp = &vmproc[VMP_SYSTEM];
 		if(vmp->vm_arch.vm_seg[T].mem_len > 0) {
@@ -307,13 +307,13 @@ static void vm_init(void)
 		if(!(ip->flags & PROC_FULLVM))
 			continue;
 
-        	if(pt_new(&vmp->vm_pt) != OK)
+        	if(pt_new(&vmp->vm_pt) != 0)
 			vm_panic("vm_init: no new pagetable", NO_NUM);
 #define BASICSTACK VM_PAGE_SIZE
 		old_stacktop = CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_vir +
 				vmp->vm_arch.vm_seg[S].mem_len);
 		if(sys_vmctl(vmp->vm_endpoint, VMCTL_INCSP,
-			VM_STACKTOP - old_stacktop) != OK) {
+			VM_STACKTOP - old_stacktop) != 0) {
 			vm_panic("VM: vmctl for new stack failed", NO_NUM);
 		}
 

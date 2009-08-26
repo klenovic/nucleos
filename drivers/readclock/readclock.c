@@ -109,7 +109,7 @@ int main(int argc, char **argv)
   struct sysgetenv sysgetenv;
 #endif
 
-  if((s=sys_readbios(MACH_ID_ADDR, &mach_id, sizeof(mach_id))) != OK) {
+  if((s=sys_readbios(MACH_ID_ADDR, &mach_id, sizeof(mach_id))) != 0) {
 	printf("readclock: sys_readbios failed: %d.\n", s);
 	exit(1);
   }
@@ -323,11 +323,11 @@ int read_register(int reg_addr)
 {
   u32_t r;
 
-  if(sys_outb(RTC_INDEX, reg_addr) != OK) {
+  if(sys_outb(RTC_INDEX, reg_addr) != 0) {
 	printf("cmos: outb failed of %x\n", RTC_INDEX);
 	exit(1);
   }
-  if(sys_inb(RTC_IO, (unsigned long*)&r) != OK) {
+  if(sys_inb(RTC_IO, (unsigned long*)&r) != 0) {
 	printf("cmos: inb failed of %x (index %x) failed\n", RTC_IO, reg_addr);
 	exit(1);
   }
@@ -396,11 +396,11 @@ void set_time(struct tm *t)
 
 void write_register(int reg_addr, int value)
 {
-  if(sys_outb(RTC_INDEX, reg_addr) != OK) {
+  if(sys_outb(RTC_INDEX, reg_addr) != 0) {
 	printf("cmos: outb failed of %x\n", RTC_INDEX);
 	exit(1);
   }
-  if(sys_outb(RTC_IO, value) != OK) {
+  if(sys_outb(RTC_IO, value) != 0) {
 	printf("cmos: outb failed of %x (index %x)\n", RTC_IO, reg_addr);
 	exit(1);
   }

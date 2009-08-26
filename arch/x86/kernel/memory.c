@@ -288,7 +288,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 			kprintf("SYSTEM:umap_virtual: umap_local failed\n");
 			phys = 0;
 		} else {
-			if(vm_lookup(rp, linear, (vir_bytes*)&phys, NULL) != OK) {
+			if(vm_lookup(rp, linear, (vir_bytes*)&phys, NULL) != 0) {
 				kprintf("SYSTEM:umap_virtual: vm_lookup of %s: seg 0x%lx: 0x%lx failed\n", rp->p_name, seg, vir_addr);
 				phys = 0;
 			}
@@ -334,7 +334,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 
 	if(!HASPT(proc)) {
 		*physical = virtual;
-		return OK;
+		return 0;
 	}
 
 	/* Retrieve page directory entry. */
@@ -350,7 +350,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 		kprintf("kernel stack: ");
 		util_stacktrace();
 #endif
-		return EFAULT;
+		return -EFAULT;
 	}
 
 	/* Retrieve page table entry. */
@@ -366,7 +366,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 		kprintf("kernel stack: ");
 		util_stacktrace();
 #endif
-		return EFAULT;
+		return -EFAULT;
 	}
 
 	if(ptent) *ptent = pte_v;
@@ -375,7 +375,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 	*physical = I386_VM_PFA(pte_v);
 	*physical += virtual % I386_PAGE_SIZE;
 
-	return OK;
+	return 0;
 }
 
 /* From virtual address v in process p,
@@ -386,7 +386,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 	int r; 				\
 	if(!(p)) { (d) = (v); } 	\
 	else {				\
-		if((r=vm_lookup((p), (v), &(d), flagsp)) != OK) { \
+		if((r=vm_lookup((p), (v), &(d), flagsp)) != 0) { \
 			kprintf("vm_copy: lookup failed of 0x%lx in %d (%s)\n"\
 				"kernel stacktrace: ", (v), (p)->p_endpoint, \
 					(p)->p_name);		\
@@ -428,7 +428,7 @@ int vm_copy(vir_bytes src, struct proc *srcproc,
 			kprintf("vm_copy: copying to nonwritable page\n");
 			kprintf("kernel stack: ");
 			util_stacktrace();
-			return EFAULT;
+			return -EFAULT;
 		}
 		phys_copy(p_src, p_dst, n);
 
@@ -439,7 +439,7 @@ int vm_copy(vir_bytes src, struct proc *srcproc,
 		dst += n;
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -471,7 +471,7 @@ int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
 	while(bytes > 0) {
 		u32_t phys;
 
-		if((r=vm_lookup(targetproc, vir_buf, (vir_bytes*)&phys, NULL)) != OK) {
+		if((r=vm_lookup(targetproc, vir_buf, (vir_bytes*)&phys, NULL)) != 0) {
 			kprintf("vm_contiguous: vm_lookup failed, %d\n", r);
 			kprintf("kernel stack: ");
 			util_stacktrace();
@@ -516,7 +516,7 @@ int vm_checkrange(struct proc *caller, struct proc *target,
 	int r;
 
 	if(!HASPT(target))
-		return OK;
+		return 0;
 
 	/* If caller has had a reply to this request, return it. */
 	if(RTS_ISSET(caller, VMREQUEST)) {
@@ -553,7 +553,7 @@ int vm_checkrange(struct proc *caller, struct proc *target,
 		/* If page exists and it's writable if desired, we're OK
 		 * for this page.
 		 */
-		if(vm_lookup(target, v, (vir_bytes*)&phys, &flags) == OK &&
+		if(vm_lookup(target, v, (vir_bytes*)&phys, &flags) == 0 &&
 			!(wrfl && !(flags & I386_VM_WRITE))) {
 			if(vm_checkrange_verbose) {
 #if 0
@@ -628,7 +628,7 @@ int vm_checkrange(struct proc *caller, struct proc *target,
 		return VMSUSPEND;
 	}
 
-	return OK;
+	return 0;
 }
 
 char *flagstr(u32_t e, int dir)
@@ -716,7 +716,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
   struct proc *procs[2];
 
   /* Check copy count. */
-  if (bytes <= 0) return(EDOM);
+  if (bytes <= 0) return(-EDOM);
 
   /* Do some more checks and map virtual addresses to physical addresses. */
   vir_addr[_SRC_] = src_addr;
@@ -739,7 +739,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
       switch(type) {
       case LOCAL_SEG:
       case LOCAL_VM_SEG:
-	  if(!p) return EDEADSRCDST;
+	  if(!p) return -EDEADSRCDST;
           seg_index = vir_addr[i]->segment & SEGMENT_INDEX;
 	  if(type == LOCAL_SEG)
 	          phys_addr[i] = umap_local(p, seg_index, vir_addr[i]->offset,
@@ -755,7 +755,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 	  }
           break;
       case REMOTE_SEG:
-	  if(!p) return EDEADSRCDST;
+	  if(!p) return -EDEADSRCDST;
           seg_index = vir_addr[i]->segment & SEGMENT_INDEX;
           phys_addr[i] = umap_remote(p, seg_index, vir_addr[i]->offset, bytes);
           break;
@@ -772,13 +772,13 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 	  break;
       default:
 	  kprintf("virtual_copy: strange type 0x%x\n", type);
-          return(EINVAL);
+          return(-EINVAL);
       }
 
       /* Check if mapping succeeded. */
       if (phys_addr[i] <= 0 && vir_addr[i]->segment != PHYS_SEG)  {
-      kprintf("virtual_copy EFAULT\n");
-          return(EFAULT);
+      kprintf("virtual_copy -EFAULT\n");
+          return(-EFAULT);
       }
   }
 
@@ -792,12 +792,12 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
   if(NOPT(procs[_SRC_]) && NOPT(procs[_DST_])) {
 	/* Without vm, address ranges actually are physical. */
 	phys_copy(phys_addr[_SRC_], phys_addr[_DST_], (phys_bytes) bytes);
-	r = OK;
+	r = 0;
   } else {
 	/* With vm, addresses need further interpretation. */
 	r = vm_copy(phys_addr[_SRC_], procs[_SRC_], 
 		phys_addr[_DST_], procs[_DST_], (phys_bytes) bytes);
-	if(r != OK) {
+	if(r != 0) {
 		kprintf("vm_copy: %lx to %lx failed\n",
 			phys_addr[_SRC_],phys_addr[_DST_]);
 	}
@@ -846,12 +846,12 @@ int arch_umap(struct proc *pr, vir_bytes offset, vir_bytes count,
 	switch(seg) {
 		case BIOS_SEG:
 			*addr = umap_bios(offset, count);
-			return OK;
+			return 0;
 	}
 
-	/* This must be EINVAL; the umap fallback function in
+	/* This must be -EINVAL; the umap fallback function in
 	 * lib/syslib/alloc_util.c depends on it to detect an
 	 * older kernel (as opposed to mapping error).
 	 */
-	return EINVAL;
+	return -EINVAL;
 }

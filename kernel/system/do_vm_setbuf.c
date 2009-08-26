@@ -34,5 +34,5 @@ message *m_ptr;			/* pointer to request message */
 		vm_size, vm_base, vm_mem_high);
 #endif
 
-	return OK;
+	return 0;
 }

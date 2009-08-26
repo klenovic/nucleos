@@ -59,7 +59,7 @@ message *mp;
 		flags= msgtable[first_slot].flags;
 		if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
 		{
-			if (msgtable[first_slot].result != OK)
+			if (msgtable[first_slot].result != 0)
 			{
 #if 0
 				printf(
@@ -84,7 +84,7 @@ message *mp;
 	{
 		/* Tell the kernel to stop processing */
 		r= senda(NULL, 0);
-		if (r != OK)
+		if (r != 0)
 			panic(__FILE__, "asynsend: senda failed", r);
 
 		dst_ind= 0;
@@ -94,7 +94,7 @@ message *mp;
 			if ((flags & (AMF_VALID|AMF_DONE)) ==
 				(AMF_VALID|AMF_DONE))
 			{
-				if (msgtable[src_ind].result != OK)
+				if (msgtable[src_ind].result != 0)
 				{
 #if 0
 					printf(

@@ -40,15 +40,15 @@ message *m_ptr;			/* pointer to request message */
   if (PM_PROC_NR == who_p) {
       if (m_ptr->PR_ENDPT != SELF) { 		/* PM tries to exit self */
           if(!isokendpt(m_ptr->PR_ENDPT, &exit_e)) /* get exiting process */
-	     return EINVAL;
+	     return -EINVAL;
           clear_proc(proc_addr(exit_e));	/* exit a user process */
-          return(OK);				/* report back to PM */
+          return 0;				/* report back to PM */
       }
   } 
 
   /* The PM or some other system process requested to be exited. */
   clear_proc(proc_addr(who_p));
-  return(EDONTREPLY);
+  return(-EDONTREPLY);
 }
 
 /*===========================================================================*

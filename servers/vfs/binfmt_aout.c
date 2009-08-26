@@ -194,7 +194,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 	char buf[1024];
 
 	/* Make sure that the file is big enough */
-	if (vp->v_size < off+seg_bytes) return EIO;
+	if (vp->v_size < off+seg_bytes) return -EIO;
 
 	if (seg != D) {
 		/* We have to use a copy loop until safecopies support segments */
@@ -219,7 +219,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 
 			if (cum_io_incr != n) {
 				printf("read_seg segment has not been read properly by exec()\n");
-				return EIO;
+				return -EIO;
 			}
 
 			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);

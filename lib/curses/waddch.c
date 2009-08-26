@@ -54,9 +54,9 @@ int c;
 	for (newx = ((x / ts) + 1) * ts; x < newx; x++) {
 		if (waddch(win, ' ') == ERR) return(ERR);
 		if (win->_curx == 0)	/* if tab to next line */
-			return(OK);	/* exit the loop */
+			return 0;	/* exit the loop */
 	}
-	return(OK);
+	return 0;
 
       case '\n':
 	if (NONL) x = 0;
@@ -100,5 +100,5 @@ int c;
   }				/* switch */
   win->_curx = x;
   win->_cury = y;
-  return(OK);
+  return 0;
 }

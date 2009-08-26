@@ -43,10 +43,10 @@ int do_utime()
   len = m_in.utime_length;
   if (len == 0) len = m_in.utime_strlen;
 
-  if (fetch_name(m_in.utime_file, len, M1) != OK) return(err_code);
+  if (fetch_name(m_in.utime_file, len, M1) != 0) return(err_code);
   
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK) return r;
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
 
   /* Fill in request fields.*/
   if (m_in.utime_length == 0) {
@@ -58,9 +58,9 @@ int do_utime()
 
   uid= fp->fp_effuid;
 
-  r= OK;
-  if (vp->v_uid != uid && uid != SU_UID) r = EPERM;
-  if (m_in.utime_length == 0 && r != OK)
+  r= 0;
+  if (vp->v_uid != uid && uid != SU_UID) r = -EPERM;
+  if (m_in.utime_length == 0 && r != 0)
   {
 	/* With a null times pointer, updating the times (to the current time)
 	 * is allow if the object is writable. 
@@ -68,10 +68,10 @@ int do_utime()
 	r = forbidden(vp, W_BIT, 0 /*!use_realuid*/);
   }
 
-  if (r == OK)
+  if (r == 0)
   	r = read_only(vp);
 
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp);
 	return r;

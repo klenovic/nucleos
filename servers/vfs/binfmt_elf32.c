@@ -304,7 +304,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 
 	/* Make sure that the file is big enough */
 	if (vp->v_size < off + seg_bytes)
-		return EIO;
+		return -EIO;
 
 	if (seg != D) {
 		/* We have to use a copy loop until safecopies support segments */
@@ -328,7 +328,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 
 			if (cum_io_incr != n) {
 				app_err("Segment 0x%X has not been read properly!\n", seg);
-				return EIO;
+				return -EIO;
 			}
 
 			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
@@ -546,7 +546,7 @@ int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp)
 
 	if (cum_io_incr != sizeof(elf32_ehdr_t)) {
 		app_err("Segment has not been read properly!\n");
-		return EIO;
+		return -EIO;
 	}
 
 	return 0;
@@ -569,7 +569,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 		phdrs_sz = ehdr->e_phnum*sizeof(elf32_phdr_t);
 	else {
 		app_err("Missing program segment headers\n");
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	/* allocate space for program headers */
@@ -577,7 +577,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 
 	if (!phdrs) {
 		app_err("Can't allocate memory for program segment headers");
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	/* Issue request */

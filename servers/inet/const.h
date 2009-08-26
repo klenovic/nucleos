@@ -31,8 +31,6 @@ Copyright 1995 Philip Homburg
 #define where()	printf("%s, %d: ", __FILE__, __LINE__)
 
 #define NW_SUSPEND	SUSPEND
-#define NW_WOULDBLOCK	EWOULDBLOCK
-#define NW_OK		OK
 
 #define BUF_S		512
 

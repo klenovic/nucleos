@@ -52,7 +52,7 @@ message *m;					/* notification message */
 #if 0
 		report("LOG","cpf_grant_direct failed for TTY", errno);
 #endif
-		return EDONTREPLY;
+		return -EDONTREPLY;
 	}
 
 	/* Ask TTY driver for log output */
@@ -61,19 +61,19 @@ message *m;					/* notification message */
 	r= sendrec(TTY_PROC_NR, &mess);
 	cpf_revoke(gid);
 
-	if (r == OK) r= mess.m_type;
-	if (r != OK)
+	if (r == 0) r= mess.m_type;
+	if (r != 0)
 	{
 		report("LOG","couldn't get copy of kmessages from TTY", r);
-		return EDONTREPLY;
+		return -EDONTREPLY;
 	}
   }
   else
   {
 	/* Try to get a fresh copy of the buffer with kernel messages. */
-	if ((r=sys_getkmessages(&kmess)) != OK) {
+	if ((r=sys_getkmessages(&kmess)) != 0) {
 		report("LOG","couldn't get copy of kmessages", r);
-		return EDONTREPLY;
+		return -EDONTREPLY;
 	}
 	prev_nextp= &kernel_prev_next;
   }
@@ -103,7 +103,7 @@ message *m;					/* notification message */
    * kernel messages buffer to print next time a notification arrives.
    */
   *prev_nextp = kmess.km_next;
-  return EDONTREPLY;
+  return -EDONTREPLY;
 }
 
 /*===========================================================================*
@@ -134,14 +134,14 @@ int do_diagnostics(message *m, int safe)
       } else {
         r = sys_datacopy(m->m_source, src+offset, SELF, (vir_bytes) &c, 1);
       }
-      if(r != OK) break;
+      if(r != 0) break;
       offset ++;
       count --;
       diagbuf[i++] = c;
   }
   log_append(diagbuf, i);
 
-  if(m->m_type == ASYN_DIAGNOSTICS_OLD) return EDONTREPLY;
+  if(m->m_type == ASYN_DIAGNOSTICS_OLD) return -EDONTREPLY;
 
-  return OK;
+  return 0;
 }

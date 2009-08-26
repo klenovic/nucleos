@@ -107,7 +107,7 @@ int main(void)
 	  {
 		printf("RS: got unauthorized request %d from endpoint %d\n",
 			call_nr, m.m_source);
-		m.m_type = EPERM;
+		m.m_type = -EPERM;
 		reply(who_e, &m);
 		continue;
 	  }
@@ -124,11 +124,11 @@ int main(void)
           default: 
               printf("Warning, RS got unexpected request %d from %d\n",
                   m.m_type, m.m_source);
-              result = EINVAL;
+              result = -EINVAL;
           }
 
           /* Finally send reply message, unless disabled. */
-          if (result != EDONTREPLY) {
+          if (result != -EDONTREPLY) {
 	      m.m_type = result;
               reply(who_e, &m);
           }
@@ -157,11 +157,11 @@ static void init_server(void)
   /* Initialize the system process table. Use the boot image from the kernel
    * and the device map from the FS to gather all needed information.
    */
-  if ((s = sys_getimage(image)) != OK) 
+  if ((s = sys_getimage(image)) != 0) 
       panic("RS","warning: couldn't get copy of image table", s);
 
   /* Set alarm to periodically check driver status. */
-  if (OK != (s=sys_setalarm(RS_DELTA_T, 0)))
+  if ((s=sys_setalarm(RS_DELTA_T, 0)) != 0)
       panic("RS", "couldn't set alarm", s);
 
   /* See if we run in verbose mode. */
@@ -211,7 +211,7 @@ message *m_in;				/* pointer to message */
 {
     int s;				/* receive status */
 
-    if (OK != (s=receive(ANY, m_in))) 	/* wait for message */
+    if ((s=receive(ANY, m_in)) != 0) 	/* wait for message */
         panic("RS","receive failed", s);
 }
 
@@ -226,7 +226,7 @@ message *m_out;                         /* reply message */
     int s;				/* send status */
 
     s = sendnb(who, m_out);		/* send the message */
-    if (s != OK)
+    if (s != 0)
         printf("RS: unable to send reply to %d: %d\n", who, s);
 }
 

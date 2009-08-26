@@ -95,20 +95,20 @@ message *m_ptr;					/* request message */
   if (m_ptr->DS_KEY_LEN > DS_MAX_KEYLEN || m_ptr->DS_KEY_LEN < 2) {
 	printf("DS: bogus key length (%d) from %d\n", m_ptr->DS_KEY_LEN,
 		m_ptr->m_source);
-	return EINVAL;
+	return -EINVAL;
       }
 
   /* Check type info. */
   type = m_ptr->DS_FLAGS & DS_TYPE_MASK;
   if(type != DS_TYPE_U32 && type != DS_TYPE_STR) {
 	printf("DS: bogus type code %lx from %d\n", type, m_ptr->m_source);
-	return EINVAL;
+	return -EINVAL;
   }
 
   /* Copy name from caller. */
   if ((r=sys_safecopyfrom(m_ptr->m_source,
 	(cp_grant_id_t) m_ptr->DS_KEY_GRANT, 0, 
-	(vir_bytes) key_name, m_ptr->DS_KEY_LEN, D)) != OK) {
+	(vir_bytes) key_name, m_ptr->DS_KEY_LEN, D)) != 0) {
 	printf("DS: publish: copy failed from %d: %d\n", m_ptr->m_source, r);
 	return r;
   } 
@@ -119,7 +119,7 @@ message *m_ptr;					/* request message */
   /* See if it already exists. */
   if (!find_key(key_name, &dsp, type)) {		/* look up key */
       if (nr_in_use >= NR_DS_KEYS) {
-          return(EAGAIN);                               /* store is full */
+          return(-EAGAIN);                               /* store is full */
       } else {
           dsp = &ds_store[nr_in_use];                   /* new slot found */
 	  strcpy(dsp->ds_key, key_name);
@@ -140,12 +140,12 @@ message *m_ptr;					/* request message */
 	  if(m_ptr->DS_VAL_LEN < 1 || m_ptr->DS_VAL_LEN > DS_MAX_VALLEN) {
 	    printf("DS: publish: bogus len from %d: %d\n",
 	      m_ptr->m_source, m_ptr->DS_VAL_LEN);
-	    return EINVAL;
+	    return -EINVAL;
 	  }
 
 	  if((r=sys_safecopyfrom(m_ptr->m_source, m_ptr->DS_VAL, 0,
 		  (vir_bytes) dsp->ds_val.ds_val_str,
-		  m_ptr->DS_VAL_LEN, D)) != OK) {
+		  m_ptr->DS_VAL_LEN, D)) != 0) {
 		  printf("DS: publish: str copy failed from %d: %d\n",
 		  m_ptr->m_source, r);
 		  return r;
@@ -159,7 +159,7 @@ message *m_ptr;					/* request message */
   /* If anyone has a matching subscription, update them. */
   check_subscribers(dsp);
 
-  return(OK);
+  return 0;
 }
 
 
@@ -177,13 +177,13 @@ message *m_ptr;					/* request message */
   if (m_ptr->DS_KEY_LEN > DS_MAX_KEYLEN || m_ptr->DS_KEY_LEN < 1) {
 	printf("DS: bogus key length (%d) from %d\n", m_ptr->DS_KEY_LEN,
 		m_ptr->m_source);
-	return EINVAL;
+	return -EINVAL;
   }
 
   /* Copy name from caller. */
   if ((r=sys_safecopyfrom(m_ptr->m_source,
 	(cp_grant_id_t) m_ptr->DS_KEY_GRANT, 0, 
-	(vir_bytes) key_name, m_ptr->DS_KEY_LEN, D)) != OK) {
+	(vir_bytes) key_name, m_ptr->DS_KEY_LEN, D)) != 0) {
 	printf("DS: retrieve: copy failed from %d: %d\n", m_ptr->m_source, r);
 	return r;
   }
@@ -207,7 +207,7 @@ message *m_ptr;					/* request message */
 		if(len > m_ptr->DS_VAL_LEN)
 			len = m_ptr->DS_VAL_LEN;
   		if ((r=sys_safecopyto(m_ptr->m_source, m_ptr->DS_VAL,
-			0, (vir_bytes) dsp->ds_val.ds_val_str,len, D)) != OK) {
+			0, (vir_bytes) dsp->ds_val.ds_val_str,len, D)) != 0) {
 			printf("DS: retrieve: copy failed to %d: %d\n",	
 				m_ptr->m_source, r);
 			return r;
@@ -219,9 +219,9 @@ message *m_ptr;					/* request message */
 		break;
 
           }
-      return(OK);					/* report success */
+      return 0;					/* report success */
   }
-  return(ESRCH);					/* key not found */
+  return(-ESRCH);					/* key not found */
       }
 
 /*===========================================================================*
@@ -237,7 +237,7 @@ message *m_ptr;					/* request message */
  */
 	struct data_store *dsp;
 	int r, s, d, type = m_ptr->DS_FLAGS & DS_TYPE_MASK;
-	if(!type) return EINVAL;
+	if(!type) return -EINVAL;
 	for(s = 0; s < NR_DS_SUBS; s++) {
 		int len;
 		if(!(ds_subs[s].sub_flags & DS_IN_USE))
@@ -269,7 +269,7 @@ message *m_ptr;					/* request message */
   			if ((r=sys_safecopyto(m_ptr->m_source,
 				(cp_grant_id_t) m_ptr->DS_KEY_GRANT, 0,
 				(vir_bytes) ds_store[d].ds_key,
-				len, D)) != OK)
+				len, D)) != 0)
 				return r;
 
 			/* Now copy the value. */
@@ -283,7 +283,7 @@ message *m_ptr;					/* request message */
 						m_ptr->DS_VAL, 0,
 						(vir_bytes) ds_store[d].
 						  ds_val.ds_val_str,
-						len, D)) != OK)
+						len, D)) != 0)
 						return r;
 					break;
 				case DS_TYPE_U32:
@@ -296,11 +296,11 @@ message *m_ptr;					/* request message */
 						type);
 			}
 
-			return OK;
+			return 0;
 		}
   }
 
-  return(ESRCH);                                        /* key not found */
+  return(-ESRCH);                                        /* key not found */
 }
 
 int do_subscribe(m_ptr)
@@ -316,7 +316,7 @@ message *m_ptr;					/* request message */
    * data for the given key. 
    */
   if(m_ptr->DS_KEY_LEN < 2 || m_ptr->DS_KEY_LEN > DS_MAX_KEYLEN)
-	return EINVAL;
+	return -EINVAL;
 
   /* Copy name from caller. Anchor the subscription with "^regexp$" so
    * substrings don't match. The caller probably will not expect this,
@@ -325,7 +325,7 @@ message *m_ptr;					/* request message */
   regex[0] = '^';
   if ((s=sys_safecopyfrom(m_ptr->m_source,
 	(cp_grant_id_t) m_ptr->DS_KEY_GRANT, 0, 
-	(vir_bytes) regex + 1, m_ptr->DS_KEY_LEN, D)) != OK) {
+	(vir_bytes) regex + 1, m_ptr->DS_KEY_LEN, D)) != 0) {
 	printf("DS: retrieve: copy failed from %d: %d\n", m_ptr->m_source, s);
 	return s;
   }
@@ -340,14 +340,14 @@ message *m_ptr;					/* request message */
 
   if(s >= NR_DS_SUBS) {
 	printf("DS: no space for subscription by %d.\n", m_ptr->m_source);
-	return ENOSPC;
+	return -ENOSPC;
 }
 
   /* Compile regular expression. */
   if((e=regcomp(&ds_subs[s].sub_regex, regex, REG_EXTENDED)) != 0) {
 	regerror(e, &ds_subs[s].sub_regex, errbuf, sizeof(errbuf));
 	printf("DS: subscribe: regerror: %s\n", errbuf);
-	return EINVAL;
+	return -EINVAL;
   }
   type = (m_ptr->DS_FLAGS & DS_TYPE_MASK);
   ds_subs[s].sub_flags = DS_IN_USE | type;
@@ -369,7 +369,7 @@ message *m_ptr;					/* request message */
       if(n) notify(ds_subs[s].sub_owner);
    }
 
-   return OK;
+   return 0;
 }
 
 
@@ -392,16 +392,16 @@ message *m_ptr;
         break; 
 
     default:
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   dst_proc = m_ptr->m_source;
   dst_addr = (vir_bytes) m_ptr->m1_p1;
-  if (OK != (s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len))) {
+  if ((s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len)) != 0) {
 	printf("DS: copy failed: %d\n", s);
         return(s);
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*

@@ -23,5 +23,5 @@ char *str;
   while (*str) {
 	if (waddch(win, *str++) == ERR) return(ERR);
   }
-  return(OK);
+  return 0;
 }

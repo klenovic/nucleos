@@ -221,7 +221,7 @@ static void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
 		vm_assert(!(phys % I386_PAGE_SIZE)); 
 		FREE_MEM(ABS2CLICK(phys), pages);
 		if(pt_writemap(&vmp->vm_pt, arch_vir2map(vmp, vir),
-			MAP_NONE, pages*I386_PAGE_SIZE, 0, WMF_OVERWRITE) != OK)
+			MAP_NONE, pages*I386_PAGE_SIZE, 0, WMF_OVERWRITE) != 0)
 				vm_panic("vm_freepages: pt_writemap failed",
 					NO_NUM);
 	} else {
@@ -333,7 +333,7 @@ void *vm_allocpages(phys_bytes *phys, int pages, int reason)
 
 	/* Map this page into our address space. */
 	if((r=pt_writemap(pt, loc, *phys, bytes,
-		I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE, 0)) != OK) {
+		I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE, 0)) != 0) {
 		FREE_MEM(newpage, CLICKSPERPAGE * pages / I386_PAGE_SIZE);
 		return NULL;
 	}
@@ -366,7 +366,7 @@ static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 
 	/* Get storage for the page table. */
         if(!(pt->pt_pt[pde] = vm_allocpages((phys_bytes*)&pt_phys, 1, VMP_PAGETABLE)))
-		return ENOMEM;
+		return -ENOMEM;
 
 	for(i = 0; i < I386_VM_PT_ENTRIES; i++)
 		pt->pt_pt[pde][i] = 0;	/* Empty entry. */
@@ -380,7 +380,7 @@ static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 	vm_assert(flags & I386_VM_PRESENT);
 	PT_SANE(pt);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -430,7 +430,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 		if(!(pt->pt_dir[pde] & I386_VM_PRESENT)) {
 			int r;
 			vm_assert(!pt->pt_dir[pde]);
-			if((r=pt_ptalloc(pt, pde, flags)) != OK) {
+			if((r=pt_ptalloc(pt, pde, flags)) != 0) {
 				/* Couldn't do (complete) mapping.
 				 * Don't bother freeing any previously
 				 * allocated page tables, they're
@@ -481,7 +481,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 	SANITYCHECK(SCL_FUNCTIONS);
 	PT_SANE(pt);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -497,7 +497,7 @@ int pt_new(pt_t *pt)
 	int i;
 
         if(!(pt->pt_dir = vm_allocpages((phys_bytes*)&pt->pt_dir_phys, 1, VMP_PAGEDIR))) {
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	for(i = 0; i < I386_VM_DIR_ENTRIES; i++) {
@@ -509,10 +509,10 @@ int pt_new(pt_t *pt)
 	pt->pt_virtop = 0;
 
         /* Map in kernel. */
-        if(pt_mapkernel(pt) != OK)
+        if(pt_mapkernel(pt) != 0)
                 vm_panic("pt_new: pt_mapkernel failed", NO_NUM);
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -544,7 +544,7 @@ void pt_init(void)
                 if(!(sparepages[s].page = aalloc(I386_PAGE_SIZE)))
                         vm_panic("pt_init: aalloc for spare failed", NO_NUM);
                 if((r=sys_umap(SELF, VM_D, (vir_bytes) sparepages[s].page,
-                        I386_PAGE_SIZE, (phys_bytes*)&sparepages[s].phys)) != OK)
+                        I386_PAGE_SIZE, (phys_bytes*)&sparepages[s].phys)) != 0)
                         vm_panic("pt_init: sys_umap failed", r);
         }
 
@@ -553,7 +553,7 @@ void pt_init(void)
         /* Make new page table for ourselves, partly copied
          * from the current one.
          */
-        if(pt_new(newpt) != OK)
+        if(pt_new(newpt) != 0)
                 vm_panic("pt_init: pt_new failed", NO_NUM); 
 
         /* Initial (current) range of our virtual address space. */
@@ -580,10 +580,10 @@ void pt_init(void)
                  * so we can move our segments.
                  */ 
                 if(pt_writemap(newpt, v+moveup, v, I386_PAGE_SIZE,
-                        I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != OK)
+                        I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != 0)
                         vm_panic("pt_init: pt_writemap failed", NO_NUM);
                 if(pt_writemap(newpt, v, v, I386_PAGE_SIZE,
-                        I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != OK)
+                        I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != 0)
                         vm_panic("pt_init: pt_writemap failed", NO_NUM);
         }
 
@@ -594,7 +594,7 @@ void pt_init(void)
 
 #if 0
         /* Map in kernel. */
-        if(pt_mapkernel(newpt) != OK)
+        if(pt_mapkernel(newpt) != 0)
                 vm_panic("pt_init: pt_mapkernel failed", NO_NUM);
 
 	/* Allocate us a page table in which to remember page directory
@@ -622,7 +622,7 @@ void pt_init(void)
                 (vmp->vm_arch.vm_seg[S].mem_vir +
                 vmp->vm_arch.vm_seg[S].mem_len) << CLICK_SHIFT;
        
-        if((s=sys_newmap(VM_PROC_NR, vmp->vm_arch.vm_seg)) != OK)
+        if((s=sys_newmap(VM_PROC_NR, vmp->vm_arch.vm_seg)) != 0)
                 vm_panic("VM: pt_init: sys_newmap failed", s);
        
         /* Back to reality - this is where the stack actually is. */
@@ -631,7 +631,7 @@ void pt_init(void)
         /* Wipe old mappings from VM. */
         for(v = lo; v < hi; v += I386_PAGE_SIZE)  {
                 if(pt_writemap(newpt, v, MAP_NONE, I386_PAGE_SIZE,
-                        0, WMF_OVERWRITE) != OK)
+                        0, WMF_OVERWRITE) != 0)
                         vm_panic("pt_init: pt_writemap failed", NO_NUM);
         }
        
@@ -754,16 +754,16 @@ int pt_mapkernel(pt_t *pt)
 	} else {
         	/* Map in text. flags: don't write, supervisor only */
         	if((r=pt_writemap(pt, KERNEL_TEXT, KERNEL_TEXT, KERNEL_TEXT_LEN,
-			I386_VM_PRESENT|global, 0)) != OK)
+			I386_VM_PRESENT|global, 0)) != 0)
 			return r;
  
         	/* Map in data. flags: read-write, supervisor only */
         	if((r=pt_writemap(pt, KERNEL_DATA, KERNEL_DATA, KERNEL_DATA_LEN,
-			I386_VM_PRESENT|I386_VM_WRITE|global, 0)) != OK)
+			I386_VM_PRESENT|I386_VM_WRITE|global, 0)) != 0)
 			return r;
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -828,7 +828,7 @@ static u32_t ismapped = MAP_NONE;
 			wantmapped, I386_PAGE_SIZE, 			\
 			I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE, \
 				MAPFLAGS); 				\
-		if(r != OK)						\
+		if(r != 0)						\
 			vm_panic("PHYS_MAP: pt_writemap", NO_NUM);	\
 		ismapped = wantmapped;					\
 		/* pt_bind() flushes TLB. */				\
@@ -839,8 +839,8 @@ static u32_t ismapped = MAP_NONE;
 #define PHYSMAGIC 0x7b9a0590
 
 #if SANITYCHECKS
-#define PHYS_UNMAP if(OK != pt_writemap(&vmp->vm_pt, varmap_loc, MAP_NONE,\
-	I386_PAGE_SIZE, 0, WMF_OVERWRITE)) {				\
+#define PHYS_UNMAP if(pt_writemap(&vmp->vm_pt, varmap_loc, MAP_NONE,	\
+	I386_PAGE_SIZE, 0, WMF_OVERWRITE) != 0) {			\
 		vm_panic("PHYS_UNMAP: pt_writemap failed", NO_NUM); }
 	ismapped = MAP_NONE;
 #endif

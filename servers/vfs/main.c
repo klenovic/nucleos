@@ -225,7 +225,7 @@ int main(void)
 				printf("VFS: illegal %d system call by %d\n",
 					call_nr, who_e);
 			} else if (fp->fp_pid == PID_FREE) {
-				error = ENOSYS;
+				error = -ENOSYS;
 				printf("FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
 					who_e, call_nr, m_in.endpt1);
 			} else {
@@ -244,7 +244,7 @@ int main(void)
 		SANITYCHECK;
 	}
 
-	return(OK);				/* shouldn't come here */
+	return 0;				/* shouldn't come here */
 }
 
 /*===========================================================================*
@@ -309,7 +309,7 @@ static void get_work(void)
 	for(;;) {
 		int r;
 		/* Normal case.  No one to revive. */
-		if ((r=receive(ANY, &m_in)) != OK)
+		if ((r=receive(ANY, &m_in)) != 0)
 			panic(__FILE__,"fs receive error", r);
 
 		who_e = m_in.m_source;
@@ -339,7 +339,7 @@ static void get_work(void)
 /**
  * @brief Send a reply to a user process
  * @param whom  process to reply to
- * @param result  result of the call (usually OK or error #)
+ * @param result  result of the call (usually 0 or error #)
  * @note If the send fails, just ignore it.
  */
 void reply(int whom, int result)
@@ -353,7 +353,7 @@ void reply(int whom, int result)
 	m_out.reply_type = result;
 	s = sendnb(whom, &m_out);
 
-	if (s != OK)
+	if (s != 0)
 		printf("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);
 }
 
@@ -379,7 +379,7 @@ static void fs_init(void)
 	 * Then, stop and synchronize with the PM.
 	 */
 	do {
-		if (OK != (s=receive(PM_PROC_NR, &mess)))
+		if ((s=receive(PM_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"FS couldn't receive from PM", s);
 
 		if (NONE == mess.PR_ENDPT)
@@ -399,7 +399,7 @@ static void fs_init(void)
 	 
 	} while (TRUE);			/* continue until process NONE */
 
-	mess.m_type = OK;			/* tell PM that we succeeded */
+	mess.m_type = 0;			/* tell PM that we succeeded */
 	s = send(PM_PROC_NR, &mess);		/* send synchronization message */
 
 	/* All process table entries have been set. Continue with FS initialization.
@@ -446,7 +446,7 @@ static void fs_init(void)
  *===========================================================================*/
 static void init_root(void)
 {
-	int r = OK;
+	int r = 0;
 	struct vmnt *vmp;
 	struct vnode *root_node;
 	struct dmap *dp;
@@ -461,7 +461,7 @@ static void init_root(void)
 	/* Wait FS login message */
 	if (last_login_fs_e != ROOT_FS_E) {
 		/* Wait FS login message */
-		if (receive(ROOT_FS_E, &m) != OK) {
+		if (receive(ROOT_FS_E, &m) != 0) {
 			printf("VFS: Error receiving login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",
@@ -505,7 +505,7 @@ static void init_root(void)
 	/* Issue request */
 	r = req_readsuper(ROOT_FS_E, label, root_dev, 0 /*!readonly*/, 1 /*isroot*/, &resX);
 
-	if (r != OK) {
+	if (r != 0) {
 		panic(__FILE__,"Cannot read superblock from root", r);
 	}
 	
@@ -545,7 +545,7 @@ static void service_pm(void)
 	for (;;) {
 		m.m_type= PM_GET_WORK;
 		r= sendrec(PM_PROC_NR, &m);
-		if (r != OK) {
+		if (r != 0) {
 			panic("VFS", "service_pm: sendrec failed", r);
 		}
 
@@ -591,7 +591,7 @@ static void service_pm(void)
 
 			r= send(PM_PROC_NR, &m);
 
-			if (r != OK)
+			if (r != 0)
 				panic(__FILE__, "service_pm: send failed", r);
 			break;
 
@@ -609,7 +609,7 @@ static void service_pm(void)
 			m.m_type= PM_REBOOT_REPLY;
 			r = send(PM_PROC_NR, &m);
 
-			if (r != OK)
+			if (r != 0)
 				panic(__FILE__, "service_pm: send failed", r);
 			break;
 
@@ -624,7 +624,7 @@ static void service_pm(void)
 			m.PM_EXEC_STATUS= r;
 			r = send(PM_PROC_NR, &m);
 
-			if (r != OK)
+			if (r != 0)
 				panic(__FILE__, "service_pm: send failed", r);
 			break;
 
@@ -638,7 +638,7 @@ static void service_pm(void)
 			m.PM_CORE_STATUS = r;
 			
 			r = send(PM_PROC_NR, &m);
-			if (r != OK)
+			if (r != 0)
 				panic(__FILE__, "service_pm: send failed", r);
 			break;
 

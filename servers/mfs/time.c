@@ -29,13 +29,13 @@ int fs_utime()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_utime() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* Only the owner of a file or the super_user can change its time. */
-  r = OK;
-  if (read_only(rip) != OK) r = EROFS;	/* not even su can touch if R/O */
-  if (r == OK) {
+  r = 0;
+  if (read_only(rip) != 0) r = -EROFS;	/* not even su can touch if R/O */
+  if (r == 0) {
 	rip->i_atime = fs_m_in.REQ_ACTIME;
 	rip->i_mtime = fs_m_in.REQ_MODTIME;
 
@@ -50,6 +50,6 @@ printf("MFS(%d) get_inode by fs_utime() failed\n", SELF_E);
 int fs_stime()
 {
   boottime = fs_m_in.REQ_BOOTTIME;
-  return OK;
+  return 0;
 }
 

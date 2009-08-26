@@ -46,22 +46,22 @@ int do_link()
   endpoint_t linked_fs_e, link_lastdir_fs_e;
   struct vnode *vp_o, *vp_d;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) 
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) 
         return(err_code);
         
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp_o)) != OK) return r;
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp_o)) != 0) return r;
 
   linked_fs_e = vp_o->v_fs_e;
 
   /* Does the final directory of 'name2' exist? */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != OK) {
+  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
 	put_vnode(vp_o);
 	return(err_code);
   }
 
   /* Request lookup */
-  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp_d)) != OK)
+  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp_d)) != 0)
   {
 	put_vnode(vp_o);
 	return r;
@@ -74,7 +74,7 @@ int do_link()
   {
 	put_vnode(vp_o);
 	put_vnode(vp_d);
-        return EXDEV;
+        return -EXDEV;
   }
 
   /* Make sure that the object is a directory */
@@ -82,11 +82,11 @@ int do_link()
   {
 	put_vnode(vp_o);
 	put_vnode(vp_d);
-	return ENOTDIR;
+	return -ENOTDIR;
   }
 
   r= forbidden(vp_d, W_BIT|X_BIT, 0 /*!use_realuid*/);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp_o);
 	put_vnode(vp_d);
@@ -115,22 +115,22 @@ int do_unlink()
   struct vnode *vp;
   int r;
   
-  if (fetch_name(m_in.name, m_in.name_length, M3) != OK) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
 
   r= lookup_lastdir(0 /*!use_realuid*/, &vp);
-  if (r != OK)
+  if (r != 0)
 	return r;
 
   /* Make sure that the object is a directory */
   if ((vp->v_mode & I_TYPE) != I_DIRECTORY)
   {
 	put_vnode(vp);
-	return ENOTDIR;
+	return -ENOTDIR;
   }
 
   /* The caller must have both search and execute permission */
   r= forbidden(vp, X_BIT|W_BIT, 0 /*!use_realuid*/);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp);
 	return r;
@@ -167,13 +167,13 @@ int do_rename()
   char old_name[PATH_MAX+1];
   
   /* See if 'name1' (existing file) exists.  Get dir and file inodes. */
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
   
   /* Request lookup */
-  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp_od)) != OK) return r;
+  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp_od)) != 0) return r;
 
   r= forbidden(vp_od, W_BIT|X_BIT, 0 /*!use_realuid*/);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp_od);
 	return r;
@@ -187,12 +187,12 @@ int do_rename()
   if (len >= sizeof(old_name))
   {
 	put_vnode(vp_od);
-	return ENAMETOOLONG;
+	return -ENAMETOOLONG;
   }
   memcpy(old_name, user_fullpath, len+1);
 
   /* See if 'name2' (new name) exists.  Get dir inode */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != OK)
+  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0)
   {
 	put_vnode(vp_od);
 	return err_code;
@@ -200,14 +200,14 @@ int do_rename()
   
   /* Request lookup */
   r = lookup_lastdir(0 /*!use_realuid*/, &vp_nd);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp_od);
 	return r;
   }
 
   r= forbidden(vp_nd, W_BIT|X_BIT, 0 /*!use_realuid*/);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp_od);
 	put_vnode(vp_nd);
@@ -223,7 +223,7 @@ int do_rename()
   {
 	put_vnode(vp_od);
 	put_vnode(vp_nd);
-	return EXDEV;
+	return -EXDEV;
   }
 
   /* Issue request */
@@ -250,12 +250,12 @@ int do_truncate()
 
   printf("in do_truncate\n");
   
-  if (fetch_name(m_in.m2_p1, m_in.m2_i1, M1) != OK) return err_code;
+  if (fetch_name(m_in.m2_p1, m_in.m2_i1, M1) != 0) return err_code;
   
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK) return r;
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
   
-  if ((r = forbidden(vp, W_BIT, 0 /*!use_realuid*/)) == OK)
+  if ((r = forbidden(vp, W_BIT, 0 /*!use_realuid*/)) == 0)
 	  r = truncate_vn(vp, m_in.m2_l1);
 
   put_vnode(vp);
@@ -277,7 +277,7 @@ int do_ftruncate()
   if ( (rfilp = get_filp(m_in.m2_i1)) == NIL_FILP)
         return err_code;
   if (!(rfilp->filp_mode & W_BIT))
-  	return EBADF;
+  	return -EBADF;
   return truncate_vn(rfilp->filp_vno, m_in.m2_l1);
 }
 
@@ -293,14 +293,14 @@ off_t newsize;
 
   if ( (vp->v_mode & I_TYPE) != I_REGULAR &&
 	(vp->v_mode & I_TYPE) != I_NAMED_PIPE) {
-	return EINVAL;
+	return -EINVAL;
   }
         
   /* Issue request */
-  if ((r = req_ftrunc(vp->v_fs_e, vp->v_inode_nr, newsize, 0)) != OK) return r;
+  if ((r = req_ftrunc(vp->v_fs_e, vp->v_inode_nr, newsize, 0)) != 0) return r;
 	  
   vp->v_size = newsize;
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -313,14 +313,14 @@ int do_slink()
   struct vnode *vp;
   char string[NAME_MAX];       /* last component of the new dir's path name */
 
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != OK)
+  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0)
        return(err_code);
 
   if (m_in.name1_length <= 1 || m_in.name1_length >= _MIN_BLOCK_SIZE)
-       return(ENAMETOOLONG);
+       return(-ENAMETOOLONG);
 
   /* Request lookup */
-  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp)) != OK)
+  if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp)) != 0)
   {
 	printf("vfs:do_slink: lookup_lastdir failed with %d\n", r);
 	return r;
@@ -332,7 +332,7 @@ int do_slink()
 #endif
 
   r= forbidden(vp, W_BIT|X_BIT, 0 /*!use_realuid*/);
-  if (r != OK)
+  if (r != 0)
   {
 	put_vnode(vp);
         return r;
@@ -357,19 +357,19 @@ int do_rdlink()
   struct vnode *vp;
   
   copylen = m_in.m1_i2;
-  if(copylen < 0) return EINVAL;
+  if(copylen < 0) return -EINVAL;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
   
   /* Request lookup */
   r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp);
-  if (r != OK) return r;
+  if (r != 0) return r;
 
   /* Make sure this is a symbolic link */
   if ((vp->v_mode & I_TYPE) != I_SYMBOLIC_LINK) {
 	put_vnode(vp);
 
-  	return EINVAL;
+  	return -EINVAL;
   }
 
   /* Issue request */

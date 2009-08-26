@@ -232,7 +232,7 @@ register struct super_block *sp; /* pointer to a superblock */
   r = block_dev_io(MFS_DEV_READ, dev, SELF_E,
   	sbbuf, cvu64(SUPER_BLOCK_BYTES), _MIN_BLOCK_SIZE, 0);
   if (r != _MIN_BLOCK_SIZE) {
-  	return EINVAL;
+  	return -EINVAL;
   }
   memcpy(sp, sbbuf, sizeof(*sp));
   sp->s_dev = NO_DEV;		/* restore later */
@@ -249,7 +249,7 @@ register struct super_block *sp; /* pointer to a superblock */
 	version = V3;
   	native = 1;
   } else {
-	return(EINVAL);
+	return(-EINVAL);
   }
 
   /* If the super block has the wrong byte order, swap the fields; the magic
@@ -284,7 +284,7 @@ register struct super_block *sp; /* pointer to a superblock */
   	if (version == V2)
   		sp->s_block_size = _STATIC_BLOCK_SIZE;
   	if (sp->s_block_size < _MIN_BLOCK_SIZE) {
-  		return EINVAL;
+  		return -EINVAL;
 	}
 	sp->s_inodes_per_block = V2_INODES_PER_BLOCK(sp->s_block_size);
 	sp->s_ndzones = V2_NR_DZONES;
@@ -292,23 +292,23 @@ register struct super_block *sp; /* pointer to a superblock */
   }
 
   if (sp->s_block_size < _MIN_BLOCK_SIZE) {
-  	return EINVAL;
+  	return -EINVAL;
   }
   if (sp->s_block_size > _MAX_BLOCK_SIZE) {
   	printf("Filesystem block size is %d kB; maximum filesystem\n"
  	"block size is %d kB. This limit can be increased by recompiling.\n",
   	sp->s_block_size/1024, _MAX_BLOCK_SIZE/1024);
-  	return EINVAL;
+  	return -EINVAL;
   }
   if ((sp->s_block_size % 512) != 0) {
-  	return EINVAL;
+  	return -EINVAL;
   }
   if (SUPER_SIZE > sp->s_block_size) {
-  	return EINVAL;
+  	return -EINVAL;
   }
   if ((sp->s_block_size % V2_INODE_SIZE) != 0 ||
      (sp->s_block_size % V1_INODE_SIZE) != 0) {
-  	return EINVAL;
+  	return -EINVAL;
   }
 
   /* Limit s_max_size to LONG_MAX */
@@ -330,8 +330,8 @@ register struct super_block *sp; /* pointer to a superblock */
   	printf("not enough imap or zone map blocks, \n");
   	printf("or not enough inodes, or not enough zones, "
   		"or zone size too large\n");
-	return(EINVAL);
+	return(-EINVAL);
   }
   sp->s_dev = dev;		/* restore device number */
-  return(OK);
+  return 0;
 }

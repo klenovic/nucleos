@@ -49,11 +49,11 @@ struct mem_map *mem_map;                        /* put memory map here */
 	struct proc p;
 	int s;
 
-	if ((s=sys_getproc(&p, proc_nr)) != OK)
+	if ((s=sys_getproc(&p, proc_nr)) != 0)
 		return(s);
 
 	memcpy(mem_map, p.p_memmap, sizeof(p.p_memmap));
-	return(OK);
+	return 0;
 }
 
 /*===========================================================================*
@@ -70,7 +70,7 @@ struct memory *mem_chunks;                      /* store mem chunks here */
   struct memory *memp;
 
   /* Obtain and parse memory from system environment. */
-  if(env_memory_parse(mem_chunks, NR_MEMS) != OK) 
+  if(env_memory_parse(mem_chunks, NR_MEMS) != 0) 
         vm_panic("couldn't obtain memory chunks", NO_NUM); 
    
   /* Round physical memory to clicks. Round start up, round end down. */
@@ -125,12 +125,12 @@ int vm_isokendpt(endpoint_t endpoint, int *proc)
 {
         *proc = _ENDPOINT_P(endpoint);
         if(*proc < -NR_TASKS || *proc >= NR_PROCS)
-                return EINVAL;
+                return -EINVAL;
         if(*proc >= 0 && endpoint != vmproc[*proc].vm_endpoint)
-                return EDEADSRCDST;
+                return -EDEADSRCDST;
         if(*proc >= 0 && !(vmproc[*proc].vm_flags & VMF_INUSE))
-                return EDEADSRCDST;
-        return OK;
+                return -EDEADSRCDST;
+        return 0;
 }
 
 
@@ -145,10 +145,10 @@ vir_bytes *sp;                                  /* put stack pointer here */
 {
   int s; 
   
-  if ((s=sys_getproc(&mytmpproc, proc_nr_e)) != OK)     
+  if ((s=sys_getproc(&mytmpproc, proc_nr_e)) != 0)     
         return(s);
   *sp = mytmpproc.p_reg.sp;
-  return(OK);
+  return 0;
 }       
 
 /*===========================================================================*
@@ -162,7 +162,7 @@ char *brk_addr;
 	struct vmproc *vmm = &vmproc[VM_PROC_NR];
 
 /* VM wants to call brk() itself. */
-        if((r=real_brk(vmm, (vir_bytes) brk_addr)) != OK)
+        if((r=real_brk(vmm, (vir_bytes) brk_addr)) != 0)
 		vm_panic("VM: brk() on myself failed\n", NO_NUM);
         _brksize = brk_addr;
         return 0;

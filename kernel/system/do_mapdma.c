@@ -36,7 +36,7 @@ register message *m_ptr;	/* pointer to request message */
 	size= m_ptr->CP_NR_BYTES;
 
 	if (!isokendpt(proc_e, &proc_p))
-		return(EINVAL);
+		return(-EINVAL);
 
 	proc = proc_addr(proc_p);
 
@@ -44,9 +44,9 @@ register message *m_ptr;	/* pointer to request message */
         if (!phys_base)
         {
                 kprintf("do_mapdma: umap_virtual failed\n");
-		return EFAULT;
+		return -EFAULT;
 	}
 
 	m_ptr->CP_DST_ADDR = phys_base;
-	return OK;
+	return 0;
 }

@@ -79,7 +79,7 @@ int main(void)
  	logdevices[i].log_revive_alerted = 0;
   }
   driver_task(&log_dtab);
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -127,11 +127,11 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 	else {
 		if(safe) {
 		   if((r=sys_safecopyfrom(proc_nr, user_vir, offset,
-			(vir_bytes)buf, count, D)) != OK)
+			(vir_bytes)buf, count, D)) != 0)
 			return r;
 		} else {
 		   if((r=sys_vircopy(proc_nr, D,
-			user_vir + offset, SELF,D,(int)buf, count)) != OK)
+			user_vir + offset, SELF,D,(int)buf, count)) != 0)
 			return r;
 		}
 	}
@@ -159,7 +159,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 		m.REP_STATUS  = log->log_status;
 		m.REP_IO_GRANT  = log->log_user_vir_g;
   		r= send(log->log_source, &m);
-		if (r != OK)
+		if (r != 0)
 		{
 			printf("log`subwrite: send to %d failed: %d\n",
 				log->log_source, r);
@@ -186,7 +186,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 			printf("select sending DEV_SEL_REPL2\n");
 #endif
   			r= send(log->log_select_proc, &m);
-			if (r != OK)
+			if (r != 0)
 			{
 				printf(	
 				"log`subwrite: send to %d failed: %d\n",
@@ -235,11 +235,11 @@ subread(struct logdevice *log, int count, int proc_nr,
     	buf = log->log_buffer + log->log_read;
 	if(safe) {
 	   if((r=sys_safecopyto(proc_nr, user_vir, offset,
-		(vir_bytes)buf, count, D)) != OK)
+		(vir_bytes)buf, count, D)) != 0)
 		return r;
 	} else {
           if((r=sys_vircopy(SELF,D,(int)buf,
-		proc_nr, safe ? GRANT_SEG : D, user_vir + offset, count)) != OK)
+		proc_nr, safe ? GRANT_SEG : D, user_vir + offset, count)) != 0)
         	return r;
 	}
 
@@ -271,7 +271,7 @@ int safe;			/* safe copies? */
   size_t vir_offset = 0;
 
   if(log_device < 0 || log_device >= NR_DEVS)
-  	return EIO;
+  	return -EIO;
 
   /* Get minor device number and check for /dev/null. */
   dv = &log_geom[log_device];
@@ -291,12 +291,12 @@ int safe;			/* safe copies? */
 	    		/* There's already someone hanging to read, or
 	    		 * no real I/O requested.
 	    		 */
-	    		return(OK);
+	    		return 0;
 	    	}
 
 	    	if (!log->log_size) {
 	    		if(accumulated_read)
-	    			return OK;
+	    			return 0;
 	    		/* No data available; let caller block. */
 	    		log->log_proc_nr = proc_nr;
 	    		log->log_iosize = count;
@@ -311,7 +311,7 @@ int safe;			/* safe copies? */
 	    		printf("blocked %d (%d)\n", 
 	    			log->log_source, log->log_proc_nr);
 #endif
-	    		return(EDONTREPLY);
+	    		return(-EDONTREPLY);
 	    	}
 	    	count = subread(log, count, proc_nr, user_vir, vir_offset, safe);
 	    	if(count < 0) {
@@ -326,14 +326,14 @@ int safe;			/* safe copies? */
 	    break;
 	/* Unknown (illegal) minor device. */
 	default:
-	    return(EINVAL);
+	    return(-EINVAL);
 	}
 
 	/* Book the number of bytes transferred. */
 	vir_offset += count;
   	if ((iov->iov_size -= count) == 0) { iov++; nr_req--; vir_offset = 0; }
   }
-  return(OK);
+  return 0;
 }
 
 /*============================================================================*
@@ -343,8 +343,8 @@ static int log_do_open(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
 {
-  if (log_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
-  return(OK);
+  if (log_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
+  return 0;
 }
 
 /*============================================================================*
@@ -370,10 +370,10 @@ message *m_ptr;
   int d;
   d = m_ptr->TTY_LINE;
   if(d < 0 || d >= NR_DEVS)
-  	return EINVAL;
+  	return -EINVAL;
   logdevices[d].log_proc_nr = 0;
   logdevices[d].log_revive_alerted = 0;
-  return(OK);
+  return 0;
 }
 
 
@@ -415,15 +415,15 @@ int safe;
 		break;
 	case DEV_STATUS: {
 		printf("log_other: unexpected DEV_STATUS request\n");
-		r = EDONTREPLY;
+		r = -EDONTREPLY;
 		break;
 	}
 	case NOTIFY_FROM(TTY_PROC_NR):
 		do_new_kmess(m_ptr);
-		r = EDONTREPLY;
+		r = -EDONTREPLY;
 		break;
 	default:
-		r = EINVAL;
+		r = -EINVAL;
 		break;
 	}
 	return r;
@@ -440,9 +440,9 @@ message *m_ptr;
   d = m_ptr->TTY_LINE;
   if(d < 0 || d >= NR_DEVS) {
 #if LOG_DEBUG
-  	printf("line %d? EINVAL\n", d);
+  	printf("line %d? -EINVAL\n", d);
 #endif
-  	return EINVAL;
+  	return -EINVAL;
   }
 
   ops = m_ptr->IO_ENDPT & (SEL_RD|SEL_WR|SEL_ERR);

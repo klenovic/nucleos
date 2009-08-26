@@ -223,7 +223,7 @@ int slabsane(void *mem, int bytes)
 	struct slabheader *s;
 	struct slabdata *f;
 	int i;
-	return (objstats(mem, bytes, &s, &f, &i) == OK);
+	return (objstats(mem, bytes, &s, &f, &i) == 0);
 }
 #endif
 
@@ -328,7 +328,7 @@ static int objstats(void *mem, int bytes,
 	if(!(cond)) { \
 		printf("VM:objstats: %s failed for ptr 0x%p, %d bytes\n", \
 			#cond, mem, bytes); \
-		return EINVAL; \
+		return -EINVAL; \
 	}
 
 	struct slabheader *s;
@@ -372,7 +372,7 @@ static int objstats(void *mem, int bytes,
 	*fp = f;
 	*sp = s;
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -391,7 +391,7 @@ void slabfree(void *mem, int bytes)
 		printf("VM: WARNING: likely double free, JUNK seen\n");
 	}
 #endif
-	if(objstats(mem, bytes, &s, &f, &i) != OK) {
+	if(objstats(mem, bytes, &s, &f, &i) != 0) {
 		vm_panic("slabfree objstats failed", NO_NUM);
 	}
 

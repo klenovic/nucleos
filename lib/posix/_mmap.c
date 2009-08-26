@@ -31,7 +31,7 @@ void *mmap(void *addr, size_t len, int prot, int flags,
 
 	r = _syscall(VM_PROC_NR, VM_MMAP, &m);
 
-	if(r != OK) {
+	if(r != 0) {
 		return MAP_FAILED;
 	}
 

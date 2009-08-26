@@ -263,20 +263,20 @@ int main(int argc, char *argv[]) {
 
 	/* Observe some function key for debug dumps. */
 	fkeys = sfkeys = 0; bit_set(sfkeys, 11);
-	if ((r=fkey_map(&fkeys, &sfkeys)) != OK) 
+	if ((r=fkey_map(&fkeys, &sfkeys)) != 0) 
 	    printf("Warning: orinoco couldn't observe F-key(s): %d\n",r);
 
 	/* Try to notify INET that we are present (again). If INET cannot
 	 * be found, assume this is the first time we started and INET is
 	 * not yet alive. */
 	r = ds_retrieve_u32("inet", &inet_proc_nr);
-	if (r == OK) 
+	if (r == 0) 
 		notify(inet_proc_nr);
 	else if (r != ESRCH)
 		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
-		if ((r = receive (ANY, &m)) != OK)
+		if ((r = receive (ANY, &m)) != 0)
 			panic(__FILE__, "orinoco: receive failed", NO_NUM);
 
 		switch (m.m_type) {
@@ -377,7 +377,7 @@ static void or_getname(message *mp) {
 	mp->m_type = DL_NAME_REPLY;
 
 	r = send(mp->m_source, mp);
-	if(r != OK) {
+	if(r != 0) {
 		panic(__FILE__, "or_getname: send failed", r);
 	}
 }
@@ -398,7 +398,7 @@ static int do_hard_int(void) {
 		or_handler( &or_table[i]);
 
 		/* Reenable interrupts for this hook. */
-		if ((s=sys_irqenable(&or_table[i].or_hook_id)) != OK) {
+		if ((s=sys_irqenable(&or_table[i].or_hook_id)) != 0) {
 			printf("orinoco: error, couldn't enable");
 			printf(" interrupts: %d\n", s);
 		}
@@ -437,7 +437,7 @@ static void or_reset() {
 	u16_t irqmask;
 	hermes_t *hw = &(orp->hw);
 
-	if (OK != (r = getuptime(&now)))
+	if ((r = getuptime(&now)) != 0)
 		panic(__FILE__, "orinoco: getuptime() failed:", r);
 
 	if(now - last_reset < system_hz * 10) {
@@ -757,7 +757,7 @@ static void map_hw_buffer(t_or *orp) {
 	r = ENOSYS;
 #endif
 
-	if(r!=OK) 
+	if(r != 0) 
 		panic(__FILE__, "map_hw_buffer: sys_vm_map failed:", r);
 
 
@@ -929,10 +929,10 @@ static void or_init_hw (t_or * orp) {
 	if(first_time) {
 		orp->or_hook_id = orp->or_irq;	
 		if ((s=sys_irqsetpolicy(orp->or_irq, 0, 
-			&orp->or_hook_id)) != OK)
+			&orp->or_hook_id)) != 0)
 			printf("orinoco: couldn't set IRQ policy: %d\n", s);
 
-		if ((s=sys_irqenable(&orp->or_hook_id)) != OK)
+		if ((s=sys_irqenable(&orp->or_hook_id)) != 0)
 			printf("orinoco: couldn't enable interrupts: %d\n", s);
 		first_time = FALSE;
 	}
@@ -993,7 +993,7 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 		return;
 	}
 
-	if (OK != env_get_param("essid", essid, sizeof(essid))) {
+	if (env_get_param("essid", essid, sizeof(essid)) != 0) {
 		essid[0] = 0;
 	}
 
@@ -1016,7 +1016,7 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 		return;
 	}
 
-	if (OK != env_get_param("wep", wepkey0, sizeof(wepkey0))) {
+	if (env_get_param("wep", wepkey0, sizeof(wepkey0)) != 0) {
 		wepkey0[0] = 0;
 	}
 
@@ -1394,7 +1394,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 				((vir_bytes) mp->DL_ADDR) + iov_offset,
 				SELF, D, (vir_bytes) orp->or_iovec,
 				n * sizeof(orp->or_iovec[0]));
-			if (cps != OK) printf("sys_vircopy failed: %d\n", cps);
+			if (cps != 0) printf("sys_vircopy failed: %d\n", cps);
 
 			for (j = 0, iovp = orp->or_iovec; j < n; j++, iovp++) {
 				s = iovp->iov_size;
@@ -1403,7 +1403,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 				}
 				cps = sys_vircopy(or_client, D, iovp->iov_addr,
 					SELF, D, (vir_bytes) databuf + o, s);
-				if (cps != OK) 
+				if (cps != 0) 
 					printf("sys_vircopy failed: %d\n",cps);
 
 				size += s;
@@ -1420,7 +1420,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 
 		cps = sys_vircopy(or_client, D, (vir_bytes)mp->DL_ADDR, 
 			SELF, D, (vir_bytes) databuf, size);
-		if (cps != OK) printf("sys_abscopy failed: %d\n", cps);
+		if (cps != 0) printf("sys_abscopy failed: %d\n", cps);
 	}
 
 	memset (&desc, 0, sizeof (desc));
@@ -1579,7 +1579,7 @@ static void or_writev_s (message * mp, int from_int) {
 		cps = sys_safecopyfrom(or_client, mp->DL_GRANT, iov_offset,
 			(vir_bytes) orp->or_iovec_s, 
 			n * sizeof(orp->or_iovec_s[0]), D);
-		if (cps != OK) 
+		if (cps != 0) 
 			printf("orinoco: sys_safecopyfrom failed: %d\n", cps);
 
 		for (j = 0, iovp = orp->or_iovec_s; j < n; j++, iovp++)	{
@@ -1590,7 +1590,7 @@ static void or_writev_s (message * mp, int from_int) {
 
 			cps = sys_safecopyfrom(or_client, iovp->iov_grant, 0,
 						(vir_bytes) databuf + o, s, D);
-			if (cps != OK) 
+			if (cps != 0) 
 				printf("orinoco: sys_safecopyfrom failed:%d\n",
 						cps);
 
@@ -1602,7 +1602,7 @@ static void or_writev_s (message * mp, int from_int) {
 	assert(size >= ETH_MIN_PACK_SIZE); 
 
 	memset (&desc, 0, sizeof (desc));
-	/* Reclaim the tx buffer once the data is sent (OK), or it is clear 
+	/* Reclaim the tx buffer once the data is sent  0, or it is clear 
 	 * that transmission failed (EX). Reclaiming means that we can reuse 
 	 * the buffer again for transmission */
 	desc.tx_control = HERMES_TXCTRL_TX_OK | HERMES_TXCTRL_TX_EX;
@@ -1718,7 +1718,7 @@ static void reply (t_or * orp, int err, int may_block) {
 	reply.DL_STAT = status | ((u32_t) err << 16);
 	reply.DL_COUNT = orp->or_read_s;
 
-	if (OK != (r = getuptime(&now)))
+	if ((r = getuptime(&now)) != 0)
 		panic(__FILE__, "orinoco: getuptime() failed:", r);
 
 	reply.DL_CLCK = now;
@@ -2012,7 +2012,7 @@ static void or_readv (message * mp, int from_int, int vectored) {
 					(vir_bytes) mp->DL_ADDR + iov_offset,
 					SELF, D, (vir_bytes) orp->or_iovec, 
 					n * sizeof(orp->or_iovec[0]));
-			if (cps != OK) printf("sys_vircopy failed: %d (%d)\n", 
+			if (cps != 0) printf("sys_vircopy failed: %d (%d)\n", 
 							cps, __LINE__);
 
 			for (j = 0, iovp = orp->or_iovec; j < n; j++, iovp++) {
@@ -2026,7 +2026,7 @@ static void or_readv (message * mp, int from_int, int vectored) {
 						(vir_bytes) databuf + o,
 						or_client, D, 
 						iovp->iov_addr, s);
-				if (cps != OK) 
+				if (cps != 0) 
 					printf("sys_vircopy failed:%d (%d)\n", 
 						cps, __LINE__);
 
@@ -2144,7 +2144,7 @@ static void or_readv_s (message * mp, int from_int) {
 		cps = sys_safecopyfrom(or_client, mp->DL_GRANT, iov_offset, 
 				(vir_bytes)orp->or_iovec_s,
 				n * sizeof(orp->or_iovec_s[0]), D);
-		if (cps != OK) 
+		if (cps != 0) 
 			panic(__FILE__, 
 			"orinoco: warning, sys_safecopytp failed:", cps);
 
@@ -2156,7 +2156,7 @@ static void or_readv_s (message * mp, int from_int) {
 			}
 			cps = sys_safecopyto(or_client, iovp->iov_grant, 0, 
 					(vir_bytes) databuf + o, s, D);
-			if (cps != OK) 
+			if (cps != 0) 
 				panic(__FILE__, 
 				"orinoco: warning, sys_safecopy failed:", 
 				cps);
@@ -2332,7 +2332,7 @@ static void or_getstat (message * mp) {
 
 	r = sys_datacopy(SELF, (vir_bytes)&stats, mp->DL_PROC,
 			(vir_bytes) mp->DL_ADDR, sizeof(stats));
-	if(r != OK) {
+	if(r != 0) {
 		panic(__FILE__, "or_getstat: send failed:", r);	
 	}
 
@@ -2341,7 +2341,7 @@ static void or_getstat (message * mp) {
 	mp->DL_STAT = OK;
 
 	r = send(mp->m_source, mp);
-	if(r != OK)
+	if(r != 0)
 		panic(__FILE__, "orinoco: getstat failed:", r);
 
 	/*reply (orp, OK, FALSE);*/
@@ -2373,7 +2373,7 @@ static void or_getstat_s (message * mp) {
 
 	r = sys_safecopyto(mp->DL_PROC,	mp->DL_GRANT, 0, 
 				(vir_bytes) &stats, sizeof(stats), D);
-	if(r != OK) {
+	if(r != 0) {
 		panic(__FILE__, "or_getstat_s: sys_safecopyto failed:", r);
 	}
 
@@ -2382,7 +2382,7 @@ static void or_getstat_s (message * mp) {
 	mp->DL_STAT = OK;
 
 	r = send(mp->m_source, mp);
-	if(r != OK)
+	if(r != 0)
 		panic(__FILE__, "orinoco: getstat_s failed:", r);
 }
 

@@ -306,12 +306,12 @@ int main(int argc, char *argv[])
 
 	memset(fxp_table, 0, ft);
 
-	if((r=micro_delay_calibrate()) != OK)
+	if((r=micro_delay_calibrate()) != 0)
 		panic("FXP","rmicro_delay_calibrate failed", r);
 
 	/* Try to notify inet that we are present (again) */
 	r= ds_retrieve_u32("inet", &tasknr);
-	if (r == OK)
+	if (r == 0)
 		notify(tasknr);
 	else if (r != ESRCH)
 		printf("fxp: ds_retrieve_u32 failed for 'inet': %d\n", r);
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 
 	while (TRUE)
 	{
-		if ((r= receive(ANY, &m)) != OK)
+		if ((r= receive(ANY, &m)) != 0)
 			panic("FXP","receive failed", r);
 
 		switch (m.m_type)
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
 				fxp_handler(fp);
 
 				r= sys_irqenable(&fp->fxp_hook);
-				if (r != OK)
+				if (r != 0)
 				{
 					panic("FXP",
 						"unable enable interrupts", r);
@@ -795,13 +795,13 @@ fxp_t *fp;
  	 */
  	fp->fxp_hook = fp->fxp_irq;
 	r= sys_irqsetpolicy(fp->fxp_irq, 0, &fp->fxp_hook);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_irqsetpolicy failed", r);
 
 	fxp_reset_hw(fp);
 
 	r= sys_irqenable(&fp->fxp_hook);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_irqenable failed", r);
 
 	/* Reset PHY? */
@@ -811,7 +811,7 @@ fxp_t *fp;
 	/* Set pointer to statistical counters */
 	r= sys_umap(SELF, VM_D, (vir_bytes)&fp->fxp_stat, sizeof(fp->fxp_stat),
 		&bus_addr);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 	fxp_cu_ptr_cmd(fp, SC_CU_LOAD_DCA, bus_addr, TRUE /* check idle */);
 
@@ -879,7 +879,7 @@ fxp_t *fp;
 	fp->fxp_rx_buf= (struct rfd *)&tmpbufp[1];
 	r= sys_umap(SELF, VM_D, (vir_bytes)fp->fxp_rx_buf, rx_totbufsize,
 		&fp->fxp_rx_busaddr);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
 #if 0
@@ -895,7 +895,7 @@ fxp_t *fp;
 		{
 			r= sys_umap(SELF, VM_D, (vir_bytes)&rfdp[1],
 				sizeof(rfdp[1]), &rfdp->rfd_linkaddr);
-			if (r != OK)
+			if (r != 0)
 				panic("FXP","sys_umap failed", r);
 		}
 		else
@@ -913,7 +913,7 @@ fxp_t *fp;
 	fp->fxp_tx_buf= (struct tx *)((char *)fp->fxp_rx_buf+rx_totbufsize);
 	r= sys_umap(SELF, VM_D, (vir_bytes)fp->fxp_tx_buf,
 		(phys_bytes)tx_totbufsize, &fp->fxp_tx_busaddr);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
 	for (i= 0, txp= fp->fxp_tx_buf; i<fp->fxp_tx_nbuf; i++, txp++)
@@ -925,7 +925,7 @@ fxp_t *fp;
 			r= sys_umap(SELF, VM_D, (vir_bytes)&txp[1],
 				(phys_bytes)sizeof(txp[1]),
 				&txp->tx_linkaddr);
-			if (r != OK)
+			if (r != 0)
 				panic("FXP","sys_umap failed", r);
 		}
 		else
@@ -1012,7 +1012,7 @@ fxp_t *fp;
 		sizeof(tmpbufp->ias.ias_ethaddr));
 	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->ias,
 		(phys_bytes)sizeof(tmpbufp->ias), &bus_addr);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
 	fxp_cu_ptr_cmd(fp, SC_CU_START, bus_addr, TRUE /* check idle */);
@@ -1022,7 +1022,7 @@ fxp_t *fp;
 		/* Wait for CU command to complete */
 		if (tmpbufp->ias.ias_status & CBL_F_C)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(1000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(1000));
 
 	if (!(tmpbufp->ias.ias_status & CBL_F_C))
 		panic("FXP","fxp_confaddr: CU command failed to complete", NO_NUM);
@@ -1150,7 +1150,7 @@ int vectored;
 			r= sys_vircopy(fxp_client, D, iov_src, 
 				SELF, D, (vir_bytes)fp->fxp_iovec,
 				n * sizeof(fp->fxp_iovec[0]));
-			if (r != OK)
+			if (r != 0)
 				panic("FXP","fxp_writev: sys_vircopy failed", r);
 
 			for (j= 0, iovp= fp->fxp_iovec; j<n; j++, iovp++)
@@ -1165,7 +1165,7 @@ int vectored;
 				r= sys_vircopy(fxp_client, D, iovp->iov_addr, 
 					SELF, D, (vir_bytes)(txp->tx_buf+o),
 					s);
-				if (r != OK)
+				if (r != 0)
 				{
 					panic("FXP","fxp_writev: sys_vircopy failed",
 						r);
@@ -1185,7 +1185,7 @@ int vectored;
 
 		r= sys_vircopy(fxp_client, D, (vir_bytes)mp->DL_ADDR, 
 			SELF, D, (vir_bytes)txp->tx_buf, size);
-		if (r != OK)
+		if (r != 0)
 			panic("FXP","fxp_writev: sys_vircopy failed", r);
 	}
 
@@ -1308,7 +1308,7 @@ int from_int;
 		r= sys_safecopyfrom(fxp_client, iov_grant, iov_offset,
 			(vir_bytes)fp->fxp_iovec_s,
 			n * sizeof(fp->fxp_iovec_s[0]), D);
-		if (r != OK)
+		if (r != 0)
 			panic("FXP","fxp_writev: sys_safecopyfrom failed", r);
 
 		for (j= 0, iovp= fp->fxp_iovec_s; j<n; j++, iovp++)
@@ -1322,7 +1322,7 @@ int from_int;
 
 			r= sys_safecopyfrom(fxp_client, iovp->iov_grant,
 				0, (vir_bytes)(txp->tx_buf+o), s, D);
-			if (r != OK)
+			if (r != 0)
 			{
 				panic("FXP",
 				"fxp_writev_s: sys_safecopyfrom failed",
@@ -1451,7 +1451,7 @@ int vectored;
 			r= sys_vircopy(fxp_client, D, iov_src, 
 				SELF, D, (vir_bytes)fp->fxp_iovec,
 				n * sizeof(fp->fxp_iovec[0]));
-			if (r != OK)
+			if (r != 0)
 				panic("FXP","fxp_readv: sys_vircopy failed", r);
 
 			for (j= 0, iovp= fp->fxp_iovec; j<n; j++, iovp++)
@@ -1466,7 +1466,7 @@ int vectored;
 				r= sys_vircopy(SELF, D,
 					(vir_bytes)(rfdp->rfd_buf+o),
 					fxp_client, D, iovp->iov_addr, s);
-				if (r != OK)
+				if (r != 0)
 				{
 					panic("FXP","fxp_readv: sys_vircopy failed",
 						r);
@@ -1630,7 +1630,7 @@ int from_int;
 		r= sys_safecopyfrom(fxp_client, iov_grant, iov_offset,
 			(vir_bytes)fp->fxp_iovec_s,
 			n * sizeof(fp->fxp_iovec_s[0]), D);
-		if (r != OK)
+		if (r != 0)
 			panic("FXP","fxp_readv_s: sys_safecopyfrom failed", r);
 
 		for (j= 0, iovp= fp->fxp_iovec_s; j<n; j++, iovp++)
@@ -1644,7 +1644,7 @@ int from_int;
 
 			r= sys_safecopyto(fxp_client, iovp->iov_grant,
 				0, (vir_bytes)(rfdp->rfd_buf+o), s, D);
-			if (r != OK)
+			if (r != 0)
 			{
 				panic("FXP","fxp_readv: sys_safecopyto failed",
 					r);
@@ -1748,7 +1748,7 @@ fxp_t *fp;
 
 	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->cc,
 		(phys_bytes)sizeof(tmpbufp->cc), &bus_addr);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
 	fxp_cu_ptr_cmd(fp, SC_CU_START, bus_addr, TRUE /* check idle */);
@@ -1758,7 +1758,7 @@ fxp_t *fp;
 		/* Wait for CU command to complete */
 		if (tmpbufp->cc.cc_status & CBL_F_C)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(100000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(100000));
 
 	if (!(tmpbufp->cc.cc_status & CBL_F_C))
 		panic("FXP","fxp_do_conf: CU command failed to complete", NO_NUM);
@@ -1801,7 +1801,7 @@ int check_idle;
 		scb_cmd= fxp_inb(port, SCB_CMD);
 		if ((scb_cmd & SC_CUC_MASK) == SC_CU_NOP)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(100000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(100000));
 
 	if ((scb_cmd & SC_CUC_MASK) != SC_CU_NOP)
 		panic("FXP","fxp_cu_ptr_cmd: CU does not accept command", NO_NUM);
@@ -1838,7 +1838,7 @@ int check_idle;
 		scb_cmd= fxp_inb(port, SCB_CMD);
 		if ((scb_cmd & SC_RUC_MASK) == SC_RU_NOP)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(1000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(1000));
 
 	if ((scb_cmd & SC_RUC_MASK) != SC_RU_NOP)
 		panic("FXP","fxp_ru_ptr_cmd: RU does not accept command", NO_NUM);
@@ -1914,7 +1914,7 @@ message *mp;
 		/* Wait for CU command to complete */
 		if (*p != 0)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(1000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(1000));
 
 	if (*p == 0)
 		panic("FXP","fxp_getstat: CU command failed to complete", NO_NUM);
@@ -1949,14 +1949,14 @@ message *mp;
 
 	r= sys_vircopy(SELF, D, (vir_bytes)&stats,
 		mp->DL_PROC, D, (vir_bytes) mp->DL_ADDR, sizeof(stats));
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__,"fxp_getstat: sys_vircopy failed", r);
 
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= OK;
 	r= send(mp->m_source, mp);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "fxp_getstat: send failed: %d\n", r);
 }
 
@@ -1998,7 +1998,7 @@ message *mp;
 		/* Wait for CU command to complete */
 		if (*p != 0)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(1000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(1000));
 
 	if (*p == 0)
 		panic("FXP","fxp_getstat: CU command failed to complete", NO_NUM);
@@ -2033,14 +2033,14 @@ message *mp;
 
 	r= sys_safecopyto(mp->DL_PROC, mp->DL_GRANT, 0, (vir_bytes)&stats,
 		sizeof(stats), D);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__,"fxp_getstat_s: sys_safecopyto failed", r);
 
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= OK;
 	r= send(mp->m_source, mp);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "fxp_getstat_s: send failed: %d\n", r);
 }
 
@@ -2057,7 +2057,7 @@ message *mp;
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
 	r= send(mp->m_source, mp);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP", "fxp_getname: send failed", r);
 }
 
@@ -2665,7 +2665,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-	if (send(req->m_source, reply_mess) != OK)
+	if (send(req->m_source, reply_mess) != 0)
 		panic("FXP","fxp: unable to mess_reply", NO_NUM);
 }
 
@@ -2813,7 +2813,7 @@ int reg;
 		v= fxp_inl(port, CSR_MDI_CTL);
 		if (v & CM_READY)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(100000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(100000));
 
 	if (!(v & CM_READY))
 		panic("FXP","mii_read: MDI not ready after command", NO_NUM);
@@ -2837,7 +2837,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
 
 	/* Get the current time. */
 	r= getuptime(&now);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","unable to get uptime from clock", r);
 
 	/* Add the timer to the local timer queue. */
@@ -2855,7 +2855,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
 			fxp_next_timeout, fxp_next_timeout-now);
 #endif
 		r= sys_setalarm(fxp_next_timeout, 1);
-		if (r != OK)
+		if (r != 0)
 			panic("FXP","unable to set synchronous alarm", r);
 	}
 }
@@ -2874,7 +2874,7 @@ static void fxp_expire_timers()
 
   /* Get the current time to compare the timers against. */
   r= getuptime(&now);
-  if (r != OK)
+  if (r != 0)
  	panic("FXP","Unable to get uptime from clock.", r);
 
   /* Scan the timers queue for expired timers. Dispatch the watchdog function
@@ -2887,7 +2887,7 @@ static void fxp_expire_timers()
   {  					  /* set new alarm */
   	fxp_next_timeout = fxp_timers->tmr_exp_time;
   	r= sys_setalarm(fxp_next_timeout, 1);
-  	if (r != OK)
+  	if (r != 0)
  		panic("FXP","Unable to set synchronous alarm.", r);
   }
 }
@@ -2898,7 +2898,7 @@ static u8_t do_inb(port_t port)
 	u32_t value;
 
 	r= sys_inb(port, &value);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_inb failed", r);
 	return value;
 }
@@ -2909,7 +2909,7 @@ static u32_t do_inl(port_t port)
 	u32_t value;
 
 	r= sys_inl(port, &value);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_inl failed", r);
 	return value;
 }
@@ -2919,7 +2919,7 @@ static void do_outb(port_t port, u8_t value)
 	int r;
 
 	r= sys_outb(port, value);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_outb failed", r);
 }
 
@@ -2928,7 +2928,7 @@ static void do_outl(port_t port, u32_t value)
 	int r;
 
 	r= sys_outl(port, value);
-	if (r != OK)
+	if (r != 0)
 		panic("FXP","sys_outl failed", r);
 }
 
@@ -2945,7 +2945,7 @@ int pci_func;
 	message m;
 
 	r= ds_retrieve_u32("amddev", &u32);
-	if (r != OK)
+	if (r != 0)
 	{
 #if 0
 		printf(
@@ -2965,13 +2965,13 @@ int pci_func;
 	m.m2_l2= size;
 
 	r= sendrec(dev_e, &m);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("fxp`tell_dev: sendrec to %d failed: %d\n",
 			dev_e, r);
 		return;
 	}
-	if (m.m_type != OK)
+	if (m.m_type != 0)
 	{
 		printf("fxp`tell_dev: dma map request failed: %d\n",
 			m.m_type);

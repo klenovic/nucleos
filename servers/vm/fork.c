@@ -42,17 +42,17 @@ int do_fork(message *msg)
 
   SANITYCHECK(SCL_FUNCTIONS);
 
-  if(vm_isokendpt(msg->VMF_ENDPOINT, &proc) != OK) {
+  if(vm_isokendpt(msg->VMF_ENDPOINT, &proc) != 0) {
 	printf("VM: bogus endpoint VM_FORK %d\n", msg->VMF_ENDPOINT);
   SANITYCHECK(SCL_FUNCTIONS);
-	return EINVAL;
+	return -EINVAL;
   }
 
   childproc = msg->VMF_SLOTNO;
   if(childproc < 0 || childproc >= NR_PROCS) {
 	printf("VM: bogus slotno VM_FORK %d\n", msg->VMF_SLOTNO);
   SANITYCHECK(SCL_FUNCTIONS);
-	return EINVAL;
+	return -EINVAL;
   }
 
   vmp = &vmproc[proc];		/* parent */
@@ -60,7 +60,7 @@ int do_fork(message *msg)
 
   if(vmp->vm_flags & VMF_HAS_DMA) {
 	printf("VM: %d has DMA memory and may not fork\n", msg->VMF_ENDPOINT);
-	return EINVAL;
+	return -EINVAL;
   }
 
   fullvm = vmp->vm_flags & VMF_HASPT;
@@ -77,17 +77,17 @@ int do_fork(message *msg)
   if(fullvm) {
 	SANITYCHECK(SCL_DETAIL);
 
-	if(pt_new(&vmc->vm_pt) != OK) {
+	if(pt_new(&vmc->vm_pt) != 0) {
 		printf("VM: fork: pt_new failed\n");
-		return ENOMEM;
+		return -ENOMEM;
 	}
 
 	SANITYCHECK(SCL_DETAIL);
 
-	if(map_proc_copy(vmc, vmp) != OK) {
+	if(map_proc_copy(vmc, vmp) != 0) {
 		printf("VM: fork: map_proc_copy failed\n");
 		pt_free(&vmc->vm_pt);
-		return(ENOMEM);
+		return(-ENOMEM);
 	}
 
 	if(vmp->vm_heap) {
@@ -110,7 +110,7 @@ int do_fork(message *msg)
 	prog_bytes = (phys_bytes) prog_clicks << CLICK_SHIFT;
 	if ( (child_base = ALLOC_MEM(prog_clicks, 0)) == NO_MEM) {
   SANITYCHECK(SCL_FUNCTIONS);
-		return(ENOMEM);
+		return(-ENOMEM);
 	}
 
 	/* Create a copy of the parent's core image for the child. */
@@ -135,12 +135,12 @@ int do_fork(message *msg)
   /* Tell kernel about the (now successful) FORK. */
   if((r=sys_fork(vmp->vm_endpoint, childproc,
 	&vmc->vm_endpoint, vmc->vm_arch.vm_seg,
-	fullvm ? PFF_VMINHIBIT : 0)) != OK) {
+	fullvm ? PFF_VMINHIBIT : 0)) != 0) {
         vm_panic("do_fork can't sys_fork", r);
   }
 
   if(fullvm) {
-	if((r=pt_bind(&vmc->vm_pt, vmc)) != OK)
+	if((r=pt_bind(&vmc->vm_pt, vmc)) != 0)
 		vm_panic("fork can't pt_bind", r);
   }
 
@@ -148,6 +148,6 @@ int do_fork(message *msg)
   msg->VMF_CHILD_ENDPOINT = vmc->vm_endpoint;
 
   SANITYCHECK(SCL_FUNCTIONS);
-  return OK;
+  return 0;
 }
 

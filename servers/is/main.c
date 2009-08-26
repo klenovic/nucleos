@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	  }
 	  continue;
       case PROC_EVENT:
-          result = EDONTREPLY;
+          result = -EDONTREPLY;
       	  break;
       case FKEY_PRESSED:
           result = do_fkey_pressed(&m_in);
@@ -73,15 +73,15 @@ int main(int argc, char **argv)
       default: 
           printf("IS: warning, got illegal request %d from %d\n",
           	callnr, m_in.m_source);
-          result = EDONTREPLY;
+          result = -EDONTREPLY;
       }
 
       /* Finally send reply message, unless disabled. */
-      if (result != EDONTREPLY) {
+      if (result != -EDONTREPLY) {
 	  reply(who_e, result);
       }
   }
-  return(OK);				/* shouldn't come here */
+  return 0;				/* shouldn't come here */
 }
 
 /*===========================================================================*
@@ -105,7 +105,7 @@ static void init_server(int argc, char **argv)
   fkeys = sfkeys = 0;
   for (i=1; i<=12; i++) bit_set(fkeys, i);
   for (i=1; i<=10; i++) bit_set(sfkeys, i);
-  if ((s=fkey_map(&fkeys, &sfkeys)) != OK)
+  if ((s=fkey_map(&fkeys, &sfkeys)) != 0)
       report("IS", "warning, fkey_map failed:", s);
 }
 
@@ -116,7 +116,7 @@ static void get_work()
 {
     int status = 0;
     status = receive(ANY, &m_in);   /* this blocks until message arrives */
-    if (OK != status)
+    if (status != 0)
         panic("IS","failed to receive message!", status);
     who_e = m_in.m_source;        /* message arrived! set sender */
     callnr = m_in.m_type;       /* set function call number */
@@ -132,7 +132,7 @@ int result;                           	/* report result to replyee */
     int send_status;
     m_out.m_type = result;  		/* build reply message */
     send_status = send(who, &m_out);    /* send the message */
-    if (OK != send_status)
+    if (send_status != 0)
         panic("IS", "unable to send reply!", send_status);
 }
 

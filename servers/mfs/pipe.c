@@ -56,7 +56,7 @@ int fs_pipe(void)
   fs_m_out.RES_UID = rip->i_uid;
   fs_m_out.RES_GID = rip->i_gid;
 
-  return OK;
+  return 0;
 }
 
 

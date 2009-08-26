@@ -41,5 +41,5 @@ int begy, begx;
   win->_begy = begy;
   win->_begx = begx;
   touchwin(win);
-  return(OK);
+  return 0;
 }				/* mvwin */

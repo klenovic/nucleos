@@ -33,5 +33,5 @@ WINDOW *win;
   win->_maxchng[y] = win->_maxx;
   win->_line[win->_regbottom] = temp;
   for (end = &(temp[win->_maxx]); temp <= end;) *temp++ = blank;
-  return(OK);
+  return 0;
 }

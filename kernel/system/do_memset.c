@@ -31,7 +31,7 @@ register message *m_ptr;
   unsigned char c = m_ptr->MEM_PATTERN;
   p = c | (c << 8) | (c << 16) | (c << 24);
   phys_memset((phys_bytes) m_ptr->MEM_PTR, p, (phys_bytes) m_ptr->MEM_COUNT);
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_MEMSET */

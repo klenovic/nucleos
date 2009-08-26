@@ -218,7 +218,7 @@ char *type;
   ACS_LANTERN = _cursgraftable[LATERN];
   ACS_BLOCK = _cursgraftable[FULLSQUARE];
   /* Wow, I got it! */
-  return OK;
+  return 0;
 }
 
 void gettmode()

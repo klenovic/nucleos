@@ -46,7 +46,7 @@ int bottom;
 	) {
 	win->_regtop = top;
 	win->_regbottom = bottom;
-	return(OK);
+	return 0;
   }
 
    /* If */ 

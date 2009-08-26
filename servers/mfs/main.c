@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
   fs_m_in.m_type = FS_READY;
 
-  if (send(FS_PROC_NR, &fs_m_in) != OK) {
+  if (send(FS_PROC_NR, &fs_m_in) != 0) {
       printf("MFS(%d): Error sending login to VFS\n", SELF_E);
       return -1;
   }
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
       /* Wait for request message. */
       get_work(&fs_m_in);
       src = fs_m_in.m_source;
-      error = OK;
+      error = 0;
 
       caller_uid = -1;	/* To trap errors */
       caller_gid = -1;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
       if (ind < 0 || ind >= NREQS) {
 	  printf("mfs: bad request %d\n", req_nr); 
 	  printf("ind = %d\n", ind);
-          error = EINVAL; 
+          error = -EINVAL; 
       }
       else {
           error = (*fs_call_vec[ind])();
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
       fs_m_out.m_type = error; 
       reply(src, &fs_m_out);
 
-      if (error == OK && rdahed_inode != NIL_INODE) {
+      if (error == 0 && rdahed_inode != NIL_INODE) {
           read_ahead(); /* do block read ahead */
       }
   }
@@ -129,7 +129,7 @@ message *m_in;				/* pointer to message */
     endpoint_t src;
     do {
     	int s;				/* receive status */
-	if (OK != (s = receive(ANY, m_in))) 	/* wait for message */
+	if ((s = receive(ANY, m_in)) != 0) 	/* wait for message */
 		panic("MFS","receive failed", s);
 	src = fs_m_in.m_source;
 
@@ -164,7 +164,7 @@ void reply(who, m_out)
 int who;	
 message *m_out;                       	/* report result */
 {
-    if (OK != send(who, m_out))    /* send the message */
+    if (send(who, m_out) != 0)    /* send the message */
         printf("MFS(%d) was unable to send reply\n", SELF_E);
 }
 

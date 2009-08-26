@@ -56,27 +56,27 @@ int fs_link_o()
   /* Copy the link name's last component */
   r = sys_datacopy(FS_PROC_NR, (vir_bytes) fs_m_in.REQ_PATH,
           SELF, (vir_bytes) string, (phys_bytes) len);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_LINKED_FILE)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   /* Check to see if the file has maximum number of links already. */
-  r = OK;
+  r = 0;
   if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX))
-	r = EMLINK;
+	r = -EMLINK;
 
   /* Only super_user may link to directories. */
-  if (r == OK)
+  if (r == 0)
 	if ( (rip->i_mode & I_TYPE) == I_DIRECTORY && caller_uid != SU_UID) 
-		r = EPERM;
+		r = -EPERM;
 
   /* If error with 'name', return the inode. */
-  if (r != OK) {
+  if (r != 0) {
 	put_inode(rip);
 	return(r);
   }
@@ -84,27 +84,27 @@ printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
   /* Temporarily open the last dir */
   if ( (ip = get_inode(fs_dev, fs_m_in.REQ_LINK_PARENT)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* If 'name2' exists in full (even if no space) set 'r' to error. */
-  if (r == OK) {
+  if (r == 0) {
 	if ( (new_ip = advance_o(&ip, string)) == NIL_INODE) {
 		r = err_code;
-		if (r == ENOENT) r = OK;
-		else if (r == EENTERMOUNT || r == ELEAVEMOUNT) r = EEXIST;
+		if (r == -ENOENT) r = 0;
+		else if (r == EENTERMOUNT || r == ELEAVEMOUNT) r = -EEXIST;
 	} else {
 		put_inode(new_ip);
-		r = EEXIST;
+		r = -EEXIST;
 	}
   }
 
   /* Try to link. */
-  if (r == OK)
+  if (r == 0)
 	r = search_dir(ip, string, &rip->i_num, ENTER);
 
   /* If success, register the linking. */
-  if (r == OK) {
+  if (r == 0) {
 	rip->i_nlinks++;
 	rip->i_update |= CTIME;
 	rip->i_dirt = DIRTY;
@@ -139,27 +139,27 @@ int fs_link_s()
   /* Copy the link name's last component */
   r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
           (vir_bytes) string, (phys_bytes) len, D);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_LINKED_FILE)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   /* Check to see if the file has maximum number of links already. */
-  r = OK;
+  r = 0;
   if (rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX))
-	r = EMLINK;
+	r = -EMLINK;
 
   /* Only super_user may link to directories. */
-  if (r == OK)
+  if (r == 0)
 	if ( (rip->i_mode & I_TYPE) == I_DIRECTORY && caller_uid != SU_UID) 
-		r = EPERM;
+		r = -EPERM;
 
   /* If error with 'name', return the inode. */
-  if (r != OK) {
+  if (r != 0) {
 	put_inode(rip);
 	return(r);
   }
@@ -167,27 +167,27 @@ printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
   /* Temporarily open the last dir */
   if ( (ip = get_inode(fs_dev, fs_m_in.REQ_LINK_PARENT)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_link() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* If 'name2' exists in full (even if no space) set 'r' to error. */
-  if (r == OK) {
+  if (r == 0) {
 	if ( (new_ip = advance_nocheck(&ip, string)) == NIL_INODE) {
 		r = err_code;
-		if (r == ENOENT) r = OK;
-		else if (r == EENTERMOUNT || r == ELEAVEMOUNT) r = EEXIST;
+		if (r == -ENOENT) r = 0;
+		else if (r == EENTERMOUNT || r == ELEAVEMOUNT) r = -EEXIST;
 	} else {
 		put_inode(new_ip);
-		r = EEXIST;
+		r = -EEXIST;
 	}
   }
 
   /* Try to link. */
-  if (r == OK)
+  if (r == 0)
 	r = search_dir_nocheck(ip, string, &rip->i_num, ENTER);
 
   /* If success, register the linking. */
-  if (r == OK) {
+  if (r == 0) {
 	rip->i_nlinks++;
 	rip->i_update |= CTIME;
 	rip->i_dirt = DIRTY;
@@ -222,24 +222,24 @@ int fs_unlink_o()
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
   r = sys_datacopy(FS_PROC_NR, (vir_bytes) fs_m_in.REQ_PATH,
           SELF, (vir_bytes) string, (phys_bytes) len);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
   
   /* Temporarily open the dir. */
   if ( (rldirp = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   /* The last directory exists.  Does the file also exist? */
-  r = OK;
+  r = 0;
   if ( (rip = advance_o(&rldirp, string)) == NIL_INODE) r = err_code;
 
   /* If error, return inode. */
-  if (r != OK) {
+  if (r != 0) {
 	printf("fs_unlink_o: advance_o failed: %d\n", r);
         /* Mount point? */
         if (r == EENTERMOUNT || r == ELEAVEMOUNT)
-            r = EBUSY;
+            r = -EBUSY;
 	put_inode(rldirp);
 	return(r);
   }
@@ -248,13 +248,13 @@ int fs_unlink_o()
   if (fs_m_in.m_type == REQ_UNLINK_O) {
 	/* Only the su may unlink directories, but the su can unlink any dir.*/
 	if ( (rip->i_mode & I_TYPE) == I_DIRECTORY 
-                && caller_uid != SU_UID) r = EPERM;
+                && caller_uid != SU_UID) r = -EPERM;
 
 	/* Don't unlink a file if it is the root of a mounted file system. */
-	if (rip->i_num == ROOT_INODE) r = EBUSY;
+	if (rip->i_num == ROOT_INODE) r = -EBUSY;
 
 	/* Actually try to unlink the file; fails if parent is mode 0 etc. */
-	if (r == OK) r = unlink_file_o(rldirp, rip, string);
+	if (r == 0) r = unlink_file_o(rldirp, rip, string);
 
   } 
   else {
@@ -264,7 +264,7 @@ int fs_unlink_o()
   /* If unlink was possible, it has been done, otherwise it has not. */
   put_inode(rip);
   put_inode(rldirp);
-  if (r != OK) printf("fs_unlink_o: returning %d\n", r);
+  if (r != 0) printf("fs_unlink_o: returning %d\n", r);
   return(r);
 }
 
@@ -288,23 +288,23 @@ int fs_unlink_s()
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
   r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
           (vir_bytes) string, (phys_bytes) len, D);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
   
   /* Temporarily open the dir. */
   if ( (rldirp = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   /* The last directory exists.  Does the file also exist? */
-  r = OK;
+  r = 0;
   if ( (rip = advance_nocheck(&rldirp, string)) == NIL_INODE) r = err_code;
 
   /* If error, return inode. */
-  if (r != OK) {
+  if (r != 0) {
         /* Mount point? */
         if (r == EENTERMOUNT || r == ELEAVEMOUNT)
-            r = EBUSY;
+            r = -EBUSY;
 	put_inode(rldirp);
 	return(r);
   }
@@ -312,10 +312,10 @@ int fs_unlink_s()
   /* Now test if the call is allowed, separately for unlink() and rmdir(). */
   if (fs_m_in.m_type == REQ_UNLINK_S) {
 	/* Only the su may unlink directories, but the su can unlink any dir.*/
-	if ( (rip->i_mode & I_TYPE) == I_DIRECTORY) r = EPERM;
+	if ( (rip->i_mode & I_TYPE) == I_DIRECTORY) r = -EPERM;
 
 	/* Actually try to unlink the file; fails if parent is mode 0 etc. */
-	if (r == OK) r = unlink_file_nocheck(rldirp, rip, string);
+	if (r == 0) r = unlink_file_nocheck(rldirp, rip, string);
   } 
   else {
 	r = remove_dir_nocheck(rldirp, rip, string); /* call is RMDIR */
@@ -346,13 +346,13 @@ int fs_rdlink_o()
 
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-        return(EINVAL);
+        return(-EINVAL);
   }
 
-  r = EACCES;
+  r = -EACCES;
   if (S_ISLNK(rip->i_mode) && (b = read_map(rip, (off_t) 0)) != NO_BLOCK) {
-       if (copylen <= 0) r = EINVAL;
-       else if (copylen < rip->i_size) r = ERANGE;
+       if (copylen <= 0) r = -EINVAL;
+       else if (copylen < rip->i_size) r = -ERANGE;
        else {
 	       if(rip->i_size < copylen) copylen = rip->i_size;
                bp = get_block(rip->i_dev, b, NORMAL);
@@ -360,7 +360,7 @@ int fs_rdlink_o()
 		fs_m_in.REQ_WHO_E, D, (vir_bytes) fs_m_in.REQ_USER_ADDR, 
                 (vir_bytes) copylen);
 
-               if (r == OK) r = copylen;
+               if (r == 0) r = copylen;
                put_block(bp, DIRECTORY_BLOCK);
        }
   }
@@ -382,18 +382,18 @@ int fs_rdlink_s()
   int copylen;
   
   copylen = fs_m_in.REQ_SLENGTH;
-  if (copylen <= 0) return(EINVAL);
+  if (copylen <= 0) return(-EINVAL);
 
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-        return(EINVAL);
+        return(-EINVAL);
   }
 
 
   if (!S_ISLNK(rip->i_mode))
-	r = EACCES;
+	r = -EACCES;
   else if ((b = read_map(rip, (off_t) 0)) == NO_BLOCK)
-	r = EIO;
+	r = -EIO;
   else {
 	/* Passed all checks */
 	if (copylen > rip->i_size)
@@ -403,7 +403,7 @@ int fs_rdlink_s()
 	(vir_bytes) bp->b_data, (vir_bytes) copylen, D);
 
 	put_block(bp, DIRECTORY_BLOCK);
-	if (r == OK)
+	if (r == 0)
 		fs_m_out.RES_RDL_LENGTH = copylen;
   }
 
@@ -424,7 +424,7 @@ int fs_rdlink_so()
 
   r = fs_rdlink_s();
 
-  if (r == OK)
+  if (r == 0)
 	r = fs_m_out.RES_RDL_LENGTH;
 
   return(r);
@@ -449,20 +449,20 @@ char dir_name[NAME_MAX];		/* name of directory to be removed */
   int r;
 
   /* search_dir checks that rip is a directory too. */
-  if ((r = search_dir(rip, "", (ino_t *) 0, IS_EMPTY)) != OK) return r;
+  if ((r = search_dir(rip, "", (ino_t *) 0, IS_EMPTY)) != 0) return r;
 
-  if (strcmp(dir_name, ".") == 0 || strcmp(dir_name, "..") == 0)return(EINVAL);
-  if (rip->i_num == ROOT_INODE) return(EBUSY); /* can't remove 'root' */
+  if (strcmp(dir_name, ".") == 0 || strcmp(dir_name, "..") == 0)return(-EINVAL);
+  if (rip->i_num == ROOT_INODE) return(-EBUSY); /* can't remove 'root' */
  
   /* Actually try to unlink the file; fails if parent is mode 0 etc. */
-  if ((r = unlink_file_o(rldirp, rip, dir_name)) != OK) return r;
+  if ((r = unlink_file_o(rldirp, rip, dir_name)) != 0) return r;
 
   /* Unlink . and .. from the dir. The super user can link and unlink any dir,
    * so don't make too many assumptions about them.
    */
   (void) unlink_file_o(rip, NIL_INODE, dot1);
   (void) unlink_file_o(rip, NIL_INODE, dot2);
-  return(OK);
+  return 0;
 }
 
 
@@ -484,20 +484,20 @@ char dir_name[NAME_MAX];		/* name of directory to be removed */
   int r;
 
   /* search_dir checks that rip is a directory too. */
-  if ((r = search_dir_nocheck(rip, "", (ino_t *) 0, IS_EMPTY)) != OK) return r;
+  if ((r = search_dir_nocheck(rip, "", (ino_t *) 0, IS_EMPTY)) != 0) return r;
 
-  if (strcmp(dir_name, ".") == 0 || strcmp(dir_name, "..") == 0)return(EINVAL);
-  if (rip->i_num == ROOT_INODE) return(EBUSY); /* can't remove 'root' */
+  if (strcmp(dir_name, ".") == 0 || strcmp(dir_name, "..") == 0)return(-EINVAL);
+  if (rip->i_num == ROOT_INODE) return(-EBUSY); /* can't remove 'root' */
  
   /* Actually try to unlink the file; fails if parent is mode 0 etc. */
-  if ((r = unlink_file_nocheck(rldirp, rip, dir_name)) != OK) return r;
+  if ((r = unlink_file_nocheck(rldirp, rip, dir_name)) != 0) return r;
 
   /* Unlink . and .. from the dir. The super user can link and unlink any dir,
    * so don't make too many assumptions about them.
    */
   (void) unlink_file_nocheck(rip, NIL_INODE, dot1);
   (void) unlink_file_nocheck(rip, NIL_INODE, dot2);
-  return(OK);
+  return 0;
 }
 
 
@@ -518,15 +518,15 @@ char file_name[NAME_MAX];	/* name of file to be removed */
   if (rip == NIL_INODE) {
   	/* Search for file in directory and try to get its inode. */
 	err_code = search_dir(dirp, file_name, &numb, LOOK_UP);
-	if (err_code == OK) rip = get_inode(dirp->i_dev, (int) numb);
-	if (err_code != OK || rip == NIL_INODE) return(err_code);
+	if (err_code == 0) rip = get_inode(dirp->i_dev, (int) numb);
+	if (err_code != 0 || rip == NIL_INODE) return(err_code);
   } else {
 	dup_inode(rip);		/* inode will be returned with put_inode */
   }
 
   r = search_dir(dirp, file_name, (ino_t *) 0, DELETE);
 
-  if (r == OK) {
+  if (r == 0) {
 	rip->i_nlinks--;	/* entry deleted from parent's dir */
 	rip->i_update |= CTIME;
 	rip->i_dirt = DIRTY;
@@ -554,15 +554,15 @@ char file_name[NAME_MAX];	/* name of file to be removed */
   if (rip == NIL_INODE) {
   	/* Search for file in directory and try to get its inode. */
 	err_code = search_dir_nocheck(dirp, file_name, &numb, LOOK_UP);
-	if (err_code == OK) rip = get_inode(dirp->i_dev, (int) numb);
-	if (err_code != OK || rip == NIL_INODE) return(err_code);
+	if (err_code == 0) rip = get_inode(dirp->i_dev, (int) numb);
+	if (err_code != 0 || rip == NIL_INODE) return(err_code);
   } else {
 	dup_inode(rip);		/* inode will be returned with put_inode */
   }
 
   r = search_dir_nocheck(dirp, file_name, (ino_t *) 0, DELETE);
 
-  if (r == OK) {
+  if (r == 0) {
 	rip->i_nlinks--;	/* entry deleted from parent's dir */
 	rip->i_update |= CTIME;
 	rip->i_dirt = DIRTY;
@@ -582,7 +582,7 @@ int fs_rename_o()
   struct inode *old_dirp, *old_ip;	/* ptrs to old dir, file inodes */
   struct inode *new_dirp, *new_ip;	/* ptrs to new dir, file inodes */
   struct inode *new_superdirp, *next_new_superdirp;
-  int r = OK;				/* error flag; initially no error */
+  int r = 0;				/* error flag; initially no error */
   int odir, ndir;			/* TRUE iff {old|new} file is dir */
   int same_pdir;			/* TRUE iff parent dirs are the same */
   char old_name[NAME_MAX], new_name[NAME_MAX];
@@ -597,14 +597,14 @@ int fs_rename_o()
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(old_name));
   r = sys_datacopy(FS_PROC_NR, (vir_bytes) fs_m_in.REQ_PATH,
           SELF, (vir_bytes) old_name, (phys_bytes) len);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(old_name, len, sizeof(old_name));
   
   /* Copy the last component of the new name */
   len = MFS_MIN(fs_m_in.REQ_SLENGTH, sizeof(new_name));
   r = sys_datacopy(FS_PROC_NR, (vir_bytes) fs_m_in.REQ_USER_ADDR,
           SELF, (vir_bytes) new_name, (phys_bytes) len);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(new_name, len, sizeof(new_name));
 
   /* Get old dir inode */ 
@@ -613,8 +613,8 @@ int fs_rename_o()
 
   if ( (old_ip = advance_o(&old_dirp, old_name)) == NIL_INODE) {
 	r = err_code;
-	if (r == EENTERMOUNT) r = EBUSY;	/* should this fail at all? */
-	else if (r == ELEAVEMOUNT) r = EINVAL;	/* rename on dot-dot */
+	if (r == EENTERMOUNT) r = -EBUSY;	/* should this fail at all? */
+	else if (r == ELEAVEMOUNT) r = -EINVAL;	/* rename on dot-dot */
   }
 
   /* Get new dir inode */ 
@@ -626,13 +626,13 @@ int fs_rename_o()
    * Note that ELEAVEMOUNT is covered by the dot-dot check later.
    */
   if (new_ip == NIL_INODE && err_code == EENTERMOUNT)
- 	r = EBUSY;
+ 	r = -EBUSY;
 
   if (old_ip != NIL_INODE)
 	odir = ((old_ip->i_mode & I_TYPE) == I_DIRECTORY);  /* TRUE iff dir */
 
   /* If it is ok, check for a variety of possible errors. */
-  if (r == OK) {
+  if (r == 0) {
 	same_pdir = (old_dirp == new_dirp);
 
 	/* The old inode must not be a superdirectory of the new last dir. */
@@ -641,7 +641,7 @@ int fs_rename_o()
 		while (TRUE) {		/* may hang in a file system loop */
 			if (new_superdirp == old_ip) {
 				put_inode(new_superdirp);
-				r = EINVAL;
+				r = -EINVAL;
 				break;
 			}
 			next_new_superdirp = advance_o(&new_superdirp, dot2);
@@ -656,13 +656,13 @@ int fs_rename_o()
 				/* imitate that we are back at the root,
 				 * cross device checked already on VFS */
 				/*next_new_superdirp = new_superdirp;*/
-				err_code = OK;
+				err_code = 0;
 				break;
 			}
 			new_superdirp = next_new_superdirp;
 			if (new_superdirp == NIL_INODE) {
 				/* Missing ".." entry.  Assume the worst. */
-				r = EINVAL;
+				r = -EINVAL;
 				break;
 			}
 		} 	
@@ -672,25 +672,25 @@ int fs_rename_o()
 	/* The old or new name must not be . or .. */
 	if (strcmp(old_name, ".")==0 || strcmp(old_name, "..")==0 ||
 	    strcmp(new_name, ".")==0 || strcmp(new_name, "..")==0) {
-		r = EINVAL;
+		r = -EINVAL;
 	}
 	/* Both parent directories must be on the same device. 
-	if (old_dirp->i_dev != new_dirp->i_dev) r = EXDEV; */
+	if (old_dirp->i_dev != new_dirp->i_dev) r = -EXDEV; */
 
 	/* Parent dirs must be writable, searchable and on a writable device */
-	if ((r1 = forbidden(old_dirp, W_BIT | X_BIT)) != OK ||
-	    (r1 = forbidden(new_dirp, W_BIT | X_BIT)) != OK) {
+	if ((r1 = forbidden(old_dirp, W_BIT | X_BIT)) != 0 ||
+	    (r1 = forbidden(new_dirp, W_BIT | X_BIT)) != 0) {
 		r = r1;
 	}
 
 	/* Some tests apply only if the new path exists. */
 	if (new_ip == NIL_INODE) {
 		/* don't rename a file with a file system mounted on it. 
-		if (old_ip->i_dev != old_dirp->i_dev) r = EXDEV;*/
+		if (old_ip->i_dev != old_dirp->i_dev) r = -EXDEV;*/
 		if (odir && new_dirp->i_nlinks >=
 		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX) &&
-		    !same_pdir && r == OK) { 
-			r = EMLINK;
+		    !same_pdir && r == 0) { 
+			r = -EMLINK;
 		}
 	} 
 	else {
@@ -699,15 +699,15 @@ int fs_rename_o()
 		}
 		
 		/* has the old file or new file a file system mounted on it? 
-		if (old_ip->i_dev != new_ip->i_dev) r = EXDEV;
+		if (old_ip->i_dev != new_ip->i_dev) r = -EXDEV;
 		*/
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY); /* dir ? */
 		if (odir == TRUE && ndir == FALSE) {
-			r = ENOTDIR;
+			r = -ENOTDIR;
 		}
 		if (odir == FALSE && ndir == TRUE) {
-			r = EISDIR;
+			r = -EISDIR;
 		}
 	}
   }
@@ -725,7 +725,7 @@ int fs_rename_o()
    *     [directory has to grow by one block and cannot because the disk
    *      is completely full].
    */
-  if (r == OK) {
+  if (r == 0) {
 	if (new_ip != NIL_INODE) {
 		  /* There is already an entry for 'new'. Try to remove it. */
 		if (odir) 
@@ -733,12 +733,12 @@ int fs_rename_o()
 		else 
 			r = unlink_file_o(new_dirp, new_ip, new_name);
 	}
-	/* if r is OK, the rename will succeed, while there is now an
+	/* if r is 0, the rename will succeed, while there is now an
 	 * unused entry in the new parent directory.
 	 */
   }
 
-  if (r == OK) {
+  if (r == 0) {
 	/* If the new name will be in the same parent directory as the old one,
 	 * first remove the old name to free an entry for the new name,
 	 * otherwise first try to create the new name entry to make sure
@@ -749,22 +749,22 @@ int fs_rename_o()
   	if (same_pdir) {
 		r = search_dir(old_dirp, old_name, (ino_t *) 0, DELETE);
 						/* shouldn't go wrong. */
-		if (r==OK) (void) search_dir(old_dirp, new_name, &numb, ENTER);
+		if (r == 0) (void) search_dir(old_dirp, new_name, &numb, ENTER);
 	} else {
 		r = search_dir(new_dirp, new_name, &numb, ENTER);
-		if (r == OK)
+		if (r == 0)
 		    (void) search_dir(old_dirp, old_name, (ino_t *) 0, DELETE);
 	}
   }
-  /* If r is OK, the ctime and mtime of old_dirp and new_dirp have been marked
+  /* If r is 0, the ctime and mtime of old_dirp and new_dirp have been marked
    * for update in search_dir.
    */
 
-  if (r == OK && odir && !same_pdir) {
+  if (r == 0 && odir && !same_pdir) {
 	/* Update the .. entry in the directory (still points to old_dirp). */
 	numb = new_dirp->i_num;
 	(void) unlink_file_o(old_ip, NIL_INODE, dot2);
-	if (search_dir(old_ip, dot2, &numb, ENTER) == OK) {
+	if (search_dir(old_ip, dot2, &numb, ENTER) == 0) {
 		/* New link created. */
 		new_dirp->i_nlinks++;
 		new_dirp->i_dirt = DIRTY;
@@ -776,7 +776,7 @@ int fs_rename_o()
   put_inode(old_ip);
   put_inode(new_dirp);
   put_inode(new_ip);
-  return(r == SAME ? OK : r);
+  return(r == SAME ? 0 : r);
 }
 
 
@@ -789,7 +789,7 @@ int fs_rename_s()
   struct inode *old_dirp, *old_ip;	/* ptrs to old dir, file inodes */
   struct inode *new_dirp, *new_ip;	/* ptrs to new dir, file inodes */
   struct inode *new_superdirp, *next_new_superdirp;
-  int r = OK;				/* error flag; initially no error */
+  int r = 0;				/* error flag; initially no error */
   int odir, ndir;			/* TRUE iff {old|new} file is dir */
   int same_pdir;			/* TRUE iff parent dirs are the same */
   char old_name[NAME_MAX], new_name[NAME_MAX];
@@ -801,14 +801,14 @@ int fs_rename_s()
   len = MFS_MIN(fs_m_in.REQ_REN_LEN_OLD, sizeof(old_name));
   r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_REN_GRANT_OLD, 0, 
           (vir_bytes) old_name, (phys_bytes) len, D);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(old_name, len, sizeof(old_name));
   
   /* Copy the last component of the new name */
   len = MFS_MIN(fs_m_in.REQ_REN_LEN_NEW, sizeof(new_name));
   r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_REN_GRANT_NEW, 0, 
           (vir_bytes) new_name, (phys_bytes) len, D);
-  if (r != OK) return r;
+  if (r != 0) return r;
   MFS_NUL(new_name, len, sizeof(new_name));
 
   /* Get old dir inode */ 
@@ -817,8 +817,8 @@ int fs_rename_s()
 
   if ( (old_ip = advance_nocheck(&old_dirp, old_name)) == NIL_INODE) {
 	r = err_code;
-	if (r == EENTERMOUNT) r = EBUSY;	/* should this fail at all? */
-	else if (r == ELEAVEMOUNT) r = EINVAL;	/* rename on dot-dot */
+	if (r == EENTERMOUNT) r = -EBUSY;	/* should this fail at all? */
+	else if (r == ELEAVEMOUNT) r = -EINVAL;	/* rename on dot-dot */
   }
 
   /* Get new dir inode */ 
@@ -830,13 +830,13 @@ int fs_rename_s()
    * Note that ELEAVEMOUNT is covered by the dot-dot check later.
    */
   if (new_ip == NIL_INODE && err_code == EENTERMOUNT)
- 	r = EBUSY;
+ 	r = -EBUSY;
 
   if (old_ip != NIL_INODE)
 	odir = ((old_ip->i_mode & I_TYPE) == I_DIRECTORY);  /* TRUE iff dir */
 
   /* If it is ok, check for a variety of possible errors. */
-  if (r == OK) {
+  if (r == 0) {
 	same_pdir = (old_dirp == new_dirp);
 
 	/* The old inode must not be a superdirectory of the new last dir. */
@@ -845,7 +845,7 @@ int fs_rename_s()
 		while (TRUE) {		/* may hang in a file system loop */
 			if (new_superdirp == old_ip) {
 				put_inode(new_superdirp);
-				r = EINVAL;
+				r = -EINVAL;
 				break;
 			}
 #if 0
@@ -870,13 +870,13 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 				/* imitate that we are back at the root,
 				 * cross device checked already on VFS */
 				/*next_new_superdirp = new_superdirp;*/
-				err_code = OK;
+				err_code = 0;
 				break;
 			}
 			new_superdirp = next_new_superdirp;
 			if (new_superdirp == NIL_INODE) {
 				/* Missing ".." entry.  Assume the worst. */
-				r = EINVAL;
+				r = -EINVAL;
 				break;
 			}
 		} 	
@@ -885,19 +885,19 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 	/* The old or new name must not be . or .. */
 	if (strcmp(old_name, ".")==0 || strcmp(old_name, "..")==0 ||
 	    strcmp(new_name, ".")==0 || strcmp(new_name, "..")==0) {
-		r = EINVAL;
+		r = -EINVAL;
 	}
 	/* Both parent directories must be on the same device. 
-	if (old_dirp->i_dev != new_dirp->i_dev) r = EXDEV; */
+	if (old_dirp->i_dev != new_dirp->i_dev) r = -EXDEV; */
 
 	/* Some tests apply only if the new path exists. */
 	if (new_ip == NIL_INODE) {
 		/* don't rename a file with a file system mounted on it. 
-		if (old_ip->i_dev != old_dirp->i_dev) r = EXDEV;*/
+		if (old_ip->i_dev != old_dirp->i_dev) r = -EXDEV;*/
 		if (odir && new_dirp->i_nlinks >=
 		    (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : SHORT_MAX) &&
-		    !same_pdir && r == OK) { 
-			r = EMLINK;
+		    !same_pdir && r == 0) { 
+			r = -EMLINK;
 		}
 	} 
 	else {
@@ -906,15 +906,15 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 		}
 		
 		/* has the old file or new file a file system mounted on it? 
-		if (old_ip->i_dev != new_ip->i_dev) r = EXDEV;
+		if (old_ip->i_dev != new_ip->i_dev) r = -EXDEV;
 		*/
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY); /* dir ? */
 		if (odir == TRUE && ndir == FALSE) {
-			r = ENOTDIR;
+			r = -ENOTDIR;
 		}
 		if (odir == FALSE && ndir == TRUE) {
-			r = EISDIR;
+			r = -EISDIR;
 		}
 	}
   }
@@ -932,7 +932,7 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
    *     [directory has to grow by one block and cannot because the disk
    *      is completely full].
    */
-  if (r == OK) {
+  if (r == 0) {
 	if (new_ip != NIL_INODE) {
 		  /* There is already an entry for 'new'. Try to remove it. */
 		if (odir) 
@@ -940,12 +940,12 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 		else 
 			r = unlink_file_nocheck(new_dirp, new_ip, new_name);
 	}
-	/* if r is OK, the rename will succeed, while there is now an
+	/* if r is 0, the rename will succeed, while there is now an
 	 * unused entry in the new parent directory.
 	 */
   }
 
-  if (r == OK) {
+  if (r == 0) {
 	/* If the new name will be in the same parent directory as the old one,
 	 * first remove the old name to free an entry for the new name,
 	 * otherwise first try to create the new name entry to make sure
@@ -956,24 +956,24 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
   	if (same_pdir) {
 		r = search_dir_nocheck(old_dirp, old_name, (ino_t *) 0, DELETE);
 						/* shouldn't go wrong. */
-		if (r==OK) (void) search_dir_nocheck(old_dirp, new_name,
+		if (r == 0) (void) search_dir_nocheck(old_dirp, new_name,
 			&numb, ENTER);
 	} else {
 		r = search_dir_nocheck(new_dirp, new_name, &numb, ENTER);
-		if (r == OK)
+		if (r == 0)
 		    (void) search_dir_nocheck(old_dirp, old_name,
 			(ino_t *) 0, DELETE);
 	}
   }
-  /* If r is OK, the ctime and mtime of old_dirp and new_dirp have been marked
+  /* If r is 0, the ctime and mtime of old_dirp and new_dirp have been marked
    * for update in search_dir.
    */
 
-  if (r == OK && odir && !same_pdir) {
+  if (r == 0 && odir && !same_pdir) {
 	/* Update the .. entry in the directory (still points to old_dirp). */
 	numb = new_dirp->i_num;
 	(void) unlink_file_nocheck(old_ip, NIL_INODE, dot2);
-	if (search_dir_nocheck(old_ip, dot2, &numb, ENTER) == OK) {
+	if (search_dir_nocheck(old_ip, dot2, &numb, ENTER) == 0) {
 		/* New link created. */
 		new_dirp->i_nlinks++;
 		new_dirp->i_dirt = DIRTY;
@@ -985,7 +985,7 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
   put_inode(old_ip);
   put_inode(new_dirp);
   put_inode(new_ip);
-  return(r == SAME ? OK : r);
+  return(r == SAME ? 0 : r);
 }
 
 
@@ -995,7 +995,7 @@ printf("fs_rename_s: next_new_superdirp: %d on 0x%x\n",
 int fs_trunc()
 {
   struct inode *rip;
-  int r = OK;
+  int r = 0;
   
   caller_uid = fs_m_in.REQ_UID;
   caller_gid = fs_m_in.REQ_GID;
@@ -1003,11 +1003,11 @@ int fs_trunc()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
   
   if ( (rip->i_mode & I_TYPE) != I_REGULAR)
-        r = EINVAL;
+        r = -EINVAL;
   else
         r = truncate_inode(rip, fs_m_in.REQ_LENGTH); 
   
@@ -1029,7 +1029,7 @@ int fs_ftrunc(void)
 		  == NIL_INODE) {
           printf("FSfreesp: couldn't find inode %d\n", 
 			  fs_m_in.REQ_FD_INODE_NR); 
-          return EINVAL;
+          return -EINVAL;
   }
 
   start = fs_m_in.REQ_FD_START;
@@ -1068,9 +1068,9 @@ off_t newsize;			/* inode must become this size */
 
   file_type = rip->i_mode & I_TYPE;	/* check to see if file is special */
   if (file_type == I_CHAR_SPECIAL || file_type == I_BLOCK_SPECIAL)
-	return EINVAL;
+	return -EINVAL;
   if(newsize > rip->i_sp->s_max_size)	/* don't let inode grow too big */
-	return EFBIG;
+	return -EFBIG;
 
   dev = rip->i_dev;		/* device on which inode resides */
   scale = rip->i_sp->s_log_zone_size;
@@ -1080,7 +1080,7 @@ off_t newsize;			/* inode must become this size */
   waspipe = rip->i_pipe == I_PIPE;	/* TRUE if this was a pipe */
   if (waspipe) {
 	if(newsize != 0)
-		return EINVAL;	/* Only truncate pipes to 0. */
+		return -EINVAL;	/* Only truncate pipes to 0. */
 	rip->i_size = PIPE_SIZE(rip->i_sp->s_block_size);
   }
 
@@ -1094,7 +1094,7 @@ off_t newsize;			/* inode must become this size */
   rip->i_update |= CTIME | MTIME;
   rip->i_dirt = DIRTY;
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -1121,7 +1121,7 @@ off_t start, end;		/* range of bytes to free (end uninclusive) */
 	if(end > rip->i_size)		/* freeing beyond end makes no sense */
 		end = rip->i_size;
 	if(end <= start)		/* end is uninclusive, so start<end */
-		return EINVAL;
+		return -EINVAL;
         zone_size = rip->i_sp->s_block_size << rip->i_sp->s_log_zone_size;
 	dev = rip->i_dev;             /* device on which inode resides */
 
@@ -1151,7 +1151,7 @@ off_t start, end;		/* range of bytes to free (end uninclusive) */
         rip->i_update |= CTIME | MTIME;
         rip->i_dirt = DIRTY;
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*

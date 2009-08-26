@@ -71,11 +71,11 @@ int do_pipe()
 
   /* Acquire two file descriptors. */
   rfp = fp;
-  if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != OK) return(r);
+  if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0) return(r);
   rfp->fp_filp[fil_des[0]] = fil_ptr0;
   FD_SET(fil_des[0], &rfp->fp_filp_inuse);
   fil_ptr0->filp_count = 1;
-  if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != OK) {
+  if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
       rfp->fp_filp[fil_des[0]] = NIL_FILP;
       FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
       fil_ptr0->filp_count = 0;
@@ -90,7 +90,7 @@ int do_pipe()
 	(dev_t)0, &res);
 
   /* Handle error */
-  if (r != OK) {
+  if (r != 0) {
       rfp->fp_filp[fil_des[0]] = NIL_FILP;
       FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
       fil_ptr0->filp_count = 0;
@@ -131,7 +131,7 @@ int do_pipe()
   m_out.reply_i1 = fil_des[0];
   m_out.reply_i2 = fil_des[1];
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -164,7 +164,7 @@ int notouch;			/* check only */
 		if (find_filp(vp, W_BIT) != NIL_FILP) {
 			/* Writer exists */
 			if (oflags & O_NONBLOCK) {
-				r = EAGAIN;
+				r = -EAGAIN;
 			} else {
 				r = SUSPEND;
 			}
@@ -184,7 +184,7 @@ int notouch;			/* check only */
 	if (!notouch) {
 		sys_kill(fp->fp_endpoint, SIGPIPE);
 	}
-	return(EPIPE);
+	return(-EPIPE);
   }
 
   if (pos + bytes > PIPE_BUF) {
@@ -192,7 +192,7 @@ int notouch;			/* check only */
 	{
 		if (bytes <= PIPE_BUF) {
 			/* Write has to be atomic */
-			return(EAGAIN);
+			return(-EAGAIN);
 		}
 
 		/* Compute available space */
@@ -205,7 +205,7 @@ int notouch;			/* check only */
 			return(bytes);
 		} else {
 			/* Pipe is full */
-			return(EAGAIN);
+			return(-EAGAIN);
 		}
 	}
 
@@ -313,16 +313,16 @@ void unsuspend_by_endpt(int proc_e)
   int client = 0;
 
   /* Revive processes waiting for drivers (SUSPENDed) that have
-   * disappeared with return code EAGAIN.
+   * disappeared with return code -EAGAIN.
    */
   for (rp = &fproc[0]; rp < &fproc[NR_PROCS]; rp++, client++)
 	if(rp->fp_pid != PID_FREE &&
 	   rp->fp_suspended == SUSPENDED && rp->fp_task == -proc_e) {
-		revive(rp->fp_endpoint, EAGAIN);
+		revive(rp->fp_endpoint, -EAGAIN);
 	}
 
   /* Revive processes waiting in drivers on select()s
-   * with EAGAIN too.
+   * with -EAGAIN too.
    */
   select_unsuspend_by_endpt(proc_e);
 
@@ -398,7 +398,7 @@ int returned;			/* if hanging on task, how many bytes read */
   int fd_nr, proc_nr;
   struct filp *fil_ptr;
 
-  if(isokendpt(proc_nr_e, &proc_nr) != OK)
+  if(isokendpt(proc_nr_e, &proc_nr) != 0)
 	return;
 
   rfp = &fproc[proc_nr];
@@ -472,17 +472,17 @@ void unpause(proc_nr_e)
 int proc_nr_e;
 {
 /* A signal has been sent to a user who is paused on the file system.
- * Abort the system call with the EINTR error message.
+ * Abort the system call with the -EINTR error message.
  */
 
   register struct fproc *rfp;
-  int proc_nr_p, task, fild, status = EINTR;
+  int proc_nr_p, task, fild, status = -EINTR;
   struct filp *f;
   dev_t dev;
   message mess;
   int wasreviving = 0;
 
-  if(isokendpt(proc_nr_e, &proc_nr_p) != OK) {
+  if(isokendpt(proc_nr_e, &proc_nr_p) != 0) {
 	printf("VFS: ignoring unpause for bogus endpoint %d\n", proc_nr_e);
 	return;
   }
@@ -522,10 +522,10 @@ int proc_nr_e;
 		if (rfp->fp_flags & SUSP_REOPEN)
 		{
 			/* Process is suspended while waiting for a reopen.
-			 * Just reply EINTR.
+			 * Just reply -EINTR.
 			 */
 			rfp->fp_flags &= ~SUSP_REOPEN;
-			status= EINTR;
+			status= -EINTR;
 			break;
 		}
 		
@@ -549,7 +549,7 @@ int proc_nr_e;
 					 * later time.
 					 */
 
-		if(status == EAGAIN) status = EINTR;
+		if(status == -EAGAIN) status = -EINTR;
 		if(GRANT_VALID(rfp->fp_grant)) {
 			if(cpf_revoke(rfp->fp_grant)) {
 				panic(__FILE__,"FS: revoke failed for grant (cancel)",

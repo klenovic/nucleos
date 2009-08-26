@@ -86,19 +86,19 @@ int fs_putnode()
   {
 	printf("put_inode: bad value for count: %d\n", count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
-	return EINVAL;
+	return -EINVAL;
   }
   if (count > rip->i_count)
   {
 	printf("put_inode: count too high: %d > %d\n", count, rip->i_count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
-	return EINVAL;
+	return -EINVAL;
   }
 
   rip->i_count -= count - 1;
   put_inode(rip);
 
-  return OK;
+  return 0;
 }
 
 
@@ -115,7 +115,7 @@ int fs_getnode()
 
   if (!rip) {
       printf("FS: inode #%d couldn't be found\n", fs_m_in.REQ_INODE_NR);
-      return EINVAL;
+      return -EINVAL;
   }
 
   /* Transfer back the inode's details */
@@ -127,7 +127,7 @@ int fs_getnode()
   fs_m_out.RES_UID = rip->i_uid;
   fs_m_out.RES_GID = rip->i_gid;
 
-  return OK;
+  return 0;
 }
 
 
@@ -166,7 +166,7 @@ static int addhash_inode(struct inode *node)
   
   /* insert into hash table */
   LIST_INSERT_HEAD(&hash_inodes[hashi], node, i_hash);
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -176,7 +176,7 @@ static int unhash_inode(struct inode *node)
 {
   /* remove from hash table */
   LIST_REMOVE(node, i_hash);
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
@@ -211,7 +211,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
 
   /* Inode is not on the hash, get a free one */
   if (TAILQ_EMPTY(&unused_inodes)) {
-      err_code = ENFILE;
+      err_code = -ENFILE;
       return NIL_INODE;
   }
   rip = TAILQ_FIRST(&unused_inodes);
@@ -325,14 +325,14 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
 
   sp = get_super(dev);	/* get pointer to super_block */
   if (sp->s_rd_only) {	/* can't allocate an inode on a read only device. */
-	err_code = EROFS;
+	err_code = -EROFS;
 	return(NIL_INODE);
   }
 
   /* Acquire an inode from the bit map. */
   b = alloc_bit(sp, IMAP, sp->s_isearch);
   if (b == NO_BIT) {
-	err_code = ENFILE;
+	err_code = -ENFILE;
 	major = (int) (sp->s_dev >> MAJOR) & BYTE;
 	minor = (int) (sp->s_dev >> MINOR) & BYTE;
 	printf("Out of i-nodes on device %d/%d\n", major, minor);

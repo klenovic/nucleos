@@ -43,14 +43,14 @@ message *m_ptr;			/* pointer to request message */
 
   /* The requesting process must be privileged. */
   rrp = proc_addr(who_p);
-  if (! (priv(rrp)->s_flags & SYS_PROC)) return(EPERM);
+  if (! (priv(rrp)->s_flags & SYS_PROC)) return(-EPERM);
 
   if (m_ptr->VT_WHICH != VT_VIRTUAL && m_ptr->VT_WHICH != VT_PROF)
-      return(EINVAL);
+      return(-EINVAL);
 
   /* The target process must be valid. */
   proc_nr_e = (m_ptr->VT_ENDPT == SELF) ? m_ptr->m_source : m_ptr->VT_ENDPT;
-  if (!isokendpt(proc_nr_e, &proc_nr)) return(EINVAL);
+  if (!isokendpt(proc_nr_e, &proc_nr)) return(-EINVAL);
   rp = proc_addr(proc_nr);
 
   /* Determine which flag and which field in the proc structure we want to
@@ -94,7 +94,7 @@ message *m_ptr;			/* pointer to request message */
 
   m_ptr->VT_VALUE = old_value;
 
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_VTIMER */

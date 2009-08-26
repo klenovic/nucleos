@@ -134,7 +134,7 @@ select_res_t select_res;
 			break;
 	}
 	if (i >= QP_FD_NR)
-		return EAGAIN;
+		return -EAGAIN;
 	qp_fd= &qp_fd_table[i];
 	qp_fd->qf_flags= QFF_INUSE;
 	qp_fd->qf_srfd= srfd;
@@ -174,14 +174,14 @@ size_t count;
 	if (!pkt)
 	{
 		/* Nothing to do */
-		qp_fd->qf_put_userdata(qp_fd->qf_srfd, EIO, 0,
+		qp_fd->qf_put_userdata(qp_fd->qf_srfd, -EIO, 0,
 			FALSE /* !for_ioctl*/);
-		return OK;
+		return 0;
 	}
 	r= do_query(qp_fd, pkt, count);
 	qp_fd->qf_put_userdata(qp_fd->qf_srfd, r, 0,
 			FALSE /* !for_ioctl*/);
-	return OK;
+	return 0;
 }
 
 static int qp_write(fd, count)
@@ -194,17 +194,17 @@ size_t count;
 	qp_fd= get_qp_fd(fd);
 	if (count > MAX_REQ)
 	{
-		qp_fd->qf_get_userdata(qp_fd->qf_srfd, ENOMEM, 0,
+		qp_fd->qf_get_userdata(qp_fd->qf_srfd, -ENOMEM, 0,
 			FALSE /* !for_ioctl*/);
-		return OK;
+		return 0;
 	}
 	pkt= qp_fd->qf_get_userdata(qp_fd->qf_srfd, 0, count,
 		FALSE /* !for_ioctl*/);
 	if (!pkt)
 	{
-		qp_fd->qf_get_userdata(qp_fd->qf_srfd, EFAULT, 0,
+		qp_fd->qf_get_userdata(qp_fd->qf_srfd, -EFAULT, 0,
 			FALSE /* !for_ioctl*/);
-		return OK;
+		return 0;
 	}
 	if (qp_fd->qf_req_pkt)
 	{
@@ -214,7 +214,7 @@ size_t count;
 	qp_fd->qf_req_pkt= pkt;
 	qp_fd->qf_get_userdata(qp_fd->qf_srfd, count, 0,
 		FALSE /* !for_ioctl*/);
-	return OK;
+	return 0;
 }
 
 static int qp_ioctl(fd, req)
@@ -224,9 +224,9 @@ ioreq_t req;
 	qp_fd_t *qp_fd;
 
 	qp_fd= get_qp_fd(fd);
-	qp_fd->qf_get_userdata(qp_fd->qf_srfd, ENOTTY, 0,
+	qp_fd->qf_get_userdata(qp_fd->qf_srfd, -ENOTTY, 0,
 			TRUE /* for_ioctl*/);
-	return OK;
+	return 0;
 }
 
 static int qp_cancel(fd, which_operation)

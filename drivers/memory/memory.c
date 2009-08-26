@@ -109,7 +109,7 @@ int main(void)
 
   m_init();			
   driver_task(&m_dtab);		
-  return(OK);				
+  return 0;				
 }
 
 /*===========================================================================*
@@ -157,12 +157,12 @@ int safe;			/* safe copies */
 
   if(!safe) {
 	printf("m_transfer: unsafe?\n");
-	return EPERM;
+	return -EPERM;
   }
 
   /* ZERO_DEV and NULL_DEV are infinite in size. */
   if (m_device != ZERO_DEV && m_device != NULL_DEV && ex64hi(pos64) != 0)
-	return OK;	/* Beyond EOF */
+	return 0;	/* Beyond EOF */
   position= cv64ul(pos64);
 
   /* Get minor device number and check for /dev/null. */
@@ -180,7 +180,7 @@ int safe;			/* safe copies */
 
 	/* No copying; ignore request. */
 	case NULL_DEV:
-	    if (opcode == DEV_GATHER_S) return(OK);	/* always at EOF */
+	    if (opcode == DEV_GATHER_S) return 0;	/* always at EOF */
 	    break;
 
 	/* Virtual copying. For RAM disks, kernel memory and internal FS. */
@@ -190,13 +190,13 @@ int safe;			/* safe copies */
 	case IMGRD_DEV:
 	    /* Bogus number. */
 	    if(m_device < 0 || m_device >= NR_DEVS) {
-		    return(EINVAL);
+		    return(-EINVAL);
 	    }
   	    if(!dev_vaddr || dev_vaddr == (vir_bytes) MAP_FAILED) {
 		printf("MEM: dev %d not initialized\n", m_device);
-		return EIO;
+		return -EIO;
 	    }
-	    if (position >= dv_size) return(OK); 	/* check for EOF */
+	    if (position >= dv_size) return 0; 	/* check for EOF */
 	    if (position + count > dv_size) count = dv_size - position;
 	    if (opcode == DEV_GATHER_S) {	/* copy actual data */
 	        r=sys_safecopyto(proc_nr, user_vir, vir_offset,
@@ -205,7 +205,7 @@ int safe;			/* safe copies */
 	        r=sys_safecopyfrom(proc_nr, user_vir, vir_offset,
 	  	  dev_vaddr + position, count, D);
 	    }
-	    if(r != OK) {
+	    if(r != 0) {
               panic("MEM","I/O copy failed",r);
 	    }
 	    break;
@@ -224,7 +224,7 @@ int safe;			/* safe copies */
   	    phys_bytes mem_phys;
 
 	    if (position >= dv_size)
-		return(OK); 	/* check for EOF */
+		return 0; 	/* check for EOF */
 	    if (position + count > dv_size)
 		count = dv_size - position;
 	    mem_phys = position;
@@ -237,16 +237,16 @@ int safe;			/* safe copies */
 	     */
 	    if(!any_mapped || pagestart_mapped != pagestart) {
 	     if(any_mapped) {
-		if(vm_unmap_phys(SELF, vaddr, I386_PAGE_SIZE) != OK)
+		if(vm_unmap_phys(SELF, vaddr, I386_PAGE_SIZE) != 0)
       			panic("MEM","vm_unmap_phys failed",NO_NUM);
 		any_mapped = 0;
 	     }
 	     vaddr = vm_map_phys(SELF, (void *) pagestart, I386_PAGE_SIZE);
 	     if(vaddr == MAP_FAILED) 
-		r = ENOMEM;
+		r = -ENOMEM;
 	     else
-		r = OK;
-	     if(r != OK) {
+		r = 0;
+	     if(r != 0) {
 		printf("memory: vm_map_phys failed\n");
 		return r;
 	     }
@@ -266,7 +266,7 @@ int safe;			/* safe copies */
 	           s=sys_safecopyfrom(proc_nr, user_vir,
 		       vir_offset, (vir_bytes) vaddr+page_off, subcount, D);
 	    }
-	    if(s != OK)
+	    if(s != 0)
 		return s;
 	    count = subcount;
 	    break;
@@ -281,7 +281,7 @@ int safe;			/* safe copies */
 	    	    chunk = (left > ZERO_BUF_SIZE) ? ZERO_BUF_SIZE : left;
 	             s=sys_safecopyto(proc_nr, user_vir,
 		       vir_offset+suboffset, (vir_bytes) dev_zero, chunk, D);
-		    if(s != OK)
+		    if(s != 0)
 	    	        report("MEM","sys_safecopyto failed", s);
 	    	    left -= chunk;
  	            suboffset += chunk;
@@ -297,7 +297,7 @@ int safe;			/* safe copies */
   	if ((iov->iov_size -= count) == 0) { iov++; nr_req--; vir_offset = 0; }
 
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -310,18 +310,18 @@ message *m_ptr;
   int r;
 
 /* Check device number on open. */
-  if (m_prepare(m_ptr->DEVICE) == NIL_DEV) return(ENXIO);
+  if (m_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
   if (m_device == MEM_DEV)
   {
 	r = sys_enable_iop(m_ptr->IO_ENDPT);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("m_do_open: sys_enable_iop failed for %d: %d\n",
 			m_ptr->IO_ENDPT, r);
 		return r;
 	}
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -332,7 +332,7 @@ static void m_init()
   /* Initialize this task. All minor devices are initialized one by one. */
   int i, s;
 
-  if (OK != (s=sys_getbootparam(&boot_param))) {
+  if ((s=sys_getbootparam(&boot_param)) != 0) {
       panic("MEM","Couldn't get kernel information.",s);
   }
 
@@ -399,7 +399,7 @@ int safe;
 
   if(!safe) {
 	printf("m_transfer: unsafe?\n");
-	return EPERM;
+	return -EPERM;
   }
 
   switch (m_ptr->REQUEST) {
@@ -417,19 +417,19 @@ int safe;
 	if((dev < RAM_DEV_FIRST || dev > RAM_DEV_LAST) && dev != RAM_DEV_OLD) {
 		printf("MEM: MIOCRAMSIZE: %d not a ramdisk\n", dev);
 	}
-        if ((dv = m_prepare(dev)) == NIL_DEV) return(ENXIO);
+        if ((dv = m_prepare(dev)) == NIL_DEV) return(-ENXIO);
 
 	/* Get request structure */
 	   s= sys_safecopyfrom(m_ptr->IO_ENDPT, (vir_bytes)m_ptr->IO_GRANT,
 		0, (vir_bytes)&ramdev_size, sizeof(ramdev_size), D);
-	if (s != OK)
+	if (s != 0)
 		return s;
 	if(m_vaddrs[dev] && !cmp64(dv->dv_size, cvul64(ramdev_size))) {
-		return(OK);
+		return 0;
 	}
 	if(m_vaddrs[dev]) {
 		printf("MEM: MIOCRAMSIZE: %d already has a ramdisk\n", dev);
-		return(EPERM);
+		return(-EPERM);
 	}
 
 #if DEBUG
@@ -439,7 +439,7 @@ int safe;
 	/* Try to allocate a piece of memory for the RAM disk. */
 	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE, MAP_ANON, -1, 0)) == MAP_FAILED) {
 	    printf("MEM: failed to get memory for ramdisk\n");
-            return(ENOMEM);
+            return(-ENOMEM);
         }
 
 	m_vaddrs[dev] = (vir_bytes) mem;
@@ -452,7 +452,7 @@ int safe;
     default:
   	return(do_diocntl(&m_dtab, m_ptr, safe));
   }
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*

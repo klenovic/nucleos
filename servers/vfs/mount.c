@@ -85,7 +85,7 @@ int do_mount()
   SANITYCHECK;
 
   /* Only the super-user may do MOUNT. */
-  if (!super_user) return(EPERM);
+  if (!super_user) return(-EPERM);
 	
   /* FS process' endpoint number */ 
   fs_e = (unsigned long)m_in.m1_p3;
@@ -93,7 +93,7 @@ int do_mount()
   /* Sanity check on process number. */
   if(fs_e <= 0) {
 	printf("vfs: warning: got process number %d for mount call.\n", fs_e);
-	return EINVAL;
+	return -EINVAL;
   }
 
   /* Do the actual job */
@@ -121,7 +121,7 @@ static int mount_fs(endpoint_t fs_e)
   SANITYCHECK;
   
   /* Only the super-user may do MOUNT. */
-  if (!super_user) return(EPERM);
+  if (!super_user) return(-EPERM);
 
   /* If FS not yet logged in, save message and suspend mount */
   if (last_login_fs_e != fs_e) {
@@ -137,7 +137,7 @@ static int mount_fs(endpoint_t fs_e)
   mount_m_in.m1_p3 = (char *) NONE;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != OK) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
   
   /* Convert name to device number */
   if ((dev = name_to_dev()) == NO_DEV) return(err_code);
@@ -187,7 +187,7 @@ static int mount_fs(endpoint_t fs_e)
 		 * to the root of the filesystem we found, we found a
 		 * filesystem that is in use.
 		 */
-		return EBUSY;   /* already mounted */
+		return -EBUSY;   /* already mounted */
 	}
 
 	if(vmp->m_mounted_on)
@@ -197,24 +197,24 @@ static int mount_fs(endpoint_t fs_e)
 		panic("fs", "inconsistency remounting old root", NO_NUM);
 
 	/* Now get the inode of the file to be mounted on. */
-	if (fetch_name(m_in.name2, m_in.name2_length, M1) != OK) {
+	if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
 		return(err_code);
 	}
 
 	/* Request lookup */
 	r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &mounted_on);
-	if (r != OK) return r;
+	if (r != 0) return r;
 
 	if (mounted_on->v_ref_count != 1)
 	{
 		put_vnode(mounted_on);
 		printf("vfs:mount_fs: mount point is busy\n");
-		return EBUSY;
+		return -EBUSY;
 	}
 
 	/* Issue mountpoint request */
 	r = req_mountpoint(mounted_on->v_fs_e, mounted_on->v_inode_nr);
-	if (r != OK)
+	if (r != 0)
 	{
 		put_vnode(mounted_on);
 		printf("vfs:mount_fs: req_mountpoint_s failed with %d\n", r);
@@ -225,15 +225,15 @@ static int mount_fs(endpoint_t fs_e)
 	root_node = vmp->m_root_node;
 
 	/* File types may not conflict. */
-	if (r == OK) {
+	if (r == 0) {
 		mdir = ((mounted_on->v_mode & I_TYPE) == I_DIRECTORY); 
 		/* TRUE iff dir */
 		rdir = ((root_node->v_mode & I_TYPE) == I_DIRECTORY);
-		if (!mdir && rdir) r = EISDIR;
+		if (!mdir && rdir) r = -EISDIR;
 	}
 
 	/* If error, return the mount point. */
-	if (r != OK) {
+	if (r != 0) {
 		put_vnode(mounted_on);
 
 		return(r);
@@ -244,11 +244,11 @@ static int mount_fs(endpoint_t fs_e)
 	vmp->m_flags = m_in.rd_only;
 	allow_newroot = 0;              /* The root is now fixed */
 
-	return(OK);
+	return 0;
   }
 
   /* Fetch the name of the mountpoint */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != OK) {
+  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
 	return(err_code);
   }
 
@@ -263,12 +263,12 @@ static int mount_fs(endpoint_t fs_e)
 #endif
 
 	r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &mounted_on);
-	if (r != OK)
+	if (r != 0)
 		return r;
 
 	/* Issue mountpoint request */
 	r = req_mountpoint(mounted_on->v_fs_e, mounted_on->v_inode_nr);
-	if (r != OK) {
+	if (r != 0) {
 		put_vnode(mounted_on);
 		printf("vfs:mount_fs: req_mountpoint_s failed with %d\n", r);
 		return r;
@@ -278,7 +278,7 @@ static int mount_fs(endpoint_t fs_e)
   /* We'll need a vnode for the root inode, check whether there is one */
   if ((root_node = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
         printf("VFSmount: no free vnode available\n");
-        return ENFILE;
+        return -ENFILE;
   }
   
 
@@ -286,7 +286,7 @@ static int mount_fs(endpoint_t fs_e)
   dp = &dmap[(dev >> MAJOR) & BYTE];
   if (dp->dmap_driver == NONE) {
         printf("VFSmount: no driver for dev %x\n", dev);
-        return(EINVAL);
+        return(-EINVAL);
   }
   label= dp->dmap_label;
   if (strlen(label) == 0)
@@ -299,7 +299,7 @@ static int mount_fs(endpoint_t fs_e)
 
   /* Issue request */
   r = req_readsuper(fs_e, label, dev, m_in.rd_only, isroot, &res);
-  if (r != OK) {
+  if (r != 0) {
 	if (mounted_on)
 		put_vnode(mounted_on);
 	return r;
@@ -351,18 +351,18 @@ static int mount_fs(endpoint_t fs_e)
 
   	SANITYCHECK;
 
-      return(OK);
+      return 0;
   }
 
   /* File types may not conflict. */
-  if (r == OK) {
+  if (r == 0) {
       mdir = ((mounted_on->v_mode & I_TYPE) == I_DIRECTORY);/* TRUE iff dir */
       rdir = ((root_node->v_mode & I_TYPE) == I_DIRECTORY);
-      if (!mdir && rdir) r = EISDIR;
+      if (!mdir && rdir) r = -EISDIR;
   }
 
   /* If error, return the super block and both inodes; release the vmnt. */
-  if (r != OK) {
+  if (r != 0) {
       put_vnode(mounted_on);
       put_vnode(root_node);
 
@@ -384,7 +384,7 @@ static int mount_fs(endpoint_t fs_e)
       bspec->v_bfs_e = fs_e; 
   }
   	SANITYCHECK;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -397,11 +397,11 @@ int do_umount()
   	SANITYCHECK;
 
   /* Only the super-user may do UMOUNT. */
-  if (!super_user) return(EPERM);
+  if (!super_user) return(-EPERM);
   	SANITYCHECK;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name, m_in.name_length, M3) != OK) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
   	SANITYCHECK;
   if ( (dev = name_to_dev()) == NO_DEV) return(err_code);
   	SANITYCHECK;
@@ -434,7 +434,7 @@ Dev_t dev;
 
   /* Device mounted? */
   if(!vmp)
-	return EINVAL;
+	return -EINVAL;
 
   /* See if the mounted device is busy.  Only 1 vnode using it should be
    * open -- the root vnode -- and that inode only 1 time.
@@ -487,7 +487,7 @@ Dev_t dev;
   	SANITYCHECK;
 
   if (count > 1) {
-      return(EBUSY);    /* can't umount a busy file system */
+      return(-EBUSY);    /* can't umount a busy file system */
   }
 
   	SANITYCHECK;
@@ -508,7 +508,7 @@ Dev_t dev;
   /* Request FS the unmount */
   if(vmp->m_fs_e <= 0 || vmp->m_fs_e == NONE)
 	panic(__FILE__, "unmount: strange fs endpoint", vmp->m_fs_e);
-  if ((r = req_unmount(vmp->m_fs_e)) != OK) {
+  if ((r = req_unmount(vmp->m_fs_e)) != 0) {
 	/* Not recoverable. */
 	printf("VFS: ignoring unmount failure %d from %d\n", r, vmp->m_fs_e);
   }
@@ -537,7 +537,7 @@ Dev_t dev;
 
           /* Send the driver endpoint (even if it is known already...) */
           if ((r = req_newdriver(vp->v_bfs_e, vp->v_sdev, dp->dmap_driver))
-                  != OK) {
+                  != 0) {
               printf("VFSunmount: error sending driver endpoint for block spec\n");
           }
       }
@@ -545,7 +545,7 @@ Dev_t dev;
 
   	SANITYCHECK;
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -560,13 +560,13 @@ static dev_t name_to_dev()
   struct vnode *vp;
   
   /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != OK) {
+  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) {
 	printf("vfs: name_to_dev: lookup of '%s' failed\n", user_fullpath);
 	return NO_DEV;
   }
 
   if ((vp->v_mode & I_TYPE) != I_BLOCK_SPECIAL) {
-  	err_code = ENOTBLK;
+  	err_code = -ENOTBLK;
 	dev= NO_DEV;
   }
   else

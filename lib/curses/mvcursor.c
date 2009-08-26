@@ -25,5 +25,5 @@ int newx;
   poscur(newy, newx);
   _cursvar.cursrow = newy;
   _cursvar.curscol = newx;
-  return(OK);
+  return 0;
 }

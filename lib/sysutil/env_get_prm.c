@@ -40,7 +40,7 @@ int max_len;				/* maximum length of value */
   int i, s, keylen;
 
   if (key == NULL)
-  	return EINVAL;
+  	return -EINVAL;
 
   keylen= strlen(key);
   for (i= 1; i<argc; i++)
@@ -53,9 +53,9 @@ int max_len;				/* maximum length of value */
 		continue;
 	key_value= argv[i]+keylen+1;
 	if (strlen(key_value)+1 > max_len)
-	      return(E2BIG);
+	      return(-E2BIG);
 	strcpy(value, key_value);
-	return OK;
+	return 0;
   }
 
   /* Get copy of boot monitor parameters. */
@@ -64,24 +64,24 @@ int max_len;				/* maximum length of value */
   m.I_ENDPT = SELF;
   m.I_VAL_LEN = sizeof(mon_params);
   m.I_VAL_PTR = mon_params;
-  if ((s=_taskcall(SYSTASK, SYS_GETINFO, &m)) != OK) {
+  if ((s=_taskcall(SYSTASK, SYS_GETINFO, &m)) != 0) {
 	printf("SYS_GETINFO: %d (size %u)\n", s, sizeof(mon_params));
 	return(s);
   }
 
   /* We got a copy, now search requested key. */
   if ((key_value = find_key(mon_params, key)) == NULL)
-	return(ESRCH);
+	return(-ESRCH);
 
   /* Value found, see if it fits in the client's buffer. Callers assume that
    * their buffer is unchanged on error, so don't make a partial copy.
    */
-  if ((strlen(key_value)+1) > max_len) return(E2BIG);
+  if ((strlen(key_value)+1) > max_len) return(-E2BIG);
 
   /* Make the actual copy. */
   strcpy(value, key_value);
 
-  return(OK);
+  return 0;
 }
 
 

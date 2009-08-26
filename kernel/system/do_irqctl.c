@@ -36,7 +36,7 @@ register message *m_ptr;	/* pointer to request message */
   int irq_vec;
   int irq_hook_id;
   int notify_id;
-  int r = OK;
+  int r = 0;
   int i;
   irq_hook_t *hook_ptr;
   struct proc *rp;
@@ -53,8 +53,8 @@ register message *m_ptr;	/* pointer to request message */
   case IRQ_ENABLE:           
   case IRQ_DISABLE: 
       if (irq_hook_id >= NR_IRQ_HOOKS || irq_hook_id < 0 ||
-          irq_hooks[irq_hook_id].proc_nr_e == NONE) return(EINVAL);
-      if (irq_hooks[irq_hook_id].proc_nr_e != m_ptr->m_source) return(EPERM);
+          irq_hooks[irq_hook_id].proc_nr_e == NONE) return(-EINVAL);
+      if (irq_hooks[irq_hook_id].proc_nr_e != m_ptr->m_source) return(-EPERM);
       if (m_ptr->IRQ_REQUEST == IRQ_ENABLE) {
           enable_irq(&irq_hooks[irq_hook_id]);	
       }
@@ -68,14 +68,14 @@ register message *m_ptr;	/* pointer to request message */
   case IRQ_SETPOLICY:  
 
       /* Check if IRQ line is acceptable. */
-      if (irq_vec < 0 || irq_vec >= NR_IRQ_VECTORS) return(EINVAL);
+      if (irq_vec < 0 || irq_vec >= NR_IRQ_VECTORS) return(-EINVAL);
 
       rp= proc_addr(who_p);
       privp= priv(rp);
       if (!privp)
       {
 	kprintf("do_irqctl: no priv structure!\n");
-	return EPERM;
+	return -EPERM;
       }
       if (privp->s_flags & CHECK_IRQ)
       {
@@ -89,7 +89,7 @@ register message *m_ptr;	/* pointer to request message */
 		kprintf(
 		"do_irqctl: IRQ check failed for proc %d, IRQ %d\n",
 			m_ptr->m_source, irq_vec);
-		return EPERM;
+		return -EPERM;
 	}
     }
 
@@ -101,13 +101,13 @@ register message *m_ptr;	/* pointer to request message */
               break;
           }
       }
-      if (hook_ptr == NULL) return(ENOSPC);
+      if (hook_ptr == NULL) return(-ENOSPC);
 
       /* When setting a policy, the caller must provide an identifier that
        * is returned on the notification message if a interrupt occurs.
        */
       notify_id = (unsigned) m_ptr->IRQ_HOOK_ID;
-      if (notify_id > CHAR_BIT * sizeof(irq_id_t) - 1) return(EINVAL);
+      if (notify_id > CHAR_BIT * sizeof(irq_id_t) - 1) return(-EINVAL);
 
       /* Install the handler. */
       hook_ptr->proc_nr_e = m_ptr->m_source;	/* process to notify */   	
@@ -122,16 +122,16 @@ register message *m_ptr;	/* pointer to request message */
   case IRQ_RMPOLICY:
       if (irq_hook_id < 0 || irq_hook_id >= NR_IRQ_HOOKS ||
                irq_hooks[irq_hook_id].proc_nr_e == NONE) {
-           return(EINVAL);
+           return(-EINVAL);
       } else if (m_ptr->m_source != irq_hooks[irq_hook_id].proc_nr_e) {
-           return(EPERM);
+           return(-EPERM);
       }
       /* Remove the handler and return. */
       rm_irq_handler(&irq_hooks[irq_hook_id]);
       break;
 
   default:
-      r = EINVAL;				/* invalid IRQ_REQUEST */
+      r = -EINVAL;				/* invalid IRQ_REQUEST */
   }
   return(r);
 }

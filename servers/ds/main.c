@@ -76,16 +76,16 @@ int main(int argc, char **argv)
           break;
       default: 
           report("DS","warning, got illegal request from:", m.m_source);
-          result = EINVAL;
+          result = -EINVAL;
       }
 
       /* Finally send reply message, unless disabled. */
-      if (result != EDONTREPLY) {
+      if (result != -EDONTREPLY) {
           m.m_type = result;            /* build reply message */
           reply(who_e, &m);             /* send it away */
       }
   }
-  return(OK);                           /* shouldn't come here */
+  return 0;                           /* shouldn't come here */
 }
 
 /*===========================================================================*
@@ -139,7 +139,7 @@ message *m_ptr;				/* message buffer */
     int status = 0;
     status = receive(ANY, m_ptr);   /* this blocks until message arrives */
 
-    if (OK != status)
+    if (status != 0)
         panic("DS","failed to receive message!", status);
 
     who_e = m_ptr->m_source;        /* message arrived! set sender */
@@ -156,7 +156,7 @@ message *m_ptr;				/* message buffer */
     int s;
     s = send(who_e, m_ptr);    /* send the message */
 
-    if (OK != s)
+    if (s != 0)
         panic("DS", "unable to send reply!", s);
 }
 

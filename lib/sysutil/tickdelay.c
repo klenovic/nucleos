@@ -26,13 +26,13 @@ long ticks;				/* number of ticks to wait */
     message m, m_alarm;
     int s;
 
-    if (ticks <= 0) return OK;		/* check for robustness */
+    if (ticks <= 0) return 0;		/* check for robustness */
 
     m.ALRM_ENDPT = SELF;		/* SELF means this process nr */
     m.ALRM_EXP_TIME = ticks;		/* request message after ticks */
     m.ALRM_ABS_TIME = 0;		/* ticks are relative to now */
     s = _taskcall(SYSTASK, SYS_SETALARM, &m);
-    if (s != OK) return(s);
+    if (s != 0) return(s);
 
     receive(CLOCK,&m_alarm);		/* await synchronous alarm */
 

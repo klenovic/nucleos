@@ -151,7 +151,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	r = read_header(exec, exec_len, &sep_id,
 		&text_bytes, &data_bytes, &bss_bytes, 
 		&tot_bytes, &pc, &hdrlen);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("do_exec: read_header failed\n");
 		goto fail;
@@ -165,7 +165,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		frame_len, sep_id, 0 /*dev*/, proc_e /*inum*/, 0 /*ctime*/, 
 		progname, new_uid, new_gid, &stack_top, &load_text,
 		&allow_setuid, pc);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("do_exec: exec_newmap failed: %d\n", r);
 		error= r;
@@ -178,7 +178,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	patch_ptr(frame, vsp);
 	r = sys_datacopy(SELF, (vir_bytes) frame,
 		proc_e, (vir_bytes) vsp, (phys_bytes)frame_len);
-	if (r != OK) {
+	if (r != 0) {
 		printf("RS: stack_top is 0x%lx; tried to copy to 0x%lx in %d\n",
 			stack_top, vsp);
 		panic("RS", "do_exec: stack copy err on", proc_e);
@@ -189,7 +189,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	/* Read in text and data segments. */
 	if (load_text) {
 		r= read_seg(exec, exec_len, off, proc_e, T, text_bytes);
-		if (r != OK)
+		if (r != 0)
 		{
 			printf("do_exec: read_seg failed: %d\n", r);
 			error= r;
@@ -201,14 +201,14 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 
 	off += text_bytes;
 	r= read_seg(exec, exec_len, off, proc_e, D, data_bytes);
-	if (r != OK)
+	if (r != 0)
 	{
 		printf("do_exec: read_seg failed: %d\n", r);
 		error= r;
 		goto fail;
 	}
 
-	exec_restart(proc_e, OK);
+	exec_restart(proc_e, 0);
 
 	return;
 
@@ -265,7 +265,7 @@ vir_bytes entry_point;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)&e;
 	r = sendrec(PM_PROC_NR, &m);
-	if (r != OK)
+	if (r != 0)
 		return r;
 #if 0
 	printf("exec_newmem: r = %d, m_type = %d\n", r, m.m_type);
@@ -295,7 +295,7 @@ int result;
 	m.EXC_RS_PROC= proc_e;
 	m.EXC_RS_RESULT= result;
 	r= sendrec(PM_PROC_NR, &m);
-	if (r != OK)
+	if (r != 0)
 		return r;
 	return m.m_type;
 }
@@ -326,7 +326,7 @@ int *hdrlenp;
    * Then come 4 more longs that are not used here.
    *	Byte 0: magic number 0x01
    *	Byte 1: magic number 0x03
-   *	Byte 2: normal = 0x10 (not checked, 0 is OK), separate I/D = 0x20
+   *	Byte 2: normal = 0x10 (not checked, 0 is 0), separate I/D = 0x20
    *	Byte 3: CPU type, Intel 16 bit = 0x04, Intel 32 bit = 0x10, 
    *            Motorola = 0x0B, Sun SPARC = 0x17
    *	Byte 4: Header length = 0x20
@@ -351,18 +351,18 @@ int *hdrlenp;
 
   pos= 0;	/* Read from the start of the file */
 
-  if (exec_len < sizeof(hdr)) return(ENOEXEC);
+  if (exec_len < sizeof(hdr)) return(-ENOEXEC);
 
   memcpy(&hdr, exec, sizeof(hdr));
 
   /* Check magic number, cpu type, and flags. */
-  if (BADMAG(hdr)) return(ENOEXEC);
+  if (BADMAG(hdr)) return(-ENOEXEC);
 
 #ifdef CONFIG_X86_32
-  if (hdr.a_cpu != A_I8086 && hdr.a_cpu != A_I80386) return(ENOEXEC);
+  if (hdr.a_cpu != A_I8086 && hdr.a_cpu != A_I80386) return(-ENOEXEC);
 #endif
 
-  if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(ENOEXEC);
+  if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(-ENOEXEC);
 
   *sep_id = !!(hdr.a_flags & A_SEP);	    /* separate I & D or not */
 
@@ -371,7 +371,7 @@ int *hdrlenp;
   *data_bytes = (vir_bytes) hdr.a_data;	/* data size in bytes */
   *bss_bytes  = (vir_bytes) hdr.a_bss;	/* bss size in bytes */
   *tot_bytes  = hdr.a_total;		/* total bytes to allocate for prog */
-  if (*tot_bytes == 0) return(ENOEXEC);
+  if (*tot_bytes == 0) return(-ENOEXEC);
 
   if (!*sep_id) {
 	/* If I & D space is not separated, it is all considered data. Text=0*/
@@ -382,7 +382,7 @@ int *hdrlenp;
   *pc = hdr.a_entry;	/* initial address to start execution */
   *hdrlenp = hdr.a_hdrlen & BYTE;		/* header length */
 
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -437,7 +437,7 @@ phys_bytes seg_bytes;		/* how much is to be transferred? */
   int r;
   off_t n, o, b_off, seg_off;
 
-  if (off+seg_bytes > exec_len) return ENOEXEC;
+  if (off+seg_bytes > exec_len) return -ENOEXEC;
   r= sys_vircopy(SELF, D, (vir_bytes)exec+off, proc_e, seg, 0, seg_bytes);
   return r;
 }

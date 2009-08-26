@@ -42,12 +42,12 @@ int fs_readwrite_o(void)
   off_t position, f_size, bytes_left;
   unsigned int off, cum_io;
   mode_t mode_word;
-  int completed, r2 = OK;
+  int completed, r2 = 0;
   char *user_addr;
   struct inode *rip;
   
   partial_pipe = 0;
-  r = OK;
+  r = 0;
   
   /* Try to get inode according to its index */
   if (fs_m_in.REQ_FD_INODE_INDEX >= 0 && 
@@ -61,7 +61,7 @@ int fs_readwrite_o(void)
       if (!rip) {
           printf("FS: unavaliable inode by fs_readwrite(), nr: %d\n", 
                   fs_m_in.REQ_FD_INODE_NR);
-          return EINVAL; 
+          return -EINVAL; 
       }
   }
 
@@ -86,7 +86,7 @@ int fs_readwrite_o(void)
 
   /*if (partial_cnt > 0) partial_pipe = 1;*/
   
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to -EIO if disk error occurs */
   
   if (rw_flag == WRITING && block_spec == 0) {
       /* Clear the zone containing present EOF if hole about
@@ -114,7 +114,7 @@ int fs_readwrite_o(void)
       r = rw_chunk(rip, cvul64(position), off, chunk, (unsigned) nrbytes,
               rw_flag, user_addr, seg, usr, block_size, &completed);
 
-      if (r != OK) break;	/* EOF reached */
+      if (r != 0) break;	/* EOF reached */
       if (rdwt_err < 0) break;
 
       /* Update counters and pointers. */
@@ -151,15 +151,15 @@ int fs_readwrite_o(void)
   }
   rip->i_seek = NO_SEEK;
 
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
   /* if user-space copying failed, read/write failed. */
-  if (r == OK && r2 != OK) {
+  if (r == 0 && r2 != 0) {
 	r = r2;
   }
   
-  if (r == OK) {
+  if (r == 0) {
 	if (rw_flag == READING) rip->i_update |= ATIME;
 	if (rw_flag == WRITING) rip->i_update |= CTIME | MTIME;
 	rip->i_dirt = DIRTY;		/* inode is thus now dirty */
@@ -183,11 +183,11 @@ int fs_readwrite_s(void)
   off_t position, f_size, bytes_left;
   unsigned int off, cum_io;
   mode_t mode_word;
-  int completed, r2 = OK;
+  int completed, r2 = 0;
   struct inode *rip;
   
   partial_pipe = 0;
-  r = OK;
+  r = 0;
   
   /* Try to get inode according to its index */
   if (fs_m_in.REQ_FD_INODE_INDEX >= 0 && 
@@ -201,7 +201,7 @@ int fs_readwrite_s(void)
       if (!rip) {
           printf("FS: unavaliable inode by fs_readwrite(), nr: %d\n", 
                   fs_m_in.REQ_FD_INODE_NR);
-          return EINVAL; 
+          return -EINVAL; 
       }
   }
 
@@ -224,12 +224,12 @@ int fs_readwrite_s(void)
 
   /*if (partial_cnt > 0) partial_pipe = 1;*/
   
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to -EIO if disk error occurs */
   
   if (rw_flag == WRITING && block_spec == 0) {
       /* Check in advance to see if file will grow too big. */
       if (position > rip->i_sp->s_max_size - nrbytes)
-		return(EFBIG);
+		return(-EFBIG);
 
       /* Clear the zone containing present EOF if hole about
        * to be created.  This is necessary because all unwritten
@@ -256,7 +256,7 @@ int fs_readwrite_s(void)
       r = rw_chunk_s(rip, cvul64(position), off, chunk, (unsigned) nrbytes,
               rw_flag, gid, cum_io, block_size, &completed);
 
-      if (r != OK) break;	/* EOF reached */
+      if (r != 0) break;	/* EOF reached */
       if (rdwt_err < 0) break;
 
       /* Update counters and pointers. */
@@ -292,15 +292,15 @@ int fs_readwrite_s(void)
   }
   rip->i_seek = NO_SEEK;
 
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
   /* if user-space copying failed, read/write failed. */
-  if (r == OK && r2 != OK) {
+  if (r == 0 && r2 != 0) {
 	r = r2;
   }
   
-  if (r == OK) {
+  if (r == 0) {
 	if (rw_flag == READING) rip->i_update |= ATIME;
 	if (rw_flag == WRITING) rip->i_update |= CTIME | MTIME;
 	rip->i_dirt = DIRTY;		/* inode is thus now dirty */
@@ -323,13 +323,13 @@ int fs_breadwrite_o(void)
   u64_t position;
   unsigned int off, cum_io;
   mode_t mode_word;
-  int completed, r2 = OK;
+  int completed, r2 = 0;
   char *user_addr;
 
   /* Pseudo inode for rw_chunk */
   struct inode rip;
   
-  r = OK;
+  r = 0;
   
   /* Get the values from the request message */ 
   rw_flag = (fs_m_in.m_type == REQ_BREAD_O ? READING : WRITING);
@@ -344,7 +344,7 @@ int fs_breadwrite_o(void)
   rip.i_mode = I_BLOCK_SPECIAL;
   rip.i_size = 0;
 
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to -EIO if disk error occurs */
   
   cum_io = 0;
   /* Split the transfer into chunks that don't span two blocks. */
@@ -358,7 +358,7 @@ int fs_breadwrite_o(void)
       r = rw_chunk(&rip, position, off, chunk, (unsigned) nrbytes,
               rw_flag, user_addr, D, usr, block_size, &completed);
 
-      if (r != OK) break;	/* EOF reached */
+      if (r != 0) break;	/* EOF reached */
       if (rdwt_err < 0) break;
 
       /* Update counters and pointers. */
@@ -371,8 +371,8 @@ int fs_breadwrite_o(void)
   fs_m_out.RES_XFD_POS_LO = ex64lo(position); 
   fs_m_out.RES_XFD_POS_HI = ex64hi(position); 
   
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
   fs_m_out.RES_XFD_CUM_IO = cum_io;
   
@@ -391,12 +391,12 @@ int fs_breadwrite_s(void)
   u64_t position;
   unsigned int off, cum_io;
   mode_t mode_word;
-  int completed, r2 = OK;
+  int completed, r2 = 0;
 
   /* Pseudo inode for rw_chunk */
   struct inode rip;
   
-  r = OK;
+  r = 0;
   
   /* Get the values from the request message */ 
   rw_flag = (fs_m_in.m_type == REQ_BREAD_S ? READING : WRITING);
@@ -410,7 +410,7 @@ int fs_breadwrite_s(void)
   rip.i_mode = I_BLOCK_SPECIAL;
   rip.i_size = 0;
 
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to -EIO if disk error occurs */
   
   cum_io = 0;
   /* Split the transfer into chunks that don't span two blocks. */
@@ -424,7 +424,7 @@ int fs_breadwrite_s(void)
       r = rw_chunk_s(&rip, position, off, chunk, (unsigned) nrbytes,
               rw_flag, gid, cum_io, block_size, &completed);
 
-      if (r != OK) break;	/* EOF reached */
+      if (r != 0) break;	/* EOF reached */
       if (rdwt_err < 0) break;
 
       /* Update counters and pointers. */
@@ -436,8 +436,8 @@ int fs_breadwrite_s(void)
   fs_m_out.RES_XFD_POS_LO = ex64lo(position); 
   fs_m_out.RES_XFD_POS_HI = ex64hi(position); 
   
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
   fs_m_out.RES_XFD_CUM_IO = cum_io;
   
@@ -465,7 +465,7 @@ int *completed;			/* number of bytes copied */
 /* Read or write (part of) a block. */
 
   register struct buf *bp;
-  register int r = OK;
+  register int r = 0;
   int n, block_spec;
   block_t b;
   dev_t dev;
@@ -561,7 +561,7 @@ int *completed;			/* number of bytes copied */
 /* Read or write (part of) a block. */
 
   register struct buf *bp;
-  register int r = OK;
+  register int r = 0;
   int n, block_spec;
   block_t b;
   dev_t dev;
@@ -907,11 +907,11 @@ int fs_getdents(void)
 
   /* Check whether the position is properly aligned */
   if (pos % DIR_ENTRY_SIZE)
-	return ENOENT;
+	return -ENOENT;
   
   if ( (rip = get_inode(fs_dev, ino)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_getdents() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   block_size= rip->i_sp->s_block_size;
@@ -969,7 +969,7 @@ printf("MFS(%d) get_inode by fs_getdents() failed\n", SELF_E);
 		{
 			r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
 				(vir_bytes)getdents_buf, tmpbuf_off, D);
-			if (r != OK)
+			if (r != 0)
 			{
 				panic(__FILE__,
 					"fs_getdents: sys_safecopyto failed\n",
@@ -1010,14 +1010,14 @@ printf("MFS(%d) get_inode by fs_getdents() failed\n", SELF_E);
   {
 	r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
 		(vir_bytes)getdents_buf, tmpbuf_off, D);
-	if (r != OK)
+	if (r != 0)
 		panic(__FILE__, "fs_getdents: sys_safecopyto failed\n", r);
 
 	userbuf_off += tmpbuf_off;
   }
 
   if (done && userbuf_off == 0)
-	r= EINVAL;		/* The user's buffer is too small */
+	r= -EINVAL;		/* The user's buffer is too small */
   else
   {
 	fs_m_out.RES_GDE_CUM_IO= userbuf_off;
@@ -1028,7 +1028,7 @@ printf("MFS(%d) get_inode by fs_getdents() failed\n", SELF_E);
 
 	rip->i_update |= ATIME;
 	rip->i_dirt = DIRTY;
-	r= OK;
+	r= 0;
   }
 
   put_inode(rip);		/* release the inode */
@@ -1047,7 +1047,7 @@ int fs_getdents_o(void)
 
   r = fs_getdents();
 
-  if (r == OK)
+  if (r == 0)
 	r = fs_m_out.RES_GDE_CUM_IO;
 
   return(r);

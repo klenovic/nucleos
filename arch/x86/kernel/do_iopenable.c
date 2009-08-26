@@ -34,11 +34,11 @@ register message *m_ptr;	/* pointer to request message */
   if (m_ptr->IO_ENDPT == SELF) {
 	proc_nr = who_p;
   } else if(!isokendpt(m_ptr->IO_ENDPT, &proc_nr))
-	return(EINVAL);
+	return(-EINVAL);
   enable_iop(proc_addr(proc_nr));
-  return(OK);
+  return 0;
 #else
-  return(EPERM);
+  return(-EPERM);
 #endif
 }
 

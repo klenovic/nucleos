@@ -32,7 +32,7 @@ int fs_chmod()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* Now make the change. Clear setgid bit if file is not in caller's grp */
@@ -44,7 +44,7 @@ printf("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
   fs_m_out.RES_MODE = rip->i_mode;
 
   put_inode(rip);
-  return(OK);
+  return 0;
 }
 
 
@@ -62,12 +62,12 @@ int fs_chown()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* Not permitted to change the owner of a file on a read-only file sys. */
   r = read_only(rip);
-  if (r == OK) {
+  if (r == 0) {
 	rip->i_uid = fs_m_in.REQ_NEW_UID;
 	rip->i_gid = fs_m_in.REQ_NEW_GID;
 	rip->i_mode &= ~(I_SET_UID_BIT | I_SET_GID_BIT);
@@ -98,7 +98,7 @@ int fs_access_o()
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
 printf("MFS(%d) get_inode by fs_access() failed\n", SELF_E);
-        return(EINVAL);
+        return(-EINVAL);
   }
 
   /* Now check the permissions. */
@@ -115,7 +115,7 @@ int forbidden(register struct inode *rip, mode_t access_desired)
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
  * caller's uid in the 'fproc' table.  If access is allowed, OK is returned
- * if it is forbidden, EACCES is returned.
+ * if it is forbidden, -EACCES is returned.
  */
 
   register struct inode *old_rip = rip;
@@ -158,19 +158,19 @@ int forbidden(register struct inode *rip, mode_t access_desired)
   }
 
   /* If access desired is not a subset of what is allowed, it is refused. */
-  r = OK;
-  if ((perm_bits | access_desired) != perm_bits) r = EACCES;
+  r = 0;
+  if ((perm_bits | access_desired) != perm_bits) r = -EACCES;
 
   /* Check to see if someone is trying to write on a file system that is
    * mounted read-only.
    */
   type = rip->i_mode & I_TYPE;
-  if (r == OK)
+  if (r == 0)
 	if (access_desired & W_BIT)
 	 	r = read_only(rip);
 
 #if 0
-  if (r != OK) printf(
+  if (r != 0) printf(
   "forbidden: caller uid/gid %d/%d object uid/gid %d/%d, returning %d\n",
 	caller_uid, caller_gid, rip->i_uid, rip->i_gid, r);
 #endif
@@ -187,13 +187,13 @@ int read_only(ip)
 struct inode *ip;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted
- * read only.  If so, return EROFS, else return OK.
+ * read only.  If so, return -EROFS, else return OK.
  */
 
   register struct super_block *sp;
 
   sp = ip->i_sp;
-  return(sp->s_rd_only ? EROFS : OK);
+  return(sp->s_rd_only ? -EROFS : 0);
 }
 
 

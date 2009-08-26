@@ -212,58 +212,58 @@ int retVal;
     /* All powerdown modes: off */
     
     retVal = CodecWrite (pCC, AC97_POWERDOWN_CONTROL_STAT,  0x0000U);   
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
         
     /* Mute Line Out & set to 0dB attenuation */
 
     retVal = CodecWrite (pCC, AC97_MASTER_VOLUME, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
 
     retVal = CodecWrite (pCC, AC97_MONO_VOLUME,   0x8000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
     
     retVal = CodecWrite (pCC, AC97_PHONE_VOLUME,  0x8008U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_MIC_VOLUME,    0x0008U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_LINE_IN_VOLUME,   0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_CD_VOLUME,     0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_AUX_IN_VOLUME,    0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_PCM_OUT_VOLUME,    0x0808U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_RECORD_GAIN_VOLUME, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
     
     /* Connect Line In to ADC */
     retVal = CodecWrite (pCC, AC97_RECORD_SELECT, 0x0404U);  
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
     retVal = CodecWrite (pCC, AC97_GENERAL_PURPOSE, 0x0000U);
-    if (OK != retVal)
+    if (retVal != 0)
         return (retVal);
 
-    return OK;
+    return 0;
 }
 
 

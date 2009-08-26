@@ -41,21 +41,21 @@ size_t count;
 	ip_fd= &ip_fd_table[fd];
 	if (count > IP_MAX_PACKSIZE)
 	{
-		error_reply (ip_fd, EPACKSIZE);
-		return NW_OK;
+		error_reply (ip_fd, -EPACKSIZE);
+		return 0;
 	}
 	pack= (*ip_fd->if_get_userdata)(ip_fd->if_srfd, (size_t)0,
 		count, FALSE);
 	if (!pack)
-		return NW_OK;
+		return 0;
 	r= ip_send(fd, pack, count);
-	assert(r != NW_WOULDBLOCK);
+	assert(r != -EWOULDBLOCK);
 
-	if (r == NW_OK)
+	if (r == 0)
 		error_reply (ip_fd, count);
 	else
 		error_reply (ip_fd, r);
-	return NW_OK;
+	return 0;
 }
 
 int ip_send(fd, data, data_len)
@@ -80,7 +80,7 @@ size_t data_len;
 	if (!(ip_fd->if_flags & IFF_OPTSET))
 	{
 		bf_afree(data);
-		return EBADMODE;
+		return -EBADMODE;
 	}
 
 	if (!(ip_fd->if_port->ip_flags & IPF_IPADDRSET))
@@ -89,7 +89,7 @@ size_t data_len;
 		 * the moment, we return OK.
 		 */
 		bf_afree(data);
-		return NW_OK;
+		return 0;
 	}
 
 	data_len= bf_bufsize(data);
@@ -104,7 +104,7 @@ size_t data_len;
 	if (data_len<IP_MIN_HDR_SIZE)
 	{
 		bf_afree(data);
-		return EPACKSIZE;
+		return -EPACKSIZE;
 	}
 
 	data= bf_packIffLess(data, IP_MIN_HDR_SIZE);
@@ -153,14 +153,14 @@ size_t data_len;
 	else
 	{
 		hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK)*4;
-		r= NW_OK;
+		r= 0;
 		if (hdr_len<IP_MIN_HDR_SIZE)
-			r= EINVAL;
+			r= -EINVAL;
 		else if (hdr_len>data_len)
-			r= EPACKSIZE;
+			r= -EPACKSIZE;
 		else if (!ip_hdr->ih_ttl)
-			r= EINVAL;
-		if (r != NW_OK)
+			r= -EINVAL;
+		if (r != 0)
 		{
 			bf_afree(data);
 			return r;
@@ -173,7 +173,7 @@ size_t data_len;
 			r= ip_chk_hdropt((u8_t *)(ptr2acc_data(data) +
 				IP_MIN_HDR_SIZE),
 				hdr_len-IP_MIN_HDR_SIZE);
-			if (r != NW_OK)
+			if (r != 0)
 			{
 				bf_afree(data);
 				return r;
@@ -205,17 +205,17 @@ size_t data_len;
 	else if ((hostrep_dst & 0xe0000000l) == 0xe0000000l)
 		;	/* OK, Multicast */
 	else if ((hostrep_dst & 0xf0000000l) == 0xf0000000l)
-		r= EBADDEST;	/* Bad class */
+		r= -EBADDEST;	/* Bad class */
 	else if ((dstaddr ^ my_ipaddr) & netmask)
 		;	/* OK, remote destination */
 	else if (!(dstaddr & ~netmask) &&
 		(ip_port->ip_flags & IPF_SUBNET_BCAST))
 	{
-		r= EBADDEST;	/* Zero host part */
+		r= -EBADDEST;	/* Zero host part */
 	}
 	if (r<0)
 	{
-		DIFBLOCK(1, r == EBADDEST,
+		DIFBLOCK(1, r == -EBADDEST,
 			printf("bad destination: ");
 			writeIpAddr(ip_hdr->ih_dst);
 			printf("\n"));
@@ -236,7 +236,7 @@ size_t data_len;
 			DBLOCK(1, printf(
 			"packet is larger than link MTU and DF is set\n"));
 			bf_afree(data);
-			return EPACKSIZE;
+			return -EPACKSIZE;
 		}
 	}
 	else
@@ -263,7 +263,7 @@ size_t data_len;
 			ip_port->ip_loopb_tail->acc_ext_link= data;
 		ip_port->ip_loopb_tail= data;
 
-		return NW_OK;
+		return 0;
 	}
 
 	if ((dstaddr & HTONL(0xe0000000)) == HTONL(0xe0000000))
@@ -299,7 +299,7 @@ size_t data_len;
 			ip_port->ip_loopb_tail->acc_ext_link= data;
 		ip_port->ip_loopb_tail= data;
 
-		return NW_OK;
+		return 0;
 	}
 
 	if (((dstaddr ^ my_ipaddr) & netmask) == 0)
@@ -315,7 +315,7 @@ size_t data_len;
 	r= oroute_frag (ip_port - ip_port_table, dstaddr, ttl, req_mtu, 
 		&nexthop);
 
-	if (r == NW_OK)
+	if (r == 0)
 	{
 		if (nexthop == ip_port->ip_ipaddr)
 		{

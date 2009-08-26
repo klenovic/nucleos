@@ -13,7 +13,7 @@
 
 #ifdef __KERNEL__
 #define CHECKRANGE_OR_SUSPEND(pr, start, length, wr)  { int mr; \
-	if(vm_running && (mr=vm_checkrange(proc_addr(who_p), pr, start, length, wr, 0)) != OK) { \
+	if(vm_running && (mr=vm_checkrange(proc_addr(who_p), pr, start, length, wr, 0)) != 0) { \
 		return mr;					 \
 	} }
 

@@ -108,11 +108,11 @@ message *m_ptr;
 		break;
 	}
 	if (pp->rdleft != 0 || pp->rdcum != 0) {
-		r = EIO;
+		r = -EIO;
 		break;
 	}
 	if (m_ptr->COUNT <= 0) {
-		r = EINVAL;
+		r = -EINVAL;
 		break;
 	}
 	pp->rdsendreply = TRUE;
@@ -138,15 +138,15 @@ message *m_ptr;
 	safe=1;
 	/* Check, store information on the writer, do I/O. */
 	if (pp->state & TTY_CLOSED) {
-		r = EIO;
+		r = -EIO;
 		break;
 	}
 	if (pp->wrleft != 0 || pp->wrcum != 0) {
-		r = EIO;
+		r = -EIO;
 		break;
 	}
 	if (m_ptr->COUNT <= 0) {
-		r = EINVAL;
+		r = -EINVAL;
 		break;
 	}
 	pp->wrsendreply = TRUE;
@@ -168,14 +168,14 @@ message *m_ptr;
 	break;
 
     case DEV_OPEN:
-	r = pp->state != 0 ? EIO : OK;
+	r = pp->state != 0 ? -EIO : 0;
 	pp->state |= PTY_ACTIVE;
 	pp->rdcum = 0;
 	pp->wrcum = 0;
 	break;
 
     case DEV_CLOSE:
-	r = OK;
+	r = 0;
 	if (pp->state & TTY_CLOSED) {
 		pp->state = 0;
 	} else {
@@ -189,21 +189,21 @@ message *m_ptr;
     	break;
 
     case CANCEL:
-	r = EINTR;
+	r = -EINTR;
 	if (m_ptr->IO_ENDPT == pp->rdproc) {
 		/* Cancel a read from a PTY. */
-		r = pp->rdcum > 0 ? pp->rdcum : EAGAIN;
+		r = pp->rdcum > 0 ? pp->rdcum : -EAGAIN;
 		pp->rdleft = pp->rdcum = 0;
 	}
 	if (m_ptr->IO_ENDPT == pp->wrproc) {
 		/* Cancel a write to a PTY. */
-		r = pp->wrcum > 0 ? pp->wrcum : EAGAIN;
+		r = pp->wrcum > 0 ? pp->wrcum : -EAGAIN;
 		pp->wrleft = pp->wrcum = 0;
 	}
 	break;
 
     default:
-	r = EINVAL;
+	r = -EINVAL;
   }
   tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
@@ -231,7 +231,7 @@ int try;
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
-							tp->tty_outproc, EIO);
+							tp->tty_outproc, -EIO);
 		tp->tty_outleft = tp->tty_outcum = 0;
 	}
 	}
@@ -251,12 +251,12 @@ int try;
 	/* Copy from user space to the PTY output buffer. */
 	if(tp->tty_out_safe) {
 	  if ((s = sys_safecopyfrom(tp->tty_outproc, tp->tty_out_vir_g,
-		tp->tty_out_vir_offset, (vir_bytes) pp->ohead, count, D))!=OK) {
+		tp->tty_out_vir_offset, (vir_bytes) pp->ohead, count, D)) != 0) {
 		break;
  	  }
 	} else {
 	  if ((s = sys_vircopy(tp->tty_outproc, D, (vir_bytes) tp->tty_out_vir_g,
-		SELF, D, (vir_bytes) pp->ohead, (phys_bytes) count)) != OK) {
+		SELF, D, (vir_bytes) pp->ohead, (phys_bytes) count)) != 0) {
 		break;
 	}
 	}
@@ -339,13 +339,13 @@ pty_t *pp;
 	/* Copy from the output buffer to the readers address space. */
 	if (pp->rdsafe) {
 	  if((s = sys_safecopyto(pp->rdproc, pp->rdvir_g,
-		pp->rdvir_offset, (vir_bytes) pp->otail, count, D)) != OK) {
+		pp->rdvir_offset, (vir_bytes) pp->otail, count, D)) != 0) {
 		break;
  	  }
 	  pp->rdvir_offset += count;
 	} else {
 	if ((s = sys_vircopy(SELF, D, (vir_bytes)pp->otail,
-		(vir_bytes) pp->rdproc, D, (vir_bytes) pp->rdvir_g, (phys_bytes) count)) != OK) {
+		(vir_bytes) pp->rdproc, D, (vir_bytes) pp->rdvir_g, (phys_bytes) count)) != 0) {
 		printf("pty tty: copy failed (error %d)\n",  s);
 		break;
 	}
@@ -420,14 +420,14 @@ int try;
 	/* Transfer one character to 'c'. */
 	if(pp->wrsafe) {
 	   if ((s = sys_safecopyfrom(pp->wrproc, pp->wrvir_g,
-	     pp->wrvir_offset, (vir_bytes) &c, 1, D)) != OK) {
+	     pp->wrvir_offset, (vir_bytes) &c, 1, D)) != 0) {
 		printf("pty: safecopy failed (error %d)\n", s);
 		break;
 	   }
 	  pp->wrvir_offset++;
 	} else {
   	  if ((s = sys_vircopy(pp->wrproc, D, (vir_bytes) pp->wrvir_g,
-		SELF, D, (vir_bytes) &c, (phys_bytes) 1)) != OK) {
+		SELF, D, (vir_bytes) &c, (phys_bytes) 1)) != 0) {
 		printf("pty: copy failed (error %d)\n", s);
 		break;
 	}
@@ -575,7 +575,7 @@ int pty_status(message *m_ptr)
 			m_ptr->REP_ENDPT = pp->wrproc;
 			m_ptr->REP_IO_GRANT = pp->wrvir_g;
 			if (pp->wrcum == 0)
-				m_ptr->REP_STATUS = EIO;
+				m_ptr->REP_STATUS = -EIO;
 			else
 				m_ptr->REP_STATUS = pp->wrcum;
 

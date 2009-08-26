@@ -63,14 +63,14 @@ int do_exit(message *msg)
 
 SANITYCHECK(SCL_FUNCTIONS);
 
-	if(vm_isokendpt(msg->VME_ENDPOINT, &proc) != OK) {
+	if(vm_isokendpt(msg->VME_ENDPOINT, &proc) != 0) {
 		printf("VM: bogus endpoint VM_EXIT %d\n", msg->VME_ENDPOINT);
-		return EINVAL;
+		return -EINVAL;
 	}
 	vmp = &vmproc[proc];
 	if(!(vmp->vm_flags & VMF_EXITING)) {
 		printf("VM: unannounced VM_EXIT %d\n", msg->VME_ENDPOINT);
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	if(vmp->vm_flags & VMF_HAS_DMA) {
@@ -101,7 +101,7 @@ SANITYCHECK(SCL_DETAIL);
 	clear_proc(vmp);
 
 SANITYCHECK(SCL_FUNCTIONS);
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -112,16 +112,16 @@ int do_willexit(message *msg)
 	int proc;
 	struct vmproc *vmp;
 
-	if(vm_isokendpt(msg->VMWE_ENDPOINT, &proc) != OK) {
+	if(vm_isokendpt(msg->VMWE_ENDPOINT, &proc) != 0) {
 		printf("VM: bogus endpoint VM_EXITING %d\n",
 			msg->VMWE_ENDPOINT);
-		return EINVAL;
+		return -EINVAL;
 	}
 	vmp = &vmproc[proc];
 
 	vmp->vm_flags |= VMF_EXITING;
 
-	return OK;
+	return 0;
 }
 
 void _exit(int code)

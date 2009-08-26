@@ -211,7 +211,7 @@ static int my_inb(port_t port)
 	int r;
 	unsigned long v = 0;
 	r = sys_inb(port, &v);
-	if (r != OK)
+	if (r != 0)
 		printf("RS232 warning: failed inb 0x%x\n", port);
 
 	return (int) v;
@@ -305,7 +305,7 @@ int try;
 		tp->tty_outrevived = 1;
 	} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
-			tp->tty_outproc, EIO);
+			tp->tty_outproc, -EIO);
 	tp->tty_outleft = tp->tty_outcum = 0;
   }
   }
@@ -459,10 +459,10 @@ tty_t *tp;			/* which TTY */
   line = tp - &tty_table[NR_CONS];
 
   /* See if kernel debugging is enabled; if so, don't initialize this
-   * serial line, making tty not look at the irq and returning ENXIO
+   * serial line, making tty not look at the irq and returning -ENXIO
    * for all requests on it from userland. (The kernel will use it.)
    */
-  if(env_get_param(SERVARNAME, l, sizeof(l)-1) == OK && atoi(l) == line) {
+  if(env_get_param(SERVARNAME, l, sizeof(l)-1) == 0 && atoi(l) == line) {
      return;
   }
 
@@ -516,10 +516,10 @@ tty_t *tp;			/* which TTY */
 
   rs->irq = irq;
   rs->irq_hook_id = rs->irq;	/* call back with irq line number */
-  if (sys_irqsetpolicy(irq, IRQ_REENABLE, &rs->irq_hook_id) != OK) {
+  if (sys_irqsetpolicy(irq, IRQ_REENABLE, &rs->irq_hook_id) != 0) {
   	printf("RS232: Couldn't obtain hook for irq %d\n", irq);
   } else {
-  	if (sys_irqenable(&rs->irq_hook_id) != OK)  {
+  	if (sys_irqenable(&rs->irq_hook_id) != 0)  {
   		printf("RS232: Couldn't enable irq %d (hooked)\n", irq);
   	}
   }

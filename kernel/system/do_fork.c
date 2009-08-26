@@ -40,10 +40,10 @@ register message *m_ptr;	/* pointer to request message */
   int p_proc;
 
   if(!isokendpt(m_ptr->PR_ENDPT, &p_proc))
-	return EINVAL;
+	return -EINVAL;
   rpp = proc_addr(p_proc);
   rpc = proc_addr(m_ptr->PR_SLOT);
-  if (isemptyp(rpp) || ! isemptyp(rpc)) return(EINVAL);
+  if (isemptyp(rpp) || ! isemptyp(rpc)) return(-EINVAL);
 
   map_ptr= (struct mem_map *) m_ptr->PR_MEM_PTR;
 

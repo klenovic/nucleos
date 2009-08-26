@@ -54,29 +54,29 @@ int do_trace()
   if (m_in.request == T_OK) {	/* enable tracing by parent for this proc */
 	mp->mp_flags |= TRACED;
 	mp->mp_reply.reply_trace = 0;
-	return(OK);
+	return 0;
   }
   if (m_in.request == T_READB_INS)
   {
 	/* Special hack for reading text segments */
 	if (mp->mp_effuid != SUPER_USER)
-		return(EPERM);
+		return(-EPERM);
 	if ((child=find_proc(m_in.pid))==NIL_MPROC)
-		return(ESRCH);
+		return(-ESRCH);
 
 	r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
-	if (r != OK) return(r);
+	if (r != 0) return(r);
 
 	mp->mp_reply.reply_trace = m_in.data;
-	return(OK);
+	return 0;
   }
   if (m_in.request == T_WRITEB_INS)
   {
 	/* Special hack for patching text segments */
 	if (mp->mp_effuid != SUPER_USER)
-		return(EPERM);
+		return(-EPERM);
 	if ((child=find_proc(m_in.pid))==NIL_MPROC)
-		return(ESRCH);
+		return(-ESRCH);
 
 #if 0
 	/* Should check for shared text */
@@ -90,34 +90,34 @@ int do_trace()
 #endif
 
 	r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
-	if (r != OK) return(r);
+	if (r != 0) return(r);
 
 	mp->mp_reply.reply_trace = m_in.data;
-	return(OK);
+	return 0;
   }
 
   /* all the other calls are made by the parent fork of the debugger to 
    * control execution of the child
    */
   if ((child=find_proc(m_in.pid))==NIL_MPROC || child->mp_parent != who_p)
-	return(ESRCH);
+	return(-ESRCH);
 
   if (m_in.request == T_STOP) {
-	if ((r = sys_trace(T_STOP, child->mp_endpoint, 0L, (long *) 0)) != OK)
+	if ((r = sys_trace(T_STOP, child->mp_endpoint, 0L, (long *) 0)) != 0)
 		return(r);
 
 	child->mp_flags |= STOPPED;
 	child->mp_sigstatus = 0;
 
 	mp->mp_reply.reply_trace = 0;
-	return(OK);
+	return 0;
   }
 
   /* for calls other than T_STOP, the child must be stopped and the parent
    * must have waited for it
    */
   if (!(child->mp_flags & STOPPED) || child->mp_sigstatus > 0)
-	return(ESRCH);
+	return(-ESRCH);
 
   switch (m_in.request) {
   case T_EXIT:		/* exit */
@@ -135,7 +135,7 @@ int do_trace()
 	return SUSPEND;
   case T_RESUME: 
   case T_STEP: 		/* resume execution */
-	if (m_in.data < 0 || m_in.data > _NSIG) return(EIO);
+	if (m_in.data < 0 || m_in.data > _NSIG) return(-EIO);
 	if (m_in.data > 0) {		/* issue signal */
 		child->mp_flags &= ~TRACED;  /* so signal is not diverted */
 		sig_proc(child, (int) m_in.data);
@@ -145,10 +145,10 @@ int do_trace()
   	break;
   }
   r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
-  if (r != OK) return(r);
+  if (r != 0) return(r);
 
   mp->mp_reply.reply_trace = m_in.data;
-  return(OK);
+  return 0;
 }
 
 /*===========================================================================*
@@ -180,7 +180,7 @@ int signo;
   int r;
 
   r= sys_trace(T_STOP, rmp->mp_endpoint, 0L, (long *) 0);
-  if (r != OK) panic("pm", "sys_trace failed", r);
+  if (r != 0) panic("pm", "sys_trace failed", r);
  
   rmp->mp_flags |= STOPPED;
   if (rpmp->mp_flags & WAITING) {

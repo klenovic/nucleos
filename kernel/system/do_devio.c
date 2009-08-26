@@ -85,7 +85,7 @@ register message *m_ptr;	/* pointer to request message */
 		else if (curr == 2*limit-1)
 			limit *= 2;
 		curr++;
-		return EPERM;
+		return -EPERM;
 	}
     }
 
@@ -105,7 +105,7 @@ doit:
 	else if (curr == 2*limit-1)
 		limit *= 2;
 	curr++;
-	return EPERM;
+	return -EPERM;
     }
 
 /* Process a single I/O request for byte, word, and long values. */
@@ -115,17 +115,17 @@ doit:
         case _DIO_BYTE: m_ptr->DIO_VALUE = inb(m_ptr->DIO_PORT); break; 
         case _DIO_WORD: m_ptr->DIO_VALUE = inw(m_ptr->DIO_PORT); break; 
         case _DIO_LONG: m_ptr->DIO_VALUE = inl(m_ptr->DIO_PORT); break;
-    	default: return(EINVAL);
+    	default: return(-EINVAL);
       } 
     } else { 
       switch (io_type) {
 	case _DIO_BYTE: outb(m_ptr->DIO_PORT, m_ptr->DIO_VALUE); break;
 	case _DIO_WORD: outw(m_ptr->DIO_PORT, m_ptr->DIO_VALUE); break;
 	case _DIO_LONG: outl(m_ptr->DIO_PORT, m_ptr->DIO_VALUE); break;
-    	default: return(EINVAL);
+    	default: return(-EINVAL);
       } 
     }
-    return(OK);
+    return 0;
 }
 
 #endif /* USE_DEVIO */

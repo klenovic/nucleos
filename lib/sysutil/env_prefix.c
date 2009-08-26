@@ -27,7 +27,7 @@ char *prefix;		/* prefix to test for */
   size_t n;
 
   if ((s = env_get_param(env, value, sizeof(value))) != 0) {
-  	if (s != ESRCH)		/* only error allowed */
+  	if (s != -ESRCH)		/* only error allowed */
   	printf("WARNING: env_get_param() failed in env_prefix(): %d\n", s);
   	return FALSE;
   }

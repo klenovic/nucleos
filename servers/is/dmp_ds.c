@@ -35,7 +35,7 @@ void data_store_dmp()
 
   printf("Data Store (DS) contents dump\n");
 
-  if((s=getsysinfo(DS_PROC_NR, SI_DATA_STORE, store)) != OK) {
+  if((s=getsysinfo(DS_PROC_NR, SI_DATA_STORE, store)) != 0) {
 	printf("Couldn't talk to DS: %d.\n", s);
 	return;
   }

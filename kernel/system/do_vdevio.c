@@ -59,8 +59,8 @@ register message *m_ptr;	/* pointer to request message */
   io_type = m_ptr->DIO_REQUEST & _DIO_TYPEMASK;
   if (io_dir == _DIO_INPUT) io_in = TRUE;
   else if (io_dir == _DIO_OUTPUT) io_in = FALSE;
-  else return(EINVAL);
-  if ((vec_size = m_ptr->DIO_VEC_SIZE) <= 0) return(EINVAL);
+  else return(-EINVAL);
+  if ((vec_size = m_ptr->DIO_VEC_SIZE) <= 0) return(-EINVAL);
   switch (io_type) {
       case _DIO_BYTE:
 	bytes = vec_size * sizeof(pvb_pair_t);
@@ -74,13 +74,13 @@ register message *m_ptr;	/* pointer to request message */
 	bytes = vec_size * sizeof(pvl_pair_t);
 	io_size= sizeof(u32_t);
 	break;
-      default:  return(EINVAL);   /* check type once and for all */
+      default:  return(-EINVAL);   /* check type once and for all */
   }
-  if (bytes > sizeof(vdevio_buf))  return(E2BIG);
+  if (bytes > sizeof(vdevio_buf))  return(-E2BIG);
 
   /* Copy (port,value)-pairs from user. */
   if((r=data_copy(who_e, (vir_bytes) m_ptr->DIO_VEC_ADDR,
-    SYSTEM, (vir_bytes) vdevio_buf, bytes)) != OK)
+    SYSTEM, (vir_bytes) vdevio_buf, bytes)) != 0)
 	return r;
 
   rp= proc_addr(who_p);
@@ -109,7 +109,7 @@ register message *m_ptr;	/* pointer to request message */
 			kprintf(
 		"do_vdevio: I/O port check failed for proc %d, port 0x%x\n",
 				m_ptr->m_source, port);
-			return EPERM;
+			return -EPERM;
 		}
 	}
   }
@@ -185,13 +185,13 @@ register message *m_ptr;	/* pointer to request message */
   if (io_in) 
 	if((r=data_copy(SYSTEM, (vir_bytes) vdevio_buf, 
 	  who_e, (vir_bytes) m_ptr->DIO_VEC_ADDR,
-	  (phys_bytes) bytes)) != OK)
+	  (phys_bytes) bytes)) != 0)
 		return r;
-  return(OK);
+  return 0;
 
 bad:
 	minix_panic("do_vdevio: unaligned port", port);
-	return EPERM;
+	return -EPERM;
 }
 
 #endif /* USE_VDEVIO */

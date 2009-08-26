@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
 	(progname=strrchr(argv[0],'/')) ? progname++ : (progname=argv[0]);
 
-	if((r=micro_delay_calibrate()) != OK)
+	if((r=micro_delay_calibrate()) != 0)
 		panic("ti1225", "micro_delay_calibrate failed", r);
 
 	debug= 0;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	for (;;)
 	{
 		r= receive(ANY, &m);
-		if (r != OK)
+		if (r != 0)
 			panic("ti1225", "receive failed", r);
 		printf("ti1225: got message %u from %d\n",
 			m.m_type, m.m_source);
@@ -224,7 +224,7 @@ struct port *pp;
 #if USE_INTS
  	pp->p_hook = pp->p_irq;
 	r= sys_irqsetpolicy(pp->p_irq, 0, &pp->p_hook);
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225","sys_irqsetpolicy failed", r);
 #endif
 
@@ -254,7 +254,7 @@ struct port *pp;
 
 #if USE_INTS
 	r= sys_irqenable(&pp->p_hook);
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225","unable enable interrupts", r);
 #endif
 }
@@ -285,7 +285,7 @@ u32_t base;
 #else
 	r = ENOSYS;
 #endif
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225", "map_regs: sys_vm_map failed", r);
 }
 
@@ -436,7 +436,7 @@ struct port *pp;
 		csr_present= pp->csr_ptr->csr_present;
 		if (csr_present & CP_PWRCYCLE)
 			break;
-	} while (getuptime(&t1)==OK && (t1-t0) < micros_to_ticks(100000));
+	} while (getuptime(&t1) == 0 && (t1-t0) < micros_to_ticks(100000));
 
 	if (!(csr_present & CP_PWRCYCLE))
 	{
@@ -466,7 +466,7 @@ struct port *pp;
 
 #if USE_INTS
 	r= sys_irqenable(&pp->p_hook);
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225","unable enable interrupts", r);
 #endif
 
@@ -492,7 +492,7 @@ static u8_t do_inb(port_t port)
 	u32_t value;
 
 	r= sys_inb(port, &value);
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225","sys_inb failed", r);
 	return value;
 }
@@ -502,7 +502,7 @@ static void do_outb(port_t port, u8_t value)
 	int r;
 
 	r= sys_outb(port, value);
-	if (r != OK)
+	if (r != 0)
 		panic("ti1225","sys_outb failed", r);
 }
 

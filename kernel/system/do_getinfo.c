@@ -85,7 +85,7 @@ register message *m_ptr;	/* pointer to request message */
 		 * Copy the queue heads and fall through to copy the process table. 
 		 */
 		if((ph=umap_local(caller, D, (vir_bytes) m_ptr->I_VAL_PTR2,length)) == 0)
-			return EFAULT;
+			return -EFAULT;
 
 		length = sizeof(struct proc *) * NR_SCHED_QUEUES;
 		CHECKRANGE_OR_SUSPEND(proc_addr(who_p), ph, length, 1);
@@ -108,7 +108,7 @@ register message *m_ptr;	/* pointer to request message */
 		who_e : m_ptr->I_VAL_LEN2_E;
 
 		if(!isokendpt(nr_e, &nr))
-			return EINVAL; /* validate request */
+			return -EINVAL; /* validate request */
 
 		length = sizeof(struct proc);
 		src_vir = (vir_bytes) proc_addr(nr);
@@ -121,7 +121,7 @@ register message *m_ptr;	/* pointer to request message */
 		len = MIN(sizeof(m_ptr->GIWHO_NAME), sizeof(caller->p_name))-1;
 		strncpy(m_ptr->GIWHO_NAME, caller->p_name, len);
 		m_ptr->GIWHO_NAME[len] = '\0';
-		return OK;
+		return 0;
 
 	case GET_MONPARAMS:
 		src_vir = (vir_bytes) params_buffer;
@@ -144,11 +144,11 @@ register message *m_ptr;	/* pointer to request message */
 
 		if(bin < 0 || bin >= RANDOM_SOURCES) {
 			kprintf("SYSTEM: GET_RANDOMNESS_BIN: %d out of range\n", bin);
-			return EINVAL;
+			return -EINVAL;
 		}
 
 		if(krandom.bin[bin].r_size < RANDOM_ELEMENTS)
-			return ENOENT;
+			return -ENOENT;
 
 		length = sizeof(krandom.bin[bin]);
 	 	src_vir = (vir_bytes) &krandom.bin[bin];
@@ -173,7 +173,7 @@ register message *m_ptr;	/* pointer to request message */
 
 	case GET_PRIVID:
 		if (!isokendpt(m_ptr->I_VAL_LEN2_E, &proc_nr)) 
-			return EINVAL;
+			return -EINVAL;
 		return proc_addr(proc_nr)->p_priv->s_id;
 
 	case GET_BOOTPARAM:
@@ -183,26 +183,26 @@ register message *m_ptr;	/* pointer to request message */
 
 	default:
 		kprintf("do_getinfo: invalid request %d\n", m_ptr->I_REQUEST);
-		return(EINVAL);
+		return(-EINVAL);
 	}
 
 	/* Try to make the actual copy for the requested data. */
 	if (m_ptr->I_VAL_LEN > 0 && length > m_ptr->I_VAL_LEN)
-		return (E2BIG);
+		return (-E2BIG);
 
 	if((ph=umap_local(caller, D, (vir_bytes) m_ptr->I_VAL_PTR,length)) == 0)
-		return EFAULT;
+		return -EFAULT;
 
 	CHECKRANGE_OR_SUSPEND(caller, ph, length, 1);
 
-	if(data_copy(SYSTEM, src_vir, who_e, (vir_bytes) m_ptr->I_VAL_PTR, length) == OK) {
+	if(data_copy(SYSTEM, src_vir, who_e, (vir_bytes) m_ptr->I_VAL_PTR, length) == 0) {
 		if(wipe_rnd_bin >= 0 && wipe_rnd_bin < RANDOM_SOURCES) {
 			krandom.bin[wipe_rnd_bin].r_size = 0;
 			krandom.bin[wipe_rnd_bin].r_next = 0;
 		}
 	}
 
-	return(OK);
+	return 0;
 }
 
 #endif /* USE_GETINFO */

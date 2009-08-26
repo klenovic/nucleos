@@ -31,5 +31,5 @@ WINDOW *win;
   for (end = &temp[win->_maxx]; temp <= end; temp++) *temp = blank;
   win->_minchng[win->_cury] = 0;
   win->_maxchng[win->_cury] = win->_maxx;
-  return(OK);
+  return 0;
 }

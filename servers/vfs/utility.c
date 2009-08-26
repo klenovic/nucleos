@@ -50,8 +50,8 @@ int flag;			/* M3 means path may be in message */
 	printf("VFS: fetch_name: len (%d) > %d\n", len, PATH_MAX);
 	util_stacktrace();
 #endif
-	err_code = ENAMETOOLONG;
-	return(EGENERIC);
+	err_code = -ENAMETOOLONG;
+	return(-EGENERIC);
   }
 
   if(len >= sizeof(user_fullpath)) {
@@ -60,10 +60,10 @@ int flag;			/* M3 means path may be in message */
 
   /* Check name length for validity. */
   if (len <= 0) {
-	err_code = EINVAL;
+	err_code = -EINVAL;
 	printf("vfs: fetch_name: len %d?\n", len);
 	util_stacktrace();
-	return(EGENERIC);
+	return(-EGENERIC);
   }
 
   if (flag == M3 && len <= M3_STRING) {
@@ -71,7 +71,7 @@ int flag;			/* M3 means path may be in message */
 	rpu = &user_fullpath[0];
 	rpm = m_in.pathname;		/* contained in input message */
 	do { *rpu++ = *rpm++; } while (--len);
-	r = OK;
+	r = 0;
   } else {
 	/* String is not contained in the message.  Get it from user space. */
 	r = sys_datacopy(who_e, (vir_bytes) path,
@@ -98,7 +98,7 @@ int no_sys()
 {
 /* Somebody has used an illegal system call number */
   printf("VFSno_sys: call %d from %d\n", call_nr, who_e);
-  return(ENOSYS);
+  return(-ENOSYS);
 }
 
 /*===========================================================================*
@@ -133,7 +133,7 @@ int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
     if(failed && fatal)
         panic(__FILE__, "isokendpt_f failed", NO_NUM);
 
-    return failed ? EDEADSRCDST : OK;
+    return failed ? -EDEADSRCDST : 0;
 }
 
 /*===========================================================================*
@@ -151,7 +151,7 @@ time_t clock_time()
   time_t boottime;
 
   r= getuptime2(&uptime, &boottime);
-  if (r != OK)
+  if (r != 0)
 	panic(__FILE__,"clock_time err", r);
 
   return( (time_t) (boottime + (uptime/system_hz)));

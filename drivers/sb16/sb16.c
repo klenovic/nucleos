@@ -22,7 +22,7 @@ int data;
 	for(i = 0; i < 100; i++);
 	sb16_outb(MIXER_DATA, data);
 
-	return OK;
+	return 0;
 }
 
 
@@ -35,7 +35,7 @@ int port;
 	int s;
 	unsigned long value;
 
-	if ((s=sys_inb(port, &value)) != OK)
+	if ((s=sys_inb(port, &value)) != 0)
 		panic("SB16DSP","sys_inb() failed", s);
 	
 	return value;
@@ -51,6 +51,6 @@ int value;
 {
 	int s;
 	
-	if ((s=sys_outb(port, value)) != OK)
+	if ((s=sys_outb(port, value)) != 0)
 		panic("SB16DSP","sys_outb() failed", s);
 }

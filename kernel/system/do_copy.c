@@ -79,19 +79,19 @@ register message *m_ptr;	/* pointer to request message */
 	if(! isokendpt(vir_addr[i].proc_nr_e, &p)) {
 	  kprintf("do_copy: %d: seg 0x%x, %d not ok endpoint\n",
 		i, vir_addr[i].segment, vir_addr[i].proc_nr_e);
-          return(EINVAL); 
+          return(-EINVAL); 
         }
       }
 
       /* Check if physical addressing is used without SYS_PHYSCOPY. */
       if ((vir_addr[i].segment & PHYS_SEG) &&
-          m_ptr->m_type != SYS_PHYSCOPY) return(EPERM);
+          m_ptr->m_type != SYS_PHYSCOPY) return(-EPERM);
   }
 
   /* Check for overflow. This would happen for 64K segments and 16-bit 
    * vir_bytes. Especially copying by the PM on do_fork() is affected. 
    */
-  if (bytes != (vir_bytes) bytes) return(E2BIG);
+  if (bytes != (vir_bytes) bytes) return(-E2BIG);
 
   /* Now try to make the actual virtual copy. */
   return( virtual_copy_vmcheck(&vir_addr[_SRC_], &vir_addr[_DST_], bytes) );

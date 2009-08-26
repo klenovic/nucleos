@@ -107,9 +107,9 @@ message *m_ptr;
 	dprint("mixer_open\n");
 
 	/* try to detect the mixer type */
-	if (!mixer_avail && mixer_init() != OK) return EIO;
+	if (!mixer_avail && mixer_init() != 0) return EIO;
 
-	return OK;
+	return 0;
 }
 
 
@@ -121,7 +121,7 @@ message *m_ptr;
 {
 	dprint("mixer_close\n");
 
-	return OK;
+	return 0;
 }
 
 
@@ -173,7 +173,7 @@ static int mixer_init()
 	dprint("Mixer detected\n");
 
 	mixer_avail = 1;
-	return OK;
+	return 0;
 }
 
 
@@ -271,7 +271,7 @@ int flag;	/* 0 = get, 1 = set */
 		sys_datacopy(SELF, (vir_bytes)&level, m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, (phys_bytes)sizeof(level));
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -336,7 +336,7 @@ int channel;    /* 0 = left, 1 = right */
 		sys_datacopy(SELF, (vir_bytes)&input, m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, (phys_bytes)sizeof(input));
 	}
 
-	return OK;
+	return 0;
 }
 
 
@@ -394,5 +394,5 @@ int flag;	/* 0 = get, 1 = set */
 		sys_datacopy(SELF, (vir_bytes)&output, m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, (phys_bytes)sizeof(output));
 	}
 
-	return OK;
+	return 0;
 }

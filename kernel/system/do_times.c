@@ -46,7 +46,7 @@ register message *m_ptr;	/* pointer to request message */
   }
   m_ptr->T_BOOT_TICKS = get_uptime();  
   m_ptr->T_BOOTTIME = boottime;  
-  return(OK);
+  return 0;
 }
 
 #endif /* USE_TIMES */

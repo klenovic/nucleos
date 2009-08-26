@@ -166,7 +166,7 @@ int micro_delay(u32_t usecs)
 {
 	/* TTY can't use the library micro_delay() as that calls PM. */
 	tickdelay(micros_to_ticks(usecs));
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -212,11 +212,11 @@ message *m;
 	unsigned char c;
 
 	/* Execute the requested device driver function. */
-	r= EINVAL;	/* just in case */
+	r= -EINVAL;	/* just in case */
 	switch (m->m_type) {
 	    case DEV_OPEN:
 		kbdp->nr_open++;
-		r= OK;
+		r= 0;
 		break;
 	    case DEV_CLOSE:
 		kbdp->nr_open--;
@@ -227,14 +227,14 @@ message *m;
 		}
 		if (kbdp->nr_open == 0)
 			kbdp->avail= 0;
-		r= OK;
+		r= 0;
 		break;
 	    case DEV_READ_S:
 	        safecopy = 1;
 		if (kbdp->req_size)
 		{
 			/* We handle only request at a time */
-			r= EIO;
+			r= -EIO;
 			break;
 		}
 		if (kbdp->avail == 0)
@@ -265,7 +265,7 @@ message *m;
 		r= sys_vircopy(SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
 			m->IO_ENDPT, D, (vir_bytes) m->ADDRESS, n);
 		}
-		if (r == OK)
+		if (r == 0)
 		{
 			kbdp->offset= (kbdp->offset+n) % KBD_BUFSZ;
 			kbdp->avail -= n;
@@ -281,7 +281,7 @@ message *m;
 		if (kbdp != &kbdaux)
 		{
 			printf("write to keyboard not implemented\n");
-			r= EINVAL;
+			r= -EINVAL;
 			break;
 		}
 
@@ -299,7 +299,7 @@ message *m;
 				(vir_bytes) m->ADDRESS+i,
 				SELF, D, (vir_bytes)&c, 1);
 			}
-			if (r != OK)
+			if (r != 0)
 				break;
 			kbc_cmd1(KBC_WRITE_AUX, c);
 		}
@@ -308,7 +308,7 @@ message *m;
 
 	    case CANCEL:
 		kbdp->req_size= 0;
-		r= OK;
+		r= 0;
 		break;
 	    case DEV_SELECT:
 		ops = m->IO_ENDPT & (SEL_RD|SEL_WR|SEL_ERR);
@@ -343,7 +343,7 @@ message *m;
 			r= sys_vircopy(m->IO_ENDPT, D, (vir_bytes) m->ADDRESS,
 				SELF, D, (vir_bytes)&leds, sizeof(leds));
 			}
-			if (r != OK)
+			if (r != 0)
 				break;
 			b= 0;
 			if (leds.kl_bits & KBD_LEDS_NUM) b |= NUM_LOCK;
@@ -367,7 +367,7 @@ message *m;
 			 }
 			 if (!kbdout.expect_ack)
 				kbd_send();
-			 r= OK;
+			 r= 0;
 			 break;
 		}
 		if (kbdp == &kbd && m->TTY_REQUEST == KIOCBELL)
@@ -383,7 +383,7 @@ message *m;
 			r= sys_vircopy(m->IO_ENDPT, D, (vir_bytes) m->ADDRESS,
 				SELF, D, (vir_bytes)&bell, sizeof(bell));
 			}
-			if (r != OK)
+			if (r != 0)
 				break;
 
 			ticks= bell.kb_duration.tv_usec * system_hz / 1000000;
@@ -392,16 +392,16 @@ message *m;
 				ticks++;
 			beep_x(bell.kb_pitch, ticks);
 
-			r= OK;
+			r= 0;
 			break;
 		}
-		r= ENOTTY;
+		r= -ENOTTY;
 		break;
 
 	    default:		
 		printf("Warning, TTY(kbd) got unexpected request %d from %d\n",
 			m->m_type, m->m_source);
-		r= EINVAL;
+		r= -EINVAL;
 	}
 	tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT, r);
 }
@@ -434,7 +434,7 @@ message *m;
 		r= sys_vircopy(SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
 			kbdp->req_proc, D, kbdp->req_addr_g, n);
 		}
-		if (r == OK)
+		if (r == 0)
 		{
 			kbdp->offset= (kbdp->offset+n) % KBD_BUFSZ;
 			kbdp->avail -= n;
@@ -641,7 +641,7 @@ static void kbd_send()
 	if (kbdout.expect_ack)
 		return;
 
-	if((r=sys_inb(KB_STATUS, &sb)) != OK) {
+	if((r=sys_inb(KB_STATUS, &sb)) != 0) {
 		printf("kbd_send: 1 sys_inb() failed: %d\n", r);
 	}
 	if (sb & (KB_OUT_FULL|KB_IN_FULL))
@@ -650,7 +650,7 @@ static void kbd_send()
 		return;
 	}
 	micro_delay(KBC_IN_DELAY);
-	if((r=sys_inb(KB_STATUS, &sb)) != OK) {
+	if((r=sys_inb(KB_STATUS, &sb)) != 0) {
 		printf("kbd_send: 2 sys_inb() failed: %d\n", r);
 	}
 	if (sb & (KB_OUT_FULL|KB_IN_FULL))
@@ -663,7 +663,7 @@ static void kbd_send()
 #if 0
 	printf("sending byte 0x%x to keyboard\n", kbdout.buf[kbdout.offset]);
 #endif
-	if((r=sys_outb(KEYBD, kbdout.buf[kbdout.offset])) != OK) {
+	if((r=sys_outb(KEYBD, kbdout.buf[kbdout.offset])) != 0) {
 		printf("kbd_send: 3 sys_inb() failed: %d\n", r);
 	}
 	kbdout.offset++;
@@ -676,13 +676,13 @@ static void kbd_send()
 		/* Add a timer to the timers list. Possibly reschedule the
 		 * alarm.
 		 */
-		if ((r= getuptime(&now)) != OK)
+		if ((r= getuptime(&now)) != 0)
 			panic("TTY","Keyboard couldn't get clock's uptime.", r);
 		tmrs_settimer(&tty_timers, &tmr_kbd_wd, now+system_hz, kbd_watchdog,
 			NULL);
 		if (tty_timers->tmr_exp_time != tty_next_timeout) {
 			tty_next_timeout = tty_timers->tmr_exp_time;
-			if ((r= sys_setalarm(tty_next_timeout, 1)) != OK)
+			if ((r= sys_setalarm(tty_next_timeout, 1)) != 0)
 				panic("TTY","Keyboard couldn't set alarm.", r);
 		}
 		kbd_watchdog_set= 1;
@@ -793,13 +793,13 @@ static void set_leds()
   if (! machine.pc_at) return;	/* PC/XT doesn't have LEDs */
 
   kb_wait();			/* wait for buffer empty  */
-  if ((s=sys_outb(KEYBD, LED_CODE)) != OK)
+  if ((s=sys_outb(KEYBD, LED_CODE)) != 0)
       printf("Warning, sys_outb couldn't prepare for LED values: %d\n", s);
    				/* prepare keyboard to accept LED values */
   kb_ack();			/* wait for ack response  */
 
   kb_wait();			/* wait for buffer empty  */
-  if ((s=sys_outb(KEYBD, locks[ccurrent])) != OK)
+  if ((s=sys_outb(KEYBD, locks[ccurrent])) != 0)
       printf("Warning, sys_outb couldn't give LED values: %d\n", s);
 				/* give keyboard LED values */
   kb_ack();			/* wait for ack response  */
@@ -812,7 +812,7 @@ static void kbc_cmd0(cmd)
 int cmd;
 {
 	kb_wait();
-	if(sys_outb(KB_COMMAND, cmd) != OK)
+	if(sys_outb(KB_COMMAND, cmd) != 0)
 		printf("kbc_cmd0: sys_outb failed\n");
 }
 
@@ -824,10 +824,10 @@ int cmd;
 int data;
 {
 	kb_wait();
-	if(sys_outb(KB_COMMAND, cmd) != OK)
+	if(sys_outb(KB_COMMAND, cmd) != 0)
 		printf("kbc_cmd1: 1 sys_outb failed\n");
 	kb_wait();
-	if(sys_outb(KEYBD, data) != OK)
+	if(sys_outb(KEYBD, data) != 0)
 		printf("kbc_cmd1: 2 sys_outb failed\n");
 }
 
@@ -856,12 +856,12 @@ static int kbc_read()
 	do
 #endif
 	{
-		if(sys_inb(KB_STATUS, &st) != OK)
+		if(sys_inb(KB_STATUS, &st) != 0)
 			printf("kbc_read: 1 sys_inb failed\n");
 		if (st & KB_OUT_FULL)
 		{
 			micro_delay(KBC_IN_DELAY);
-			if(sys_inb(KEYBD, &byte) != OK)
+			if(sys_inb(KEYBD, &byte) != 0)
 				printf("kbc_read: 2 sys_inb failed\n");
 			if (st & KB_AUX_BYTE)
 				printf("kbc_read: aux byte 0x%x\n", byte);
@@ -876,7 +876,7 @@ static int kbc_read()
 	while (micro_elapsed(&ms) < 1000000);
 #endif
 	panic("TTY", "kbc_read failed to complete", NO_NUM);
-	return EINVAL;
+	return -EINVAL;
 }
 
 
@@ -896,7 +896,7 @@ static int kb_wait()
   retries = MAX_KB_BUSY_RETRIES + 1;	/* wait until not busy */
   do {
       s = sys_inb(KB_STATUS, &status);
-      if(s != OK)
+      if(s != 0)
 	printf("kb_wait: sys_inb failed: %d\n", s);
       if (status & KB_OUT_FULL) {
 	  if (scan_keyboard(&byte, &isaux))
@@ -926,7 +926,7 @@ static int kb_ack()
   retries = MAX_KB_ACK_RETRIES + 1;
   do {
       s = sys_inb(KEYBD, &u8val);
-	if(s != OK)
+	if(s != 0)
 		printf("kb_ack: sys_inb failed: %d\n", s);
       if (u8val == KB_ACK)	
           break;		/* wait for ack */
@@ -955,7 +955,7 @@ void kb_init_once(void)
   u8_t ccb;
   char env[100];
 
-  if(env_get_param("sticky_alt", env, sizeof(env)-1) == OK
+  if(env_get_param("sticky_alt", env, sizeof(env)-1) == 0
    && atoi(env) == 1) {
         sticky_alt_mode = 1; 
   }
@@ -976,18 +976,18 @@ void kb_init_once(void)
 
       /* Set interrupt handler and enable keyboard IRQ. */
       irq_hook_id = KEYBOARD_IRQ;	/* id to be returned on interrupt */
-      if ((i=sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE, &irq_hook_id)) != OK)
+      if ((i=sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE, &irq_hook_id)) != 0)
           panic("TTY",  "Couldn't set keyboard IRQ policy", i);
-      if ((i=sys_irqenable(&irq_hook_id)) != OK)
+      if ((i=sys_irqenable(&irq_hook_id)) != 0)
           panic("TTY", "Couldn't enable keyboard IRQs", i);
       kbd_irq_set |= (1 << KEYBOARD_IRQ);
 
       /* Set AUX interrupt handler and enable AUX IRQ. */
       aux_irq_hook_id = KBD_AUX_IRQ;	/* id to be returned on interrupt */
       if ((i=sys_irqsetpolicy(KBD_AUX_IRQ, IRQ_REENABLE,
-		&aux_irq_hook_id)) != OK)
+		&aux_irq_hook_id)) != 0)
           panic("TTY",  "Couldn't set AUX IRQ policy", i);
-      if ((i=sys_irqenable(&aux_irq_hook_id)) != OK)
+      if ((i=sys_irqenable(&aux_irq_hook_id)) != 0)
           panic("TTY", "Couldn't enable AUX IRQs", i);
       kbd_irq_set |= (1 << KBD_AUX_IRQ);
 
@@ -1039,11 +1039,11 @@ message *m_ptr;			/* pointer to the request message */
  * notifications if it is pressed. At most one binding per key can exist.
  */
   int i; 
-  int result = EINVAL;
+  int result = -EINVAL;
 
   switch (m_ptr->FKEY_REQUEST) {	/* see what we must do */
   case FKEY_MAP:			/* request for new mapping */
-      result = OK;			/* assume everything will be ok*/
+      result = 0;			/* assume everything will be ok*/
       for (i=0; i < 12; i++) {		/* check F1-F12 keys */
           if (bit_isset(m_ptr->FKEY_FKEYS, i+1) ) {
 #if DEAD_CODE
@@ -1059,7 +1059,7 @@ message *m_ptr;			/* pointer to the request message */
 #if DEAD_CODE
     	      } else {
     	          printf("WARNING, fkey_map failed F%d\n", i+1);
-    	          result = EBUSY;	/* report failure, but try rest */
+    	          result = -EBUSY;	/* report failure, but try rest */
     	      }
 #endif
     	  }
@@ -1075,14 +1075,14 @@ message *m_ptr;			/* pointer to the request message */
 #if DEAD_CODE
     	      } else {
     	          printf("WARNING, fkey_map failed Shift F%d\n", i+1);
-    	          result = EBUSY;	/* report failure but try rest */
+    	          result = -EBUSY;	/* report failure but try rest */
     	      }
 #endif
     	  }
       }
       break;
   case FKEY_UNMAP:
-      result = OK;			/* assume everything will be ok*/
+      result = 0;			/* assume everything will be ok*/
       for (i=0; i < 12; i++) {		/* check F1-F12 keys */
           if (bit_isset(m_ptr->FKEY_FKEYS, i+1) ) {
               if (fkey_obs[i].proc_nr == m_ptr->m_source) { 
@@ -1090,7 +1090,7 @@ message *m_ptr;			/* pointer to the request message */
     	          fkey_obs[i].events = 0;
     	          bit_unset(m_ptr->FKEY_FKEYS, i+1);
     	      } else {
-    	          result = EPERM;	/* report failure, but try rest */
+    	          result = -EPERM;	/* report failure, but try rest */
     	      }
     	  }
       }
@@ -1101,7 +1101,7 @@ message *m_ptr;			/* pointer to the request message */
     	          sfkey_obs[i].events = 0;
     	          bit_unset(m_ptr->FKEY_SFKEYS, i+1);
     	      } else {
-    	          result = EPERM;	/* report failure, but try rest */
+    	          result = -EPERM;	/* report failure, but try rest */
     	      }
     	  }
       }
@@ -1209,7 +1209,7 @@ int *isauxp;
 {
   unsigned long b, sb;
 
-  if(sys_inb(KB_STATUS, &sb) != OK)
+  if(sys_inb(KB_STATUS, &sb) != 0)
 	printf("scan_keyboard: sys_inb failed\n");
 
   if (!(sb & KB_OUT_FULL))
@@ -1218,7 +1218,7 @@ int *isauxp;
 		kbd_send();
 	return 0;
   }
-  if(sys_inb(KEYBD, &b) != OK)
+  if(sys_inb(KEYBD, &b) != 0)
 	printf("scan_keyboard: 2 sys_inb failed\n");
 #if 0
   printf("got byte 0x%x from %s\n", b, (sb & KB_AUX_BYTE) ? "AUX" : "keyboard");
@@ -1263,13 +1263,13 @@ timer_t *tmrp;
 	}
 	kbd_alive= 0;
 
-	if ((r= getuptime(&now)) != OK)
+	if ((r= getuptime(&now)) != 0)
 		panic("TTY","Keyboard couldn't get clock's uptime.", r);
 	tmrs_settimer(&tty_timers, &tmr_kbd_wd, now+system_hz, kbd_watchdog,
 		NULL);
 	if (tty_timers->tmr_exp_time != tty_next_timeout) {
 		tty_next_timeout = tty_timers->tmr_exp_time;
-		if ((r= sys_setalarm(tty_next_timeout, 1)) != OK)
+		if ((r= sys_setalarm(tty_next_timeout, 1)) != 0)
 			panic("TTY","Keyboard couldn't set alarm.", r);
 	}
 	kbd_watchdog_set= 1;

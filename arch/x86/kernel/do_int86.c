@@ -48,5 +48,5 @@ register message *m_ptr;	/* pointer to request message */
   get_randomness(&krandom, CLOCK_IRQ);
   unlock;
 
-  return(OK);
+  return 0;
 }

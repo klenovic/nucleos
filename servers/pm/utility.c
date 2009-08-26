@@ -65,7 +65,7 @@ int no_sys()
 {
 /* A system call number not implemented by PM has been requested. */
   printf("PM: in no_sys, call nr %d from %d\n", call_nr, who_e);
-  return(ENOSYS);
+  return(-ENOSYS);
 }
 
 /*===========================================================================*
@@ -110,11 +110,11 @@ int pm_isokendpt(int endpoint, int *proc)
 {
 	*proc = _ENDPOINT_P(endpoint);
 	if(*proc < -NR_TASKS || *proc >= NR_PROCS)
-		return EINVAL;
+		return -EINVAL;
 	if(*proc >= 0 && endpoint != mproc[*proc].mp_endpoint)
-		return EDEADSRCDST;
+		return -EDEADSRCDST;
 	if(*proc >= 0 && !(mproc[*proc].mp_flags & IN_USE))
-		return EDEADSRCDST;
-	return OK;
+		return -EDEADSRCDST;
+	return 0;
 }
 

@@ -1,6 +1,6 @@
 # Makefile for all device drivers.
-obj-y := at_wini/ bios_wini/ floppy/ lance/ log/ pci/ random/ \
-	 readclock/ tty/ memory/
+obj-y := at_wini/ bios_wini/ dp8390/ floppy/ lance/ log/ pci/ random/ \
+	 readclock/ rtl8139/ tty/ memory/
 
 #subdir-y-flags := not-sort
 

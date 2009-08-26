@@ -76,7 +76,7 @@ int rw_flag;			/* READING or WRITING */
 
   /* If the file descriptor is valid, get the vnode, size and mode. */
   if (m_in.nbytes < 0)
-  	return(EINVAL);
+  	return(-EINVAL);
 
   if ((f = get_filp(m_in.fd)) == NIL_FILP) {
   	return(err_code);
@@ -85,7 +85,7 @@ int rw_flag;			/* READING or WRITING */
 #if 0
 	printf("vfs:read_write: returning error\n");
 #endif
-      return(f->filp_mode == FILP_CLOSED ? EIO : EBADF);
+      return(f->filp_mode == FILP_CLOSED ? -EIO : -EBADF);
   }
 
   if (m_in.nbytes == 0)
@@ -106,7 +106,7 @@ int rw_flag;			/* READING or WRITING */
 	return rw_pipe(rw_flag, usr, m_in.fd, f, m_in.buffer, m_in.nbytes);
   }
 
-  r = OK;
+  r = 0;
   cum_io = 0;
 
   op = (rw_flag == READING ? VFS_DEV_READ : VFS_DEV_WRITE);
@@ -138,7 +138,7 @@ int rw_flag;			/* READING or WRITING */
 	if (r >= 0) {
 		cum_io = r;
 		position = add64ul(position, r);
-		r = OK;
+		r = 0;
 	}
   } 
   /* Block special files. */
@@ -210,7 +210,7 @@ int rw_flag;			/* READING or WRITING */
 
   f->filp_pos = position;
 
-  if (r == OK) {
+  if (r == 0) {
       return cum_io;
   }
 
@@ -235,10 +235,10 @@ int do_getdents()
   }
   
   if (!(rfilp->filp_mode & R_BIT))
-	return EBADF;
+	return -EBADF;
 
   if ((rfilp->filp_vno->v_mode & I_TYPE) != I_DIRECTORY)
-	return EBADF;
+	return -EBADF;
 
   gid=cpf_grant_magic(rfilp->filp_vno->v_fs_e, who_e, (vir_bytes) m_in.buffer,
 	m_in.nbytes, CPF_WRITE);
@@ -366,7 +366,7 @@ size_t req_size;
   else
 	vp->v_pipe_wr_pos= cv64ul(position);
 
-  if (r == OK) {
+  if (r == 0) {
 	if (partial_pipe) {
 		/* partial write on pipe with */
 		/* O_NONBLOCK, return write count */

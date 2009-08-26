@@ -32,8 +32,8 @@ message *m_ptr;			/* pointer to request message */
   int proc;
 
   map_ptr = (struct mem_map *) m_ptr->PR_MEM_PTR;
-  if (! isokendpt(m_ptr->PR_ENDPT, &proc)) return(EINVAL);
-  if (iskerneln(proc)) return(EPERM);
+  if (! isokendpt(m_ptr->PR_ENDPT, &proc)) return(-EINVAL);
+  if (iskerneln(proc)) return(-EPERM);
   rp = proc_addr(proc);
 
   return newmap(rp, map_ptr);
@@ -50,14 +50,14 @@ struct mem_map *map_ptr;	/* virtual address of map inside caller */
   int r;
 /* Fetch the memory map. */
   if((r=data_copy(who_e, (vir_bytes) map_ptr,
-	SYSTEM, (vir_bytes) rp->p_memmap, sizeof(rp->p_memmap))) != OK) {
+	SYSTEM, (vir_bytes) rp->p_memmap, sizeof(rp->p_memmap))) != 0) {
 	kprintf("newmap: data_copy failed! (%d)\n", r);
 	return r;
   }
 
   alloc_segments(rp);
 
-  return(OK);
+  return 0;
 }
 #endif /* USE_NEWMAP */
 

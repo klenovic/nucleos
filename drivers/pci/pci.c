@@ -155,37 +155,37 @@ static void print_hyper_cap(int devind, U8_t capptr);
 unsigned pci_inb(U16_t port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inb(port, (unsigned long*)&value)) !=OK)
+	if ((s=sys_inb(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inb failed: %d\n", s);
 	return value;
 }
 unsigned pci_inw(U16_t port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inw(port, (unsigned long*)&value)) !=OK)
+	if ((s=sys_inw(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inw failed: %d\n", s);
 	return value;
 }
 unsigned pci_inl(U16_t port) {
 	U32_t value;
 	int s;
-	if ((s=sys_inl(port, (unsigned long*)&value)) !=OK)
+	if ((s=sys_inl(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inl failed: %d\n", s);
 	return value;
 }
 void pci_outb(U16_t port, U8_t value) {
 	int s;
-	if ((s=sys_outb(port, value)) !=OK)
+	if ((s=sys_outb(port, value)) != 0)
 		printf("PCI: warning, sys_outb failed: %d\n", s);
 }
 void pci_outw(U16_t port, U16_t value) {
 	int s;
-	if ((s=sys_outw(port, value)) !=OK)
+	if ((s=sys_outw(port, value)) != 0)
 		printf("PCI: warning, sys_outw failed: %d\n", s);
 }
 void pci_outl(U16_t port, U32_t value) {
 	int s;
-	if ((s=sys_outl(port, value)) !=OK)
+	if ((s=sys_outl(port, value)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 }
 
@@ -320,10 +320,10 @@ int proc;
 	if (devind < 0 || devind >= nr_pcidev)
 	{
 		printf("pci:pci_reserve2: bad devind: %d\n", devind);
-		return EINVAL;
+		return -EINVAL;
 	}
 	if(pcidev[devind].pd_inuse)
-		return EBUSY;
+		return -EBUSY;
 	pcidev[devind].pd_inuse= 1;
 	pcidev[devind].pd_proc= proc;
 
@@ -346,7 +346,7 @@ int proc;
 				proc, ior.ior_base, ior.ior_limit);
 			}
 			r= sys_privctl(proc, SYS_PRIV_ADD_IO, 0, &ior);
-			if (r != OK)
+			if (r != 0)
 			{
 				printf("sys_privctl failed for proc %d: %d\n",
 					proc, r);
@@ -364,7 +364,7 @@ int proc;
 				proc, mr.mr_base, mr.mr_limit);
 			}
 			r= sys_privctl(proc, SYS_PRIV_ADD_MEM, 0, &mr);
-			if (r != OK)
+			if (r != 0)
 			{
 				printf("sys_privctl failed for proc %d: %d\n",
 					proc, r);
@@ -376,14 +376,14 @@ int proc;
 	{
 		if(debug) printf("pci_reserve3: adding IRQ %d\n", ilr);
 		r= sys_privctl(proc, SYS_PRIV_ADD_IRQ, ilr, NULL);
-		if (r != OK)
+		if (r != 0)
 		{
 			printf("sys_privctl failed for proc %d: %d\n",
 				proc, r);
 		}
 	}
 
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -413,11 +413,11 @@ u16_t *vidp;
 u16_t *didp;
 {
 	if (devind < 0 || devind >= nr_pcidev)
-		return EINVAL;
+		return -EINVAL;
 
 	*vidp= pcidev[devind].pd_vid;
 	*didp= pcidev[devind].pd_did;
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -450,7 +450,7 @@ char **cpp;
 	char *p;
 
 	if (devind < 0 || devind >= nr_pcidev)
-		return EINVAL;
+		return -EINVAL;
 
 	p= label;
 	end= label+sizeof(label);
@@ -464,7 +464,7 @@ char **cpp;
 	ntostr(pcidev[devind].pd_func, &p, end);
 
 	*cpp= label;
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -496,12 +496,12 @@ int port;
 u8_t *vp;
 {
 	if (devind < 0 || devind >= nr_pcidev)
-		return EINVAL;
+		return -EINVAL;
 	if (port < 0 || port > 255)
-		return EINVAL;
+		return -EINVAL;
 
 	*vp= pci_attr_r8_u(devind, port);
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -541,12 +541,12 @@ int port;
 u32_t *vp;
 {
 	if (devind < 0 || devind >= nr_pcidev)
-		return EINVAL;
+		return -EINVAL;
 	if (port < 0 || port > 256-4)
-		return EINVAL;
+		return -EINVAL;
 
 	*vp= pci_attr_r32_u(devind, port);
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -630,7 +630,7 @@ static void pci_intel_init()
 	vid= PCII_RREG16_(bus, dev, func, PCI_VID);
 	did= PCII_RREG16_(bus, dev, func, PCI_DID);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -688,7 +688,7 @@ static void pci_intel_init()
 	probe_bus(busind);
 
 	r= do_isabridge(busind);
-	if (r != OK)
+	if (r != 0)
 	{
 		busnr= pcibus[busind].pb_busnr;
 
@@ -1269,7 +1269,7 @@ static void complete_bars()
 	char memstr[256];
 
 	r= env_get_param("memory", memstr, sizeof(memstr));
-	if (r != OK)
+	if (r != 0)
 		panic("pci", "env_get_param failed", r);
 	
 	/* Set memgap_low to just above physical memory */
@@ -1828,9 +1828,9 @@ int devind;
 	dev= pcidev[devind].pd_dev;
 	func= pcidev[devind].pd_func;
 #if USER_SPACE
-	if (OK != (s=sys_inb(PIIX_ELCR1, (unsigned long*)&elcr1)))
+	if ((s=sys_inb(PIIX_ELCR1, (unsigned long*)&elcr1)) != 0)
 		printf("Warning, sys_inb failed: %d\n", s);
-	if (OK != (s=sys_inb(PIIX_ELCR2, (unsigned long*)&elcr2)))
+	if ((s=sys_inb(PIIX_ELCR2, (unsigned long*)&elcr2)) != 0)
 		printf("Warning, sys_inb failed: %d\n", s);
 #else
 	elcr1= inb(PIIX_ELCR1);
@@ -2271,7 +2271,7 @@ int port;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2300,7 +2300,7 @@ int port;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n");
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2329,7 +2329,7 @@ int port;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2363,7 +2363,7 @@ u8_t value;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port, value);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2390,7 +2390,7 @@ u16_t value;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port, value);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2417,7 +2417,7 @@ u32_t value;
 		pcidev[devind].pd_dev, pcidev[devind].pd_func,
 		port, value);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n");
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2435,7 +2435,7 @@ int busind;
 
 	v= PCII_RREG16_(pcibus[busind].pb_busnr, 0, 0, PCI_SR);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
@@ -2453,7 +2453,7 @@ u16_t value;
 	int s;
 	PCII_WREG16_(pcibus[busind].pb_busnr, 0, 0, PCI_SR, value);
 #if USER_SPACE
-	if (OK != (s=sys_outl(PCII_CONFADD, PCII_UNSEL)))
+	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);

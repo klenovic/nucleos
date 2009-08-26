@@ -163,7 +163,7 @@ int ak4531_get_set_volume(struct volume_level *level, int flag) {
 	else { /* get volume */
 		level->left = - ((int) (mixer_values[cmd_left] & ~MUTE)) + 0x1f;
 		level->right = - ((int) (mixer_values[cmd_right] & ~MUTE)) + 0x1f;
-		return OK;
+		return 0;
 	}
 }
 
@@ -181,5 +181,5 @@ static int set_volume(struct volume_level *level, int cmd_left, int cmd_right,
 	mixer_values[cmd_right] = (-level->right)+0x1f;
 	ak4531_write(cmd_right, mixer_values[cmd_right]);
 
-	return OK;
+	return 0;
 }

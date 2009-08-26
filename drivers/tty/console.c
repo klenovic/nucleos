@@ -192,12 +192,12 @@ int try;
 	if (count > sizeof(buf)) count = sizeof(buf);
 	if(tp->tty_out_safe) {
 	   if ((result = sys_safecopyfrom(tp->tty_outproc, tp->tty_out_vir_g,
-		tp->tty_out_vir_offset, (vir_bytes) buf, count, D)) != OK)
+		tp->tty_out_vir_offset, (vir_bytes) buf, count, D)) != 0)
 		break;
 	    tp->tty_out_vir_offset += count;
 	} else {
 	   if ((result = sys_vircopy(tp->tty_outproc, D, tp->tty_out_vir_g, 
-			SELF, D, (vir_bytes) buf, (vir_bytes) count)) != OK)
+			SELF, D, (vir_bytes) buf, (vir_bytes) count)) != 0)
 		break;
 	    tp->tty_out_vir_g += count;
 	}
@@ -231,7 +231,7 @@ int try;
   flush(cons);			/* transfer anything buffered to the screen */
 
   /* Reply to the writer if all output is finished or if an error occured. */
-  if (tp->tty_outleft == 0 || result != OK) {
+  if (tp->tty_outleft == 0 || result != 0) {
 	/* REVIVE is not possible. I/O on memory mapped consoles finishes. */
 	tty_reply(tp->tty_outrepcode, tp->tty_outcaller, tp->tty_outproc,
 							tp->tty_outcum);
@@ -791,16 +791,16 @@ static void beep()
   int s;
   
   /* Fetch current time in advance to prevent beeping delay. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
   	panic("TTY","Console couldn't get clock's uptime.", s);
   if (!beeping) {
 	/* Set timer channel 2, square wave, with given frequency. */
         pv_set(char_out[0], TIMER_MODE, 0xB6);	
         pv_set(char_out[1], TIMER2, (BEEP_FREQ >> 0) & BYTE);
         pv_set(char_out[2], TIMER2, (BEEP_FREQ >> 8) & BYTE);
-        if (sys_voutb(char_out, 3)==OK) {
-        	if (sys_inb(PORT_B, &port_b_val)==OK &&
-        	    sys_outb(PORT_B, (port_b_val|3))==OK)
+        if (sys_voutb(char_out, 3) == 0) {
+        	if (sys_inb(PORT_B, &port_b_val) == 0 &&
+        	    sys_outb(PORT_B, (port_b_val|3)) == 0)
         	    	beeping = TRUE;
         }
   }
@@ -808,7 +808,7 @@ static void beep()
   tmrs_settimer(&tty_timers, &tmr_stop_beep, now+B_TIME, stop_beep, NULL);
   if (tty_timers->tmr_exp_time != tty_next_timeout) {
   	tty_next_timeout = tty_timers->tmr_exp_time;
-  	if ((s=sys_setalarm(tty_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(tty_next_timeout, 1)) != 0)
   		panic("TTY","Console couldn't set alarm.", s);
   }
 }
@@ -822,16 +822,16 @@ void do_video(message *m)
 	int r, safe = 0;
 
 	/* Execute the requested device driver function. */
-	r= EINVAL;	/* just in case */
+	r= -EINVAL;	/* just in case */
 	switch (m->m_type) {
 	    case DEV_OPEN:
 		/* Should grant IOPL */
 		disable_console();
-		r= OK;
+		r= 0;
 		break;
 	    case DEV_CLOSE:
 		reenable_console();
-		r= OK;
+		r= 0;
 		break;
 	    case DEV_IOCTL_S:
 		safe=1;
@@ -854,7 +854,7 @@ void do_video(message *m)
 			  (vir_bytes)m->ADDRESS, 0, (vir_bytes) &mapreqvm,
 			  sizeof(mapreqvm), D);
 
-			if (r != OK)
+			if (r != 0)
 			{
 				printf("tty: sys_safecopyfrom failed\n");
 				tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT,
@@ -873,7 +873,7 @@ void do_video(message *m)
 	   			if((r = sys_safecopyto(m->IO_ENDPT,
 				  (vir_bytes)m->ADDRESS, 0,
 				  (vir_bytes) &mapreqvm,
-				  sizeof(mapreqvm), D)) != OK) {
+				  sizeof(mapreqvm), D)) != 0) {
 				  printf("tty: sys_safecopyto failed\n");
 				}
 			} else {
@@ -884,14 +884,14 @@ void do_video(message *m)
 			return;
 		   }
 		}
-		r= ENOTTY;
+		r= -ENOTTY;
 		break;
 
 	    default:		
 		printf(
 		"Warning, TTY(video) got unexpected request %d from %d\n",
 			m->m_type, m->m_source);
-		r= EINVAL;
+		r= -EINVAL;
 	}
 	tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT, r);
 }
@@ -919,16 +919,16 @@ clock_t dur;
 	return;	/* Frequency out of range */
 
   /* Fetch current time in advance to prevent beeping delay. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
   	panic("TTY","Console couldn't get clock's uptime.", s);
   if (!beeping) {
 	/* Set timer channel 2, square wave, with given frequency. */
         pv_set(char_out[0], TIMER_MODE, 0xB6);	
         pv_set(char_out[1], TIMER2, (ival >> 0) & BYTE);
         pv_set(char_out[2], TIMER2, (ival >> 8) & BYTE);
-        if (sys_voutb(char_out, 3)==OK) {
-        	if (sys_inb(PORT_B, &port_b_val)==OK &&
-        	    sys_outb(PORT_B, (port_b_val|3))==OK)
+        if (sys_voutb(char_out, 3) == 0) {
+        	if (sys_inb(PORT_B, &port_b_val) == 0 &&
+        	    sys_outb(PORT_B, (port_b_val|3)) == 0)
         	    	beeping = TRUE;
         }
   }
@@ -936,7 +936,7 @@ clock_t dur;
   tmrs_settimer(&tty_timers, &tmr_stop_beep, now+dur, stop_beep, NULL);
   if (tty_timers->tmr_exp_time != tty_next_timeout) {
   	tty_next_timeout = tty_timers->tmr_exp_time;
-  	if ((s=sys_setalarm(tty_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(tty_next_timeout, 1)) != 0)
   		panic("TTY","Console couldn't set alarm.", s);
   }
 }
@@ -949,8 +949,8 @@ timer_t *tmrp;
 {
 /* Turn off the beeper by turning off bits 0 and 1 in PORT_B. */
   unsigned long port_b_val;
-  if (sys_inb(PORT_B, &port_b_val)==OK && 
-	sys_outb(PORT_B, (port_b_val & ~3))==OK)
+  if (sys_inb(PORT_B, &port_b_val) == 0 && 
+	sys_outb(PORT_B, (port_b_val & ~3)) == 0)
 		beeping = FALSE;
 }
 
@@ -1103,7 +1103,7 @@ message *m;
    * while the system task makes a copy of the kernel messages buffer.
    * Hence, don't check the return value. 
    */
-  if ((r=sys_getkmessages(&kmess)) != OK) {
+  if ((r=sys_getkmessages(&kmess)) != 0) {
   	printf("TTY: couldn't get copy of kmessages: %d, 0x%x\n", r,r);
   	return;
   }
@@ -1144,7 +1144,7 @@ int safe;
   char c;
   vir_bytes src;
   int count, offset = 0;
-  int result = OK;
+  int result = 0;
   int proc_nr = m_ptr->m_source;
 
   src = (vir_bytes) m_ptr->DIAG_PRINT_BUF_G;
@@ -1152,19 +1152,19 @@ int safe;
 	int r;
 	if(safe) {
 	   r = sys_safecopyfrom(proc_nr, src, offset, (vir_bytes) &c, 1, D);
-	   if(r != OK)
+	   if(r != 0)
 	  	   printf("<tty: proc %d, grant %ld>", proc_nr, src);
 	} else {
 	   r = sys_vircopy(proc_nr, D, src+offset, SELF, D, (vir_bytes) &c, 1);
 	}
 	offset++;
-	if(r != OK) {
-		result = EFAULT;
+	if(r != 0) {
+		result = -EFAULT;
 		break;
 	}
 	cons_putk(c);
   }
-  cons_putk(0);			/* always terminate, even with EFAULT */
+  cons_putk(0);			/* always terminate, even with -EFAULT */
 
   if(m_ptr->m_type != ASYN_DIAGNOSTICS_OLD) {
 	  m_ptr->m_type = DIAG_REPL_OLD;
@@ -1184,10 +1184,10 @@ message *m_ptr;			/* pointer to request message */
   int r;
 
   dst = (vir_bytes) m_ptr->GETKM_PTR;
-  r= OK;
+  r= 0;
   if (sys_vircopy(SELF, D, (vir_bytes)&kmess, m_ptr->m_source, D,
-	dst, sizeof(kmess)) != OK) {
-	r = EFAULT;
+	dst, sizeof(kmess)) != 0) {
+	r = -EFAULT;
   }
   m_ptr->m_type = r;
   send(m_ptr->m_source, m_ptr);
@@ -1204,10 +1204,10 @@ message *m_ptr;			/* pointer to request message */
   int r;
 
   gid = m_ptr->GETKM_GRANT;
-  r= OK;
+  r= 0;
   if (sys_safecopyto(m_ptr->m_source, gid, 0, (vir_bytes)&kmess, sizeof(kmess),
-	D) != OK) {
-	r = EFAULT;
+	D) != 0) {
+	r = -EFAULT;
   }
   m_ptr->m_type = r;
   send(m_ptr->m_source, m_ptr);
@@ -1358,7 +1358,7 @@ message *m;
 
   seq2[6].value= color ? 0x0E : 0x0A;
 
-  if (!machine.vdu_ega) return(ENOTTY);
+  if (!machine.vdu_ega) return(-ENOTTY);
   result = ga_program(seq1);	/* bring font memory into view */
 
   result = sys_physcopy(m->IO_ENDPT, GRANT_SEG, (vir_bytes) m->ADDRESS, 

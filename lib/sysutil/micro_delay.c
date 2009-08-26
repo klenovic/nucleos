@@ -25,7 +25,7 @@
 #define CALIBRATE 						\
 	if(!calibrated) {					\
 		int r;						\
-		if((r=micro_delay_calibrate()) != OK)		\
+		if((r=micro_delay_calibrate()) != 0)		\
 			panic(__FILE__, "micro_delay: calibrate failed\n", r); \
 	}
 
@@ -69,7 +69,7 @@ micro_delay_calibrate(void)
 #endif
 	calibrated = 1;
 
-	return OK;
+	return 0;
 }
 
 int
@@ -99,6 +99,6 @@ micro_delay(u32_t micros)
 	while(cmp64(now, end) < 0)
 		read_tsc_64(&now);
 
-	return OK;
+	return 0;
 }
 

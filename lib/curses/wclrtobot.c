@@ -40,5 +40,5 @@ WINDOW *win;
 	}			/* if */
 	startx = 0;
   }
-  return(OK);
+  return 0;
 }

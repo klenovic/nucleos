@@ -48,7 +48,7 @@ struct rs_pci *rs_pci;
 	{
 		printf("pci_set_acl: cpf_grant_direct failed: %d\n",
 			errno);
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	m.m_type= BUSC_PCI_SET_ACL;

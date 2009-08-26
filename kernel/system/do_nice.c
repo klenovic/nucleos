@@ -31,15 +31,15 @@ int do_nice(message *m_ptr)
   register struct proc *rp;
 
   /* Extract the message parameters and do sanity checking. */
-  if(!isokendpt(m_ptr->PR_ENDPT, &proc_nr)) return EINVAL;
-  if (iskerneln(proc_nr)) return(EPERM);
+  if(!isokendpt(m_ptr->PR_ENDPT, &proc_nr)) return -EINVAL;
+  if (iskerneln(proc_nr)) return(-EPERM);
   pri = m_ptr->PR_PRIORITY;
   rp = proc_addr(proc_nr);
 
   if (pri == PRIO_STOP) {
       /* Take process off the scheduling queues. */
       RTS_LOCK_SET(rp, NO_PRIORITY);
-      return(OK);
+      return 0;
   }
   else if (pri >= PRIO_MIN && pri <= PRIO_MAX) {
 
@@ -59,9 +59,9 @@ int do_nice(message *m_ptr)
       rp->p_max_priority = rp->p_priority = new_q;
       RTS_LOCK_UNSET(rp, NO_PRIORITY);
 
-      return(OK);
+      return 0;
   }
-  return(EINVAL);
+  return(-EINVAL);
 }
 
 #endif /* USE_NICE */

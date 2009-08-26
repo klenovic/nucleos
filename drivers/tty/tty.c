@@ -164,7 +164,7 @@ int main(void)
   register tty_t *tp;
 
   /* Get kernel environment (protected_mode, pc_at and ega are needed). */ 
-  if (OK != (s=sys_getmachine(&machine))) {
+  if ((s=sys_getmachine(&machine)) != 0) {
     panic("TTY","Couldn't obtain kernel environment.", s);
   }
 
@@ -284,14 +284,14 @@ int main(void)
 		tp = NULL;
 	}
 
-	/* If the device doesn't exist or is not configured return ENXIO. */
+	/* If the device doesn't exist or is not configured return -ENXIO. */
 	if (tp == NULL || ! tty_active(tp)) {
 		printf("Warning, TTY got illegal request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
 		if (tty_mess.m_source != LOG_PROC_NR)
 		{
 			tty_reply(TASK_REPLY, tty_mess.m_source,
-						tty_mess.IO_ENDPT, ENXIO);
+						tty_mess.IO_ENDPT, -ENXIO);
 		}
 		continue;
 	}
@@ -309,7 +309,7 @@ int main(void)
 		printf("Warning, TTY got unexpected request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
 	    tty_reply(TASK_REPLY, tty_mess.m_source,
-						tty_mess.IO_ENDPT, EINVAL);
+						tty_mess.IO_ENDPT, -EINVAL);
 	}
   }
 
@@ -397,7 +397,7 @@ message *m_ptr;
 
   /* Almost done. Send back the reply message to the caller. */
   status = sendnb(m_ptr->m_source, m_ptr);
-  if (status != OK) {
+  if (status != 0) {
 	printf("tty`do_status: send to %d failed: %d\n",
 		m_ptr->m_source, status);
   }
@@ -418,10 +418,10 @@ int safe;			/* use safecopies? */
    * parameters are correct, do I/O.
    */
   if (tp->tty_inleft > 0) {
-	r = EIO;
+	r = -EIO;
   } else
   if (m_ptr->COUNT <= 0) {
-	r = EINVAL;
+	r = -EINVAL;
   } else {
 	/* Copy information from the message to the tty struct. */
 	tp->tty_inrepcode = TASK_REPLY;
@@ -487,10 +487,10 @@ int safe;
    * parameters are correct, do I/O.
    */
   if (tp->tty_outleft > 0) {
-	r = EIO;
+	r = -EIO;
   } else
   if (m_ptr->COUNT <= 0) {
-	r = EINVAL;
+	r = -EINVAL;
   } else {
 	/* Copy message parameters to the tty structure. */
 	tp->tty_outrepcode = TASK_REPLY;
@@ -568,7 +568,7 @@ int safe;
     default:		size = 0;
   }
 
-  r = OK;
+  r = 0;
   switch (m_ptr->TTY_REQUEST) {
     case TCGETS:
 	/* Get the termios attributes. */
@@ -607,7 +607,7 @@ int safe;
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
 		SELF, D, (vir_bytes) &tp->tty_termios, (vir_bytes) size);
 	}
-	if (r != OK) break;
+	if (r != 0) break;
 	setattr(tp);
 	break;
 
@@ -619,12 +619,12 @@ int safe;
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
 		SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
 	}
-	if (r != OK) break;
+	if (r != 0) break;
 	switch (param.i) {
 	    case TCIFLUSH:	tty_icancel(tp);		 	    break;
 	    case TCOFLUSH:	(*tp->tty_ocancel)(tp, 0);		    break;
 	    case TCIOFLUSH:	tty_icancel(tp); (*tp->tty_ocancel)(tp, 0); break;
-	    default:		r = EINVAL;
+	    default:		r = -EINVAL;
 	}
 	break;
 
@@ -636,7 +636,7 @@ int safe;
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
 		SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
 	}
-	if (r != OK) break;
+	if (r != 0) break;
 	switch (param.i) {
 	    case TCOOFF:
 	    case TCOON:
@@ -650,7 +650,7 @@ int safe;
 		(*tp->tty_echo)(tp, tp->tty_termios.c_cc[VSTART]);
 		break;
 	    default:
-		r = EINVAL;
+		r = -EINVAL;
 	}
 	break;
 
@@ -701,7 +701,7 @@ int safe;
     case TIOCGPGRP:
     case TIOCSPGRP:
     default:
-	r = ENOTTY;
+	r = -ENOTTY;
   }
 
   /* Send the reply. */
@@ -717,13 +717,13 @@ message *m_ptr;			/* pointer to message sent to task */
 {
 /* A tty line has been opened.  Make it the callers controlling tty if
  * O_NOCTTY is *not* set and it is not the log device.  1 is returned if
- * the tty is made the controlling tty, otherwise OK or an error code.
+ * the tty is made the controlling tty, otherwise 0 or an error code.
  */
-  int r = OK;
+  int r = 0;
 
   if (m_ptr->TTY_LINE == LOG_MINOR) {
 	/* The log device is a write-only diagnostics device. */
-	if (m_ptr->COUNT & R_BIT) r = EACCES;
+	if (m_ptr->COUNT & R_BIT) r = -EACCES;
   } else {
 	if (!(m_ptr->COUNT & O_NOCTTY)) {
 		tp->tty_pgrp = m_ptr->IO_ENDPT;
@@ -752,7 +752,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	tp->tty_winsize = winsize_defaults;
 	setattr(tp);
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, OK);
+  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, 0);
 }
 
 /*===========================================================================*
@@ -768,7 +768,7 @@ message *m_ptr;			/* pointer to message sent to task */
 
   int proc_nr;
   int mode;
-  int r = EINTR;
+  int r = -EINTR;
 
   /* Check the parameters carefully, to avoid cancelling twice. */
   proc_nr = m_ptr->IO_ENDPT;
@@ -777,13 +777,13 @@ message *m_ptr;			/* pointer to message sent to task */
 	(!tp->tty_in_safe || tp->tty_in_vir_g==(vir_bytes)m_ptr->IO_GRANT)) {
 	/* Process was reading when killed.  Clean up input. */
 	tty_icancel(tp);
-	r = tp->tty_incum > 0 ? tp->tty_incum : EAGAIN;
+	r = tp->tty_incum > 0 ? tp->tty_incum : -EAGAIN;
 	tp->tty_inleft = tp->tty_incum = tp->tty_inrevived = 0;
   }
   if ((mode & W_BIT) && tp->tty_outleft != 0 && proc_nr == tp->tty_outproc &&
 	(!tp->tty_out_safe || tp->tty_out_vir_g==(vir_bytes)m_ptr->IO_GRANT)) {
 	/* Process was writing when killed.  Clean up output. */
-	r = tp->tty_outcum > 0 ? tp->tty_outcum : EAGAIN;
+	r = tp->tty_outcum > 0 ? tp->tty_outcum : -EAGAIN;
 	tp->tty_outleft = tp->tty_outcum = tp->tty_outrevived = 0;
   }
   if (tp->tty_ioreq != 0 && proc_nr == tp->tty_ioproc) {
@@ -808,7 +808,7 @@ int select_try(struct tty *tp, int ops)
 	if (ops & SEL_RD) {
 		/* will i/o not block on read? */
 		if (tp->tty_inleft > 0) {
-			ready_ops |= SEL_RD;	/* EIO - no blocking */
+			ready_ops |= SEL_RD;	/* -EIO - no blocking */
 		} else if (tp->tty_incount > 0) {
 			/* Is a regular read possible? tty_incount
 			 * says there is data. But a read will only succeed
@@ -832,7 +832,7 @@ int select_retry(struct tty *tp)
 {
   	if (tp->tty_select_ops && select_try(tp, tp->tty_select_ops))
 		notify(tp->tty_select_proc);
-	return OK;
+	return 0;
 }
 
 /*===========================================================================*
@@ -1374,7 +1374,7 @@ tty_t *tp;
  * sure that an attribute change doesn't affect the processing of current
  * output.  Once output finishes the ioctl is executed as in do_ioctl().
  */
-  int result = EINVAL;
+  int result = -EINVAL;
 
   if (tp->tty_outleft > 0) return;		/* output not finished */
 
@@ -1481,7 +1481,7 @@ int status;			/* reply code */
   }
 
   status = sendnb(replyee, &tty_mess);
-  if (status != OK)
+  if (status != 0)
 	printf("tty`tty_reply: send to %d failed: %d\n", replyee, status);
 }
 
@@ -1501,7 +1501,7 @@ int mayflush;
   int status;
 
   if (tp->tty_pgrp != 0)  {
-      if (OK != (status = sys_kill(tp->tty_pgrp, sig))) {
+      if ((status = sys_kill(tp->tty_pgrp, sig)) != 0) {
         panic("TTY","Error, call to sys_kill failed", status);
       }
   }
@@ -1594,7 +1594,7 @@ static void expire_timers(void)
   int s;
 
   /* Get the current time to compare the timers against. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
  	panic("TTY","Couldn't get uptime from clock.", s);
 
   /* Scan the queue of timers for expired timers. This dispatch the watchdog
@@ -1604,7 +1604,7 @@ static void expire_timers(void)
   if (tty_timers == NULL) tty_next_timeout = TMR_NEVER;
   else {  					  /* set new sync alarm */
   	tty_next_timeout = tty_timers->tmr_exp_time;
-  	if ((s=sys_setalarm(tty_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(tty_next_timeout, 1)) != 0)
  		panic("TTY","Couldn't set synchronous alarm.", s);
   }
 }
@@ -1621,7 +1621,7 @@ int enable;			/* set timer if true, otherwise unset */
   int s;
 
   /* Get the current time to calculate the timeout time. */
-  if ((s=getuptime(&now)) != OK)
+  if ((s=getuptime(&now)) != 0)
  	panic("TTY","Couldn't get uptime from clock.", s);
   if (enable) {
   	exp_time = now + tty_ptr->tty_termios.c_cc[VTIME] * (system_hz/10);
@@ -1640,7 +1640,7 @@ int enable;			/* set timer if true, otherwise unset */
   if (tty_timers == NULL) tty_next_timeout = TMR_NEVER;
   else if (tty_timers->tmr_exp_time != tty_next_timeout) { 
   	tty_next_timeout = tty_timers->tmr_exp_time;
-  	if ((s=sys_setalarm(tty_next_timeout, 1)) != OK)
+  	if ((s=sys_setalarm(tty_next_timeout, 1)) != 0)
  		panic("TTY","Couldn't set synchronous alarm.", s);
   }
 }

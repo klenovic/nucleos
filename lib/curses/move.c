@@ -23,5 +23,5 @@ int x;
 	return(ERR);
   win->_curx = x;
   win->_cury = y;
-  return(OK);
+  return 0;
 }

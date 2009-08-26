@@ -155,7 +155,7 @@ void main(void)
 
 	/* Our new identity as a server. */
 	r= ds_retrieve_u32("inet", &tasknr);
-	if (r != OK)
+	if (r != 0)
 		ip_panic(("inet: ds_retrieve_u32 failed for 'inet': %d", r));
 	this_proc= tasknr;
 

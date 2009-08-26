@@ -112,7 +112,7 @@ ip_port_t *ip_port;
 		result= arp_set_cb(ip_port->ip_dl.dl_eth.de_port,
 			ip_port->ip_port,
 			ipeth_arp_reply);
-		if (result != NW_OK)
+		if (result != 0)
 		{
 			printf("ipeth_main: arp_set_cb failed: %d\n",
 				result);
@@ -163,7 +163,7 @@ int for_ioctl;
 			}
 			if (ip_port->ip_dl.dl_eth.de_flags & IEF_SUSPEND)
 				ipeth_main(ip_port);
-			return NW_OK;
+			return 0;
 		}
 		assert ((!offset) && (count == sizeof(struct nwio_ethopt)));
 		{
@@ -193,7 +193,7 @@ int for_ioctl;
 					~IEF_WRITE_SP;
 				ipeth_restart_send(ip_port);
 			}
-			return NW_OK;
+			return 0;
 		}
 		data= bf_cut (ip_port->ip_dl.dl_eth.de_frame, offset, count);
 		assert (data);
@@ -229,7 +229,7 @@ int for_ioctl;
 			{
 				DBLOCK(1, printf(
 				"ip.c: put_eth_data(..,%d,..)\n", result));
-				return NW_OK;
+				return 0;
 			}
 			if (ip_port->ip_dl.dl_eth.de_flags & IEF_READ_SP)
 			{
@@ -239,7 +239,7 @@ int for_ioctl;
 			}
 			else
 				ip_port->ip_dl.dl_eth.de_flags &= ~IEF_READ_IP;
-			return NW_OK;
+			return 0;
 		}
 		assert (!offset);
 		/* Warning: the above assertion is illegal; puts and
@@ -247,7 +247,7 @@ int for_ioctl;
 		   likes. However we assume that the server is eth.c
 		   and it transfers only whole packets. */
 		ip_eth_arrived(port, data, bf_bufsize(data));
-		return NW_OK;
+		return 0;
 	}
 	printf("ip_port->ip_dl.dl_eth.de_state= 0x%x",
 		ip_port->ip_dl.dl_eth.de_state);
@@ -345,14 +345,14 @@ int type;
 					acc_ext_link= eth_pack;
 			}
 			ip_port->ip_dl.dl_eth.de_arp_tail= eth_pack;
-			return NW_OK;
+			return 0;
 		}
-		if (r == EDSTNOTRCH)
+		if (r == -EDSTNOTRCH)
 		{
 			bf_afree(eth_pack);
-			return EDSTNOTRCH;
+			return -EDSTNOTRCH;
 		}
-		assert(r == NW_OK);
+		assert(r == 0);
 	}
 
 	/* If we have no write in progress, we can try to send the ethernet
@@ -365,13 +365,13 @@ int type;
 	{
 		r= eth_send(ip_port->ip_dl.dl_eth.de_fd,
 			eth_pack, pack_size);
-		if (r == NW_OK)
-			return NW_OK;
+		if (r == 0)
+			return 0;
 
 		/* A non-blocking send is not possible, start a regular
 		 * send.
 		 */
-		assert(r == NW_WOULDBLOCK);
+		assert(r == -EWOULDBLOCK);
 		ip_port->ip_dl.dl_eth.de_frame= eth_pack;
 		r= eth_write(ip_port->ip_dl.dl_eth.de_fd, pack_size);
 		if (r == NW_SUSPEND)
@@ -380,8 +380,8 @@ int type;
 				IEF_WRITE_SP));
 			ip_port->ip_dl.dl_eth.de_flags |= IEF_WRITE_SP;
 		}
-		assert(r == NW_OK || r == NW_SUSPEND);
-		return NW_OK;
+		assert(r == 0 || r == NW_SUSPEND);
+		return 0;
 	}
 
 	/* Enqueue the packet, and store the current time, in the
@@ -401,7 +401,7 @@ int type;
 	ip_port->ip_dl.dl_eth.de_q_tail= eth_pack;
 	if (ip_port->ip_dl.dl_eth.de_frame == NULL)
 		ipeth_restart_send(ip_port);
-	return NW_OK;
+	return 0;
 }
 
 static void ipeth_restart_send(ip_port)
@@ -464,7 +464,7 @@ ip_port_t *ip_port;
 		if (enq_time + HZ < now)
 		{
 			r= ipeth_update_ttl(enq_time, now, eth_pack);
-			if (r == ETIMEDOUT)
+			if (r == -ETIMEDOUT)
 			{	
 				ip_pack= bf_delhead(eth_pack, sizeof(*eth_hdr));
 				eth_pack= NULL;
@@ -472,7 +472,7 @@ ip_port_t *ip_port;
 					ip_pack, ICMP_TTL_EXC);
 				continue;
 			}
-			assert(r == NW_OK);
+			assert(r == 0);
 		}
 
 		if (pack_size<ETH_MIN_PACK_SIZE)
@@ -494,13 +494,13 @@ ip_port_t *ip_port;
 		assert(ip_port->ip_dl.dl_eth.de_frame == NULL);
 
 		r= eth_send(ip_port->ip_dl.dl_eth.de_fd, eth_pack, pack_size);
-		if (r == NW_OK)
+		if (r == 0)
 			continue;
 
 		/* A non-blocking send is not possible, start a regular
 		 * send.
 		 */
-		assert(r == NW_WOULDBLOCK);
+		assert(r == -EWOULDBLOCK);
 		ip_port->ip_dl.dl_eth.de_frame= eth_pack;
 		r= eth_write(ip_port->ip_dl.dl_eth.de_fd, pack_size);
 		if (r == NW_SUSPEND)
@@ -510,7 +510,7 @@ ip_port_t *ip_port;
 			ip_port->ip_dl.dl_eth.de_flags |= IEF_WRITE_SP;
 			return;
 		}
-		assert(r == NW_OK);
+		assert(r == 0);
 	}
 }
 
@@ -600,12 +600,12 @@ ether_addr_t *eth_addr;
 		/* Dequeue the packet */
 		ip_port->ip_dl.dl_eth.de_arp_head= eth_pack->acc_ext_link;
 
-		if (r == EDSTNOTRCH)
+		if (r == -EDSTNOTRCH)
 		{
 			bf_afree(eth_pack);
 			continue;
 		}
-		assert(r == NW_OK);
+		assert(r == 0);
 
 		/* Fill in the ethernet address and put the packet on the 
 		 * transmit queue.
@@ -653,7 +653,7 @@ acc_t *eth_pack;
 
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(ip_pack);
 	if (ip_hdr->ih_ttl <= ttl_diff)
-		return ETIMEDOUT;
+		return -ETIMEDOUT;
 	sum= (u16_t)~ip_hdr->ih_hdr_chk;
 	word= *(u16_t *)&ip_hdr->ih_ttl;
 	if (word > sum)
@@ -668,7 +668,7 @@ acc_t *eth_pack;
 	assert(!(sum & 0xffff0000));
 	ip_hdr->ih_hdr_chk= ~sum;
 	assert(ip_hdr->ih_ttl > 0);
-	return NW_OK;
+	return 0;
 }
 
 static void do_eth_read(ip_port)
