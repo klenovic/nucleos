@@ -8,9 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*	syslib.h - System library common definitions.	*/
-
-#define _SYSTEM
-
 #include <lib.h>
 #include <nucleos/com.h>
 #include <nucleos/syslib.h>

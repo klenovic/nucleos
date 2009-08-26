@@ -35,7 +35,7 @@ struct tchars {
   char t_brkc;			/* input delimiter (like nl) */
 };
 
-#if !_SYSTEM			/* the kernel doesn't want to see the rest */
+#if !defined(__KERNEL__) && !defined(__UKERNEL__)			/* the kernel doesn't want to see the rest */
 
 /* Field names */
 #define XTABS	     0006000	/* do tab expansion */
@@ -97,5 +97,5 @@ struct winsize
 	unsigned short	ws_xpixel;	/* horizontal size, pixels */
 	unsigned short	ws_ypixel;	/* vertical size, pixels */
 };
-#endif /* !_SYSTEM */
+#endif /* !defined(__KERNEL__) && !defined(__UKERNEL__) */
 #endif /* _SGTTY_H */

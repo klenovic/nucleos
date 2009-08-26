@@ -15,7 +15,7 @@ Created:	Nov 2004 by Philip Homburg <philip@f-mnx.phicoh.com>
 Media Independent (Ethernet) Interface functions
 */
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 #include "mii.h"
 
 /*===========================================================================*

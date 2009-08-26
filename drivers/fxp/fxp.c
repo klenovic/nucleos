@@ -61,7 +61,7 @@
  * Created:	Nov 2004 by Philip Homburg <philip@f-mnx.phicoh.com>
  */
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 
 #include <stdlib.h>
 #include <net/hton.h>
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
 	r= ds_retrieve_u32("inet", &tasknr);
 	if (r == 0)
 		notify(tasknr);
-	else if (r != ESRCH)
+	else if (r != -ESRCH)
 		printf("fxp: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 
@@ -395,7 +395,7 @@ message *mp;
 	if (port < 0 || port >= FXP_PORT_NR)
 	{
 		reply_mess.m_type= DL_CONF_REPLY;
-		reply_mess.m3_i1= ENXIO;
+		reply_mess.m3_i1= -ENXIO;
 		mess_reply(mp, &reply_mess);
 		return;
 	}
@@ -408,7 +408,7 @@ message *mp;
 		{
 			/* Probe failed, or the device is configured off. */
 			reply_mess.m_type= DL_CONF_REPLY;
-			reply_mess.m3_i1= ENXIO;
+			reply_mess.m3_i1= -ENXIO;
 			mess_reply(mp, &reply_mess);
 			return;
 		}
@@ -1219,7 +1219,7 @@ int vectored;
 	 */
 	if (from_int)
 		return;
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 	return;
 
 suspend:
@@ -1227,7 +1227,7 @@ suspend:
 		panic("FXP","fxp: should not be sending\n", NO_NUM);
 
 	fp->fxp_tx_mess= *mp;
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 }
 
 /*===========================================================================*
@@ -1365,7 +1365,7 @@ int from_int;
 	 */
 	if (from_int)
 		return;
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 	return;
 
 suspend:
@@ -1373,7 +1373,7 @@ suspend:
 		panic("FXP","fxp: should not be sending\n", NO_NUM);
 
 	fp->fxp_tx_mess= *mp;
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 }
 
 /*===========================================================================*
@@ -1518,7 +1518,7 @@ int vectored;
 	fp->fxp_rx_head= fxp_rx_head;
 
 	if (!from_int)
-		reply(fp, OK, FALSE);
+		reply(fp, 0, FALSE);
 
 	return;
 
@@ -1553,7 +1553,7 @@ suspend:
 	assert(!(fp->fxp_flags & FF_READING));
 	fp->fxp_flags |= FF_READING;
 
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 }
 
 /*===========================================================================*
@@ -1691,7 +1691,7 @@ int from_int;
 	fp->fxp_rx_head= fxp_rx_head;
 
 	if (!from_int)
-		reply(fp, OK, FALSE);
+		reply(fp, 0, FALSE);
 
 	return;
 
@@ -1726,7 +1726,7 @@ suspend:
 	assert(!(fp->fxp_flags & FF_READING));
 	fp->fxp_flags |= FF_READING;
 
-	reply(fp, OK, FALSE);
+	reply(fp, 0, FALSE);
 }
 
 /*===========================================================================*
@@ -1954,7 +1954,7 @@ message *mp;
 
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
-	mp->DL_STAT= OK;
+	mp->DL_STAT= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "fxp_getstat: send failed: %d\n", r);
@@ -2038,7 +2038,7 @@ message *mp;
 
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
-	mp->DL_STAT= OK;
+	mp->DL_STAT= 0;
 	r= send(mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "fxp_getstat_s: send failed: %d\n", r);
@@ -2276,7 +2276,7 @@ fxp_t *fp;
 		fxp_report_link(fp);
 
 	if (fp->fxp_flags & (FF_PACK_SENT | FF_PACK_RECV))
-		reply(fp, OK, TRUE);
+		reply(fp, 0, TRUE);
 }
 
 /*===========================================================================*
@@ -2643,7 +2643,7 @@ int may_block;
 
 	r= send(fp->fxp_client, &reply);
 
-	if (r == ELOCKED && may_block)
+	if (r == -ELOCKED && may_block)
 	{
 #if 0
 		printW(); printf("send locked\n");

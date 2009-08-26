@@ -121,7 +121,7 @@ int drv_init_hw (void) {
 
     /* First, detect the hardware */
     if (detect_hw() != 0) {
-      return EIO;
+      return -EIO;
     }
 
 	/* PCI command register 
@@ -151,10 +151,10 @@ int drv_init_hw (void) {
 
 	/* Sample Rate Converter initialization */
 	if (src_init(&dev) != 0) {
-      return EIO;
+      return -EIO;
     }
 	if (AC97_init(&dev) != 0) {
-      return EIO;
+      return -EIO;
     }
     
     /* initialize variables for each sub_device */
@@ -194,7 +194,7 @@ static int detect_hw(void) {
 
   /* did we find anything? */
   if (v_id != VENDOR_ID || d_id != DEVICE_ID) {
-    return EIO;
+    return -EIO;
   }
 
 	pci_reserve(devind);
@@ -244,7 +244,7 @@ int drv_start(int sub_dev, int DmaMode) {
   result |= set_int_cnt(sub_dev);
   
   if (result) {
-    return EIO;
+    return -EIO;
   }
   
   /* if device currently paused, resume */
@@ -254,7 +254,7 @@ int drv_start(int sub_dev, int DmaMode) {
 		case ADC1_CHAN: enable_bit = ADC1_EN;break;
 		case DAC1_CHAN: enable_bit = DAC1_EN;break;
 		case DAC2_CHAN: enable_bit = DAC2_EN;break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 
   /* enable interrupts from 'sub device' */
@@ -277,7 +277,7 @@ int drv_stop(int sub_dev)
 		case ADC1_CHAN: enable_bit = ADC1_EN;break;
 		case DAC1_CHAN: enable_bit = DAC1_EN;break;
 		case DAC2_CHAN: enable_bit = DAC2_EN;break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
   
 	/* stop the specified channel */
@@ -323,7 +323,7 @@ int drv_io_ctl(int request, void * val, int * len, int sub_dev) {
 		case MIXIOSETVOLUME:
 			status = get_set_volume(val, len, sub_dev, 1); break;
 		default:                 
-			status = EINVAL; break;
+			status = -EINVAL; break;
 	}
   
   return 0;
@@ -360,7 +360,7 @@ int drv_set_dma(u32_t dma, u32_t length, int chan) {
 						frame_count_reg = DAC2_BUFFER_SIZE;
 						dma_add_reg = DAC2_PCI_ADDRESS;
                     break;;    
-    default: return EIO;
+    default: return -EIO;
   }
 	pci_outb(reg(MEM_PAGE), page);
   pci_outl(reg(dma_add_reg), dma);
@@ -410,7 +410,7 @@ int drv_reenable_int(int chan) {
 		case ADC1_CHAN: int_en_bit = R1_INT_EN; break;
 		case DAC1_CHAN: int_en_bit = P1_INTR_EN; break;
 		case DAC2_CHAN: int_en_bit = P2_INTR_EN; break;    
-    default: EINVAL;
+    default: -EINVAL;
   }
 
   /* clear and reenable an interrupt */
@@ -430,7 +430,7 @@ int drv_pause(int sub_dev) {
   switch(sub_dev) {
 		case DAC1_CHAN: pause_bit = P1_PAUSE;break;
 		case DAC2_CHAN: pause_bit = P2_PAUSE;break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 
   /* pause */
@@ -449,7 +449,7 @@ int drv_resume(int sub_dev) {
   switch(sub_dev) {
 		case DAC1_CHAN: pause_bit = P1_PAUSE;break;
 		case DAC2_CHAN: pause_bit = P2_PAUSE;break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 
   /* clear pause bit */
@@ -468,7 +468,7 @@ static int set_bits(u32_t nr_of_bits, int sub_dev) {
 		case ADC1_CHAN: size_16_bit = R1_S_EB; break;
 		case DAC1_CHAN: size_16_bit = P1_S_EB; break;
 		case DAC2_CHAN: size_16_bit = P2_S_EB; break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 
 	ser_interface = pci_inw(reg(SERIAL_INTERFACE_CTRL));
@@ -476,7 +476,7 @@ static int set_bits(u32_t nr_of_bits, int sub_dev) {
   switch(nr_of_bits) {
 		case 16: ser_interface |= size_16_bit;break;
     case  8: break;
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 	pci_outw(reg(SERIAL_INTERFACE_CTRL), ser_interface);
   aud_conf[sub_dev].nr_of_bits = nr_of_bits;
@@ -492,7 +492,7 @@ static int set_stereo(u32_t stereo, int sub_dev) {
 		case ADC1_CHAN: stereo_bit = R1_S_MB; break;
 		case DAC1_CHAN: stereo_bit = P1_S_MB; break;
 		case DAC2_CHAN: stereo_bit = P2_S_MB; break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 	ser_interface = pci_inw(reg(SERIAL_INTERFACE_CTRL));
 	ser_interface &= ~stereo_bit;
@@ -515,7 +515,7 @@ static int set_frag_size(u32_t fragment_size, int sub_dev_nr) {
 	if (fragment_size > (sub_dev[sub_dev_nr].DmaSize / 
 				sub_dev[sub_dev_nr].NrOfDmaFragments) || 
 			fragment_size < sub_dev[sub_dev_nr].MinFragmentSize) {
-    return EINVAL;
+    return -EINVAL;
   }
   aud_conf[sub_dev_nr].fragment_size = fragment_size;
   return 0;
@@ -526,14 +526,14 @@ static int set_sample_rate(u32_t rate, int sub_dev) {
 	u32_t src_base_reg;
 
   if (rate > MAX_RATE || rate < MIN_RATE) {
-    return EINVAL;
+    return -EINVAL;
   }
   /* set the sample rate for the specified channel*/
   switch(sub_dev) {
 		case ADC1_CHAN: src_base_reg = SRC_ADC_BASE;break;
 		case DAC1_CHAN: src_base_reg = SRC_SYNTH_BASE;break;
 		case DAC2_CHAN: src_base_reg = SRC_DAC_BASE;break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
 	src_set_rate(&dev, src_base_reg, rate);
   aud_conf[sub_dev].sample_rate = rate;
@@ -551,14 +551,14 @@ static int set_int_cnt(int chan) {
 	if (aud_conf[chan].fragment_size > 
 			(sub_dev[chan].DmaSize / sub_dev[chan].NrOfDmaFragments) 
        || aud_conf[chan].fragment_size < sub_dev[chan].MinFragmentSize) {
-    return EINVAL;
+    return -EINVAL;
   }
   
   switch(chan) {
 		case ADC1_CHAN: int_cnt_reg = ADC_SAMP_CT; break;
 		case DAC1_CHAN: int_cnt_reg = DAC1_SAMP_CT; break;
 		case DAC2_CHAN: int_cnt_reg = DAC2_SAMP_CT; break;    
-    default: return EINVAL;
+    default: return -EINVAL;
   }
   
   sample_count = aud_conf[chan].fragment_size;
@@ -568,7 +568,7 @@ static int set_int_cnt(int chan) {
   switch(aud_conf[chan].nr_of_bits) {
    case 16:   sample_count >>= 1;break;
    case  8:   break;
-   default: return EINVAL;
+   default: return -EINVAL;
   }    
   /* set the sample count - 1 for the specified channel. */
   pci_outw(reg(int_cnt_reg), sample_count - 1);
@@ -591,7 +591,7 @@ static int disable_int(int chan) {
 		case ADC1_CHAN: int_en_bit = R1_INT_EN; break;
 		case DAC1_CHAN: int_en_bit = P1_INTR_EN; break;
 		case DAC2_CHAN: int_en_bit = P2_INTR_EN; break;    
-    default: EINVAL;
+    default: -EINVAL;
   }
   /* clear the interrupt */
 	ser_interface = pci_inw(reg(SERIAL_INTERFACE_CTRL));
@@ -617,7 +617,7 @@ static int get_samples_in_buf (u32_t *samples_in_buf, int *len, int chan) {
 		case DAC2_CHAN: 
 			curr_samp_ct_reg = DAC2_CURR_SAMP_CT;
 			samp_ct_reg = DAC2_SAMP_CT; break;    
-		default: return EINVAL;
+		default: return -EINVAL;
 	}
      
 	samp_ct = pci_inw(reg(samp_ct_reg));
@@ -651,6 +651,6 @@ static int get_set_volume(struct volume_level *level, int *len, int sub_dev,
 		return AC97_get_set_volume(level, flag);
 	}
 	else {
-		return EINVAL;
+		return -EINVAL;
 	}
 }

@@ -129,7 +129,7 @@ int drv_reset(void) {
 
 	for(i = 0; i < 1000 && !(sb16_inb(DSP_DATA_AVL) & 0x80); i++); 	
 	
-	if(sb16_inb(DSP_READ) != 0xAA) return EIO; /* No SoundBlaster */
+	if(sb16_inb(DSP_READ) != 0xAA) return -EIO; /* No SoundBlaster */
 
 	return 0;
 }
@@ -246,7 +246,7 @@ int drv_io_ctl(int request, void *val, int *len, int sub_dev) {
 		return mixer_ioctl(request, val, len);
 	} 
 
-	return EIO;
+	return -EIO;
 }
 
 
@@ -278,7 +278,7 @@ static int dsp_ioctl(int request, void *val, int *len) {
 		case DSPIOSIGN:		status = dsp_set_sign(*((u32_t*) val)); break;
 		case DSPIOMAX:		status = dsp_get_max_frag_size(val, len); break;
 		case DSPIORESET:    status = drv_reset(); break;
-		default:            status = ENOTTY; break;
+		default:            status = -ENOTTY; break;
 	}
 
 	return status;
@@ -336,7 +336,7 @@ static int dsp_set_size(unsigned int size) {
 
 	/* Sanity checks */
 	if(size < sub_dev[AUDIO].MinFragmentSize || size > sub_dev[AUDIO].DmaSize / sub_dev[AUDIO].NrOfDmaFragments || size % 2 != 0) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	DspFragmentSize = size; 
@@ -350,7 +350,7 @@ static int dsp_set_speed(unsigned int speed) {
 	dprint("sb16: setting speed to %u, stereo = %d\n", speed, DspStereo);
 
 	if(speed < DSP_MIN_SPEED || speed > DSP_MAX_SPEED) {
-		return EPERM;
+		return -EPERM;
 	}
 
 	/* Soundblaster 16 can be programmed with real sample rates
@@ -389,7 +389,7 @@ static int dsp_set_stereo(unsigned int stereo) {
 static int dsp_set_bits(unsigned int bits) {
 	/* Sanity checks */
 	if(bits != 8 && bits != 16) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	DspBits = bits; 

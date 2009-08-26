@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
 	r= ds_retrieve_u32("inet", &inet_proc_nr);
 	if (r == 0)
 		notify(inet_proc_nr);
-	else if (r != ESRCH)
+	else if (r != -ESRCH)
 		printf("rtl8139: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE)
@@ -526,7 +526,7 @@ message *mp;
 	if (port < 0 || port >= RE_PORT_NR)
 	{
 		reply_mess.m_type= DL_CONF_REPLY;
-		reply_mess.m3_i1= ENXIO;
+		reply_mess.m3_i1= -ENXIO;
 		mess_reply(mp, &reply_mess);
 		return;
 	}
@@ -539,7 +539,7 @@ message *mp;
 		{
 			/* Probe failed, or the device is configured off. */
 			reply_mess.m_type= DL_CONF_REPLY;
-			reply_mess.m3_i1= ENXIO;
+			reply_mess.m3_i1= -ENXIO;
 			mess_reply(mp, &reply_mess);
 			return;
 		}
@@ -2376,7 +2376,7 @@ int may_block;
 
 	r= send(rep->re_client, &reply);
 
-	if (r == ELOCKED && may_block)
+	if (r == -ELOCKED && may_block)
 	{
 #if 0
 		printW(); printf("send locked\n");

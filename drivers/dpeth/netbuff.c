@@ -18,7 +18,7 @@
 **  $Id: netbuff.c 2361 2006-07-10 12:43:38Z philip $
 */
 
-#include "drivers.h"
+#include <nucleos/drivers.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
 #include "dp.h"

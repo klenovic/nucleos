@@ -1,41 +1,19 @@
 # Makefile for the Sound Blaster 16 driver (SB16)
+app-y := sb16.elf32
+sb16.elf32-type := driver
+sb16.elf32-obj-y := sb16.o mixer.o
+sb16.elf32-extobj-y:= $(audio-framework)/audio_fw.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_sb16.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS = -lsys 
+$(src)/sb16.elf32: drivers/driver_32.lds
 
+# Create in minix3's aout format
+sb16_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+sb16_a_hdrlen  := 0x20
+sb16_a_cpu     := i386
+sb16_stackheap := 512k
 
-# build local binary
-all build:	sb16	
-
-sb16:	sb16.o mixer.o audio_fw.o
-	$(CC) -o $@ $(LDFLAGS) sb16.o mixer.o audio_fw.o $(LIBS)
-
-audio_fw.o:	../framework/audio_fw.c ../framework/audio_fw.h
-	$(CC) -c ../framework/audio_fw.c
-
-# install with other drivers
-install:	/usr/sbin/sb16
-/usr/sbin/sb16:	sb16
-	install -o root -S 512k -c $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak sb16 
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := sb16.elf32,sb16

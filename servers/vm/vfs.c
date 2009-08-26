@@ -7,9 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#define _SYSTEM 1
-
 #define VERBOSE 0
 
 #include <nucleos/callnr.h>

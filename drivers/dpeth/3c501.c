@@ -20,7 +20,7 @@
 **  $Id: 3c501.c 551 2005-08-05 19:08:43Z beng $
 */
 
-#include "drivers.h"
+#include <nucleos/drivers.h>
 #include <nucleos/com.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>

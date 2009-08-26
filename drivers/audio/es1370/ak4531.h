@@ -11,7 +11,7 @@
 #define AK4531_H
 /* best viewed with tabsize=4 */
 
-#include "../../drivers.h"
+#include <nucleos/drivers.h>
 #include <nucleos/sound.h>
 
 int ak4531_init(u16_t base, u16_t status_reg, u16_t bit, u16_t poll);

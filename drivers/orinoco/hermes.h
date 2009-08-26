@@ -28,7 +28,7 @@
 #ifndef _HERMES_H
 #define _HERMES_H
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
 #include <net/hton.h>
@@ -317,8 +317,7 @@ int  hermes_init(hermes_t * hw);
 int  hermes_docmd_wait(hermes_t * hw, u16_t cmd, u16_t parm0, hermes_response_t * resp);
 int  hermes_allocate(hermes_t * hw, u16_t size, u16_t * fid);
 int  hermes_bap_pread(hermes_t * hw, int bap, void *buf, unsigned len, u16_t id, u16_t offset);
-int  hermes_bap_pwrite(hermes_t * hw, int bap, const void *buf, unsigned len, u16_t id,
-		       u16_t offset));
+int  hermes_bap_pwrite(hermes_t * hw, int bap, const void *buf, unsigned len, u16_t id, u16_t offset);
 void hermes_read_words(hermes_t * hw, int off, void *buf, unsigned count);
 void hermes_write_words(hermes_t * hw, int off, const void *buf, unsigned count);
 int  hermes_read_ltv(hermes_t * hw, int bap, u16_t rid, unsigned buflen, u16_t * length,void *buf);

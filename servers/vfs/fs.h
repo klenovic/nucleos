@@ -37,8 +37,6 @@
 /* This is the master header for fs.  It includes some other files
  * and defines the principal constants.
  */
-#define _SYSTEM            1	/* tell headers that this is the kernel */
-
 #define DO_SANITYCHECKS	   0
 
 #if DO_SANITYCHECKS

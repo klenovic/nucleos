@@ -8,8 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#define _SYSTEM 1
-
 #define VERBOSE 0
 #include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>

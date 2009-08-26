@@ -67,7 +67,7 @@
 **   DL_STAT_REPLY)
 */
 
-#include "drivers.h"
+#include <nucleos/drivers.h>
 #include <nucleos/keymap.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
@@ -131,7 +131,7 @@ static void reply(dpeth_t * dep, int err, int m_type)
 	dep->de_read_s = 0;
 	dep->de_flags &= NOT(DEF_ACK_SEND | DEF_ACK_RECV);
 
-  } else if (status != ELOCKED || err == 0)
+  } else if (status != -ELOCKED || err == 0)
 	panic(dep->de_name, SendErrMsg, status);
 
   return;
@@ -324,7 +324,7 @@ static void do_init(message * mp)
 
 	    case DEM_DISABLED:
 		/* Device is configured OFF or hardware probe failed */
-		port = ENXIO;
+		port = -ENXIO;
 		break;
 
 	    case DEM_ENABLED:
@@ -354,7 +354,7 @@ static void do_init(message * mp)
 	*(ether_addr_t *) reply_mess.m3_ca1 = dep->de_address;
 
   } else			/* Port number is out of range */
-	port = ENXIO;
+	port = -ENXIO;
 
   reply_mess.m_type = DL_CONF_REPLY;
   reply_mess.m3_i1 = port;
@@ -438,7 +438,7 @@ static void do_vwrite_s(message * mp)
   } else if (dep->de_mode == DEM_SINK)
 	dep->de_flags |= DEF_ACK_SEND;
 
-  reply(dep, OK, DL_TASK_REPLY);
+  reply(dep, 0, DL_TASK_REPLY);
   return;
 }
 
@@ -481,7 +481,7 @@ static void do_vread_s(message * mp)
 	dep->de_flags &= NOT(DEF_STOPPED);
 #endif
   }
-  reply(dep, OK, DL_TASK_REPLY);
+  reply(dep, 0, DL_TASK_REPLY);
   return;
 }
 
@@ -506,7 +506,7 @@ static void do_getstat_s(message * mp)
 			(vir_bytes)&dep->de_stat,
 			(vir_bytes) sizeof(dep->de_stat), 0)) != 0)
         panic(DevName, CopyErrMsg, rc);
-  reply(dep, OK, DL_STAT_REPLY);
+  reply(dep, 0, DL_STAT_REPLY);
   return;
 }
 
@@ -638,7 +638,7 @@ int main(int argc, char **argv)
 				dep->de_int_pending = TRUE;
 				(*dep->de_interruptf) (dep);
 				if (dep->de_flags & (DEF_ACK_SEND | DEF_ACK_RECV))
-					reply(dep, !OK, DL_TASK_REPLY);
+					reply(dep, !0, DL_TASK_REPLY);
 				dep->de_int_pending = FALSE;
 				sys_irqenable(&dep->de_hook);
 			}

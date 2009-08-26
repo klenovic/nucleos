@@ -8,9 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Header file including all needed system headers. */
-
-#define _SYSTEM            1    /* get OK and negative error codes */
-
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>

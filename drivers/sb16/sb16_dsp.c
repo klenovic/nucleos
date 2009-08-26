@@ -115,14 +115,14 @@ void main()
 #endif
 #ifdef DEV_READ
 
-			case DEV_READ:		r = EINVAL; break; /* Not yet implemented */
+			case DEV_READ:		r = -EINVAL; break; /* Not yet implemented */
 			case DEV_WRITE:		dsp_write(&mess); continue; /* don't reply */
 #endif
 			
 			case DEV_STATUS:	dsp_status(&mess); continue; /* don't reply */
 			case HARD_INT:		dsp_hardware_msg(); continue; /* don't reply */
 			case SYS_SIG:		continue; /* don't reply */
-			default:			r = EINVAL;
+			default:			r = -EINVAL;
 		}
 
 		/* Finally, prepare and send the reply message. */
@@ -140,13 +140,13 @@ static int dsp_open()
 	dprint("sb16_dsp.c: dsp_open()\n");
 	
 	/* try to detect SoundBlaster card */
-	if(!DspAvail && dsp_init() != 0) return EIO;
+	if(!DspAvail && dsp_init() != 0) return -EIO;
 
 	/* Only one open at a time with soundcards */
-	if(DspBusy) return EBUSY;
+	if(DspBusy) return -EBUSY;
 
 	/* Start with a clean DSP */
-	if(dsp_reset() != 0) return EIO;
+	if(dsp_reset() != 0) return -EIO;
 
 	/* Setup default values */
 	DspStereo = DEFAULT_STEREO;
@@ -187,7 +187,7 @@ message *m_ptr;
 	dprint("sb16_dsp.c: dsp_ioctl()\n");
 
 	/* Cannot change parameters during play or recording */
-	if(DmaBusy >= 0) return EBUSY;
+	if(DmaBusy >= 0) return -EBUSY;
 
 	/* Get user data */
 	if(m_ptr->REQUEST != DSPIORESET) {
@@ -205,10 +205,10 @@ message *m_ptr;
 		case DSPIOMAX: 
 			val = DSP_MAX_FRAGMENT_SIZE;
 			sys_vircopy(SELF, D, (vir_bytes)&val, m_ptr->IO_ENDPT, D, (vir_bytes)m_ptr->ADDRESS, sizeof(val));
-			status = OK;
+			status = 0;
 			break;
 		case DSPIORESET:    status = dsp_reset(); break;
-		default:            status = ENOTTY; break;
+		default:            status = -ENOTTY; break;
 	}
 
 	return status;
@@ -227,11 +227,11 @@ message *m_ptr;
 	dprint("sb16_dsp.c: dsp_write()\n");
 
 	if(m_ptr->COUNT != DspFragmentSize) {
-		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, EINVAL);
+		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
 		return;
 	}
 	if(m_ptr->m_type != DmaMode && DmaBusy >= 0) {
-		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, EBUSY);
+		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
 		return;
 	}
 	
@@ -446,7 +446,7 @@ static int dsp_reset()
 
 	for(i = 0; i < 1000 && !(sb16_inb(DSP_DATA_AVL) & 0x80); i++); 	
 	
-	if(sb16_inb(DSP_READ) != 0xAA) return EIO; /* No SoundBlaster */
+	if(sb16_inb(DSP_READ) != 0xAA) return -EIO; /* No SoundBlaster */
 
 	DmaBusy = -1;
 
@@ -484,7 +484,7 @@ unsigned int size;
 
 	/* Sanity checks */
 	if(size < DSP_MIN_FRAGMENT_SIZE || size > DSP_MAX_FRAGMENT_SIZE || size % 2 != 0) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	DspFragmentSize = size; 
@@ -502,7 +502,7 @@ unsigned int speed;
 	dprint("sb16: setting speed to %u, stereo = %d\n", speed, DspStereo);
 
 	if(speed < DSP_MIN_SPEED || speed > DSP_MAX_SPEED) {
-		return EPERM;
+		return -EPERM;
 	}
 
 	/* Soundblaster 16 can be programmed with real sample rates
@@ -549,7 +549,7 @@ unsigned int bits;
 {
 	/* Sanity checks */
 	if(bits != 8 && bits != 16) {
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	DspBits = bits; 

@@ -1,42 +1,18 @@
 # Makefile for the Orinoco wireless card (Prism chipset)
-DRIVER = orinoco
+app-y := orinoco.elf32
+orinoco.elf32-type := driver
+orinoco.elf32-obj-y := orinoco.o hermes.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_orinoco.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i $(CPROFILE)
-LDFLAGS = -i
-LIBS = -lsys -ltimers
+$(src)/orinoco.elf32: drivers/driver_32.lds
 
-OBJ = orinoco.o hermes.o
- 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ) 
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-	install -S 100kw $(DRIVER)
+# Create in minix3's aout format
+orinoco_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+orinoco_a_hdrlen  := 0x20
+orinoco_a_cpu     := i386
+orinoco_stackheap := 400k
 
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f $(DRIVER) *.o *.bak 
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
-
-
+e2a-y := orinoco.elf32,orinoco

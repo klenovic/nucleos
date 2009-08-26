@@ -12,8 +12,6 @@ amddev.c
 
 Driver for the AMD Device Exclusion Vector (DEV)
 */
-
-#define _SYSTEM
 #include <nucleos/type.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
@@ -285,13 +283,13 @@ static int do_add(message *m)
 	{
 		printf("amddev`do_add: bad start 0x%x from proc %d\n",
 			start, proc);
-		return EINVAL;
+		return -EINVAL;
 	}
 	if (size % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_add: bad size 0x%x from proc %d\n",
 			size, proc);
-		return EINVAL;
+		return -EINVAL;
 	}
 	r= sys_umap(proc, VM_D, (vir_bytes)start, size, &busaddr);
 	if (r != 0)
@@ -322,12 +320,12 @@ static int do_add_phys(message *m)
 	if (start % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_add_phys: bad start 0x%x\n", start);
-		return EINVAL;
+		return -EINVAL;
 	}
 	if (size % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_add_phys: bad size 0x%x\n", size);
-		return EINVAL;
+		return -EINVAL;
 	}
 	add_range(start, size);
 
@@ -338,7 +336,7 @@ static int do_add_phys(message *m)
 			continue;
 		return 0;
 	}
-	return EBUSY;
+	return -EBUSY;
 }
 
 static int do_del_phys(message *m)
@@ -358,12 +356,12 @@ static int do_del_phys(message *m)
 	if (start % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_del_phys: bad start 0x%x\n", start);
-		return EINVAL;
+		return -EINVAL;
 	}
 	if (size % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_del_phys: bad size 0x%x\n", size);
-		return EINVAL;
+		return -EINVAL;
 	}
 	del_range(start, size);
 
@@ -395,13 +393,13 @@ static int do_add4pci(message *m)
 	{
 		printf("amddev`do_add4pci: bad start 0x%x from proc %d\n",
 			start, proc);
-		return EINVAL;
+		return -EINVAL;
 	}
 	if (size % I386_PAGE_SIZE)
 	{
 		printf("amddev`do_add4pci: bad size 0x%x from proc %d\n",
 			size, proc);
-		return EINVAL;
+		return -EINVAL;
 	}
 
 	printf("amddev`do_add4pci: should check with PCI\n");
@@ -479,7 +477,7 @@ static int do_pm_notify(message *m)
 		r= getdma(&proc_e, &base, &size);
 		if (r == -1)
 		{
-			if (errno != -EAGAIN)
+			if (errno != EAGAIN)
 			{
 				printf(
 				"amddev`do_pm_notify: getdma failed: %d\n",

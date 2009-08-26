@@ -1,39 +1,19 @@
 # Makefile for the ES1371 sounddriver (SB16)
+app-y := es1370.elf32
+es1370.elf32-type := driver
+es1370.elf32-obj-y := es1370.o ak4531.o pci_helper.o
+es1370.elf32-extobj-y := $(audio-framework)/audio_fw.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-gen_drv_dir = ../../gen_drivers/cyclic_dma
+LDFLAGS_es1370.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS = -lsys
+$(src)/es1370.elf32: drivers/driver_32.lds
 
-# build local binary
-all:	es1370
+# Create in minix3's aout format
+es1370_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+es1370_a_hdrlen  := 0x20
+es1370_a_cpu     := i386
+es1370_stackheap := 1024k
 
-es1370:	es1370.o ak4531.o audio_fw.o pci_helper.o
-	$(CC) -o $@ $(LDFLAGS) es1370.o ak4531.o audio_fw.o pci_helper.o $(LIBS)
-
-audio_fw.o: ../framework/audio_fw.c ../framework/audio_fw.h
-	$(CC) -c ../framework/audio_fw.c
-	
-install: /usr/sbin/es1370
-/usr/sbin/es1370:	es1370
-	install -o root -S 1024k -c $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak core es1370
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := es1370.elf32,es1370

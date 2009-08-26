@@ -83,14 +83,14 @@ message mess;
 #ifdef DEV_IOCTL
 			case DEV_IOCTL:     err = mixer_ioctl(&mess); break;
 #endif
-			default:		err = EINVAL; break;
+			default:		err = -EINVAL; break;
 		}
 
 		/* Finally, prepare and send the reply message. */
 		mess.m_type = TASK_REPLY;
 		mess.REP_ENDPT = proc_nr;
 	
-		dprint("%d %d", err, OK);
+		dprint("%d %d", err, 0);
 		
 		mess.REP_STATUS = err;	/* error code */
 		send(caller, &mess);	/* send reply to caller */
@@ -107,7 +107,7 @@ message *m_ptr;
 	dprint("mixer_open\n");
 
 	/* try to detect the mixer type */
-	if (!mixer_avail && mixer_init() != 0) return EIO;
+	if (!mixer_avail && mixer_init() != 0) return -EIO;
 
 	return 0;
 }
@@ -145,7 +145,7 @@ message *m_ptr;
 		case MIXIOSETINPUTLEFT:   status = get_set_input(m_ptr, 1, 0); break;
 		case MIXIOSETINPUTRIGHT:  status = get_set_input(m_ptr, 1, 1); break;
 		case MIXIOSETOUTPUT:      status = get_set_output(m_ptr, 1); break;
-		default:                  status = ENOTTY;
+		default:                  status = -ENOTTY;
 	}
 
 	return status;
@@ -164,7 +164,7 @@ static int mixer_init()
 	mixer_set(MIXER_DAC_LEVEL, 0x10);       /* write something to it */
 	if(mixer_get(MIXER_DAC_LEVEL) != 0x10) {
 		dprint("sb16: Mixer not detected\n");
-		return EIO;
+		return -EIO;
 	}
 
 	/* Enable Automatic Gain Control */
@@ -249,7 +249,7 @@ int flag;	/* 0 = get, 1 = set */
 			max_level = 0x0F;
 			break;
 		default:     
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if(flag) { /* Set volume level */
@@ -311,7 +311,7 @@ int channel;    /* 0 = left, 1 = right */
 			del_mask = 0x7E;
 			break;
 		default:   
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if (flag) {  /* Set input */
@@ -369,7 +369,7 @@ int flag;	/* 0 = get, 1 = set */
 			del_mask = 0x7E;
 			break;
 		default:   
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if (flag) {  /* Set input */

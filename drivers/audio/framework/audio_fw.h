@@ -10,7 +10,7 @@
 #ifndef AUDIO_FW_H
 #define AUDIO_FW_H
 
-#include "../../drivers.h"
+#include <nucleos//drivers.h>
 #include <sys/ioc_sound.h>
 
 

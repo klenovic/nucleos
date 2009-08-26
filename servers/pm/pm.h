@@ -13,8 +13,6 @@
 /* This is the master header for PM.  It includes some other files
  * and defines the principal constants.
  */
-#define _SYSTEM            1	/* tell headers that this is the kernel */
-
 /* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/types.h>
 #include <nucleos/const.h>

@@ -7,24 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* The <nucleos/errno.h> header defines the numbers of the various errors that can
- * occur during program execution.  They are visible to user programs and 
- * should be small positive integers.  However, they are also used within 
- * MINIX, where they must be negative.  For example, the READ system call is 
- * executed internally by calling do_read().  This function returns either a 
- * (negative) error number or a (positive) number of bytes actually read.
- *
- * To solve the problem of having the error numbers be negative inside the
- * the system and positive outside, the following mechanism is used.  All the
- * definitions are are the form:
- *
- *	#define EPERM		(_SIGN 1)
- *
- * If the macro _SYSTEM is defined, then  _SIGN is set to "-", otherwise it is
- * set to "".  Thus when compiling the operating system, the  macro _SYSTEM
- * will be defined, setting EPERM to (- 1), whereas when when this
- * file is included in an ordinary user program, EPERM has the value ( 1).
- */
+/* For kernel and user-kernel return negative error values. */
 
 #ifndef __NUCLEOS_ERRNO_H		/* check if <nucleos/errno.h> is already included */
 #define __NUCLEOS_ERRNO_H		/* it is not included; note that fact */

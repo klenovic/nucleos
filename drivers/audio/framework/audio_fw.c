@@ -198,13 +198,13 @@ static int init_driver(void) {
 	/* initialize hardware*/
 	if (drv_init_hw() != 0) {
 		error("%s: Could not initialize hardware\n", drv.DriverName, 0);
-		return EIO;
+		return -EIO;
 	}
 
 	/* get irq from device driver...*/
 	if (drv_get_irq(&irq) != 0) {
 		error("%s: init driver couldn't get IRQ", drv.DriverName, i);
-		return EIO;
+		return -EIO;
 	}
 	/* todo: execute the rest of this function only once 
 	   we don't want to set irq policy twice */
@@ -214,7 +214,7 @@ static int init_driver(void) {
 	/* ...and register interrupt vector */
 	if ((i=sys_irqsetpolicy(irq, 0, &irq_hook_id )) != 0){
 		error("%s: init driver couldn't set IRQ policy", drv.DriverName, i);
-		return EIO;
+		return -EIO;
 	}
 	irq_hook_set = TRUE; /* now msg_sig_stop knows it must unregister policy*/
 	return 0;
@@ -229,7 +229,7 @@ static int msg_open (int minor_dev_nr) {
 
 	special_file_ptr = get_special_file(minor_dev_nr);
 	if(special_file_ptr == NULL) {
-		return EIO;
+		return -EIO;
 	}
 
 	read_chan = special_file_ptr->read_chan;
@@ -239,18 +239,18 @@ static int msg_open (int minor_dev_nr) {
 	if (read_chan==NO_CHANNEL && write_chan==NO_CHANNEL && io_ctl==NO_CHANNEL) {
 		error("%s: No channel specified for minor device!\n", 
 				drv.DriverName, minor_dev_nr);
-		return EIO;
+		return -EIO;
 	}
 	if (read_chan == write_chan && read_chan != NO_CHANNEL) {
 		error("%s: Read and write channels are equal!\n", 
 				drv.DriverName, minor_dev_nr);
-		return EIO;
+		return -EIO;
 	}
 	/* init driver */
 	if (!device_available) {  
 		if (init_driver() != 0) {
 			error("%s: Couldn't init driver!\n", drv.DriverName, minor_dev_nr);
-			return EIO;
+			return -EIO;
 		} else {
 			device_available = TRUE;
 		}
@@ -258,10 +258,10 @@ static int msg_open (int minor_dev_nr) {
 	/* open the sub devices specified in the interface header file */
 	if (write_chan != NO_CHANNEL) {
 		/* open sub device for writing */
-		if (open_sub_dev(write_chan, DEV_WRITE_S) != 0) return EIO;
+		if (open_sub_dev(write_chan, DEV_WRITE_S) != 0) return -EIO;
 	}  
 	if (read_chan != NO_CHANNEL) {
-		if (open_sub_dev(read_chan, DEV_READ_S) != 0) return EIO;
+		if (open_sub_dev(read_chan, DEV_READ_S) != 0) return -EIO;
 	}
 	if (read_chan == io_ctl || write_chan == io_ctl) {
 		/* io_ctl is already opened because it's the same as read or write */
@@ -269,7 +269,7 @@ static int msg_open (int minor_dev_nr) {
 	}
 	if (io_ctl != NO_CHANNEL) { /* Ioctl differs from read/write channels, */
 		r = open_sub_dev(io_ctl, NO_DMA); /* open it explicitly */
-		if (r != 0) return EIO;
+		if (r != 0) return -EIO;
 	} 
 	return 0;
 }
@@ -283,11 +283,11 @@ static int open_sub_dev(int sub_dev_nr, int dma_mode) {
 	if (sub_dev_ptr->Opened) { 
 		error("%s: Sub device %d is already opened\n", 
 				drv.DriverName, sub_dev_nr);
-		return EBUSY;
+		return -EBUSY;
 	}
 	if (sub_dev_ptr->DmaBusy) { 
 		error("%s: Sub device %d is still busy\n", drv.DriverName, sub_dev_nr);
-		return EBUSY;
+		return -EBUSY;
 	}
 	/* Setup variables */
 	sub_dev_ptr->Opened = TRUE;
@@ -305,7 +305,7 @@ static int open_sub_dev(int sub_dev_nr, int dma_mode) {
 	if (dma_mode != NO_DMA) { /* sub device uses DMA */
 		/* allocate dma buffer and extra buffer space
 		   and configure sub device for dma */
-		if (init_buffers(sub_dev_ptr) != 0 ) return EIO;
+		if (init_buffers(sub_dev_ptr) != 0 ) return -EIO;
 	}
 	return 0;  
 }
@@ -320,21 +320,21 @@ static int msg_close(int minor_dev_nr) {
 
 	special_file_ptr = get_special_file(minor_dev_nr);
 	if(special_file_ptr == NULL) {
-		return EIO;
+		return -EIO;
 	}
 
 	read_chan = special_file_ptr->read_chan;
 	write_chan = special_file_ptr->write_chan;
 	io_ctl = special_file_ptr->io_ctl;
 
-	r= OK;
+	r = 0;
 
 	/* close all sub devices */
 	if (write_chan != NO_CHANNEL) {
-		if (close_sub_dev(write_chan) != 0) r = EIO;
+		if (close_sub_dev(write_chan) != 0) r = -EIO;
 	}  
 	if (read_chan != NO_CHANNEL) {
-		if (close_sub_dev(read_chan) != 0) r = EIO;
+		if (close_sub_dev(read_chan) != 0) r = -EIO;
 	}
 	if (read_chan == io_ctl || write_chan == io_ctl) {
 		/* io_ctl is already closed because it's the same as read or write */
@@ -342,7 +342,7 @@ static int msg_close(int minor_dev_nr) {
 	}
 	/* ioctl differs from read/write channels... */
 	if (io_ctl != NO_CHANNEL) { 
-		if (close_sub_dev(io_ctl) != 0) r = EIO; /* ...close it explicitly */
+		if (close_sub_dev(io_ctl) != 0) r = -EIO; /* ...close it explicitly */
 	} 
 	return r;
 }
@@ -382,21 +382,21 @@ static int msg_ioctl(message *m_ptr)
 
 	special_file_ptr = get_special_file(m_ptr->DEVICE);
 	if(special_file_ptr == NULL) {
-		return EIO;
+		return -EIO;
 	}
 
 	chan = special_file_ptr->io_ctl;
 
 	if (chan == NO_CHANNEL) {
 		error("%s: No io control channel specified!\n", drv.DriverName);
-		return EIO;
+		return -EIO;
 	}
 	/* get pointer to sub device data */
 	sub_dev_ptr = &sub_dev[chan];
 
 	if(!sub_dev_ptr->Opened) {
 		error("%s: io control impossible - not opened!\n", drv.DriverName);
-		return EIO;
+		return -EIO;
 	}
 
 
@@ -447,7 +447,7 @@ static void msg_write(message *m_ptr)
 
 	if (chan == NO_CHANNEL) {
 		error("%s: No write channel specified!\n", drv.DriverName);
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EIO);
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EIO);
 		return;
 	}
 	/* get pointer to sub device data */
@@ -461,13 +461,13 @@ static void msg_write(message *m_ptr)
 	}
 	if(m_ptr->COUNT != sub_dev_ptr->FragSize) {
 		error("Fragment size does not match user's buffer length\n");
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EINVAL);		
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);		
 		return;
 	}
-	/* if we are busy with something else than writing, return EBUSY */
+	/* if we are busy with something else than writing, return -EBUSY */
 	if(sub_dev_ptr->DmaBusy && sub_dev_ptr->DmaMode != DEV_WRITE_S) {
 		error("Already busy with something else then writing\n");
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EBUSY);
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
 		return;
 	}
 
@@ -498,7 +498,7 @@ static void msg_read(message *m_ptr)
 
 	if (chan == NO_CHANNEL) {
 		error("%s: No read channel specified!\n", drv.DriverName);
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EIO);
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EIO);
 		return;
 	}
 	/* get pointer to sub device data */
@@ -507,18 +507,18 @@ static void msg_read(message *m_ptr)
 	if (!sub_dev_ptr->DmaBusy) { /* get fragment size on first read */
 		if (drv_get_frag_size(&(sub_dev_ptr->FragSize), sub_dev_ptr->Nr) != 0){
 			error("%s: Could not retrieve fragment size!\n", drv.DriverName);
-			reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EIO);      	
+			reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EIO);      	
 			return;
 		}
 	}
 	if(m_ptr->COUNT != sub_dev_ptr->FragSize) {
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EINVAL);
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
 		error("fragment size does not match message size\n");
 		return;
 	}
-	/* if we are busy with something else than reading, reply EBUSY */
+	/* if we are busy with something else than reading, reply -EBUSY */
 	if(sub_dev_ptr->DmaBusy && sub_dev_ptr->DmaMode != DEV_READ_S) {
-		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, EBUSY);
+		reply(DEV_REVIVE, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
 		return;
 	}
 
@@ -740,7 +740,7 @@ static int get_started(sub_dev_t *sub_dev_ptr) {
 	/* enable interrupt messages from MINIX */
 	if ((i=sys_irqenable(&irq_hook_id)) != 0) {
 		error("%s: Couldn't enable IRQs",drv.DriverName);
-		return EIO;
+		return -EIO;
 	}
 	/* let the lower part of the driver start the device */
 	if (drv_start(sub_dev_ptr->Nr, sub_dev_ptr->DmaMode) != 0) {
@@ -902,7 +902,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 	if (!base) {
 		error("%s: failed to allocate dma buffer for channel %d\n", 
 				drv.DriverName,i);
-		return EIO;
+		return -EIO;
 	}
 	sub_dev_ptr->DmaBuf= base;
 
@@ -914,7 +914,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 					sub_dev_ptr->NrOfDmaFragments))) {
 		error("%s failed to allocate extra buffer for channel %d\n", 
 				drv.DriverName,i);
-		return EIO;
+		return -EIO;
 	}
 
 	sub_dev_ptr->DmaPtr = sub_dev_ptr->DmaBuf;
@@ -924,7 +924,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 			&(sub_dev_ptr->DmaPhys));
 
 	if (i != 0) {
-		return EIO;
+		return -EIO;
 	}
 
 	if ((left = dma_bytes_left(sub_dev_ptr->DmaPhys)) < 
@@ -941,7 +941,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 
 #else /* !CONFIG_X86_32 */
 	error("%s: init_buffer() failed, not x86", drv.DriverName);
-	return EIO;
+	return -EIO;
 #endif /* CONFIG_X86_32 */
 }
 

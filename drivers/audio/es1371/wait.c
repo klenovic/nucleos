@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "../../drivers.h"
+#include <nucleos/drivers.h>
 #include <nucleos/types.h>
 #include <time.h>
 #include "pci_helper.h"

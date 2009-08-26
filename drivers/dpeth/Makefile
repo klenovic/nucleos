@@ -1,43 +1,18 @@
-##
-##  Makefile for ISA ethernet drivers	May  02, 2000
-##
+# Makefile for ISA ethernet drivers	May  02, 2000
+app-y := dpeth.elf32
+dpeth.elf32-type := driver
+dpeth.elf32-obj-y := 3c501.o 3c509.o 3c503.o ne.o wd.o 8390.o devio.o netbuff.o dp.o
 
-##  Programs, flags, etc.
-DRIVER	= dpeth
+LDFLAGS_dpeth.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-Tdrivers/driver_32.lds
 
-debug	= 0
+$(src)/dpeth.elf32: drivers/driver_32.lds
 
-CC	= exec cc
-LD	= $(CC)
-CPPFLAGS= -I.. -I/usr/include -Ddebug=$(debug) $(CPROFILE)
-CFLAGS	= -ws $(CPPFLAGS)
-LDFLAGS	= -i -o $@
+# Create in minix3's aout format
+dpeth_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+dpeth_a_hdrlen  := 0x20
+dpeth_a_cpu     := i386
+dpeth_stackheap := 16k
 
-SRCS	= 3c501.c 3c509.c 3c503.c ne.c wd.c 8390.c devio.c netbuff.c dp.c
-OBJS	= 3c501.o 3c509.o 3c503.o ne.o wd.o 8390.o devio.o netbuff.o dp.o
-LIBS	= -lsys
-
-##  Build rules
-all build:	$(DRIVER)
-
-$(DRIVER):	$(OBJS)
-	$(CC) $(OBJS) $(LIBS) $(LDFLAGS)
-	install -S 16k $(DRIVER)
-
-##  Install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-##  Generate dependencies
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-##  Clean directory
-clean:
-	@rm -f $(DRIVER) *.o *.BAK
-
-include .depend
-
-##  end
+e2a-y := dpeth.elf32,dpeth

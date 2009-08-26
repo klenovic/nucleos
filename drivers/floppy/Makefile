@@ -1,4 +1,3 @@
-# Makefile for the AT disk driver (AT_WINI)
 app-y := floppy.elf32
 floppy.elf32-type := driver
 floppy.elf32-obj-y := floppy.o

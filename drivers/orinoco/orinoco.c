@@ -62,7 +62,7 @@
  *
  */
 
-#include 	"../drivers.h" 
+#include 	<nucleos/drivers.h>
 #include	<string.h>
 #include 	<nucleos/stddef.h>
 #include	<nucleos/keymap.h>
@@ -73,9 +73,8 @@
 #include 	<sys/ioc_memory.h>
 #include	<ibm/pci.h>
 #include 	<servers/ds/ds.h>
-#include	"../../kernel/const.h"
-#include	"../../kernel/config.h"
-#include	"../../kernel/type.h"
+#include	<kernel/const.h>
+#include	<kernel/type.h>
 
 #define		tmra_ut			timer_t
 #define		tmra_inittimer(tp)	tmr_inittimer(tp)
@@ -272,7 +271,7 @@ int main(int argc, char *argv[]) {
 	r = ds_retrieve_u32("inet", &inet_proc_nr);
 	if (r == 0) 
 		notify(inet_proc_nr);
-	else if (r != ESRCH)
+	else if (r != -ESRCH)
 		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
@@ -493,7 +492,7 @@ static void or_dump (message *m) {
 
 		m->m_type = FKEY_CONTROL;
 		m->FKEY_REQUEST = FKEY_EVENTS;
-		if(OK!=(sendrec(TTY_PROC_NR,m)) )
+		if((sendrec(TTY_PROC_NR,m)) != 0)
 			printf("Contacting the TTY failed\n");
 		
 		if(bit_isset(m->FKEY_SFKEYS, 11)) {
@@ -528,7 +527,7 @@ static void or_init (message * mp) {
 	if (port < 0 || port >= OR_PORT_NR)	{
 		/* illegal port in message */
 		reply.m_type = DL_CONF_REPLY;
-		reply.m3_i1 = ENXIO;
+		reply.m3_i1 = -ENXIO;
 		mess_reply (mp, &reply);
 		return;
 	}
@@ -543,7 +542,7 @@ static void or_init (message * mp) {
 		or_init_struct (orp);
 		if (orp->or_mode == OR_M_DISABLED) {
 			reply.m_type = DL_CONF_REPLY;
-			reply.m3_i1 = ENXIO;
+			reply.m3_i1 = -ENXIO;
 			mess_reply (mp, &reply);
 			return;
 		}
@@ -754,7 +753,7 @@ static void map_hw_buffer(t_or *orp) {
 	r = sys_vm_map(SELF, 1, (vir_bytes)abuf, 
 			1 * I386_PAGE_SIZE, (phys_bytes)orp->or_base_port);
 #else
-	r = ENOSYS;
+	r = -ENOSYS;
 #endif
 
 	if(r != 0) 
@@ -1486,12 +1485,12 @@ fail:
 		return;
 	}
 
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 	return;
 
 suspend_write:
 	orp->or_tx_mess = *mp;
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 	return;
 }
 
@@ -1684,13 +1683,13 @@ fail:
 		return;
 	}
 
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 	return;
 
 suspend_write_s:
 	orp->or_tx_mess = *mp;
 
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 	return;
 }
 
@@ -1724,7 +1723,7 @@ static void reply (t_or * orp, int err, int may_block) {
 	reply.DL_CLCK = now;
 	r = send (orp->or_client, &reply);
 
-	if (r == ELOCKED && may_block) {
+	if (r == -ELOCKED && may_block) {
 		return;
 	}
 
@@ -1919,7 +1918,7 @@ static void or_check_ints (t_or * orp) {
 	}
 
 	if (orp->or_flags & (OR_F_PACK_SENT | OR_F_PACK_RECV)) {
-		reply (orp, OK, TRUE);
+		reply (orp, 0, TRUE);
 	}
 }
 
@@ -2047,7 +2046,7 @@ static void or_readv (message * mp, int from_int, int vectored) {
 	orp->or_flags |= OR_F_PACK_RECV;
 
 	if (!from_int)
-		reply (orp, OK, FALSE);
+		reply (orp, 0, FALSE);
 
 	return;
 
@@ -2061,7 +2060,7 @@ suspend_readv :
 	assert (!(orp->or_flags & OR_F_READING));
 	orp->or_flags |= OR_F_READING;
 
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 }
 
 
@@ -2181,7 +2180,7 @@ drop:
 	if (!from_int) {
 		/* There was data in the orp->rx_buf[x] which is now copied to 
 		 * the inet sever. Tell the inet server */
-		reply (orp, OK, FALSE);
+		reply (orp, 0, FALSE);
 	}
 
 	return;
@@ -2198,7 +2197,7 @@ suspend_readv_s:
 	assert (!(orp->or_flags & OR_F_READING));
 	orp->or_flags |= OR_F_READING;
 
-	reply (orp, OK, FALSE);
+	reply (orp, 0, FALSE);
 
 }
 
@@ -2338,13 +2337,13 @@ static void or_getstat (message * mp) {
 
 	mp->m_type = DL_STAT_REPLY;
 	mp->DL_PORT = port;
-	mp->DL_STAT = OK;
+	mp->DL_STAT = 0;
 
 	r = send(mp->m_source, mp);
 	if(r != 0)
 		panic(__FILE__, "orinoco: getstat failed:", r);
 
-	/*reply (orp, OK, FALSE);*/
+	/*reply (orp, 0, FALSE);*/
 
 }
 
@@ -2379,7 +2378,7 @@ static void or_getstat_s (message * mp) {
 
 	mp->m_type = DL_STAT_REPLY;
 	mp->DL_PORT = port;
-	mp->DL_STAT = OK;
+	mp->DL_STAT = 0;
 
 	r = send(mp->m_source, mp);
 	if(r != 0)

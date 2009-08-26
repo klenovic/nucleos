@@ -12,9 +12,6 @@
  * Created:
  *    Jul 13, 2004	by Jorrit N. Herder 
  */
-
-#define _SYSTEM            1    /* get OK and negative error codes */
-
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>

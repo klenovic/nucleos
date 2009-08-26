@@ -1,40 +1,18 @@
 # Makefile for the Texas Instruments PCI1225 PC Card controller driver (ti1225)
-DRIVER = ti1225
+app-y := ti1225.elf32
+ti1225.elf32-type := driver
+ti1225.elf32-obj-y := ti1225.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_ti1225.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i 
-LIBS = -lsys -lsysutil -ltimers
+$(src)/ti1225.elf32: drivers/driver_32.lds
 
-OBJ = ti1225.o
+# Create in minix3's aout format
+ti1225_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+ti1225_a_hdrlen  := 0x20
+ti1225_a_cpu     := i386
+ti1225_stackheap := 4k
 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ) 
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-	install -S 4096 $(DRIVER)
-
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak $(DRIVER)
-
-depend: 
-	/usr/bin/mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := ti1225.elf32,ti1225

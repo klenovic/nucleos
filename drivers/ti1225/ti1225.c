@@ -13,7 +13,7 @@ ti1225.c
 Created:	Dec 2005 by Philip Homburg
 */
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 #include <ibm/pci.h>
 #include <servers/vm/vm.h>
 #include <asm/servers/vm/vm.h>
@@ -283,7 +283,7 @@ u32_t base;
 	r= sys_vm_map(SELF, 1 /* map */, (vir_bytes)pp->base_ptr,
 		I386_PAGE_SIZE, (phys_bytes)base);
 #else
-	r = ENOSYS;
+	r = -ENOSYS;
 #endif
 	if (r != 0)
 		panic("ti1225", "map_regs: sys_vm_map failed", r);

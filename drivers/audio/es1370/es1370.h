@@ -12,7 +12,7 @@
 /* best viewed with tabsize=4 */
 
 #include <nucleos/types.h>
-#include "../../drivers.h"
+#include <nucleos/drivers.h>
 #include <sys/ioc_sound.h>
 
 

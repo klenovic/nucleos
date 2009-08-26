@@ -12,9 +12,6 @@
  * Created:
  *    Jul 22, 2005	by Jorrit N. Herder 
  */
-
-#define _SYSTEM            1    /* get OK and negative error codes */
-
 #define VERBOSE		   0	/* display diagnostics */
 
 #include <nucleos/types.h>

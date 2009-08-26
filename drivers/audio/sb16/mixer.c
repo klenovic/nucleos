@@ -31,7 +31,7 @@ int mixer_ioctl(int request, void *val, int *len) {
 		case MIXIOSETINPUTLEFT:   status = get_set_input(val, 1, 0); break;
 		case MIXIOSETINPUTRIGHT:  status = get_set_input(val, 1, 1); break;
 		case MIXIOSETOUTPUT:      status = get_set_output(val, 1); break;
-		default:                  status = ENOTTY;
+		default:                  status = -ENOTTY;
 	}
 
 	return status;
@@ -49,7 +49,7 @@ int mixer_init() {
 	mixer_set(MIXER_DAC_LEVEL, 0x10);       /* write something to it */
 	if(mixer_get(MIXER_DAC_LEVEL) != 0x10) {
 		dprint("sb16: Mixer not detected\n");
-		return EIO;
+		return -EIO;
 	}
 
 	/* Enable Automatic Gain Control */
@@ -112,7 +112,7 @@ static int get_set_volume(struct volume_level *level, int flag) {
 			max_level = 0x0F;
 			break;
 		default:     
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if(flag) { /* Set volume level */
@@ -163,7 +163,7 @@ static int get_set_input(struct inout_ctrl *input, int flag, int channel) {
 			del_mask = 0x7E;
 			break;
 		default:   
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if (flag) {  /* Set input */
@@ -211,7 +211,7 @@ static int get_set_output(struct inout_ctrl *output, int flag) {
 			del_mask = 0x7E;
 			break;
 		default:   
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if (flag) {  /* Set input */

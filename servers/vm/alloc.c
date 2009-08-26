@@ -22,9 +22,6 @@
  *   free_mem:	release a previously allocated chunk of memory
  *   mem_init:	initialize the tables when PM start up
  */
-
-#define _SYSTEM 1
-
 #include <nucleos/com.h>
 #include <nucleos/callnr.h>
 #include <nucleos/type.h>

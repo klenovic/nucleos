@@ -9,9 +9,6 @@
  */
 
 /* This file contains some utility routines for VM.  */
-
-#define _SYSTEM 1
-
 #define brk _brk	/* Our brk() must redefine _brk(). */
 #include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>

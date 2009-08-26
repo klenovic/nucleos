@@ -41,7 +41,7 @@
  * Note: since only 1 printer is supported, minor dev is not used at present.
  */
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 
 /* Control bits (in port_base + 2).  "+" means positive logic and "-" means
  * negative logic.  Most of the signals are negative logic on the pins but
@@ -147,7 +147,7 @@ void main(void)
                  do_initialize();		/* initialize */
 	        /* fall through */
 	    case DEV_CLOSE:
-		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, OK);
+		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, 0);
 		break;
 	    case DEV_WRITE_S:	do_write(&pr_mess, 1);	break;
 	    case DEV_STATUS:	do_status(&pr_mess);	break;
@@ -157,7 +157,7 @@ void main(void)
 	    case DEV_PING:  	notify(pr_mess.m_source);	break;
 	    case PROC_EVENT:	break;
 	    default:
-		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, EINVAL);
+		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
 	}
   }
 }
@@ -195,8 +195,8 @@ int safe;			/* use virtual addresses or grant id's? */
     /* Reject command if last write is not yet finished, the count is not
      * positive, or the user address is bad.
      */
-    if (writing)  			r = EIO;
-    else if (m_ptr->COUNT <= 0)  	r = EINVAL;
+    if (writing)  			r = -EIO;
+    else if (m_ptr->COUNT <= 0)  	r = -EINVAL;
 
     /* Reply to FS, no matter what happened, possible SUSPEND caller. */
     reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
@@ -246,17 +246,17 @@ static void output_done()
 
     if (!writing) return;	  	/* probably leftover interrupt */
     if (done_status != 0) {      	/* printer error occurred */
-        status = EIO;
+        status = -EIO;
 	if ((done_status & ON_LINE) == 0) { 
 	    printf("Printer is not on line\n");
 	} else if ((done_status & NO_PAPER)) { 
 	    printf("Printer is out of paper\n");
-	    status = EAGAIN;	
+	    status = -EAGAIN;	
 	} else {
 	    printf("Printer error, status is 0x%02X\n", done_status);
 	}
 	/* Some characters have been printed, tell how many. */
-	if (status == EAGAIN && user_left < orig_count) {
+	if (status == -EAGAIN && user_left < orig_count) {
 		status = orig_count - user_left;
 	}
 	oleft = 0;			/* cancel further output */
@@ -302,7 +302,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 /* Cancel a print request that has already started.  Usually this means that
  * the process doing the printing has been killed by a signal.  It is not
  * clear if there are race conditions.  Try not to cancel the wrong process,
- * but rely on FS to handle the EINTR reply and de-suspension properly.
+ * but rely on FS to handle the -EINTR reply and de-suspension properly.
  */
 
   if (writing && m_ptr->IO_ENDPT == proc_nr) {
@@ -310,7 +310,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 	writing = FALSE;
 	revive_pending = FALSE;
   }
-  reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, EINTR);
+  reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINTR);
 }
 
 /*===========================================================================*
@@ -327,7 +327,7 @@ int status;			/* number of  chars printed or error code */
   message pr_mess;
 
   pr_mess.m_type = code;		/* TASK_REPLY or REVIVE */
-  pr_mess.REP_STATUS = status;		/* count or EIO */
+  pr_mess.REP_STATUS = status;		/* count or -EIO */
   pr_mess.REP_ENDPT = process;	/* which user does this pertain to */
   send(replyee, &pr_mess);		/* send the message */
 }
@@ -381,7 +381,7 @@ static void prepare_output()
   }
 
   if(s != 0) {
-  	done_status = EFAULT;
+  	done_status = -EFAULT;
   	output_done();
   	return;
   }
@@ -465,7 +465,7 @@ static void do_printer_output()
   while (--oleft != 0);
 
   /* Finished printing chunk OK. */
-  done_status = OK;
+  done_status = 0;
   output_done();
   if(sys_irqenable(&irq_hook_id) != 0) {
 	panic(__FILE__, "sys_irqenable failed\n", NO_NUM);

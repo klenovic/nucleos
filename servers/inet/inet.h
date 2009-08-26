@@ -18,8 +18,6 @@ Copyright 1995 Philip Homburg
 #ifndef INET__INET_H
 #define INET__INET_H
 
-#define _SYSTEM	1	/* get OK and negative error codes */
-
 #include <nucleos/types.h>
 #include <nucleos/errno.h>
 #include <nucleos/stddef.h>

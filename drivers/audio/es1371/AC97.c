@@ -9,10 +9,6 @@
  */
 #include "AC97.h"
 
-
-
-
-
 /* AC97 Mixer and Mode control function prototypes */
 
 static int  AC97_read(DEV_STRUCT * pCC, u16_t wAddr, u16_t *data);
@@ -42,11 +38,6 @@ static int AC97_set_volume(struct volume_level *level);
 #define AC97_ERR_DATA_TIMEOUT          -2      /* data ready */
 #define AC97_ERR_SRC_NOT_BUSY_TIMEOUT  -3      /* SRC not busy */
 #define AC97_ERR_SRC_SYNC_TIMEOUT      -4      /* state #1 */
-
-
-
-
-
 
 /* Timeouts in milliseconds */
 #define WIP_TIMEOUT     250UL
@@ -408,7 +399,7 @@ static int AC97_get_volume(struct volume_level *level) {
 					&(level->left), &(level->right), 0x1f, 0);
 			break;
 		case Dac:
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Fm:
 			cmd = AC97_PCM_OUT_VOLUME;
@@ -436,7 +427,7 @@ static int AC97_get_volume(struct volume_level *level) {
 			break;
 		case Speaker:
 			cmd = AC97_PC_BEEP_VOLUME;
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Treble:
 			cmd = AC97_MASTER_TONE;
@@ -451,7 +442,7 @@ static int AC97_get_volume(struct volume_level *level) {
 					&(level->left), &(level->right), 0xf, 1);
 			break;
 		default:     
-			return EINVAL;
+			return -EINVAL;
 	}
 	return 0;
 }
@@ -468,7 +459,7 @@ static int AC97_set_volume(struct volume_level *level) {
 			convert(level->left, level->right, 0x1f, &left, &right, 0x1f, 0);
 			break;
 		case Dac:
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Fm:
 			cmd = AC97_PCM_OUT_VOLUME;
@@ -488,18 +479,18 @@ static int AC97_set_volume(struct volume_level *level) {
 			break;
 		case Speaker:
 			cmd = AC97_PC_BEEP_VOLUME;
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Treble:
 			cmd = AC97_MASTER_TONE;
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Bass:  
 			cmd = AC97_MASTER_TONE;
-			return EINVAL;
+			return -EINVAL;
 			break;
 		default:     
-			return EINVAL;
+			return -EINVAL;
 	}
 	set_volume(left, right, cmd);
 

@@ -23,8 +23,6 @@
  *   adjust:      see if a proposed segment adjustment is allowed
  */
 
-#define _SYSTEM 1
-
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>

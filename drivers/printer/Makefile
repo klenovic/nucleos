@@ -1,41 +1,18 @@
 # Makefile for Centronics printer driver (PRINTER)
-DRIVER = printer
+app-y := printer.elf32
+printer.elf32-type := driver
+printer.elf32-obj-y := printer.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_printer.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS = -lsys -lsysutil
+$(src)/printer.elf32: drivers/driver_32.lds
 
-OBJ = printer.o
+# Create in minix3's aout format
+printer_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+printer_a_hdrlen  := 0x20
+printer_a_cpu     := i386
+printer_stackheap := 256k
 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-#	install -S 64w $(DRIVER)
-
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -c $? $@
-#	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak $(DRIVER)
-
-depend: 
-	/usr/bin/mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := printer.elf32,printer

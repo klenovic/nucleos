@@ -315,7 +315,7 @@ int hermes_docmd_wait (hermes_t * hw, u16_t cmd, u16_t parm0,
 	/* check whether there has been a valid value in the Status register. 
 	 * the high order bits should have at least some value */
 	if (status & HERMES_STATUS_RESULT) {
-		printf("Hermes: EIO\n");
+		printf("Hermes: -EIO\n");
 		err = -EIO;
 	}
 

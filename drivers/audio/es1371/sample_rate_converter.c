@@ -9,12 +9,8 @@
  */
 #include "sample_rate_converter.h"
 
-
-
-
 #define SRC_RATE        48000U
 #define reg(n) DSP->base + n
-
 
 /* register/base and control equates for the SRC RAM */
 #define SRC_SYNTH_FIFO      0x00

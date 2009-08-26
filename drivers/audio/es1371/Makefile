@@ -1,56 +1,19 @@
 # Makefile for the ES1371 sounddriver (SB16)
+app-y := es1371.elf32
+es1371.elf32-type := driver
+es1371.elf32-obj-y := es1371.o AC97.o pci_helper.o wait.o sample_rate_converter.o
+es1371.elf32-extobj-y := $(audio-framework)/audio_fw.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
+LDFLAGS_es1371.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS 	= -lsys 
+$(src)/es1371.elf32: drivers/driver_32.lds
 
-PROGRAM_NAME 	= es1371
-INSTALL_BIN		= /usr/sbin/$(PROGRAM_NAME)
-OBJ				= es1371.o AC97.o audio_fw.o pci_helper.o wait.o sample_rate_converter.o
+# Create in minix3's aout format
+es1371_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+es1371_a_hdrlen  := 0x20
+es1371_a_cpu     := i386
+es1371_stackheap := 1024k
 
-
-
-# build local binary
-all: $(PROGRAM_NAME)
-
-
-$(PROGRAM_NAME): $(OBJ)
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-
-
-audio_fw.o: ../framework/audio_fw.c ../framework/audio_fw.h
-	$(CC) -c ../framework/audio_fw.c
-	
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $<
-
-
-install: $(INSTALL_BIN)
-
-
-$(INSTALL_BIN):	$(PROGRAM_NAME)
-	install -o root -S 1024k -c $? $@
-
-
-# clean up local files
-clean:
-	rm -f $(OBJ) $(PROGRAM_NAME) core 
-
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := es1371.elf32,es1371

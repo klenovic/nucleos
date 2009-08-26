@@ -1,32 +1,17 @@
-# Makefile for AMD's DEV
-DRIVER = amddev
+app-y := amddev.elf32
+amddev.elf32-type := driver
+amddev.elf32-obj-y := amddev.o
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = $(CPROFILE)
-LDFLAGS = -i 
-LIBS = -lsys 
+LDFLAGS_amddev.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-OBJ = amddev.o
+$(src)/amddev.elf32: drivers/driver_32.lds
 
-# build local binary
-all build:	$(DRIVER)
-$(DRIVER):	$(OBJ) 
-	$(CC) -o $@ $(LDFLAGS) $(OBJ) $(LIBS)
-	install -S 320k $(DRIVER)
+# Create in minix3's aout format
+amddev_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+amddev_a_hdrlen  := 0x20
+amddev_a_cpu     := i386
+amddev_stackheap := 320k
 
-# install with other drivers
-install:	/usr/sbin/$(DRIVER)
-/usr/sbin/$(DRIVER):	$(DRIVER)
-	install -o root -cs $? $@
-
-# clean up local files
-clean:
-	rm -f *.o *.bak $(DRIVER)
-
-depend: 
-	mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
-
-# Include generated dependencies.
-include .depend
-
+e2a-y := amddev.elf32,amddev

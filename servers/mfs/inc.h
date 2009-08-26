@@ -7,8 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#define _SYSTEM            1    /* get OK and negative error codes */
 #define VERBOSE		   0	/* display diagnostics */
 
 #include <nucleos/types.h>

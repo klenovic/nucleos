@@ -1,9 +1,10 @@
 # Makefile for all audio drivers.
-MAKE = exec make -$(MAKEFLAGS)
+obj-y := framework/ es1370/ es1371/
+# Oboslete?
+obj-n :=  sb16/
 
-build: all
+subdir-y-flags := not-sort
 
-all install depend clean:
-	cd ./es1370 && $(MAKE) $@
-	cd ./es1371 && $(MAKE) $@
-
+# For rest of audio drivers
+audio-framework := $(src)/framework
+export audio-framework

@@ -1,41 +1,37 @@
 # Makefile for the Sound Blaster 16 driver (SB16)
+app-y := sb16_dsp.elf32
+sb16_dsp.elf32-type := driver
+sb16_dsp.elf32-obj-y := sb16.o sb16_dsp.o
 
-# directories
-u = /usr
-i = $u/include
-s = $i/sys
-m = $i/minix
-b = $i/ibm
-d = ..
+LDFLAGS_sb16_dsp.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-# programs, flags, etc.
-CC =	exec cc
-CFLAGS = -I$i
-LDFLAGS = -i
-LIBS = -lsys -lsysutil
+$(src)/sb16_dsp.elf32: drivers/driver_32.lds
 
+# Create in minix3's aout format
+sb16_dsp_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+sb16_dsp_a_hdrlen  := 0x20
+sb16_dsp_a_cpu     := i386
+sb16_dsp_stackheap := 128k
 
-# build local binary
-all build:	sb16_dsp sb16_mixer
-sb16_dsp:	sb16.o sb16_dsp.o
-	$(CC) -o $@ $(LDFLAGS) sb16.o sb16_dsp.o $(LIBS)
-sb16_mixer:	sb16.o sb16_mixer.o
-	$(CC) -o $@ $(LDFLAGS) sb16.o sb16_mixer.o $(LIBS)
+e2a-y := sb16_dsp.elf32,sb16_dsp
 
-# install with other drivers
-install:	/usr/sbin/sb16_dsp /usr/sbin/sb16_mixer
-/usr/sbin/sb16_dsp:	sb16_dsp
-	install -o root -c $? $@
-/usr/sbin/sb16_mixer:	sb16_mixer
-	install -o root -c $? $@
+app-y += sb16_mixer.elf32
+sb16_mixer.elf32-type := driver
+sb16_mixer.elf32-obj-y := sb16.o sb16_mixer.o
 
-# clean up local files
-clean:
-	rm -f *.o *.bak sb16 sb16_dsp sb16_mixer
+LDFLAGS_sb16_mixer.elf32 := -L$(lib-arch) -Llib \
+			-ldriver -lsys -ltimers -lnucc \
+			-Tdrivers/driver_32.lds
 
-depend: 
-	/usr/bin/mkdep "$(CC) -E $(CPPFLAGS)" *.c > .depend
+$(src)/sb16_mixer.elf32: drivers/driver_32.lds
 
-# Include generated dependencies.
-include .depend
+# Create in minix3's aout format
+sb16_mixer_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+sb16_mixer_a_hdrlen  := 0x20
+sb16_mixer_a_cpu     := i386
+sb16_mixer_stackheap := 128k
+
+e2a-y += sb16_mixer.elf32,sb16_mixer
 

@@ -126,7 +126,7 @@ int ak4531_get_set_volume(struct volume_level *level, int flag) {
 			cmd_right = MASTER_VOLUME_RCH;
 			break;
 		case Dac:
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Fm:
 			cmd_left = FM_VOLUME_LCH;
@@ -148,13 +148,13 @@ int ak4531_get_set_volume(struct volume_level *level, int flag) {
 			max_level = 0x03;
 			break;
 		case Treble:
-			return EINVAL;
+			return -EINVAL;
 			break;
 		case Bass:  
-			return EINVAL;
+			return -EINVAL;
 			break;
 		default:     
-			return EINVAL;
+			return -EINVAL;
 	}
 
 	if (flag) { /* set volume */

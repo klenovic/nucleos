@@ -10,7 +10,7 @@
 #ifndef SB16_H
 #define SB16_H
 
-#include "../drivers.h"
+#include <nucleos/drivers.h>
 #include <sys/ioc_sound.h>
 #include <nucleos/sound.h>
 

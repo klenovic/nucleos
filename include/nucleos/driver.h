@@ -10,9 +10,6 @@
 /* Types and constants shared between the generic and device dependent
  * device driver code.
  */
-
-#define _SYSTEM		   1	/* get negative error number in <nucleos/errno.h> */
-
 /* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/type.h>
 #include <nucleos/ipc.h>

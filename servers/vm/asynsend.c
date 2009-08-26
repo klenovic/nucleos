@@ -8,8 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#define _SYSTEM 1
-
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>

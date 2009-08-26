@@ -23,7 +23,7 @@
 **  $Id: wd.c 660 2005-08-22 15:17:42Z beng $
 */
 
-#include "drivers.h"
+#include <nucleos/drivers.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
 #include "dp.h"

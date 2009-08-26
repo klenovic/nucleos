@@ -22,7 +22,7 @@
 **  $Id: 8390.c 2361 2006-07-10 12:43:38Z philip $
 */
 
-#include "drivers.h"
+#include <nucleos/drivers.h>
 #include <nucleos/com.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
