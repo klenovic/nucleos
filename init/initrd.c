@@ -10,6 +10,11 @@
 #include <nucleos/types.h>
 #include <nucleos/stddef.h>
 
-/* Just dummy weak definitions for builtin ramdisk */
-__weak __section(".data.initrd") unsigned char *initrd = 0;
-__weak size_t initrd_size = 0;
+/* Compile ramdisk translated to array of chars. */
+__section(".data.initrd") unsigned char initrd[] =
+{
+	/* Automatically generated (see Makefile) */
+	#include "initrd.h"
+};
+
+size_t initrd_size = sizeof(initrd);

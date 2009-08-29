@@ -235,9 +235,8 @@ no-dot-config-targets := clean distclean help mrproper tools \
 			 include/nucleos/version.h headers_%
 
 # possible %config goals
-config-goals := config menuconfig xconfig gconfig \
-	        randconfig allyesconfig allnoconfig \
-	        silentoldconfig
+config-goals := config %_defconfig defconfig menuconfig xconfig gconfig \
+		randconfig allyesconfig allnoconfig silentoldconfig
 
 config-targets := 0
 mixed-targets  := 0
@@ -268,7 +267,11 @@ $(MAKECMDGOALS): FORCE
 else
 ifeq ($(config-targets),1)
 # include architecture goals, vars,...
+# Read arch specific Makefile to set KBUILD_DEFCONFIG as needed.
+# KBUILD_DEFCONFIG may point out an alternative default configuration
+# used for 'make defconfig'
 include $(srctree)/arch/$(SRCARCH)/Makefile
+export KBUILD_DEFCONFIG KBUILD_KCONFIG
 
 config: scripts_basic FORCE
 	$(Q)mkdir -p include/nucleos include/config

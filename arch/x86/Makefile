@@ -1,21 +1,28 @@
+# select defconfig based on actual architecture
+ifeq ($(ARCH),x86)
+        KBUILD_DEFCONFIG := i386_defconfig
+else
+        KBUILD_DEFCONFIG := $(ARCH)_defconfig
+endif
+
 # BITS is used as extension for files which are available in a 32 bit
 # and a 64 bit version to simplify shared Makefiles.
 # e.g.: obj-y += foo_$(BITS).o
 export BITS
 
 ifeq ($(CONFIG_X86_32),y)
-  BITS := 32
-  biarch := $(call cc-option,-m32)
-  KBUILD_AFLAGS += $(biarch)
-  KBUILD_CFLAGS += $(biarch)
+	BITS := 32
+        biarch := $(call cc-option,-m32)
+        KBUILD_AFLAGS += $(biarch)
+        KBUILD_CFLAGS += $(biarch)
 
-  KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2)
-  KBUILD_CPPFLAGS += -D__CODE32__
+        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2)
+        KBUILD_CPPFLAGS += -D__CODE32__
 
-  # include compiler stuffs
-  include arch/$(SRCARCH)/Makefile_32.cpu
+        # include compiler stuffs
+        include arch/$(SRCARCH)/Makefile_32.cpu
 
-  KBUILD_CFLAGS += $(cflags-y)
+        KBUILD_CFLAGS += $(cflags-y)
 endif
 
 boot := arch/x86/boot

@@ -133,12 +133,17 @@ targets += $(objs-y)
 
 # Targets
 # ---------------------------------------------------------------------------
+# Get those with absolute path
+targets_abspath := $(filter $(srctree)/%,$(targets))
 
 # Add `$(src)' to targets
 # Note that some of targets may be already with $(src) prefix thus
 # we need to remove this and add it then
-targets := $(patsubst $(src)/%,%,$(targets))
-targets := $(sort $(addprefix $(src)/,$(targets)))
+targets := $(patsubst $(src)/%,%,$(filter-out $(targets_abspath),$(targets)))
+targets := $(addprefix $(src)/,$(targets))
+
+# The final set
+targets := $(sort $(targets) $(targets_abspath))
 
 # remove those that were specified to make as first
 targets := $(filter-out $(first),$(targets))

@@ -35,39 +35,68 @@ int main(int argc, char *argv[])
 {
 	int c, i, r, first;
 	FILE *file_in, *file_out;
-	char *in_name;
-	char *o_arg;
+	char *in_name = 0;
+	char *out_name = 0;
+	int otype_s = 0;
+	int otype_S = 0;
 
 	(progname=strrchr(argv[0],'/')) ? progname++ : (progname=argv[0]);
 
-	o_arg= NULL;
-	while (c= getopt(argc, argv, "ho:"), c != -1)
+	while (c= getopt(argc, argv, "hi:o:sS"), c != -1)
 	{
 		switch(c)
 		{
-		case 'h': usage();
-		case 'o': o_arg= optarg; break;
-		default:  fatal("getopt failed: '%c'\n", c);
+		case 'h':
+			usage();
+			exit(0);
+
+		case 'i':
+			in_name = optarg;
+			break;
+
+		case 'o':
+			out_name= optarg;
+			break;
+
+		case 's':
+			/* generate code usable in .s file i.e. raw assembly */
+			otype_s = 1;
+			break;
+
+		case 'S':
+			/* generate code usable in .S file */
+			otype_S = 1;
+			break;
+
+		default:
+			fatal("getopt failed: '%c'\n", c);
 		}
 	}
 
-	if (o_arg)
+	/* this is mandatory */
+	if (!out_name) {
+		usage();
+		exit(1);
+	}
+
+	if (otype_s && otype_S)
+		fatal("Specify either `-s' or `-S' not both!\n");
+
+	if (out_name)
 	{
-		file_out= fopen(o_arg, "w");
+		file_out= fopen(out_name, "w");
 		if (file_out == NULL)
 		{
 			fatal("unable to create '%s': %s\n",
-				o_arg, strerror(errno));
+				out_name, strerror(errno));
 			exit(1);
 		}
 	}
 	else
 		file_out= stdout;
 
-	if (optind < argc)
+	if (in_name)
 	{
-		in_name= argv[optind];
-		optind++;
 		file_in= fopen(in_name, "r");
 		if (file_in == NULL)
 		{
@@ -81,12 +110,12 @@ int main(int argc, char *argv[])
 		file_in= stdin;
 	}
 
-	if (optind != argc)
-		usage();
 
 	first= 1;
 	/* add comment */ 
-	fprintf(file_out, comment);
+	if (!otype_s)
+		fprintf(file_out, comment);
+
 	for (;;)
 	{
 		r= fread(buf, 1, sizeof(buf), file_in);
@@ -100,12 +129,19 @@ int main(int argc, char *argv[])
 				{
 					fprintf(file_out, "\t");
 					first= 0;
+				} else {
+					if (!otype_s && !otype_S)
+						fprintf(file_out, ",\n\t");
+					else
+						fprintf(file_out, "\n\t");
 				}
-				else
-					fprintf(file_out, ",\n\t");
-			}
-			else
+
+				if (otype_s)
+					fprintf(file_out, ".byte\t");
+			} else {
 				fprintf(file_out, ", ");
+			}
+
 			fprintf(file_out, "0x%02x", buf[i]);
 		}
 	}
@@ -137,6 +173,6 @@ static void fatal(char *fmt, ...)
 
 static void usage(void)
 {
-	fprintf(stderr, "Usage: bintoc [-o <out-file>] [<in-file>]\n");
-	exit(1);
+	fprintf(stderr, "Usage: bintoc [-s] [-i <in-file>] -o <out-file>\n");
+	return;
 }

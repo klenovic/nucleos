@@ -80,6 +80,8 @@ int fs_version;
 unsigned int block_size;
 
 FILE *proto;
+int use_proto = 0;
+
 MNX(block_t) sizeup(char *device);
 void super(MNX(zone_t) zones, MNX(Ino_t) inodes);
 void rootdir(MNX(Ino_t) inode);
@@ -168,7 +170,7 @@ int main(int argc, char *argv[])
   fs_version = 3;
   inodes_per_block = 0;
   block_size = 0;
-  while ((ch = getopt(argc, argv, "12b:di:lotB:")) != EOF)
+  while ((ch = getopt(argc, argv, "12b:di:lotpB:")) != EOF)
     switch (ch) {
       case '1':
         fs_version = 1;
@@ -189,6 +191,7 @@ int main(int argc, char *argv[])
         break;
       case 'l':   print = 1;    break;
       case 'o':   override = 1;   break;
+      case 'p':   use_proto = 1;   break;
       case 't':   donttest = 1;   break;
       case 'B':   block_size = atoi(optarg);    break;
       default:  usage();
@@ -385,40 +388,51 @@ int main(int argc, char *argv[])
 /*================================================================
  *          sizeup  -  determine device size
  *===============================================================*/
-MNX(block_t) sizeup(device)
-char *device;
+MNX(block_t) sizeup(char *device)
 {
-  int fd;
-  MNX(u64_t) devsize64;
-  MNX(block_t) d;
-  struct stat st;
-  unsigned int rem;
-  MNX(u64_t) resize;
+	int fd;
+	MNX(u64_t) devsize64;
+	MNX(block_t) d;
+	struct stat st;
+	unsigned int rem;
+	MNX(u64_t) resize;
 
-  if ((fd = open(device, O_RDONLY)) == -1) {
-    if (errno != ENOENT)
-      perror("sizeup open");
-    return 0;
-  }
+	if ((fd = open(device, O_RDONLY)) == -1) {
+		if (errno != ENOENT)
+			perror("sizeup open");
+			return 0;
+	}
 
-  if (ioctl(fd, BLKGETSIZE64, &devsize64) != 0) {
-  fprintf(stderr,"mkfs: %s: can't device size.\n", __FUNCTION__);
-  return 0;
-  }
-  close(fd);
+	if(!use_proto) {
+		if (ioctl(fd, BLKGETSIZE64, &devsize64) != 0) {
+			fprintf(stderr,"mkfs: %d: %s: can't device size.\n", __LINE__, __FUNCTION__);
+			return 0;
+		}
 
-  /* cast into unsigned long */
-  d = (unsigned long)(devsize64 / block_size);
-  rem = (unsigned int)(devsize64 % block_size);
+		close(fd);
 
-  resize = (MNX(u64_t))(d*block_size + rem);
+		/* cast into unsigned long */
+		d = (unsigned long)(devsize64 / block_size);
+		rem = (unsigned int)(devsize64 % block_size);
+		resize = (MNX(u64_t))(d*block_size + rem);
 
-  if(resize != devsize64) {
-      d = ULONG_MAX;
-      fprintf(stderr, "mkfs: truncating FS at %lu blocks\n", d);
-  }
+		if(resize != devsize64) {
+			d = ULONG_MAX;
+			fprintf(stderr, "mkfs: truncating FS at %lu blocks\n", d);
+		}
+	} else {
+		off_t size = lseek(fd, 0, SEEK_END);
 
-  return d;
+		if (size == (off_t) -1) {
+			fprintf(stderr, "mkfs: %d: %s: can't device size.\n", __LINE__, __FUNCTION__);
+			return 0;
+		}
+
+		d = size / block_size;
+	}
+
+	close(fd);
+	return d;
 }
 
 
