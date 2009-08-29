@@ -27,7 +27,7 @@ quiet_cmd_gen_initrd.minixfs = GEN     $@
       cmd_gen_initrd.minixfs = $(srctree)/scripts/tools/mkfs $@ -p $(src)/proto.gen
 
 $(src)/initrd.minixfs: $(srctree)/scripts/tools/mkfs
-$(src)/initrd.minixfs: $(scripts) $(bin-y) FORCE
+$(src)/initrd.minixfs: $(addprefix $(src)/,$(scripts)) $(bin-y) FORCE
 	$(call if_changed,gen_initrd.minixfs)
 
 quiet_cmd_gen_initrd = GEN     $@
@@ -42,7 +42,9 @@ targets += $(scripts) $(src)/sh
 quiet_cmd_extract_scripts = EXTRACT $@
       cmd_extract_scripts = tar -C $(src) -xmjf $(srctree)/scripts/initrd-scripts.tar.bz2 $(notdir $@)
 
-$(addprefix $(src),$(scripts)): $(srctree)/scripts/initrd-scripts.tar.bz2 FORCE
+$(addprefix $(src)/,$(scripts)): $(srctree)/scripts/initrd-scripts.tar.bz2 FORCE
+	$(call if_changed,extract_scripts)
+
 $(src)/sh: $(srctree)/scripts/initrd-scripts.tar.bz2 FORCE
 	$(call if_changed,extract_scripts)
 
