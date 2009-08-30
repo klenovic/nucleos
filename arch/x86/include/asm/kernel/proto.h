@@ -63,6 +63,18 @@ void vir_outsb(u16_t port, struct proc *proc, u32_t vir, size_t count);
 void vir_insw(u16_t port, struct proc *proc, u32_t vir, size_t count);
 void vir_outsw(u16_t port, struct proc *proc, u32_t vir, size_t count);
 
+/* prototype of an interrupt vector table entry */
+struct gate_table_s {
+	void (*gate)(void);
+	unsigned char vec_nr;
+	unsigned char privilege;
+};
+
+extern struct gate_table_s gate_table_pic[];
+
+/* copies an array of vectors to the IDT. The last vector must be zero filled */
+void idt_copy_vectors(struct gate_table_s * first);
+
 
 /* exception.c */
 void exception(unsigned vec_nr, u32_t trap_errno, u32_t old_eip, U16_t old_cs, u32_t old_eflags);
