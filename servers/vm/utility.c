@@ -10,6 +10,7 @@
 
 /* This file contains some utility routines for VM.  */
 #define brk _brk	/* Our brk() must redefine _brk(). */
+#include <asm/bootparam.h>
 #include <nucleos/nucleos.h>
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
@@ -113,7 +114,58 @@ struct mem_map *map_ptr;                        /* memory to remove */
         vm_panic("reserve_proc_mem: can't find map in mem_chunks ",
                 map_ptr[T].mem_phys);
   }
-} 
+}
+
+#ifndef CONFIG_BUILTIN_INITRD
+/* @brief Remove initial ramdisk from the free memory list.
+ * @param mem_chunks  list of memory chunks
+ * @return 0 on success or -ENXIO on failure
+ * @details The initial ramdisk is copied right after the boot image by
+ *          boot monitor. It is very important to reserve initrd memory
+ *          right after the boot image was reserved.
+ */
+int reserve_initrd_mem(struct memory *mem_chunks)
+{
+	int i;
+	int s;
+	int found = 0;
+	struct boot_param bootparam;
+	phys_bytes initrd_base_clicks;
+	phys_bytes initrd_size_clicks;
+
+	/* Don't enter if the ramdisk has been found already */
+	if (found)
+		return 0;
+
+	/* The initrd is put right after boot image */
+	if ((s = sys_getbootparam(&bootparam)) != 0) {
+		panic("VM","Couldn't get boot parameters!",s);
+	}
+
+	initrd_base_clicks = (bootparam.initrd_base >> CLICK_SHIFT);
+
+	/* Find initial ramdisk */
+	for (i=0; i<NR_MEMS; i++) {
+		if (mem_chunks[i].base == initrd_base_clicks) {
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found) {
+		printf("VM: Couldn't find initial ramdisk at 0x%x\n", initrd_base_clicks);
+		return -ENXIO;
+	}
+
+	/* Round up the reserved memory */
+	initrd_size_clicks = ((bootparam.initrd_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
+
+	mem_chunks[i].base += initrd_size_clicks;
+	mem_chunks[i].size -= initrd_size_clicks;
+
+	return 0;
+}
+#endif
 
 /*===========================================================================*
  *                              vm_isokendpt                           	     *

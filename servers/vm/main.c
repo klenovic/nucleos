@@ -255,6 +255,15 @@ static void vm_init(void)
 			vmp->vm_flags |= VMF_SEPARATE;
 	}
 
+#ifndef CONFIG_BUILTIN_INITRD
+	/* Remove initrd memory from the free list. We must do it right after we
+	   have reserved memory for boot image otherwise it may happen that initrd
+	   will be overwritten by other process.
+	 */
+	if ((s = reserve_initrd_mem(mem_chunks)) < 0) {
+		panic("VM", "Couldn't reserve memory for initial ramdisk!", s);
+	}
+#endif
 
 	/* Let architecture-dependent VM initialization use some memory. */
 	arch_init_vm(mem_chunks);

@@ -567,6 +567,7 @@ void exec_image(char *image)
 		 * misused as the address where the process is loaded at.
 		 */
 		hdr.process.a_syms = addr;
+
 		raw_copy(aout + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
 
 		if (!banner) {
@@ -674,6 +675,7 @@ void exec_image(char *image)
 
 		/* Process endpoint. */
 		procp->end= addr;
+
 		if (i == 0 && (k_flags & K_HIGH)) {
 			/* Load the rest in extended memory. */
 			addr = mem[1].base;

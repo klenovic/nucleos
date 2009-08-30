@@ -49,7 +49,7 @@
 	map_sanitycheck(__FILE__, __LINE__); \
 	} 
 #else
-#define SANITYCHECK 
+#define SANITYCHECK
 #endif
 
 #endif /* __SERVERS_VM_SANITYCHECK_H */
