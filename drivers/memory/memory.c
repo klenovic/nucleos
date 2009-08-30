@@ -367,11 +367,6 @@ static void m_init()
   m_vaddrs[IMGRD_DEV] = (vir_bytes) initrd;
 #endif
 
-unsigned char* addr = (unsigned char*)m_vaddrs[IMGRD_DEV];
-for(i=0;i<32;i++)
-  printf("%x ", (unsigned char)addr[i]);
-printf("\n");
-
   /* Initialize /dev/zero. Simply write zeros into the buffer. */
   for (i=0; i<ZERO_BUF_SIZE; i++) {
        dev_zero[i] = '\0';
