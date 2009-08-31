@@ -18,7 +18,7 @@
  * C language equivalents written by Theodore Ts'o, 9/26/92
  */
 
-#include <linux/compiler.h>
+#include <nucleos/compiler.h>
 
 
 #include <asm-generic/bitops/fls.h>

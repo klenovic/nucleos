@@ -12,11 +12,11 @@
 #endif
 
 /* GCC 4.1.[01] miscompiles __weak */
-#ifdef __KERNEL__
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 # if __GNUC_MINOR__ == 1 && __GNUC_PATCHLEVEL__ <= 1
 #  error Your version of gcc miscompiles the __weak directive
 # endif
-#endif
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #define __used				__attribute__((__used__))
 #define __must_check 			__attribute__((warn_unused_result))
