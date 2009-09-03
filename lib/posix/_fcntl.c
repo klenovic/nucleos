@@ -9,7 +9,7 @@
  */
 #include <lib.h>
 #define fcntl _fcntl
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdarg.h>
 
 int fcntl(int fd, int cmd, ...)

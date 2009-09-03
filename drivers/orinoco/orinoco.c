@@ -103,7 +103,7 @@ static tmra_ut or_watchdog;
 #include	<net/gen/eth_io.h>
 #include	<asm/servers/vm/vm.h>
 #include	<nucleos/types.h>
-#include	<fcntl.h>
+#include	<nucleos/fcntl.h>
 #include 	<unistd.h>
 #include	<nucleos/errno.h>
 

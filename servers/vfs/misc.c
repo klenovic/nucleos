@@ -28,7 +28,7 @@
  */
 
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <assert.h>
 #include <unistd.h>	/* cc runs out of memory with unistd.h :-( */
 #include <nucleos/callnr.h>

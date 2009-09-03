@@ -87,7 +87,7 @@
 #include <ibm/pci.h>
 
 #include <nucleos/types.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <assert.h>
 #include <unistd.h>
 #include <sys/ioc_memory.h>

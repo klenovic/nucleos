@@ -27,7 +27,7 @@ static char	elsieid[] = "@(#)localtime.c	7.99";
 #include <nucleos/nucleos.h>
 #include <zoneinfo/private.h>
 #include <zoneinfo/tzfile.h>
-#include "fcntl.h"
+#include <nucleos/fcntl.h>
 #include "float.h"	/* for FLT_MAX and DBL_MAX */
 
 #ifndef TZ_ABBR_MAX_LEN

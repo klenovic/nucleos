@@ -56,7 +56,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/ioctl.h>

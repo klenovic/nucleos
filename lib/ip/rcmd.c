@@ -30,7 +30,7 @@
 #include <sys/ioctl.h>
 #include <ctype.h>
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/limits.h>
 #include <pwd.h>
 #include <stdio.h>

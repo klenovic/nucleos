@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <nucleos/stddef.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>
 #include <string.h>

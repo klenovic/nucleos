@@ -14,7 +14,7 @@
 #include <nucleos/nucleos.h>
 #include "inc.h"
 #include <ctype.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <nucleos/types.h>
 #include <sys/stat.h>

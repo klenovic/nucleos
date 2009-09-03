@@ -44,7 +44,7 @@
 #include <nucleos/types.h>
 #include <nucleos/minlib.h>
 #include <ctype.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

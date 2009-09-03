@@ -10,7 +10,7 @@
 #include <lib.h>
 #define dup	_dup
 #define fcntl	_fcntl
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 
 int dup(fd)

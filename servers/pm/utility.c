@@ -22,7 +22,7 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <signal.h>		/* needed only because mproc.h needs it */
 #include "mproc.h"
 #include "param.h"

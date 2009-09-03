@@ -52,7 +52,7 @@
 #include <nucleos/nucleos.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <fts.h>
 #include <stdlib.h>
 #include <string.h>

@@ -41,7 +41,7 @@
  */
 #include <nucleos/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <ctype.h>

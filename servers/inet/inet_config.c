@@ -20,7 +20,7 @@ Copyright 1995 Philip Homburg
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <string.h>
 #include <nucleos/errno.h>
 #include <nucleos/types.h>

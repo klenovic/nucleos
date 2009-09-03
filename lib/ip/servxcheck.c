@@ -21,7 +21,7 @@
 #include <syslog.h>
 #include <nucleos/errno.h>
 #include <string.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/ioctl.h>

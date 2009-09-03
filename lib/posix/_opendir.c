@@ -23,7 +23,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/errno.h>
 
 DIR *opendir(const char *name)

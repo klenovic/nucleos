@@ -30,7 +30,7 @@
 #include <nucleos/vm.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <sys/resource.h>
 #include <nucleos/utsname.h>
 #include <string.h>

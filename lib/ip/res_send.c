@@ -47,7 +47,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

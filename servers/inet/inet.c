@@ -53,7 +53,7 @@ from DL_ETH:
 
 #include "inet.h"
 
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <time.h>
 #include <unistd.h>
 #include <sys/svrctl.h>

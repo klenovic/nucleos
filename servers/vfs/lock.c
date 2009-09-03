@@ -17,7 +17,7 @@
 #include "fs.h"
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include "file.h"
 #include "fproc.h"

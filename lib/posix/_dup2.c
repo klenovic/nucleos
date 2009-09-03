@@ -11,7 +11,7 @@
 #define close	_close
 #define dup2	_dup2
 #define fcntl	_fcntl
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 
 int dup2(fd, fd2)

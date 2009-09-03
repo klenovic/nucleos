@@ -13,7 +13,7 @@
 
 #define uname	_uname
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <nucleos/types.h>

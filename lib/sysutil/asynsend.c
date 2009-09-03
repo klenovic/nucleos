@@ -12,7 +12,7 @@
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <nucleos/syslib.h>

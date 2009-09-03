@@ -28,7 +28,7 @@
  */
 
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <signal.h>
 #include <assert.h>
 #include <nucleos/callnr.h>

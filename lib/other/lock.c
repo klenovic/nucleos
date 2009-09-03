@@ -12,7 +12,7 @@
 #include <nucleos/types.h>
 #include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 

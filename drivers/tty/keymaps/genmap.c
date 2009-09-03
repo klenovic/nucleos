@@ -11,7 +11,7 @@
  */
 #include <nucleos/types.h>
 #include <nucleos/keymap.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>

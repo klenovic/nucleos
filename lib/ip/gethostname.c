@@ -10,7 +10,7 @@
 /* gethostname(2) system call emulation */
 
 #include <nucleos/types.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

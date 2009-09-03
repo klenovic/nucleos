@@ -14,7 +14,7 @@ Copy a device or file specified as argument to /dev/ram
 */
 
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

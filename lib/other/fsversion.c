@@ -21,7 +21,7 @@
 #include <nucleos/const.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
 

@@ -19,7 +19,7 @@
 #define read _read
 #define close _close
 #include <nucleos/types.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <signal.h>
 #include <termios.h>

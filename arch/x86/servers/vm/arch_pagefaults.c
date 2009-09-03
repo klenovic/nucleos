@@ -24,7 +24,7 @@
 #include <string.h>
 #include <env.h>
 #include <stdio.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 
 #include <servers/vm/glo.h>
 #include <servers/vm/proto.h>

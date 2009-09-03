@@ -25,7 +25,7 @@
 #define	O_RDWR		2
 
 /* Since the O_CREAT flag is not available on all systems, we can't get it
- * from the standard library. Furthermore, even if we know that <fcntl.h>
+ * from the standard library. Furthermore, even if we know that <nucleos/fcntl.h>
  * contains such a flag, it's not sure whether it can be used, since we
  * might be cross-compiling for another system, which may use an entirely
  * different value for O_CREAT (or not support such a mode). The safest

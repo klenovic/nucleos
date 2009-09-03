@@ -17,7 +17,7 @@
  */
 
 #include <stdio.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/type.h>
 #include <nucleos/safecopies.h>
 

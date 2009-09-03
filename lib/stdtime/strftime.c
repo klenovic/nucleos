@@ -36,7 +36,7 @@ static char	elsieid[] = "@(#)strftime.c	7.75";
 ** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 */
 #include <zoneinfo/tzfile.h>
-#include "fcntl.h"
+#include <nucleos/fcntl.h>
 #include "locale.h"
 
 struct lc_time_T {

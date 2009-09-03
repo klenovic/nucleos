@@ -20,7 +20,7 @@
  */
 
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <string.h>
 #include <stdio.h>
 #include <signal.h>

@@ -10,7 +10,7 @@
 
 
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/stddef.h>
 #include <nucleos/nucleos.h>
 #include <string.h>

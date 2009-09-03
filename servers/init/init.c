@@ -29,7 +29,7 @@
 #include <sys/svrctl.h>
 #include <ttyent.h>
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/limits.h>
 #include <signal.h>
 #include <string.h>

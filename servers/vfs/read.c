@@ -22,7 +22,7 @@
  */
 #include <nucleos/nucleos.h>
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>

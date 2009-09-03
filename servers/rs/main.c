@@ -18,7 +18,7 @@
  */
 #include <nucleos/nucleos.h>
 #include "inc.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/endpoint.h>
 #include <kernel/const.h>
 #include <kernel/type.h>

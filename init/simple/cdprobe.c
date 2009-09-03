@@ -25,7 +25,7 @@
 #define MAGIC_OFF	24
 
 #include <nucleos/errno.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

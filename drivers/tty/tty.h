@@ -41,7 +41,7 @@
 
 #define ESC             '\33'	/* escape */
 
-#define O_NOCTTY       00400	/* from <fcntl.h>, or cc will choke */
+#define O_NOCTTY       00400	/* from <nucleos/fcntl.h>, or cc will choke */
 #define O_NONBLOCK     04000
 
 struct tty;

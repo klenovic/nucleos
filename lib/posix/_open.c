@@ -9,7 +9,7 @@
  */
 #include <lib.h>
 #define open	_open
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <stdarg.h>
 #include <string.h>
 

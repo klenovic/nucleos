@@ -16,7 +16,7 @@
  * $Id: flock.c 1291 2005-10-31 14:31:05Z beng $
  */
 #include <nucleos/types.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <string.h>
 #include <nucleos/errno.h>
 #include <unistd.h>

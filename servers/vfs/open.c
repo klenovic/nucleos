@@ -24,7 +24,7 @@
 
 #include "fs.h"
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <nucleos/callnr.h>

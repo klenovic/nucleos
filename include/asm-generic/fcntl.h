@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* The <fcntl.h> header is needed by the open() and fcntl() system calls,
+/* The <nucleos/fcntl.h> header is needed by the open() and fcntl() system calls,
  * which  have a variety of parameters and flags.  They are described here.  
  * The formats of the calls to each of these are:
  *
@@ -16,8 +16,8 @@
  * 
  */
 
-#ifndef _FCNTL_H
-#define _FCNTL_H
+#ifndef __ASM_GENERIC_FCNTL_H
+#define __ASM_GENERIC_FCNTL_H
 
 #include <nucleos/types.h>
 
@@ -63,11 +63,11 @@
 
 /* Struct used for locking.  POSIX Table 6-8. */
 struct flock {
-  short l_type;			/* type: F_RDLCK, F_WRLCK, or F_UNLCK */
-  short l_whence;		/* flag for starting offset */
-  off_t l_start;		/* relative offset in bytes */
-  off_t l_len;			/* size; if 0, then until EOF */
-  pid_t l_pid;			/* process id of the locks' owner */
+	short l_type;			/* type: F_RDLCK, F_WRLCK, or F_UNLCK */
+	short l_whence;		/* flag for starting offset */
+	off_t l_start;		/* relative offset in bytes */
+	off_t l_len;			/* size; if 0, then until EOF */
+	pid_t l_pid;			/* process id of the locks' owner */
 };
 
 /* Function Prototypes. */
@@ -83,4 +83,4 @@ int open(const char *_path, int _oflag, ...);
 
 int flock(int fd, int mode);
 
-#endif /* _FCNTL_H */
+#endif /* __ASM_GENERIC_FCNTL_H */

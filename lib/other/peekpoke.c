@@ -17,7 +17,7 @@
  */
 
 #include <nucleos/types.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <unistd.h>
 
 int peek(unsigned segment, unsigned offset);

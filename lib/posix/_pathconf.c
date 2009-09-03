@@ -13,7 +13,7 @@
 #define close		_close
 #define open		_open
 #define pathconf	_pathconf
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/errno.h>
 #include <unistd.h>
 

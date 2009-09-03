@@ -9,7 +9,7 @@
  */
 
 #include "fs.h"
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/vfsif.h>
 
 #include "buf.h"

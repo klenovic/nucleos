@@ -19,7 +19,7 @@
  */
 #include <libutil.h>
 #include <termios.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <grp.h>
 #include <string.h>
 #include <stdlib.h>

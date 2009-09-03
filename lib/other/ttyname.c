@@ -16,7 +16,7 @@
 #include <lib.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <fcntl.h>
+#include <nucleos/fcntl.h>
 #include <nucleos/stddef.h>
 #include <string.h>
 #include <unistd.h>
