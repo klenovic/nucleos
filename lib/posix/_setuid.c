@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 int setuid(usr)
-_mnx_Uid_t usr;
+uid_t usr;
 {
   message m;
 
@@ -22,7 +22,7 @@ _mnx_Uid_t usr;
 }
 
 int seteuid(usr)
-_mnx_Uid_t usr;
+uid_t usr;
 {
   message m;
 

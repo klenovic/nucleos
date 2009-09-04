@@ -82,10 +82,10 @@ extern u32_t lowsec;		/* Offset to the file system on the boot dev */
 
 /* Prototypes */
 off_t r_super(void);
-void r_stat(Ino_t _inum, struct stat *_stp);
+void r_stat(ino_t _inum, struct stat *_stp);
 ino_t r_readdir(char *_name);
 off_t r_vir2abs(off_t _virblk);
-ino_t r_lookup(Ino_t _cwd, char *_path);
+ino_t r_lookup(ino_t _cwd, char *_path);
 
 #ifdef _MONHEAD
 void readerr(off_t _sec, int _err);

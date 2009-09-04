@@ -43,28 +43,28 @@ int fs_flush(void);
 void init_inode_cache(void);
 
 /* cache.c */
-zone_t alloc_zone(Dev_t dev, zone_t z);
-void flushall(Dev_t dev);
-void free_zone(Dev_t dev, zone_t numb);
-struct buf *get_block(Dev_t dev, block_t block,int only_search);
-void invalidate(Dev_t device);
+zone_t alloc_zone(dev_t dev, zone_t z);
+void flushall(dev_t dev);
+void free_zone(dev_t dev, zone_t numb);
+struct buf *get_block(dev_t dev, block_t block,int only_search);
+void invalidate(dev_t device);
 void put_block(struct buf *bp, int block_type);
 void set_blocksize(int blocksize);
-void rw_scattered(Dev_t dev, struct buf **bufq, int bufqsize, int rw_flag);
+void rw_scattered(dev_t dev, struct buf **bufq, int bufqsize, int rw_flag);
 void buf_pool(void);
 
 /* device.c */
-int block_dev_io(int op, Dev_t dev, int proc, void *buf, u64_t pos, int bytes, int flags);
-int dev_open(endpoint_t driver_e, Dev_t dev, int proc, int flags);
-void dev_close(endpoint_t driver_e, Dev_t dev);
+int block_dev_io(int op, dev_t dev, int proc, void *buf, u64_t pos, int bytes, int flags);
+int dev_open(endpoint_t driver_e, dev_t dev, int proc, int flags);
+void dev_close(endpoint_t driver_e, dev_t dev);
 
 /* inode.c */
-struct inode *find_inode(Dev_t dev, int numb);
+struct inode *find_inode(dev_t dev, int numb);
 
 struct inode *alloc_inode(dev_t dev, mode_t bits);
 void dup_inode(struct inode *ip);
 void free_inode(dev_t dev, ino_t numb);
-struct inode *get_inode(Dev_t dev, int numb);
+struct inode *get_inode(dev_t dev, int numb);
 void put_inode(struct inode *rip);
 void update_times(struct inode *rip);
 void rw_inode(struct inode *rip, int rw_flag);
@@ -111,7 +111,7 @@ int fs_readsuper_o(void);
 int fs_readsuper_s(void);
 int do_mount(void);
 int do_umount(void);
-int unmount(Dev_t dev);
+int unmount(dev_t dev);
 
 /* open.c */
 int fs_create_o(void);
@@ -176,7 +176,7 @@ int do_lstat(void);
 /* super.c */
 bit_t alloc_bit(struct super_block *sp, int map, bit_t origin);
 void free_bit(struct super_block *sp, int map, bit_t bit_returned);
-struct super_block *get_super(Dev_t dev);
+struct super_block *get_super(dev_t dev);
 int mounted(struct inode *rip);
 int read_super(struct super_block *sp);
 int get_block_size(dev_t dev);

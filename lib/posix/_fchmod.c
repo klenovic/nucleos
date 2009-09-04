@@ -13,7 +13,7 @@
 
 int fchmod(fd, mode)
 int fd;
-_mnx_Mode_t mode;
+mode_t mode;
 {
   message m;
 

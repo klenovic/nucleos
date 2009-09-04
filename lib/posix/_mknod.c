@@ -15,8 +15,8 @@
 
 int mknod(name, mode, dev)
 const char *name;
-_mnx_Mode_t mode;
-Dev_t dev;
+mode_t mode;
+dev_t dev;
 {
   message m;
 

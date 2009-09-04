@@ -74,13 +74,13 @@ struct stat {
 #define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)	/* is a pipe/FIFO */
 
 /* Function Prototypes. */
-int chmod(const char *_path, _mnx_Mode_t _mode);
-int fchmod(int fd, _mnx_Mode_t _mode);
+int chmod(const char *_path, mode_t _mode);
+int fchmod(int fd, mode_t _mode);
 int fstat(int _fildes, struct stat *_buf);
-int mkdir(const char *_path, _mnx_Mode_t _mode);
-int mkfifo(const char *_path, _mnx_Mode_t _mode);
+int mkdir(const char *_path, mode_t _mode);
+int mkfifo(const char *_path, mode_t _mode);
 int stat(const char *_path, struct stat *_buf);
-mode_t umask(_mnx_Mode_t _cmask);
+mode_t umask(mode_t _cmask);
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 int lstat(const char *_path, struct stat *_buf);

@@ -60,7 +60,7 @@ char *			hostname;
 	line++;
 
 /* read in the hostname */
-    while (!isspace(*line))
+    while (!isspace((int)*line))
 	*hostname++ = *line++;
     *hostname = '\0';
     return 0;

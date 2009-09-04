@@ -92,7 +92,7 @@ void raw_copy(u32_t dstaddr, u32_t srcaddr, u32_t count);
 u16_t get_word(u32_t addr);
 
 /* Put a word anywhere. */
-void put_word(u32_t addr, U16_t word);
+void put_word(u32_t addr, u16 word);
 
 /* Switch to a copy of this program. */
 void relocate(void);
@@ -104,10 +104,10 @@ int dev_open(void), dev_close(void);
 int dev_boundary(u32_t sector);
 
 /* Read 1 or more sectors from "device". */
-int readsectors(u32_t bufaddr, u32_t sector, U8_t count);
+int readsectors(u32_t bufaddr, u32_t sector, u8 count);
 
 /* Write 1 or more sectors to "device". */
-int writesectors(u32_t bufaddr, u32_t sector, U8_t count);
+int writesectors(u32_t bufaddr, u32_t sector, u8 count);
 
 /* Read a keypress. */
 int getch(void);

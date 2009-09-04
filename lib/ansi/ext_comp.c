@@ -473,7 +473,7 @@ _str_ext_cvt(const char *s, char **ss, struct EXTEND *e)
 	int		exp = 0;
 
 	if (ss) *ss = (char *)s;
-	while (isspace(*s)) s++;
+	while (isspace((int)*s)) s++;
 
 	e->sign = 0;
 	e->exp = 0;

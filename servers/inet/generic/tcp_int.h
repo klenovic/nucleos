@@ -212,7 +212,7 @@ void tcp_bytesavailable(tcp_fd_t *tcp_fd, int *bytesp);
 
 /* tcp_send.c */
 void tcp_conn_write(tcp_conn_t *tcp_conn, int enq);
-void tcp_release_retrans(tcp_conn_t *tcp_conn, u32_t seg_ack, U16_t new_win);
+void tcp_release_retrans(tcp_conn_t *tcp_conn, u32_t seg_ack, u16 new_win);
 void tcp_fast_retrans(tcp_conn_t *tcp_conn);
 void tcp_set_send_timer(tcp_conn_t *tcp_conn);
 void tcp_fd_write(tcp_conn_t *tcp_conn);

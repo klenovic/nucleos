@@ -259,15 +259,15 @@ hostalias(name)
 		return (NULL);
 	buf[sizeof(buf) - 1] = '\0';
 	while (fgets(buf, sizeof(buf), fp)) {
-		for (C1 = buf; *C1 && !isspace(*C1); ++C1);
+		for (C1 = buf; *C1 && !isspace((int)*C1); ++C1);
 		if (!*C1)
 			break;
 		*C1 = '\0';
 		if (!strcasecmp(buf, name)) {
-			while (isspace(*++C1));
+			while (isspace((int)*++C1));
 			if (!*C1)
 				break;
-			for (C2 = C1 + 1; *C2 && !isspace(*C2); ++C2);
+			for (C2 = C1 + 1; *C2 && !isspace((int)*C2); ++C2);
 			abuf[sizeof(abuf) - 1] = *C2 = '\0';
 			(void)strncpy(abuf, C1, sizeof(abuf) - 1);
 			fclose(fp);

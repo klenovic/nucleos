@@ -14,8 +14,8 @@
 
 int fchown(fd, owner, grp)
 int fd;
-_mnx_Uid_t owner;
-_mnx_Gid_t grp;
+uid_t owner;
+gid_t grp;
 {
   message m;
 

@@ -43,7 +43,7 @@ static void reply_thr_put(udp_fd_t *udp_fd, int reply, int for_ioctl);
 static void reply_thr_get(udp_fd_t *udp_fd, int reply, int for_ioctl);
 static int udp_setopt(udp_fd_t *udp_fd);
 static udpport_t find_unused_port(int fd);
-static int is_unused_port(Udpport_t port);
+static int is_unused_port(udpport_t port);
 static int udp_packet2user(udp_fd_t *udp_fd);
 static void restart_write_fd(udp_fd_t *udp_fd);
 static u16_t pack_oneCsum(acc_t *pack);

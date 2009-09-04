@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 
 mode_t umask(complmode)
-_mnx_Mode_t complmode;
+mode_t complmode;
 {
   message m;
 

@@ -72,7 +72,7 @@ again:
 			cp++;
 			continue;
 		}
-		if (base == 16 && isxdigit(c)) {
+		if (base == 16 && isxdigit((int)c)) {
 			val = (val << 4) + (c + 10 - (islower(c) ? 'a' : 'A'));
 			cp++;
 			continue;
@@ -85,7 +85,7 @@ again:
 		*pp++ = val, cp++;
 		goto again;
 	}
-	if (*cp && !isspace(*cp))
+	if (*cp && !isspace((int)*cp))
 		return (INADDR_NONE);
 	*pp++ = val;
 	n = pp - parts;

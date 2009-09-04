@@ -105,7 +105,7 @@ char *name;
 		def_len = strlen(bp) - 2;
 	} while (bp[def_len] == '\\');
 
-	while (isspace(*cp)) cp++;
+	while (isspace((int)*cp)) cp++;
 
 	/* Comment lines start with a '#'  */
 	if (*cp == '#') continue;
@@ -141,7 +141,7 @@ char *id;
 	while (*cp++ != ':')
 		if (cp[-1] == '\0') return(-1);
 
-	while (isspace(*cp)) cp++;
+	while (isspace((int)*cp)) cp++;
 
 	if (strncmp(cp, id, 2) == 0 && cp[2] == '#') return(atoi(cp + 3));
   }
@@ -165,7 +165,7 @@ char *id;
 	while (*cp++ != ':')
 		if (cp[-1] == '\0') return(0);
 
-	while (isspace(*cp)) cp++;
+	while (isspace((int)*cp)) cp++;
 
 	if (strncmp(cp, id, 2) == 0) return(1);
   }
@@ -191,7 +191,7 @@ char **area;
 	while (*cp++ != ':')
 		if (cp[-1] == '\0') return((char *)NULL);
 
-	while (isspace(*cp)) cp++;
+	while (isspace((int)*cp)) cp++;
 
 	if (strncmp(cp, id, 2) == 0 && cp[2] == '=') {
 		for (cp += 3; *cp && *cp != ':'; wsp++, cp++) switch (*cp) {

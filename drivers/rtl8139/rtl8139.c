@@ -215,26 +215,26 @@ static re_t re_table[RE_PORT_NR];
 static u16_t eth_ign_proto;
 static tmra_ut rl_watchdog;
 
-static unsigned my_inb(U16_t port);
-static unsigned my_inw(U16_t port);
-static unsigned my_inl(U16_t port);
+static unsigned my_inb(u16 port);
+static unsigned my_inw(u16 port);
+static unsigned my_inl(u16 port);
 
-static unsigned my_inb(U16_t port) {
+static unsigned my_inb(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inb(port, &value)) != 0)
 		printf("RTL8139: warning, sys_inb failed: %d\n", s);
 	return value;
 }
-static unsigned my_inw(U16_t port) {
+static unsigned my_inw(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inw(port, &value)) != 0)
 		printf("RTL8139: warning, sys_inw failed: %d\n", s);
 	return value;
 }
-static unsigned my_inl(U16_t port) {
-	U32_t value;
+static unsigned my_inl(u16 port) {
+	u32 value;
 	int s;
 	if ((s=sys_inl(port, &value)) != 0)
 		printf("RTL8139: warning, sys_inl failed: %d\n", s);
@@ -244,21 +244,21 @@ static unsigned my_inl(U16_t port) {
 #define rl_inw(port, offset)	(my_inw((port) + (offset)))
 #define rl_inl(port, offset)	(my_inl((port) + (offset)))
 
-static void my_outb(U16_t port, U8_t value);
-static void my_outw(U16_t port, U16_t value);
-static void my_outl(U16_t port, U32_t value);
+static void my_outb(u16 port, u8 value);
+static void my_outw(u16 port, u16 value);
+static void my_outl(u16 port, u32 value);
 
-static void my_outb(U16_t port, U8_t value) {
+static void my_outb(u16 port, u8 value) {
 	int s;
 	if ((s=sys_outb(port, value)) != 0)
 		printf("RTL8139: warning, sys_outb failed: %d\n", s);
 }
-static void my_outw(U16_t port, U16_t value) {
+static void my_outw(u16 port, u16 value) {
 	int s;
 	if ((s=sys_outw(port, value)) != 0)
 		printf("RTL8139: warning, sys_outw failed: %d\n", s);
 }
-static void my_outl(U16_t port, U32_t value) {
+static void my_outl(u16 port, u32 value) {
 	int s;
 	if ((s=sys_outl(port, value)) != 0)
 		printf("RTL8139: warning, sys_outl failed: %d\n", s);
@@ -282,8 +282,8 @@ static void rl_writev(message *mp, int from_int, int vectored);
 static void rl_writev_s(message *mp, int from_int);
 static void rl_check_ints(re_t *rep);
 static void rl_report_link(re_t *rep);
-static void mii_print_techab(U16_t techab);
-static void mii_print_stat_speed(U16_t stat, U16_t extstat);
+static void mii_print_techab(u16 techab);
+static void mii_print_stat_speed(u16 stat, u16 extstat);
 static void rl_clear_rx(re_t *rep);
 static void rl_do_reset(re_t *rep);
 static void rl_getstat(message *mp);
@@ -2840,7 +2840,7 @@ timer_t *tp;
 static void rtl_init(struct dpeth *dep);
 static u16_t get_ee_word(dpeth_t *dep, int a);
 static void ee_wen(dpeth_t *dep);
-static void set_ee_word(dpeth_t *dep, int a, U16_t w);
+static void set_ee_word(dpeth_t *dep, int a, u16 w);
 static void ee_wds(dpeth_t *dep);
 
 static void rtl_init(dep)

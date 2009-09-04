@@ -24,6 +24,6 @@ void icmp_snd_parmproblem(acc_t *pack);
 void icmp_snd_time_exceeded(int port_nr, acc_t *pack, int code);
 void icmp_snd_unreachable(int port_nr, acc_t *pack, int code);
 void icmp_snd_redirect(int port_nr, acc_t *pack, int code, ipaddr_t gw);
-void icmp_snd_mtu(int port_nr, acc_t *pack, U16_t mtu);
+void icmp_snd_mtu(int port_nr, acc_t *pack, u16 mtu);
 
 #endif /* ICMP_LIB_H */

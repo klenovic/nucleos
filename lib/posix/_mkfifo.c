@@ -15,7 +15,7 @@
 
 int mkfifo(name, mode)
 const char *name;
-_mnx_Mode_t mode;
+mode_t mode;
 {
-  return mknod(name, mode | S_IFIFO, (Dev_t) 0);
+  return mknod(name, mode | S_IFIFO, (dev_t) 0);
 }

@@ -47,7 +47,7 @@ static void rtl_init(struct dpeth *dep);
 #if 0
 static u16_t get_ee_word(dpeth_t *dep, int a);
 static void ee_wen(dpeth_t *dep);
-static void set_ee_word(dpeth_t *dep, int a, U16_t w);
+static void set_ee_word(dpeth_t *dep, int a, u16 w);
 static void ee_wds(dpeth_t *dep);
 #endif
 

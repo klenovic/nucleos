@@ -103,7 +103,7 @@ char *__hostalias(const char *name);
 
 u16_t _getshort(const u8_t *msgp);
 u32_t _getlong(const u8_t *msgp);
-void __putshort(U16_t s, u8_t *msgp);
+void __putshort(u16 s, u8_t *msgp);
 void __putlong(u32_t l, u8_t *msgp);
 
 void p_query(char *msg);

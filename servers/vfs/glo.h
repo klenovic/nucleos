@@ -17,7 +17,7 @@ extern int susp_count;		/* number of procs suspended on pipe */
 extern int nr_locks;		/* number of locks currently in place */
 extern int reviving;		/* number of pipe processes to be revived */
 
-extern Dev_t root_dev;		/* device number of the root device */
+extern dev_t root_dev;		/* device number of the root device */
 extern int ROOT_FS_E;           /* kernel endpoint of the root FS proc */
 extern int last_login_fs_e;     /* endpoint of the FS proc that logged in
                                    before the corresponding mount request */

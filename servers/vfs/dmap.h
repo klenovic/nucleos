@@ -27,7 +27,7 @@ dmap.h
 #define DMAP_BABY		0x04	/* driver exec() not done yet */
 
 struct dmap {
-  int (*dmap_opcl)(int, Dev_t, int, int);
+  int (*dmap_opcl)(int, dev_t, int, int);
   int (*dmap_io)(int, message *);
   endpoint_t dmap_driver;
   int dmap_flags;

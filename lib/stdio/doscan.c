@@ -186,8 +186,8 @@ _doscan(register FILE *stream, const char *format, va_list ap)
 	if (!*format) return 0;
 
 	while (1) {
-		if (isspace(*format)) {
-			while (isspace(*format))
+		if (isspace((int)*format)) {
+			while (isspace((int)*format))
 				format++;	/* skip whitespace */
 			ic = getc(stream);
 			nrchars++;
@@ -357,10 +357,10 @@ _doscan(register FILE *stream, const char *format, va_list ap)
 							; str++)
 				*str = 0;
 
-			if (*format == ']') Xtable[*format++] = 1;
+			if (*format == ']') Xtable[(int)*format++] = 1;
 
 			while (*format && *format != ']') {
-				Xtable[*format++] = 1;
+				Xtable[(int)*format++] = 1;
 				if (*format == '-') {
 					format++;
 					if (*format

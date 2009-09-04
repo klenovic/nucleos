@@ -112,7 +112,7 @@ off_t r_super(int *bs)
 
 }
 
-void r_stat(Ino_t inum, struct stat *stp)
+void r_stat(ino_t inum, struct stat *stp)
 /* Return information about a file like stat(2) and remember it. */
 {
   block_t block;
@@ -294,7 +294,7 @@ off_t r_vir2abs(off_t virblk)
   return z;
 }
 
-ino_t r_lookup(Ino_t cwd, char *path)
+ino_t r_lookup(ino_t cwd, char *path)
 /* Translates a pathname to an inode number.  This is just a nice utility
  * function, it only needs r_stat and r_readdir.
  */

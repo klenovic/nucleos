@@ -60,11 +60,11 @@ static struct pcibus
 	u8_t (*pb_rreg8)(int busind, int devind, int port);
 	u16_t (*pb_rreg16)(int busind, int devind, int port);
 	u32_t (*pb_rreg32)(int busind, int devind, int port);
-	void (*pb_wreg8)(int busind, int devind, int port, U8_t value);
-	void (*pb_wreg16)(int busind, int devind, int port, U16_t value);
+	void (*pb_wreg8)(int busind, int devind, int port, u8 value);
+	void (*pb_wreg16)(int busind, int devind, int port, u16 value);
 	void (*pb_wreg32)(int busind, int devind, int port, u32_t value);
 	u16_t (*pb_rsts)(int busind);
-	void (*pb_wsts)(int busind, U16_t value);
+	void (*pb_wsts)(int busind, u16 value);
 } pcibus[NR_PCIBUS];
 static int nr_pcibus= 0;
 
@@ -101,7 +101,7 @@ static int nr_pcidev= 0;
 
 static void pci_intel_init(void);
 static void probe_bus(int busind);
-static int is_duplicate(U8_t busnr, U8_t dev, U8_t func);
+static int is_duplicate(u8 busnr, u8 dev, u8 func);
 static void record_irq(int devind);
 static void record_bars(int devind);
 static void record_bars_bridge(int devind);
@@ -121,69 +121,69 @@ static int do_via_isabr(int devind);
 #if 0
 static void report_vga(int devind);
 #endif
-static char *pci_vid_name(U16_t vid);
-static char *pci_baseclass_name(U8_t baseclass);
-static char *pci_subclass_name(U8_t baseclass, U8_t subclass, U8_t infclass);
+static char *pci_vid_name(u16 vid);
+static char *pci_baseclass_name(u8 baseclass);
+static char *pci_subclass_name(u8 baseclass, u8 subclass, u8 infclass);
 static void ntostr(unsigned n, char **str, char *end);
 
 static u8_t pci_attr_r8_u(int devind, int port);
 static u32_t pci_attr_r32_u(int devind, int port);
 
 static u16_t pci_attr_rsts(int devind);
-static void pci_attr_wsts(int devind, U16_t value);
+static void pci_attr_wsts(int devind, u16 value);
 static u16_t pcibr_std_rsts(int busind);
-static void pcibr_std_wsts(int busind, U16_t value);
+static void pcibr_std_wsts(int busind, u16 value);
 static u16_t pcibr_cb_rsts(int busind);
-static void pcibr_cb_wsts(int busind, U16_t value);
+static void pcibr_cb_wsts(int busind, u16 value);
 static u16_t pcibr_via_rsts(int busind);
-static void pcibr_via_wsts(int busind, U16_t value);
+static void pcibr_via_wsts(int busind, u16 value);
 static u8_t pcii_rreg8(int busind, int devind, int port);
 static u16_t pcii_rreg16(int busind, int devind, int port);
 static u32_t pcii_rreg32(int busind, int devind, int port);
-static void pcii_wreg8(int busind, int devind, int port, U8_t value);
-static void pcii_wreg16(int busind, int devind, int port, U16_t value);
+static void pcii_wreg8(int busind, int devind, int port, u8 value);
+static void pcii_wreg16(int busind, int devind, int port, u16 value);
 static void pcii_wreg32(int busind, int devind, int port, u32_t value);
 static u16_t pcii_rsts(int busind);
-static void pcii_wsts(int busind, U16_t value);
+static void pcii_wsts(int busind, u16 value);
 static void print_capabilities(int devind);
 static int visible(struct rs_pci *aclp, int devind);
-static void print_hyper_cap(int devind, U8_t capptr);
+static void print_hyper_cap(int devind, u8 capptr);
 
 /*===========================================================================*
  *			helper functions for I/O			     *
  *===========================================================================*/
-unsigned pci_inb(U16_t port) {
+unsigned pci_inb(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inb(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inb failed: %d\n", s);
 	return value;
 }
-unsigned pci_inw(U16_t port) {
+unsigned pci_inw(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inw(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inw failed: %d\n", s);
 	return value;
 }
-unsigned pci_inl(U16_t port) {
-	U32_t value;
+unsigned pci_inl(u16 port) {
+	u32 value;
 	int s;
 	if ((s=sys_inl(port, (unsigned long*)&value)) != 0)
 		printf("PCI: warning, sys_inl failed: %d\n", s);
 	return value;
 }
-void pci_outb(U16_t port, U8_t value) {
+void pci_outb(u16 port, u8 value) {
 	int s;
 	if ((s=sys_outb(port, value)) != 0)
 		printf("PCI: warning, sys_outb failed: %d\n", s);
 }
-void pci_outw(U16_t port, U16_t value) {
+void pci_outw(u16 port, u16 value) {
 	int s;
 	if ((s=sys_outw(port, value)) != 0)
 		printf("PCI: warning, sys_outw failed: %d\n", s);
 }
-void pci_outl(U16_t port, U32_t value) {
+void pci_outl(u16 port, u32 value) {
 	int s;
 	if ((s=sys_outl(port, value)) != 0)
 		printf("PCI: warning, sys_outl failed: %d\n", s);
@@ -569,7 +569,7 @@ int port;
 void pci_attr_w8(devind, port, value)
 int devind;
 int port;
-u16_t value;
+u8 value;
 {
 	int busnr, busind;
 

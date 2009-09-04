@@ -18,18 +18,18 @@ Created:	Jan 15, 1992 by Philip Homburg
 
 #include <nucleos/types.h>
 
-unsigned inb(U16_t _port);
-unsigned inw(U16_t _port);
-unsigned inl(U32_t _port);
-void outb(U16_t _port, U8_t _value);
-void outw(U16_t _port, U16_t _value);
-void outl(U16_t _port, U32_t _value);
-void insb(U16_t _port, void *_buf, size_t _count);
-void insw(U16_t _port, void *_buf, size_t _count);
-void insl(U16_t _port, void *_buf, size_t _count);
-void outsb(U16_t _port, void *_buf, size_t _count);
-void outsw(U16_t _port, void *_buf, size_t _count);
-void outsl(U16_t _port, void *_buf, size_t _count);
+unsigned inb(u16 _port);
+unsigned inw(u16 _port);
+unsigned inl(u32 _port);
+void outb(u16 _port, u8 _value);
+void outw(u16 _port, u16 _value);
+void outl(u16 _port, u32 _value);
+void insb(u16 _port, void *_buf, size_t _count);
+void insw(u16 _port, void *_buf, size_t _count);
+void insl(u16 _port, void *_buf, size_t _count);
+void outsb(u16 _port, void *_buf, size_t _count);
+void outsw(u16 _port, void *_buf, size_t _count);
+void outsl(u16 _port, void *_buf, size_t _count);
 void intr_disable(void);
 void intr_enable(void);
 

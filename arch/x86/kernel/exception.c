@@ -83,7 +83,7 @@ void exception_handler(vec_nr, trap_errno, old_eip, old_cs, old_eflags)
 unsigned vec_nr;
 u32_t trap_errno;
 u32_t old_eip;
-U16_t old_cs;
+u16 old_cs;
 u32_t old_eflags;
 {
 /* An exception or unexpected interrupt has occurred. */

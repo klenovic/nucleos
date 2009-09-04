@@ -77,7 +77,7 @@ void idt_copy_vectors(struct gate_table_s * first);
 
 
 /* exception.c */
-void exception(unsigned vec_nr, u32_t trap_errno, u32_t old_eip, U16_t old_cs, u32_t old_eflags);
+void exception(unsigned vec_nr, u32_t trap_errno, u32_t old_eip, u16 old_cs, u32_t old_eflags);
 
 /* klib386.s */
 void level0(void (*func)(void));
@@ -90,11 +90,11 @@ unsigned long read_cr4(void);
 void write_cr4(unsigned long value);
 void write_cr3(unsigned long value);
 unsigned long read_cpu_flags(void);
-void phys_insb(U16_t port, phys_bytes buf, size_t count);
-void phys_insw(U16_t port, phys_bytes buf, size_t count);
-void phys_outsb(U16_t port, phys_bytes buf, size_t count);
-void phys_outsw(U16_t port, phys_bytes buf, size_t count);
-void i386_invlpg(U32_t addr);
+void phys_insb(u16 port, phys_bytes buf, size_t count);
+void phys_insw(u16 port, phys_bytes buf, size_t count);
+void phys_outsb(u16 port, phys_bytes buf, size_t count);
+void phys_outsw(u16 port, phys_bytes buf, size_t count);
+void i386_invlpg(u32 addr);
 
 /* protect.c */
 void prot_init(void);

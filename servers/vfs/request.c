@@ -586,7 +586,7 @@ struct node_details *res;
  *===========================================================================*/
 int req_newdriver(fs_e, dev, driver_e)
 endpoint_t fs_e;
-Dev_t dev;
+dev_t dev;
 endpoint_t driver_e;
 {
 /* Note: this is the only request function that doesn't use the 

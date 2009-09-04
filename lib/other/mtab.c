@@ -100,7 +100,7 @@ char *prog_name;
   /* Replace all the whitespace by '\0'. */
   ptr = mtab_in;
   while (*ptr != '\0') {
-	if (isspace(*ptr)) *ptr = '\0';
+	if (isspace((int)*ptr)) *ptr = '\0';
 	ptr++;
   }
   return(0);

@@ -22,7 +22,7 @@ struct	group {
 };
 
 /* Function Prototypes. */
-struct group *getgrgid(_mnx_Gid_t _gid);
+struct group *getgrgid(gid_t _gid);
 struct group *getgrnam(const char *_name);
 
 void endgrent(void);

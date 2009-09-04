@@ -85,7 +85,7 @@ inet_aton(cp, addr)
 				cp++;
 				continue;
 			}
-			if (base == 16 && isascii(c) && isxdigit(c)) {
+			if (base == 16 && isascii((int)c) && isxdigit((int)c)) {
 				val = (val << 4) + 
 					(c + 10 - (islower(c) ? 'a' : 'A'));
 				cp++;
@@ -109,7 +109,7 @@ inet_aton(cp, addr)
 	/*
 	 * Check for trailing characters.
 	 */
-	if (*cp && (!isascii(*cp) || !isspace(*cp)))
+	if (*cp && (!isascii((int)*cp) || !isspace((int)*cp)))
 		return (0);
 	/*
 	 * Concoct the address according to

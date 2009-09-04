@@ -62,7 +62,7 @@ int isokendpt_f(endpoint_t e, int *p, int f);
 #endif
 
 /* start.c */
-void cstart(U16_t cs, U16_t ds, U16_t mds, U16_t parmoff, U16_t parmsize);
+void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize);
 
 /* system.c */
 int get_priv(register struct proc *rc, int proc_type);
@@ -139,7 +139,7 @@ void cp_mess(int src,phys_clicks src_clicks, vir_bytes src_offset, phys_clicks d
 	     vir_bytes dst_offset);
 phys_bytes umap_remote(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes bytes);
 phys_bytes umap_virtual(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes bytes);
-phys_bytes seg2phys(U16_t);
+phys_bytes seg2phys(u16);
 void phys_memset(phys_bytes source, unsigned long pattern, phys_bytes count);
 vir_bytes alloc_remote_segment(u32_t *, segframe_t *, int, phys_bytes, vir_bytes, int);
 int arch_init_clock(void);

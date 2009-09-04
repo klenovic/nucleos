@@ -45,7 +45,7 @@ string2long(register const char *nptr, char ** const endptr,
 	const char *startnptr = nptr, *nrstart;
 
 	if (endptr) *endptr = (char *)nptr;
-	while (isspace(*nptr)) nptr++;
+	while (isspace((int)*nptr)) nptr++;
 	c = *nptr;
 
 	if (c == '-' || c == '+') {

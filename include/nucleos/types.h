@@ -58,54 +58,6 @@ typedef int		intptr_t;
 typedef unsigned long	uintmax_t;
 typedef long		intmax_t;
 
-/* The following types are needed because MINIX uses K&R style function
- * definitions (for maximum portability).  When a short, such as dev_t, is
- * passed to a function with a K&R definition, the compiler automatically
- * promotes it to an int.  The prototype must contain an int as the parameter,
- * not a short, because an int is what an old-style function definition
- * expects.  Thus using dev_t in a prototype would be incorrect.  It would be
- * sufficient to just use int instead of dev_t in the prototypes, but Dev_t
- * is clearer.
- */
-typedef __s32	__kernel_Dev_t;
-typedef __s32	__kernel__mnx_Gid_t;
-typedef __s32	__kernel_Nlink_t;
-typedef __s32	__kernel__mnx_Uid_t;
-typedef __s32	__kernel_U8_t;
-typedef __u32	__kernel_U32_t;
-typedef __s32	__kernel_I8_t;
-typedef __s32	__kernel_I16_t;
-typedef __s32	__kernel_I32_t;
-
-/* ANSI C makes writing down the promotion of unsigned types very messy.  When
- * sizeof(short) == sizeof(int), there is no promotion, so the type stays
- * unsigned.  When the compiler is not ANSI, there is usually no loss of
- * unsignedness, and there are usually no prototypes so the promoted type
- * doesn't matter.  The use of types like Ino_t is an attempt to use ints
- * (which are not promoted) while providing information to the reader.
- */
-typedef __u32	__kernel_Ino_t;
-typedef __s32	__kernel_Zone1_t;
-typedef __s32	__kernel_Bitchunk_t;
-typedef __s32	__kernel_U16_t;
-typedef __s32	__kernel__mnx_Mode_t;
-
-typedef __kernel_Dev_t		Dev_t;
-typedef __kernel__mnx_Gid_t	_mnx_Gid_t;
-typedef __kernel_Nlink_t	Nlink_t;
-typedef __kernel__mnx_Uid_t	_mnx_Uid_t;
-typedef __kernel_U8_t		U8_t;
-typedef __kernel_U32_t		U32_t;
-typedef __kernel_I8_t		I8_t;
-typedef __kernel_I16_t		I16_t;
-typedef __kernel_I32_t		I32_t;
-
-typedef __kernel_Ino_t  Ino_t;
-typedef __kernel_Zone1_t	Zone1_t;
-typedef __kernel_Bitchunk_t	Bitchunk_t;
-typedef __kernel_U16_t		U16_t;
-typedef __kernel__mnx_Mode_t	_mnx_Mode_t;
-
 /* Signal handler type, e.g. SIG_IGN */
 typedef void (*sighandler_t)(int);
 

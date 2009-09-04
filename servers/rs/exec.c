@@ -20,7 +20,7 @@ static int read_header(char *exec, size_t exec_len, int *sep_id, vir_bytes *text
 		       vir_bytes *pc, int *hdrlenp);
 static int exec_newmem(int proc_e, vir_bytes text_bytes, vir_bytes data_bytes,
 		       vir_bytes bss_bytes, vir_bytes tot_bytes, vir_bytes frame_len,
-		       int sep_id, Dev_t st_dev, ino_t st_ino, time_t st_ctime,
+		       int sep_id, dev_t st_dev, ino_t st_ino, time_t st_ctime,
 		       char *progname, int new_uid, int new_gid, vir_bytes *stack_topp,
 		       int *load_textp, int *allow_setuidp, vir_bytes entry_point);
 static int exec_restart(int proc_e, int result);

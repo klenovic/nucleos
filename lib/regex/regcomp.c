@@ -826,7 +826,7 @@ register cset *cs;
 	register char *u;
 	register char c;
 
-	while (MORE() && isalpha(PEEK()))
+	while (MORE() && isalpha((int)PEEK()))
 		NEXT();
 	len = p->next - sp;
 	for (cp = cclasses; cp->name != NULL; cp++)

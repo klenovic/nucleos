@@ -48,8 +48,8 @@
 #define offset_high	m2_l2
  
 static int common_open(int oflags, mode_t omode);
-static int create_open(_mnx_Mode_t omode, int excl, struct vnode **vpp, int *created);
-static int exists_open(struct vnode *vp, _mnx_Mode_t bits, int oflags);
+static int create_open(mode_t omode, int excl, struct vnode **vpp, int *created);
+static int exists_open(struct vnode *vp, mode_t bits, int oflags);
 static int pipe_open(struct vnode *vp,mode_t bits,int oflags);
 
 /*===========================================================================*

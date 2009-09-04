@@ -28,7 +28,7 @@ struct passwd {
 
 /* Function Prototypes. */
 struct passwd *getpwnam(const char *_name);
-struct passwd *getpwuid(_mnx_Uid_t _uid);
+struct passwd *getpwuid(uid_t _uid);
 
 void endpwent(void);
 struct passwd *getpwent(void);

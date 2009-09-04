@@ -147,11 +147,11 @@ int __ivaliduser(FILE *hostf, unsigned long raddr,
 	i = 0;
 	p = buf;
 	for (;;) {
-	    while (isspace(*p)) *p++ = '\0';
+	    while (isspace((int)*p)) *p++ = '\0';
 	    if (*p == '\0') break;
 	    if (i < 2) word[i] = p;
 	    i++;
-	    while (*p != '\0' && !isspace(*p)) p++;
+	    while (*p != '\0' && !isspace((int)*p)) p++;
 	}
 	if (i != 1 && i != 2) continue;
 	if (word[0][0] == '#') continue;

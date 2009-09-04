@@ -30,7 +30,7 @@ static char *get_value(const char *params, const char *key);
  * @param parmoff  boot parameters offset
  * @param parmsize  boot parameters length
  */
-void cstart(U16_t cs, U16_t ds, U16_t mds, U16_t parmoff, U16_t parmsize)
+void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 {
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by MINIX' loader.

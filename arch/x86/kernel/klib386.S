@@ -134,7 +134,7 @@ csinit:
 //===========================================================================
 //                             phys_insw
 //===========================================================================
-// void phys_insw(Port_t port, phys_bytes buf, size_t count);
+// void phys_insw(port_t port, phys_bytes buf, size_t count);
 // Input an array from an I/O port.  Absolute address version of insw().
 .globl phys_insw      // transfer data from (disk controller) port to memory
 phys_insw:
@@ -162,7 +162,7 @@ phys_insw:
 //===========================================================================
 //                             phys_insb
 //===========================================================================
-// void phys_insb(Port_t port, phys_bytes buf, size_t count);
+// void phys_insb(port_t port, phys_bytes buf, size_t count);
 // Input an array from an I/O port.  Absolute address version of insb().
 .globl phys_insb      // likewise byte by byte
 phys_insb:
@@ -189,7 +189,7 @@ phys_insb:
 //===========================================================================
 //                             phys_outsw
 //===========================================================================
-// void phys_outsw(Port_t port, phys_bytes buf, size_t count);
+// void phys_outsw(port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsw().
         .p2align 4
 .globl phys_outsw     // transfer data from memory to (disk controller) port
@@ -218,7 +218,7 @@ phys_outsw:
 //===========================================================================
 //                             phys_outsb
 //===========================================================================
-// void phys_outsb(Port_t port, phys_bytes buf, size_t count);
+// void phys_outsb(port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsb().
         .p2align 4
 .globl phys_outsb     // likewise byte by byte
@@ -420,7 +420,7 @@ fill_done:
 //===========================================================================
 //                             mem_rdw
 //===========================================================================
-// u16_t mem_rdw(U16_t segment, u16_t *offset);
+// u16_t mem_rdw(u16 segment, u16_t *offset);
 // Load and return word at far pointer segment:offset.
         .p2align 4
 .globl mem_rdw        // copy one word from [segment:offset]

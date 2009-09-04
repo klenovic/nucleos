@@ -13,7 +13,7 @@
 
 int creat(name, mode)
 const char *name;
-_mnx_Mode_t mode;
+mode_t mode;
 {
   message m;
 

@@ -414,7 +414,7 @@ int do_umount()
  *                              unmount                                      *
  *===========================================================================*/
 int unmount(dev)
-Dev_t dev;
+dev_t dev;
 {
   struct vnode *vp, *vi;
   struct vmnt *vmp_i = NULL, *vmp = NULL;

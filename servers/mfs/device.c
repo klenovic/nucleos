@@ -32,7 +32,7 @@ static int dummyproc;
 static int safe_io_conversion(endpoint_t, cp_grant_id_t *, int *, cp_grant_id_t *,
 			      int, endpoint_t *, void **, int *, vir_bytes);
 static void safe_io_cleanup(cp_grant_id_t, cp_grant_id_t *, int);
-static int gen_opcl(endpoint_t driver_e, int op, Dev_t dev, int proc_e, int flags);
+static int gen_opcl(endpoint_t driver_e, int op, dev_t dev, int proc_e, int flags);
 static int gen_io(int task_nr, message *mess_ptr);
 
 /*===========================================================================*

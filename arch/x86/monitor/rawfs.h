@@ -40,7 +40,7 @@
 #define ROOT_INO        ((ino_t) 1)     /* Inode nr of root dir. */
 
 off_t r_super(int *);
-void r_stat(Ino_t file, struct stat *stp);
+void r_stat(ino_t file, struct stat *stp);
 off_t r_vir2abs(off_t virblockno);
 ino_t r_readdir(char *name);
-ino_t r_lookup(Ino_t cwd, char *path);
+ino_t r_lookup(ino_t cwd, char *path);

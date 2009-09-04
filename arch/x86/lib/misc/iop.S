@@ -12,7 +12,7 @@
 .section .text
 
 //       inb() - Input one byte
-//       unsigned inb(U16_t port);
+//       unsigned inb(u16 port);
 .globl inb
 inb:
         push    %ebp
@@ -24,7 +24,7 @@ inb:
         ret
 
 //       inl() - Input one dword
-//       unsigned inl(U16_t port);
+//       unsigned inl(u16 port);
 .globl inl
 inl:
         push    %ebp
@@ -35,7 +35,7 @@ inl:
         ret
 
 //       insb() - Input a byte array
-//       void insb(U16_t port, void *buf, size_t count);
+//       void insb(u16 port, void *buf, size_t count);
 .globl insb
 insb:
         push    %ebp
@@ -51,7 +51,7 @@ insb:
         ret
 
 //       insl() - Input a dword array
-//       void insl(U16_t port, void *buf, size_t count);
+//       void insl(u16 port, void *buf, size_t count);
 .globl insl
 insl:
         push    %ebp
@@ -68,7 +68,7 @@ insl:
         ret
 
 //       insw() - Input a word array
-//       void insw(U16_t port, void *buf, size_t count);
+//       void insw(u16 port, void *buf, size_t count);
 .globl insw
 insw:
         push    %ebp
@@ -98,7 +98,7 @@ intr_enable:
         ret
 
 //       inw() - Input one word
-//       unsigned inw(U16_t port);
+//       unsigned inw(u16 port);
 .globl inw
 inw:
         push    %ebp
@@ -110,7 +110,7 @@ inw:
         ret
 
 //       outb() - Output one byte
-//       void outb(U16_t port, U8_t value);
+//       void outb(u16 port, u8 value);
 .globl outb
 outb:
         push    %ebp
@@ -122,7 +122,7 @@ outb:
         ret
 
 //       outl() - Output one dword
-//       void outl(U16_t port, u32_t value);
+//       void outl(u16 port, u32_t value);
 .globl outl
 outl:
         push    %ebp
@@ -134,7 +134,7 @@ outl:
         ret
 
 //       outsb() - Output a byte array
-//       void outsb(U16_t port, void *buf, size_t count);
+//       void outsb(u16 port, void *buf, size_t count);
 .globl outsb
 outsb:
         push    %ebp
@@ -150,7 +150,7 @@ outsb:
         ret
 
 //       outsl() - Output a dword array
-//       void outsl(U16_t port, void *buf, size_t count);
+//       void outsl(u16 port, void *buf, size_t count);
 .globl outsl
 outsl:
         push    %ebp
@@ -167,7 +167,7 @@ outsl:
         ret
 
 //       outsw() - Output a word array
-//       void outsw(U16_t port, void *buf, size_t count);
+//       void outsw(u16 port, void *buf, size_t count);
 .globl outsw
 outsw:
         push    %ebp
@@ -184,7 +184,7 @@ outsw:
         ret
 
 //       outw() - Output one word
-//       void outw(U16_t port, U16_t value);
+//       void outw(u16 port, u16 value);
 .globl outw
 outw:
         push    %ebp

@@ -315,7 +315,7 @@ getlong(msgp)
 
 void
 putshort(s, msgp)
-	register U16_t s;
+	register u16 s;
 	register u8_t *msgp;
 {
 

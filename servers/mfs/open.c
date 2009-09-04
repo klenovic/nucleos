@@ -122,7 +122,7 @@ printf("MFS(%d) get_inode by open() failed\n", SELF_E);
 	     	   case I_CHAR_SPECIAL:
      		   case I_BLOCK_SPECIAL:
                         /* Send back the device number */
-			fs_m_out.RES_DEV = (Dev_t) rip->i_zone[0];
+			fs_m_out.RES_DEV = (dev_t) rip->i_zone[0];
 			break;
                         
                    case I_NAMED_PIPE:

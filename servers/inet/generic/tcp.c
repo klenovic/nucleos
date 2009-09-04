@@ -46,15 +46,15 @@ static int tcp_connect(tcp_fd_t *tcp_fd);
 static int tcp_listen(tcp_fd_t *tcp_fd, int do_listenq);
 static int tcp_acceptto(tcp_fd_t *tcp_fd);
 static tcpport_t find_unused_port(int fd);
-static int is_unused_port(Tcpport_t port);
+static int is_unused_port(tcpport_t port);
 static int reply_thr_put(tcp_fd_t *tcp_fd, int reply, int for_ioctl);
 static void reply_thr_get(tcp_fd_t *tcp_fd, int reply, int for_ioctl);
-static tcp_conn_t *find_conn_entry(Tcpport_t locport, ipaddr_t locaddr, Tcpport_t remport,
+static tcp_conn_t *find_conn_entry(tcpport_t locport, ipaddr_t locaddr, tcpport_t remport,
 				   ipaddr_t readaddr);
 static tcp_conn_t *find_empty_conn(void);
 static tcp_conn_t *find_best_conn(ip_hdr_t *ip_hdr, tcp_hdr_t *tcp_hdr);
 static tcp_conn_t *new_conn_for_queue(tcp_fd_t *tcp_fd);
-static int maybe_listen(ipaddr_t locaddr, Tcpport_t locport, ipaddr_t remaddr, Tcpport_t remport);
+static int maybe_listen(ipaddr_t locaddr, tcpport_t locport, ipaddr_t remaddr, tcpport_t remport);
 static int tcp_su4connect(tcp_fd_t *tcp_fd);
 static void tcp_buffree(int priority);
 #ifdef BUF_CONSISTENCY_CHECK

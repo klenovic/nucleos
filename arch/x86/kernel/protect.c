@@ -88,7 +88,7 @@ void enable_iop(struct proc *pp)
 /*===========================================================================*
  *				seg2phys				     *
  *===========================================================================*/
-phys_bytes seg2phys(U16_t seg)
+phys_bytes seg2phys(u16 seg)
 {
 /* Return the base address of a segment, with seg being a 
  * register, or a 286/386 segment selector.

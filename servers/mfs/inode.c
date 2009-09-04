@@ -123,7 +123,7 @@ int fs_getnode()
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_MODE = rip->i_mode;
   fs_m_out.RES_FILE_SIZE = rip->i_size;
-  fs_m_out.RES_DEV = (Dev_t) rip->i_zone[0];
+  fs_m_out.RES_DEV = (dev_t) rip->i_zone[0];
   fs_m_out.RES_UID = rip->i_uid;
   fs_m_out.RES_GID = rip->i_gid;
 

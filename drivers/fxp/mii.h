@@ -117,5 +117,5 @@ Definitions for the Media Independent (Ethernet) Interface
 #define		MII_ESTAT_RES		0x0FFF	/* Reserved */
 /* 0x10 ... 0x1F */		/* Vendor Specific */
 
-void mii_print_stat_speed(U16_t stat, U16_t extstat);
-void mii_print_techab(U16_t techab);
+void mii_print_stat_speed(u16 stat, u16 extstat);
+void mii_print_techab(u16 techab);

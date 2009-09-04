@@ -86,6 +86,6 @@ void ipr_redirect(int port_nr, ipaddr_t dest, ipaddr_t subnetmask, ipaddr_t old_
 		  ipaddr_t new_gateway, time_t timeout);
 void ipr_destunrch(int port_nr, ipaddr_t dest, ipaddr_t subnetmask, time_t timeout);
 void ipr_ttl_exc(int port_nr, ipaddr_t dest, ipaddr_t subnetmask, time_t timeout);
-void ipr_mtu(int port_nr, ipaddr_t dest, U16_t mtu, time_t timeout);
+void ipr_mtu(int port_nr, ipaddr_t dest, u16 mtu, time_t timeout);
 
 #endif /* IPR_H */

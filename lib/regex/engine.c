@@ -562,8 +562,8 @@ sopno lev;			/* PLUS nesting level */
 					(sp < m->endp && *(sp-1) == '\n' &&
 						(m->g->cflags&REG_NEWLINE)) ||
 					(sp > m->beginp &&
-							!ISWORD(*(sp-1))) ) &&
-					(sp < m->endp && ISWORD(*sp)) )
+							!ISWORD((int)*(sp-1))) ) &&
+					(sp < m->endp && ISWORD((int)*sp)) )
 				{ /* yes */ }
 			else
 				return(NULL);
@@ -572,8 +572,8 @@ sopno lev;			/* PLUS nesting level */
 			if (( (sp == m->endp && !(m->eflags&REG_NOTEOL)) ||
 					(sp < m->endp && *sp == '\n' &&
 						(m->g->cflags&REG_NEWLINE)) ||
-					(sp < m->endp && !ISWORD(*sp)) ) &&
-					(sp > m->beginp && ISWORD(*(sp-1))) )
+					(sp < m->endp && !ISWORD((int)*sp)) ) &&
+					(sp > m->beginp && ISWORD((int)*(sp-1))) )
 				{ /* yes */ }
 			else
 				return(NULL);

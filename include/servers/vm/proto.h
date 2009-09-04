@@ -60,7 +60,7 @@ void free_proc(struct vmproc *vmp);
 int do_fork(message *msg);
 
 /* exec.c */
-struct vmproc *find_share(struct vmproc *vmp_ign, ino_t ino, Dev_t dev, time_t ctime);
+struct vmproc *find_share(struct vmproc *vmp_ign, ino_t ino, dev_t dev, time_t ctime);
 int do_exec_newmem(message *msg);
 int proc_new(struct vmproc *vmp, phys_bytes start, phys_bytes text, phys_bytes data,
 	     phys_bytes stack, phys_bytes gap, phys_bytes text_here, phys_bytes data_here,

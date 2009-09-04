@@ -14,13 +14,13 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 */
 
 /* tempory functions: to be replaced later (see pci_intel.h) */
-unsigned pci_inb(U16_t port);
-unsigned pci_inw(U16_t port);
-unsigned pci_inl(U16_t port);
+unsigned pci_inb(u16 port);
+unsigned pci_inw(u16 port);
+unsigned pci_inl(u16 port);
 
-void pci_outb(U16_t port, U8_t value);
-void pci_outw(U16_t port, U16_t value);
-void pci_outl(U16_t port, U32_t value);
+void pci_outb(u16 port, u8 value);
+void pci_outw(u16 port, u16 value);
+void pci_outl(u16 port, u32 value);
 
 struct pci_vendor
 {

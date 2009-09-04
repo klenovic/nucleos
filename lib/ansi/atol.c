@@ -23,7 +23,7 @@ atol(register const char *nptr)
 	long total = 0;
 	int minus = 0;
 
-	while (isspace(*nptr)) nptr++;
+	while (isspace((int)*nptr)) nptr++;
 	if (*nptr == '+') nptr++;
 	else if (*nptr == '-') {
 		minus = 1;
