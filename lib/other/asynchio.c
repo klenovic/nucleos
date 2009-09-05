@@ -24,7 +24,7 @@
 #define write	_write
 #include <lib.h>
 #include <time.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <sys/asynchio.h>
 #include <stdlib.h>
 #include <unistd.h>

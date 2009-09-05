@@ -14,8 +14,8 @@
 
 #include <nucleos/drivers.h>
 #include <nucleos/driver_asyn.h>
-#include <sys/ioc_memory.h>
 #include <nucleos/type.h>
+#include <asm/ioctls.h>
 
 #include "assert.h"
 #include "random.h"

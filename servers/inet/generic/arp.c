@@ -12,6 +12,7 @@ arp.c
 
 Copyright 1995 Philip Homburg
 */
+#include <asm/ioctls.h>
 
 #include "../inet.h"
 #include "type.h"

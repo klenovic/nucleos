@@ -16,7 +16,7 @@
  * sgtty.h for tty functions, and ioctl replaced code should be moved to
  * sys/ioctl.h and specific header files in the sys, or minix directory.
  */
-#include <sys/ioctl.h>		/* Ouch. */
+#include <nucleos/ioctl.h>		/* Ouch. */
 
 struct sgttyb {
   char sg_ispeed;		/* input speed */

@@ -49,13 +49,10 @@
  *		(only audio playback) (Peter Boonstoppel)
  *  May 20 1995	    SB16 Driver: Michel R. Prevenier 
  */
-
-
 #include "audio_fw.h"
 #include <servers/vm/vm.h>
 #include <servers/ds/ds.h>
 #include <asm/servers/vm/vm.h>
-
 
 static int msg_open(int minor_dev_nr);
 static int msg_close(int minor_dev_nr);

@@ -15,7 +15,6 @@
  *	fcntl(fd, cmd [,arg])		get or set file attributes
  * 
  */
-
 #ifndef __ASM_GENERIC_FCNTL_H
 #define __ASM_GENERIC_FCNTL_H
 

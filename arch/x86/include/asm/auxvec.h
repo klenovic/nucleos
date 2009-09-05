@@ -7,18 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*	sys/ioc_tape.h - Magnetic Tape ioctl() command codes.
- *							Author: Kees J. Bot
- *								23 Nov 2002
- *
+#ifndef __ASM_X86_AUXVEC_H
+#define __ASM_X86_AUXVEC_H
+/*
+ * Architecture-neutral AT_ values in 0-17, leave some room
+ * for more of them, start the x86-specific ones at 32.
  */
 
-#ifndef _S_I_TAPE_H
-#define _S_I_TAPE_H
-
-#include <nucleos/ioctl.h>
-
-#define MTIOCTOP	_IOW('M', 1, struct mtop)
-#define MTIOCGET	_IOR('M', 2, struct mtget)
-
-#endif /* _S_I_TAPE_H */
+#endif /* __ASM_X86_AUXVEC_H */

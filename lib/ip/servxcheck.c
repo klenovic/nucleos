@@ -24,7 +24,7 @@
 #include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <time.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <net/hton.h>
 #include <net/gen/in.h>
 #include <net/gen/tcp.h>

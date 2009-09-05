@@ -16,7 +16,7 @@
  */
 
 #include <nucleos/drivers.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <sys/kbdio.h>
 #include <nucleos/time.h>
 #include <termios.h>
@@ -25,6 +25,9 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
+
+#include <asm/ioctls.h>
+
 #include "tty.h"
 
 u16_t keymap[NR_SCAN_CODES * MAP_COLS] = {

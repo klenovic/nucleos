@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _S_I_DISK_H
-#define _S_I_DISK_H
+#ifndef __ASM_GENERIC_IOCTLS_DISK_H
+#define __ASM_GENERIC_IOCTLS_DISK_H
 
 #include <nucleos/ioctl.h>
 
@@ -23,4 +23,4 @@
 #define DIOCTIMEOUT	_IORW('d', 6, int)
 #define DIOCOPENCT	_IOR('d', 7, int)
 
-#endif /* _S_I_DISK_H */
+#endif /* __ASM_GENERIC_IOCTLS_DISK_H */

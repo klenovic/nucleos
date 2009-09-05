@@ -17,8 +17,9 @@ Created:	June 11, 1993 by Philip Homburg
 #define ioctl _ioctl
 #include <nucleos/errno.h>
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <nucleos/types.h>
+#include <asm/ioctls.h>
 
 int tcsetattr(fd, opt_actions, termios_p)
 int fd;

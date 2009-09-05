@@ -23,11 +23,10 @@ Copyright 1995 Philip Homburg
 #include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <unistd.h>
-#include <sys/ioc_file.h>
 #include <nucleos/time.h>
 #include <nucleos/type.h>
+#include <asm/ioctls.h>
 
 typedef int ioreq_t;
 

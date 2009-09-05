@@ -7,12 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/**
- * @file arch/x86/include/asm/page_32.h
- * @brief
- * @details
+/*	sys/ioc_scsi.h - SCSI ioctl() command codes.	Author: Kees J. Bot
+ *								23 Nov 2002
+ *
  */
-#ifndef __ASM_X86_PAGE_32_H
-#define __ASM_X86_PAGE_32_H
+#ifndef __ASM_GENERIC_IOCTLS_SCSI_H
+#define __ASM_GENERIC_IOCTLS_SCSI_H
 
-#endif /* !__ASM_X86_PAGE_32_H */
+#include <nucleos/ioctl.h>
+
+#define SCIOCCMD	_IOW('S', 1, struct scsicmd)
+
+#endif /* __ASM_GENERIC_IOCTLS_SCSI_H */

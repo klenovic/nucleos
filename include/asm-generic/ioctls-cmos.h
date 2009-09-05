@@ -7,14 +7,18 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*	sys/ioc_file.h - File ioctl() command codes.
+/*	sys/ioc_cmos.h - CMOS ioctl() command codes.
  */
 
-#ifndef _SYS_IOC_FILE_H
-#define _SYS_IOC_FILE_H
+#ifndef __ASM_GENERIC_IOCTLS_CMOS_H
+#define __ASM_GENERIC_IOCTLS_CMOS_H
 
 #include <nucleos/ioctl.h>
 
-#define FIONREAD	_IOR('f', 1, int)
+#define CIOCGETTIME	_IOR('c', 1, struct tm)
+#define CIOCGETTIMEY2K	_IOR('c', 2, struct tm)
+#define CIOCSETTIME	_IOW('c', 3, u32_t)
+#define CIOCSETTIMEY2K	_IOW('c', 4, u32_t)
 
-#endif /* _SYS_IOC_FILE_H */
+#endif /* __ASM_GENERIC_IOCTLS_CMOS_H */
+

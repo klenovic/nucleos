@@ -16,7 +16,8 @@ Created:	July 26, 1994 by Philip Homburg
 #define tcdrain _tcdrain
 #define ioctl _ioctl
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
+#include <asm/ioctls.h>
 
 int tcdrain(fd)
 int fd;

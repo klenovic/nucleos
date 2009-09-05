@@ -10,7 +10,7 @@
 #include <lib.h>
 #define ioctl	_ioctl
 #include <nucleos/com.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 
 int ioctl(fd, request, data)
 int fd;

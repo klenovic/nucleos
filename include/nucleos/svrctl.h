@@ -13,33 +13,15 @@ sys/svrctl.h
 Created:	Feb 15, 1994 by Philip Homburg <philip@cs.vu.nl>
 */
 
-#ifndef _SYS__SVRCTL_H
-#define _SYS__SVRCTL_H
+#ifndef __NUCLEOS_SVRCTL_H
+#define __NUCLEOS_SVRCTL_H
 
 #include <nucleos/types.h>
-
-/* Server control commands have the same encoding as the commands for ioctls. */
-#include <nucleos/ioctl.h>
-
-/* MM controls. */
-#define MMSIGNON	_IO ('M',  4)
-#define MMSWAPON	_IOW('M',  5, struct mmswapon)
-#define MMSWAPOFF	_IO ('M',  6)
-#define MMGETPARAM	_IOW('M',  5, struct sysgetenv)
-#define MMSETPARAM	_IOR('M',  7, struct sysgetenv)
-
-/* FS controls. */
-#define FSSIGNON	_IOW('F',  2, struct fssignon)
-#define FSDEVUNMAP	_IOW('F',  6, struct fsdevunmap)
-
-/* Kernel controls. */
-#define SYSSENDMASK	_IO ('S',  4)
-#define SYSSIGNON	_IOR('S',  2, struct systaskinfo)
-#define SYSGETENV	_IOW('S',  1, struct sysgetenv)
+#include <asm/svrctl.h>
 
 struct mmswapon {
-	u32_t		offset;		/* Starting offset within file. */
-	u32_t		size;		/* Size of swap area. */
+	__u32		offset;		/* Starting offset within file. */
+	__u32		size;		/* Size of swap area. */
 	char		file[128];	/* Name of swap file/device. */
 };
 
@@ -52,6 +34,7 @@ struct svrqueryparam {
 
 /* A proper system call must be created later. */
 #include <nucleos/dmap.h>
+
 struct fssignon {
 	dev_t		dev;		/* Device to manage. */
 	enum dev_style	style;		/* Management style. */
@@ -74,4 +57,4 @@ struct sysgetenv {
 
 int svrctl(int _request, void *_data);
 
-#endif /* _SYS__SVRCTL_H */
+#endif /* __NUCLEOS_SVRCTL_H */

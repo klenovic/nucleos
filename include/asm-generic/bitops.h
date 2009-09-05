@@ -20,7 +20,6 @@
 
 #include <nucleos/compiler.h>
 
-
 #include <asm-generic/bitops/fls.h>
 
 #ifndef __NUCLEOS_BITOPS_H

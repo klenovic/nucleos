@@ -50,7 +50,7 @@
 
 #include "inet.h"
 
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
 #include <nucleos/callnr.h>
 
 #include "mq.h"

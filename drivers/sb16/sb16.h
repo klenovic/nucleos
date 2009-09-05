@@ -11,9 +11,8 @@
 #define SB16_H
 
 #include <nucleos/drivers.h>
-#include <sys/ioc_sound.h>
 #include <nucleos/sound.h>
-
+#include <asm/ioctls.h>
 
 #define SB_TIMEOUT		32000   /* timeout count */
 

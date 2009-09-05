@@ -19,7 +19,8 @@ Copy a device or file specified as argument to /dev/ram
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
+#include <asm/ioctls.h>
 
 #define RAM	"/dev/ram"
 

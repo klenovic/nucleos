@@ -27,7 +27,7 @@
 
 #include <nucleos/drivers.h>
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <servers/vm/vm.h>
 #include <sys/video.h>
 #include <sys/mman.h>
@@ -35,6 +35,9 @@
 #include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
+
+#include <asm/ioctls.h>
+
 #include "tty.h"
 
 /* Set this to 1 if you want console output duplicated on the first

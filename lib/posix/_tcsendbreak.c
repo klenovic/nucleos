@@ -13,7 +13,8 @@
 #define tcsendbreak _tcsendbreak
 #define ioctl _ioctl
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
+#include <asm/ioctls.h>
 
 int tcsendbreak(int fd, int duration)
 {

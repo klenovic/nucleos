@@ -9,12 +9,14 @@
  */
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <sys/socket.h>
 
 #include <net/gen/in.h>
 #include <net/gen/tcp.h>
 #include <net/gen/tcp_io.h>
+
+#include <asm/ioctls.h>
 
 #define DEBUG 1
 

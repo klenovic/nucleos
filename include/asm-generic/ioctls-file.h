@@ -7,12 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/**
- * @file arch/x86/include/asm/page_32.h
- * @brief
- * @details
+/*	sys/ioc_file.h - File ioctl() command codes.
  */
-#ifndef __ASM_X86_PAGE_32_H
-#define __ASM_X86_PAGE_32_H
 
-#endif /* !__ASM_X86_PAGE_32_H */
+#ifndef __ASM_GENERIC_IOCTLS_FILE_H
+#define __ASM_GENERIC_IOCTLS_FILE_H
+
+#include <nucleos/ioctl.h>
+
+#define FIONREAD	_IOR('f', 1, int)
+
+#endif /* __ASM_GENERIC_IOCTLS_FILE_H */

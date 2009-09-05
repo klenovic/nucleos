@@ -45,10 +45,8 @@
  *
  *   driver_task:	called by the device dependent task entry
  */
-
-
 #include <nucleos/drivers.h>
-#include <sys/ioc_disk.h>
+#include <asm/ioctls.h>
 #include <nucleos/mq.h>
 #include <nucleos/driver_asyn.h>
 

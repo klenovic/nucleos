@@ -64,8 +64,7 @@
 #include <servers/ds/ds.h>
 
 #include "lance.h"
-
-#include <sys/ioc_memory.h>
+#include <asm/ioctls.h>
 
 static ether_card_t ec_table[EC_PORT_NR_MAX];
 static int eth_tasknr= ANY;

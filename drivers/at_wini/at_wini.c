@@ -29,9 +29,9 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/type.h>
-#include <sys/ioc_disk.h>
 #include <ibm/pci.h>
 #include <sys/mman.h>
+#include <asm/ioctls.h>
 
 #define ATAPI_DEBUG	    0	/* To debug ATAPI code. */
 

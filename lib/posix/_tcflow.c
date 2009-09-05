@@ -16,7 +16,8 @@ Created:	June 8, 1993 by Philip Homburg
 #define tcflow _tcflow
 #define ioctl _ioctl
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
+#include <asm/ioctls.h>
 
 int tcflow(fd, action)
 int fd;

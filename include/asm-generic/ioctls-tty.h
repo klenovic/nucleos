@@ -13,8 +13,8 @@
  *
  */
 
-#ifndef _S_I_TTY_H
-#define _S_I_TTY_H
+#ifndef __ASM_GENERIC_IOCTLS_TTY_H
+#define __ASM_GENERIC_IOCTLS_TTY_H
 
 #include <nucleos/ioctl.h>
 
@@ -49,4 +49,4 @@
 #define TIOCMAPMEM	_IORW('v', 1, struct mapreqvm)
 #define TIOCUNMAPMEM	_IORW('v', 2, struct mapreqvm)
 
-#endif /* _S_I_TTY_H */
+#endif /* __ASM_GENERIC_IOCTLS_TTY_H */

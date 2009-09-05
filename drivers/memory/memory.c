@@ -26,7 +26,7 @@
 #include <asm/bootparam.h>
 #include <nucleos/drivers.h>
 #include <nucleos/driver.h>
-#include <sys/ioc_memory.h>
+#include <asm/ioctls.h>
 #include <env.h>
 #include <servers/ds/ds.h>
 #include <nucleos/vm.h>

@@ -67,14 +67,15 @@
 #include <nucleos/nucleos.h>
 #include <nucleos/drivers.h>
 #include <termios.h>
-#include <sys/ioc_tty.h>
 #include <signal.h>
 #include <nucleos/callnr.h>
 #include <nucleos/tty.h>
 #include <nucleos/keymap.h>
-#include "tty.h"
-
 #include <nucleos/time.h>
+
+#include <asm/ioctls.h>
+
+#include "tty.h"
 
 extern int irq_hook_id;
 

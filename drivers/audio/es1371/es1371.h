@@ -13,9 +13,8 @@
 
 #include <nucleos/types.h>
 #include <nucleos/drivers.h>
-#include <sys/ioc_sound.h>
 #include <nucleos/sound.h>
-
+#include <asm/ioctls.h>
 
 /* set your vendor and device ID's here */
 #define VENDOR_ID				0x1274

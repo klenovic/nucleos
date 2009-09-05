@@ -27,7 +27,7 @@
  */
 #include <nucleos/types.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <ctype.h>
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
@@ -44,6 +44,8 @@
 #include <net/gen/tcp_io.h>
 #include <net/hton.h>
 #include <net/netlib.h>
+
+#include <asm/ioctls.h>
 
 #define MAXHOSTNAMELEN	256
 #define MAXPATHLEN PATH_MAX

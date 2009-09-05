@@ -59,7 +59,7 @@
 #include <nucleos/fcntl.h>
 #include <unistd.h>
 #include <syslog.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <net/netlib.h>
 #include <net/hton.h>
 #include <net/gen/in.h>
@@ -68,6 +68,7 @@
 #include <net/gen/netdb.h>
 #include <nucleos/errno.h>
 #include <net/gen/inet.h>
+#include <asm/ioctls.h>
 
 static int LogPid = (-1);
 static int nfd = (-1);

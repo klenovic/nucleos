@@ -18,7 +18,7 @@ Created:	June 1995 by Philip Homburg <philip@f-mnx.phicoh.com>
 #include "inet.h"
 #include "generic/assert.h"
 
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
 #include "queryparam.h"
 
 #include "generic/buf.h"

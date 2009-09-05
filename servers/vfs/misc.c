@@ -39,7 +39,8 @@
 #include <nucleos/time.h>
 #include <nucleos/types.h>
 #include <sys/ptrace.h>
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
+#include <asm/ioctls.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"

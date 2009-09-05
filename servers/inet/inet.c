@@ -56,7 +56,7 @@ from DL_ETH:
 #include <nucleos/fcntl.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
 #include <servers/ds/ds.h>
 
 #include "mq.h"

@@ -13,7 +13,8 @@
 #define tcflush _tcflush
 #define ioctl _ioctl
 #include <termios.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
+#include <asm/ioctls.h>
 
 int tcflush(int fd, int queue_selector)
 {

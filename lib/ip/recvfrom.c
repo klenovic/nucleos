@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -25,6 +25,8 @@
 #include <net/gen/udp.h>
 #include <net/gen/udp_hdr.h>
 #include <net/gen/udp_io.h>
+
+#include <asm/ioctls.h>
 
 #define DEBUG 0
 

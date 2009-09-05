@@ -6,10 +6,22 @@ header-y += bitsperlong.h
 header-y += errno-base.h
 # ok
 header-y += errno.h
-
+# ok
 header-y += fcntl.h 
+# ok
 header-y += ioctl.h
+
 header-y += ioctls.h
+header-y += ioctls-cmos.h
+header-y += ioctls-disk.h
+header-y += ioctls-file.h
+header-y += ioctls-memory.h
+header-y += ioctls-scsi.h
+header-y += ioctls-sound.h
+header-y += ioctls-svrctl.h
+header-y += ioctls-tape.h
+header-y += ioctls-tty.h
+
 header-y += ipcbuf.h
 header-y += mman-common.h
 header-y += mman.h

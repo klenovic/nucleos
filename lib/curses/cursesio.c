@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <termcap.h>
 #include <nucleos/types.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <curses.h>
 #include "curspriv.h"
 

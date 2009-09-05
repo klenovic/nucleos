@@ -10,9 +10,8 @@
 #ifndef AUDIO_FW_H
 #define AUDIO_FW_H
 
-#include <nucleos//drivers.h>
-#include <sys/ioc_sound.h>
-
+#include <nucleos/drivers.h>
+#include <asm/ioctls.h>
 
 /* change to DEBUG to 1 to print debug info and error messages */
 

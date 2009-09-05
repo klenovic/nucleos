@@ -7,18 +7,18 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*	sys/ioc_cmos.h - CMOS ioctl() command codes.
+/*	sys/ioc_tape.h - Magnetic Tape ioctl() command codes.
+ *							Author: Kees J. Bot
+ *								23 Nov 2002
+ *
  */
 
-#ifndef _S_I_CMOS_H
-#define _S_I_CMOS_H
+#ifndef __ASM_GENERIC_IOCTLS_TAPE_H
+#define __ASM_GENERIC_IOCTLS_TAPE_H
 
 #include <nucleos/ioctl.h>
 
-#define CIOCGETTIME	_IOR('c', 1, struct tm)
-#define CIOCGETTIMEY2K	_IOR('c', 2, struct tm)
-#define CIOCSETTIME	_IOW('c', 3, u32_t)
-#define CIOCSETTIMEY2K	_IOW('c', 4, u32_t)
+#define MTIOCTOP	_IOW('M', 1, struct mtop)
+#define MTIOCGET	_IOR('M', 2, struct mtget)
 
-#endif /* _S_I_CMOS_H */
-
+#endif /* __ASM_GENERIC_IOCTLS_TAPE_H */

@@ -90,9 +90,10 @@
 #include <nucleos/fcntl.h>
 #include <assert.h>
 #include <unistd.h>
-#include <sys/ioc_memory.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
+
+#include <asm/ioctls.h>
 
 #define tmra_ut			timer_t
 #define tmra_inittimer(tp)	tmr_inittimer(tp)

@@ -26,7 +26,7 @@
 #include <nucleos/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
 #include <ttyent.h>
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
@@ -37,6 +37,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <utmp.h>
+
+#include <asm/ioctls.h>
 
 /* Command to execute as a response to the three finger salute. */
 char *REBOOT_CMD[] =    { "shutdown", "now", "CTRL-ALT-DEL", NULL };

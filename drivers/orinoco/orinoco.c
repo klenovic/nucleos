@@ -62,19 +62,19 @@
  *
  */
 
-#include 	<nucleos/drivers.h>
-#include	<string.h>
-#include 	<nucleos/stddef.h>
-#include	<nucleos/keymap.h>
-#include	<nucleos/syslib.h>
-#include	<nucleos/type.h>
-#include	<nucleos/sysutil.h>
-#include	<timers.h>
-#include 	<sys/ioc_memory.h>
-#include	<ibm/pci.h>
-#include 	<servers/ds/ds.h>
-#include	<kernel/const.h>
-#include	<kernel/type.h>
+#include <nucleos/drivers.h>
+#include <string.h>
+#include <nucleos/stddef.h>
+#include <nucleos/keymap.h>
+#include <nucleos/syslib.h>
+#include <nucleos/type.h>
+#include <nucleos/sysutil.h>
+#include <timers.h>
+#include <asm/ioctls.h>
+#include <ibm/pci.h>
+#include <servers/ds/ds.h>
+#include <kernel/const.h>
+#include <kernel/type.h>
 
 #define		tmra_ut			timer_t
 #define		tmra_inittimer(tp)	tmr_inittimer(tp)
@@ -94,23 +94,23 @@ static struct pcitab {
 
 static tmra_ut or_watchdog;
 
-#include 	<stdio.h>
-#include	<stdlib.h>
-#include	<nucleos/com.h>
-#include	<nucleos/portio.h>
-#include	<net/hton.h>
-#include	<net/gen/ether.h>
-#include	<net/gen/eth_io.h>
-#include	<asm/servers/vm/vm.h>
-#include	<nucleos/types.h>
-#include	<nucleos/fcntl.h>
-#include 	<unistd.h>
-#include	<nucleos/errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <nucleos/com.h>
+#include <nucleos/portio.h>
+#include <net/hton.h>
+#include <net/gen/ether.h>
+#include <net/gen/eth_io.h>
+#include <asm/servers/vm/vm.h>
+#include <nucleos/types.h>
+#include <nucleos/fcntl.h>
+#include <unistd.h>
+#include <nucleos/errno.h>
 
-#include	"assert.h"
-#include	"hermes.h"
-#include	"hermes_rid.h"
-#include	"orinoco.h"
+#include "assert.h"
+#include "hermes.h"
+#include "hermes_rid.h"
+#include "orinoco.h"
 
 #define 	ERR -1
 

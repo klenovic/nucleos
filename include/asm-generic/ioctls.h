@@ -13,23 +13,23 @@
  * This header file includes all other ioctl command code headers.
  */
 
-#ifndef _S_IOCTL_H
-#define _S_IOCTL_H
+#ifndef __ASM_GENERIC_IOCTLS_H
+#define __ASM_GENERIC_IOCTLS_H
 
 /* A driver that uses ioctls claims a character for its series of commands.
  * For instance:  #define TCGETS  _IOR('T',  8, struct termios)
  * This is a terminal ioctl that uses the character 'T'.  The character(s)
  * used in each header file are shown in the comment following.
  */
+#include <asm-generic/ioctls-tty.h>	/* 'T' 't' 'k'		*/
+#include <net/ioctl.h>			/* 'n'			*/
+#include <asm-generic/ioctls-disk.h>	/* 'd'			*/
+#include <asm-generic/ioctls-file.h>	/* 'f'			*/
+#include <asm-generic/ioctls-memory.h>	/* 'm'			*/
+#include <asm-generic/ioctls-cmos.h>	/* 'c'			*/
+#include <asm-generic/ioctls-tape.h>	/* 'M'			*/
+#include <asm-generic/ioctls-scsi.h>	/* 'S'			*/
+#include <asm-generic/ioctls-sound.h>	/* 's'			*/
+#include <asm-generic/ioctls-svrctl.h>	/* 's'			*/
 
-#include <sys/ioc_tty.h>	/* 'T' 't' 'k'		*/
-#include <net/ioctl.h>		/* 'n'			*/
-#include <sys/ioc_disk.h>	/* 'd'			*/
-#include <sys/ioc_file.h>	/* 'f'			*/
-#include <sys/ioc_memory.h>	/* 'm'			*/
-#include <sys/ioc_cmos.h>	/* 'c'			*/
-#include <sys/ioc_tape.h>	/* 'M'			*/
-#include <sys/ioc_scsi.h>	/* 'S'			*/
-#include <sys/ioc_sound.h>	/* 's'			*/
-
-#endif /* _S_IOCTL_H */
+#endif /* __ASM_GENERIC_IOCTLS_H */

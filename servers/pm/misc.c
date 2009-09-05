@@ -20,13 +20,12 @@
  *   do_getsetpriority: get/set process priority
  *   do_svrctl: process manager control
  */
-
 #define brk _brk
 #include <nucleos/nucleos.h>
 #include "pm.h"
 #include <nucleos/callnr.h>
 #include <signal.h>
-#include <sys/svrctl.h>
+#include <nucleos/svrctl.h>
 #include <sys/resource.h>
 #include <nucleos/utsname.h>
 #include <nucleos/com.h>
@@ -38,6 +37,7 @@
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <lib.h>
+#include <asm/ioctls.h>
 #include "mproc.h"
 #include "param.h"
 

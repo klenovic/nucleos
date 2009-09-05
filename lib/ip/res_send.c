@@ -43,7 +43,7 @@
  * Send query to name server and wait for reply.
  */
 #include <nucleos/types.h>
-#include <sys/ioctl.h>
+#include <nucleos/ioctl.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <nucleos/errno.h>
@@ -67,6 +67,8 @@
 #include <net/gen/udp.h>
 #include <net/gen/udp_hdr.h>
 #include <net/gen/udp_io.h>
+
+#include <asm/ioctls.h>
 
 static int tcp_connect(ipaddr_t host, tcpport_t port, int *terrno);
 static int tcpip_writeall(int fd, const char *buf, size_t siz);

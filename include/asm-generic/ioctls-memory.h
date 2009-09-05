@@ -13,8 +13,8 @@
  *
  */
 
-#ifndef _S_I_MEMORY_H
-#define _S_I_MEMORY_H
+#ifndef __ASM_GENERIC_IOCTLS_MEMORY_H
+#define __ASM_GENERIC_IOCTLS_MEMORY_H
 
 #include <nucleos/ioctl.h>
 
@@ -22,4 +22,4 @@
 #define MIOCMAP		_IOW('m', 4, struct mapreq)
 #define MIOCUNMAP	_IOW('m', 5, struct mapreq)
 
-#endif /* _S_I_MEMORY_H */
+#endif /* __ASM_GENERIC_IOCTLS_MEMORY_H */

@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <nucleos/types.h>
 #include <sys/stat.h>
-#include <sys/ioc_tty.h>
+#include <asm/ioctls.h>
 
 #define DEV_DIR		"/dev"
 

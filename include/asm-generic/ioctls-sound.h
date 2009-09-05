@@ -11,9 +11,8 @@
  *								23 Nov 2002
  *
  */
-
-#ifndef _S_I_SOUND_H
-#define _S_I_SOUND_H
+#ifndef __ASM_GENERIC_IOCTLS_SOUND_H
+#define __ASM_GENERIC_IOCTLS_SOUND_H
 
 #include <nucleos/ioctl.h>
 
@@ -24,7 +23,7 @@
 #define DSPIOBITS		_IOW('s', 4, unsigned int)
 #define DSPIOSIGN		_IOW('s', 5, unsigned int)
 #define DSPIOMAX		_IOR('s', 6, unsigned int)
-#define DSPIORESET	_IO ('s', 7)
+#define DSPIORESET		_IO ('s', 7)
 #define DSPIOFREEBUF 		_IOR('s', 30, unsigned int)
 #define DSPIOSAMPLESINBUF	_IOR('s', 31, unsigned int)
 #define DSPIOPAUSE		_IO ('s', 32)
@@ -40,4 +39,4 @@
 #define MIXIOSETINPUTRIGHT	_IORW('s', 22, struct inout_ctrl)
 #define MIXIOSETOUTPUT		_IORW('s', 23, struct inout_ctrl)
 
-#endif /* _S_I_SOUND_H */
+#endif /* __ASM_GENERIC_IOCTLS_SOUND_H */

@@ -35,7 +35,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/keymap.h>
-#include <sys/ioc_disk.h>
+#include <asm/ioctls.h>
 #include <ibm/int86.h>
 #include <assert.h>
 

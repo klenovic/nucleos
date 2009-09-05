@@ -7,4 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __ASM_X86_FCNTL_H
+#define __ASM_X86_FCNTL_H
+
 #include <asm-generic/fcntl.h>
+
+#endif /* __ASM_X86_FCNTL_H */
