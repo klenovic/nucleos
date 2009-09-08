@@ -24,7 +24,7 @@
 
 #include "pm.h"
 
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <nucleos/syslib.h>
 #include <nucleos/com.h>
 

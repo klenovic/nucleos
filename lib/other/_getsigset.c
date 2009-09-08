@@ -7,17 +7,18 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getsigset	_getsigset
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-
-int getsigset(sp)
-sigset_t *sp;				/* where to put it */
+/**
+ * @brief
+ * @param sp  where to put it
+ */
+int getsigset(sigset_t *sp)
 {
   message m;
   m.m2_i1 = SELF;			/* request own signal set */
-  if (_syscall(PM_PROC_NR, PROCSTAT, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_procstat, &m) < 0) return(-1);
   *sp = m.m2_l1;
   return(0);
 }

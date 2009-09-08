@@ -31,7 +31,6 @@ typedef unsigned int	__kernel_size_t;
 typedef int 		__kernel_ssize_t;
 typedef long 		__kernel_time_t;	/* time in sec since 1 Jan 1970 0000 GMT */
 typedef long 		__kernel_clock_t;	/* unit for system accounting */
-typedef unsigned long	__kernel_sigset_t;
 typedef int		__kernel_daddr_t;
 typedef char*		__kernel_caddr_t;
 typedef int 		__kernel_ptrdiff_t;

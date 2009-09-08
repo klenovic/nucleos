@@ -13,7 +13,7 @@
  *   clock_time:  ask the clock task for the real time
  *   copy:	  copy a block of data
  *   fetch_name:  go get a path name from user space
- *   no_sys:      reject a system call that FS does not handle
+ *   no_sys:      reject a system call that FS_PROC_NR does not handle
  *   panic:       something awful has occurred;  MINIX cannot continue
  *   conv2:	  do byte swapping on a 16-bit int
  *   conv4:	  do byte swapping on a 32-bit long
@@ -22,7 +22,7 @@
 #include "fs.h"
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "file.h"
@@ -36,10 +36,10 @@
 int fetch_name(path, len, flag)
 char *path;			/* pointer to the path in user space */
 int len;			/* path length, including 0 byte */
-int flag;			/* M3 means path may be in message */
+int flag;			/* KIPC_FLG_M3 means path may be in message */
 {
 /* Go get path and put it in 'user_fullpath'.
- * If 'flag' = M3 and 'len' <= M3_STRING, the path is present in 'message'.
+ * If 'flag' = KERN_KIPC_FLG_M3 and 'len' <= KIPC_FLG_M3_STRLEN, the path is present in 'message'.
  * If it is not, go copy it from user space.
  */
   register char *rpu, *rpm;
@@ -66,7 +66,7 @@ int flag;			/* M3 means path may be in message */
 	return(-EGENERIC);
   }
 
-  if (flag == M3 && len <= M3_STRING) {
+  if (flag == KIPC_FLG_M3 && len <= KIPC_FLG_M3_STRLEN) {
 	/* Just copy the path from the message to 'user_fullpath'. */
 	rpu = &user_fullpath[0];
 	rpm = m_in.pathname;		/* contained in input message */

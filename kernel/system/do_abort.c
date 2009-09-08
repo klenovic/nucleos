@@ -16,9 +16,9 @@
  *    m1_i3:	ABRT_MON_LEN	(length of monitor params)
  *    m1_p1:	ABRT_MON_ADDR 	(virtual address of params)	
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <kernel/system.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 #if USE_ABORT
 

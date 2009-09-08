@@ -12,9 +12,9 @@
 #include <nucleos/types.h>
 #include <nucleos/keymap.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 
 u16_t keymap[NR_SCAN_CODES * MAP_COLS] = {

@@ -17,28 +17,27 @@
  *   do_sync:	  perform the SYNC system call
  *   do_fsync:	  perform the FSYNC system call
  *   do_reboot:	  sync disks and prepare for shutdown
- *   do_fork:	  adjust the tables after MM has performed a FORK system call
- *   do_exec:	  handle files with FD_CLOEXEC on after MM has done an EXEC
+ *   do_fork:	  adjust the tables after PM_PROC_NR has performed a FORK system call
+ *   do_exec:	  handle files with FD_CLOEXEC on after PM_PROC_NR has done an EXEC
  *   do_exit:	  a process has exited; note that in the tables
  *   do_set:	  set uid or gid for some process
  *   do_revive:	  revive a process that was waiting for something (e.g. TTY)
  *   do_svrctl:	  file system control
- *   do_getsysinfo:	request copy of FS data structure
+ *   do_getsysinfo:	request copy of FS_PROC_NR data structure
  *   pm_dumpcore: create a core dump
  */
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <assert.h>
-#include <unistd.h>	/* cc runs out of memory with unistd.h :-( */
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <nucleos/time.h>
 #include <nucleos/types.h>
-#include <sys/ptrace.h>
+#include <nucleos/ptrace.h>
 #include <nucleos/svrctl.h>
 #include <asm/ioctls.h>
 #include "file.h"
@@ -53,7 +52,7 @@
 #define CORE_MODE	0777	/* mode to use on core image files */
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-unsigned long calls_stats[NCALLS];
+unsigned long calls_stats[__NR_SYSCALLS];
 #endif
 
 static void free_proc(struct fproc *freed, int flags);
@@ -79,7 +78,7 @@ int do_getsysinfo()
 
   if (!super_user)
   {
-	printf("FS: unauthorized call of do_getsysinfo by proc %d\n", who_e);
+	printf("FS_PROC_NR: unauthorized call of do_getsysinfo by proc %d\n", who_e);
 	return(-EPERM);	/* only su may call do_getsysinfo. This call may leak
 			 * information (and is not stable enough to be part 
 			 * of the API/ABI).
@@ -339,7 +338,7 @@ void unmount_all(void)
  *===========================================================================*/
 void pm_reboot()
 {
-  /* Perform the FS side of the reboot call. */
+  /* Perform the FS_PROC_NR side of the reboot call. */
   int i;
 
   do_sync();
@@ -378,7 +377,7 @@ int cpid;	/* Child process id */
 /* Perform those aspects of the fork() system call that relate to files.
  * In particular, let the child inherit its parent's file descriptors.
  * The parent and child parameters tell who forked off whom. The file
- * system uses the same slot numbers as the kernel.  Only MM makes this call.
+ * system uses the same slot numbers as the kernel.  Only PM_PROC_NR makes this call.
  */
 
   register struct fproc *cp;
@@ -393,9 +392,9 @@ int cpid;	/* Child process id */
    */
   childno = _ENDPOINT_P(cproc);
   if(childno < 0 || childno >= NR_PROCS)
-	panic(__FILE__, "FS: bogus child for forking", m_in.child_endpt);
+	panic(__FILE__, "FS_PROC_NR: bogus child for forking", m_in.child_endpt);
   if(fproc[childno].fp_pid != PID_FREE)
-	panic(__FILE__, "FS: forking on top of in-use child", childno);
+	panic(__FILE__, "FS_PROC_NR: forking on top of in-use child", childno);
 
   /* Copy the parent's fproc struct to the child. */
   fproc[childno] = fproc[parentno];
@@ -586,7 +585,7 @@ int do_svrctl()
 	if (fp->fp_effuid != SU_UID && fp->fp_effuid != SERVERS_UID)
 		return(-EPERM);
 
-	/* Try to copy request structure to FS. */
+	/* Try to copy request structure to FS_PROC_NR. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
 		FS_PROC_NR, (vir_bytes) &device,
 		(phys_bytes) sizeof(device))) != 0) 
@@ -621,7 +620,7 @@ int do_svrctl()
   case FSDEVUNMAP: {
 	struct fsdevunmap fdu;
 	int r, major;
-	/* Try to copy request structure to FS. */
+	/* Try to copy request structure to FS_PROC_NR. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
 		FS_PROC_NR, (vir_bytes) &fdu,
 		(phys_bytes) sizeof(fdu))) != 0) 

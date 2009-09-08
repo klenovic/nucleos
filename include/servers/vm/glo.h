@@ -10,7 +10,7 @@
 #ifndef __SERVERS_VM_GLO_H
 #define __SERVERS_VM_GLO_H
 
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/a.out.h>
 #include <tools.h>
 

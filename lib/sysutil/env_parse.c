@@ -10,7 +10,7 @@
 #include "sysutil.h"
 #include <stdlib.h>
 #include <env.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 
 /*=========================================================================*

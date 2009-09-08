@@ -7,14 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define isatty _isatty
-#define tcgetattr _tcgetattr
-#include <termios.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/termios.h>
+#include <nucleos/unistd.h>
 
-int isatty(fd)
-int fd;
+int isatty(int fd)
 {
   struct termios dummy;
 

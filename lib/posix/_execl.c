@@ -10,9 +10,7 @@
 /*	execl() - execute				Author: Kees J. Bot
  *								21 Jan 1994
  */
-#define execl _execl
-#define execve _execve
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 extern char * const **_penviron;	/* The default environment. */
 

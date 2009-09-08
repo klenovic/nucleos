@@ -12,8 +12,8 @@ setgroups.c
 */
 
 #include <nucleos/errno.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <grp.h>
 
 int setgroups(int ngroups, const gid_t *gidset)

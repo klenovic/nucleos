@@ -17,8 +17,8 @@
  */
 
 #include <kernel/system.h>
-#include <string.h>
-#include <signal.h>
+#include <nucleos/string.h>
+#include <nucleos/signal.h>
 #include <ibm/cpu.h>
 #include <asm/sigcontext.h>
 

@@ -21,7 +21,7 @@
  */
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <kernel/ipc.h>
+#include <kernel/kipc.h>
 #include <nucleos/com.h>
 
 /* Variables relating to shutting down MINIX. */
@@ -108,9 +108,9 @@ char *t_stack[TOT_STACK_SPACE / sizeof(char *)];
 /* Define system call traps for the various process types. These call masks
  * determine what system call traps a process is allowed to make.
  */
-#define TSK_T	(1 << RECEIVE)			/* clock and system */
+#define TSK_T	(1 << KIPC_RECEIVE)			/* clock and system */
 #define SRV_T	(~0)				/* system services */
-#define USR_T   ((1 << SENDREC))		/* user processes */
+#define USR_T   ((1 << KIPC_SENDREC))		/* user processes */
 
 /* Send masks determine to whom processes can send messages or notifications. 
  * The values here are used for the processes in the boot image. We rely on 

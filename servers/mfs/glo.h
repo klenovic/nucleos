@@ -42,10 +42,10 @@ extern char user_path[PATH_MAX+1];  /* pathname to be processed */
 extern char *vfs_slink_storage;
 extern int Xsymloop;
 
-extern dev_t fs_dev;    	/* The device that is handled by this FS proc.
+extern dev_t fs_dev;    	/* The device that is handled by this FS_PROC_NR proc.
 				 */
 extern char fs_dev_label[16];	/* Name of the device driver that is handled
-				 * by this FS proc.
+				 * by this FS_PROC_NR proc.
 				 */
 extern int unmountdone;
 extern int exitsignaled;

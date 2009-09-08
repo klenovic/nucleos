@@ -12,8 +12,8 @@ nice.c
 */
 
 #include <nucleos/errno.h>
-#include <unistd.h>
-#include <sys/resource.h>
+#include <nucleos/unistd.h>
+#include <nucleos/resource.h>
 
 int nice(incr)
 int incr;

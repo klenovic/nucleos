@@ -12,7 +12,7 @@
  */
 
 #include "fs.h"
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include "file.h"
 #include "fproc.h"
@@ -29,8 +29,8 @@ int nr_locks;            /* number of locks currently in place */
 int reviving;            /* number of pipe processes to be revived */
 
 dev_t root_dev;          /* device number of the root device */
-int ROOT_FS_E;           /* kernel endpoint of the root FS proc */
-int last_login_fs_e;     /* endpoint of the FS proc that logged in
+int ROOT_FS_E;           /* kernel endpoint of the root FS_PROC_NR proc */
+int last_login_fs_e;     /* endpoint of the FS_PROC_NR proc that logged in
                                    before the corresponding mount request */
 u32_t system_hz;         /* system clock frequency. */
 
@@ -105,7 +105,7 @@ int (*call_vec[])(void) = {
 	do_ioctl,	/* 54 = ioctl	*/
 	do_fcntl,	/* 55 = fcntl	*/
 	no_sys,		/* 56 = (mpx)	*/
-	do_fslogin,	/* 57 = FS proc login */
+	do_fslogin,	/* 57 = FS_PROC_NR proc login */
 	no_sys,		/* 58 = unused	*/
 	no_sys,		/* 59 = (execve) */
 	do_umask,	/* 60 = umask	*/
@@ -162,5 +162,5 @@ int (*call_vec[])(void) = {
 };
 
 /* This should not fail with "array size is negative": */
-extern int dummy[sizeof(call_vec) == NCALLS * sizeof(call_vec[0]) ? 1 : -1];
+extern int dummy[sizeof(call_vec) == __NR_SYSCALLS * sizeof(call_vec[0]) ? 1 : -1];
 

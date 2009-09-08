@@ -72,7 +72,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/stddef.h>
 #include <nucleos/com.h>
 #include <servers/ds/ds.h>
@@ -80,7 +80,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
 #include <nucleos/sysutil.h>
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
@@ -89,7 +89,7 @@
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
 #include <assert.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
 	if ((r=fkey_map(&fkeys, &sfkeys)) != 0) 
 	    printf("Warning: RTL8139 couldn't observe Shift+F9 key: %d\n",r);
 
-	/* Claim buffer memory now under Minix, before MM takes it all. */
+	/* Claim buffer memory now under Minix, before PM_PROC_NR takes it all. */
 	for (rep= &re_table[0]; rep < re_table+RE_PORT_NR; rep++)
 		rl_init_buf(rep);
 
@@ -349,18 +349,18 @@ int main(int argc, char *argv[])
 	 */
 	r= ds_retrieve_u32("inet", &inet_proc_nr);
 	if (r == 0)
-		notify(inet_proc_nr);
+		kipc_notify(inet_proc_nr);
 	else if (r != -ESRCH)
 		printf("rtl8139: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE)
 	{
-		if ((r= receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("rtl8139","receive failed", r);
 
 		switch (m.m_type)
 		{
-		case DEV_PING: notify(m.m_source);		break;
+		case DEV_PING: kipc_notify(m.m_source);		break;
 		case DL_WRITE:	rl_writev(&m, FALSE, FALSE);	break;
 		case DL_WRITEV:	rl_writev(&m, FALSE, TRUE);	break;
 		case DL_WRITEV_S: rl_writev_s(&m, FALSE);	break;
@@ -2290,7 +2290,7 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getstat: send failed: %d\n", r);
 }
@@ -2324,7 +2324,7 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getstat_s: send failed: %d\n", r);
 }
@@ -2341,7 +2341,7 @@ message *mp;
 	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getname: send failed: %d\n", r);
 }
@@ -2375,7 +2375,7 @@ int may_block;
 		panic("rtl8139","getuptime() failed:", r);
 	reply.DL_CLCK = now;
 
-	r= send(rep->re_client, &reply);
+	r= kipc_send(rep->re_client, &reply);
 
 	if (r == -ELOCKED && may_block)
 	{
@@ -2401,7 +2401,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-	if (send(req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("rtl8139","unable to mess_reply", NO_NUM);
 }
 
@@ -3099,7 +3099,7 @@ int pci_func;
 	m.m2_l1= buf;
 	m.m2_l2= size;
 
-	r= sendrec(dev_e, &m);
+	r= kipc_sendrec(dev_e, &m);
 	if (r != 0)
 	{
 		printf("rtl8139`tell_dev: sendrec to %d failed: %d\n",

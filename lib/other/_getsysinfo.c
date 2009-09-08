@@ -7,36 +7,33 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <nucleos/endpoint.h>
-#define getsysinfo	_getsysinfo
-#define getsysinfo_up	_getsysinfo_up
 #include <nucleos/sysinfo.h>
 
-
-int getsysinfo(who, what, where)
-endpoint_t who;			/* from whom to request info */
-int what;			/* what information is requested */
-void *where;			/* where to put it */
+int getsysinfo(endpoint_t who, int what, void *where)
 {
   message m;
   m.m1_i1 = what;
   m.m1_p1 = where;
-  if (_syscall(who, GETSYSINFO, &m) < 0) return(-1);
+  if (_syscall(who, __NR_getsysinfo, &m) < 0) return(-1);
   return(0);
 }
 
 /* Unprivileged variant of getsysinfo. */
-ssize_t getsysinfo_up(who, what, size, where)
-endpoint_t who;			/* from whom to request info */
-int what;			/* what information is requested */
-size_t size;			/* input and output size */
-void *where;			/* where to put it */
+/**
+ * @brief
+ * @param who  from whom to request info
+ * @param what  what information is requested
+ * @param size  input and output size
+ * @param where  where to put it
+ */
+ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where)
 {
   message m;
   m.SIU_WHAT = what;
   m.SIU_WHERE = where;
   m.SIU_LEN = size;
-  return _syscall(who, GETSYSINFO_UP, &m);
+  return _syscall(who, __NR_getsysinfo_up, &m);
 }
 

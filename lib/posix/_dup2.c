@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define close	_close
-#define dup2	_dup2
-#define fcntl	_fcntl
+#include <nucleos/lib.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
-int dup2(fd, fd2)
-int fd, fd2;
+int dup2(int fd, int fd2)
 {
 /* The behavior of dup2 is defined by POSIX in 6.2.1.2 as almost, but not
  * quite the same as fcntl.

@@ -13,15 +13,11 @@
  *	This call relates to suplementary group ids, which are not
  *	supported in MINIX.
  */
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <nucleos/time.h>
 
-#include <lib.h>
-#define getgroups _getgroups
-#include <unistd.h>
-#include <time.h>
-
-int getgroups(gidsetsize, grouplist)
-int gidsetsize;
-gid_t grouplist[];
+int getgroups(int gidsetsize, gid_t grouplist[])
 {
   return(0);
 }

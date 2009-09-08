@@ -14,10 +14,10 @@
 
 #include "fs.h"
 #include "fproc.h"
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <servers/ds/ds.h>
 #include "param.h"
@@ -32,7 +32,7 @@
  * numbers and tasks.  The first entry (major device 0) is not used.  The
  * next entry is major device 1, etc.  Character and block devices can be
  * intermixed at random.  The ordering determines the device numbers in /dev/.
- * Note that FS knows the device number of /dev/ram/ to load the RAM disk.
+ * Note that FS_PROC_NR knows the device number of /dev/ram/ to load the RAM disk.
  * Also note that the major device numbers used in /dev/ are NOT the same as 
  * the process numbers of the device drivers. 
  */
@@ -74,7 +74,7 @@ int do_devctl()
 {
 	if (!super_user)
 	{
-		printf("FS: unauthorized call of do_devctl by proc %d\n",
+		printf("FS_PROC_NR: unauthorized call of do_devctl by proc %d\n",
 			who_e);
 		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_devctl.
@@ -142,7 +142,7 @@ int do_mapdriver()
 
 	if (!super_user)
 	{
-		printf("FS: unauthorized call of do_mapdriver by proc %d\n",
+		printf("FS_PROC_NR: unauthorized call of do_mapdriver by proc %d\n",
 			who_e);
 		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_mapdriver.
@@ -342,7 +342,7 @@ void dmap_unmap_by_endpt(int proc_nr_e)
 	for (i=0; i<NR_DEVICES; i++)
 	  if(dmap[i].dmap_driver && dmap[i].dmap_driver == proc_nr_e)
 	    if((r=map_driver(i, NONE, 0, 0)) != 0)
-		printf("FS: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
+		printf("FS_PROC_NR: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
 
 	return;
 

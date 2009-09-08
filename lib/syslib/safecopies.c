@@ -14,7 +14,7 @@
  *
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <nucleos/errno.h>
 #include <nucleos/sysutil.h>
 #include <assert.h>
@@ -22,7 +22,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/com.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 #define ACCESS_CHECK(a) { 			\
 	if((a) & ~(CPF_READ|CPF_WRITE)) {	\

@@ -16,12 +16,12 @@ Driver for the AMD Device Exclusion Vector (DEV)
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <asm/servers/vm/vm.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 #include <ibm/pci.h>
@@ -78,7 +78,7 @@ int main(void)
 	{
 		report_exceptions();
 
-		r= receive(ANY, &m);
+		r= kipc_receive(ANY, &m);
 		if (r != 0)
 			panic(__FILE__, "receive failed", r);
 		switch(m.m_type)
@@ -90,7 +90,7 @@ int main(void)
 		case IOMMU_MAP:
 			r= do_add4pci(&m);
 			m.m_type= r;
-			send(m.m_source, &m);
+			kipc_send(m.m_source, &m);
 			continue;
 		}
 		printf("amddev: got message from %d\n", m.m_source);

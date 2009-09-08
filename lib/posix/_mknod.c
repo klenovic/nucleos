@@ -7,16 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define mknod	_mknod
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
-int mknod(name, mode, dev)
-const char *name;
-mode_t mode;
-dev_t dev;
+int mknod(const char *name, mode_t mode, dev_t dev)
 {
   message m;
 
@@ -25,5 +21,5 @@ dev_t dev;
   m.m1_i3 = dev;
   m.m1_p1 = (char *) name;
   m.m1_p2 = (char *) ((int) 0);		/* obsolete size field */
-  return(_syscall(FS, MKNOD, &m));
+  return(_syscall(FS_PROC_NR, __NR_mknod, &m));
 }

@@ -19,12 +19,12 @@ Copyright 1995 Philip Homburg
 */
 
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/fcntl.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/type.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>

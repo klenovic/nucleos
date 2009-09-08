@@ -17,8 +17,8 @@
  *    m1_p3:	PR_IP_PTR		(new instruction pointer)
  */
 #include <kernel/system.h>
-#include <string.h>
-#include <signal.h>
+#include <nucleos/string.h>
+#include <nucleos/signal.h>
 #include <nucleos/endpoint.h>
 
 #if USE_EXEC

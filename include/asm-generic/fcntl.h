@@ -69,17 +69,20 @@ struct flock {
 	pid_t l_pid;			/* process id of the locks' owner */
 };
 
+#if defined(__KERNEL__) || defined(__UKERNEL__)
+
 /* Function Prototypes. */
 int creat(const char *_path, mode_t _mode);
 int fcntl(int _filedes, int _cmd, ...);
 int open(const char *_path, int _oflag, ...);
+int flock(int fd, int mode);
+
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 /* For locking files. */
 #define LOCK_SH		F_RDLCK		/* Shared lock */
 #define LOCK_EX		F_WRLCK		/* Exclusive lock */
 #define LOCK_NB		0x0080		/* Do not block when locking */
 #define LOCK_UN		F_UNLCK		/* Unlock */
-
-int flock(int fd, int mode);
 
 #endif /* __ASM_GENERIC_FCNTL_H */

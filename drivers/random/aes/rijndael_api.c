@@ -17,7 +17,7 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/types.h>
 
 #include "rijndael-alg.h"

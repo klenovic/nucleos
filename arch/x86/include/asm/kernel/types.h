@@ -60,7 +60,7 @@ struct segdesc_s {		/* segment descriptor for protected mode */
 
 /* Fixed local descriptors. */
 #define CS_LDT_INDEX         0  /* process CS */
-#define DS_LDT_INDEX         1  /* process DS=ES=FS=GS=SS */
+#define DS_LDT_INDEX         1  /* process DS=ES=FS_PROC_NR=GS=SS */
 #define EXTRA_LDT_INDEX      2  /* first of the extra LDT entries */
 
 typedef struct segframe {

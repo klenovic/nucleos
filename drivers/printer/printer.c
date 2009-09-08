@@ -93,7 +93,7 @@
  * with the sys_outb() messages exchanged.
  */
 
-static int caller;		/* process to tell when printing done (FS) */
+static int caller;		/* process to tell when printing done (FS_PROC_NR) */
 static int revive_pending;	/* set to true if revive is pending */
 static int revive_status;	/* revive status */
 static int done_status;	/* status of last output completion */
@@ -141,23 +141,23 @@ void main(void)
   if (sigaction(SIGTERM,&sa,NULL)<0) panic("PRN","sigaction failed", errno);
   
   while (TRUE) {
-	receive(ANY, &pr_mess);
+	kipc_receive(ANY, &pr_mess);
 	switch(pr_mess.m_type) {
 	    case DEV_OPEN:
                  do_initialize();		/* initialize */
 	        /* fall through */
 	    case DEV_CLOSE:
-		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, 0);
+		reply(__NR_task_reply, pr_mess.m_source, pr_mess.IO_ENDPT, 0);
 		break;
 	    case DEV_WRITE_S:	do_write(&pr_mess, 1);	break;
 	    case DEV_STATUS:	do_status(&pr_mess);	break;
 	    case CANCEL:	do_cancel(&pr_mess);	break;
 	    case HARD_INT:	do_printer_output();	break;
 	    case SYS_SIG:	do_signal(&pr_mess); 	break;
-	    case DEV_PING:  	notify(pr_mess.m_source);	break;
+	    case DEV_PING:  	kipc_notify(pr_mess.m_source);	break;
 	    case PROC_EVENT:	break;
 	    default:
-		reply(TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
+		reply(__NR_task_reply, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
 	}
   }
 }
@@ -198,8 +198,8 @@ int safe;			/* use virtual addresses or grant id's? */
     if (writing)  			r = -EIO;
     else if (m_ptr->COUNT <= 0)  	r = -EINVAL;
 
-    /* Reply to FS, no matter what happened, possible SUSPEND caller. */
-    reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+    /* Reply to FS_PROC_NR, no matter what happened, possible SUSPEND caller. */
+    reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 
     /* If no errors occurred, continue printing with SUSPENDED caller.
      * First wait until the printer is online to prevent stupid errors.
@@ -240,7 +240,7 @@ int safe;			/* use virtual addresses or grant id's? */
 static void output_done()
 {
 /* Previous chunk of printing is finished.  Continue if OK and more.
- * Otherwise, reply to caller (FS).
+ * Otherwise, reply to caller (FS_PROC_NR).
  */
     register int status;
 
@@ -265,12 +265,12 @@ static void output_done()
 	prepare_output();
 	return;
     } 
-    else {				/* done! report back to FS */
+    else {				/* done! report back to FS_PROC_NR */
 	status = orig_count;
     }
     revive_pending = TRUE;
     revive_status = status;
-    notify(caller);
+    kipc_notify(caller);
 }
 
 /*===========================================================================*
@@ -290,7 +290,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
   } else {
 	m_ptr->m_type = DEV_NO_STATUS;
   }
-  send(m_ptr->m_source, m_ptr);			/* send the message */
+  kipc_send(m_ptr->m_source, m_ptr);			/* send the message */
 }
 
 /*===========================================================================*
@@ -302,7 +302,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 /* Cancel a print request that has already started.  Usually this means that
  * the process doing the printing has been killed by a signal.  It is not
  * clear if there are race conditions.  Try not to cancel the wrong process,
- * but rely on FS to handle the -EINTR reply and de-suspension properly.
+ * but rely on FS_PROC_NR to handle the -EINTR reply and de-suspension properly.
  */
 
   if (writing && m_ptr->IO_ENDPT == proc_nr) {
@@ -310,7 +310,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 	writing = FALSE;
 	revive_pending = FALSE;
   }
-  reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINTR);
+  reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EINTR);
 }
 
 /*===========================================================================*
@@ -318,18 +318,18 @@ register message *m_ptr;	/* pointer to the newly arrived message */
  *===========================================================================*/
 static void reply(code, replyee, process, status)
 int code;			/* TASK_REPLY or REVIVE */
-int replyee;			/* destination for message (normally FS) */
+int replyee;			/* destination for message (normally FS_PROC_NR) */
 int process;			/* which user requested the printing */
 int status;			/* number of  chars printed or error code */
 {
-/* Send a reply telling FS that printing has started or stopped. */
+/* Send a reply telling FS_PROC_NR that printing has started or stopped. */
 
   message pr_mess;
 
   pr_mess.m_type = code;		/* TASK_REPLY or REVIVE */
   pr_mess.REP_STATUS = status;		/* count or -EIO */
   pr_mess.REP_ENDPT = process;	/* which user does this pertain to */
-  send(replyee, &pr_mess);		/* send the message */
+  kipc_send(replyee, &pr_mess);		/* send the message */
 }
 
 /*===========================================================================*

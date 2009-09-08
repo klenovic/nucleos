@@ -10,20 +10,12 @@
 /*	getpass() - read a password		Author: Kees J. Bot
  *							Feb 16 1993
  */
-#define open _open
-#define sigaction _sigaction
-#define sigemptyset _sigemptyset
-#define tcgetattr _tcgetattr
-#define tcsetattr _tcsetattr
-#define write _write
-#define read _read
-#define close _close
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
-#include <signal.h>
-#include <termios.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/signal.h>
+#include <nucleos/termios.h>
+#include <nucleos/string.h>
 
 static int intr;
 

@@ -227,16 +227,16 @@ int main(int argc, char *argv[])
 	/* Try to notify inet that we are present (again) */
 	r = _pm_findproc("inet", &tasknr);
 	if (r == 0)
-		notify(tasknr);
+		kipc_notify(tasknr);
 
 	while (TRUE)
 	{
-		if ((r= receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("", "dp8390: receive failed", r);
 
 		switch (m.m_type)
 		{
-		case DEV_PING:  notify(m.m_source);		continue;
+		case DEV_PING:  kipc_notify(m.m_source);		continue;
 		case DL_WRITE:	do_vwrite(&m, FALSE, FALSE);	break;
 		case DL_WRITEV:	do_vwrite(&m, FALSE, TRUE);	break;
 		case DL_WRITEV_S: do_vwrite_s(&m, FALSE);	break;
@@ -836,7 +836,7 @@ message *mp;
 		mp->m_type= DL_STAT_REPLY;
 		mp->DL_PORT= port;
 		mp->DL_STAT= 0;
-		r= send(mp->m_source, mp);
+		r= kipc_send(mp->m_source, mp);
 		if (r != 0)
 			panic(__FILE__, "do_getstat: send failed: %d\n", r);
 		return;
@@ -854,7 +854,7 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "do_getstat: send failed: %d\n", r);
 }
@@ -881,7 +881,7 @@ message *mp;
 		mp->m_type= DL_STAT_REPLY;
 		mp->DL_PORT= port;
 		mp->DL_STAT= 0;
-		r= send(mp->m_source, mp);
+		r= kipc_send(mp->m_source, mp);
 		if (r != 0)
 			panic(__FILE__, "do_getstat: send failed: %d\n", r);
 		return;
@@ -899,7 +899,7 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "do_getstat: send failed: %d\n", r);
 }
@@ -915,7 +915,7 @@ message *mp;
 	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic("dp8390", "do_getname: send failed: %d\n", r);
 }
@@ -2637,7 +2637,7 @@ int may_block;
 	reply.DL_STAT = status | ((u32_t) err << 16);
 	reply.DL_COUNT = dep->de_read_s;
 	reply.DL_CLCK = 0;	/* Don't know */
-	r= send(dep->de_client, &reply);
+	r= kipc_send(dep->de_client, &reply);
 
 	if (r == -ELOCKED && may_block)
 	{
@@ -2661,7 +2661,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-	if (send(req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("", "dp8390: unable to mess_reply", NO_NUM);
 }
 

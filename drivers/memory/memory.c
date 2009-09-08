@@ -22,7 +22,7 @@
  *	Jul 26, 2004	moved RAM driver to user-space  (Jorrit N. Herder)
  *	Apr 20, 1992	device dependent/independent split  (Kees J. Bot)
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <asm/bootparam.h>
 #include <nucleos/drivers.h>
 #include <nucleos/driver.h>
@@ -30,7 +30,7 @@
 #include <env.h>
 #include <servers/ds/ds.h>
 #include <nucleos/vm.h>
-#include <sys/mman.h>
+#include <nucleos/mman.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <servers/vm/vm.h>
@@ -183,7 +183,7 @@ int safe;			/* safe copies */
 	    if (opcode == DEV_GATHER_S) return 0;	/* always at EOF */
 	    break;
 
-	/* Virtual copying. For RAM disks, kernel memory and internal FS. */
+	/* Virtual copying. For RAM disks, kernel memory and internal FS_PROC_NR. */
 	default:
 	case KMEM_DEV:
 	case RAM_DEV_OLD:
@@ -432,7 +432,7 @@ int safe;
 #endif
 
 	/* Try to allocate a piece of memory for the RAM disk. */
-	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE, MAP_ANON, -1, 0)) == MAP_FAILED) {
+	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
 	    printf("MEM: failed to get memory for ramdisk\n");
             return(-ENOMEM);
         }

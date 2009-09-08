@@ -11,11 +11,11 @@
  * misc - data and miscellaneous routines
  */
 #include <ctype.h>
-#include <time.h>
+#include <nucleos/time.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 
-#include	"loc_time.h"
+#include "loc_time.h"
 
 #define	RULE_LEN	120
 #define	TZ_LEN		10

@@ -14,7 +14,7 @@
 #include "editline.h"
 
 #if	defined(HAVE_TCGETATTR)
-#include <termios.h>
+#include <nucleos/termios.h>
 
 void
 rl_ttyset(Reset)

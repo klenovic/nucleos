@@ -11,11 +11,11 @@
  *								24 Apr 1989
  */
 #define nil 0
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <nucleos/types.h>
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #include <nucleos/errno.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 off_t telldir(DIR *dp)
 /* Return the current read position in a directory. */

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/sysutil.h>
 
 #include "syslib.h"

@@ -40,7 +40,7 @@
  * SUCH DAMAGE.
  */
 #include <netdb.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 extern int _proto_stayopen;
 

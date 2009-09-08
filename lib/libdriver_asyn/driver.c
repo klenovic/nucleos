@@ -91,7 +91,7 @@ struct driver *dp;	/* Device dependent entry points. */
 	} else {
 		int s;
 		/* Wait for a request to read or write a disk block. */
-		if ((s=receive(ANY, &mess)) != 0)
+		if ((s=kipc_receive(ANY, &mess)) != 0)
         		panic((*dp->dr_name)(),"receive() failed", s);
 	}
 
@@ -158,7 +158,7 @@ struct driver *dp;	/* Device dependent entry points. */
 				continue;	/* don't reply */
 	case SYN_ALARM:		(*dp->dr_alarm)(dp, &mess);	
 				continue;	/* don't reply */
-	case DEV_PING:		notify(mess.m_source);
+	case DEV_PING:		kipc_notify(mess.m_source);
 				continue;
 	default:		
 		if(dp->dr_other)
@@ -217,7 +217,7 @@ struct driver *dp;	/* Device dependent entry points. */
 			printf("driver_task: TASK_REPLY to req %d\n",
 				mess.m_type);
 #endif
-			reply_mess.m_type = TASK_REPLY;
+			reply_mess.m_type = __NR_task_reply;
 			reply_mess.REP_ENDPT = proc_nr;
 			/* Status is # of bytes transferred or error code. */
 			reply_mess.REP_STATUS = r;	
@@ -304,7 +304,7 @@ message *mp;		/* pointer to read or write message */
 int safe;		/* use safecopies? */
 {
 /* Carry out an device read or write to/from a vector of user addresses.
- * The "user addresses" are assumed to be safe, i.e. FS transferring to/from
+ * The "user addresses" are assumed to be safe, i.e. FS_PROC_NR transferring to/from
  * its own buffers, so they are not checked.
  */
   static iovec_t iovec[NR_IOREQS];
@@ -576,9 +576,9 @@ message *mp;
 	if (next_slot >= ASYN_NR)
 	{
 		/* Tell the kernel to stop processing */
-		r= senda(NULL, 0);
+		r= kipc_senda(NULL, 0);
 		if (r != 0)
-			panic(__FILE__, "asynsend: senda failed", r);
+			panic(__FILE__, "asynsend: kipc_senda failed", r);
 
 		dst_ind= 0;
 		for (src_ind= first_slot; src_ind<next_slot; src_ind++)
@@ -621,7 +621,7 @@ message *mp;
 	next_slot++;
 
 	/* Tell the kernel to rescan the table */
-	return senda(msgtable+first_slot, next_slot-first_slot);
+	return kipc_senda(msgtable+first_slot, next_slot-first_slot);
 }
 
 #endif

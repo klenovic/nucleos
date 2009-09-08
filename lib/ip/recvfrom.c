@@ -13,10 +13,10 @@
 #include <nucleos/errno.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/ioctl.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 #include <netinet/in.h>
 
 #include <net/gen/in.h>

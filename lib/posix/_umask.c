@@ -7,15 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define umask	_umask
-#include <sys/stat.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
 
-mode_t umask(complmode)
-mode_t complmode;
+mode_t umask(mode_t complmode)
 {
   message m;
 
   m.m1_i1 = complmode;
-  return( (mode_t) _syscall(FS, UMASK, &m));
+  return( (mode_t) _syscall(FS_PROC_NR, __NR_umask, &m));
 }

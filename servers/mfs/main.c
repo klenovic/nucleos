@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
   /* Initialize the server, then go to work. */
   init_server();	
 
-  fs_m_in.m_type = FS_READY;
+  fs_m_in.m_type = __NR_fs_ready;
 
-  if (send(FS_PROC_NR, &fs_m_in) != 0) {
+  if (kipc_send(FS_PROC_NR, &fs_m_in) != 0) {
       printf("MFS(%d): Error sending login to VFS\n", SELF_E);
       return -1;
   }
@@ -129,7 +129,7 @@ message *m_in;				/* pointer to message */
     endpoint_t src;
     do {
     	int s;				/* receive status */
-	if ((s = receive(ANY, m_in)) != 0) 	/* wait for message */
+	if ((s = kipc_receive(ANY, m_in)) != 0) 	/* wait for message */
 		panic("MFS","receive failed", s);
 	src = fs_m_in.m_source;
 
@@ -143,9 +143,9 @@ message *m_in;				/* pointer to message */
 			printf("MFS: unexpected source %d\n", src);
 	} else if(src == FS_PROC_NR) {
 		if(unmountdone) {
-			printf("MFS: unmounted: unexpected message from FS\n");
+			printf("MFS: unmounted: unexpected message from FS_PROC_NR\n");
 		} else {
-			/* Normal FS request. */
+			/* Normal FS_PROC_NR request. */
 			srcok = 1;
 		}
 	} else
@@ -164,7 +164,7 @@ void reply(who, m_out)
 int who;	
 message *m_out;                       	/* report result */
 {
-    if (send(who, m_out) != 0)    /* send the message */
+    if (kipc_send(who, m_out) != 0)    /* send the message */
         printf("MFS(%d) was unable to send reply\n", SELF_E);
 }
 

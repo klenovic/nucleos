@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 int allocmem(size, base)
 phys_bytes size;			/* size of mem chunk requested */
@@ -16,7 +16,7 @@ phys_bytes *base;			/* return base address */
 {
   message m;
   m.m4_l1 = size;		
-  if (_syscall(MM, ALLOCMEM, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_allocmem, &m) < 0) return(-1);
   *base = m.m4_l2;
   return(0);
 }

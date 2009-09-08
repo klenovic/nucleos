@@ -27,10 +27,10 @@
 
 #include <nucleos/drivers.h>
 #include <assert.h>
-#include <termios.h>
-#include <signal.h>
+#include <nucleos/termios.h>
+#include <nucleos/signal.h>
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include "tty.h"
 
 #if NR_PTYS > 0
@@ -42,7 +42,7 @@ typedef struct pty {
 
   /* Read call on /dev/ptypX. */
   char		rdsendreply;	/* send a reply (instead of notify) */
-  int		rdcaller;	/* process making the call (usually FS) */
+  int		rdcaller;	/* process making the call (usually FS_PROC_NR) */
   int		rdproc;		/* process that wants to read from the pty */
   vir_bytes	rdvir_g;	/* virtual address in readers address space */
   vir_bytes	rdvir_offset;	/* offset in above grant */
@@ -52,7 +52,7 @@ typedef struct pty {
 
   /* Write call to /dev/ptypX. */
   char		wrsendreply;	/* send a reply (instead of notify) */
-  int		wrcaller;	/* process making the call (usually FS) */
+  int		wrcaller;	/* process making the call (usually FS_PROC_NR) */
   int		wrproc;		/* process that wants to write to the pty */
   vir_bytes	wrvir_g;	/* virtual address in writers address space */
   vir_bytes	wrvir_offset;	/* offset in above grant */
@@ -205,7 +205,7 @@ message *m_ptr;
     default:
 	r = -EINVAL;
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -227,7 +227,7 @@ int try;
   	if (try) return 1;
 	if (tp->tty_outleft > 0) {
 		if(tp->tty_outrepcode == TTY_REVIVE) {
-			notify(tp->tty_outcaller);
+			kipc_notify(tp->tty_outcaller);
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
@@ -281,7 +281,7 @@ int try;
 	if ((tp->tty_outleft -= count) == 0) {
 		/* Output is finished, reply to the writer. */
 		if(tp->tty_outrepcode == TTY_REVIVE) {
-			notify(tp->tty_outcaller);
+			kipc_notify(tp->tty_outcaller);
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
@@ -371,11 +371,11 @@ pty_t *pp;
  */
   if (pp->rdcum > 0) {
         if (pp->rdsendreply) {
-		tty_reply(TASK_REPLY, pp->rdcaller, pp->rdproc, pp->rdcum);
+		tty_reply(__NR_task_reply, pp->rdcaller, pp->rdproc, pp->rdcum);
 		pp->rdleft = pp->rdcum = 0;
 	}
 	else
-		notify(pp->rdcaller);
+		kipc_notify(pp->rdcaller);
   }
 
 }
@@ -397,7 +397,7 @@ int try;
 	if (try) return 1;
 	if (tp->tty_inleft > 0) {
 		if(tp->tty_inrepcode == TTY_REVIVE) {
-			notify(tp->tty_incaller);
+			kipc_notify(tp->tty_incaller);
 			tp->tty_inrevived = 1;
 		} else {
 			tty_reply(tp->tty_inrepcode, tp->tty_incaller,
@@ -441,12 +441,12 @@ int try;
 	pp->wrcum++;
 	if (--pp->wrleft == 0) {
 		if (pp->wrsendreply) {
-			tty_reply(TASK_REPLY, pp->wrcaller, pp->wrproc,
+			tty_reply(__NR_task_reply, pp->wrcaller, pp->wrproc,
 				pp->wrcum);
 			pp->wrcum = 0;
 		}
 		else
-			notify(pp->wrcaller);
+			kipc_notify(pp->wrcaller);
 	}
   }
 
@@ -467,12 +467,12 @@ int try;
 
   if (pp->rdleft > 0) {
   	assert(!pp->rdsendreply);
-  	notify(pp->rdcaller);
+  	kipc_notify(pp->rdcaller);
   }
 
   if (pp->wrleft > 0) {
   	assert(!pp->wrsendreply);
-  	notify(pp->wrcaller);
+  	kipc_notify(pp->wrcaller);
   }
 
   if (pp->state & PTY_CLOSED) pp->state = 0; else pp->state |= TTY_CLOSED;
@@ -493,7 +493,7 @@ int try;
   if (pp->wrleft > 0) {
   	pp->wrcum += pp->wrleft;
   	pp->wrleft= 0;
-  	notify(pp->wrcaller);
+  	kipc_notify(pp->wrcaller);
   }
 
   return 0;
@@ -633,7 +633,7 @@ void select_retry_pty(tty_t *tp)
 	if (pp->select_ops && (r=select_try_pty(tp, pp->select_ops))) {
 		pp->select_ops &= ~r;
 		pp->select_ready_ops |= r;
-		notify(pp->select_proc);
+		kipc_notify(pp->select_proc);
 	}
 }
 

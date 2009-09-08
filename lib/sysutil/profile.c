@@ -19,11 +19,11 @@
  *   14 Aug, 2006   Created (Rogier Meurs)
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/profile.h>
 #include <nucleos/syslib.h>
 #include <nucleos/u64.h>

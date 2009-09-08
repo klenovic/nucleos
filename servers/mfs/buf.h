@@ -20,8 +20,8 @@
  * will eventually be rewritten to the disk.
  */
 
-#include <sys/dir.h>			/* need struct direct */
-#include <dirent.h>
+#include <nucleos/dir.h>			/* need struct direct */
+#include <nucleos/dirent.h>
 
 union fsdata_u {
     char b__data[_MAX_BLOCK_SIZE];		     /* ordinary user data */

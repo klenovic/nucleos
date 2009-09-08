@@ -10,13 +10,10 @@
 /*	closedir()					Author: Kees J. Bot
  *								24 Apr 1989
  */
-#define nil 0
-#include <lib.h>
-#define close	_close
-#define closedir _closedir
+#include <nucleos/lib.h>
 #include <nucleos/types.h>
-#include <dirent.h>
-#include <unistd.h>
+#include <nucleos/dirent.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
 #include <nucleos/errno.h>
 
@@ -25,7 +22,7 @@ int closedir(DIR *dp)
 {
 	int d;
 
-	if (dp == nil) { errno= EBADF; return -1; }
+	if (dp == 0) { errno= EBADF; return -1; }
 
 	d= dp->_fd;
 	free((void *) dp);

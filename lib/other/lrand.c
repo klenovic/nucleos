@@ -29,7 +29,7 @@
  *	3)  Has a known implementation by E. L. Schrage.
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 
 long seed(long lseed);
 long lrand(void);

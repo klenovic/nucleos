@@ -7,14 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sigprocmask _sigprocmask
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-int sigprocmask(how, set, oset)
-int how;
-const sigset_t *set;
-sigset_t *oset;
+int sigprocmask(int how, const sigset_t *set, sigset_t *oset)
 {
   message m;
 
@@ -25,7 +21,7 @@ sigset_t *oset;
 	m.m2_i1 = how;
 	m.m2_l1 = (long) *set;
   }
-  if (_syscall(MM, SIGPROCMASK, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0) return(-1);
   if (oset != (sigset_t *) NULL) *oset = (sigset_t) (m.m2_l1);
   return(m.m_type);
 }

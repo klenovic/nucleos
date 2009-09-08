@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 /* bcmp - Berklix equivalent of memcmp  */
 
-#include <string.h>
+#include <nucleos/string.h>
 
 int bcmp(s1, s2, length)	/* == 0 or != 0 for equality and inequality */ 
 const void *s1;

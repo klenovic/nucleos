@@ -22,8 +22,7 @@
  */
 
 #include "fs.h"
-#include <unistd.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"
@@ -46,15 +45,15 @@ int do_chmod()
   gid_t gid;
   mode_t new_mode;
     
-  if (call_nr == CHMOD) {
+  if (call_nr == __NR_chmod) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
+      if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
 
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
       if (r != 0) return r;
   } 
-  else if (call_nr == FCHMOD) {
+  else if (call_nr == __NR_fchmod) {
       if (!(flp = get_filp(m_in.m3_i1))) return err_code;
       vp= flp->filp_vno;
       dup_vnode(vp);
@@ -106,15 +105,15 @@ int do_chown()
   gid_t gid;
   mode_t new_mode;
   
-  if (call_nr == CHOWN) {
+  if (call_nr == __NR_chown) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+      if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
       
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
       if (r != 0) return r;
   } 
-  else if (call_nr == FCHOWN) {
+  else if (call_nr == __NR_fchown) {
       if (!(flp = get_filp(m_in.m1_i1))) return err_code;
       vp= flp->filp_vno;
       dup_vnode(vp);
@@ -187,7 +186,7 @@ int do_access()
   if ( (m_in.mode & ~(R_OK | W_OK | X_OK)) != 0 && m_in.mode != F_OK)
 	return(-EINVAL);
 
-  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
 
   /* Request lookup */
   r = lookup_vp(0 /*flags*/, TRUE /*use_realuid*/, &vp);

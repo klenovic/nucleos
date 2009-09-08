@@ -127,7 +127,7 @@ static void reply(dpeth_t * dep, int err, int m_type)
 
   DEBUG(printf("\t reply %d (%ld)\n", reply.m_type, reply.DL_STAT));
 
-  if ((status = send(dep->de_client, &reply)) == 0) {
+  if ((status = kipc_send(dep->de_client, &reply)) == 0) {
 	dep->de_read_s = 0;
 	dep->de_flags &= NOT(DEF_ACK_SEND | DEF_ACK_RECV);
 
@@ -360,7 +360,7 @@ static void do_init(message * mp)
   reply_mess.m3_i1 = port;
   reply_mess.m3_i2 = DE_PORT_NR;
   DEBUG(printf("\t reply %d\n", reply_mess.m_type));
-  if (send(mp->m_source, &reply_mess) != 0)	/* Can't send */
+  if (kipc_send(mp->m_source, &reply_mess) != 0)	/* Can't send */
 	panic(dep->de_name, SendErrMsg, mp->m_source);
 
   return;
@@ -518,7 +518,7 @@ message *mp;
 	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
 		panic("dpeth", "do_getname: send failed: %d\n", r);
 }
@@ -586,16 +586,16 @@ int main(int argc, char **argv)
   /* Try to notify inet that we are present (again) */
   rc = _pm_findproc("inet", &tasknr);
   if (rc == 0)
-	notify(tasknr);
+	kipc_notify(tasknr);
 
   while (TRUE) {
-	if ((rc = receive(ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
+	if ((rc = kipc_receive(ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
 
 	DEBUG(printf("eth: got message %d, ", m.m_type));
 
 	switch (m.m_type) {
 	    case DEV_PING:	/* Status request from RS */
-		notify(m.m_source);
+		kipc_notify(m.m_source);
 		continue;
 	    case DL_WRITEV_S:	/* Write message to device */
 		do_vwrite_s(&m);

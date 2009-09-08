@@ -11,13 +11,13 @@
 include scripts/mk/Kbuild.include
 
 # final flags
-a_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) \
+a_flags = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) \
 	        $(asflags-y) $(ASFLAGS_$(basetarget).o)
 
-c_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
+c_flags = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
 	        $(ccflags-y) $(CFLAGS_$(basetarget).o)
 
-cpp_flags = -Wp,-MD,$(depfile) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) \
+cpp_flags = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(NUCLEOSINCLUDE) $(KBUILD_CPPFLAGS) \
 	          $(cppflags-y) $(CPPFLAGS_$(notdir $@))
 
 ld_flags = $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(notdir $@))

@@ -27,7 +27,7 @@
  *		be misrepresented as being the original software.
  */
 
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 #define const		/* avoid "const poisoning" */
 #include <regexp.h>

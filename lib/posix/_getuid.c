@@ -7,13 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getuid	_getuid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 uid_t getuid()
 {
   message m;
 
-  return( (uid_t) _syscall(MM, GETUID, &m));
+  return( (uid_t) _syscall(PM_PROC_NR, __NR_getuid, &m));
 }

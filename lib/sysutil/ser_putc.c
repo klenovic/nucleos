@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "sysutil.h"
-#include <timers.h>
+#include <nucleos/timer.h>
 
 #define COM1_BASE       0x3F8
 #define COM1_THR        (COM1_BASE + 0)

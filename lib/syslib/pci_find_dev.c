@@ -32,7 +32,7 @@ int *devindp;
 	m.m1_i2= dev;
 	m.m1_i3= func;
 
-	r= sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_find_dev: can't talk to PCI", r);
 

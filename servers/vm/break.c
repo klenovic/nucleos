@@ -23,7 +23,7 @@
  *   adjust:      see if a proposed segment adjustment is allowed
  */
 
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
@@ -31,7 +31,7 @@
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 

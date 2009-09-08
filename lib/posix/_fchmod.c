@@ -7,17 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fchmod	_fchmod
-#include <sys/stat.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
 
-int fchmod(fd, mode)
-int fd;
-mode_t mode;
+int fchmod(int fd, mode_t mode)
 {
   message m;
 
   m.m3_i1 = fd;
   m.m3_i2 = mode;
-  return(_syscall(FS, FCHMOD, &m));
+  return(_syscall(FS_PROC_NR, __NR_fchmod, &m));
 }

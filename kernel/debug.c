@@ -16,7 +16,7 @@
 #include <kernel/proc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/limits.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK		/* only include code if enabled */
 

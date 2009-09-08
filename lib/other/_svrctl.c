@@ -10,9 +10,8 @@
 /*	svrctl() - special server control functions.	Author: Kees J. Bot
  *								24 Apr 1994
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <stdio.h>
-#define svrctl _svrctl
 #include <nucleos/svrctl.h>
 
 int svrctl(int request, void *argp)
@@ -25,12 +24,12 @@ int svrctl(int request, void *argp)
 	switch ((request >> 8) & 0xFF) {
 	case 'M':
 	case 'S':
-		/* MM handles calls for itself and the kernel. */
-		return _syscall(MM, SVRCTL, &m);
+		/* PM_PROC_NR handles calls for itself and the kernel. */
+		return _syscall(PM_PROC_NR, __NR_svrctl, &m);
 	case 'F':
 	case 'I':
-		/* FS handles calls for itself and inet. */
-		return _syscall(FS, SVRCTL, &m);
+		/* FS_PROC_NR handles calls for itself and inet. */
+		return _syscall(FS_PROC_NR, __NR_svrctl, &m);
 	default:
 		errno = EINVAL;
 		return -1;

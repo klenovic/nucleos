@@ -8,13 +8,12 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "fs.h"
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include "buf.h"
 #include "inode.h"
@@ -140,7 +139,7 @@ printf("MFS(%d) get_inode by open() failed\n", SELF_E);
   }
 
   /* Reply message */
-  fs_m_out.m_source = rip->i_dev;  /* filled with FS endpoint by the system */
+  fs_m_out.m_source = rip->i_dev;  /* filled with FS_PROC_NR endpoint by the system */
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_MODE = rip->i_mode;
   fs_m_out.RES_FILE_SIZE = rip->i_size;
@@ -204,7 +203,7 @@ printf("MFS(%d) get_inode for parent dir by creat() failed\n", SELF_E);
   }
 
   /* Reply message */
-  fs_m_out.m_source = rip->i_dev;  /* filled with FS endpoint by the system */
+  fs_m_out.m_source = rip->i_dev;  /* filled with FS_PROC_NR endpoint by the system */
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_MODE = rip->i_mode;
   fs_m_out.RES_FILE_SIZE = rip->i_size;
@@ -267,7 +266,7 @@ printf("MFS(%d) get_inode for parent dir by creat() failed\n", SELF_E);
   }
 
   /* Reply message */
-  fs_m_out.m_source = rip->i_dev;  /* filled with FS endpoint by the system */
+  fs_m_out.m_source = rip->i_dev;  /* filled with FS_PROC_NR endpoint by the system */
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_MODE = rip->i_mode;
   fs_m_out.RES_FILE_SIZE = rip->i_size;

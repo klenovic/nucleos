@@ -8,16 +8,16 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/type.h>
 #include <nucleos/const.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 
-#include <sys/mman.h>
+#include <nucleos/mman.h>
 
 #include <nucleos/limits.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <assert.h>
 #include <nucleos/types.h>

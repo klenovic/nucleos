@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 /* memccpy - copy bytes up to a certain char
  *
  * CHARBITS should be defined only if the compiler lacks "unsigned char".

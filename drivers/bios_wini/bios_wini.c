@@ -362,7 +362,7 @@ int safe;			/* use safecopies? */
 		vir_offset = 0;
 		iov->iov_size = 0;
 		if (nbytes == 0) {
-			/* The rest is optional, so we return to give FS a
+			/* The rest is optional, so we return to give FS_PROC_NR a
 			 * chance to think it over.
 			 */
 			return 0;

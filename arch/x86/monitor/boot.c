@@ -14,15 +14,15 @@
 char version[]=   "2.20";
 
 #define nil 0
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/stringify.h>
 #include <nucleos/stddef.h>
 #include <stdio.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <stdlib.h>
 #include <nucleos/limits.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <ibm/partition.h>
 #include <ibm/bios.h>
@@ -34,7 +34,7 @@ char version[]=   "2.20";
 #include <nucleos/syslib.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
-#include <sys/video.h>
+#include <nucleos/video.h>
 #include "rawfs.h"
 #include "boot.h"
 
@@ -706,7 +706,7 @@ void get_parameters(void)
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "ram");
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "bootdev");
   b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
-  b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(DEFAULT_HZ));
+  b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(HZ));
 
   processor = getprocessor();
 

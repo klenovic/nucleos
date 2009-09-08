@@ -49,15 +49,15 @@
 
 
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/fcntl.h>
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
+#include <nucleos/string.h>
+#include <nucleos/time.h>
 #include <nucleos/errno.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
 #include <nucleos/com.h>

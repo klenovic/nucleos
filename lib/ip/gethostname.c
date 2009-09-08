@@ -12,8 +12,8 @@
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <net/gen/netdb.h>
 
 #define HOSTNAME_FILE "/etc/hostname.file"

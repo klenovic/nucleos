@@ -21,6 +21,7 @@
  *   Jul 01, 2005	Created.  (Jorrit N. Herder)	
  */
 #include <nucleos/com.h>
+#include <nucleos/signal.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <asm/kernel/types.h>

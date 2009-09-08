@@ -10,9 +10,7 @@
 /*	sysuname(2) - transfer uname(3) strings.	Author: Kees J. Bot
  *								5 Dec 1992
  */
-
-#define sysuname _sysuname
-#include <lib.h>
+#include <nucleos/lib.h>
 
 int sysuname(int req, int field, char *value, size_t len)
 {
@@ -27,5 +25,5 @@ int sysuname(int req, int field, char *value, size_t len)
 	m.m1_p2 = NULL;
 	m.m1_p3 = NULL;
 
-	return _syscall(MM, SYSUNAME, &m);
+	return _syscall(PM_PROC_NR, __NR_sysuname, &m);
 }

@@ -21,7 +21,7 @@
  */
 
 #include "fs.h"
-#include <string.h>
+#include <nucleos/string.h>
 #include "buf.h"
 #include "inode.h"
 #include "super.h"

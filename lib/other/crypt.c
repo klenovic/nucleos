@@ -12,23 +12,13 @@
  * This routine does not encrypt anything, it uses the pwdauth
  * program to do the hard work.
  */
-#define nil ((void*)0)
-#define pipe _pipe
-#define fork _fork
-#define close _close
-#define dup2 _dup2
-#define execl _execl
-#define read _read
-#define _exit __exit
-#define write _write
-#define waitpid _waitpid
 #include <nucleos/types.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 #include <nucleos/errno.h>
 #include <stdarg.h>
-#include <sys/wait.h>
+#include <nucleos/wait.h>
 
 /* Set-uid root program to read /etc/shadow or encrypt passwords. */
 static char PWDAUTH[] = "/usr/lib/pwdauth";
@@ -41,7 +31,7 @@ static void tell(const char *s0, ...)
 
 	va_start(ap, s0);
 	s= s0;
-	while (s != nil) {
+	while (s != 0) {
 		(void) write(2, s, strlen(s));
 		s= va_arg(ap, const char *);
 	}
@@ -84,10 +74,9 @@ char *crypt(const char *key, const char *salt)
 			close(pfd[1]);
 		}
 
-		execl(PWDAUTH, PWDAUTH, (char *) nil);
+		execl(PWDAUTH, PWDAUTH, (char *) 0);
 
-		tell("crypt(): ", PWDAUTH, ": ", strerror(errno), "\r\n",
-								(char *) nil);
+		tell("crypt(): ", PWDAUTH, ": ", strerror(errno), "\r\n", (char *) 0);
 		/* No pwdauth?  Fail! */
 		(void) read(0, pwdata, LEN);
 		_exit(1);

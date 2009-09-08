@@ -13,7 +13,7 @@
  *      
  *  get_vnode - increase counter and get details of an inode
  *  get_free_vnode - get a pointer to a free vnode obj
- *  find_vnode - find a vnode according to the FS endpoint and the inode num.  
+ *  find_vnode - find a vnode according to the FS_PROC_NR endpoint and the inode num.  
  *  dup_vnode - duplicate vnode (i.e. increase counter)
  *  put_vnode - drop vnode (i.e. decrease counter)  
  *  
@@ -75,7 +75,7 @@ int line;
  *===========================================================================*/
 struct vnode *find_vnode(int fs_e, int numb)
 {
-/* Find a specified (FS endpoint and inode number) vnode in the
+/* Find a specified (FS_PROC_NR endpoint and inode number) vnode in the
  * vnode table */
   struct vnode *vp;
 
@@ -106,7 +106,7 @@ void dup_vnode(struct vnode *vp)
 void put_vnode(struct vnode *vp)
 {
 /* Decrease vnode's usage counter and decrease inode's usage counter in the 
- * corresponding FS process.
+ * corresponding FS_PROC_NR process.
  */
   ASSERTVP(vp);
 
@@ -147,7 +147,7 @@ void put_vnode(struct vnode *vp)
  *===========================================================================*/
 void vnode_clean_refs(struct vnode *vp)
 {
-/* Tell the underlying FS to drop all reference but one. */
+/* Tell the underlying FS_PROC_NR to drop all reference but one. */
   if (vp == NIL_VNODE) {
         return;
   }

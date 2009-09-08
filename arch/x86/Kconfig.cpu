@@ -66,6 +66,13 @@ config X86_GENERIC
     This is really intended for distributors who need more
     generic optimizations.
 
+#
+# Define implied options from the CPU selection here
+
+config X86_BSWAP
+	def_bool y
+	depends on X86_32 && !M386
+
 # this should be set for all -march=.. options where the compiler
 # generates cmov.
 config X86_CMOV

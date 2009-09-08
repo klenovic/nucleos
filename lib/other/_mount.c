@@ -7,18 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define mount	_mount
-#define umount	_umount
-#include <string.h>
-#include <sys/mount.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
+#include <nucleos/mount.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/syslib.h>
 #include <servers/rs/rs.h>
 #include <nucleos/paths.h>
-#define OK	0
 
 #define FSPATH "/sbin/"
 #define FSDEFAULT "mfs"
@@ -80,7 +77,7 @@ int mountflags;
     mountflags &= ~MS_REUSE; /* Temporary: turn off to not confuse VFS */
   }
 
-  /* Make FS process label for RS from special name. */
+  /* Make FS_PROC_NR process label for RS from special name. */
   if(!(label=makelabel(special))) {
 	return -1;
   }
@@ -136,7 +133,7 @@ int mountflags;
   m.m1_p1 = special;
   m.m1_p2 = name;
   m.m1_p3 = (char*) ep;
-  r = _syscall(FS, MOUNT, &m);
+  r = _syscall(FS_PROC_NR, __NR_mount, &m);
 
   if(r != 0) {
 	/* If mount() failed, tell RS to shutdown MFS process.
@@ -161,7 +158,7 @@ const char *name;
   }
 
   _loadname(name, &m);
-  r = _syscall(FS, UMOUNT, &m);
+  r = _syscall(FS_PROC_NR, __NR_umount, &m);
 
   if(r == 0) {
 	rs_down(label);

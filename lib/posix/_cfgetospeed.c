@@ -8,14 +8,14 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
-posix/_cfgetospeed
+posix/cfgetospeed
 
 Created:	June 11, 1993 by Philip Homburg
 */
 
-#include <termios.h>
+#include <nucleos/termios.h>
 
-speed_t _cfgetospeed(const struct termios *termios_p)
+speed_t cfgetospeed(const struct termios *termios_p)
 {
   return termios_p->c_ospeed;
 }

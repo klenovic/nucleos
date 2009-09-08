@@ -300,7 +300,7 @@ void main( int argc, char **argv )
    /* Try to notify inet that we are present (again) */
    r= ds_retrieve_u32("inet", &tasknr);
    if (r == 0)
-      notify(tasknr);
+      kipc_notify(tasknr);
    else if (r != -ESRCH)
       printf("lance: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
@@ -313,7 +313,7 @@ void main( int argc, char **argv )
             sys_irqenable(&ec->ec_hook);
       }
 
-      if ((r= receive(ANY, &m)) != 0)
+      if ((r= kipc_receive(ANY, &m)) != 0)
          panic( "lance", "receive failed", r);
 
       for (i=0;i<EC_PORT_NR_MAX;++i)
@@ -325,7 +325,7 @@ void main( int argc, char **argv )
       switch (m.m_type)
       {
       case DEV_PING:
-         notify(m.m_source);
+         kipc_notify(m.m_source);
          continue;
       case DL_WRITEV_S:
          do_vwrite_s(&m, FALSE);
@@ -715,7 +715,7 @@ int may_block;
       panic("lance", "getuptime() failed:", r);
    reply.DL_CLCK = now;
 
-   r = send(ec->client, &reply);
+   r = kipc_send(ec->client, &reply);
    if (r == -ELOCKED && may_block)
    {
       return;
@@ -735,7 +735,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-   if (send(req->m_source, reply_mess) != 0)
+   if (kipc_send(req->m_source, reply_mess) != 0)
       panic( "lance", "unable to mess_reply", NO_NUM);
 }
 
@@ -1376,7 +1376,7 @@ message *mp;
    mp->m_type= DL_STAT_REPLY;
    mp->DL_PORT= port;
    mp->DL_STAT= 0;
-   r= send(mp->m_source, mp);
+   r= kipc_send(mp->m_source, mp);
    if (r != 0)
       panic(__FILE__, "do_getstat_s: send failed: %d\n", r);
 }
@@ -1581,7 +1581,7 @@ message *mp;
    strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
    mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
    mp->m_type= DL_NAME_REPLY;
-   r= send(mp->m_source, mp);
+   r= kipc_send(mp->m_source, mp);
    if (r != 0)
       panic("LANCE", "do_getname: send failed", r);
 }

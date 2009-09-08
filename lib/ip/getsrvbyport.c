@@ -26,7 +26,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include <nucleos/stddef.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <net/gen/netdb.h>
 
 extern int _serv_stayopen;

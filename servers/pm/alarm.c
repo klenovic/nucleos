@@ -22,9 +22,9 @@
  */
 
 #include "pm.h"
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <nucleos/time.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/com.h>
 #include "mproc.h"
 #include "param.h"

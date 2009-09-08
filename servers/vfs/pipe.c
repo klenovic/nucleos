@@ -29,9 +29,9 @@
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <assert.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
@@ -170,7 +170,7 @@ int notouch;			/* check only */
 			}
 			/* If need be, activate sleeping writers. */
 			if (susp_count > 0)
-				release(vp, WRITE, susp_count);
+				release(vp, __NR_write, susp_count);
 		}
 		return(r);
 	}
@@ -201,7 +201,7 @@ int notouch;			/* check only */
 		if (bytes > 0)  {
 			/* Do a partial write. Need to wakeup reader */
 			if (!notouch)
-				release(vp, READ, susp_count);
+				release(vp, __NR_read, susp_count);
 			return(bytes);
 		} else {
 			/* Pipe is full */
@@ -218,7 +218,7 @@ int notouch;			/* check only */
 			 * since we'll suspend ourself in read_write()
 			 */
 			if (!notouch)
-				release(vp, READ, susp_count);
+				release(vp, __NR_read, susp_count);
 			return(bytes);
 		}
 	}
@@ -229,7 +229,7 @@ int notouch;			/* check only */
 
   /* Writing to an empty pipe.  Search for suspended reader. */
   if (pos == 0 && !notouch)
-	release(vp, READ, susp_count);
+	release(vp, __NR_read, susp_count);
 
   /* Requested amount fits */
   return bytes;
@@ -298,7 +298,7 @@ size_t size;
   susp_count++;					/* #procs susp'ed on pipe*/
   fp->fp_suspended = SUSPENDED;
   assert(!GRANT_VALID(fp->fp_grant));
-  fp->fp_fd = (fd_nr << 8) | ((rw_flag == READING) ? READ : WRITE);
+  fp->fp_fd = (fd_nr << 8) | ((rw_flag == READING) ? __NR_read : __NR_write);
   fp->fp_task = -XPIPE;
   fp->fp_buffer = buf;		
   fp->fp_nbytes = size;
@@ -353,9 +353,9 @@ int count;			/* max number of processes to release */
   /* Trying to perform the call also includes SELECTing on it with that
    * operation.
    */
-  if (call_nr == READ || call_nr == WRITE) {
+  if (call_nr == __NR_read || call_nr == __NR_write) {
   	  int op;
-  	  if (call_nr == READ)
+  	  if (call_nr == __NR_read)
   	  	op = SEL_RD;
   	  else
   	  	op = SEL_WR;
@@ -449,12 +449,12 @@ int returned;			/* if hanging on task, how many bytes read */
 		 * Pretend it wants only what there is.
 		 */
 		rfp->fp_nbytes = returned; 
-		/* If a grant has been issued by FS for this I/O, revoke
+		/* If a grant has been issued by FS_PROC_NR for this I/O, revoke
 		 * it again now that I/O is done.
 		 */
 		if(GRANT_VALID(rfp->fp_grant)) {
 			if(cpf_revoke(rfp->fp_grant)) {
-				panic(__FILE__,"FS: revoke failed for grant",
+				panic(__FILE__,"FS_PROC_NR: revoke failed for grant",
 					rfp->fp_grant);
 			} 
 			rfp->fp_grant = GRANT_INVALID;
@@ -539,7 +539,7 @@ int proc_nr_e;
 		mess.IO_GRANT = (char *) rfp->fp_grant;
 
 		/* Tell kernel R or W. Mode is from current call, not open. */
-		mess.COUNT = (rfp->fp_fd & BYTE) == READ ? R_BIT : W_BIT;
+		mess.COUNT = (rfp->fp_fd & BYTE) == __NR_read ? R_BIT : W_BIT;
 		mess.m_type = CANCEL;
 		fp = rfp;	/* hack - ctty_io uses fp */
 		(*dmap[(dev >> MAJOR) & BYTE].dmap_io)(task, &mess);
@@ -552,7 +552,7 @@ int proc_nr_e;
 		if(status == -EAGAIN) status = -EINTR;
 		if(GRANT_VALID(rfp->fp_grant)) {
 			if(cpf_revoke(rfp->fp_grant)) {
-				panic(__FILE__,"FS: revoke failed for grant (cancel)",
+				panic(__FILE__,"FS_PROC_NR: revoke failed for grant (cancel)",
 					rfp->fp_grant);
 			} 
 			rfp->fp_grant = GRANT_INVALID;

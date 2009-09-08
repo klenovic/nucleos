@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Type definitions for the Data Store Server. */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/types.h>
 #include <servers/ds/ds.h>
 #include <nucleos/bitmap.h>

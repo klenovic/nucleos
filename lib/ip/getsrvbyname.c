@@ -25,7 +25,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <string.h>
+#include <nucleos/string.h>
 #include <net/gen/netdb.h>
 
 extern int _serv_stayopen;

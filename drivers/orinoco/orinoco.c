@@ -63,13 +63,13 @@
  */
 
 #include <nucleos/drivers.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/stddef.h>
 #include <nucleos/keymap.h>
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
 #include <nucleos/sysutil.h>
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <asm/ioctls.h>
 #include <ibm/pci.h>
 #include <servers/ds/ds.h>
@@ -104,7 +104,7 @@ static tmra_ut or_watchdog;
 #include <asm/servers/vm/vm.h>
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
 
 #include "assert.h"
@@ -270,17 +270,17 @@ int main(int argc, char *argv[]) {
 	 * not yet alive. */
 	r = ds_retrieve_u32("inet", &inet_proc_nr);
 	if (r == 0) 
-		notify(inet_proc_nr);
+		kipc_notify(inet_proc_nr);
 	else if (r != -ESRCH)
 		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
-		if ((r = receive (ANY, &m)) != 0)
+		if ((r = kipc_receive (ANY, &m)) != 0)
 			panic(__FILE__, "orinoco: receive failed", NO_NUM);
 
 		switch (m.m_type) {
 		case DEV_PING: 
-			notify(m.m_source);	
+			kipc_notify(m.m_source);	
 			break;
 		case DL_WRITEV:
 			or_writev (&m, FALSE, TRUE);
@@ -375,7 +375,7 @@ static void or_getname(message *mp) {
 	mp->DL_NAME[sizeof(mp->DL_NAME) - 1] = '\0';
 	mp->m_type = DL_NAME_REPLY;
 
-	r = send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp);
 	if(r != 0) {
 		panic(__FILE__, "or_getname: send failed", r);
 	}
@@ -492,7 +492,7 @@ static void or_dump (message *m) {
 
 		m->m_type = FKEY_CONTROL;
 		m->FKEY_REQUEST = FKEY_EVENTS;
-		if((sendrec(TTY_PROC_NR,m)) != 0)
+		if((kipc_sendrec(TTY_PROC_NR,m)) != 0)
 			printf("Contacting the TTY failed\n");
 		
 		if(bit_isset(m->FKEY_SFKEYS, 11)) {
@@ -1320,7 +1320,7 @@ static void or_watchdog_f(timer_t *tp) {
  *****************************************************************************/
 
 static void mess_reply (message * req, message * reply_mess) {
-	if (send (req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic(__FILE__, "orinoco: unable to mess_reply", NO_NUM);
 
 }
@@ -1721,7 +1721,7 @@ static void reply (t_or * orp, int err, int may_block) {
 		panic(__FILE__, "orinoco: getuptime() failed:", r);
 
 	reply.DL_CLCK = now;
-	r = send (orp->or_client, &reply);
+	r = kipc_send(orp->or_client, &reply);
 
 	if (r == -ELOCKED && may_block) {
 		return;
@@ -2339,7 +2339,7 @@ static void or_getstat (message * mp) {
 	mp->DL_PORT = port;
 	mp->DL_STAT = 0;
 
-	r = send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp);
 	if(r != 0)
 		panic(__FILE__, "orinoco: getstat failed:", r);
 
@@ -2380,7 +2380,7 @@ static void or_getstat_s (message * mp) {
 	mp->DL_PORT = port;
 	mp->DL_STAT = 0;
 
-	r = send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp);
 	if(r != 0)
 		panic(__FILE__, "orinoco: getstat_s failed:", r);
 }

@@ -21,13 +21,13 @@
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdio.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <nucleos/svrctl.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
 #include <nucleos/const.h>
@@ -46,7 +46,7 @@
 #include "vnode.h"
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[NCALLS];
+extern unsigned long calls_stats[__NR_SYSCALLS];
 #endif
 
 static void fs_init(void);
@@ -97,7 +97,7 @@ int main(void)
 		get_work();		/* sets who and call_nr */
 
 		if (who_e == PM_PROC_NR && call_nr != PROC_EVENT)
-			printf("FS: strange, got message %d from PM\n", call_nr);
+			printf("FS_PROC_NR: strange, got message %d from PM\n", call_nr);
 
 		if (call_nr == DEV_REVIVE) {
 			endpoint_t endpt;
@@ -107,7 +107,7 @@ int main(void)
 				endpt = suspended_ep(m_in.m_source, m_in.REP_IO_GRANT);
 
 				if(endpt == NONE) {
-					printf("FS: proc with "
+					printf("FS_PROC_NR: proc with "
 					       "grant %d from %d not found (revive)\n",
 					m_in.REP_IO_GRANT, m_in.m_source);
 					continue;
@@ -141,7 +141,7 @@ int main(void)
 		/* Check for special control messages first. */
 		if ((call_nr & NOTIFY_MESSAGE)) {
 			if (call_nr == PROC_EVENT && who_e == PM_PROC_NR) {
-				/* PM tries to get FS to do something */
+				/* PM tries to get FS_PROC_NR to do something */
 				service_pm();
 			} else if (call_nr == SYN_ALARM && who_e == CLOCK) {
 				/* Alarm timer expired. Used only for select().
@@ -159,7 +159,7 @@ int main(void)
 
 		/* We only expect notify()s from tasks. */
 		if(who_p < 0) {
-			printf("FS: ignoring message from %d (%d)\n",
+			printf("FS_PROC_NR: ignoring message from %d (%d)\n",
 			who_e, m_in.m_type);
 			continue;
 		}
@@ -204,14 +204,14 @@ int main(void)
 
 		/* Other calls. */
 		switch (call_nr) {
-		case DEVCTL:
+		case __NR_devctl:
 			error= do_devctl();
 
 			if (error != SUSPEND)
 				reply(who_e, error);
 			break;
 
-		case MAPDRIVER:
+		case __NR_mapdriver:
 			error= do_mapdriver();
 			if (error != SUSPEND)
 				reply(who_e, error);
@@ -219,14 +219,14 @@ int main(void)
 
 		default:
 			/* Call the internal function that does the work. */
-			if (call_nr < 0 || call_nr >= NCALLS) {
+			if (call_nr < 0 || call_nr >= __NR_SYSCALLS) {
 				error = SUSPEND;
 				/* Not supposed to happen. */
 				printf("VFS: illegal %d system call by %d\n",
 					call_nr, who_e);
 			} else if (fp->fp_pid == PID_FREE) {
 				error = -ENOSYS;
-				printf("FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
+				printf("FS_PROC_NR, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
 					who_e, call_nr, m_in.endpt1);
 			} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
@@ -289,7 +289,7 @@ static void get_work(void)
 
 					assert(f != NULL);
 
-					r= rw_pipe((call_nr == READ) ? READING :
+					r= rw_pipe((call_nr == __NR_read) ? READING :
 						   WRITING, who_e, fd_nr, f,
 						   rp->fp_buffer, rp->fp_nbytes);
 
@@ -309,7 +309,7 @@ static void get_work(void)
 	for(;;) {
 		int r;
 		/* Normal case.  No one to revive. */
-		if ((r=receive(ANY, &m_in)) != 0)
+		if ((r=kipc_receive(ANY, &m_in)) != 0)
 			panic(__FILE__,"fs receive error", r);
 
 		who_e = m_in.m_source;
@@ -319,15 +319,15 @@ static void get_work(void)
 			panic(__FILE__,"receive process out of range", who_p);
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint == NONE) {
-			printf("FS: ignoring request from %d, endpointless slot %d (%d)\n",
+			printf("FS_PROC_NR: ignoring request from %d, endpointless slot %d (%d)\n",
 			m_in.m_source, who_p, m_in.m_type);
 			continue;
 		}
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint != who_e) {
-			printf("FS: receive endpoint inconsistent (%d, %d, %d).\n",
+			printf("FS_PROC_NR: receive endpoint inconsistent (%d, %d, %d).\n",
 				who_e, fproc[who_p].fp_endpoint, who_e);
-			panic(__FILE__, "FS: inconsistent endpoint ", NO_NUM);
+			panic(__FILE__, "FS_PROC_NR: inconsistent endpoint ", NO_NUM);
 			continue;
 		}
 
@@ -347,11 +347,11 @@ void reply(int whom, int result)
 	int s;
 
 #if 0
-	if (call_nr == SYMLINK)
+	if (call_nr == __NR_symlink)
 	printf("vfs:reply: replying %d for call %d\n", result, call_nr);
 #endif
 	m_out.reply_type = result;
-	s = sendnb(whom, &m_out);
+	s = kipc_sendnb(whom, &m_out);
 
 	if (s != 0)
 		printf("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);
@@ -379,8 +379,8 @@ static void fs_init(void)
 	 * Then, stop and synchronize with the PM.
 	 */
 	do {
-		if ((s=receive(PM_PROC_NR, &mess)) != 0)
-			panic(__FILE__,"FS couldn't receive from PM", s);
+		if ((s=kipc_receive(PM_PROC_NR, &mess)) != 0)
+			panic(__FILE__,"FS_PROC_NR couldn't receive from PM", s);
 
 		if (NONE == mess.PR_ENDPT)
 			break;
@@ -400,9 +400,9 @@ static void fs_init(void)
 	} while (TRUE);			/* continue until process NONE */
 
 	mess.m_type = 0;			/* tell PM that we succeeded */
-	s = send(PM_PROC_NR, &mess);		/* send synchronization message */
+	s = kipc_send(PM_PROC_NR, &mess);		/* kipc_send synchronization message */
 
-	/* All process table entries have been set. Continue with FS initialization.
+	/* All process table entries have been set. Continue with FS_PROC_NR initialization.
 	 * Certain relations must hold for the file system to work at all. Some 
 	 * extra block_size requirements are checked at super-block-read-in time.
 	 */
@@ -458,17 +458,17 @@ static void init_root(void)
 	root_dev = DEV_IMGRD;
 	ROOT_FS_E = MFS_PROC_NR;
 
-	/* Wait FS login message */
+	/* Wait FS_PROC_NR login message */
 	if (last_login_fs_e != ROOT_FS_E) {
-		/* Wait FS login message */
-		if (receive(ROOT_FS_E, &m) != 0) {
+		/* Wait FS_PROC_NR login message */
+		if (kipc_receive(ROOT_FS_E, &m) != 0) {
 			printf("VFS: Error receiving login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",
 			      ROOT_FS_E);
 		}
 
-		if (m.m_type != FS_READY) {
+		if (m.m_type != __NR_fs_ready) {
 			printf("VFS: Invalid login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",
@@ -544,7 +544,7 @@ static void service_pm(void)
 	/* Ask PM for work until there is nothing left to do */
 	for (;;) {
 		m.m_type= PM_GET_WORK;
-		r= sendrec(PM_PROC_NR, &m);
+		r= kipc_sendrec(PM_PROC_NR, &m);
 		if (r != 0) {
 			panic("VFS", "service_pm: sendrec failed", r);
 		}
@@ -589,10 +589,10 @@ static void service_pm(void)
 			m.m_type = PM_EXIT_REPLY;
 			/* Keep m.PM_EXIT_PROC */
 
-			r= send(PM_PROC_NR, &m);
+			r= kipc_send(PM_PROC_NR, &m);
 
 			if (r != 0)
-				panic(__FILE__, "service_pm: send failed", r);
+				panic(__FILE__, "service_pm: kipc_send failed", r);
 			break;
 
 		case PM_UNPAUSE:
@@ -607,10 +607,10 @@ static void service_pm(void)
 
 			/* Reply dummy status to PM for synchronization */
 			m.m_type= PM_REBOOT_REPLY;
-			r = send(PM_PROC_NR, &m);
+			r = kipc_send(PM_PROC_NR, &m);
 
 			if (r != 0)
-				panic(__FILE__, "service_pm: send failed", r);
+				panic(__FILE__, "service_pm: kipc_send failed", r);
 			break;
 
 		case PM_EXEC:
@@ -622,10 +622,10 @@ static void service_pm(void)
 			m.m_type = PM_EXEC_REPLY;
 			/* Keep m.PM_EXEC_PROC */
 			m.PM_EXEC_STATUS= r;
-			r = send(PM_PROC_NR, &m);
+			r = kipc_send(PM_PROC_NR, &m);
 
 			if (r != 0)
-				panic(__FILE__, "service_pm: send failed", r);
+				panic(__FILE__, "service_pm: kipc_send failed", r);
 			break;
 
 		case PM_DUMPCORE:
@@ -637,9 +637,9 @@ static void service_pm(void)
 			/* Keep m.PM_CORE_PROC */
 			m.PM_CORE_STATUS = r;
 			
-			r = send(PM_PROC_NR, &m);
+			r = kipc_send(PM_PROC_NR, &m);
 			if (r != 0)
-				panic(__FILE__, "service_pm: send failed", r);
+				panic(__FILE__, "service_pm: kipc_send failed", r);
 			break;
 
 		default:

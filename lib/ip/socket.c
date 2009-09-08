@@ -9,10 +9,10 @@
  */
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
+#include <nucleos/unistd.h>
+#include <nucleos/socket.h>
 
 #include <net/netlib.h>
 #include <netinet/in.h>

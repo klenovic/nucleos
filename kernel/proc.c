@@ -46,15 +46,15 @@
  */
 
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/stddef.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <kernel/ipc.h>
+#include <kernel/kipc.h>
 #include <kernel/vm.h>
 
 /* The process table and pointers to process table slots. The pointers allow
@@ -174,12 +174,12 @@ long bit_map;			/* notification event set or flags */
 #if 0
   if(src_dst_e != 4 && src_dst_e != 5 &&
 	caller_ptr->p_endpoint != 4 && caller_ptr->p_endpoint != 5) {
-	if(call_nr == SEND)
-		kprintf("(%d SEND to %d) ", caller_ptr->p_endpoint, src_dst_e);
-	else if(call_nr == RECEIVE)
-		kprintf("(%d RECEIVE from %d) ", caller_ptr->p_endpoint, src_dst_e);
-	else if(call_nr == SENDREC)
-		kprintf("(%d SENDREC to %d) ", caller_ptr->p_endpoint, src_dst_e);
+	if(call_nr == KIPC_SEND)
+		kprintf("(%d KIPC_SEND to %d) ", caller_ptr->p_endpoint, src_dst_e);
+	else if(call_nr == KIPC_RECEIVE)
+		kprintf("(%d KIPC_RECEIVE from %d) ", caller_ptr->p_endpoint, src_dst_e);
+	else if(call_nr == KIPC_SENDREC)
+		kprintf("(%d KIPC_SENDREC to %d) ", caller_ptr->p_endpoint, src_dst_e);
 	else
 		kprintf("(%d %d to/from %d) ", caller_ptr->p_endpoint, call_nr, src_dst_e);
   }
@@ -196,19 +196,19 @@ long bit_map;			/* notification event set or flags */
 #endif
 
   /* Check destination. SENDA is special because its argument is a table and
-   * not a single destination. RECEIVE is the only call that accepts ANY (in
-   * addition to a real endpoint). The other calls (SEND, SENDREC,
-   * and NOTIFY) require an endpoint to corresponds to a process. In addition,
+   * not a single destination. KIPC_RECEIVE is the only call that accepts ANY (in
+   * addition to a real endpoint). The other calls (KIPC_SEND, KIPC_SENDREC,
+   * and KIPC_NOTIFY) require an endpoint to corresponds to a process. In addition,
    * it is necessary to check whether a process is allowed to send to a given
    * destination.
    */
-  if (call_nr == SENDA)
+  if (call_nr == KIPC_SENDA)
   {
 	/* No destination argument */
   }
   else if (src_dst_e == ANY)
   {
-	if (call_nr != RECEIVE)
+	if (call_nr != KIPC_RECEIVE)
 	{
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 		kprintf("sys_call: trap %d by %d with bad endpoint %d\n", 
@@ -233,11 +233,11 @@ long bit_map;			/* notification event set or flags */
 		return -EDEADSRCDST;
 	}
 
-	/* If the call is to send to a process, i.e., for SEND, SENDNB,
+	/* If the call is to send to a process, i.e., for KIPC_SEND, KIPC_SENDNB,
 	 * SENDREC or NOTIFY, verify that the caller is allowed to send to
 	 * the given destination. 
 	 */
-	if (call_nr != RECEIVE)
+	if (call_nr != KIPC_RECEIVE)
 	{
 		if (!may_send_to(caller_ptr, src_dst_p)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
@@ -278,7 +278,7 @@ long bit_map;			/* notification event set or flags */
 	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
   }
 
-  if ((iskerneln(src_dst_p) && call_nr != SENDREC && call_nr != RECEIVE)) {
+  if ((iskerneln(src_dst_p) && call_nr != KIPC_SENDREC && call_nr != KIPC_RECEIVE)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
       kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_e);
@@ -292,7 +292,7 @@ long bit_map;			/* notification event set or flags */
    * Normally this is just the size of a regular message, but in the
    * case of SENDA the argument is a table.
    */
-  if(call_nr == SENDA) {
+  if(call_nr == KIPC_SENDA) {
 	msg_size = (size_t) src_dst_e;
 
 	/* Limit size to something reasonable. An arbitrary choice is 16
@@ -305,15 +305,15 @@ long bit_map;			/* notification event set or flags */
 	msg_size = sizeof(*m_ptr);
   }
 
-  /* If the call involves a message buffer, i.e., for SEND, SENDREC, 
-   * or RECEIVE, check the message pointer. This check allows a message to be 
+  /* If the call involves a message buffer, i.e., for KIPC_SEND, KIPC_SENDREC, 
+   * or KIPC_RECEIVE, check the message pointer. This check allows a message to be 
    * anywhere in data or stack or gap. It will have to be made more elaborate 
    * for machines which don't have the gap mapped. 
    *
    * We use msg_size decided above.
    */
-  if (call_nr == SEND || call_nr == SENDREC ||
-	call_nr == RECEIVE || call_nr == SENDA || call_nr == SENDNB) {
+  if (call_nr == KIPC_SEND || call_nr == KIPC_SENDREC ||
+	call_nr == KIPC_RECEIVE || call_nr == KIPC_SENDA || call_nr == KIPC_SENDNB) {
 	int r;
 	phys_bytes lin;
 
@@ -360,8 +360,8 @@ long bit_map;			/* notification event set or flags */
 
   } 
 
-  /* Check for a possible deadlock for blocking SEND(REC) and RECEIVE. */
-  if (call_nr == SEND || call_nr == SENDREC || call_nr == RECEIVE) {
+  /* Check for a possible deadlock for blocking KIPC_SEND(REC) and KIPC_RECEIVE. */
+  if (call_nr == KIPC_SEND || call_nr == KIPC_SENDREC || call_nr == KIPC_RECEIVE) {
       if (group_size = deadlock(call_nr, caller_ptr, src_dst_p)) {
 #if 0
           kprintf("sys_call: trap %d from %d to %d deadlocked, group size %d\n",
@@ -374,35 +374,35 @@ long bit_map;			/* notification event set or flags */
   }
 
   /* Now check if the call is known and try to perform the request. The only
-   * system calls that exist in MINIX are sending and receiving messages.
-   *   - SENDREC: combines SEND and RECEIVE in a single system call
-   *   - SEND:    sender blocks until its message has been delivered
-   *   - RECEIVE: receiver blocks until an acceptable message has arrived
-   *   - NOTIFY:  asynchronous call; deliver notification or mark pending
-   *   - SENDA:   list of asynchronous send requests
+   * system calls that exist in Nucleos are sending and receiving messages.
+   *   - KIPC_SENDREC: combines KIPC_SEND and KIPC_RECEIVE in a single system call
+   *   - KIPC_SEND:    sender blocks until its message has been delivered
+   *   - KIPC_RECEIVE: receiver blocks until an acceptable message has arrived
+   *   - KIPC_NOTIFY:  asynchronous call; deliver notification or mark pending
+   *   - KIPC_SENDA:   list of asynchronous send requests
    */
   switch(call_nr) {
-  case SENDREC:
+  case KIPC_SENDREC:
 	/* A flag is set so that notifications cannot interrupt SENDREC. */
 	caller_ptr->p_misc_flags |= REPLY_PENDING;
 	/* fall through */
-  case SEND:			
+  case KIPC_SEND:			
 	result = mini_send(caller_ptr, src_dst_e, m_ptr, 0);
-	if (call_nr == SEND || result != 0)
-		break;				/* done, or SEND failed */
-	/* fall through for SENDREC */
-  case RECEIVE:			
-	if (call_nr == RECEIVE)
+	if (call_nr == KIPC_SEND || result != 0)
+		break;				/* done, or KIPC_SEND failed */
+	/* fall through for KIPC_SENDREC */
+  case KIPC_RECEIVE:			
+	if (call_nr == KIPC_RECEIVE)
 		caller_ptr->p_misc_flags &= ~REPLY_PENDING;
 	result = mini_receive(caller_ptr, src_dst_e, m_ptr, 0);
 	break;
-  case NOTIFY:
+  case KIPC_NOTIFY:
 	result = mini_notify(caller_ptr, src_dst_p);
 	break;
-  case SENDNB:
+  case KIPC_SENDNB:
         result = mini_send(caller_ptr, src_dst_e, m_ptr, NON_BLOCKING);
         break;
-  case SENDA:
+  case KIPC_SENDA:
 	result = mini_senda(caller_ptr, (asynmsg_t *)m_ptr, (size_t)src_dst_e);
 	break;
   default:
@@ -423,8 +423,8 @@ int src_dst;					/* src or dst process */
 {
 /* Check for deadlock. This can happen if 'caller_ptr' and 'src_dst' have
  * a cyclic dependency of blocking send and receive calls. The only cyclic 
- * depency that is not fatal is if the caller and target directly SEND(REC)
- * and RECEIVE to each other. If a deadlock is found, the group size is 
+ * depency that is not fatal is if the caller and target directly KIPC_SEND(REC)
+ * and KIPC_RECEIVE to each other. If a deadlock is found, the group size is 
  * returned. Otherwise zero is returned. 
  */
   register struct proc *xp;			/* process pointer */
@@ -456,7 +456,7 @@ int src_dst;					/* src or dst process */
       }
 
       /* Now check if there is a cyclic dependency. For group sizes of two,  
-       * a combination of SEND(REC) and RECEIVE is not fatal. Larger groups
+       * a combination of KIPC_SEND(REC) and KIPC_RECEIVE is not fatal. Larger groups
        * or other combinations indicate a deadlock.  
        */
       if (src_dst == proc_nr(cp)) {		/* possible deadlock */

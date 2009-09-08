@@ -11,11 +11,11 @@
  *
  * The entry points into this file are
  *   do_utime:		perform the UTIME system call
- *   do_stime:		PM informs FS about STIME system call
+ *   do_stime:		PM informs FS_PROC_NR about STIME system call
  */
 
 #include "fs.h"
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include "file.h"
 #include "fproc.h"
@@ -43,7 +43,7 @@ int do_utime()
   len = m_in.utime_length;
   if (len == 0) len = m_in.utime_strlen;
 
-  if (fetch_name(m_in.utime_file, len, M1) != 0) return(err_code);
+  if (fetch_name(m_in.utime_file, len, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Request lookup */
   if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;

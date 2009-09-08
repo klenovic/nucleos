@@ -9,14 +9,12 @@
  */
 /* POSIX fpathconf (Sec. 5.7.1) 		Author: Andy Tanenbaum */
 
-#include <lib.h>
-#define fstat		_fstat
-#define fpathconf	_fpathconf
-#include <sys/stat.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
 #include <nucleos/errno.h>
 #include <nucleos/limits.h>
-#include <unistd.h>
-#include <termios.h>
+#include <nucleos/unistd.h>
+#include <nucleos/termios.h>
 
 long fpathconf(fd, name)
 int fd;				/* file descriptor being interrogated */

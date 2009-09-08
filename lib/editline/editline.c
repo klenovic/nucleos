@@ -12,7 +12,7 @@
 **  Main editing routines for editline library.
 */
 #include "editline.h"
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <nucleos/errno.h>
 #include <ctype.h>
 

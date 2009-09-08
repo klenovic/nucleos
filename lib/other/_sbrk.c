@@ -7,14 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sbrk	_sbrk
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 extern char *_brksize;
 
-char *sbrk(incr)
-int incr;
+char *sbrk(int incr)
 {
   char *newsize, *oldsize;
 

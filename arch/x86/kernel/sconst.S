@@ -13,7 +13,7 @@
 // Offsets in struct proc. They MUST match proc.h.
 	.set P_STACKBASE,	0
 	.set GSREG,	P_STACKBASE
-	.set FSREG,	GSREG + 2	// 386 introduces FS and GS segments
+	.set FSREG,	GSREG + 2	// 386 introduces FS_PROC_NR and GS segments
 	.set ESREG,	FSREG + 2
 	.set DSREG,	ESREG + 2
 	.set DIREG,	DSREG + 2

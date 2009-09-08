@@ -21,11 +21,10 @@
  *   prepare_shutdown:	prepare to take MINIX down
  */
 #include <kernel/kernel.h>
-#include <signal.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/a.out.h>
-#include <nucleos/callnr.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <kernel/proc.h>

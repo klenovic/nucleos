@@ -36,7 +36,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <nucleos/types.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters

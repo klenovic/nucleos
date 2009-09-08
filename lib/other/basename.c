@@ -12,7 +12,7 @@ basename.c
 */
 
 #include <libgen.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 char *basename(path)
 char *path;

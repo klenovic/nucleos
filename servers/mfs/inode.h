@@ -20,7 +20,7 @@
  * 2007-01-06: jfdsmit@gmail.com added i_zsearch
  */
 
-#include <sys/queue.h>
+#include <nucleos/queue.h>
 
 struct inode {
   mode_t i_mode;		/* file type, protection, etc. */

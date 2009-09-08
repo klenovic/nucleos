@@ -9,7 +9,7 @@
  */
 /* A server must occasionally print some message.  It uses a simple version of 
  * printf() found in the system lib that calls kputc() to output characters.
- * Printing is done with a call to the kernel, and not by going through FS.
+ * Printing is done with a call to the kernel, and not by going through FS_PROC_NR.
  *
  * This routine can only be used by servers and device drivers.  The kernel
  * must define its own kputc(). Note that the log driver also defines its own 

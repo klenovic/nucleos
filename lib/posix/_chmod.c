@@ -7,17 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define chmod	_chmod
-#include <sys/stat.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
 
-int chmod(name, mode)
-const char *name;
-mode_t mode;
+int chmod(const char *name, mode_t mode)
 {
   message m;
 
   m.m3_i2 = mode;
   _loadname(name, &m);
-  return(_syscall(FS, CHMOD, &m));
+  return(_syscall(FS_PROC_NR, __NR_chmod, &m));
 }

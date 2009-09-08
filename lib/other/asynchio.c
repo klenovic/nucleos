@@ -14,22 +14,14 @@
  * Thise are just stub routines that are call compatible with
  * the asynchio(3) library of Minix-vmd.  See asynchio.h.
  */
-#define nil 0
-#define alarm	_alarm
-#define ioctl	_ioctl
-#define read	_read
-#define sigaction _sigaction
-#define sigfillset _sigfillset
-#define time	_time
-#define write	_write
-#include <lib.h>
-#include <time.h>
+#include <nucleos/lib.h>
+#include <nucleos/time.h>
 #include <nucleos/ioctl.h>
-#include <sys/asynchio.h>
+#include <nucleos/asynchio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/signal.h>
 
 #define IO_IDLE		0
 #define IO_INPROGRESS	1
@@ -107,8 +99,8 @@ int asyn_wait(asynchio_t *asyn, int flags, struct timeval *to)
 		return 0;
 	}
 
-	if (to != nil) {
-		now= time(nil);
+	if (to != 0) {
+		now= time(0);
 		if (to->tv_sec <= now) { errno= EINTR; return -1; }
 		old_timer= alarm(0);
 		new_sa.sa_handler= time_out;
@@ -138,7 +130,7 @@ int asyn_wait(asynchio_t *asyn, int flags, struct timeval *to)
 		asyn->errno= errno;
 		break;
 	}
-	if (to != nil) {
+	if (to != 0) {
 		alarm(0);
 		sigaction(SIGALRM, &old_sa, (struct sigaction *)0);
 		alarm(old_timer);

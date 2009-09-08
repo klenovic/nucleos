@@ -17,9 +17,9 @@
  */
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 /*
  *	Name:		int flock(int fd, int mode);

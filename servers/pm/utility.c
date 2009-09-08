@@ -16,19 +16,19 @@
  *   proc_from_pid:	return process pointer from pid number
  *   pm_isokendpt:	check the validity of an endpoint
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "pm.h"
-#include <sys/stat.h>
-#include <nucleos/callnr.h>
+#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/fcntl.h>
-#include <signal.h>		/* needed only because mproc.h needs it */
+#include <nucleos/signal.h>		/* needed only because mproc.h needs it */
 #include "mproc.h"
 #include "param.h"
 
-#include <timers.h>
-#include <string.h>
+#include <nucleos/timer.h>
+#include <nucleos/string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <kernel/const.h>

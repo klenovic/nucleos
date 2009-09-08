@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
 /*  lsearch(3)  and  lfind(3)
  *
  *  Author: Terrence W. Holm          Sep. 1988

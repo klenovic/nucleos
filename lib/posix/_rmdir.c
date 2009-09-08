@@ -7,15 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define rmdir	_rmdir
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int rmdir(name)
-const char *name;
+int rmdir(const char *name)
 {
   message m;
 
   _loadname(name, &m);
-  return(_syscall(FS, RMDIR, &m));
+  return(_syscall(FS_PROC_NR, __NR_rmdir, &m));
 }

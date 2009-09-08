@@ -7,14 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define dup	_dup
-#define fcntl	_fcntl
+#include <nucleos/lib.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
-int dup(fd)
-int fd;
+int dup(int fd)
 {
   return(fcntl(fd, F_DUPFD, 0));
 }

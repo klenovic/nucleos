@@ -16,7 +16,7 @@ struct stat;
 struct mem_map;
 struct memory;
 
-#include <timers.h>
+#include <nucleos/timer.h>
 
 /* alarm.c */
 int do_alarm(void);

@@ -40,12 +40,12 @@
  * SUCH DAMAGE.
  */
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/fcntl.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
 
 static int _gettemp(char*,int*);

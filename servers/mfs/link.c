@@ -8,12 +8,12 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "fs.h"
-#include <sys/stat.h>
-#include <string.h>
+#include <nucleos/stat.h>
+#include <nucleos/string.h>
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 
 #include "buf.h"
 #include "inode.h"

@@ -10,12 +10,9 @@
 /*	rewinddir()					Author: Kees J. Bot
  *								24 Apr 1989
  */
-#define nil 0
-#include <lib.h>
-#define rewinddir _rewinddir
-#define seekdir	_seekdir
+#include <nucleos/lib.h>
 #include <nucleos/types.h>
-#include <dirent.h>
+#include <nucleos/dirent.h>
 
 void rewinddir(DIR *dp)
 {

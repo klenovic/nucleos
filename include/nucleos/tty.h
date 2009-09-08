@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _MINIX_TTY_H
-#define _MINIX_TTY_H
+#ifndef __NUCLEOS_TTY_H
+#define __NUCLEOS_TTY_H
 
 #include <nucleos/types.h>
 
@@ -33,5 +33,4 @@ struct boot_tty_info {
 #define BTIF_CONSORIGIN	0x01	/* consorigin is set */
 #define BTIF_CONSCURSOR	0x02	/* conscursor is set */
 
-#endif
-
+#endif /* __NUCLEOS_TTY_H */

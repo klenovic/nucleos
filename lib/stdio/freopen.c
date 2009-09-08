@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "loc_incl.h"
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 
 #define	PMODE		0666
 
@@ -29,9 +29,9 @@
 #define	O_TRUNC		0x020
 #define	O_APPEND	0x040
 
-int _open(const char *path, int flags);
-int _creat(const char *path, mode_t mode);
-int _close(int d);
+int open(const char *path, int flags);
+int creat(const char *path, mode_t mode);
+int close(int d);
 
 FILE *
 freopen(const char *name, const char *mode, FILE *stream)
@@ -42,7 +42,7 @@ freopen(const char *name, const char *mode, FILE *stream)
 	int fd, flags = stream->_flags & (_IONBF | _IOFBF | _IOLBF | _IOMYBUF);
 
 	(void) fflush(stream);				/* ignore errors */
-	(void) _close(fileno(stream));
+	(void) close(fileno(stream));
 
 	switch(*mode++) {
 	case 'r':
@@ -79,11 +79,11 @@ freopen(const char *name, const char *mode, FILE *stream)
 	}
 
 	if ((rwflags & O_TRUNC)
-	    || (((fd = _open(name, rwmode)) < 0)
+	    || (((fd = open(name, rwmode)) < 0)
 		    && (rwflags & O_CREAT))) {
-		if (((fd = _creat(name, PMODE)) < 0) && flags | _IOREAD) {
-			(void) _close(fd);
-			fd = _open(name, rwmode);
+		if (((fd = creat(name, PMODE)) < 0) && flags | _IOREAD) {
+			(void) close(fd);
+			fd = open(name, rwmode);
 		}
 	}
 

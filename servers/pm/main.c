@@ -9,18 +9,18 @@
  */
 /* This file contains the main program of the process manager and some related
  * procedures.  When MINIX starts up, the kernel runs for a little while,
- * initializing itself and its tasks, and then it runs PM and FS.  Both PM
- * and FS initialize themselves as far as they can. PM asks the kernel for
+ * initializing itself and its tasks, and then it runs PM and FS_PROC_NR.  Both PM
+ * and FS_PROC_NR initialize themselves as far as they can. PM asks the kernel for
  * all free memory and starts serving requests.
  *
  * The entry points into this file are:
  *   main:	starts PM running
  *   setreply:	set the reply to be sent to process making an PM system call
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "pm.h"
 #include <nucleos/keymap.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <servers/ds/ds.h>
 #include <nucleos/type.h>
@@ -28,12 +28,12 @@
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdlib.h>
 #include <nucleos/fcntl.h>
-#include <sys/resource.h>
+#include <nucleos/resource.h>
 #include <nucleos/utsname.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <env.h>
@@ -46,7 +46,7 @@
 struct mproc mproc[NR_PROCS];
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[NCALLS];
+extern unsigned long calls_stats[__NR_SYSCALLS];
 #endif
 
 static void get_work(void);
@@ -110,32 +110,32 @@ int main()
 		else
 			result= -ENOSYS;
 		break;
-	case ALLOCMEM:
+	case __NR_allocmem:
 		result= do_allocmem();
 		break;
-	case FORK_NB:
+	case __NR_fork_nb:
 		result= do_fork_nb();
 		break;
-	case EXEC_NEWMEM:
+	case __NR_exec_newmem:
 		result= exec_newmem();
 		break;
-	case EXEC_RESTART:
+	case __NR_exec_restart:
 		result= do_execrestart();
 		break;
-	case PROCSTAT:
+	case __NR_procstat:
 		result= do_procstat();
 		break;
-	case GETPROCNR:
+	case __NR_getprocnr:
 		result= do_getprocnr();
 		break;
-	case GETPUID:
+	case __NR_getpuid:
 		result= do_getpuid();
 		break;
 	default:
 		/* Else, if the system call number is valid, perform the
 		 * call.
 		 */
-		if ((unsigned) call_nr >= NCALLS) {
+		if ((unsigned) call_nr >= __NR_SYSCALLS) {
 		result = -ENOSYS;
 	} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
@@ -162,7 +162,7 @@ int main()
 		 */
 		if ((rmp->mp_flags & (REPLY | IN_USE | EXITING)) ==
 		   (REPLY | IN_USE)) {
-			s=sendnb(rmp->mp_endpoint, &rmp->mp_reply);
+			s=kipc_sendnb(rmp->mp_endpoint, &rmp->mp_reply);
 			if (s != 0) {
 				printf("PM can't reply to %d (%s): %d\n",
 					rmp->mp_endpoint, rmp->mp_name, s);
@@ -180,7 +180,7 @@ int main()
 static void get_work()
 {
 /* Wait for the next message and extract useful information from it. */
-  if (receive(ANY, &m_in) != 0)
+  if (kipc_receive(ANY, &m_in) != 0)
 	panic(__FILE__,"PM receive error", NO_NUM);
   who_e = m_in.m_source;	/* who sent the message */
 
@@ -314,12 +314,12 @@ static void pm_init()
 		/* Get kernel endpoint identifier. */
 		rmp->mp_endpoint = ip->endpoint;
 
-		/* Tell FS about this system process. */
+		/* Tell FS_PROC_NR about this system process. */
 		mess.PR_SLOT = ip->proc_nr;
 		mess.PR_PID = rmp->mp_pid;
 		mess.PR_ENDPT = rmp->mp_endpoint;
-  		if ((s=send(FS_PROC_NR, &mess)) != 0)
-			panic(__FILE__,"can't sync up with FS", s);
+  		if ((s=kipc_send(FS_PROC_NR, &mess)) != 0)
+			panic(__FILE__,"can't sync up with FS_PROC_NR", s);
 
 		/* Register proces with ds */
 		s= ds_publish_u32(rmp->mp_name, rmp->mp_endpoint);
@@ -332,17 +332,17 @@ static void pm_init()
 	printf("PM: failed to register %d/%d boot processes\n",
 		failed, NR_BOOT_PROCS);
 
-  /* Override some details. INIT, PM, FS and RS are somewhat special. */
+  /* Override some details. INIT, PM, FS_PROC_NR and RS are somewhat special. */
   mproc[PM_PROC_NR].mp_pid = PM_PID;		/* PM has magic pid */
 #if 0
   mproc[RS_PROC_NR].mp_parent = INIT_PROC_NR;	/* INIT is root */
 #endif
   sigfillset(&mproc[PM_PROC_NR].mp_ignore); 	/* guard against signals */
 
-  /* Tell FS that no more system processes follow and synchronize. */
+  /* Tell FS_PROC_NR that no more system processes follow and synchronize. */
   mess.PR_ENDPT = NONE;
-  if (sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
-	panic(__FILE__,"can't sync up with FS", NO_NUM);
+  if (kipc_sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
+	panic(__FILE__,"can't sync up with FS_PROC_NR", NO_NUM);
 
 #ifdef CONFIG_X86_32
         uts_val.machine[0] = 'i';
@@ -414,7 +414,7 @@ static void send_work()
 			m.m_type= call;
 			m.PM_SETSID_PROC= rmp->mp_endpoint;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the original caller */
@@ -427,7 +427,7 @@ static void send_work()
 			m.PM_SETGID_EGID= rmp->mp_effgid;
 			m.PM_SETGID_RGID= rmp->mp_realgid;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the original caller */
@@ -440,7 +440,7 @@ static void send_work()
 			m.PM_SETUID_EGID= rmp->mp_effuid;
 			m.PM_SETUID_RGID= rmp->mp_realuid;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the original caller */
@@ -460,7 +460,7 @@ static void send_work()
 			m.PM_FORK_CPROC= rmp->mp_endpoint;
 			m.PM_FORK_CPID= rmp->mp_pid;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			/* Wakeup the newly created process */
@@ -484,7 +484,7 @@ static void send_work()
 			m.m_type= call;
 			m.PM_UNPAUSE_PROC= rmp->mp_endpoint;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call2= PM_IDLE;
 
 			/* Ask the kernel to deliver the signal */
@@ -505,7 +505,7 @@ static void send_work()
 			m.m_type= call;
 			m.PM_UNPAUSE_PROC= rmp->mp_endpoint;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			break;
@@ -536,7 +536,7 @@ static void send_work()
 			m.PM_FORK_CPROC= rmp->mp_endpoint;
 			m.PM_FORK_CPID= rmp->mp_pid;
 
-			/* FS does not reply */
+			/* FS_PROC_NR does not reply */
 			rmp->mp_fs_call= PM_IDLE;
 
 			break;
@@ -555,7 +555,7 @@ static void send_work()
 			break;
 
 		default:
-			printf("send_work: should report call 0x%x to FS\n",
+			printf("send_work: should report call 0x%x to FS_PROC_NR\n",
 				call);
 			break;
 	}
@@ -570,7 +570,7 @@ static void send_work()
 		m.m_type= PM_REBOOT;
 		report_reboot= FALSE;
 	}
-	r= send(FS_PROC_NR, &m);
+	r= kipc_send(FS_PROC_NR, &m);
 	if (r != 0) panic("pm", "send_work: send failed", r);
 }
 
@@ -586,7 +586,7 @@ message *m_ptr;
 		proc_e= m_ptr->PM_EXIT_PROC;
 
 		if (pm_isokendpt(proc_e, &proc_n) != 0)
-			panic(__FILE__,	"PM_EXIT_REPLY: got bad endpoint from FS", proc_e);
+			panic(__FILE__,	"PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR", proc_e);
 
 		rmp= &mproc[proc_n];
 
@@ -617,7 +617,7 @@ message *m_ptr;
 		if (pm_isokendpt(proc_e, &proc_n) != 0)
 		{
 			panic(__FILE__,
-				"PM_EXIT_REPLY: got bad endpoint from FS",
+				"PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR",
 				proc_e);
 }
 		rmp= &mproc[proc_n];
@@ -636,7 +636,7 @@ message *m_ptr;
 		proc_e= m_ptr->PM_CORE_PROC;
 
 		if (pm_isokendpt(proc_e, &proc_n) != 0)
-			panic(__FILE__, "PM_EXIT_REPLY: got bad endpoint from FS", proc_e);
+			panic(__FILE__, "PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR", proc_e);
 
 		rmp= &mproc[proc_n];
 

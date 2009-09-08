@@ -99,9 +99,9 @@ void logwtmp(char *, char *, char *);
 #include <nucleos/types.h>	/* for time_t */
 #include <stdio.h>
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/limits.h>	/* for CHAR_BIT */
-#include <time.h>
+#include <nucleos/time.h>
 #include <stdlib.h>
 
 #if HAVE_GETTEXT
@@ -109,7 +109,7 @@ void logwtmp(char *, char *, char *);
 #endif /* HAVE_GETTEXT */
 
 #if HAVE_SYS_WAIT_H
-#include <sys/wait.h>	/* for WIFEXITED and WEXITSTATUS */
+#include <nucleos/wait.h>	/* for WIFEXITED and WEXITSTATUS */
 #endif /* HAVE_SYS_WAIT_H */
 
 #ifndef WIFEXITED
@@ -120,7 +120,7 @@ void logwtmp(char *, char *, char *);
 #endif /* !defined WEXITSTATUS */
 
 #if HAVE_UNISTD_H
-#include "unistd.h"	/* for F_OK and R_OK */
+#include <nucleos/unistd.h>	/* for F_OK and R_OK */
 #endif /* HAVE_UNISTD_H */
 
 #if !HAVE_UNISTD_H

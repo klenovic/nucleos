@@ -11,8 +11,8 @@
  * routines that perform them.
  */
 #include "pm.h"
-#include <nucleos/callnr.h>
-#include <signal.h>
+#include <nucleos/unistd.h>
+#include <nucleos/signal.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -28,9 +28,9 @@ int who_p, who_e;        /* caller's proc number, endpoint */
 int call_nr;             /* system call number */
 sigset_t core_sset;      /* which signals cause core images */
 sigset_t ign_sset;       /* which signals are by default ignored */
-time_t boottime;         /* time when the system was booted (for reporting to FS) */
+time_t boottime;         /* time when the system was booted (for reporting to FS_PROC_NR) */
 u32_t system_hz;         /* System clock frequency. */
-int report_reboot;       /* During reboot to report to FS that we are rebooting. */
+int report_reboot;       /* During reboot to report to FS_PROC_NR that we are rebooting. */
 int abort_flag;
 char monitor_code[256];
 
@@ -152,4 +152,4 @@ int (*call_vec[])(void) = {
 	do_getdma,	/* 110 = getdma */
 };
 /* This should not fail with "array size is negative": */
-extern int dummy[sizeof(call_vec) == NCALLS * sizeof(call_vec[0]) ? 1 : -1];
+extern int dummy[sizeof(call_vec) == __NR_SYSCALLS * sizeof(call_vec[0]) ? 1 : -1];

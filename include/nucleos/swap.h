@@ -15,15 +15,15 @@ Defines the super block of swap partitions and some useful constants.
 Created:	Aug 2, 1992 by Philip Homburg
 */
 
-#ifndef _MINIX__SWAP_H
-#define _MINIX__SWAP_H
+#ifndef __NUCLEOS_SWAP_H
+#define __NUCLEOS_SWAP_H
 
 /* Two possible layouts for a partition with swapspace:
  *
- *	Sector		Swap partition		FS+swap partition
+ *	Sector		Swap partition		FS_PROC_NR+swap partition
  *
  *       0 - 1		bootblock		bootblock
- *	     2		swap header		FS header
+ *	     2		swap header		FS_PROC_NR header
  *	     3		blank			swap header
  *	 4 - m		swapspace		file system
  *	m+1 - n		-			swapspace
@@ -50,4 +50,4 @@ typedef struct swap_hdr
 #define SH_VERSION	    1
 #define SH_PRIORITY	    0
 
-#endif /* _MINIX__SWAP_H */
+#endif /* __NUCLEOS_SWAP_H */

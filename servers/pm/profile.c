@@ -19,10 +19,10 @@
 
 #include <nucleos/profile.h>
 #include "pm.h"
-#include <sys/wait.h>
-#include <nucleos/callnr.h>
+#include <nucleos/wait.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include "mproc.h"
 #include "param.h"
 

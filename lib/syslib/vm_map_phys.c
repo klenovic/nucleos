@@ -7,12 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#include <sys/mman.h>
+#include <nucleos/lib.h>
+#include <nucleos/mman.h>
 #include <nucleos/syslib.h>
 #include <nucleos/vm.h>
 #include <stdarg.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 
 void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)

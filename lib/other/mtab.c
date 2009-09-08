@@ -46,8 +46,8 @@
 #include <ctype.h>
 #include <nucleos/fcntl.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <stdio.h>
 
 #define BUF_SIZE   512		  /* size of the /etc/mtab buffer */

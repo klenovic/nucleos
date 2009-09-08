@@ -44,15 +44,15 @@
  */
 #include <nucleos/types.h>
 #include <nucleos/ioctl.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <assert.h>
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
 #include <net/hton.h>
 

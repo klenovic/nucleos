@@ -15,7 +15,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 #include <asm/cpufeature.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/servers/vm/vm.h>
 #include <nucleos/portio.h>
 #include <asm/kernel/proto.h>

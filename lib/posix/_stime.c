@@ -7,16 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define stime	_stime
+#include <nucleos/lib.h>
 #include <nucleos/minlib.h>
-#include <time.h>
+#include <nucleos/time.h>
 
-int stime(top)
-long *top;
+int stime(long *top)
 {
   message m;
 
   m.m2_l1 = *top;
-  return(_syscall(MM, STIME, &m));
+  return(_syscall(PM_PROC_NR, __NR_stime, &m));
 }

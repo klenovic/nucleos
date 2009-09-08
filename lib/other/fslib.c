@@ -9,8 +9,8 @@
  */
 /* fslib.c - routines needed by fs and fs utilities */
 
-#include <nucleos/nucleos.h>
-#include <dirent.h>
+#include <nucleos/kernel.h>
+#include <nucleos/dirent.h>
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>		/* for unshort :-( */

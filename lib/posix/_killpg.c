@@ -7,16 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define killpg	_killpg
-#define kill	_kill
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-int killpg(pgrp, sig)
-int pgrp;			/* which process group is to be sent the
-				 * signal
-				 */
-int sig;			/* signal number */
+/**
+ * @brief killpg
+ * @param pgrp  which process group is to be sent the signal
+ * @param sig  signal number
+ */
+int killpg(int pgrp, int sig)
 {
   return kill(-pgrp, sig);
 }

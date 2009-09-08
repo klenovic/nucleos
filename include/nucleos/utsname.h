@@ -11,13 +11,15 @@
 #define __NUCLEOS_UTSNAME_H
 
 struct utsname {
-  char sysname[64+1];
-  char nodename[64+1];
-  char release[64+1];
-  char version[64];
-  char machine[64+1];
-  char arch[64+1];
+	char sysname[64+1];
+	char nodename[64+1];
+	char release[64+1];
+	char version[64];
+	char machine[64+1];
+	char arch[64+1];
 };
+
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 
 /* Function Prototypes. */
 int uname(struct utsname *_name);
@@ -40,5 +42,7 @@ int sysuname(int _req, int _field, char *_value, size_t _len);
 #define _UTS_SYSNAME	7
 #define _UTS_BUS	8
 #define _UTS_MAX	9	/* Number of strings. */
+
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_UTSNAME_H */

@@ -9,14 +9,11 @@
  */
 /* utime(2) for POSIX		Authors: Terrence W. Holm & Edwin L. Froese */
 
-#include <lib.h>
-#define utime	_utime
-#include <string.h>
-#include <utime.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
+#include <nucleos/utime.h>
 
-int utime(name, timp)
-const char *name;
-const struct utimbuf *timp;
+int utime(const char *name, const struct utimbuf *timp)
 {
   message m;
 
@@ -29,5 +26,5 @@ const struct utimbuf *timp;
 	m.m2_i1 = strlen(name) + 1;
   }
   m.m2_p1 = (char *) name;
-  return(_syscall(FS, UTIME, &m));
+  return(_syscall(FS_PROC_NR, __NR_utime, &m));
 }

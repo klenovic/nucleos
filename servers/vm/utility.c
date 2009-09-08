@@ -9,24 +9,23 @@
  */
 
 /* This file contains some utility routines for VM.  */
-#define brk _brk	/* Our brk() must redefine _brk(). */
+
 #include <asm/bootparam.h>
-#include <nucleos/nucleos.h>
-#include <nucleos/callnr.h>
+#include <nucleos/kernel.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <env.h>
-#include <unistd.h>
 
 #include <servers/vm/proto.h>
 #include <servers/vm/glo.h>
@@ -201,9 +200,11 @@ vir_bytes *sp;                                  /* put stack pointer here */
 }       
 
 /*===========================================================================*
- *                              _brk                                         *
+ *                              brk                                          *
  *===========================================================================*/
 extern char *_brksize;
+
+/* Our brk() must redefine brk(). */
 int brk(brk_addr)
 char *brk_addr;
 {

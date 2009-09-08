@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "loc_incl.h"
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 
 #define	PMODE		0666
 
@@ -44,9 +44,9 @@
 #define	O_TRUNC		0x020
 #define	O_APPEND	0x040
 
-int _open(const char *path, int flags);
-int _creat(const char *path, mode_t mode);
-int _close(int d);
+int open(const char *path, int flags);
+int creat(const char *path, mode_t mode);
+int close(int d);
 
 FILE *
 fopen(const char *name, const char *mode)
@@ -99,11 +99,11 @@ fopen(const char *name, const char *mode)
 	 * the file is opened for writing and the open() failed.
 	 */
 	if ((rwflags & O_TRUNC)
-	    || (((fd = _open(name, rwmode)) < 0)
+	    || (((fd = open(name, rwmode)) < 0)
 		    && (rwflags & O_CREAT))) {
-		if (((fd = _creat(name, PMODE)) > 0) && flags  | _IOREAD) {
-			(void) _close(fd);
-			fd = _open(name, rwmode);
+		if (((fd = creat(name, PMODE)) > 0) && flags  | _IOREAD) {
+			(void) close(fd);
+			fd = open(name, rwmode);
 		}
 			
 	}
@@ -111,14 +111,14 @@ fopen(const char *name, const char *mode)
 	if (fd < 0) return (FILE *)NULL;
 
 	if ( fstat( fd, &st ) < 0 ) {
-		_close(fd);
+		close(fd);
 		return (FILE *)NULL;
 	}
 	
 	if ( S_ISFIFO(st.st_mode) ) flags |= _IOFIFO;
 	
 	if (( stream = (FILE *) malloc(sizeof(FILE))) == NULL ) {
-		_close(fd);
+		close(fd);
 		return (FILE *)NULL;
 	}
 

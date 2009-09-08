@@ -13,7 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/errno.h>
 

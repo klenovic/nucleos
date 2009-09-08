@@ -10,9 +10,10 @@
 
 #include <nucleos/types.h>
 #include <nucleos/sysinfo.h>
+#include <nucleos/param.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <lib.h>
+#include <nucleos/unistd.h>
+#include <nucleos/lib.h>
 
 /* Retrieve system load average information. */
 int getloadavg(double *loadavg, int nelem)
@@ -33,7 +34,7 @@ int getloadavg(double *loadavg, int nelem)
   if(system_hz == 0) {
   	if((getsysinfo_up(PM_PROC_NR, SIU_SYSTEMHZ,
 	  sizeof(system_hz), &system_hz)) < 0) {
-		system_hz = DEFAULT_HZ;
+		system_hz = HZ;
 	}
   }
 

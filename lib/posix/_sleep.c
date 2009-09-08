@@ -11,14 +11,11 @@
  *								25 July 2009
  * (Avoids interfering with alarm/setitimer by using select, like usleep)
  */
-
-#include <lib.h>
-#define sleep _sleep
-#include <signal.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
-#include <time.h>
-#include <sys/select.h>
+#include <nucleos/select.h>
 #include <nucleos/time.h>
 
 unsigned sleep(unsigned sleep_seconds)

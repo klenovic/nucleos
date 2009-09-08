@@ -13,13 +13,13 @@
  *	Determines name of a terminal device.
  */
 
-#include <lib.h>
-#include <sys/stat.h>
-#include <dirent.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
+#include <nucleos/dirent.h>
 #include <nucleos/fcntl.h>
 #include <nucleos/stddef.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
 static char base[] = "/dev";
 static char path[sizeof(base) + 1 + NAME_MAX];	/* extra 1 for '/' */

@@ -12,15 +12,11 @@ posix/_tcdrain.c
 
 Created:	July 26, 1994 by Philip Homburg
 */
-
-#define tcdrain _tcdrain
-#define ioctl _ioctl
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <nucleos/ioctl.h>
 #include <asm/ioctls.h>
 
-int tcdrain(fd)
-int fd;
+int tcdrain(int fd)
 {
   return(ioctl(fd, TCDRAIN, (void *)0));
 }

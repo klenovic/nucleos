@@ -7,13 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define rename	_rename
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 
-int rename(name, name2)
-const char *name, *name2;
+int rename(const char *name, const char *name2)
 {
   message m;
 
@@ -21,5 +19,5 @@ const char *name, *name2;
   m.m1_i2 = strlen(name2) + 1;
   m.m1_p1 = (char *) name;
   m.m1_p2 = (char *) name2;
-  return(_syscall(FS, RENAME, &m));
+  return(_syscall(FS_PROC_NR, __NR_rename, &m));
 }

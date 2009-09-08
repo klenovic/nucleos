@@ -7,8 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fcntl _fcntl
+#include <nucleos/lib.h>
 #include <nucleos/fcntl.h>
 #include <stdarg.h>
 
@@ -44,5 +43,5 @@ int fcntl(int fd, int cmd, ...)
   va_end(argp);
   m.m1_i1 = fd;
   m.m1_i2 = cmd;
-  return(_syscall(FS, FCNTL, &m));
+  return(_syscall(FS_PROC_NR, __NR_fcntl, &m));
 }

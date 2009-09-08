@@ -25,7 +25,7 @@
  * assembly versions such as arch/ppc/lib/div64.S and arch/sh/lib/div64.S.
  */
 
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/math64.h>
 #include <nucleos/bitops.h>
 

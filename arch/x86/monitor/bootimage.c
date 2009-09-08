@@ -13,18 +13,18 @@
 #define BIOS      1       /* Can only be used under the BIOS. */
 #include <nucleos/stddef.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <nucleos/limits.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <nucleos/a.out.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
 #include <nucleos/tty.h>
-#include <sys/video.h>
+#include <nucleos/video.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <ibm/partition.h>
@@ -76,7 +76,7 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 
 #define PROCESS_MAX	16      /* Must match the space in kernel/mpx.x */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
-#define FS		2       /* The third must be fs. */
+#define FS_PROC_NR		2       /* The third must be fs. */
 
 struct process {  /* Per-process memory adresses. */
 	u32_t entry;    /* Entry point. */
@@ -253,12 +253,12 @@ void patch_sizes(void)
 	}
 
 	if (k_flags & (K_HIGH|K_MEML))
-		return;  /* Doesn't need FS patching. */
+		return;  /* Doesn't need FS_PROC_NR patching. */
 
 	/* Patch cs and sizes of init into fs data. */
-	put_word(process[FS].data + P_INIT_OFF+0, initp->cs >> click_shift);
-	put_word(process[FS].data + P_INIT_OFF+2, text_size);
-	put_word(process[FS].data + P_INIT_OFF+4, data_size);
+	put_word(process[FS_PROC_NR].data + P_INIT_OFF+0, initp->cs >> click_shift);
+	put_word(process[FS_PROC_NR].data + P_INIT_OFF+2, text_size);
+	put_word(process[FS_PROC_NR].data + P_INIT_OFF+4, data_size);
 }
 
 int selected(char *name)
@@ -858,7 +858,7 @@ bail_out:
 	return 0;
 }
 
-/* Check FS magic */
+/* Check FS_PROC_NR magic */
 #define SUPER_V3_MAGIC         0x4d5a
 #define SUPER_V3_MAGIC_OFFSET  0x418
 

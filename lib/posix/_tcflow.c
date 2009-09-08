@@ -12,16 +12,11 @@ posix/_tcflow.c
 
 Created:	June 8, 1993 by Philip Homburg
 */
-
-#define tcflow _tcflow
-#define ioctl _ioctl
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <nucleos/ioctl.h>
 #include <asm/ioctls.h>
 
-int tcflow(fd, action)
-int fd;
-int action;
+int tcflow(int fd, int action)
 {
   return(ioctl(fd, TCFLOW, &action));
 }

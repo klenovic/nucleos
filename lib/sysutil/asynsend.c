@@ -14,7 +14,7 @@
 
 #include <nucleos/fcntl.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
@@ -80,9 +80,9 @@ message *mp;
 	if (next_slot >= ASYN_NR)
 	{
 		/* Tell the kernel to stop processing */
-		r= senda(NULL, 0);
+		r= kipc_senda(NULL, 0);
 		if (r != 0)
-			panic(__FILE__, "asynsend: senda failed", r);
+			panic(__FILE__, "asynsend: kipc_senda failed", r);
 
 		dst_ind= 0;
 		for (src_ind= first_slot; src_ind<next_slot; src_ind++)
@@ -132,7 +132,7 @@ message *mp;
 	assert(first_slot + len <= ASYN_NR);
 
 	/* Tell the kernel to rescan the table */
-	r = senda(msgtable+first_slot, len);
+	r = kipc_senda(msgtable+first_slot, len);
 
 	inside = 0;
 

@@ -9,8 +9,8 @@
  */
 /* The eth_stat struct is used in a DL_GETSTAT request the the ehw_task. */
 
-#ifndef _ETH_HW_H
-#define _ETH_HW_H
+#ifndef __NUCLEOS_DL_ETH_H
+#define __NUCLEOS_DL_ETH_H
 
 typedef struct eth_stat
 {
@@ -32,4 +32,4 @@ typedef struct eth_stat
 	ets_OWC;		/* # times out of window collision */
 } eth_stat_t;
 
-#endif /* _ETH_HW_H */
+#endif /* __NUCLEOS_DL_ETH_H */

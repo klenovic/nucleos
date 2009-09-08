@@ -10,20 +10,15 @@
 /*	servxcheck() - Service access check.		Author: Kees J. Bot
  *								8 Jan 1997
  */
-#define nil 0
-#define ioctl _ioctl
-#define open _open
-#define write _write
-#define close _close
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
-#include <time.h>
+#include <nucleos/unistd.h>
+#include <nucleos/time.h>
 #include <nucleos/ioctl.h>
 #include <net/hton.h>
 #include <net/gen/in.h>
@@ -178,7 +173,7 @@ int servxcheck(ipaddr_t peer, const char *service,
     /* Localhost? */
     if ((peer & HTONL(0xFF000000)) == HTONL(0x7F000000)) return 1;
 
-    if ((fp= fopen(path_servacces, "r")) == nil) {
+    if ((fp= fopen(path_servacces, "r")) == 0) {
 	/* Succeed on error, fail if simply nonexistent. */
 	return (errno != ENOENT);
     }
@@ -223,7 +218,7 @@ int servxcheck(ipaddr_t peer, const char *service,
 	    }
 
 	    if (c != '-' && c != '+') {
-		if (logf == nil) {
+		if (logf == 0) {
 		    syslog(LOG_ERR, "%s: strange check word '%s'\n",
 			path_servacces, word);
 		}
@@ -271,7 +266,7 @@ int servxcheck(ipaddr_t peer, const char *service,
 	/* Log the result of the check. */
 	if (got_name == -1) (void) get_name(peer, name);
 
-	if (logf != nil) {
+	if (logf != 0) {
 	    (*logf)(state == PASS, name);
 	} else {
 	    syslog(LOG_NOTICE, "service '%s' %s to %s\n",

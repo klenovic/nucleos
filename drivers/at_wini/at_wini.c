@@ -25,12 +25,12 @@
 
 #include "at_wini.h"
 
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/type.h>
 #include <ibm/pci.h>
-#include <sys/mman.h>
+#include <nucleos/mman.h>
 #include <asm/ioctls.h>
 
 #define ATAPI_DEBUG	    0	/* To debug ATAPI code. */
@@ -493,9 +493,9 @@ static void init_params()
   } else {
 	/* Ask for anonymous memory for DMA, that is physically contiguous. */
 	dma_buf = mmap(0, ATA_DMA_BUF_SIZE, PROT_READ|PROT_WRITE,
-		MAP_PREALLOC | MAP_CONTIG | MAP_ANON, -1, 0);
+		MAP_PREALLOC | MAP_CONTIG | MAP_ANONYMOUS, -1, 0);
 	prdt = mmap(0, PRDT_BYTES,
-		PROT_READ|PROT_WRITE, MAP_CONTIG | MAP_ANON, -1, 0);
+		PROT_READ|PROT_WRITE, MAP_CONTIG | MAP_ANONYMOUS, -1, 0);
 	if(dma_buf == MAP_FAILED || prdt == MAP_FAILED) {
 		disable_dma = 1;
 		printf("at_wini%d: no dma\n", w_instance);
@@ -2056,8 +2056,8 @@ static void w_intr_wait()
 	 */
 	while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
 		int rr;
-		if((rr=receive(ANY, &m)) != 0)
-			panic("at_wini", "receive(ANY) failed", rr);
+		if((rr=kipc_receive(ANY, &m)) != 0)
+			panic("at_wini", "kipc_receive(ANY) failed", rr);
 		switch(m.m_type) {
 		  case SYN_ALARM:
 			/* Timeout. */
@@ -2073,7 +2073,7 @@ static void w_intr_wait()
 			break;
 		  case DEV_PING:
 			/* RS monitor ping. */
-			notify(m.m_source);
+			kipc_notify(m.m_source);
 			break;
 		  default:
 			/* unhandled message.

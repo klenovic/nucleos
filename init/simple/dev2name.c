@@ -8,15 +8,15 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-/* Translate internal FS device number to a /dev/ name. */
+/* Translate internal FS_PROC_NR device number to a /dev/ name. */
 
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
-#include <dirent.h>
-#include <unistd.h>
+#include <nucleos/dirent.h>
+#include <nucleos/unistd.h>
 
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 

@@ -7,18 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#define _exit	__exit
-#include <lib.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-void _exit(status)
-int status;
+void _exit(int status)
 {
   void (*suicide)(void);
   message m;
 
   m.m1_i1 = status;
-  _syscall(MM, EXIT, &m);
+  _syscall(PM_PROC_NR, __NR_exit, &m);
 
   /* If exiting nicely through PM fails for some reason, try to
    * commit suicide. E.g., message to PM might fail due to deadlock.

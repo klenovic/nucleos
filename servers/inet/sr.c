@@ -51,7 +51,7 @@
 #include "inet.h"
 
 #include <nucleos/svrctl.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 
 #include "mq.h"
 #include "qp.h"
@@ -65,7 +65,7 @@
 #include "sr_int.h"
 
 #define DEV_CANCEL NW_CANCEL
-#define DEVICE_REPLY TASK_REPLY
+#define DEVICE_REPLY __NR_task_reply
 #define DEV_IOCTL3 DEV_IOCTL
 #define NDEV_BUFFER ADDRESS
 #define NDEV_COUNT COUNT
@@ -655,7 +655,7 @@ message *m;
 		repl_queue= mq->mq_next;
 
 		mq->mq_mess.m_type= DEV_REVIVE;
-		result= send(mq->mq_mess.m_source, &mq->mq_mess);
+		result= kipc_send(mq->mq_mess.m_source, &mq->mq_mess);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		mq_free(mq);
@@ -688,14 +688,14 @@ message *m;
 		m->DEV_MINOR= fd;
 		m->DEV_SEL_OPS= m_ops;
 
-		result= send(m->m_source, m);
+		result= kipc_send(m->m_source, m);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		return;
 	}
 
 	m->m_type= DEV_NO_STATUS;
-	result= send(m->m_source, m);
+	result= kipc_send(m->m_source, m);
 	if (result != 0)
 		ip_panic(("unable to send"));
 }
@@ -784,12 +784,12 @@ int is_revive;
 	mp->REP_IO_GRANT= ref;
 	if (is_revive)
 	{
-		notify(mq->mq_mess.m_source);
+		kipc_notify(mq->mq_mess.m_source);
 		result= -ELOCKED;
 	}
 	else
 	{
-		result= send(mq->mq_mess.m_source, mp);
+		result= kipc_send(mq->mq_mess.m_source, mp);
 	}
 
 	if (result == -ELOCKED && is_revive)
@@ -995,7 +995,7 @@ unsigned ops;
 	if (ops & SR_SELECT_WRITE) sr_fd->srf_flags |= SFF_SELECT_W;
 	if (ops & SR_SELECT_EXCEPTION) sr_fd->srf_flags |= SFF_SELECT_X;
 
-	notify(sr_fd->srf_select_proc);
+	kipc_notify(sr_fd->srf_select_proc);
 }
 
 static void process_req_q(mq, tail, tail_ptr)
@@ -1101,7 +1101,7 @@ int size;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *)vir_cp_req;
 
-			if (sendrec(SYSTASK, &mess) <0)
+			if (kipc_sendrec(SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{
@@ -1152,7 +1152,7 @@ char *dest;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *) vir_cp_req;
 
-			if (sendrec(SYSTASK, &mess) <0)
+			if (kipc_sendrec(SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{
@@ -1325,7 +1325,7 @@ int operation;
 
 	if (m_cancel)
 	{
-		result= send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess);
+		result= kipc_send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess);
 		if (result != 0)
 			ip_panic(("unable to send: %d", result));
 		mq_free(m_cancel);

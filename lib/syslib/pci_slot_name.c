@@ -41,7 +41,7 @@ int devind;
 	m.m1_i2= sizeof(name);
 	m.m1_i3= gid;
 
-	r= sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m);
 	cpf_revoke(gid);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_slot_name: can't talk to PCI", r);

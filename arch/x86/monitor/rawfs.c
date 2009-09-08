@@ -12,12 +12,12 @@
  *             Based on readfs by Paul Polderman
  */
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <stdlib.h>
 #include <nucleos/limits.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
 #include <servers/mfs/const.h>
@@ -48,10 +48,10 @@ static unsigned inodes_per_block;
 static int block_size;
 
 #ifdef FLEX
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #define direct _v7_direct
 #else
-#include <sys/dir.h>
+#include <nucleos/dir.h>
 #endif
 
 static struct super_block super; /* Superblock of file system */

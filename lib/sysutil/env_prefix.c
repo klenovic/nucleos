@@ -9,7 +9,7 @@
  */
 #include "sysutil.h"
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 /*=========================================================================*
  *				env_prefix				   *

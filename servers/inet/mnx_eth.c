@@ -1064,6 +1064,6 @@ message *mp;
 					 */
 
 	/* Tell the kernel to rescan the table */
-	return senda(msgtable, msgtable_n);
+	return kipc_senda(msgtable, msgtable_n);
 }
 #endif

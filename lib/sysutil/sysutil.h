@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*	sysutil.h - System library utilities.	*/
-#include <lib.h>		/* common to all libraries */
+#include <nucleos/lib.h>		/* common to all libraries */
 #include <nucleos/com.h>		/* need task numbers + message types */
 #include <nucleos/syslib.h>	/* need sendrec, _taskcall, etc */
 #include <nucleos/sysutil.h>	/* prototypes in this library */

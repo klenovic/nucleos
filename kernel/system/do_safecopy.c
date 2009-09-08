@@ -151,13 +151,13 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		*offset_result = g.cp_u.cp_direct.cp_start + offset_in;
 		*e_granter = granter;
 	} else if(g.cp_flags & CPF_MAGIC) {
-		/* Currently, it is hardcoded that only FS may do
+		/* Currently, it is hardcoded that only FS_PROC_NR may do
 		 * magic grants.
 		 */
 		if(granter != FS_PROC_NR) {
 			kprintf(
 		"verify_grant: magic grant verify failed: granter (%d) "
-		"is not FS (%d)\n", granter, FS_PROC_NR);
+		"is not FS_PROC_NR (%d)\n", granter, FS_PROC_NR);
 			return -EPERM;
 		}
 

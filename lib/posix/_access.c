@@ -7,17 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define access	_access
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int access(name, mode)
-const char *name;
-int mode;
+int access(const char *name, int mode)
 {
   message m;
 
   m.m3_i2 = mode;
   _loadname(name, &m);
-  return(_syscall(FS, ACCESS, &m));
+  return(_syscall(FS_PROC_NR, __NR_access, &m));
 }

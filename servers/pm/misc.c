@@ -20,23 +20,22 @@
  *   do_getsetpriority: get/set process priority
  *   do_svrctl: process manager control
  */
-#define brk _brk
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "pm.h"
-#include <nucleos/callnr.h>
-#include <signal.h>
+#include <nucleos/unistd.h>
+#include <nucleos/signal.h>
 #include <nucleos/svrctl.h>
-#include <sys/resource.h>
+#include <nucleos/resource.h>
 #include <nucleos/utsname.h>
 #include <nucleos/com.h>
 #include <nucleos/sysinfo.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>
 #include <kernel/proc.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <asm/ioctls.h>
 #include "mproc.h"
 #include "param.h"
@@ -56,7 +55,7 @@ static char *uts_tbl[] = {
 };
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-unsigned long calls_stats[NCALLS];
+unsigned long calls_stats[__NR_SYSCALLS];
 #endif
 
 /*===========================================================================*
@@ -110,7 +109,7 @@ int do_procstat()
   /* For the moment, this is only used to return pending signals to 
    * system processes that request the PM for their own status. 
    *
-   * Future use might include the FS requesting for process status of
+   * Future use might include the FS_PROC_NR requesting for process status of
    * any user process. 
    */
   
@@ -417,7 +416,7 @@ int do_reboot()
   else
 	monitor_code[0] = '\0';
 
-  /* Order matters here. When FS is told to reboot, it exits all its
+  /* Order matters here. When FS_PROC_NR is told to reboot, it exits all its
    * processes, and then would be confused if they're exited again by
    * SIGKILL. So first kill, then reboot. 
    */
@@ -426,8 +425,8 @@ int do_reboot()
   sys_nice(INIT_PROC_NR, PRIO_STOP);	/* stop init, but keep it around */
 
   report_reboot= 1;
-  r= notify(FS_PROC_NR);
-  if (r != 0) panic("pm", "do_reboot: unable to notify FS", r);
+  r= kipc_notify(FS_PROC_NR);
+  if (r != 0) panic("pm", "do_reboot: unable to notify FS_PROC_NR", r);
   
   return(SUSPEND);			/* don't reply to caller */
 }
@@ -464,7 +463,7 @@ int do_getsetpriority()
 		return -EPERM;
 
 	/* If GET, that's it. */
-	if (call_nr == GETPRIORITY) {
+	if (call_nr == __NR_getpriority) {
 		return(rmp->mp_nice - PRIO_MIN);
 	}
 
@@ -494,7 +493,7 @@ int do_svrctl()
   req = m_in.svrctl_req;
   ptr = (vir_bytes) m_in.svrctl_argp;
 
-  /* Is the request indeed for the MM? */
+  /* Is the request indeed for the PM_PROC_NR? */
   if (((req >> 8) & 0xFF) != 'M') return(-EINVAL);
 
   /* Control operations local to the PM. */
@@ -584,10 +583,11 @@ int do_svrctl()
 }
 
 /*===========================================================================*
- *				_brk				             *
+ *				brk				             *
  *===========================================================================*/
 
 extern char *_brksize;
+/* redefine brk */
 int brk(brk_addr)
 char *brk_addr;
 {

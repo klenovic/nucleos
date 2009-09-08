@@ -11,10 +11,10 @@
  * Special character files also require I/O.  The routines for these are here.
  *
  * The entry points in this file are:
- *   dev_open:   FS opens a device
- *   dev_close:  FS closes a device
- *   dev_io:	 FS does a read or write on a device
- *   dev_status: FS processes callback request alert
+ *   dev_open:   FS_PROC_NR opens a device
+ *   dev_close:  FS_PROC_NR closes a device
+ *   dev_io:	 FS_PROC_NR does a read or write on a device
+ *   dev_status: FS_PROC_NR processes callback request alert
  *   gen_opcl:   generic call to a task to perform an open/close
  *   gen_io:     generic call to a task to perform an I/O operation
  *   no_dev:     open/close processing for devices that don't exist
@@ -23,13 +23,13 @@
  *   ctty_opcl:  perform controlling-tty-specific processing for open/close
  *   ctty_io:    perform controlling-tty-specific processing for I/O
  *   do_ioctl:	 perform the IOCTL system call
- *   do_setsid:	 perform the SETSID system call (FS side)
+ *   do_setsid:	 perform the SETSID system call (FS_PROC_NR side)
  */
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <assert.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/ioctl.h>
@@ -129,7 +129,7 @@ int filp_no;
  *===========================================================================*/
 endpoint_t suspended_ep(endpoint_t driver, cp_grant_id_t g)
 {
-/* A process is suspended on a driver for which FS issued
+/* A process is suspended on a driver for which FS_PROC_NR issued
  * a grant. Find out which process it was.
  */
     struct fproc *rfp;
@@ -173,7 +173,7 @@ void dev_status(message *m)
 	do {
 		int r;
 		st.m_type = DEV_STATUS;
-		if ((r=sendrec(m->m_source, &st)) != 0) {
+		if ((r=kipc_sendrec(m->m_source, &st)) != 0) {
 			printf("DEV_STATUS failed to %d: %d\n", m->m_source, r);
 			if (r == -EDEADSRCDST) return;
 			if (r == -EDSTDIED) return;
@@ -188,7 +188,7 @@ void dev_status(message *m)
 					endpt = suspended_ep(m->m_source,
 						st.REP_IO_GRANT);
 					if(endpt == NONE) {
-						printf("FS: proc with "
+						printf("FS_PROC_NR: proc with "
 					"grant %d from %d not found (revive)\n",
 					st.REP_IO_GRANT,
 					st.m_source);
@@ -202,7 +202,7 @@ void dev_status(message *m)
 					st.DEV_SEL_OPS);
 				break;
 			default:
-				printf("FS: unrecognized reply %d to "
+				printf("FS_PROC_NR: unrecognized reply %d to "
 					"DEV_STATUS\n", st.m_type);
 				/* Fall through. */
 			case DEV_NO_STATUS:
@@ -319,7 +319,7 @@ u32_t *pos_lo;
 	}
 
 	/* If we have converted to a safe operation, I/O
-	 * endpoint becomes FS if it wasn't already.
+	 * endpoint becomes FS_PROC_NR if it wasn't already.
 	 */
 	if(GRANT_VALID(*gid)) {
 		*io_ept = FS_PROC_NR;
@@ -384,7 +384,7 @@ int suspend_reopen;		/* Just suspend the process */
 
   /* See if driver is roughly valid. */
   if (dp->dmap_driver == NONE) {
-	printf("FS: dev_io: no driver for dev %x\n", dev);
+	printf("FS_PROC_NR: dev_io: no driver for dev %x\n", dev);
 	return -ENXIO;
   }
 
@@ -399,7 +399,7 @@ int suspend_reopen;		/* Just suspend the process */
   }
 
   if(isokendpt(dp->dmap_driver, &dummyproc) != 0) {
-	printf("FS: dev_io: old driver for dev %x (%d)\n",
+	printf("FS_PROC_NR: dev_io: old driver for dev %x (%d)\n",
 		dev, dp->dmap_driver);
 	return -ENXIO;
   }
@@ -461,8 +461,8 @@ int suspend_reopen;		/* Just suspend the process */
 		 * logic. Mode is expected in the COUNT field.
 		 */
 		dev_mess.COUNT = 0;
-		if(call_nr == READ) 		dev_mess.COUNT = R_BIT;
-		else if(call_nr == WRITE)	dev_mess.COUNT = W_BIT;
+		if(call_nr == __NR_read) 		dev_mess.COUNT = R_BIT;
+		else if(call_nr == __NR_write)	dev_mess.COUNT = W_BIT;
 		dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 		(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 		if (dev_mess.REP_STATUS == -EINTR) dev_mess.REP_STATUS = -EAGAIN;
@@ -486,8 +486,8 @@ int suspend_reopen;		/* Just suspend the process */
 			 * logic. Mode is expected in the COUNT field.
 			 */
 			dev_mess.COUNT = 0;
-			if(call_nr == READ) 		dev_mess.COUNT = R_BIT;
-			else if(call_nr == WRITE)	dev_mess.COUNT = W_BIT;
+			if(call_nr == __NR_read) 		dev_mess.COUNT = R_BIT;
+			else if(call_nr == __NR_write)	dev_mess.COUNT = W_BIT;
 			dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 			(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 
@@ -526,7 +526,7 @@ int flags;			/* mode bits and flags */
   dev_mess.COUNT    = flags;
 
   if (dp->dmap_driver == NONE) {
-	printf("FS: gen_opcl: no driver for dev %x\n", dev);
+	printf("FS_PROC_NR: gen_opcl: no driver for dev %x\n", dev);
 	return -ENXIO;
   }
 
@@ -596,7 +596,7 @@ int flags;			/* mode bits and flags */
 void pm_setsid(proc_e)
 int proc_e;
 {
-/* Perform the FS side of the SETSID call, i.e. get rid of the controlling
+/* Perform the FS_PROC_NR side of the SETSID call, i.e. get rid of the controlling
  * terminal of a process, and make the process a session leader.
  */
   register struct fproc *rfp;
@@ -651,7 +651,7 @@ message *mess_ptr;		/* pointer to message for task */
 
   proc_e = mess_ptr->IO_ENDPT;
 
-  r = sendrec(task_nr, mess_ptr);
+  r = kipc_sendrec(task_nr, mess_ptr);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
@@ -726,12 +726,12 @@ message *mess_ptr;		/* pointer to message for task */
 	mess_ptr->DEVICE = (fp->fp_tty >> MINOR) & BYTE;
 
   if (dp->dmap_driver == NONE) {
-	printf("FS: ctty_io: no driver for dev\n");
+	printf("FS_PROC_NR: ctty_io: no driver for dev\n");
 	return -EIO;
   }
 
 	if(isokendpt(dp->dmap_driver, &dummyproc) != 0) {
-		printf("FS: ctty_io: old driver %d\n",
+		printf("FS_PROC_NR: ctty_io: old driver %d\n",
 			dp->dmap_driver);
 		return -EIO;
 	}
@@ -818,7 +818,7 @@ int flags;			/* mode bits and flags */
                 struct node_details res;
 
 		/* A new minor device number has been returned.
-                 * Request the root FS to create a temporary device file to
+                 * Request the root FS_PROC_NR to create a temporary device file to
 		 * hold it. 
                  */
 		
@@ -1171,9 +1171,9 @@ message *mp;
 	if (next_slot >= ASYN_NR)
 	{
 		/* Tell the kernel to stop processing */
-		r= senda(NULL, 0);
+		r= kipc_senda(NULL, 0);
 		if (r != 0)
-			panic(__FILE__, "asynsend: senda failed", r);
+			panic(__FILE__, "asynsend: kipc_senda failed", r);
 
 		dst_ind= 0;
 		for (src_ind= first_slot; src_ind<next_slot; src_ind++)
@@ -1216,7 +1216,7 @@ message *mp;
 	next_slot++;
 
 	/* Tell the kernel to rescan the table */
-	return senda(msgtable+first_slot, next_slot-first_slot);
+	return kipc_senda(msgtable+first_slot, next_slot-first_slot);
 }
 #endif
 

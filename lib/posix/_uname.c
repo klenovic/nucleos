@@ -10,14 +10,12 @@
 /*	uname(3) - describe the machine.		Author: Kees J. Bot
  *								5 Dec 1992
  */
-
-#define uname	_uname
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <nucleos/types.h>
-#include <sys/utsname.h>
+#include <nucleos/utsname.h>
 
 #define uts_get(field, string) \
 	if (sysuname(_UTS_GET, field, name->string, sizeof(name->string)) < 0) \

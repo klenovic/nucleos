@@ -18,7 +18,7 @@
  */
 
 #include <kernel/system.h>
-#include <sys/ptrace.h>
+#include <nucleos/ptrace.h>
 
 #if USE_TRACE
 

@@ -114,7 +114,7 @@ int fs_getnode()
   rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR);
 
   if (!rip) {
-      printf("FS: inode #%d couldn't be found\n", fs_m_in.REQ_INODE_NR);
+      printf("FS_PROC_NR: inode #%d couldn't be found\n", fs_m_in.REQ_INODE_NR);
       return -EINVAL;
   }
 

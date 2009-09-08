@@ -18,7 +18,7 @@
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include "file.h"
 #include "fproc.h"
 #include "lock.h"

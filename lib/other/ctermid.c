@@ -20,8 +20,8 @@
  *  Returns a pointer to "/dev/tty".
  */
 
-#include <lib.h>
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 
 char *ctermid(char *name_space);

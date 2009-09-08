@@ -11,9 +11,9 @@
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/com.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include "buf.h"
 #include "inode.h"
 #include "super.h"
@@ -29,10 +29,10 @@ struct super_block superblock;
 int fs_readsuper_s()
 {
 /* This function reads the superblock of the partition, gets the root inode
- * and sends back the details of them. Note, that the FS process does not
+ * and sends back the details of them. Note, that the FS_PROC_NR process does not
  * know the index of the vmnt object which refers to it, whenever the pathname 
  * lookup leaves a partition an ELEAVEMOUNT error is transferred back 
- * so that the VFS knows that it has to find the vnode on which this FS 
+ * so that the VFS knows that it has to find the vnode on which this FS_PROC_NR 
  * process' partition is mounted on.
  */
   struct super_block *xp;
@@ -136,10 +136,10 @@ int fs_readsuper_s()
 int fs_readsuper_o()
 {
 /* This function reads the superblock of the partition, gets the root inode
- * and sends back the details of them. Note, that the FS process does not
+ * and sends back the details of them. Note, that the FS_PROC_NR process does not
  * know the index of the vmnt object which refers to it, whenever the pathname 
  * lookup leaves a partition an ELEAVEMOUNT error is transferred back 
- * so that the VFS knows that it has to find the vnode on which this FS 
+ * so that the VFS knows that it has to find the vnode on which this FS_PROC_NR 
  * process' partition is mounted on.
  */
   struct super_block *xp;
@@ -240,7 +240,7 @@ printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
   
   rip->i_mountpoint = TRUE;
 
-  fs_m_out.m_source = rip->i_dev;/* Filled with the FS endp by the system */
+  fs_m_out.m_source = rip->i_dev;/* Filled with the FS_PROC_NR endp by the system */
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_FILE_SIZE = rip->i_size;
   fs_m_out.RES_MODE = rip->i_mode;

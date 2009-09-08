@@ -9,7 +9,7 @@
  */
 #include <nucleos/drivers.h>
 #include <nucleos/types.h>
-#include <time.h>
+#include <nucleos/time.h>
 #include "pci_helper.h"
 
 

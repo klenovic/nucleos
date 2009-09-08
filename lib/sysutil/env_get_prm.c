@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "sysutil.h"
-#include <string.h>
+#include <nucleos/string.h>
 
 static int argc = 0;
 static char **argv = NULL;

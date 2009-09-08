@@ -14,7 +14,7 @@ Copyright 1995 Philip Homburg
 
 The valid messages and their parameters are:
 
-from FS:
+from FS_PROC_NR:
  __________________________________________________________________
 |		|           |         |       |          |         |
 | m_type	|   DEVICE  | PROC_NR |	COUNT |	POSITION | ADDRESS |
@@ -54,8 +54,8 @@ from DL_ETH:
 #include "inet.h"
 
 #include <nucleos/fcntl.h>
-#include <time.h>
-#include <unistd.h>
+#include <nucleos/time.h>
+#include <nucleos/unistd.h>
 #include <nucleos/svrctl.h>
 #include <servers/ds/ds.h>
 
@@ -214,7 +214,7 @@ void main(void)
 		if (!mq)
 			ip_panic(("out of messages"));
 
-		r= receive (ANY, &mq->mq_mess);
+		r= kipc_receive (ANY, &mq->mq_mess);
 		if (r<0)
 		{
 			ip_panic(("unable to receive: %d", r));

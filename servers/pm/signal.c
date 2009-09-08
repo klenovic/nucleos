@@ -26,18 +26,18 @@
  *   check_sig: check which processes to signal with sig_proc()
  *   check_pending:  check if a pending signal can now be delivered
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "pm.h"
-#include <sys/stat.h>
-#include <sys/ptrace.h>
-#include <nucleos/callnr.h>
+#include <nucleos/stat.h>
+#include <nucleos/ptrace.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
-#include <signal.h>
-#include <sys/resource.h>
+#include <nucleos/signal.h>
+#include <nucleos/resource.h>
 #include <asm/sigcontext.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -416,7 +416,7 @@ int signo;			/* signal to send to process (1 to _NSIG) */
 		return;
 	}
 
-	/* Ask FS to unpause the process. Deliver the signal when FS is
+	/* Ask FS_PROC_NR to unpause the process. Deliver the signal when FS_PROC_NR is
 	 * ready.
 	 */
 	unpause(slot, FALSE /*!for_trace*/);
@@ -426,7 +426,7 @@ int signo;			/* signal to send to process (1 to _NSIG) */
 
 	/* Mark event pending in process slot and send notification. */
 	sigaddset(&rmp->mp_sigpending, signo);
-	notify(rmp->mp_endpoint);
+	kipc_notify(rmp->mp_endpoint);
   	return;
   }
 
@@ -553,7 +553,7 @@ int for_trace;			/* for tracing */
 /* A signal is to be sent to a process.  If that process is hanging on a
  * system call, the system call must be terminated with -EINTR.  Possible
  * calls are PAUSE, WAIT, READ and WRITE, the latter two for pipes and ttys.
- * First check if the process is hanging on an PM call.  If not, tell FS,
+ * First check if the process is hanging on an PM call.  If not, tell FS_PROC_NR,
  * so it can check for READs and WRITEs from pipes, ttys and the like.
  */
   register struct mproc *rmp;
@@ -568,7 +568,7 @@ int for_trace;			/* for tracing */
 	return;
   }
 
-  /* Process is not hanging on an PM call.  Ask FS to take a look. */
+  /* Process is not hanging on an PM call.  Ask FS_PROC_NR to take a look. */
   if (for_trace)
   {
 	  if (rmp->mp_fs_call != PM_IDLE)
@@ -581,6 +581,6 @@ int for_trace;			/* for tracing */
 		panic( __FILE__, "unpause: not idle", rmp->mp_fs_call2);
 	  rmp->mp_fs_call2= PM_UNPAUSE;
   }
-  r= notify(FS_PROC_NR);
-  if (r != 0) panic("pm", "unpause: unable to notify FS", r);
+  r= kipc_notify(FS_PROC_NR);
+  if (r != 0) panic("pm", "unpause: unable to notify FS_PROC_NR", r);
 }

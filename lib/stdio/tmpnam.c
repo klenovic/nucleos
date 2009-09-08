@@ -12,10 +12,10 @@
  */
 #include <nucleos/types.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "loc_incl.h"
 
-pid_t _getpid(void);
+pid_t getpid(void);
 
 char *
 tmpnam(char *s) {
@@ -25,7 +25,7 @@ tmpnam(char *s) {
 
 	if (!name) { 
 		name = name_buffer + strlen(name_buffer);
-		name = _i_compute((unsigned long)_getpid(), 10, name, 5);
+		name = _i_compute((unsigned long)getpid(), 10, name, 5);
 		*name++ = '.';
 		*name = '\0';
 	}

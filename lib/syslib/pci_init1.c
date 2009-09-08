@@ -13,8 +13,8 @@ pci_init1.c
 
 #include "pci.h"
 #include "syslib.h"
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <servers/ds/ds.h>
 #include <nucleos/sysutil.h>
 
@@ -46,7 +46,7 @@ char *name;
 		memcpy(m.m3_ca1, name, len);
 		m.m3_ca1[len]= '\0';
 	}
-	r= sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_init1: can't talk to PCI", r);
 	if (m.m_type != 0)

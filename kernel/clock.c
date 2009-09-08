@@ -41,7 +41,7 @@
 
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <nucleos/com.h>
 #include <nucleos/portio.h>
 
@@ -52,7 +52,7 @@ static int clock_handler(irq_hook_t *hook);
 static void do_clocktick(message *m_ptr);
 static void load_update(void);
 
-/* The CLOCK's timers queue. The functions in <timers.h> operate on this. 
+/* The CLOCK's timers queue. The functions in <nucleos/timer.h> operate on this. 
  * Each system process possesses a single synchronous alarm timer. If other 
  * kernel parts want to use additional timers, they must declare their own 
  * persistent (static) timer structure, which can be passed to the clock
@@ -82,7 +82,7 @@ void clock_task()
   /* Main loop of the clock task.  Get work, process it. Never reply. */
   while(TRUE) {
 	/* Go get a message. */
-	result = receive(ANY, &m);
+	result = kipc_receive(ANY, &m);
 
 	if(result != 0)
 		minix_panic("receive() failed", result);

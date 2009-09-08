@@ -8,7 +8,9 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #ifndef __NUCLEOS_COM_H
-#define __NUCLEOS_COM_H 
+#define __NUCLEOS_COM_H
+
+#ifndef __ASSEMBLY__
 
 /*===========================================================================*
  *          	    		Magic process numbers			     *
@@ -55,7 +57,7 @@
 /* User-space processes, that is, device drivers, servers, and INIT. */
 #define PM_PROC_NR	  0	/* process manager */
 #define FS_PROC_NR 	  1	/* file system */
-#define VFS_PROC_NR 	  FS_PROC_NR /* FS has been renamed to VFS. */
+#define VFS_PROC_NR 	  FS_PROC_NR /* FS_PROC_NR has been renamed to VFS. */
 #define RS_PROC_NR 	  2  	/* memory driver (RAM disk, null, etc.) */
 #define MEM_PROC_NR 	  3  	/* memory driver (RAM disk, null, etc.) */
 #define LOG_PROC_NR	  4	/* log device driver */
@@ -582,7 +584,7 @@
 #define SCP_MAKEINFO(seg)  ((seg) & 0xffff)
 #define SCP_INFO2SEG(info) ((info) & 0xffff)
 
-/* Field names for SELECT (FS). */
+/* Field names for SELECT (FS_PROC_NR). */
 #define SEL_NFDS       m8_i1
 #define SEL_READFDS    m8_p1
 #define SEL_WRITEFDS   m8_p2
@@ -704,7 +706,7 @@
 #  define FKEY_FKEYS	      m2_l1	/* F1-F12 keys pressed */
 #  define FKEY_SFKEYS	      m2_l2	/* Shift-F1-F12 keys pressed */
 #define DIAG_BASE	0xa00
-#define DIAGNOSTICS_OLD 	(DIAG_BASE+1) 	/* output a string without FS in between */
+#define DIAGNOSTICS_OLD 	(DIAG_BASE+1) 	/* output a string without FS_PROC_NR in between */
 #define DIAGNOSTICS_S_OLD 	(DIAG_BASE+2) 	/* grant-based version of DIAGNOSTICS */
 #  define DIAG_PRINT_BUF_G    m1_p1
 #  define DIAG_BUF_COUNT      m1_i1
@@ -719,27 +721,27 @@
 #define PM_BASE	0x900
 #define PM_GET_WORK	(PM_BASE + 1)	/* Get work from PM */
 #define PM_IDLE		(PM_BASE + 2)	/* PM doesn't have any more work */
-#define PM_BUSY		(PM_BASE + 3)	/* A reply from FS is needed */
-#define PM_SETSID	(PM_BASE + 5)	/* Tell FS about the session leader */
+#define PM_BUSY		(PM_BASE + 3)	/* A reply from FS_PROC_NR is needed */
+#define PM_SETSID	(PM_BASE + 5)	/* Tell FS_PROC_NR about the session leader */
 #define		PM_SETSID_PROC	m1_i1		/* process */
-#define PM_SETGID	(PM_BASE + 6)	/* Tell FS about the new group IDs */
+#define PM_SETGID	(PM_BASE + 6)	/* Tell FS_PROC_NR about the new group IDs */
 #define		PM_SETGID_PROC	m1_i1		/* process */
 #define		PM_SETGID_EGID	m1_i2		/* effective group id */
 #define		PM_SETGID_RGID	m1_i3		/* real group id */
-#define PM_SETUID	(PM_BASE + 7)	/* Tell FS about the new user IDs */
+#define PM_SETUID	(PM_BASE + 7)	/* Tell FS_PROC_NR about the new user IDs */
 #define		PM_SETUID_PROC	m1_i1		/* process */
 #define		PM_SETUID_EGID	m1_i2		/* effective user id */
 #define		PM_SETUID_RGID	m1_i3		/* real user id */
-#define PM_FORK		(PM_BASE + 8)	/* Tell FS about the new process */
+#define PM_FORK		(PM_BASE + 8)	/* Tell FS_PROC_NR about the new process */
 #define		PM_FORK_PPROC	m1_i1		/* parent process */
 #define		PM_FORK_CPROC	m1_i2		/* child process */
 #define		PM_FORK_CPID	m1_i3		/* child pid */
-#define PM_EXIT		(PM_BASE + 9)	/* Tell FS about the exiting process */
+#define PM_EXIT		(PM_BASE + 9)	/* Tell FS_PROC_NR about the exiting process */
 #define		PM_EXIT_PROC	m1_i1		/* process */
 #define PM_UNPAUSE	(PM_BASE + 10)	/* interrupted process */
 #define		PM_UNPAUSE_PROC	m1_i1		/* process */
-#define PM_REBOOT	(PM_BASE + 11)	/* Tell FS that we about to reboot */
-#define PM_EXEC		(PM_BASE + 12)	/* Forward exec call to FS */
+#define PM_REBOOT	(PM_BASE + 11)	/* Tell FS_PROC_NR that we about to reboot */
+#define PM_EXEC		(PM_BASE + 12)	/* Forward exec call to FS_PROC_NR */
 #define		PM_EXEC_PROC		m1_i1	/* process */
 #define		PM_EXEC_PATH		m1_p1	/* executable */
 #define		PM_EXEC_PATH_LEN	m1_i2	/* length of path including
@@ -747,19 +749,19 @@
 						 */
 #define		PM_EXEC_FRAME		m1_p2	/* arguments and environment */
 #define		PM_EXEC_FRAME_LEN	m1_i3	/* size of frame */
-#define PM_FORK_NB	(PM_BASE + 13)	/* Tell FS about the fork_nb call */
-#define PM_DUMPCORE	(PM_BASE + 14)	/* Ask FS to generate a core dump */
+#define PM_FORK_NB	(PM_BASE + 13)	/* Tell FS_PROC_NR about the fork_nb call */
+#define PM_DUMPCORE	(PM_BASE + 14)	/* Ask FS_PROC_NR to generate a core dump */
 #define		PM_CORE_PROC		m1_i1
 #define		PM_CORE_SEGPTR		m1_p1
 #define PM_UNPAUSE_TR	(PM_BASE + 15)	/* interrupted process (for tracing) */
 
 /* Replies */
-#define PM_EXIT_REPLY	(PM_BASE + 20)	/* Reply from FS */
-#define PM_REBOOT_REPLY	(PM_BASE + 21)	/* Reply from FS */
-#define PM_EXEC_REPLY	(PM_BASE + 22)	/* Reply from FS */
+#define PM_EXIT_REPLY	(PM_BASE + 20)	/* Reply from FS_PROC_NR */
+#define PM_REBOOT_REPLY	(PM_BASE + 21)	/* Reply from FS_PROC_NR */
+#define PM_EXEC_REPLY	(PM_BASE + 22)	/* Reply from FS_PROC_NR */
 		/* PM_EXEC_PROC m1_i1 */
 #define		PM_EXEC_STATUS m1_i2	/* OK or failure */
-#define PM_CORE_REPLY	(PM_BASE + 23)	/* Reply from FS */
+#define PM_CORE_REPLY	(PM_BASE + 23)	/* Reply from FS_PROC_NR */
 		/* PM_CORE_PROC m1_i1 */
 #define		PM_CORE_STATUS m1_i2	/* OK or failure */
 
@@ -775,7 +777,7 @@
 					 * text segment is already present)
 					 */
 #define EXC_NM_RF_ALLOW_SETUID	2	/* Setuid execution is allowed (tells
-					 * FS to update its uid and gid 
+					 * FS_PROC_NR to update its uid and gid 
 					 * fields.
 					 */
 #define EXC_NM_RF_FULLVM	4	
@@ -897,6 +899,8 @@
 #define VM_VFS_REPLY_CLOSE	(VM_RQ_BASE+32)
 
 /* Total. */
-#define VM_NCALLS				33
+#define VM_NCALLS		33
+
+#endif /* __ASSEMBLY__ */
 
 #endif /* __NUCLEOS_COM_H */ 

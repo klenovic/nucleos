@@ -9,30 +9,31 @@
  */
 
 #include <stdio.h>
-#include <time.h>
 #include <nucleos/time.h>
-#include <sys/times.h>
+#include <nucleos/time.h>
+#include <nucleos/times.h>
 #include <nucleos/types.h>
 #include <nucleos/u64.h>
 #include <nucleos/const.h>
+#include <nucleos/param.h>
 
 #include "sysutil.h"
 
-static u32_t Hz;
+static u32_t hz;
 
 u32_t
 sys_hz(void)
 {
-	if(Hz <= 0) {
+	if(hz <= 0) {
 		int r;
 		/* Get HZ. */
-		if((r=sys_getinfo(GET_HZ, &Hz, sizeof(Hz), 0, 0)) != 0) {
-			Hz = DEFAULT_HZ;
-			printf("sys_hz: %d: reverting to HZ = %d\n", r, Hz);
+		if((r=sys_getinfo(GET_HZ, &hz, sizeof(hz), 0, 0)) != 0) {
+			hz = HZ;
+			printf("sys_hz: %d: reverting to HZ = %d\n", r, hz);
 		}
 	}
 
-	return Hz;
+	return hz;
 }
 
 u32_t

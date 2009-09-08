@@ -15,9 +15,9 @@
  * Created:
  *   Oct 03, 2005:	by Jorrit N. Herder
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <kernel/priv.h>
 #include "../rs/manager.h"
 

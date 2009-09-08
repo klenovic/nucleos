@@ -7,15 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define ptrace	_ptrace
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-long ptrace(req, pid, addr, data)
-int req;
-pid_t pid;
-long addr;
-long data;
+long ptrace(int req, pid_t pid, long addr, long data)
 {
   message m;
 
@@ -23,7 +18,7 @@ long data;
   m.m2_i2 = req;
   m.m2_l1 = addr;
   m.m2_l2 = data;
-  if (_syscall(MM, PTRACE, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_ptrace, &m) < 0) return(-1);
 
   /* There was no error, but -1 is a legal return value.  Clear errno if
    * necessary to distinguish this case.  _syscall has set errno to nonzero

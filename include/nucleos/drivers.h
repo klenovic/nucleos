@@ -14,7 +14,7 @@
 #include <nucleos/type.h>
 #include <nucleos/com.h>
 #include <nucleos/dmap.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/devio.h>
@@ -26,11 +26,9 @@
 #include <ibm/bios.h>		/* BIOS index numbers */
 #include <ibm/ports.h>		/* Well-known ports */
 
-#include <string.h>
-#include <signal.h>
+#include <nucleos/string.h>
+#include <nucleos/signal.h>
 #include <stdlib.h>
 #include <nucleos/limits.h>
 #include <nucleos/stddef.h>
 #include <nucleos/errno.h>
-#include <unistd.h>
-

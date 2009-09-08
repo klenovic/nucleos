@@ -30,7 +30,7 @@
 #include <nucleos/types.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 /* max. number of simultaneously pending select() calls */
 #define MAXSELECTS 25

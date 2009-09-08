@@ -15,7 +15,7 @@
  */
 
 #include <kernel/system.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <asm/sigcontext.h>
 
 #if USE_ENDKSIG 

@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include "loc_incl.h"
 
-ssize_t _read(ssize_t d, char *buf, size_t nbytes);
+ssize_t read(ssize_t d, char *buf, size_t nbytes);
 
 int
 __fillbuf(register FILE *stream)
@@ -57,7 +57,7 @@ __fillbuf(register FILE *stream)
 		stream->_bufsiz = 1;
 	}
 	stream->_ptr = stream->_buf;
-	stream->_count = _read(stream->_fd, (char *)stream->_buf, stream->_bufsiz);
+	stream->_count = read(stream->_fd, (char *)stream->_buf, stream->_bufsiz);
 
 	if (stream->_count <= 0){
 		if (stream->_count == 0) {

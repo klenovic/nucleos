@@ -18,7 +18,7 @@ Copyright 1995 Philip Homburg
 #include "inet.h"
 
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 #include "generic/assert.h"
 #include "generic/buf.h"

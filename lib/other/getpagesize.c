@@ -11,7 +11,7 @@
 getpagesize.c
 */
 
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 int getpagesize(void)
 {

@@ -28,8 +28,8 @@
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
 #include <net/hton.h>
 #include <net/gen/in.h>

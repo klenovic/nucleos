@@ -7,10 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fstatfs	_fstatfs
-#include <sys/stat.h>
-#include <sys/statfs.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
+#include <nucleos/statfs.h>
 
 int fstatfs(int fd, struct statfs *buffer)
 {
@@ -18,5 +17,5 @@ int fstatfs(int fd, struct statfs *buffer)
 
   m.m1_i1 = fd;
   m.m1_p1 = (char *) buffer;
-  return(_syscall(FS, FSTATFS, &m));
+  return(_syscall(FS_PROC_NR, __NR_fstatfs, &m));
 }

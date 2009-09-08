@@ -10,9 +10,9 @@
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/ioctl.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 #include <netinet/in.h>
 
 #include <net/gen/in.h>

@@ -34,7 +34,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <nucleos/types.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the

@@ -9,10 +9,10 @@
  */
 
 #include "fs.h"
-#include <sys/stat.h>
-#include <string.h>
+#include <nucleos/stat.h>
+#include <nucleos/string.h>
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
 
 #include "buf.h"

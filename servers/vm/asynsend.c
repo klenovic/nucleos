@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
@@ -16,12 +16,12 @@
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <env.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,6 +68,6 @@ message *mp;
                                          */
 
         /* Tell the kernel to rescan the table */
-        return senda(msgtable, msgtable_n);
+        return kipc_senda(msgtable, msgtable_n);
 }
 

@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getppid	_getppid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 pid_t getppid()
 {
@@ -20,6 +19,6 @@ pid_t getppid()
    * are not always successful and Minix returns the reserved value
    * (pid_t) -1 when there is an error.
    */
-  if (_syscall(MM, GETPID, &m) < 0) return ( (pid_t) -1);
+  if (_syscall(PM_PROC_NR, __NR_getpid, &m) < 0) return ( (pid_t) -1);
   return( (pid_t) m.m2_i1);
 }

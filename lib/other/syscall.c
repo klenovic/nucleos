@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 
 int _syscall(who, syscallnr, msgptr)
 int who;
@@ -17,7 +17,7 @@ register message *msgptr;
   int status;
 
   msgptr->m_type = syscallnr;
-  status = _sendrec(who, msgptr);
+  status = kipc_sendrec(who, msgptr);
 
   if (status != 0) {
 	/* 'sendrec' itself failed. */

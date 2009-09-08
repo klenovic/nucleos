@@ -34,12 +34,6 @@ typedef uint16_t	in_port_t;
 typedef uint32_t	in_addr_t;
 #endif /* _IN_ADDR_T */
 
-#ifndef _SA_FAMILY_T
-#define _SA_FAMILY_T
-/* Should match corresponding typedef in <sys/socket.h> */
-typedef uint8_t		sa_family_t;
-#endif /* _SA_FAMILY_T */
-
 /* Protocols */
 #define IPPROTO_IP	0	/* Dummy protocol */
 #define IPPROTO_ICMP	1	/* ICMP */

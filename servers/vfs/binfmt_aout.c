@@ -8,9 +8,9 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "fs.h"
-#include <sys/stat.h>
-#include <nucleos/nucleos.h>
-#include <nucleos/callnr.h>
+#include <nucleos/stat.h>
+#include <nucleos/kernel.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
@@ -18,9 +18,9 @@
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
 #include <nucleos/a.out.h>
-#include <signal.h>
-#include <string.h>
-#include <dirent.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
+#include <nucleos/dirent.h>
 
 #include "fproc.h"
 #include "param.h"
@@ -264,11 +264,11 @@ static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_s
 	int err;
 	message m;
 
-	m.m_type = EXEC_NEWMEM;
+	m.m_type = __NR_exec_newmem;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)ex;
 
-	err = sendrec(PM_PROC_NR, &m);
+	err = kipc_sendrec(PM_PROC_NR, &m);
 
 	if (err)
 		return err;

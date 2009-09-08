@@ -13,8 +13,6 @@
 #define TRUE               1	/* used for turning integers into Booleans */
 #define FALSE              0	/* used for turning integers into Booleans */
 
-#define DEFAULT_HZ        60	/* clock freq (software settable on IBM-PC) */
-
 #define SUPER_USER (uid_t) 0	/* uid_t of superuser */
 
 #define NULL     ((void *)0)	/* null pointer */
@@ -25,7 +23,7 @@
 				/* maximum number of entries in an iorequest */
 
 /* Message passing constants. */
-#define MESS_SIZE (sizeof(message))	/* might need usizeof from FS here */
+#define MESS_SIZE (sizeof(message))	/* might need usizeof from FS_PROC_NR here */
 #define NIL_MESS ((message *) 0)	/* null pointer */
 
 /* Memory related constants. */

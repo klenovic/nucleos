@@ -13,7 +13,7 @@
  */
 #include	<ctype.h>
 #include	<nucleos/errno.h>
-#include	<nucleos/nucleos.h>
+#include	<nucleos/kernel.h>
 #include	<stdlib.h>
 
 static unsigned long

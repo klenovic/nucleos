@@ -15,9 +15,9 @@
  */
 
 #include <kernel/system.h>
-#include <nucleos/ipc.h>
-#include <signal.h>
-#include <string.h>
+#include <nucleos/kipc.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
 
 #if USE_PRIVCTL
 

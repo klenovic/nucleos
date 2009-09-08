@@ -12,7 +12,7 @@
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
 #include <nucleos/types.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdlib.h>
 
 extern void (*_clean)(void);

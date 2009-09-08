@@ -7,20 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fchown	_fchown
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
-int fchown(fd, owner, grp)
-int fd;
-uid_t owner;
-gid_t grp;
+int fchown(int fd, uid_t owner, gid_t grp)
 {
   message m;
 
   m.m1_i1 = fd;
   m.m1_i2 = owner;
   m.m1_i3 = grp;
-  return(_syscall(FS, FCHOWN, &m));
+  return(_syscall(FS_PROC_NR, __NR_fchown, &m));
 }

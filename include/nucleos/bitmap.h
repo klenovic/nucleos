@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _BITMAP_H
-#define _BITMAP_H
+#ifndef __NUCLEOS_BITMAP_H
+#define __NUCLEOS_BITMAP_H
 
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 
 /* Bit map operations to manipulate bits of a simple mask variable. */
 #define bit_set(mask, n)	((mask) |= (1 << (n)))
@@ -28,4 +28,4 @@
 #define SET_BIT(map,bit) ( MAP_CHUNK(map,bit) |= (1 << CHUNK_OFFSET(bit) )
 #define UNSET_BIT(map,bit) ( MAP_CHUNK(map,bit) &= ~(1 << CHUNK_OFFSET(bit) )
 
-#endif	/* _BITMAP_H */
+#endif /* __NUCLEOS_BITMAP_H */

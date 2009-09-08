@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
@@ -15,17 +15,17 @@
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
 
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <env.h>
 #include <stdio.h>
 #include <nucleos/fcntl.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 
 #include <servers/vm/glo.h>
 #include <servers/vm/proto.h>

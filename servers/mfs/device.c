@@ -11,13 +11,13 @@
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <assert.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/ioctl.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/u64.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "inode.h"
 #include "super.h"
 #include "const.h"
@@ -152,7 +152,7 @@ vir_bytes bytes;
 	}
 
 	/* If we have converted to a safe operation, I/O
-	 * endpoint becomes FS if it wasn't already.
+	 * endpoint becomes FS_PROC_NR if it wasn't already.
 	 */
 	if(GRANT_VALID(*gid)) {
 		*io_ept = SELF_E;
@@ -219,7 +219,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       return -EDSTDIED;
   }
   
-  /* The io vector copying relies on this I/O being for FS itself. */
+  /* The io vector copying relies on this I/O being for FS_PROC_NR itself. */
   if(proc_e != SELF_E) {
       printf("MFS(%d) doing block_dev_io for non-self %d\n", SELF_E, proc_e);
       panic(__FILE__, "doing block_dev_io for non-self", proc_e);
@@ -246,7 +246,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   m.HIGHPOS  = ex64hi(pos);
 
   /* Call the task. */
-  r = sendrec(driver_e, &m);
+  r = kipc_sendrec(driver_e, &m);
 
   /* As block I/O never SUSPENDs, safe cleanup must be done whether
    * the I/O succeeded or not. */
@@ -255,7 +255,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   /* RECOVERY:
    * - send back dead driver number
    * - VFS unmaps it, waits for new driver
-   * - VFS sends the new driver endp for the FS proc and the request again 
+   * - VFS sends the new driver endp for the FS_PROC_NR proc and the request again 
    */
   if (r != 0) {
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
@@ -365,7 +365,7 @@ message *mess_ptr;		/* pointer to message for task */
 
   proc_e = mess_ptr->IO_ENDPT;
 
-  r = sendrec(task_nr, mess_ptr);
+  r = kipc_sendrec(task_nr, mess_ptr);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);

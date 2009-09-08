@@ -7,20 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define ioctl	_ioctl
+#include <nucleos/lib.h>
 #include <nucleos/com.h>
 #include <nucleos/ioctl.h>
 
-int ioctl(fd, request, data)
-int fd;
-int request;
-void *data;
+int ioctl(int fd, int request, void *data)
 {
   message m;
 
   m.TTY_LINE = fd;
   m.TTY_REQUEST = request;
   m.ADDRESS = (char *) data;
-  return(_syscall(FS, IOCTL, &m));
+  return(_syscall(FS_PROC_NR, __NR_ioctl, &m));
 }

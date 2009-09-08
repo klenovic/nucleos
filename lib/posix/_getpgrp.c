@@ -7,13 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getpgrp	_getpgrp
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 pid_t getpgrp()
 {
   message m;
 
-  return(_syscall(MM, GETPGRP, &m));
+  return(_syscall(PM_PROC_NR, __NR_getpgrp, &m));
 }

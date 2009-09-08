@@ -9,9 +9,9 @@
  */
 
 #include <stdio.h>
-#include <time.h>
 #include <nucleos/time.h>
-#include <sys/times.h>
+#include <nucleos/time.h>
+#include <nucleos/times.h>
 #include <nucleos/types.h>
 #include <nucleos/u64.h>
 #include <nucleos/const.h>

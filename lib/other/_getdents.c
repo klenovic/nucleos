@@ -7,19 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getdents _getdents
-#include <dirent.h>
+#include <nucleos/lib.h>
+#include <nucleos/dirent.h>
 
-ssize_t getdents(fd, buffer, nbytes)
-int fd;
-struct dirent *buffer;
-size_t nbytes;
+ssize_t getdents(int fd, struct dirent *buffer, size_t nbytes)
 {
   message m;
 
   m.m1_i1 = fd;
   m.m1_i2 = nbytes;
   m.m1_p1 = (char *) buffer;
-  return _syscall(FS, GETDENTS, &m);
+  return _syscall(FS_PROC_NR, __NR_getdents, &m);
 }

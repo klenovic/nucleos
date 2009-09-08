@@ -16,9 +16,9 @@
 #include <nucleos/svrctl.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/ioctls.h>
 
 #define NIL ((char*)0)

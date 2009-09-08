@@ -7,16 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define mmap	_mmap
+#include <nucleos/lib.h>
 #define munmap	_munmap
-#include <sys/mman.h>
+#include <nucleos/mman.h>
 #include <stdarg.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 
-void *mmap(void *addr, size_t len, int prot, int flags,
-	int fd, off_t offset)
+void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
 	message m;
 	int r;

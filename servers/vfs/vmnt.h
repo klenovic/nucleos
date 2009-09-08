@@ -11,7 +11,7 @@
 #define __SERVERS_VFS_VMNT_H
 
 struct vmnt {
-  int m_fs_e;                   /* FS process' kernel endpoint */
+  int m_fs_e;                   /* FS_PROC_NR process' kernel endpoint */
   dev_t m_dev;                  /* device number */
   int m_flags;                  /* mount flags */
   struct vnode *m_mounted_on;   /* the vnode on which the partition is mounted */

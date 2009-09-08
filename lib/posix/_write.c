@@ -7,19 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define write	_write
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-ssize_t write(fd, buffer, nbytes)
-int fd;
-const void *buffer;
-size_t nbytes;
+ssize_t write(int fd, const void *buffer, size_t nbytes)
 {
   message m;
 
   m.m1_i1 = fd;
   m.m1_i2 = nbytes;
   m.m1_p1 = (char *) buffer;
-  return(_syscall(FS, WRITE, &m));
+  return(_syscall(FS_PROC_NR, __NR_write, &m));
 }

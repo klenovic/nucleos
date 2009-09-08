@@ -68,7 +68,7 @@ int main(int argc, char **argv)
           result = do_fkey_pressed(&m_in);
           break;
       case DEV_PING:
-	  notify(m_in.m_source);
+	  kipc_notify(m_in.m_source);
 	  continue;
       default: 
           printf("IS: warning, got illegal request %d from %d\n",
@@ -115,7 +115,7 @@ static void init_server(int argc, char **argv)
 static void get_work()
 {
     int status = 0;
-    status = receive(ANY, &m_in);   /* this blocks until message arrives */
+    status = kipc_receive(ANY, &m_in);   /* this blocks until message arrives */
     if (status != 0)
         panic("IS","failed to receive message!", status);
     who_e = m_in.m_source;        /* message arrived! set sender */
@@ -131,7 +131,7 @@ int result;                           	/* report result to replyee */
 {
     int send_status;
     m_out.m_type = result;  		/* build reply message */
-    send_status = send(who, &m_out);    /* send the message */
+    send_status = kipc_send(who, &m_out);    /* send the message */
     if (send_status != 0)
         panic("IS", "unable to send reply!", send_status);
 }

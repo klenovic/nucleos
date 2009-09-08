@@ -9,8 +9,8 @@
  */
 /*	keymap.h - defines for keymapping		Author: Marcus Hampel
  */
-#ifndef _SYS__KEYMAP_H
-#define _SYS__KEYMAP_H
+#ifndef __NUCLEOS_KEYMAP_H
+#define __NUCLEOS_KEYMAP_H
 
 #define	C(c)	((c) & 0x1F)	/* Map to control code		*/
 #define A(c)	((c) | 0x80)	/* Set eight bit (ALT)		*/
@@ -152,4 +152,4 @@ typedef unsigned short keymap_t[NR_SCAN_CODES * MAP_COLS];
 
 #define KEY_MAGIC	"KMAZ"	/* Magic number of keymap file */
 
-#endif /* _SYS__KEYMAP_H */
+#endif /* __NUCLEOS_KEYMAP_H */

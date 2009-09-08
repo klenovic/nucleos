@@ -7,9 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-
-#define cprofile _cprofile
+#include <nucleos/lib.h>
 
 int cprofile(int action, int size, char *ctl_ptr, int *mem_ptr)
 {
@@ -20,6 +18,6 @@ int cprofile(int action, int size, char *ctl_ptr, int *mem_ptr)
   m.PROF_CTL_PTR        = (void *) ctl_ptr;
   m.PROF_MEM_PTR        = (void *) mem_ptr;
 
-  return _syscall(MM, CPROF, &m);
+  return _syscall(PM_PROC_NR, __NR_cprof, &m);
 }
 

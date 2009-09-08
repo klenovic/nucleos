@@ -19,8 +19,7 @@
  * by the kernel's context switching code.  Floating point registers should
  * be added in a different struct.
  */
-#ifdef CONFIG_X86_32
-struct sigregs {  
+struct sigregs {
   short sr_gs;
   short sr_fs;
   short sr_es;
@@ -51,7 +50,6 @@ struct sigframe {		/* stack frame created for signalled process */
   void (*sf_retadr2)(void);
   struct sigcontext *sf_scpcopy;
 };
-#endif /* CONFIG_X86_32 */
 
 struct sigcontext {
   int sc_flags;			/* sigstack state to restore */
@@ -59,7 +57,6 @@ struct sigcontext {
   struct sigregs sc_regs;	/* register set to restore */
 };
 
-#ifdef CONFIG_X86_32
 #define sc_gs sc_regs.sr_gs
 #define sc_fs sc_regs.sr_fs
 #define sc_es sc_regs.sr_es
@@ -79,7 +76,6 @@ struct sigcontext {
 #define sc_psw sc_regs.sr_psw
 #define sc_sp sc_regs.sr_sp
 #define sc_ss sc_regs.sr_ss
-#endif /* CONFIG_X86_32 */
 
 int sigreturn(struct sigcontext *_scp);
 

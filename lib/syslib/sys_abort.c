@@ -9,7 +9,7 @@
  */
 #include "syslib.h"
 #include <stdarg.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 int sys_abort(int how, ...)
 {

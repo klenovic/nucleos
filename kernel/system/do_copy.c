@@ -19,7 +19,7 @@
  *    m5_i2:	CP_DST_PROC_NR		destination process number
  *    m5_l3:	CP_NR_BYTES		number of bytes to copy
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <kernel/system.h>
 #include <nucleos/vm.h>
 #include <nucleos/type.h>

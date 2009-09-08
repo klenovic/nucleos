@@ -16,8 +16,8 @@
  */
 #include <nucleos/stddef.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <nucleos/limits.h>
 #if !DEBUG
 #define NDEBUG  1

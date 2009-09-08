@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define mkfifo	_mkfifo
-#define mknod	_mknod
-#include <sys/stat.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
 
-int mkfifo(name, mode)
-const char *name;
-mode_t mode;
+int mkfifo(const char *name, mode_t mode)
 {
   return mknod(name, mode | S_IFIFO, (dev_t) 0);
 }

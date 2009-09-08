@@ -19,16 +19,15 @@
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <string.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
 #include <nucleos/const.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/syslib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <dirent.h>
+#include <nucleos/stat.h>
+#include <nucleos/dirent.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"
@@ -60,7 +59,7 @@ int do_fslogin()
       /* Copy back original mount request message */
       m_in = mount_m_in;
 
-      /* Set up last login FS */
+      /* Set up last login FS_PROC_NR */
       last_login_fs_e = who_e;
 
       /* Set up endpoint and call nr */
@@ -87,7 +86,7 @@ int do_mount()
   /* Only the super-user may do MOUNT. */
   if (!super_user) return(-EPERM);
 	
-  /* FS process' endpoint number */ 
+  /* FS_PROC_NR process' endpoint number */ 
   fs_e = (unsigned long)m_in.m1_p3;
 
   /* Sanity check on process number. */
@@ -123,21 +122,21 @@ static int mount_fs(endpoint_t fs_e)
   /* Only the super-user may do MOUNT. */
   if (!super_user) return(-EPERM);
 
-  /* If FS not yet logged in, save message and suspend mount */
+  /* If FS_PROC_NR not yet logged in, save message and suspend mount */
   if (last_login_fs_e != fs_e) {
       mount_m_in = m_in; 
       return SUSPEND;
   }
   
-  /* Mount request got after FS login or 
-   * FS login arrived after a suspended mount */
+  /* Mount request got after FS_PROC_NR login or 
+   * FS_PROC_NR login arrived after a suspended mount */
   last_login_fs_e = NONE;
   
   /* Clear endpoint field */
   mount_m_in.m1_p3 = (char *) NONE;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Convert name to device number */
   if ((dev = name_to_dev()) == NO_DEV) return(err_code);
@@ -149,9 +148,9 @@ static int mount_fs(endpoint_t fs_e)
           /* Found, sync the buffer cache */
           req_sync(bspec->v_fs_e);          
           break;
-          /* Note: there are probably some blocks in the FS process' buffer
+          /* Note: there are probably some blocks in the FS_PROC_NR process' buffer
            * cache which contain data on this minor, although they will be
-           * purged since the handling moves to the new FS process (if
+           * purged since the handling moves to the new FS_PROC_NR process (if
            * everything goes well with the mount...)
            */ 
       }
@@ -182,8 +181,8 @@ static int mount_fs(endpoint_t fs_e)
 	if (vmp->m_mounted_on || vmp->m_mounted_on == fproc[FS_PROC_NR].fp_rd) {
 		/* Normally, m_mounted_on refers to the mount point. For a
 		 * root filesystem, m_mounted_on is equal to the root vnode.
-		 * We assume that the root of FS is always the real root. If
-		 * the two vnodes are different or if the root of FS is equal
+		 * We assume that the root of FS_PROC_NR is always the real root. If
+		 * the two vnodes are different or if the root of FS_PROC_NR is equal
 		 * to the root of the filesystem we found, we found a
 		 * filesystem that is in use.
 		 */
@@ -197,7 +196,7 @@ static int mount_fs(endpoint_t fs_e)
 		panic("fs", "inconsistency remounting old root", NO_NUM);
 
 	/* Now get the inode of the file to be mounted on. */
-	if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
+	if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0) {
 		return(err_code);
 	}
 
@@ -248,7 +247,7 @@ static int mount_fs(endpoint_t fs_e)
   }
 
   /* Fetch the name of the mountpoint */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
+  if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0) {
 	return(err_code);
   }
 
@@ -257,7 +256,7 @@ static int mount_fs(endpoint_t fs_e)
 
   if (!replace_root)
   {
-	/* Get mount point and inform the FS it is on. */
+	/* Get mount point and inform the FS_PROC_NR it is on. */
 #if 0
 	printf("vfs:mount_fs: mount point at '%s'\n", user_fullpath);
 #endif
@@ -378,7 +377,7 @@ static int mount_fs(endpoint_t fs_e)
   allow_newroot = 0;            
 
   /* There was a block spec file open, and it should be handled by the 
-   * new FS proc now */
+   * new FS_PROC_NR proc now */
   if (bspec) {
       printf("VFSmount: moving opened block spec to new FS_e: %d...\n", fs_e);
       bspec->v_bfs_e = fs_e; 
@@ -401,7 +400,7 @@ int do_umount()
   	SANITYCHECK;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
   	SANITYCHECK;
   if ( (dev = name_to_dev()) == NO_DEV) return(err_code);
   	SANITYCHECK;
@@ -505,7 +504,7 @@ dev_t dev;
   vmp->m_root_node->v_ref_count = 0;
   vmp->m_root_node = NIL_VNODE;
 
-  /* Request FS the unmount */
+  /* Request FS_PROC_NR the unmount */
   if(vmp->m_fs_e <= 0 || vmp->m_fs_e == NONE)
 	panic(__FILE__, "unmount: strange fs endpoint", vmp->m_fs_e);
   if ((r = req_unmount(vmp->m_fs_e)) != 0) {
@@ -532,7 +531,7 @@ dev_t dev;
               continue;
           }
 
-          printf("VFSunmount: moving block spec %d to root FS\n", dev);
+          printf("VFSunmount: moving block spec %d to root FS_PROC_NR\n", dev);
           vp->v_bfs_e = ROOT_FS_E;
 
           /* Send the driver endpoint (even if it is known already...) */

@@ -11,7 +11,7 @@
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <nucleos/ioctl.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 #include <nucleos/types.h>
 #include <netinet/tcp.h>
 

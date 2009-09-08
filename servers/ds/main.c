@@ -16,7 +16,7 @@
  * Created:
  *   Oct 19, 2005       by Jorrit N. Herder
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"        /* include master header file */
 
 /* Allocate space for the global variables. */
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
       case DS_CHECK:
 	  result = do_check(&m);
 	  break;
-      case GETSYSINFO:
+      case __NR_getsysinfo:
           result = do_getsysinfo(&m);
           break;
       default: 
@@ -137,7 +137,7 @@ static void get_work(m_ptr)
 message *m_ptr;				/* message buffer */
 {
     int status = 0;
-    status = receive(ANY, m_ptr);   /* this blocks until message arrives */
+    status = kipc_receive(ANY, m_ptr);   /* this blocks until message arrives */
 
     if (status != 0)
         panic("DS","failed to receive message!", status);
@@ -154,7 +154,7 @@ int who_e;                           	/* destination */
 message *m_ptr;				/* message buffer */
 {
     int s;
-    s = send(who_e, m_ptr);    /* send the message */
+    s = kipc_send(who_e, m_ptr);    /* send the message */
 
     if (s != 0)
         panic("DS", "unable to send reply!", s);

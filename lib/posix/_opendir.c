@@ -10,18 +10,11 @@
 /*	opendir()					Author: Kees J. Bot
  *								24 Apr 1989
  */
-#define nil 0
-#include <lib.h>
-#define close	_close
-#define fcntl	_fcntl
-#define fstat	_fstat
-#define open	_open
-#define opendir	_opendir
-#define stat	_stat
+#include <nucleos/lib.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <unistd.h>
+#include <nucleos/stat.h>
+#include <nucleos/dirent.h>
+#include <nucleos/unistd.h>
 #include <stdlib.h>
 #include <nucleos/fcntl.h>
 #include <nucleos/errno.h>
@@ -34,22 +27,22 @@ DIR *opendir(const char *name)
 	struct stat st;
 
 	/* Only read directories. */
-	if (stat(name, &st) < 0) return nil;
-	if (!S_ISDIR(st.st_mode)) { errno= ENOTDIR; return nil; }
+	if (stat(name, &st) < 0) return 0;
+	if (!S_ISDIR(st.st_mode)) { errno= ENOTDIR; return 0; }
 
-	if ((d= open(name, O_RDONLY | O_NONBLOCK)) < 0) return nil;
+	if ((d= open(name, O_RDONLY | O_NONBLOCK)) < 0) return 0;
 
 	/* Check the type again, mark close-on-exec, get a buffer. */
 	if (fstat(d, &st) < 0
 		|| (errno= ENOTDIR, !S_ISDIR(st.st_mode))
 		|| (f= fcntl(d, F_GETFD)) < 0
 		|| fcntl(d, F_SETFD, f | FD_CLOEXEC) < 0
-		|| (dp= (DIR *) malloc(sizeof(*dp))) == nil
+		|| (dp= (DIR *) malloc(sizeof(*dp))) == 0
 	) {
 		int err= errno;
 		(void) close(d);
 		errno= err;
-		return nil;
+		return 0;
 	}
 
 	dp->_fd= d;

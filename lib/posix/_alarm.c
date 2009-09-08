@@ -7,15 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define alarm	_alarm
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-unsigned int alarm(sec)
-unsigned int sec;
+unsigned int alarm(unsigned int sec)
 {
   message m;
 
   m.m1_i1 = (int) sec;
-  return( (unsigned) _syscall(MM, ALARM, &m));
+  return( (unsigned) _syscall(PM_PROC_NR, __NR_alarm, &m));
 }

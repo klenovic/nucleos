@@ -47,7 +47,7 @@
  */
 #include <nucleos/types.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <ctype.h>
 #include <nucleos/limits.h>
 #include <stdlib.h>

@@ -50,7 +50,7 @@
 #include "assert.h"
 #include <ibm/pci.h>
 
-#include "string.h"
+#include <nucleos/string.h>
 int this_proc;
 
 /*****************************************************************************

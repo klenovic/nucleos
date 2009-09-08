@@ -35,7 +35,7 @@
  *   DEV_OPEN:       a tty line has been opened
  *   DEV_CLOSE:      a tty line has been closed
  *   DEV_SELECT:     start select notification request
- *   DEV_STATUS:     FS wants to know status for SELECT or REVIVE
+ *   DEV_STATUS:     FS_PROC_NR wants to know status for SELECT or REVIVE
  *   CANCEL:         terminate a previous incomplete system call immediately
  *
  *    m_type      TTY_LINE   IO_ENDPT    COUNT   TTY_SPEKS  ADDRESS
@@ -64,11 +64,11 @@
  *   Sep 20, 2004   local timer management/ sync alarms  (Jorrit N. Herder)
  *   Jul 13, 2004   support for function key observers  (Jorrit N. Herder)  
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/drivers.h>
-#include <termios.h>
-#include <signal.h>
-#include <nucleos/callnr.h>
+#include <nucleos/termios.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/tty.h>
 #include <nucleos/keymap.h>
 #include <nucleos/time.h>
@@ -184,7 +184,7 @@ int main(void)
 	}
 
 	/* Get a request message. */
-	r= receive(ANY, &tty_mess);
+	r= kipc_receive(ANY, &tty_mess);
 	if (r != 0)
 		panic("TTY", "receive failed with %d", r);
 
@@ -202,7 +202,7 @@ int main(void)
 		expire_timers();	/* run watchdogs of expired timers */
 		continue;		/* contine to check for events */
 	case DEV_PING:
-		notify(tty_mess.m_source);
+		kipc_notify(tty_mess.m_source);
 		continue;
 	case HARD_INT: {		/* hardware interrupt notification */
 		if (tty_mess.NOTIFY_ARG & kbd_irq_set)
@@ -291,7 +291,7 @@ int main(void)
 			tty_mess.m_type, tty_mess.m_source);
 		if (tty_mess.m_source != LOG_PROC_NR)
 		{
-			tty_reply(TASK_REPLY, tty_mess.m_source,
+			tty_reply(__NR_task_reply, tty_mess.m_source,
 						tty_mess.IO_ENDPT, -ENXIO);
 		}
 		continue;
@@ -309,7 +309,7 @@ int main(void)
 	    default:		
 		printf("Warning, TTY got unexpected request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
-	    tty_reply(TASK_REPLY, tty_mess.m_source,
+	    tty_reply(__NR_task_reply, tty_mess.m_source,
 						tty_mess.IO_ENDPT, -EINVAL);
 	}
   }
@@ -329,7 +329,7 @@ message *m_ptr;
   int ops;
   
   /* Check for select or revive events on any of the ttys. If we found an, 
-   * event return a single status message for it. The FS will make another 
+   * event return a single status message for it. The FS_PROC_NR will make another 
    * call to see if there is more.
    */
   event_found = 0;
@@ -397,7 +397,7 @@ message *m_ptr;
   }
 
   /* Almost done. Send back the reply message to the caller. */
-  status = sendnb(m_ptr->m_source, m_ptr);
+  status = kipc_sendnb(m_ptr->m_source, m_ptr);
   if (status != 0) {
 	printf("tty`do_status: send to %d failed: %d\n",
 		m_ptr->m_source, status);
@@ -425,7 +425,7 @@ int safe;			/* use safecopies? */
 	r = -EINVAL;
   } else {
 	/* Copy information from the message to the tty struct. */
-	tp->tty_inrepcode = TASK_REPLY;
+	tp->tty_inrepcode = __NR_task_reply;
 	tp->tty_incaller = m_ptr->m_source;
 	tp->tty_inproc = m_ptr->IO_ENDPT;
 	tp->tty_in_vir_g = (vir_bytes) m_ptr->ADDRESS;
@@ -468,7 +468,7 @@ int safe;			/* use safecopies? */
 		r = SUSPEND;				/* suspend the caller */
 	tp->tty_inrepcode = TTY_REVIVE;
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
   if (tp->tty_select_ops)
   	select_retry(tp);
 }
@@ -494,7 +494,7 @@ int safe;
 	r = -EINVAL;
   } else {
 	/* Copy message parameters to the tty structure. */
-	tp->tty_outrepcode = TASK_REPLY;
+	tp->tty_outrepcode = __NR_task_reply;
 	tp->tty_outcaller = m_ptr->m_source;
 	tp->tty_outproc = m_ptr->IO_ENDPT;
 	tp->tty_out_vir_g = (vir_bytes) m_ptr->ADDRESS;
@@ -513,7 +513,7 @@ int safe;
 		r = SUSPEND;				/* suspend the caller */
 	tp->tty_outrepcode = TTY_REVIVE;
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -706,7 +706,7 @@ int safe;
   }
 
   /* Send the reply. */
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -732,7 +732,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	}
 	tp->tty_openct++;
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -753,7 +753,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	tp->tty_winsize = winsize_defaults;
 	setattr(tp);
   }
-  tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, 0);
+  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, 0);
 }
 
 /*===========================================================================*
@@ -792,7 +792,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	tp->tty_ioreq = 0;
   }
   tp->tty_events = 1;
-  tty_reply(TASK_REPLY, m_ptr->m_source, proc_nr, r);
+  tty_reply(__NR_task_reply, m_ptr->m_source, proc_nr, r);
 }
 
 int select_try(struct tty *tp, int ops)
@@ -832,7 +832,7 @@ int select_try(struct tty *tp, int ops)
 int select_retry(struct tty *tp)
 {
   	if (tp->tty_select_ops && select_try(tp, tp->tty_select_ops))
-		notify(tp->tty_select_proc);
+		kipc_notify(tp->tty_select_proc);
 	return 0;
 }
 
@@ -875,7 +875,7 @@ tty_t *tp;			/* TTY to check for events. */
   /* Reply if enough bytes are available. */
   if (tp->tty_incum >= tp->tty_min && tp->tty_inleft > 0) {
 	if (tp->tty_inrepcode == TTY_REVIVE) {
-		notify(tp->tty_incaller);
+		kipc_notify(tp->tty_incaller);
 		tp->tty_inrevived = 1;
 	} else {
 		tty_reply(tp->tty_inrepcode, tp->tty_incaller, 
@@ -968,7 +968,7 @@ register tty_t *tp;		/* pointer to terminal to read from */
   /* Usually reply to the reader, possibly even if incum == 0 (EOF). */
   if (tp->tty_inleft == 0) {
 	if (tp->tty_inrepcode == TTY_REVIVE) {
-		notify(tp->tty_incaller);
+		kipc_notify(tp->tty_incaller);
 		tp->tty_inrevived = 1;
 	} else {
 		tty_reply(tp->tty_inrepcode, tp->tty_incaller, 
@@ -1393,7 +1393,7 @@ tty_t *tp;
 	setattr(tp);
   }
   tp->tty_ioreq = 0;
-  notify(tp->tty_iocaller);
+  kipc_notify(tp->tty_iocaller);
   tp->tty_iorevived = 1;
   tp->tty_iostatus = result;
 }
@@ -1481,7 +1481,7 @@ int status;			/* reply code */
 	panic("TTY","tty_reply sending TTY_REVIVE", NO_NUM);
   }
 
-  status = sendnb(replyee, &tty_mess);
+  status = kipc_sendnb(replyee, &tty_mess);
   if (status != 0)
 	printf("tty`tty_reply: send to %d failed: %d\n", replyee, status);
 }
@@ -1495,7 +1495,7 @@ int sig;			/* SIGINT, SIGQUIT, SIGKILL or SIGHUP */
 int mayflush;
 {
 /* Process a SIGINT, SIGQUIT or SIGKILL char from the keyboard or SIGHUP from
- * a tty close, "stty 0", or a real RS-232 hangup.  MM will send the signal to
+ * a tty close, "stty 0", or a real RS-232 hangup.  PM_PROC_NR will send the signal to
  * the process group (INT, QUIT), all processes (KILL), or the session leader
  * (HUP).
  */
@@ -1676,7 +1676,7 @@ register message *m_ptr;	/* pointer to message sent to the task */
 		tp->tty_select_proc = m_ptr->m_source;
 	}
 
-        tty_reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, ready_ops);
+        tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, ready_ops);
 
         return;
 }

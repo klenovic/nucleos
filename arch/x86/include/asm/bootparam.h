@@ -15,7 +15,7 @@
 #ifndef __ASM_X86_BOOTPARAM_H
 #define __ASM_X86_BOOTPARAM_H
 
-#include <asm/types.h>
+#include <nucleos/types.h>
 
 struct boot_param {
 	__u32 initrd_base; /* physical address of initial ramdisk */

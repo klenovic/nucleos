@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* This file contains the wrapper functions for issueing a request
- * and receiving response from FS processes.
+ * and receiving response from FS_PROC_NR processes.
  * Each function builds a request message according to the request
  * parameter, calls the most low-level fs_sendrec and copies
  * back the response.
@@ -19,17 +19,15 @@
  */
 
 #include "fs.h"
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/statfs.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/stat.h>
+#include <nucleos/statfs.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
 #include <nucleos/const.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/u64.h>
-#include <unistd.h>
-
 #include <nucleos/vfsif.h>
 #include "fproc.h"
 #include "vmnt.h"
@@ -603,7 +601,7 @@ endpoint_t driver_e;
     m.REQ_DRIVER_E = driver_e;
 
     /* Issue request */
-    if ((r = sendrec(fs_e, &m)) != 0) {
+    if ((r = kipc_sendrec(fs_e, &m)) != 0) {
         printf("VFSreq_newdriver: error sending message to %d: %d\n", fs_e, r);
 	util_stacktrace();
         return r;
@@ -1057,7 +1055,7 @@ time_t modtime;
  *===========================================================================*/
 static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
 {
-/* This is the low level function that sends requests to FS processes.
+/* This is the low level function that sends requests to FS_PROC_NR processes.
  * It also handles driver recovery mechanism and reissuing the
  * request which failed due to a dead driver.
  */
@@ -1074,8 +1072,8 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
 
   /* In response to the request we sent, some file systems may send back their
    * own VFS request, instead of a reply. VFS currently offers limited support
-   * for this. As long as the FS keeps sending requests, we process them and
-   * send back a reply. We break out of the loop as soon as the FS sends a
+   * for this. As long as the FS_PROC_NR keeps sending requests, we process them and
+   * send back a reply. We break out of the loop as soon as the FS_PROC_NR sends a
    * reply to the original request.
    *
    * There is no form of locking or whatever on global data structures, so it
@@ -1084,7 +1082,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
    */
   for (;;) {
       /* Do the actual send, receive */
-      if ((r=sendrec(fs_e, reqm)) != 0) {
+      if ((r=kipc_sendrec(fs_e, reqm)) != 0) {
           printf("VFS:fs_sendrec:%s:%d: error sending message. FS_e: %d req_nr: %d err: %d\n", 
                   file, line, fs_e, reqm->m_type, r);
 	  util_stacktrace();
@@ -1123,7 +1121,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
           old_driver_e = NONE;
           /* Find old driver by endpoint */
           for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp) {
-              if (vmp->m_fs_e == fs_e) {   /* found FS */
+              if (vmp->m_fs_e == fs_e) {   /* found FS_PROC_NR */
 #if 0
                   old_driver_e = vmp->m_driver_e;
 #endif
@@ -1132,20 +1130,20 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
               }
           }
          
-          /* No FS ?? */
+          /* No FS_PROC_NR ?? */
           if (old_driver_e == NONE)
-              panic(__FILE__, "VFSdead_driver: couldn't find FS\n", fs_e);
+              panic(__FILE__, "VFSdead_driver: couldn't find FS_PROC_NR\n", fs_e);
 
           /* Wait for a new driver. */
           for (;;) {
               new_driver_e = 0;
               printf("VFSdead_driver: waiting for new driver\n");
-              r = receive(RS_PROC_NR, &m);
+              r = kipc_receive(RS_PROC_NR, &m);
               if (r != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to receive from RS", 
 				  r);
               }
-              if (m.m_type == DEVCTL) {
+              if (m.m_type == __NR_devctl) {
                   /* Map new driver */
                   r = fs_devctl(m.ctl_req, m.dev_nr, m.driver_nr,
                           m.dev_style, m.m_force);
@@ -1160,7 +1158,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
                           m.m_type);
               }
               m.m_type = r;
-              if ((r = send(RS_PROC_NR, &m)) != 0) {
+              if ((r = kipc_send(RS_PROC_NR, &m)) != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to send to RS",
                           r);
               }

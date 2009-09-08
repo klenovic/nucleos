@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _MINIX_SAFECOPIES_H
-#define _MINIX_SAFECOPIES_H 1
+#ifndef __NUCLEOS_SAFECOPIES_H
+#define __NUCLEOS_SAFECOPIES_H
 
 #include <nucleos/types.h>
 #include <nucleos/types.h>
@@ -93,5 +93,4 @@ void cpf_reload(void);
 	priv(rp)->s_grant_table= (ptr);		\
 	priv(rp)->s_grant_entries= (entries);
 
-#endif	/* _MINIX_SAFECOPIES_H */
-
+#endif	/* __NUCLEOS_SAFECOPIES_H */

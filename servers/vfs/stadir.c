@@ -23,11 +23,11 @@
  */
 
 #include "fs.h"
-#include <sys/stat.h>
-#include <sys/statfs.h>
+#include <nucleos/stat.h>
+#include <nucleos/statfs.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"
@@ -75,7 +75,7 @@ int do_fchdir()
  *===========================================================================*/
 int do_chdir()
 {
-/* Change directory.  This function is  also called by MM to simulate a chdir
+/* Change directory.  This function is  also called by PM_PROC_NR to simulate a chdir
  * in order to do EXEC, etc.  It also changes the root directory, the uids and
  * gids, and the umask. 
  */
@@ -104,9 +104,9 @@ int do_chdir()
         put_vnode(fp->fp_wd);
         dup_vnode(fp->fp_wd = rfp->fp_wd);
         
-	/* MM uses access() to check permissions.  To make this work, pretend
+	/* PM_PROC_NR uses access() to check permissions.  To make this work, pretend
 	 * that the user's real ids are the same as the user's effective ids.
-	 * FS calls other than access() do not use the real ids, so are not
+	 * FS_PROC_NR calls other than access() do not use the real ids, so are not
 	 * affected.
 	 */
 	fp->fp_realuid =
@@ -156,7 +156,7 @@ int len;			/* length of the directory name string */
   struct vnode *vp;
   int r;
 
-  if (fetch_name(name_ptr, len, M3) != 0) return(err_code);
+  if (fetch_name(name_ptr, len, KIPC_FLG_M3) != 0) return(err_code);
   
   /* Request lookup */
   if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
@@ -203,7 +203,7 @@ int do_stat()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Request lookup */
   if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0)
@@ -276,7 +276,7 @@ int do_lstat()
   struct vnode *vp;
   int r;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Request lookup */
   if ((r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp)) != 0)

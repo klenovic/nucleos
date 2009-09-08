@@ -15,8 +15,8 @@
  *	Apr 08, 2004 by Jorrit N. Herder
  */
 
-#ifndef _DEVIO_H
-#define _DEVIO_H
+#ifndef __NUCLEOS_DEVIO_H
+#define __NUCLEOS_DEVIO_H
 
 #include <nucleos/types.h>        /* u8_t, u16_t, u32_t needed */
 
@@ -73,4 +73,4 @@ typedef struct { u16_t port; u32_t value; } pvl_pair_t;
 #endif /* 0 */
 	
 
-#endif  /* _DEVIO_H */
+#endif  /* __NUCLEOS_DEVIO_H */

@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sync	_sync
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 int fsync(int fd)
 {
@@ -17,5 +16,5 @@ int fsync(int fd)
 
   m.m1_i1 = fd;
 
-  return(_syscall(FS, FSYNC, &m));
+  return(_syscall(FS_PROC_NR, __NR_fsync, &m));
 }

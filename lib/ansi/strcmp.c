@@ -13,7 +13,7 @@
  */
 /* $Id: strcmp.c,v 1.1.1.1 2005/04/21 14:56:06 beng Exp $ */
 
-#include	<string.h>
+#include	<nucleos/string.h>
 
 int
 strcmp(register const char *s1, register const char *s2)

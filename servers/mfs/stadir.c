@@ -10,10 +10,10 @@
 
 
 #include "fs.h"
-#include <sys/stat.h>
-#include <sys/statfs.h>
+#include <nucleos/stat.h>
+#include <nucleos/statfs.h>
 #include <nucleos/com.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "buf.h"
 #include "inode.h"
 #include "super.h"

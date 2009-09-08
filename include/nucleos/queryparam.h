@@ -10,8 +10,8 @@
 /*	queryparam.h - query program parameters		Author: Kees J. Bot
  *								22 Apr 1994
  */
-#ifndef _MINIX__QUERYPARAM_H
-#define _MINIX__QUERYPARAM_H
+#ifndef __NUCLEOS_QUERYPARAM_H
+#define __NUCLEOS_QUERYPARAM_H
 
 typedef size_t _mnx_size_t;
 
@@ -40,4 +40,4 @@ struct export_params {
 void qp_export(struct export_params *_ex_params);
 int queryparam(int (*_qgetc)(void), void **_paddress, _mnx_size_t *_psize);
 _mnx_size_t paramvalue(char **_value, void *_address, _mnx_size_t _size);
-#endif /* _MINIX__QUERYPARAM_H */
+#endif /* __NUCLEOS_QUERYPARAM_H */

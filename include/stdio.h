@@ -41,7 +41,7 @@ typedef struct __iobuf {
 #define	_IOAPPEND	0x200
 #define _IOFIFO		0x400
 
-/* The following definitions are also in <unistd.h>. They should not
+/* The following definitions are also in <nucleos/unistd.h>. They should not
  * conflict.
  */
 #define	SEEK_SET	0
@@ -58,7 +58,7 @@ typedef struct __iobuf {
 
 #define	FOPEN_MAX	20
 
-#include <sys/dir.h>
+#include <nucleos/dir.h>
 #define	FILENAME_MAX	DIRSIZ
 
 #define	TMP_MAX		999

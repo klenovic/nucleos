@@ -16,8 +16,8 @@ Replace the current root with a new one
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/mount.h>
+#include <nucleos/string.h>
+#include <nucleos/mount.h>
 
 void usage(void) {
 	fprintf(stderr, "Usage: newroot [-i] <block-special>\n");

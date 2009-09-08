@@ -7,13 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getgid	_getgid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 gid_t getgid()
 {
   message m;
 
-  return( (gid_t) _syscall(MM, GETGID, &m));
+  return( (gid_t) _syscall(PM_PROC_NR, __NR_getgid, &m));
 }

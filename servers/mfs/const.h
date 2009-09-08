@@ -40,8 +40,8 @@
 /* Miscellaneous constants */
 #define SU_UID 	 ((uid_t) 0)	/* super_user's uid_t */
 #define SERVERS_UID ((uid_t) 11) /* who may do FSSIGNON */
-#define SYS_UID  ((uid_t) 0)	/* uid_t for processes MM and INIT */
-#define SYS_GID  ((gid_t) 0)	/* gid_t for processes MM and INIT */
+#define SYS_UID  ((uid_t) 0)	/* uid_t for processes PM_PROC_NR and INIT */
+#define SYS_GID  ((gid_t) 0)	/* gid_t for processes PM_PROC_NR and INIT */
 #define NORMAL	           0	/* forces get_block to do disk read */
 #define NO_READ            1	/* prevents get_block from doing disk read */
 #define PREFETCH           2	/* tells get_block not to read or mark dev */
@@ -80,7 +80,7 @@
 #define ROOT_INODE         1		/* inode number for root directory */
 #define BOOT_BLOCK  ((block_t) 0)	/* block number of boot block */
 #define SUPER_BLOCK_BYTES (1024)	/* bytes offset */
-#define START_BLOCK 	2		/* first block of FS (not counting SB) */
+#define START_BLOCK 	2		/* first block of FS_PROC_NR (not counting SB) */
 
 #define DIR_ENTRY_SIZE       usizeof (struct direct)  /* # bytes/dir entry   */
 #define NR_DIR_ENTRIES(b)   ((b)/DIR_ENTRY_SIZE)  /* # dir entries/blk   */

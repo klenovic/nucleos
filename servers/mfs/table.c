@@ -12,7 +12,7 @@
  * routines that perform them.
  */
 #include "fs.h"
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include "inode.h"
 #include "buf.h"
@@ -49,10 +49,10 @@ char user_path[PATH_MAX+1];  /* pathname to be processed */
 char *vfs_slink_storage;
 int Xsymloop;
 
-dev_t fs_dev;            /* The device that is handled by this FS proc.
+dev_t fs_dev;            /* The device that is handled by this FS_PROC_NR proc.
                                  */
 char fs_dev_label[16];   /* Name of the device driver that is handled
-                                 * by this FS proc.
+                                 * by this FS_PROC_NR proc.
                                  */
 int unmountdone;
 int exitsignaled;

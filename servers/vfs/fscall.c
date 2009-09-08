@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* This file handles nested counter-request calls to VFS sent by file system
- * (FS) servers in response to VFS requests.
+ * (FS_PROC_NR) servers in response to VFS requests.
  *
  * The entry points into this file are
  *   nested_fs_call	perform a nested call from a file system server
@@ -16,9 +16,9 @@
 
 #include "fs.h"
 #include "fproc.h"
-#include <string.h>
+#include <nucleos/string.h>
 #include <assert.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 
 /* maximum nested call stack depth */
@@ -40,7 +40,7 @@ static struct {
 static int depth = 0;			/* current globals stack level */
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[NCALLS];
+extern unsigned long calls_stats[__NR_SYSCALLS];
 #endif
 
 static int push_globals(void);
@@ -133,15 +133,15 @@ message *m;				/* request/reply message pointer */
 
   /* Save global variables of the current call */
   if ((r = push_globals()) != 0) {
-	printf("VFS: error saving global variables in call %d from FS %d\n",
+	printf("VFS: error saving global variables in call %d from FS_PROC_NR %d\n",
 		m->m_type, m->m_source);
   } else {
 	/* Initialize global variables for the nested call */
 	set_globals(m);
 
 	/* Perform the nested call */
-	if (call_nr < 0 || call_nr >= NCALLS) {
-		printf("VFS: invalid nested call %d from FS %d\n", call_nr,
+	if (call_nr < 0 || call_nr >= __NR_SYSCALLS) {
+		printf("VFS: invalid nested call %d from FS_PROC_NR %d\n", call_nr,
 			who_e);
 
 		r = -ENOSYS;

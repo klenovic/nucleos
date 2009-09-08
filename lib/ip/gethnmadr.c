@@ -29,7 +29,7 @@
 #include <ctype.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 #include <net/hton.h>
 #include <net/gen/nameser.h>

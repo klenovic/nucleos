@@ -10,11 +10,7 @@
 /*
 settimeofday.c
 */
-
-#define stime _stime
-
 #include <nucleos/time.h>
-#include <time.h>
 
 int settimeofday(const struct timeval *tp, const void *tzp)
 {

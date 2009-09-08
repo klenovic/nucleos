@@ -14,9 +14,9 @@
 
 #include <kernel/kernel.h>
 #include <kernel/proto.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/sysutil.h>
 #include <kernel/proc.h>
 

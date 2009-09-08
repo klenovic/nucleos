@@ -23,11 +23,10 @@
  */
 
 #include "fs.h"
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <nucleos/time.h>
@@ -37,7 +36,7 @@
 #include "fproc.h"
 #include "lock.h"
 #include "param.h"
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #include <assert.h>
 
 #include <nucleos/vfsif.h>
@@ -60,7 +59,7 @@ int do_creat()
 /* Perform the creat(name, mode) system call. */
   int r;
 
-  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
   r = common_open(O_WRONLY | O_CREAT | O_TRUNC, (mode_t) m_in.mode);
   return(r);
 }
@@ -77,9 +76,9 @@ int do_open()
   /* If O_CREAT is set, open has three parameters, otherwise two. */
   if (m_in.mode & O_CREAT) {
 	create_mode = m_in.c_mode;	
-	r = fetch_name(m_in.c_name, m_in.name1_length, M1);
+	r = fetch_name(m_in.c_name, m_in.name1_length, KIPC_FLG_M1);
   } else {
-	r = fetch_name(m_in.name, m_in.name_length, M3);
+	r = fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3);
   }
 
   if (r != 0) {
@@ -176,7 +175,7 @@ static int common_open(register int oflags, mode_t omode)
 	  if (found) {
 	      vp->v_bfs_e = vmp->m_fs_e;
 	  }
-	  else { /* To be handled in the root FS proc if not mounted */ 
+	  else { /* To be handled in the root FS_PROC_NR proc if not mounted */ 
 	      vp->v_bfs_e = ROOT_FS_E;
 	  }
 	  
@@ -218,7 +217,7 @@ static int common_open(register int oflags, mode_t omode)
 
                   /* v_count was incremented after the vnode has 
                    * been found, i_count was incremented incorrectly
-                   * by eatpath in FS, not knowing that we were going to 
+                   * by eatpath in FS_PROC_NR, not knowing that we were going to 
                    * use an existing filp entry.  Correct this error.
                    */
                   put_vnode(vp);
@@ -521,8 +520,8 @@ static int pipe_open(register struct vnode *vp, register mode_t bits,
 		return(SUSPEND);
 	}
   } else if (susp_count > 0) {/* revive blocked processes */
-	release(vp, OPEN, susp_count);
-	release(vp, CREAT, susp_count);
+	release(vp, __NR_open, susp_count);
+	release(vp, __NR_creat, susp_count);
   }
   return 0;
 }
@@ -541,7 +540,7 @@ int do_mknod()
   /* Only the super_user may make nodes other than fifos. */
   mode_bits = (mode_t) m_in.mk_mode;		/* mode of the inode */
   if (!super_user && ((mode_bits & I_TYPE) != I_NAMED_PIPE)) return(-EPERM);
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   bits = (mode_bits & I_TYPE) | (mode_bits & ALL_MODES & fp->fp_umask);
   
   /* Request lookup */
@@ -579,7 +578,7 @@ int do_mkdir()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
 
   bits = I_DIRECTORY | (m_in.mode & RWX_MODES & fp->fp_umask);
 
@@ -785,7 +784,7 @@ struct filp *fp;
 
   /* If the inode being closed is a pipe, release everyone hanging on it. */
   if (vp->v_pipe == I_PIPE) {
-	rw = (fp->filp_mode & R_BIT ? WRITE : READ);
+	rw = (fp->filp_mode & R_BIT ? __NR_write : __NR_read);
 	release(vp, rw, NR_PROCS);
   }
 

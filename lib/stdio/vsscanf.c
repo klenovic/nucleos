@@ -13,7 +13,7 @@
 
 #include	<stdio.h>
 #include	<stdarg.h>
-#include	<string.h>
+#include	<nucleos/string.h>
 #include	"loc_incl.h"
 
 int vsscanf(const char *s, const char *format, va_list ap)

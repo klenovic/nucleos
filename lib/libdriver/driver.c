@@ -95,7 +95,7 @@ struct driver *dp;	/* Device dependent entry points. */
 	} else {
 		int s;
 	/* Wait for a request to read or write a disk block. */
-		if ((s=receive(ANY, &mess)) != 0)
+		if ((s=kipc_receive(ANY, &mess)) != 0)
         		panic((*dp->dr_name)(),"receive() failed", s);
 	}
 
@@ -135,7 +135,7 @@ struct driver *dp;	/* Device dependent entry points. */
 				continue;	/* don't reply */
 	case SYN_ALARM:		(*dp->dr_alarm)(dp, &mess);	
 				continue;	/* don't reply */
-	case DEV_PING:		notify(mess.m_source);
+	case DEV_PING:		kipc_notify(mess.m_source);
 				continue;
 	default:		
 		if(dp->dr_other)
@@ -150,14 +150,14 @@ struct driver *dp;	/* Device dependent entry points. */
 
 	/* Finally, prepare and send the reply message. */
 	if (r != -EDONTREPLY) {
-		mess.m_type = TASK_REPLY;
+		mess.m_type = __NR_task_reply;
 		mess.REP_ENDPT = proc_nr;
 		/* Status is # of bytes transferred or error code. */
 		mess.REP_STATUS = r;	
-		r= sendnb(device_caller, &mess);
+		r= kipc_sendnb(device_caller, &mess);
 		if (r != 0)
 		{
-			printf("driver_task: unable to sendnb to %d: %d\n",
+			printf("driver_task: unable to kipc_sendnb to %d: %d\n",
 				device_caller, r);
 		}
 	}
@@ -235,7 +235,7 @@ message *mp;		/* pointer to read or write message */
 int safe;		/* use safecopies? */
 {
 /* Carry out an device read or write to/from a vector of user addresses.
- * The "user addresses" are assumed to be safe, i.e. FS transferring to/from
+ * The "user addresses" are assumed to be safe, i.e. FS_PROC_NR transferring to/from
  * its own buffers, so they are not checked.
  */
   static iovec_t iovec[NR_IOREQS];

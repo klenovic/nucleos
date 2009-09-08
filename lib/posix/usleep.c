@@ -11,7 +11,7 @@
 lib/posix/usleep.c
 */
 
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/time.h>
 
 int usleep(useconds_t useconds)

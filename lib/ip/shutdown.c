@@ -10,7 +10,7 @@
 #include <nucleos/errno.h>
 #include <stdio.h>
 #include <nucleos/ioctl.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 
 #include <net/gen/in.h>
 #include <net/gen/tcp.h>

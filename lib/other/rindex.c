@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 /* rindex - find last occurrence of a character in a string  */
 
-#include <string.h>
+#include <nucleos/string.h>
 
 char *rindex(s, charwanted)	/* found char, or NULL if none */
 const char *s;

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _MINLIB
-#define _MINLIB
+#ifndef __NUCLEOS_MINLIB_H
+#define __NUCLEOS_MINLIB_H
 
 /* Miscellaneous arch-dependent Nucleos. */
 #include <asm/minlib.h>
@@ -28,4 +28,4 @@ int rewrite_mtab(char *_prog_name);
 int get_mtab_entry(char *_s1, char *_s2, char *_s3, char *_s4);
 int put_mtab_entry(char *_s1, char *_s2, char *_s3, char *_s4);
 
-#endif
+#endif /* __NUCLEOS_MINLIB_H */

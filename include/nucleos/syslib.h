@@ -9,20 +9,14 @@
  */
 /* Prototypes for system library functions. */
 
-#ifndef _SYSLIB_H
-#define _SYSLIB_H
+#ifndef __NUCLEOS_SYSLIB_H
+#define __NUCLEOS_SYSLIB_H
 
 #include <nucleos/types.h>
-
-#ifndef _IPC_H
-#include <nucleos/ipc.h>
-#endif
-
+#include <nucleos/signal.h>
+#include <nucleos/kipc.h>
 #include <nucleos/u64.h>
-
-#ifndef _DEVIO_H
 #include <nucleos/devio.h>
-#endif
 
 #include <nucleos/safecopies.h>
 
@@ -236,5 +230,4 @@ void read_tsc_64(u64_t *t);
 
 void read_tsc(u32_t *hi, u32_t *lo);
 
-#endif /* _SYSLIB_H */
-
+#endif /* __NUCLEOS_SYSLIB_H */

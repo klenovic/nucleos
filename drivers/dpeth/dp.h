@@ -173,7 +173,7 @@ typedef struct dpeth {
 #define DEM_SINK	0x0001
 #define DEM_ENABLED	0x0002
 
-  /* Temporary storage for RECV/SEND requests */
+  /* Temporary storage for KERN_RECV/KIPC_SEND requests */
   iovec_dat_s_t de_read_iovec;
   iovec_dat_s_t de_write_iovec;
   vir_bytes de_read_s;

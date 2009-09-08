@@ -19,18 +19,18 @@
  *   do_fork:		perform the FORK system call
  *   do_fork_nb:	special nonblocking version of FORK, for RS
  *   do_exit:		perform the EXIT system call (by calling exit_proc())
- *   exit_proc:		actually do the exiting, and tell FS about it
- *   exit_restart:	continue exiting a process after FS has replied
+ *   exit_proc:		actually do the exiting, and tell FS_PROC_NR about it
+ *   exit_restart:	continue exiting a process after FS_PROC_NR has replied
  *   do_waitpid:	perform the WAITPID or WAIT system call
  */
 
 #include "pm.h"
-#include <sys/wait.h>
-#include <nucleos/callnr.h>
+#include <nucleos/wait.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
-#include <sys/resource.h>
-#include <signal.h>
+#include <nucleos/resource.h>
+#include <nucleos/signal.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -105,10 +105,10 @@ int do_fork()
   if (rmc->mp_fs_call != PM_IDLE)
 	panic("pm", "do_fork: not idle", rmc->mp_fs_call);
   rmc->mp_fs_call= PM_FORK;
-  r= notify(FS_PROC_NR);
-  if (r != 0) panic("pm", "do_fork: unable to notify FS", r);
+  r= kipc_notify(FS_PROC_NR);
+  if (r != 0) panic("pm", "do_fork: unable to notify FS_PROC_NR", r);
 
-  /* Do not reply until FS is ready to process the fork
+  /* Do not reply until FS_PROC_NR is ready to process the fork
   * request
   */
   return SUSPEND;
@@ -179,8 +179,8 @@ int do_fork_nb()
   if (rmc->mp_fs_call != PM_IDLE)
 	panic("pm", "do_fork: not idle", rmc->mp_fs_call);
   rmc->mp_fs_call= PM_FORK_NB;
-  r= notify(FS_PROC_NR);
-  if (r != 0) panic("pm", "do_fork: unable to notify FS", r);
+  r= kipc_notify(FS_PROC_NR);
+  if (r != 0) panic("pm", "do_fork: unable to notify FS_PROC_NR", r);
 
   /* Wakeup the newly created process */
   setreply(rmc-mproc, 0);
@@ -222,7 +222,7 @@ int dump_core;			/* flag indicating whether to dump core */
   if (dump_core && rmp->mp_realuid != rmp->mp_effuid)
 	dump_core = FALSE;
 
-  /* System processes are destroyed before informing FS, meaning that FS can
+  /* System processes are destroyed before informing FS_PROC_NR, meaning that FS_PROC_NR can
    * not get their CPU state, so we can't generate a coredump for them either.
    */
   if (dump_core && (rmp->mp_flags & PRIV_PROC))
@@ -246,9 +246,9 @@ int dump_core;			/* flag indicating whether to dump core */
   p_mp->mp_child_stime += sys_time + rmp->mp_child_stime; /* add system time */
 
   /* Tell the kernel the process is no longer runnable to prevent it from 
-   * being scheduled in between the following steps. Then tell FS that it 
+   * being scheduled in between the following steps. Then tell FS_PROC_NR that it 
    * the process has exited and finally, clean up the process at the kernel.
-   * This order is important so that FS can tell drivers to cancel requests
+   * This order is important so that FS_PROC_NR can tell drivers to cancel requests
    * such as copying to/ from the exiting process, before it is gone.
    */
   sys_nice(proc_nr_e, PRIO_STOP);	/* stop the process */
@@ -262,20 +262,20 @@ int dump_core;			/* flag indicating whether to dump core */
 	return;
   }
   else
-  if(proc_nr_e != FS_PROC_NR)		/* if it is not FS that is exiting.. */
+  if(proc_nr_e != FS_PROC_NR)		/* if it is not FS_PROC_NR that is exiting.. */
   {
-	/* Tell FS about the exiting process. */
+	/* Tell FS_PROC_NR about the exiting process. */
 	if (rmp->mp_fs_call != PM_IDLE)
 		panic(__FILE__, "exit_proc: not idle", rmp->mp_fs_call);
 	rmp->mp_fs_call= dump_core ? PM_DUMPCORE : PM_EXIT;
-	r= notify(FS_PROC_NR);
-	if (r != 0) panic(__FILE__, "exit_proc: unable to notify FS", r);
+	r= kipc_notify(FS_PROC_NR);
+	if (r != 0) panic(__FILE__, "exit_proc: unable to notify FS_PROC_NR", r);
 
 	if (rmp->mp_flags & PRIV_PROC)
 	{
-		/* Destroy system processes without waiting for FS. This is
+		/* Destroy system processes without waiting for FS_PROC_NR. This is
 		 * needed because the system process might be a block device
-		 * driver that FS is blocked waiting on.
+		 * driver that FS_PROC_NR is blocked waiting on.
 		 */
 		if((r= sys_exit(rmp->mp_endpoint)) != 0)
 			panic(__FILE__, "exit_proc: sys_exit failed", r);
@@ -283,7 +283,7 @@ int dump_core;			/* flag indicating whether to dump core */
   }
   else
   {
-	printf("PM: FS died\n");
+	printf("PM: FS_PROC_NR died\n");
 	return;
   }
 
@@ -295,7 +295,7 @@ int dump_core;			/* flag indicating whether to dump core */
   /* Pending reply messages for the dead process cannot be delivered. */
   rmp->mp_flags &= ~REPLY;
 
-  /* Keep the process around until FS is finished with it. */
+  /* Keep the process around until FS_PROC_NR is finished with it. */
   
   rmp->mp_exitstatus = (char) exit_status;
 
@@ -331,7 +331,7 @@ void exit_restart(rmp, dump_core)
 struct mproc *rmp;		/* pointer to the process being terminated */
 int dump_core;			/* flag indicating whether to dump core */
 {
-/* FS replied to our exit or coredump request. Perform the second half of the
+/* FS_PROC_NR replied to our exit or coredump request. Perform the second half of the
  * exit code.
  */
   int r;
@@ -382,8 +382,8 @@ int do_waitpid()
   int pidarg, options, children;
 
   /* Set internal variables, depending on whether this is WAIT or WAITPID. */
-  pidarg  = (call_nr == WAIT ? -1 : m_in.pid);	   /* 1st param of waitpid */
-  options = (call_nr == WAIT ?  0 : m_in.sig_nr);  /* 3rd param of waitpid */
+  pidarg  = (call_nr == __NR_wait ? -1 : m_in.pid);	   /* 1st param of waitpid */
+  options = (call_nr == __NR_wait ?  0 : m_in.sig_nr);  /* 3rd param of waitpid */
   if (pidarg == 0) pidarg = -mp->mp_procgrp;	/* pidarg < 0 ==> proc grp */
 
   /* Is there a child waiting to be collected? At this point, pidarg != 0:

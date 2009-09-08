@@ -12,9 +12,9 @@
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <nucleos/stddef.h>
-#include <nucleos/nucleos.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/kernel.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include "buf.h"
@@ -59,7 +59,7 @@ int fs_readwrite_o(void)
       /* Find the inode referred */
       rip = find_inode(fs_dev, fs_m_in.REQ_FD_INODE_NR);
       if (!rip) {
-          printf("FS: unavaliable inode by fs_readwrite(), nr: %d\n", 
+          printf("FS_PROC_NR: unavaliable inode by fs_readwrite(), nr: %d\n", 
                   fs_m_in.REQ_FD_INODE_NR);
           return -EINVAL; 
       }
@@ -199,7 +199,7 @@ int fs_readwrite_s(void)
       /* Find the inode referred */
       rip = find_inode(fs_dev, fs_m_in.REQ_FD_INODE_NR);
       if (!rip) {
-          printf("FS: unavaliable inode by fs_readwrite(), nr: %d\n", 
+          printf("FS_PROC_NR: unavaliable inode by fs_readwrite(), nr: %d\n", 
                   fs_m_in.REQ_FD_INODE_NR);
           return -EINVAL; 
       }
@@ -459,7 +459,7 @@ int rw_flag;			/* READING or WRITING */
 char *buff;			/* virtual address of the user buffer */
 int seg;			/* T or D segment in user space */
 int usr;			/* which user process */
-int block_size;			/* block size of FS operating on */
+int block_size;			/* block size of FS_PROC_NR operating on */
 int *completed;			/* number of bytes copied */
 {
 /* Read or write (part of) a block. */
@@ -555,7 +555,7 @@ unsigned left;			/* max number of bytes wanted after position */
 int rw_flag;			/* READING or WRITING */
 cp_grant_id_t gid;		/* grant */
 unsigned buf_off;		/* offset in grant */
-int block_size;			/* block size of FS operating on */
+int block_size;			/* block size of FS_PROC_NR operating on */
 int *completed;			/* number of bytes copied */
 {
 /* Read or write (part of) a block. */

@@ -10,7 +10,7 @@
 /*
  * difftime - compute the difference between two calendar times
  */
-#include	<time.h>
+#include <nucleos/time.h>
 
 double
 difftime(time_t time1, time_t time0)

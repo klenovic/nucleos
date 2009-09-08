@@ -11,17 +11,13 @@
  * sigmisc.c - used to get a signal mask
  */
 /* This can't be done in setjmp.e, since SIG_SETMASK is defined in
- * <signal.h>. This is a C-file, which can't be included.
+ * <nucleos/signal.h>. This is a C-file, which can't be included.
  */
+#include <nucleos/types.h>
+#include <nucleos/signal.h>
+#include <nucleos/stddef.h>
 
-#include	<nucleos/types.h>
-#include	<signal.h>
-#include	<nucleos/stddef.h>
-
-int _sigprocmask(int, sigset_t *, sigset_t *);
-
-static void
-__testsigset(void) {
+static void __testsigset(void) {
 	/* This switch compiles when a sigset_t has the right size. */
 	switch(0) {
 	case 0: 
@@ -29,15 +25,13 @@ __testsigset(void) {
 	}
 }
 
-void
-__newsigset(sigset_t *p)
+void __newsigset(sigset_t *p)
 {
 	/* The SIG_SETMASK is not significant */
-	_sigprocmask(SIG_SETMASK, NULL, p);
+	sigprocmask(SIG_SETMASK, NULL, p);
 }
 
-void
-__oldsigset(sigset_t *p)
+void __oldsigset(sigset_t *p)
 {
-	_sigprocmask(SIG_SETMASK, p, NULL);
+	sigprocmask(SIG_SETMASK, p, NULL);
 }

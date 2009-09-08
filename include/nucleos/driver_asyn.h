@@ -12,15 +12,15 @@
  */
 /* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/limits.h>
 #include <nucleos/stddef.h>
 #include <nucleos/errno.h>

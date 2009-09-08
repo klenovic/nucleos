@@ -10,8 +10,7 @@
 /* Copyright (c) 2009 Vrije Universiteit, Amsterdam.
  * See the copyright notice in file LICENSE.minix3.
  */
-#include <lib.h>
-#define getitimer _getitimer
+#include <nucleos/lib.h>
 #include <nucleos/time.h>
 
 /*
@@ -26,5 +25,5 @@ int getitimer(int which, struct itimerval *value)
   m.m1_p1 = NULL;		/* only retrieve the timer */
   m.m1_p2 = (char *) value;
 
-  return _syscall(PM_PROC_NR, ITIMER, &m);
+  return _syscall(PM_PROC_NR, __NR_itimer, &m);
 }

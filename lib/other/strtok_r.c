@@ -50,7 +50,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <nucleos/stddef.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 char *
 strtok_r(char *s, const char *delim, char **last)

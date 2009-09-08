@@ -7,19 +7,20 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define freemem	_freemem
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-
-int freemem(size, base)
-phys_bytes size;			/* size of mem chunk requested */
-phys_bytes base;			/* base address of mem chunk */
+/**
+ * @brief freemem
+ * @param size  size of mem chunk requested
+ * @param base  base address of mem chunk
+ */
+int freemem(phys_bytes size, phys_bytes base)
 {
   message m;
   m.m4_l1 = size;		
   m.m4_l2 = base;		
-  if (_syscall(MM, FREEMEM, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_freemem, &m) < 0) return(-1);
   return(0);
 }
 

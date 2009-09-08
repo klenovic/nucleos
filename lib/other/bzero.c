@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 /* bzero - Berklix subset of memset  */
 
-#include <string.h>
+#include <nucleos/string.h>
 
 void bzero(dst, length)
 void *dst;

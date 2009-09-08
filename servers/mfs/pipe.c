@@ -10,8 +10,8 @@
 
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <signal.h>
-#include <nucleos/callnr.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/time.h>
@@ -48,7 +48,7 @@ int fs_pipe(void)
   rip->i_update = ATIME | CTIME | MTIME;
   
   /* Fill in the fields of the response message */
-  fs_m_out.m_source = fs_dev;  /* filled with FS endpoint by the system */
+  fs_m_out.m_source = fs_dev;  /* filled with FS_PROC_NR endpoint by the system */
   fs_m_out.RES_INODE_NR = rip->i_num;
   fs_m_out.RES_MODE = rip->i_mode;
   fs_m_out.RES_INODE_INDEX = (rip - &inode[0]) / sizeof(struct inode);

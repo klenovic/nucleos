@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define chown	_chown
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
-int chown(name, owner, grp)
-const char *name;
-uid_t owner;
-gid_t grp;
+int chown(const char *name, uid_t owner, gid_t grp)
 {
   message m;
 
@@ -23,5 +19,5 @@ gid_t grp;
   m.m1_i2 = owner;
   m.m1_i3 = grp;
   m.m1_p1 = (char *) name;
-  return(_syscall(FS, CHOWN, &m));
+  return(_syscall(FS_PROC_NR, __NR_chown, &m));
 }

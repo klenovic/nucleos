@@ -18,7 +18,7 @@ Copyright 1995 Philip Homburg
 
 #include <nucleos/const.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/mq.h>
 
 #define MQ_SIZE		128

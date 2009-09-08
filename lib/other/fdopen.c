@@ -13,7 +13,7 @@
 #include	<stdlib.h>
 #include	"../stdio/loc_incl.h"
 #include	<stdio.h>
-#include	<sys/stat.h>
+#include	<nucleos/stat.h>
 
 FILE *
 fdopen(fd, mode)

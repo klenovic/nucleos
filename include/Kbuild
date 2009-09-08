@@ -1,0 +1,12 @@
+# Top-level Makefile calls into asm-$(ARCH)
+# List only non-arch directories below
+
+header-y += asm-generic/
+header-y += nucleos/
+# n/a header-y += sound/
+# n/a header-y += mtd/
+# n/a header-y += rdma/
+# n/a header-y += video/
+# n/a header-y += drm/
+# n/a header-y += xen/
+# n/a header-y += scsi/

@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "fs.h"
-#include <sys/stat.h>
-#include <nucleos/callnr.h>
+#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
@@ -21,9 +21,9 @@
 #include <nucleos/time.h>
 #include <nucleos/types.h>
 
-#include <signal.h>
-#include <string.h>
-#include <dirent.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
+#include <nucleos/dirent.h>
 
 #include "fproc.h"
 #include "param.h"
@@ -50,7 +50,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 {
 /* Perform the execve(name, argv, envp) call.  The user library builds a
  * complete stack image, including pointers, args, environ, etc.  The stack
- * is copied to a buffer inside FS, and then to the new core image.
+ * is copied to a buffer inside FS_PROC_NR, and then to the new core image.
  */
 	int r, round, proc_s;
 	vir_bytes vsp;
@@ -210,7 +210,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		return r;
 	}
 
-	/* Patch up stack and copy it from FS to new core image. */
+	/* Patch up stack and copy it from FS_PROC_NR to new core image. */
 	vsp = bfmt_param.stack_top;
 	vsp -= bfmt_param.ex.args_bytes;
 
@@ -251,7 +251,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
  *===========================================================================*/
 static int patch_stack(vp, stack, stk_bytes)
 struct vnode *vp;		/* pointer for open script file */
-char stack[ARG_MAX];		/* pointer to stack image within FS */
+char stack[ARG_MAX];		/* pointer to stack image within FS_PROC_NR */
 vir_bytes *stk_bytes;		/* size of initial stack */
 {
 /* Patch the argument vector to include the path name of the script to be
@@ -386,7 +386,7 @@ int replace;
  *				patch_ptr				     *
  *===========================================================================*/
 static void patch_ptr(stack, base)
-char stack[ARG_MAX];		/* pointer to stack image within FS */
+char stack[ARG_MAX];		/* pointer to stack image within FS_PROC_NR */
 vir_bytes base;			/* virtual address of stack base inside user */
 {
 /* When doing an exec(name, argv, envp) call, the user builds up a stack

@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/ioctl.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 #include <nucleos/types.h>
 #include <netinet/tcp.h>
 

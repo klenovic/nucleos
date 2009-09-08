@@ -158,7 +158,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 		m.REP_ENDPT = log->log_proc_nr;
 		m.REP_STATUS  = log->log_status;
 		m.REP_IO_GRANT  = log->log_user_vir_g;
-  		r= send(log->log_source, &m);
+  		r= kipc_send(log->log_source, &m);
 		if (r != 0)
 		{
 			printf("log`subwrite: send to %d failed: %d\n",
@@ -185,7 +185,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 #if LOG_DEBUG
 			printf("select sending DEV_SEL_REPL2\n");
 #endif
-  			r= send(log->log_select_proc, &m);
+  			r= kipc_send(log->log_select_proc, &m);
 			if (r != 0)
 			{
 				printf(	

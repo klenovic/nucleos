@@ -18,7 +18,7 @@
 
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 int peek(unsigned segment, unsigned offset);
 int poke(unsigned segment, unsigned offset, unsigned value);

@@ -9,10 +9,10 @@
  */
 // This routine is the low-level code for returning from signals.
 // It calls __sigreturn, which is the normal "system call" routine.
-// Both __sigreturn and _sigreturn are needed.
+// Both __sigreturn and sigreturn are needed.
 .section .text
 
 .globl __sigreturn
 __sigreturn:
   add $16, %esp
-  jmp _sigreturn
+  jmp sigreturn

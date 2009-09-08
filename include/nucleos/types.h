@@ -103,11 +103,6 @@ typedef __kernel_time_t		time_t;		/* time in sec since 1 Jan 1970 0000 GMT */
 typedef __kernel_clock_t	clock_t;	/* unit for system accounting */
 #endif
 
-#ifndef _SIGSET_T
-#define _SIGSET_T
-typedef __kernel_sigset_t	sigset_t;
-#endif
-
 #ifndef _CADDR_T
 #define _CADDR_T
 typedef __kernel_caddr_t	caddr_t;

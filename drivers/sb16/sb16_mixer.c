@@ -61,7 +61,7 @@ message mess;
 	* it out, and sends a reply.
 	*/
 	while (TRUE) {
-		receive(ANY, &mess);
+		kipc_receive(ANY, &mess);
 
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;
@@ -87,13 +87,13 @@ message mess;
 		}
 
 		/* Finally, prepare and send the reply message. */
-		mess.m_type = TASK_REPLY;
+		mess.m_type = __NR_task_reply;
 		mess.REP_ENDPT = proc_nr;
 	
 		dprint("%d %d", err, 0);
 		
 		mess.REP_STATUS = err;	/* error code */
-		send(caller, &mess);	/* send reply to caller */
+		kipc_send(caller, &mess);	/* send reply to caller */
 	}
 }
 

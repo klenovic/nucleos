@@ -7,17 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fstat	_fstat
-#include <sys/stat.h>
+#include <nucleos/lib.h>
+#include <nucleos/stat.h>
 
-int fstat(fd, buffer)
-int fd;
-struct stat *buffer;
+int fstat(int fd, struct stat *buffer)
 {
   message m;
 
   m.m1_i1 = fd;
   m.m1_p1 = (char *) buffer;
-  return(_syscall(FS, FSTAT, &m));
+  return(_syscall(FS_PROC_NR, __NR_fstat, &m));
 }

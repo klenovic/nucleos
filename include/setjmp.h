@@ -44,7 +44,7 @@
  * As far as porting is concerned --
  *
  * All code writers/porters that have to deal with the actual contents of the
- * jmp_buf structure in one way or another, should look at  <sys/jmp_buf.h>.
+ * jmp_buf structure in one way or another, should look at  <nucleos/jmp_buf.h>.
  *
  * Porters of a new compiler to Minix have to make sure the compiler
  * recognizes at least __setjmp as a setjmp call (if applicable) and provide

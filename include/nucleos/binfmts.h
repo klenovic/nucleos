@@ -14,11 +14,13 @@
 #ifndef __NUCLEOS_BINFMTS_H
 #define __NUCLEOS_BINFMTS_H
 
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/types.h>
 #include <nucleos/errno.h>
 
 #define BINFMT_BUFSIZE	128
+
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 
 /* Returned by read_header for a #! script. */
 #define ESCRIPT		(-2000)
@@ -146,5 +148,7 @@ static inline void unregister_binfmt(struct nucleos_binfmt *binfmt)
 {
 	return;
 }
+
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_BINFMTS_H */

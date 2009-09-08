@@ -15,13 +15,13 @@
 #define CRLF		"\r\n"
 
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 
 #if	defined(USE_DIRENT)
-#include <dirent.h>
+#include <nucleos/dirent.h>
 typedef struct dirent	DIRENTRY;
 #else
-#include <sys/dir.h>
+#include <nucleos/dir.h>
 typedef struct direct	DIRENTRY;
 #endif	/* defined(USE_DIRENT) */
 

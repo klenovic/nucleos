@@ -15,7 +15,7 @@
  */
 
 #include "fs.h"
-#include <string.h>
+#include <nucleos/string.h>
 #include "file.h"
 #include "fproc.h"
 

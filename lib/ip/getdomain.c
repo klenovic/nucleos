@@ -10,11 +10,10 @@
 /*	getdomainname()					Author: Kees J. Bot
  *								2 Dec 1994
  */
-#define nil 0
 #include <nucleos/types.h>
-#include <sys/utsname.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/utsname.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 
 int getdomainname(char *domain, size_t size)
 {
@@ -24,7 +23,7 @@ int getdomainname(char *domain, size_t size)
 	if (gethostname(nodename, sizeof(nodename)) < 0)
 		return -1;
 	nodename[sizeof(nodename)-1]= 0;
-	if ((dot= strchr(nodename, '.')) == nil) dot= ".";
+	if ((dot= strchr(nodename, '.')) == 0) dot= ".";
 
 	strncpy(domain, dot+1, size);
 	if (size > 0) domain[size-1]= 0;

@@ -17,8 +17,8 @@
 #include <nucleos/types.h>		/* general system types */
 #include <nucleos/const.h>	/* MINIX specific constants */
 #include <nucleos/type.h>		/* MINIX specific types, e.g. message */
-#include <nucleos/ipc.h>		/* MINIX run-time system */
-#include <timers.h>		/* watchdog timer management */
+#include <nucleos/kipc.h>		/* MINIX run-time system */
+#include <nucleos/timer.h>		/* watchdog timer management */
 #include <nucleos/errno.h>		/* return codes and error numbers */
 
 /* Important kernel header files. */
@@ -26,7 +26,7 @@
 #include <kernel/type.h>		/* type definitions, MUST be third */
 #include <kernel/proto.h>		/* function prototypes */
 #include <kernel/glo.h>			/* global variables */
-#include <nucleos/ipc.h>		/* IPC constants */
+#include <nucleos/kipc.h>		/* IPC constants */
 #include <kernel/profile.h>		/* system profiling */
 
 #endif /* __KERNEL_KERNEL_H */

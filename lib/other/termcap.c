@@ -38,11 +38,11 @@
  *   - Allow '#' comments in definition file		 [tgetent]
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <termcap.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 
 char *capab = (char *)NULL;		/* the capability itself */

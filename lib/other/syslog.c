@@ -53,11 +53,11 @@
 #include <nucleos/types.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdarg.h>
-#include <time.h>
+#include <nucleos/time.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <syslog.h>
 #include <nucleos/ioctl.h>
 #include <net/netlib.h>

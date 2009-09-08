@@ -7,6 +7,6 @@ libdriver.a-obj-y := libdriver/
 libdriver_asyn.a-obj-y := libdriver_asyn/
 libtimers.a-obj-y := timers/
 libnucc.a-obj-y := ansi/ editline/ gnu/ gnu/ ip/ math/ math64/ other/ \
-	           posix/ regex/ syscall/ stdio/ stdtime/
+		   posix/ regex/ stdio/ stdtime/
 libcurses.a-obj-y := curses/
 libutil.a-obj-y := util/

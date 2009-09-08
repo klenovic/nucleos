@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef _MINIX_SYSINFO_H
-#define _MINIX_SYSINFO_H
+#ifndef __NUCLEOS_SYSINFO_H
+#define __NUCLEOS_SYSINFO_H
 
 #include <nucleos/endpoint.h>
 #include <nucleos/type.h>
@@ -22,5 +22,4 @@ ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where);
 
 /* Exported system parameters. */
 
-#endif
-
+#endif /* __NUCLEOS_SYSINFO_H */

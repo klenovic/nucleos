@@ -27,7 +27,7 @@ u8_t busnr;
 	m.m_type= BUSC_PCI_RESCAN;
 	m.m1_i1= busnr;
 
-	r= sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_rescan_bus: can't talk to PCI", r);
 

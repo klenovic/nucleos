@@ -11,12 +11,12 @@
  * "nlist.c", Peter Valkenburg, january 1989.
  */
  
-#include <lib.h>
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/string.h>
 #include <nucleos/a.out.h>
 #include <nucleos/types.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <stdio.h>
 
 #define fail(fp)	(fclose(fp), -1)	/* ret. exp. when nlist fails */

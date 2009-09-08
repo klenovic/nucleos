@@ -24,11 +24,11 @@
  */
 
 #include "fs.h"
-#include <sys/stat.h>
-#include <string.h>
+#include <nucleos/stat.h>
+#include <nucleos/string.h>
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
-#include <dirent.h>
+#include <nucleos/unistd.h>
+#include <nucleos/dirent.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"
@@ -46,7 +46,7 @@ int do_link()
   endpoint_t linked_fs_e, link_lastdir_fs_e;
   struct vnode *vp_o, *vp_d;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) 
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) 
         return(err_code);
         
   /* Request lookup */
@@ -55,7 +55,7 @@ int do_link()
   linked_fs_e = vp_o->v_fs_e;
 
   /* Does the final directory of 'name2' exist? */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0) {
+  if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0) {
 	put_vnode(vp_o);
 	return(err_code);
   }
@@ -115,7 +115,7 @@ int do_unlink()
   struct vnode *vp;
   int r;
   
-  if (fetch_name(m_in.name, m_in.name_length, M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
 
   r= lookup_lastdir(0 /*!use_realuid*/, &vp);
   if (r != 0)
@@ -142,7 +142,7 @@ int do_unlink()
    */
   
   /* Issue request */
-  r= ((call_nr == UNLINK) ? req_unlink : req_rmdir)(vp->v_fs_e,
+  r= ((call_nr == __NR_unlink) ? req_unlink : req_rmdir)(vp->v_fs_e,
 	vp->v_inode_nr, user_fullpath);
 
   put_vnode(vp);
@@ -167,7 +167,7 @@ int do_rename()
   char old_name[PATH_MAX+1];
   
   /* See if 'name1' (existing file) exists.  Get dir and file inodes. */
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Request lookup */
   if ((r = lookup_lastdir(0 /*!use_realuid*/, &vp_od)) != 0) return r;
@@ -179,7 +179,7 @@ int do_rename()
 	return r;
   }
   
-  /* Remeber FS endpoint */
+  /* Remeber FS_PROC_NR endpoint */
   old_fs_e = vp_od->v_fs_e;
 
   /* Save the last component of the old name */
@@ -192,7 +192,7 @@ int do_rename()
   memcpy(old_name, user_fullpath, len+1);
 
   /* See if 'name2' (new name) exists.  Get dir inode */
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0)
+  if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0)
   {
 	put_vnode(vp_od);
 	return err_code;
@@ -215,7 +215,7 @@ int do_rename()
   }
   
   
-  /* Remeber FS endpoint */
+  /* Remeber FS_PROC_NR endpoint */
   new_fs_e = vp_nd->v_fs_e;
   
   /* Both parent directories must be on the same device. */
@@ -250,7 +250,7 @@ int do_truncate()
 
   printf("in do_truncate\n");
   
-  if (fetch_name(m_in.m2_p1, m_in.m2_i1, M1) != 0) return err_code;
+  if (fetch_name(m_in.m2_p1, m_in.m2_i1, KIPC_FLG_M1) != 0) return err_code;
   
   /* Request lookup */
   if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
@@ -313,7 +313,7 @@ int do_slink()
   struct vnode *vp;
   char string[NAME_MAX];       /* last component of the new dir's path name */
 
-  if (fetch_name(m_in.name2, m_in.name2_length, M1) != 0)
+  if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0)
        return(err_code);
 
   if (m_in.name1_length <= 1 || m_in.name1_length >= _MIN_BLOCK_SIZE)
@@ -359,7 +359,7 @@ int do_rdlink()
   copylen = m_in.m1_i2;
   if(copylen < 0) return -EINVAL;
 
-  if (fetch_name(m_in.name1, m_in.name1_length, M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
   
   /* Request lookup */
   r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp);

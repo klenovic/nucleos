@@ -12,10 +12,10 @@
  *  Author: Terrence W. Holm          Sept. 1987
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <pwd.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <stdio.h>
 
 #ifndef  L_cuserid

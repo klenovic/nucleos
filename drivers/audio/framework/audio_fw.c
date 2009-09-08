@@ -93,14 +93,14 @@ void main(void)
 	   carries it out, and sends a reply. */
 
 	while(1) {
-		receive(ANY, &mess);
+		kipc_receive(ANY, &mess);
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;
 
 		if (caller == RS_PROC_NR && mess.m_type == DEV_PING)
 		{
 			/* Got ping from RS. Just notify RS */
-			notify(RS_PROC_NR);
+			kipc_notify(RS_PROC_NR);
 			continue;
 		}
 
@@ -112,7 +112,7 @@ void main(void)
 				repl_mess.m_type = DEV_REVIVE;
 				repl_mess.REP_ENDPT = mess.IO_ENDPT;
 				repl_mess.REP_STATUS = r;
-				send(caller, &repl_mess);
+				kipc_send(caller, &repl_mess);
 
 				continue;
 
@@ -122,7 +122,7 @@ void main(void)
 				repl_mess.m_type = DEV_CLOSE_REPL;
 				repl_mess.REP_ENDPT = mess.IO_ENDPT;
 				repl_mess.REP_STATUS = r;
-				send(caller, &repl_mess);
+				kipc_send(caller, &repl_mess);
 
 				continue;
 
@@ -136,7 +136,7 @@ void main(void)
 					repl_mess.REP_IO_GRANT =
 						(unsigned)mess.IO_GRANT;
 					repl_mess.REP_STATUS = r;
-					send(caller, &repl_mess);
+					kipc_send(caller, &repl_mess);
 				}
 				continue;
 
@@ -152,7 +152,7 @@ void main(void)
 				repl_mess.m_type = DEV_REOPEN_REPL;
 				repl_mess.REP_ENDPT = mess.IO_ENDPT;
 				repl_mess.REP_STATUS = r;
-				send(caller, &repl_mess);
+				kipc_send(caller, &repl_mess);
 				continue;
 			case HARD_INT:
 				msg_hardware();continue;  /* don't reply */
@@ -576,7 +576,7 @@ static void msg_status(message *m_ptr)
 			m_ptr->REP_ENDPT = sub_dev[i].ReviveProcNr;
 			m_ptr->REP_IO_GRANT = sub_dev[i].ReviveGrant;
 			m_ptr->REP_STATUS = sub_dev[i].ReviveStatus;
-			send(m_ptr->m_source, m_ptr);			/* send the message */
+			kipc_send(m_ptr->m_source, m_ptr);			/* kipc_send the message */
 
 			/* reset variables */
 			sub_dev[i].ReadyToRevive = FALSE;
@@ -588,7 +588,7 @@ static void msg_status(message *m_ptr)
 	}
 	m_ptr->m_type = DEV_NO_STATUS;
 	m_ptr->REP_STATUS = 0;
-	send(m_ptr->m_source, m_ptr);			/* send DEV_NO_STATUS message */
+	kipc_send(m_ptr->m_source, m_ptr);			/* kipc_send DEV_NO_STATUS message */
 }
 
 
@@ -810,10 +810,10 @@ static void data_from_user(sub_dev_t *subdev)
 	m.REP_ENDPT = subdev->ReviveProcNr;
 	m.REP_IO_GRANT = subdev->ReviveGrant;
 	m.REP_STATUS = subdev->ReviveStatus;
-	r= send(subdev->NotifyProcNr, &m);		/* send the message */
+	r= kipc_send(subdev->NotifyProcNr, &m);		/* kipc_send the message */
 	if (r != 0)
 	{
-		printf("audio_fw: send to %d failed: %d\n",
+		printf("audio_fw: kipc_send to %d failed: %d\n",
 			subdev->NotifyProcNr, r);
 	}
 
@@ -866,16 +866,16 @@ static void data_to_user(sub_dev_t *sub_dev_ptr)
 
 	sub_dev_ptr->ReviveStatus = sub_dev_ptr->FragSize;
 	sub_dev_ptr->ReadyToRevive = TRUE; 
-		/* drv_status will send REVIVE mess to FS*/	
+		/* drv_status will kipc_send REVIVE mess to FS_PROC_NR*/	
 
 	m.m_type = DEV_REVIVE;			/* build message */
 	m.REP_ENDPT = sub_dev_ptr->ReviveProcNr;
 	m.REP_IO_GRANT = sub_dev_ptr->ReviveGrant;
 	m.REP_STATUS = sub_dev_ptr->ReviveStatus;
-	r= send(sub_dev_ptr->NotifyProcNr, &m);		/* send the message */
+	r= kipc_send(sub_dev_ptr->NotifyProcNr, &m);		/* kipc_send the message */
 	if (r != 0)
 	{
-		printf("audio_fw: send to %d failed: %d\n",
+		printf("audio_fw: kipc_send to %d failed: %d\n",
 			sub_dev_ptr->NotifyProcNr, r);
 	}
 
@@ -949,7 +949,7 @@ static void reply(int code, int replyee, int process, int status) {
 	m.m_type = code;		/* DEV_REVIVE */
 	m.REP_STATUS = status;	/* result of device operation */
 	m.REP_ENDPT = process;	/* which user made the request */
-	send(replyee, &m);
+	kipc_send(replyee, &m);
 }
 
 
@@ -1005,7 +1005,7 @@ int pci_func;
 	m.m2_l1= buf;
 	m.m2_l2= size;
 
-	r= sendrec(dev_e, &m);
+	r= kipc_sendrec(dev_e, &m);
 	if (r != 0)
 	{
 		printf("tell_dev: sendrec to %d failed: %d\n", dev_e, r);

@@ -11,7 +11,7 @@
  * setlocale - set the programs locale
  */
 #include	<locale.h>
-#include	<string.h>
+#include	<nucleos/string.h>
 
 struct lconv _lc;
 

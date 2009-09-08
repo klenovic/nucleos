@@ -9,7 +9,7 @@
  */
 #define VERBOSE 0
 
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
@@ -17,15 +17,15 @@
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
 
-#include <sys/mman.h>
+#include <nucleos/mman.h>
 
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <env.h>
 #include <stdio.h>
 #include <nucleos/fcntl.h>
@@ -59,7 +59,7 @@ int do_mmap(message *m)
 	if(!(vmp->vm_flags & VMF_HASPT))
 		return -ENXIO;
 
-	if(m->VMM_FD == -1 || (m->VMM_FLAGS & MAP_ANON)) {
+	if(m->VMM_FD == -1 || (m->VMM_FLAGS & MAP_ANONYMOUS)) {
 		int s;
 		vir_bytes v;
 		u32_t vrflags = VR_ANON | VR_WRITABLE;

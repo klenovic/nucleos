@@ -31,8 +31,8 @@
 
 #include "pm.h"
 #include <nucleos/com.h>
-#include <sys/ptrace.h>
-#include <signal.h>
+#include <nucleos/ptrace.h>
+#include <nucleos/signal.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -123,13 +123,13 @@ int do_trace()
   case T_EXIT:		/* exit */
 	child->mp_flags |= TRACE_EXIT;
 
-	/* Defer the exit if the traced process has an FS call pending. */
+	/* Defer the exit if the traced process has an FS_PROC_NR call pending. */
 	if (child->mp_fs_call != PM_IDLE || child->mp_fs_call2 != PM_IDLE)
 		child->mp_exitstatus = (int) m_in.data;	/* save for later */
 	else
 		exit_proc(child, (int) m_in.data, FALSE /*dump_core*/);
 
-	/* Do not reply to the caller until FS has processed the exit
+	/* Do not reply to the caller until FS_PROC_NR has processed the exit
 	 * request.
 	 */
 	return SUSPEND;

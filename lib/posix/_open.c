@@ -7,11 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define open	_open
+#include <nucleos/lib.h>
 #include <nucleos/fcntl.h>
 #include <stdarg.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 int open(const char *name, int flags, ...)
 {
@@ -31,5 +30,5 @@ int open(const char *name, int flags, ...)
   }
   va_end(argp);
 
-  return (_syscall(FS, OPEN, &m));
+  return (_syscall(FS_PROC_NR, __NR_open, &m));
 }

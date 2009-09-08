@@ -19,7 +19,7 @@
 #include <nucleos/type.h>
 
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 

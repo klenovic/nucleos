@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define geteuid	_geteuid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 uid_t geteuid()
 {
@@ -20,6 +19,6 @@ uid_t geteuid()
    * are not always successful and Minix returns the unreserved value
    * (uid_t) -1 when there is an error.
    */
-  if (_syscall(MM, GETUID, &m) < 0) return ( (uid_t) -1);
+  if (_syscall(PM_PROC_NR, __NR_getuid, &m) < 0) return ( (uid_t) -1);
   return( (uid_t) m.m2_i1);
 }

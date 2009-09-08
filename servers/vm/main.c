@@ -9,8 +9,8 @@
  */
 
 #define VERBOSE 0
-#include <nucleos/nucleos.h>
-#include <nucleos/callnr.h>
+#include <nucleos/kernel.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <servers/ds/ds.h>
@@ -18,12 +18,12 @@
 #include <nucleos/keymap.h>
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <env.h>
 #include <stdio.h>
 
@@ -119,7 +119,7 @@ int main(void)
 #endif
 	SANITYCHECK(SCL_DETAIL);
 
-  	if ((r=receive(ANY, &msg)) != 0)
+  	if ((r=kipc_receive(ANY, &msg)) != 0)
 		vm_panic("receive() error", r);
 
 	SANITYCHECK(SCL_DETAIL);
@@ -173,7 +173,7 @@ int main(void)
 	if(result != SUSPEND) {
 	SANITYCHECK(SCL_DETAIL);
 		msg.m_type = result;
-		if((r=send(who_e, &msg)) != 0) {
+		if((r=kipc_send(who_e, &msg)) != 0) {
 			printf("VM: couldn't send %d to %d (err %d)\n",
 				msg.m_type, who_e, r);
 			vm_panic("send() error", NO_NUM);

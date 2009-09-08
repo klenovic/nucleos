@@ -17,8 +17,8 @@
  * of corresponding slots referring to the same process in all three.
  */
 
-#include <timers.h>
-#include <signal.h>
+#include <nucleos/timer.h>
+#include <nucleos/signal.h>
 #include <nucleos/com.h>
 
 #include "const.h"
@@ -60,7 +60,7 @@ struct mproc {
 	vir_bytes mp_procargs;	/* ptr to proc's initial stack arguments */
 	message mp_reply;	/* reply message to be sent to one */
 
-	/* Communication with FS */
+	/* Communication with FS_PROC_NR */
 	int mp_fs_call;			/* Record the call for normal system calls */
 	int mp_fs_call2;		/* Record the call for signals */
 	char *mp_exec_path;		/* Path of executable */
@@ -88,7 +88,7 @@ extern struct mproc mproc[];
 #define SIGSUSPENDED	0x100	/* set by SIGSUSPEND system call */
 #define REPLY		0x200	/* set if a reply message is pending */
 #define PRIV_PROC	0x2000	/* system process, special privileges */
-#define PM_SIG_PENDING	0x4000	/* process got a signal while waiting for FS */
+#define PM_SIG_PENDING	0x4000	/* process got a signal while waiting for FS_PROC_NR */
 #define PARTIAL_EXEC	0x8000	/* Process got a new map but no content */
 #define TOLD_PARENT	0x10000	/* Parent wait() completed, ZOMBIE off */
 #define EXITING		0x20000	/* set by EXIT, process is now exiting */

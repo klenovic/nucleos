@@ -65,7 +65,7 @@ typedef struct {
 	cp_grant_id_t ReviveGrant;		  /* grant id associated with io */
 	void *UserBuf;                            /* address of user's data buffer */
 	int ReadyToRevive;                        /* are we ready to revive process?*/
-	int NotifyProcNr;                         /* process to send notify to (FS) */
+	int NotifyProcNr;                         /* process to send notify to (FS_PROC_NR) */
 	u32_t FragSize;                           /* dma fragment size */
 	char *DmaBuf;        /* the dma buffer; extra space for 
 												  page alignment */

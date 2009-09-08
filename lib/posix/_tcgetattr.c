@@ -7,16 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#define tcgetattr _tcgetattr
-#define ioctl _ioctl
 #include <nucleos/ioctl.h>
 #include <nucleos/errno.h>
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <asm/ioctls.h>
 
-int tcgetattr(fd, termios_p)
-int fd;
-struct termios *termios_p;
+int tcgetattr(int fd, struct termios *termios_p)
 {
   return(ioctl(fd, TCGETS, termios_p));
 }

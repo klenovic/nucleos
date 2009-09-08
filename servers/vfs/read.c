@@ -20,16 +20,16 @@
  * Changes for VFS:
  *   Jul 2006 (Balazs Gerofi)
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "fs.h"
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include "file.h"
 #include "fproc.h"
 #include "param.h"
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #include <assert.h>
 
 #include <nucleos/vfsif.h>

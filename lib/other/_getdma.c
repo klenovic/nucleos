@@ -9,21 +9,16 @@
  */
 /* getdma.c 
  */
-
-#include <lib.h>
-#define getdma	_getdma
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <stdarg.h>
 
-int getdma(procp, basep, sizep)
-endpoint_t *procp;
-phys_bytes *basep;
-phys_bytes *sizep;
+int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
 {
   int r;
   message m;
 
-  r= _syscall(MM, GETDMA, &m);
+  r= _syscall(PM_PROC_NR, __NR_getdma, &m);
   if (r == 0)
   {
 	*procp= m.m2_i1;

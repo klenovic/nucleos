@@ -13,15 +13,11 @@
  */
 
 #define nil 0
-#define execve _execve
-#define execvp _execvp
-#define sbrk _sbrk
-#define stat _stat
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 
 extern char * const **_penviron;	/* The default environment. */
 

@@ -7,16 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define wait	_wait
-#include <sys/wait.h>
+#include <nucleos/lib.h>
+#include <nucleos/wait.h>
 
-pid_t wait(status)
-int *status;
+pid_t wait(int *status)
 {
   message m;
 
-  if (_syscall(MM, WAIT, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_wait, &m) < 0) return(-1);
   if (status != 0) *status = m.m2_i1;
   return(m.m_type);
 }

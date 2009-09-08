@@ -12,14 +12,13 @@ gettimeofday.c
 */
 
 #include <nucleos/time.h>
-#include <lib.h>
-#include <time.h>
+#include <nucleos/lib.h>
 
 int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp)
 {
   message m;
 
-  if (_syscall(MM, GETTIMEOFDAY, &m) < 0)
+  if (_syscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
   	return -1;
 
   tp->tv_sec = m.m2_l1;

@@ -15,7 +15,7 @@
 
 #include <nucleos/driver.h>
 #include <nucleos/drvlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 /* Extended partition? */
 #define ext_part(s)	((s) == 0x05 || (s) == 0x0F)

@@ -9,7 +9,7 @@
  */
 
 #include <servers/ds/ds.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 #include "syslib.h"
 

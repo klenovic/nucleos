@@ -24,18 +24,18 @@
 
 #include <nucleos/type.h>
 #include <nucleos/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
+#include <nucleos/wait.h>
+#include <nucleos/stat.h>
 #include <nucleos/svrctl.h>
 #include <ttyent.h>
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
 #include <nucleos/limits.h>
-#include <signal.h>
-#include <string.h>
-#include <time.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
+#include <nucleos/time.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <utmp.h>
 
 #include <asm/ioctls.h>

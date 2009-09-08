@@ -7,11 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* This file contains procedures to dump to FS' data structures.
+/* This file contains procedures to dump to FS_PROC_NR' data structures.
  *
  * The entry points into this file are
  *   dtab_dump:   	display device <-> driver mappings	  
- *   fproc_dump:   	display FS process table	  
+ *   fproc_dump:   	display FS_PROC_NR process table	  
  *
  * Created:
  *   Oct 01, 2004:	by Jorrit N. Herder
@@ -37,7 +37,7 @@ void fproc_dmp()
 
   getsysinfo(FS_PROC_NR, SI_PROC_TAB, fproc);
 
-  printf("File System (FS) process table dump\n");
+  printf("File System (FS_PROC_NR) process table dump\n");
   printf("-nr- -pid- -tty- -umask- --uid-- --gid-- -ldr- -sus-rev-proc-\n");
   for (i=prev_i; i<NR_PROCS; i++) {
   	fp = &fproc[i];
@@ -79,7 +79,7 @@ void dtab_dmp()
 
     getsysinfo(FS_PROC_NR, SI_DMAP_TAB, dmap);
     
-    printf("File System (FS) device <-> driver mappings\n");
+    printf("File System (FS_PROC_NR) device <-> driver mappings\n");
     printf("Major  Driver ept  Flags\n");
     printf("-----  ----------  -----\n");
     for (i=0; i<NR_DEVICES; i++) {

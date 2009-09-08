@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* This library provides generic watchdog timer management functionality.
- * See the comments in <timers.h> for details.
+ * See the comments in <nucleos/timer.h> for details.
  */
 
-#include <timers.h>		/* definitions and function prototypes */
+#include <nucleos/timer.h>		/* definitions and function prototypes */
 

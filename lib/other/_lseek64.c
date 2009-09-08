@@ -7,16 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define lseek64	_lseek64
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/u64.h>
 
-int lseek64(fd, offset, whence, newpos)
-int fd;
-u64_t offset;
-int whence;
-u64_t *newpos;
+int lseek64(int fd, u64_t offset, int whence, u64_t *newpos)
 {
   message m;
 
@@ -24,7 +19,7 @@ u64_t *newpos;
   m.m2_l1 = ex64lo(offset);
   m.m2_l2 = ex64hi(offset);
   m.m2_i2 = whence;
-  if (_syscall(FS, LLSEEK, &m) < 0) return -1;
+  if (_syscall(FS_PROC_NR, __NR_llseek, &m) < 0) return -1;
   if (newpos)
 	*newpos= make64(m.m2_l1, m.m2_l2);
   return 0;

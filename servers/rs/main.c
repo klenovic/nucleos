@@ -16,7 +16,7 @@
  * Created:
  *   Jul 22, 2005	by Jorrit N. Herder
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"
 #include <nucleos/fcntl.h>
 #include <nucleos/endpoint.h>
@@ -92,7 +92,7 @@ int main(void)
        * Handle the request and send a reply to the caller.
        */
       else {
-	  if (call_nr != GETSYSINFO && 
+	  if (call_nr != __NR_getsysinfo && 
 	  	(call_nr < RS_RQ_BASE || call_nr >= RS_RQ_BASE+0x100))
 	  {
 		/* Ignore invalid requests. Do not try to reply. */
@@ -120,7 +120,7 @@ int main(void)
           case RS_REFRESH: 	result = do_refresh(&m); 	break;
           case RS_RESTART: 	result = do_restart(&m); 	break;
           case RS_SHUTDOWN: 	result = do_shutdown(&m); 	break;
-          case GETSYSINFO: 	result = do_getsysinfo(&m); 	break;
+          case __NR_getsysinfo: 	result = do_getsysinfo(&m); 	break;
           default: 
               printf("Warning, RS got unexpected request %d from %d\n",
                   m.m_type, m.m_source);
@@ -155,7 +155,7 @@ static void init_server(void)
   if (sigaction(SIGTERM,&sa,NULL)<0) panic("RS","sigaction failed", errno);
 
   /* Initialize the system process table. Use the boot image from the kernel
-   * and the device map from the FS to gather all needed information.
+   * and the device map from the FS_PROC_NR to gather all needed information.
    */
   if ((s = sys_getimage(image)) != 0) 
       panic("RS","warning: couldn't get copy of image table", s);
@@ -211,7 +211,7 @@ message *m_in;				/* pointer to message */
 {
     int s;				/* receive status */
 
-    if ((s=receive(ANY, m_in)) != 0) 	/* wait for message */
+    if ((s=kipc_receive(ANY, m_in)) != 0) 	/* wait for message */
         panic("RS","receive failed", s);
 }
 
@@ -225,7 +225,7 @@ message *m_out;                         /* reply message */
 {
     int s;				/* send status */
 
-    s = sendnb(who, m_out);		/* send the message */
+    s = kipc_sendnb(who, m_out);		/* send the message */
     if (s != 0)
         printf("RS: unable to send reply to %d: %d\n", who, s);
 }

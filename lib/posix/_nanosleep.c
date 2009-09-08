@@ -11,14 +11,12 @@
  *								25 July 2009
  */
 
-#include <lib.h>
-#define nanosleep _nanosleep
-#include <signal.h>
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
 #include <nucleos/time.h>
-#include <sys/select.h>
-#include <time.h>
+#include <nucleos/select.h>
 
 #define MSEC_PER_SEC 1000
 #define USEC_PER_MSEC 1000

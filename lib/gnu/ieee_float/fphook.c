@@ -11,7 +11,7 @@
  * fltpr.c - print floating point numbers
  */
 #ifndef	NOFLOAT
-#include	<string.h>
+#include	<nucleos/string.h>
 #include	<stdarg.h>
 #include	"../../stdio/loc_incl.h"
 int _fp_hook = 1;

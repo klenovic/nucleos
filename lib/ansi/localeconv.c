@@ -10,7 +10,7 @@
 /*
  * localeconv - set components of a struct according to current locale
  */
-#include	<nucleos/nucleos.h>
+#include	<nucleos/kernel.h>
 #include	<locale.h>
 
 extern struct lconv _lc;

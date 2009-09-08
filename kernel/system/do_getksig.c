@@ -16,7 +16,7 @@
  */
 
 #include <kernel/system.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <asm/sigcontext.h>
 #include <nucleos/endpoint.h>
 
@@ -32,7 +32,7 @@ message *m_ptr;			/* pointer to request message */
  * one. Find a process with pending signals. If no signals are available, 
  * return NONE in the process number field.
  * It is not sufficient to ready the process when PM is informed, because 
- * PM can block waiting for FS to do a core dump.
+ * PM can block waiting for FS_PROC_NR to do a core dump.
  */
   register struct proc *rp;
 

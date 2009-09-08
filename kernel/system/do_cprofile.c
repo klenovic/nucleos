@@ -20,9 +20,10 @@
  * Changes:
  *   14 Aug, 2006   Created (Rogier Meurs)
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
+#include <nucleos/signal.h>
 #include <kernel/system.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 int cprof_mem_size;              /* available user memory for data */
 struct cprof_info_s cprof_info;  /* profiling info for user program */

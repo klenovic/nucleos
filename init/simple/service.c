@@ -18,21 +18,21 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <pwd.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysinfo.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <configfile.h>
-
+#include <nucleos/param.h>
 
 /* This array defines all known requests. */
 static char *known_requests[] = {
@@ -254,7 +254,7 @@ static int parse_arguments(int argc, char **argv)
 		u32_t system_hz;
 		if(getsysinfo_up(PM_PROC_NR,
 			SIU_SYSTEMHZ, sizeof(system_hz), &system_hz) < 0) {
-			system_hz = DEFAULT_HZ;
+			system_hz = HZ;
 			fprintf(stderr, "WARNING: reverting to default HZ %d\n",
 				system_hz);
 		} 

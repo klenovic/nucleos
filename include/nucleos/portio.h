@@ -13,8 +13,8 @@ minix/portio.h
 Created:	Jan 15, 1992 by Philip Homburg
 */
 
-#ifndef _PORTIO_H_
-#define _PORTIO_H_
+#ifndef __NUCLEOS_PORTIO_H
+#define __NUCLEOS_PORTIO_H
 
 #include <nucleos/types.h>
 
@@ -33,4 +33,4 @@ void outsl(u16 _port, void *_buf, size_t _count);
 void intr_disable(void);
 void intr_enable(void);
 
-#endif /* _PORTIO_H_ */
+#endif /* __NUCLEOS_PORTIO_H */

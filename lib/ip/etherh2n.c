@@ -14,7 +14,7 @@ Created:	May 20, 1992 by Philip Homburg
 */
 
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <net/gen/if_ether.h>
 
 int

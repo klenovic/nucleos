@@ -7,25 +7,21 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define chdir	_chdir
-#define fchdir	_fchdir
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int chdir(name)
-const char *name;
+int chdir(const char *name)
 {
   message m;
 
   _loadname(name, &m);
-  return(_syscall(FS, CHDIR, &m));
+  return(_syscall(FS_PROC_NR, __NR_chdir, &m));
 }
 
-int fchdir(fd)
-int fd;
+int fchdir(int fd)
 {
   message m;
 
   m.m1_i1 = fd;
-  return(_syscall(FS, FCHDIR, &m));
+  return(_syscall(FS_PROC_NR, __NR_fchdir, &m));
 }

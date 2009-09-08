@@ -13,12 +13,13 @@
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/bootparam.h>
 #include <asm/kernel/const.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
 #include <nucleos/compile.h>
+#include <nucleos/param.h>
 
 static char *get_value(const char *params, const char *key);
 
@@ -99,8 +100,8 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 
 	/* sanity check */
 	if(!value || system_hz < 2 || system_hz > 50000) {
-		kprintf("Wrong value of HZ=0x%x, using default HZ=0x%x\n", system_hz, DEFAULT_HZ);
-		system_hz = DEFAULT_HZ;
+		kprintf("Wrong value of HZ=0x%x, using default HZ=0x%x\n", system_hz, HZ);
+		system_hz = HZ;
 	}
 
 	value = get_value(params_buffer, SERVARNAME);

@@ -12,15 +12,14 @@
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
 #include <nucleos/types.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 
-int _kill(int pid, int sig);
-pid_t _getpid(void);
+int kill(int pid, int sig);
+pid_t getpid(void);
 
-int
-raise(int sig)
+int raise(int sig)
 {
 	if (sig < 0 || sig > _NSIG)
 		return -1;
-	return _kill(_getpid(), sig);
+	return kill(getpid(), sig);
 }

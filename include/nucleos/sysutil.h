@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _MINIX_SYSUTIL_H
-#define _MINIX_SYSUTIL_H 1
+#ifndef __NUCLEOS_SYSUTIL_H
+#define __NUCLEOS_SYSUTIL_H
 
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 
 /* Extra system library definitions to support device drivers and servers.
  *
@@ -87,5 +87,4 @@ struct util_timingdata {
 
 typedef struct util_timingdata util_timingdata_t;
 
-#endif /* _MINIX_SYSUTIL_H */
-
+#endif /* __NUCLEOS_SYSUTIL_H */

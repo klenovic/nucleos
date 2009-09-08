@@ -10,8 +10,7 @@
 /* Copyright (c) 2009 Vrije Universiteit, Amsterdam.
  * See the copyright notice in file LICENSE.minix3.
  */
-#include <lib.h>
-#define setitimer _setitimer
+#include <nucleos/lib.h>
 #include <nucleos/time.h>
 
 /*
@@ -32,5 +31,5 @@ int setitimer(int which, const struct itimerval *__restrict value,
   m.m1_p1 = (char *) value;
   m.m1_p2 = (char *) ovalue;
 
-  return _syscall(PM_PROC_NR, ITIMER, &m);
+  return _syscall(PM_PROC_NR, __NR_itimer, &m);
 }

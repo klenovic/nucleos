@@ -11,7 +11,7 @@
 #define __SERVERS_VFS_PROTO_H
 
 /* Function prototypes. */
-#include "timers.h"
+#include <nucleos/timer.h>
 #include "request.h"
 
 /* Structs used in prototypes must be declared as such first. */

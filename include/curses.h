@@ -12,7 +12,7 @@
 #ifndef _CURSES_H
 #define _CURSES_H
 
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <stdarg.h>
 #include <stdio.h>
 

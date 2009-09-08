@@ -43,7 +43,7 @@
  */
 #ifdef notyet
 #include <nucleos/types.h>
-#include <sys/param.h>
+#include <nucleos/param.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <netdb.h>

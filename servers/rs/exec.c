@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"
 #include <nucleos/a.out.h>
 
@@ -172,7 +172,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		goto fail;
 	}
 
-	/* Patch up stack and copy it from FS to new core image. */
+	/* Patch up stack and copy it from FS_PROC_NR to new core image. */
 	vsp = stack_top;
 	vsp -= frame_len;
 	patch_ptr(frame, vsp);
@@ -261,10 +261,10 @@ vir_bytes entry_point;
 	e.progname[sizeof(e.progname)-1]= '\0';
 	e.entry_point = entry_point;
 
-	m.m_type = EXEC_NEWMEM;
+	m.m_type = __NR_exec_newmem;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)&e;
-	r = sendrec(PM_PROC_NR, &m);
+	r = kipc_sendrec(PM_PROC_NR, &m);
 	if (r != 0)
 		return r;
 #if 0
@@ -291,10 +291,10 @@ int result;
 	int r;
 	message m;
 
-	m.m_type= EXEC_RESTART;
+	m.m_type= __NR_exec_restart;
 	m.EXC_RS_PROC= proc_e;
 	m.EXC_RS_RESULT= result;
-	r= sendrec(PM_PROC_NR, &m);
+	r= kipc_sendrec(PM_PROC_NR, &m);
 	if (r != 0)
 		return r;
 	return m.m_type;

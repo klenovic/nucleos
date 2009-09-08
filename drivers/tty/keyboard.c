@@ -17,12 +17,11 @@
 
 #include <nucleos/drivers.h>
 #include <nucleos/ioctl.h>
-#include <sys/kbdio.h>
+#include <nucleos/kbdio.h>
 #include <nucleos/time.h>
-#include <termios.h>
-#include <signal.h>
-#include <unistd.h>
-#include <nucleos/callnr.h>
+#include <nucleos/termios.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
 
@@ -406,7 +405,7 @@ message *m;
 			m->m_type, m->m_source);
 		r= -EINVAL;
 	}
-	tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT, r);
+	tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
 }
 
 
@@ -540,10 +539,10 @@ message *m_ptr;
 	 kbdp->buf[o]= scode;
 	 kbdp->avail++;
 	 if (kbdp->req_size) {
-		notify(kbdp->incaller);
+		kipc_notify(kbdp->incaller);
 	 }
 	 if (kbdp->select_ops & SEL_RD)
-		notify(kbdp->select_proc);
+		kipc_notify(kbdp->select_proc);
 	 return;
   }
 
@@ -1130,7 +1129,7 @@ message *m_ptr;			/* pointer to the request message */
 
   /* Almost done, return result to caller. */
   m_ptr->m_type = result;
-  send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr);
 }
 
 /*===========================================================================*
@@ -1175,7 +1174,7 @@ int scode;			/* scan code for a function key */
   /* See if an observer is registered and send it a message. */
   if (proc_nr != NONE) { 
       m.NOTIFY_TYPE = FKEY_PRESSED;
-      notify(proc_nr);
+      kipc_notify(proc_nr);
   }
   return(TRUE);
 }

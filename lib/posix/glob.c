@@ -64,19 +64,19 @@
  *	Number of matches in the current invocation of glob.
  */
 
-#include <sys/param.h>
-#include <sys/stat.h>
+#include <nucleos/param.h>
+#include <nucleos/stat.h>
 
 #include <ctype.h>
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #include <nucleos/errno.h>
 #include <glob.h>
 #include <nucleos/limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 
 #define	DOLLAR		'$'
 #define	DOT		'.'

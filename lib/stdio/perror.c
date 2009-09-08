@@ -14,10 +14,10 @@
 #include <stdio.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include "loc_incl.h"
 
-ssize_t _write(int d, const char *buf, size_t nbytes);
+ssize_t write(int d, const char *buf, size_t nbytes);
 
 void
 perror(const char *s)
@@ -30,9 +30,9 @@ perror(const char *s)
 	fflush(stdout);
 	fflush(stderr);
 	if (s && *s) {
-		_write(fd, s, strlen(s));
-		_write(fd, ": ", 2);
+		write(fd, s, strlen(s));
+		write(fd, ": ", 2);
 	}
-	_write(fd, p, strlen(p));
-	_write(fd, "\n", 1);
+	write(fd, p, strlen(p));
+	write(fd, "\n", 1);
 }

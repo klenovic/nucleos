@@ -7,19 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define read	_read
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-ssize_t read(fd, buffer, nbytes)
-int fd;
-void *buffer;
-size_t nbytes;
+ssize_t read(int fd, void *buffer, size_t nbytes)
 {
   message m;
 
   m.m1_i1 = fd;
   m.m1_i2 = nbytes;
   m.m1_p1 = (char *) buffer;
-  return(_syscall(FS, READ, &m));
+  return(_syscall(FS_PROC_NR, __NR_read, &m));
 }

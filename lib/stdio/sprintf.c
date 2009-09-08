@@ -10,7 +10,7 @@
 /*
  * sprintf - print formatted output on an array
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <nucleos/limits.h>

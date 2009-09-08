@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _MINIX_PATHS_H
-#define _MINIX_PATHS_H 1
+#ifndef __NUCLEOS_PATHS_H
+#define __NUCLEOS_PATHS_H
 
 #define _PATH_DHCPCONF	"/etc/dhcp.conf"
 #define _PATH_DHCPPID	"/usr/run/dhcpd.pid"
@@ -29,4 +29,4 @@
 #define _PATH_SERVICE	"/bin/service"
 #define _PATH_DRIVERS_CONF	"/etc/drivers.conf"
 
-#endif
+#endif /* __NUCLEOS_PATHS_H */

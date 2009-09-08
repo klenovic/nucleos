@@ -14,18 +14,17 @@
  */
 
 #include "fs.h"
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include "file.h"
 #include "fproc.h"
 #include "lock.h"
 #include "param.h"
-#include <dirent.h>
+#include <nucleos/dirent.h>
 #include <assert.h>
 
 #include <nucleos/vfsif.h>

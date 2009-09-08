@@ -11,7 +11,7 @@
  * (c) copyright 1987 by the Vrije Universiteit, Amsterdam, The Netherlands.
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
-#include	<string.h>
+#include	<nucleos/string.h>
 
 size_t
 memcspn(const char *string, size_t strlen, const char *notin, size_t notinlen)

@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-/* Fields of VFS/FS request messages */
+/* Fields of VFS/FS_PROC_NR request messages */
 #define REQ_INODE_NR             m6_l1
 #define REQ_CHROOT_NR            m6_l2
 #define REQ_DEVx                 m6_l2
@@ -101,7 +101,7 @@
 #define REQ_REN_GRANT_NEW	m2_i3
 #define REQ_REN_LEN_NEW		m2_s1
 
-/* Fields of VFS/FS respons messages */
+/* Fields of VFS/FS_PROC_NR respons messages */
 #define RES_MOUNTED              m6_s1
 #define RES_OFFSET               m6_s2
 #define RES_INODE_NR             m6_l1

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _MINIX_ENDPOINT_H
-#define _MINIX_ENDPOINT_H 1
+#ifndef __NUCLEOS_ENDPOINT_H
+#define __NUCLEOS_ENDPOINT_H
 
 #include <nucleos/com.h>
 #include <nucleos/limits.h>
@@ -30,4 +30,4 @@
 #define _ENDPOINT_G(e) (((e)+NR_TASKS) / _ENDPOINT_GENERATION_SIZE)
 #define _ENDPOINT_P(e) ((((e)+NR_TASKS) % _ENDPOINT_GENERATION_SIZE) - NR_TASKS)
 
-#endif
+#endif /* __NUCLEOS_ENDPOINT_H */

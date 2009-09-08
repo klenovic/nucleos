@@ -74,7 +74,7 @@
 #define reply_t4 	m4_l4
 #define reply_t5 	m4_l5
 
-/* The following names are used to inform the FS about certain events. */
+/* The following names are used to inform the FS_PROC_NR about certain events. */
 #define tell_fs_arg1    m1_i1
 #define tell_fs_arg2    m1_i2
 #define tell_fs_arg3    m1_i3

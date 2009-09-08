@@ -185,7 +185,7 @@ void b_unset(char *name);
 
 void parse_code(char *code);	/* Parse boot monitor commands. */
 
-extern int fsok;	/* True if the boot device contains an FS. */
+extern int fsok;	/* True if the boot device contains an FS_PROC_NR. */
 u32_t lowsec;	/* Offset to the file system on the boot device. */
 
 /* Called by boot.c: */

@@ -15,10 +15,10 @@
 #define NDEBUG
 #endif
 
-#include	<stdlib.h>
-#include	<string.h>
-#include	<nucleos/errno.h>
-#include	<assert.h>
+#include <stdlib.h>
+#include <nucleos/string.h>
+#include <nucleos/errno.h>
+#include <assert.h>
 
 #define	ptrint		int
 
@@ -42,8 +42,8 @@
  * Free slots are merged together by free().
  */
 
-extern void *_sbrk(int);
-extern int _brk(void *);
+extern void *sbrk(int);
+extern int brk(void *);
 static void *_bottom, *_top, *_empty;
 
 static int grow(size_t len)
@@ -56,7 +56,7 @@ static int grow(size_t len)
 	errno = ENOMEM;
 	return(0);
   }
-  if (_brk(p) != 0)
+  if (brk(p) != 0)
 	return(0);
   NextSlot((char *)_top) = p;
   NextSlot(p) = 0;
@@ -80,7 +80,7 @@ malloc(size_t size)
 		return NULL;
 	}
 	if (_bottom == 0) {
-		if ((p = _sbrk(2 * PTRSIZE)) == (char *) -1)
+		if ((p = sbrk(2 * PTRSIZE)) == (char *) -1)
 			return NULL;
 		p = (char *) Align((ptrint)p, PTRSIZE);
 		p += PTRSIZE;

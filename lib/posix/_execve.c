@@ -10,12 +10,9 @@
 /*	execve() - basic program execution call		Author: Kees J. Bot
  *								21 Jan 1994
  */
-
-#define execve _execve
-#define sbrk _sbrk
-#include <lib.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <nucleos/stddef.h>
 
 int execve(const char *path, char * const *argv, char * const *envp)
@@ -123,7 +120,7 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	m.m1_i3 = 0;
 	m.m1_p3 = NULL;
 
-	(void) _syscall(MM, EXEC, &m);
+	(void) _syscall(PM_PROC_NR, __NR_exec, &m);
 	/* Failure, return the memory used for the frame and exit. */
 	(void) sbrk(-frame_size);
 

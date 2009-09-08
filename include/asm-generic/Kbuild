@@ -1,16 +1,12 @@
-# ok
+#
+# The Kbuild according to linux one.
+#
 header-y += auxvec.h
-# ok
 header-y += bitsperlong.h
-# ok
 header-y += errno-base.h
-# ok
 header-y += errno.h
-# ok
 header-y += fcntl.h 
-# ok
 header-y += ioctl.h
-
 header-y += ioctls.h
 header-y += ioctls-cmos.h
 header-y += ioctls-disk.h
@@ -21,32 +17,30 @@ header-y += ioctls-sound.h
 header-y += ioctls-svrctl.h
 header-y += ioctls-tape.h
 header-y += ioctls-tty.h
-
-header-y += ipcbuf.h
+# n/a header-y += ipcbuf.h
 header-y += mman-common.h
 header-y += mman.h
-header-y += msgbuf.h
+# n/a header-y += msgbuf.h
 header-y += param.h
-header-y += poll.h
+# n/a header-y += poll.h
 header-y += posix_types.h
-header-y += sembuf.h
-header-y += setup.h
-header-y += shmbuf.h
-header-y += shmparam.h
+# n/a header-y += sembuf.h
+# n/a header-y += setup.h
+# n/a header-y += shmbuf.h
+# n/a header-y += shmparam.h
 header-y += signal-defs.h
 header-y += signal.h
-header-y += socket.h
-header-y += sockios.h
-header-y += stat.h
-header-y += statfs.h
+# n/a header-y += socket.h
+# n/a header-y += sockios.h
+# n/a header-y += stat.h
+# n/a header-y += statfs.h
 header-y += swab.h
-header-y += termbits.h
-header-y += termios.h
+# n/a header-y += termbits.h
+# n/a header-y += termios.h
 header-y += types.h
-header-y += ucontext.h
-header-y += unistd.h
-
-header-y += int-l64.h
+# n/a header-y += ucontext.h
+# n/a header-y += unistd.h
+# n/a header-y += int-l64.h
 header-y += int-ll64.h
-header-y += resource.h
-header-y += siginfo.h
+# n/a header-y += resource.h
+# n/a header-y += siginfo.h

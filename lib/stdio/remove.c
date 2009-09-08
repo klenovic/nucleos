@@ -10,11 +10,11 @@
 /*
  * remove.c - remove a file
  */
-#include	<stdio.h>
-#include	<nucleos/errno.h>
+#include <stdio.h>
+#include <nucleos/errno.h>
 
-int _rmdir(const char *path);
-int _unlink(const char *path);
+int rmdir(const char *path);
+int unlink(const char *path);
 
 int
 remove(const char *filename) {
@@ -22,12 +22,12 @@ remove(const char *filename) {
 
 	saved_errno = errno;
 
-	retval = _rmdir(filename);
+	retval = rmdir(filename);
 
 	if (retval == -1 && errno == ENOTDIR) {
 		errno = saved_errno;
 
-		retval = _unlink(filename);
+		retval = unlink(filename);
 	}
 
 	return retval;

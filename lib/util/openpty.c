@@ -18,16 +18,16 @@
  *
  */
 #include <libutil.h>
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <nucleos/fcntl.h>
 #include <grp.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <asm/ioctls.h>
 
 #define DEV_DIR		"/dev"

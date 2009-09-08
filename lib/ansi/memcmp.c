@@ -13,7 +13,7 @@
  */
 /* $Id: memcmp.c,v 1.1.1.1 2005/04/21 14:56:05 beng Exp $ */
 
-#include	<string.h>
+#include	<nucleos/string.h>
 
 int
 memcmp(const void *s1, const void *s2, size_t n)

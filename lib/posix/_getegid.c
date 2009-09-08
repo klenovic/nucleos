@@ -7,9 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define getegid	_getegid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
 gid_t getegid()
 {
@@ -20,6 +19,6 @@ gid_t getegid()
    * are not always successful and Minix returns the unreserved value
    * (gid_t) -1 when there is an error.
    */
-  if (_syscall(MM, GETGID, &m) < 0) return ( (gid_t) -1);
+  if (_syscall(PM_PROC_NR, __NR_getgid, &m) < 0) return ( (gid_t) -1);
   return( (gid_t) m.m2_i1);
 }

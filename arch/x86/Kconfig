@@ -28,7 +28,7 @@ source "arch/x86/kernel/Kconfig"
 menu "Processor type and features"
 
 source "arch/x86/Kconfig.cpu"
-
+source "kernel/Kconfig.hz"
 source "mm/Kconfig"
 
 endmenu

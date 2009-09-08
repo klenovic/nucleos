@@ -12,9 +12,8 @@
    author: Edvard Tuinder  v892231@si.hhs.NL
  */
 
-#include <lib.h>
-#define reboot	_reboot
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <stdarg.h>
 
 int reboot(int how, ...)
@@ -29,5 +28,5 @@ int reboot(int how, ...)
   }
   va_end(ap);
 
-  return _syscall(MM, REBOOT, &m);
+  return _syscall(PM_PROC_NR, __NR_reboot, &m);
 }

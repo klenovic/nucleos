@@ -14,7 +14,7 @@
 #include <nucleos/const.h>
 #include <nucleos/com.h>
 #include <nucleos/types.h>
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 
 /* Constants and types. */
 

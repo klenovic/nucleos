@@ -31,7 +31,7 @@ u32_t value;
 	m.m2_i2= port;
 	m.m2_l1= value;
 
-	r= sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_attr_w32: can't talk to PCI", r);
 

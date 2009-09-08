@@ -11,12 +11,12 @@
 #include "pm.h"
 
 #include <nucleos/com.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <asm/kernel/const.h>
 
 #include "mproc.h"

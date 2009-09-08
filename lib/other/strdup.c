@@ -12,7 +12,7 @@ lib/other/strdup.c
 */
 
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 
 char *strdup(s1)
 const char *s1;

@@ -19,10 +19,10 @@
  */
 
 #include "fs.h"
-#include <string.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include "buf.h"
 #include "inode.h"
 #include "super.h"
@@ -258,7 +258,7 @@ int action;                    /* action on last part of path */
   if (fs_m_in.REQ_CHROOT_NR != 0) {
 	  if ((chroot_dir = find_inode(fs_dev, fs_m_in.REQ_CHROOT_NR)) 
 			  == NIL_INODE) {
-		  printf("FS: couldn't find chroot inode\n");
+		  printf("FS_PROC_NR: couldn't find chroot inode\n");
 		  err_code = -ENOENT;
 		  return NIL_INODE;
 	  }
@@ -287,7 +287,7 @@ int action;                    /* action on last part of path */
    * namely: climbing up on a mount (ELEAVEMOUNT).
    * In this case the lookup is intrested in the parent dir of the mount
    * point, but the last ".." component was processed in the 'previous'
-   * FS process. Let's do that first.
+   * FS_PROC_NR process. Let's do that first.
    */
   if (rip->i_mountpoint && rip->i_num != ROOT_INODE) {
 	dir_ip = rip;
@@ -789,7 +789,7 @@ char string[NAME_MAX];		/* component name to look for */
   }
 
   /* Don't go beyond the current root directory, unless the string is dot2. 
-   * Note: it has to be checked only if this FS process owns the chroot
+   * Note: it has to be checked only if this FS_PROC_NR process owns the chroot
    * directory of the process */
   if (chroot_dir != NIL_INODE) {
 	  if (dirp == chroot_dir && strcmp(string, "..") == 0 && string != dot2)
@@ -821,7 +821,7 @@ char string[NAME_MAX];		/* component name to look for */
 
 				  /* Climbing up mountpoint */
 				  err_code = ELEAVEMOUNT;
-				  /* This will be the FS process endoint */
+				  /* This will be the FS_PROC_NR process endoint */
 				  fs_m_out.m_source = rip->i_dev;
 				  fs_m_out.RES_OFFSET = path_processed;
                                   fs_m_out.RES_SYMLOOP = Xsymloop;
@@ -884,7 +884,7 @@ char string[NAME_MAX];		/* component name to look for */
   }
 
   /* Don't go beyond the current root directory, unless the string is dot2. 
-   * Note: it has to be checked only if this FS process owns the chroot
+   * Note: it has to be checked only if this FS_PROC_NR process owns the chroot
    * directory of the process */
   if (chroot_dir != NIL_INODE) {
 	  if (dirp == chroot_dir && strcmp(string, "..") == 0 && string != dot2)
@@ -914,7 +914,7 @@ char string[NAME_MAX];		/* component name to look for */
 
 				  /* Climbing up mountpoint */
 				  err_code = ELEAVEMOUNT;
-				  /* This will be the FS process endoint */
+				  /* This will be the FS_PROC_NR process endoint */
 				  fs_m_out.m_source = rip->i_dev;
 				  fs_m_out.RES_OFFSET = path_processed;
                                   fs_m_out.RES_SYMLOOP = Xsymloop;

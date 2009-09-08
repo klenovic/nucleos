@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
 	for (;;)
 	{
-		r= receive(ANY, &m);
+		r= kipc_receive(ANY, &m);
 		if (r != 0)
 			panic("ti1225", "receive failed", r);
 		printf("ti1225: got message %u from %d\n",

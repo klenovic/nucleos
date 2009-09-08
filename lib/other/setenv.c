@@ -42,7 +42,7 @@
 #include <nucleos/errno.h>
 #include <nucleos/stddef.h>
 #include	<stdlib.h>
-#include	<string.h>
+#include	<nucleos/string.h>
 
 char *__findenv(const char *, int *);
 

@@ -7,13 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define pause	_pause
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int pause()
+int pause(void)
 {
   message m;
 
-  return(_syscall(MM, PAUSE, &m));
+  return(_syscall(PM_PROC_NR, __NR_pause, &m));
 }

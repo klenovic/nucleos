@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 /* XXX - these have to be hidden because signal() uses them and signal() is
  * ANSI and not POSIX.  It would be surely be better to use macros for the
  * library and system uses, and perhaps macros as well as functions for the
@@ -17,13 +17,7 @@
  * system uses, the signal number is mostly already known to be valid
  * before the sigset-changing routines are called.
  */
-#define sigaddset	_sigaddset
-#define sigdelset	_sigdelset
-#define sigemptyset	_sigemptyset
-#define sigfillset	_sigfillset
-#define sigismember	_sigismember
-
-#include <signal.h>
+#include <nucleos/signal.h>
 
 /* Low bit of signal masks. */
 #define SIGBIT_0	((sigset_t) 1)
@@ -33,9 +27,7 @@
 
 #define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
 
-int sigaddset(set, signo)
-sigset_t *set;
-int signo;
+int sigaddset(sigset_t *set, int signo)
 {
   if (!sigisvalid(signo)) {
   	errno = EINVAL;
@@ -45,9 +37,7 @@ int signo;
   return 0;
 }
 
-int sigdelset(set, signo)
-sigset_t *set;
-int signo;
+int sigdelset(sigset_t *set, int signo)
 {
   if (!sigisvalid(signo)) {
   	errno = EINVAL;
@@ -57,23 +47,19 @@ int signo;
   return 0;
 }
 
-int sigemptyset(set)
-sigset_t *set;
+int sigemptyset(sigset_t *set)
 {
   *set = 0;
   return 0;
 }
 
-int sigfillset(set)
-sigset_t *set;
+int sigfillset(sigset_t *set)
 {
   *set = SIGMASK;
   return 0;
 }
 
-int sigismember(set, signo)
-const sigset_t *set;
-int signo;
+int sigismember(const sigset_t *set, int signo)
 {
   if (!sigisvalid(signo)) {
   	errno = EINVAL;

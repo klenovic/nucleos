@@ -129,7 +129,7 @@ int only_search;		/* if NO_READ, don't read, else act normal */
 	ASSERT(!bp->bp);
 	ASSERT(bp->b_bytes == 0);
 	if(!(bp->bp = alloc_contig(fs_block_size, 0, &ph)))
-		panic(__FILE__,"couldn't allocate FS buffer", n);
+		panic(__FILE__,"couldn't allocate FS_PROC_NR buffer", n);
   	bp->b_bytes = fs_block_size;
 	n++;
   }

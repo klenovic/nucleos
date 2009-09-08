@@ -366,7 +366,7 @@ message *m_ptr;					/* request message */
       }
 
       /* Any matches? */
-      if(n) notify(ds_subs[s].sub_owner);
+      if(n) kipc_notify(ds_subs[s].sub_owner);
    }
 
    return 0;
@@ -420,7 +420,7 @@ check_subscribers(struct data_store *dsp)
 			if(regexec(&ds_subs[i].sub_regex, dsp->ds_key, 
 				0, NULL, 0) == 0) {
 				SET_BIT(dsp->ds_old_subs, i);
-				notify(ds_subs[i].sub_owner);
+				kipc_notify(ds_subs[i].sub_owner);
 			} else {
 				UNSET_BIT(dsp->ds_old_subs, i);
 			}

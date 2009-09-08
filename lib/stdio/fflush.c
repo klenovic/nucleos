@@ -15,8 +15,8 @@
 #include	<nucleos/errno.h>
 #include	"loc_incl.h"
 
-ssize_t _write(int d, const char *buf, size_t nbytes);
-off_t _lseek(int fildes, off_t offset, int whence);
+ssize_t write(int d, const char *buf, size_t nbytes);
+off_t lseek(int fildes, off_t offset, int whence);
 
 int
 fflush(FILE *stream)
@@ -44,7 +44,7 @@ fflush(FILE *stream)
 		if (stream->_buf && !io_testflag(stream,_IONBF))
 			adjust = -stream->_count;
 		stream->_count = 0;
-		if (_lseek(fileno(stream), (off_t) adjust, SEEK_CUR) == -1 &&
+		if (lseek(fileno(stream), (off_t) adjust, SEEK_CUR) == -1 &&
 		  errno != ESPIPE) {
 			stream->_flags |= _IOERR;
 			return EOF;
@@ -66,12 +66,12 @@ fflush(FILE *stream)
 		return 0;
 
 	if (io_testflag(stream, _IOAPPEND)) {
-		if (_lseek(fileno(stream), 0L, SEEK_END) == -1) {
+		if (lseek(fileno(stream), 0L, SEEK_END) == -1) {
 			stream->_flags |= _IOERR;
 			return EOF;
 		}
 	}
-	c1 = _write(stream->_fd, (char *)stream->_buf, count);
+	c1 = write(stream->_fd, (char *)stream->_buf, count);
 
 	stream->_count = 0;
 

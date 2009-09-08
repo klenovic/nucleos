@@ -7,25 +7,21 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define setgid	_setgid
-#define setegid	_setegid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int setgid(grp)
-gid_t grp;
+int setgid(gid_t grp)
 {
   message m;
 
   m.m1_i1 = (int) grp;
-  return(_syscall(MM, SETGID, &m));
+  return(_syscall(PM_PROC_NR, __NR_setgid, &m));
 }
 
-int setegid(grp)
-gid_t grp;
+int setegid(gid_t grp)
 {
   message m;
 
   m.m1_i1 = (int) grp;
-  return(_syscall(MM, SETEGID, &m));
+  return(_syscall(PM_PROC_NR, __NR_setegid, &m));
 }

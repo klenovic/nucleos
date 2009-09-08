@@ -7,17 +7,19 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define kill	_kill
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-int kill(proc, sig)
-int proc;			/* which process is to be sent the signal */
-int sig;			/* signal number */
+/**
+ * @brief kill
+ * @param proc  which process is to be sent the signal
+ * @param sig  signal number
+ */
+int kill(int proc, int sig)
 {
   message m;
 
   m.m1_i1 = proc;
   m.m1_i2 = sig;
-  return(_syscall(MM, KILL, &m));
+  return(_syscall(PM_PROC_NR, __NR_kill, &m));
 }

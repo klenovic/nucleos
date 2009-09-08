@@ -12,8 +12,8 @@ domainname.c
 */
 
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <net/netlib.h>
 
 int getdomainname(domain, size)

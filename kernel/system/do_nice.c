@@ -17,7 +17,7 @@
 
 #include <kernel/system.h>
 #include <nucleos/type.h>
-#include <sys/resource.h>
+#include <nucleos/resource.h>
 
 #if USE_NICE
 

@@ -8,19 +8,12 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include <lib.h>
-#define vm_adddma	_vm_adddma
-#define vm_deldma	_vm_deldma
-#define vm_getdma	_vm_getdma
+#include <nucleos/lib.h>
 #include <nucleos/vm.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <stdarg.h>
 
-int vm_adddma(req_proc_e, proc_e, start, size)
-endpoint_t req_proc_e;
-endpoint_t proc_e;
-phys_bytes start;
-phys_bytes size;
+int vm_adddma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
   message m;
 
@@ -32,11 +25,7 @@ phys_bytes size;
   return _syscall(VM_PROC_NR, VM_ADDDMA, &m);
 }
 
-int vm_deldma(req_proc_e, proc_e, start, size)
-endpoint_t req_proc_e;
-endpoint_t proc_e;
-phys_bytes start;
-phys_bytes size;
+int vm_deldma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
   message m;
 
@@ -48,11 +37,7 @@ phys_bytes size;
   return _syscall(VM_PROC_NR, VM_DELDMA, &m);
 }
 
-int vm_getdma(req_proc_e, procp, basep, sizep)
-endpoint_t req_proc_e;
-endpoint_t *procp;
-phys_bytes *basep;
-phys_bytes *sizep;
+int vm_getdma(endpoint_t req_proc_e, endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
 {
   int r;
   message m;

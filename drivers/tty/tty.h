@@ -9,7 +9,7 @@
  */
 /*	tty.h - Terminals	*/
 
-#include <timers.h>
+#include <nucleos/timer.h>
 
 #undef lock
 #undef unlock
@@ -80,7 +80,7 @@ typedef struct tty {
   /* Information about incomplete I/O requests is stored here. */
   int tty_inrepcode;		/* reply code, TASK_REPLY or REVIVE */
   char tty_inrevived;		/* set to 1 if revive callback is pending */
-  int tty_incaller;		/* process that made the call (usually FS) */
+  int tty_incaller;		/* process that made the call (usually FS_PROC_NR) */
   int tty_inproc;		/* process that wants to read from tty */
   vir_bytes tty_in_vir_g;	/* address or grant where data is to go */
   vir_bytes tty_in_vir_offset;	/* offset into grant */
@@ -89,14 +89,14 @@ typedef struct tty {
   int tty_incum;		/* # chars input so far */
   int tty_outrepcode;		/* reply code, TASK_REPLY or REVIVE */
   int tty_outrevived;		/* set to 1 if revive callback is pending */
-  int tty_outcaller;		/* process that made the call (usually FS) */
+  int tty_outcaller;		/* process that made the call (usually FS_PROC_NR) */
   int tty_outproc;		/* process that wants to write to tty */
   vir_bytes tty_out_vir_g;	/* address or grant where data comes from */
   vir_bytes tty_out_vir_offset;	/* offset into grant */
   int tty_out_safe;		/* nonzero: safecopies (out_vir is grantid) */
   int tty_outleft;		/* # chars yet to be output */
   int tty_outcum;		/* # chars output so far */
-  int tty_iocaller;		/* process that made the call (usually FS) */
+  int tty_iocaller;		/* process that made the call (usually FS_PROC_NR) */
   int tty_iorevived;		/* set to 1 if revive callback is pending */
   int tty_ioproc;		/* process that wants to do an ioctl */
   int tty_iostatus;		/* result */

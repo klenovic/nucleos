@@ -7,9 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-
-#define sprofile _sprofile
+#include <nucleos/lib.h>
 
 int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
 {
@@ -21,6 +19,6 @@ int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
   m.PROF_CTL_PTR        = (void *) ctl_ptr;
   m.PROF_MEM_PTR        = (void *) mem_ptr;
 
-  return _syscall(MM, SPROF, &m);
+  return _syscall(PM_PROC_NR, __NR_sprof, &m);
 }
 

@@ -14,7 +14,7 @@
 #include <stdio.h>
 #if	defined(HAVE_STDLIB)
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #endif	/* defined(HAVE_STDLIB) */
 #if	defined(SYS_UNIX)
 #include "unix.h"

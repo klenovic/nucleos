@@ -7,15 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sigsuspend _sigsuspend
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-int sigsuspend(set)
-const sigset_t *set;
+int sigsuspend(const sigset_t *set)
 {
   message m;
 
   m.m2_l1 = (long) *set;
-  return(_syscall(MM, SIGSUSPEND, &m));
+  return(_syscall(PM_PROC_NR, __NR_sigsuspend, &m));
 }

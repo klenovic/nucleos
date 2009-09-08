@@ -7,17 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define mapdriver5	_mapdriver5
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-
-int mapdriver5(label, len, major, dev_style, force)
-char *label;
-size_t len;
-int major;
-int dev_style;
-int force;
+int mapdriver5(char *label, size_t len, int major, int dev_style, int force)
 {
   message m;
   m.m2_p1 = label;
@@ -25,7 +18,7 @@ int force;
   m.m2_i1 = major;
   m.m2_i2 = dev_style;
   m.m2_i3 = force;
-  if (_syscall(FS, MAPDRIVER, &m) < 0) return(-1);
+  if (_syscall(FS_PROC_NR, __NR_mapdriver, &m) < 0) return(-1);
   return(0);
 }
 

@@ -22,7 +22,7 @@
 
 #include <nucleos/types.h>
 #include <nucleos/errno.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <nucleos/limits.h>

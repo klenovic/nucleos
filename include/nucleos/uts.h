@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _NUCLEOS_UTS_H
-#define _NUCLEOS_UTS_H
+#ifndef __NUCLEOS_UTS_H
+#define __NUCLEOS_UTS_H
 
 /*
  * Defines for what uname() should return 
@@ -25,4 +25,4 @@
 #define UTS_DOMAINNAME "(none)"	/* set by setdomainname() */
 #endif
 
-#endif
+#endif /* __NUCLEOS_UTS_H */

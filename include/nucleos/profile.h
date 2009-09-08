@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _PROFILE_H
-#define _PROFILE_H
+#ifndef __NUCLEOS_PROFILE_H
+#define __NUCLEOS_PROFILE_H
 
 /*
  * Types relating to system profiling.  Types are supplied for both
@@ -106,5 +106,4 @@ int sprofile(int action, int size, int freq, void *ctl_ptr, void *mem_ptr);
 
 int cprofile(int action, int size, void *ctl_ptr, void *mem_ptr);
 
-#endif /* PROFILE_H */
-
+#endif /* __NUCLEOS_PROFILE_H */

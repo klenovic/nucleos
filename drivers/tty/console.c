@@ -26,13 +26,13 @@
  */
 
 #include <nucleos/drivers.h>
-#include <termios.h>
+#include <nucleos/termios.h>
 #include <nucleos/ioctl.h>
 #include <servers/vm/vm.h>
-#include <sys/video.h>
-#include <sys/mman.h>
+#include <nucleos/video.h>
+#include <nucleos/mman.h>
 #include <nucleos/tty.h>
-#include <nucleos/callnr.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
 
@@ -860,14 +860,14 @@ void do_video(message *m)
 			if (r != 0)
 			{
 				printf("tty: sys_safecopyfrom failed\n");
-				tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT,
+				tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT,
 					r);
 				return;
 			}
 
 			/* In safe ioctl mode, the POSITION field contains
 			 * the endpt number of the original requestor.
-			 * IO_ENDPT is always FS.
+			 * IO_ENDPT is always FS_PROC_NR.
 			 */
 
 			if(do_map) {
@@ -883,7 +883,7 @@ void do_video(message *m)
 				r = vm_unmap_phys(m->POSITION, 
 					mapreqvm.vaddr, mapreqvm.size);
 			}
-			tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT, r);
+			tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
 			return;
 		   }
 		}
@@ -896,7 +896,7 @@ void do_video(message *m)
 			m->m_type, m->m_source);
 		r= -EINVAL;
 	}
-	tty_reply(TASK_REPLY, m->m_source, m->IO_ENDPT, r);
+	tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
 }
 
 
@@ -1084,7 +1084,7 @@ int c;
           kmess.km_size += 1;		
       kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
   } else {
-      notify(LOG_PROC_NR);
+      kipc_notify(LOG_PROC_NR);
   }
 }
 
@@ -1172,7 +1172,7 @@ int safe;
   if(m_ptr->m_type != ASYN_DIAGNOSTICS_OLD) {
 	  m_ptr->m_type = DIAG_REPL_OLD;
 	  m_ptr->REP_STATUS = result;
-	  send(m_ptr->m_source, m_ptr);
+	  kipc_send(m_ptr->m_source, m_ptr);
   }
 }
 
@@ -1193,7 +1193,7 @@ message *m_ptr;			/* pointer to request message */
 	r = -EFAULT;
   }
   m_ptr->m_type = r;
-  send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr);
 }
 
 /*===========================================================================*
@@ -1213,7 +1213,7 @@ message *m_ptr;			/* pointer to request message */
 	r = -EFAULT;
   }
   m_ptr->m_type = r;
-  send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr);
 }
 
 /*===========================================================================*

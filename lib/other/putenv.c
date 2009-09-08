@@ -12,7 +12,7 @@
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
 #include	<stdlib.h>
-#include	<string.h>
+#include	<nucleos/string.h>
 
 #define	ENTRY_INC	10
 #define	rounded(x)	(((x / ENTRY_INC) + 1) * ENTRY_INC)

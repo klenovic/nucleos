@@ -7,25 +7,21 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define setuid	_setuid
-#define seteuid	_seteuid
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-int setuid(usr)
-uid_t usr;
+int setuid(uid_t usr)
 {
   message m;
 
   m.m1_i1 = usr;
-  return(_syscall(MM, SETUID, &m));
+  return(_syscall(PM_PROC_NR, __NR_setuid, &m));
 }
 
-int seteuid(usr)
-uid_t usr;
+int seteuid(uid_t usr)
 {
   message m;
 
   m.m1_i1 = usr;
-  return(_syscall(MM, SETEUID, &m));
+  return(_syscall(PM_PROC_NR, __NR_seteuid, &m));
 }

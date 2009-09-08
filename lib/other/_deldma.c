@@ -9,16 +9,11 @@
  */
 /* deldma.c 
  */
-
-#include <lib.h>
-#define deldma	_deldma
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <stdarg.h>
 
-int deldma(proc_e, start, size)
-endpoint_t proc_e;
-phys_bytes start;
-phys_bytes size;
+int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
   message m;
 
@@ -26,5 +21,5 @@ phys_bytes size;
   m.m2_l1= start;
   m.m2_l2= size;
 
-  return _syscall(MM, DELDMA, &m);
+  return _syscall(PM_PROC_NR, __NR_deldma, &m);
 }

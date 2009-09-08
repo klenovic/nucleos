@@ -52,11 +52,11 @@
  * macros that code uses.  This lets the same code operate on two different
  * representations for state sets.
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/limits.h>
 #include <ctype.h>
 #include <regex.h>

@@ -7,11 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
+#include <nucleos/lib.h>
 #include <nucleos/errno.h>
 #include <nucleos/types.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <nucleos/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>

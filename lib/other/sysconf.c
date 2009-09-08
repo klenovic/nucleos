@@ -15,10 +15,10 @@
  *	at run time.  MINIX does not use this facility - the run time
  *	limits are those given in <nucleos/limits.h>.
  */
-
-#include <lib.h>
-#include <unistd.h>
-#include <time.h>
+#include <nucleos/param.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <nucleos/time.h>
 
 long int sysconf(name)
 int name;			/* property being inspected */

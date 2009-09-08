@@ -9,7 +9,7 @@
  */
 #include <nucleos/errno.h>
 #include <stdio.h>
-#include <sys/uio.h>
+#include <nucleos/uio.h>
 
 ssize_t writev(int fildes, const struct iovec *iov, int iovcnt)
 {

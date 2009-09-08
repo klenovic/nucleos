@@ -11,21 +11,21 @@
  * Changes:
  *   Jul 22, 2005:	Created  (Jorrit N. Herder)
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"
 #include <ctype.h>
 #include <nucleos/fcntl.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
+#include <nucleos/stat.h>
+#include <nucleos/wait.h>
 #include <nucleos/dmap.h>
 #include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <servers/rs/rs.h>
-#include <lib.h>
+#include <nucleos/lib.h>
 
-#include <timers.h>				/* For priv.h */
+#include <nucleos/timer.h>				/* For priv.h */
 #include <kernel/priv.h>
 
 /* Allocate variables. */
@@ -628,7 +628,7 @@ void do_exit(message *m_ptr)
 		  if(rp->r_flags & RS_LATEREPLY) {
 			message rsm;
 			rsm.m_type = 0;
-			send(rp->r_caller, &rsm);
+			kipc_send(rp->r_caller, &rsm);
 		  }
 
 		  /* Release slot. */
@@ -761,7 +761,7 @@ message *m_ptr;
 	      else if (now - rp->r_check_tm > rp->r_period) {
 		if(rs_verbose)
                   printf("RS: status request sent to %d\n", rp->r_proc_nr_e); 
-		  notify(rp->r_proc_nr_e);		/* request status */
+		  kipc_notify(rp->r_proc_nr_e);		/* request status */
 		  rp->r_check_tm = now;			/* mark time */
               }
           }
@@ -969,7 +969,7 @@ static pid_t fork_nb()
 {
   message m;
 
-  return(_syscall(PM_PROC_NR, FORK_NB, &m));
+  return(_syscall(PM_PROC_NR, __NR_fork_nb, &m));
 }
 
 static int copy_exec(rp_dst, rp_src)

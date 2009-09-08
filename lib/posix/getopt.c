@@ -40,7 +40,7 @@
  * SUCH DAMAGE.
  */
 
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdio.h>
 
 int	opterr = 1,		/* if error message should be printed */

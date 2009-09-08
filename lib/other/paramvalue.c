@@ -17,7 +17,7 @@
 #define nil 0
 #include <nucleos/stddef.h>
 #include <stdlib.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/types.h>
 #include <nucleos/queryparam.h>
 

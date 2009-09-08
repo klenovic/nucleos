@@ -23,7 +23,7 @@
 #define nil 0
 #include <nucleos/types.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <net/gen/netdb.h>
 #include <net/gen/in.h>
 #include <net/gen/inet.h>

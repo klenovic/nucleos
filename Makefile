@@ -187,7 +187,7 @@ export AR ARCH AS AS16 AS64 KBUILD_AFLAGS CC CC16 CC64 CONFIG_SHELL CPP \
 	CXX CXX16 CXX64 CXXFLAGS EXTRA_CFLAGS INSTALL_PATH LD LDFLAGS \
 	MAKE NUCLEOSINCLUDE OBJCOPY PERL RANLIB READELF SRCARCH
 
-export KBUILD_ARFLAGS KBUILD_CFLAGS KBUILD_CPPFLAGS
+export KBUILD_ARFLAGS KBUILD_CFLAGS KBUILD_CPPFLAGS NOSTDINC_FLAGS
 
 # Files to ignore in find ... statements
 
@@ -351,6 +351,10 @@ KBUILD_CFLAGS += -fomit-frame-pointer
 KBUILD_CXXFLAGS += -fomit-frame-pointer
 endif
 
+# arch Makefile may override CC so keep this after arch Makefile is included
+NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+CHECKFLAGS     += $(NOSTDINC_FLAGS)
+
 ifeq ($(KBUILD_EXTMOD),)
 # Generate some files
 # ---------------------------------------------------------------------------
@@ -512,7 +516,7 @@ CLEAN_DIRS  +=
 CLEAN_FILES +=
 
 # Directories & files removed with 'make mrproper'
-MRPROPER_DIRS  += include/config
+MRPROPER_DIRS  += include/config usr/include
 MRPROPER_FILES += .config .config.old include/asm .version .old_version \
 		  include/nucleos/autoconf.h include/nucleos/version.h \
 		  include/nucleos/utsrelease.h cscope*

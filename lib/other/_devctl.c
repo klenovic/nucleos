@@ -7,13 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define devctl	_devctl
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-
-int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style,
-	int force)
+int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style, int force)
 {
   message m;
   m.m4_l1 = ctl_req;
@@ -21,7 +18,7 @@ int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style,
   m.m4_l3 = dev_nr;
   m.m4_l4 = dev_style;
   m.m4_l5 = force;
-  if (_syscall(FS, DEVCTL, &m) < 0) return(-1);
+  if (_syscall(FS_PROC_NR, __NR_devctl, &m) < 0) return(-1);
   return(0);
 }
 

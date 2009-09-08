@@ -30,9 +30,9 @@
  *   Nov 28, 1986   better resetting for 386  (Peter Kay)
  *   Oct 27, 1986   fdc_results fixed for 8 MHz  (Jakob Schripsema)
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "floppy.h"
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <assert.h>
 #include <ibm/diskparm.h>
 #include <nucleos/sysutil.h>
@@ -675,7 +675,7 @@ int safe;
 		nbytes -= iov->iov_size;
 		iov->iov_size = 0;
 		if (nbytes == 0) {
-			/* The rest is optional, so we return to give FS a
+			/* The rest is optional, so we return to give FS_PROC_NR a
 			 * chance to think it over.
 			 */
 			return 0;
@@ -767,11 +767,11 @@ static void start_motor()
   f_set_timer(&f_tmr_timeout, f_dp->start_ms * system_hz / 1000, f_timeout);
   f_busy = BSY_IO;
   do {
-  	receive(ANY, &mess); 
+  	kipc_receive(ANY, &mess); 
   	if (mess.m_type == SYN_ALARM) { 
   		f_expire_tmrs(NULL, NULL);
 	} else if(mess.m_type == DEV_PING) {
-		notify(mess.m_source);
+		kipc_notify(mess.m_source);
   	} else {
   		f_busy = BSY_IDLE;
   	}
@@ -851,11 +851,11 @@ static int seek()
  	f_set_timer(&f_tmr_timeout, system_hz/30, f_timeout);
 	f_busy = BSY_IO;
   	do {
-  		receive(ANY, &mess); 
+  		kipc_receive(ANY, &mess); 
   		if (mess.m_type == SYN_ALARM) { 
   			f_expire_tmrs(NULL, NULL);
 		} else if(mess.m_type == DEV_PING) {
-			notify(mess.m_source);
+			kipc_notify(mess.m_source);
   		} else {
   			f_busy = BSY_IDLE;
   		}
@@ -1125,11 +1125,11 @@ static void f_reset()
    * SYN_ALARM message on a timeout.
    */
   do {
-  	receive(ANY, &mess); 
+  	kipc_receive(ANY, &mess); 
   	if (mess.m_type == SYN_ALARM) { 
   		f_expire_tmrs(NULL, NULL);
 	} else if(mess.m_type == DEV_PING) {
-		notify(mess.m_source);
+		kipc_notify(mess.m_source);
   	} else {			/* expect HARD_INT */
   		f_busy = BSY_IDLE;
   	}
@@ -1172,11 +1172,11 @@ static int f_intr_wait()
    * occurs, report an error.
    */
   do {
-  	receive(ANY, &mess); 
+  	kipc_receive(ANY, &mess); 
   	if (mess.m_type == SYN_ALARM) {
   		f_expire_tmrs(NULL, NULL);
 	} else if(mess.m_type == DEV_PING) {
-		notify(mess.m_source);
+		kipc_notify(mess.m_source);
   	} else { 
   		f_busy = BSY_IDLE;
   	}

@@ -8,16 +8,16 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Debugging dump procedures for the kernel. */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "inc.h"
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <ibm/interrupt.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/sysutil.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
-#include <kernel/ipc.h>
+#include <kernel/kipc.h>
 
 #define LINES 22
 
@@ -339,11 +339,11 @@ static char *s_flags_str(int flags)
 static char *s_traps_str(int flags)
 {
 	static char str[10];
-	str[0] = (flags & (1 << SEND))  ? 'S' : '-';
-	str[1] = (flags & (1 << SENDA)) ? 'A' : '-';
-	str[2] = (flags & (1 << RECEIVE))  ? 'R' : '-';
-	str[3] = (flags & (1 << SENDREC))  ? 'B' : '-';
-	str[4] = (flags & (1 << NOTIFY)) ? 'N' : '-';
+	str[0] = (flags & (1 << KIPC_SEND))  ? 'S' : '-';
+	str[1] = (flags & (1 << KIPC_SENDA)) ? 'A' : '-';
+	str[2] = (flags & (1 << KIPC_RECEIVE))  ? 'R' : '-';
+	str[3] = (flags & (1 << KIPC_SENDREC))  ? 'B' : '-';
+	str[4] = (flags & (1 << KIPC_NOTIFY)) ? 'N' : '-';
 	str[5] = '\0';
 
 	return str;

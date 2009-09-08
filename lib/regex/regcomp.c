@@ -45,10 +45,10 @@
  *
  *	@(#)regcomp.c	8.5 (Berkeley) 3/20/94
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/types.h>
 #include <stdio.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <ctype.h>
 #include <nucleos/limits.h>
 #include <stdlib.h>

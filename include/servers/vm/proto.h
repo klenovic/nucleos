@@ -17,10 +17,10 @@ struct stat;
 struct mem_map;
 struct memory;
 
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/safecopies.h>
-#include <timers.h>
+#include <nucleos/timer.h>
 #include <stdio.h>
 #include <asm/pagetable.h>
 #include <servers/vm/vmproc.h>

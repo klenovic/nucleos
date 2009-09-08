@@ -20,7 +20,7 @@
  *   14 Aug, 2006   Created (Rogier Meurs)
  */
 
-#include <lib.h>
+#include <nucleos/lib.h>
 
 #include <nucleos/profile.h>
 #include <nucleos/syslib.h>

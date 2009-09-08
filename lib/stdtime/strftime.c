@@ -16,7 +16,7 @@ static char	elsieid[] = "@(#)strftime.c	7.75";
 */
 #endif /* !defined NOID */
 #endif /* !defined lint */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <zoneinfo/private.h>
 
 /*
@@ -53,7 +53,7 @@ struct lc_time_T {
 };
 
 #ifdef LOCALE_HOME
-#include "sys/stat.h"
+#include <nucleos/stat.h>
 static struct lc_time_T		localebuf;
 static struct lc_time_T *	_loc P((void));
 #define Locale	_loc()

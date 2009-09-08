@@ -10,14 +10,10 @@
 /*	seekdir()					Author: Kees J. Bot
  *								24 Apr 1989
  */
-#define nil 0
-#include <lib.h>
-#define lseek	_lseek
-#define readdir	_readdir
-#define seekdir	_seekdir
+#include <nucleos/lib.h>
 #include <nucleos/types.h>
-#include <dirent.h>
-#include <unistd.h>
+#include <nucleos/dirent.h>
+#include <nucleos/unistd.h>
 #include <nucleos/errno.h>
 
 int seekdir(DIR *dp, off_t pos)
@@ -25,7 +21,7 @@ int seekdir(DIR *dp, off_t pos)
 {
 	int off;
 
-	if (dp == nil) { errno= EBADF; return -1; }
+	if (dp == 0) { errno= EBADF; return -1; }
 
 	dp->_count= 0;
 

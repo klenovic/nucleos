@@ -9,5 +9,7 @@
  */
 #ifndef __ASM_X86_SVRCTL_H
 #define __ASM_X86_SVRCTL_H
-
+/*
+ * Server control.
+ */
 #endif /* __ASM_X86_SVRCTL_H */

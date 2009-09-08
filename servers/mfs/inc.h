@@ -12,10 +12,8 @@
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>
-#include <signal.h>
-#include <unistd.h>
-
-#include <nucleos/callnr.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
 #include <nucleos/type.h>
 #include <nucleos/const.h>
 #include <nucleos/com.h>
@@ -26,9 +24,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <signal.h>
+#include <nucleos/string.h>
+#include <nucleos/signal.h>
 
 #include "proto.h"
 

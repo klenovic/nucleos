@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define readlink _readlink
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 
-int readlink(name, buffer, bufsiz)
-const char *name;
-char *buffer;
-size_t bufsiz;
+int readlink(const char *name, char *buffer, size_t bufsiz)
 {
   message m;
 
@@ -24,5 +20,5 @@ size_t bufsiz;
   m.m1_p1 = (char *) name;
   m.m1_p2 = (char *) buffer;
 
-  return(_syscall(FS, RDLNK, &m));
+  return(_syscall(FS_PROC_NR, __NR_rdlnk, &m));
 }

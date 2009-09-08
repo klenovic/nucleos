@@ -26,7 +26,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include <nucleos/types.h>
-#include <sys/stat.h>
+#include <nucleos/stat.h>
 #include <nucleos/ioctl.h>
 #include <ctype.h>
 #include <nucleos/errno.h>
@@ -35,9 +35,9 @@
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <string.h>
-#include <unistd.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <net/gen/netdb.h>
 #include <net/gen/in.h>
 #include <net/gen/tcp.h>

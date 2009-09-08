@@ -7,17 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define creat	_creat
+#include <nucleos/lib.h>
 #include <nucleos/fcntl.h>
 
-int creat(name, mode)
-const char *name;
-mode_t mode;
+int creat(const char *name, mode_t mode)
 {
   message m;
 
   m.m3_i2 = mode;
   _loadname(name, &m);
-  return(_syscall(FS, CREAT, &m));
+  return(_syscall(FS_PROC_NR, __NR_creat, &m));
 }

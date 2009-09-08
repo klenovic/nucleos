@@ -14,7 +14,7 @@
 #include	<stdlib.h>
 #include	"loc_incl.h"
 
-int _close(int d);
+int close(int d);
 
 int
 fclose(FILE *fp)
@@ -29,7 +29,7 @@ fclose(FILE *fp)
 	if (i >= FOPEN_MAX)
 		return EOF;
 	if (fflush(fp)) retval = EOF;
-	if (_close(fileno(fp))) retval = EOF;
+	if (close(fileno(fp))) retval = EOF;
 	if ( io_testflag(fp,_IOMYBUF) && fp->_buf )
 		free((void *)fp->_buf);
 	if (fp != stdin && fp != stdout && fp != stderr)

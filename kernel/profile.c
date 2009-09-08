@@ -31,7 +31,7 @@
 
 #ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 
-#include <string.h>
+#include <nucleos/string.h>
 
 /* Function prototype for the profiling clock handler. */ 
 static int profile_clock_handler(irq_hook_t *hook);

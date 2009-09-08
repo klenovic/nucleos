@@ -12,16 +12,14 @@
  *								5 Jun 1999
  */
 #define nil ((void*)0)
-#define fstat _fstat
-#define stat _stat
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <nucleos/stddef.h>
 #include <stdlib.h>
 #include <nucleos/errno.h>
-#include <string.h>
-#include <time.h>
-#include <sys/stat.h>
+#include <nucleos/string.h>
+#include <nucleos/time.h>
+#include <nucleos/stat.h>
 #include <ctype.h>
 #define _c /* not const */
 #include <configfile.h>
@@ -509,7 +507,7 @@ size_t config_length(config_t *cfg)
 }
 
 #if TEST
-#include <unistd.h>
+#include <nucleos/unistd.h>
 
 static void print_list(int indent, config_t *cfg);
 

@@ -7,13 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define fork	_fork
-#include <unistd.h>
+#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 
-pid_t fork()
+pid_t fork(void)
 {
   message m;
 
-  return(_syscall(MM, FORK, &m));
+  return(_syscall(PM_PROC_NR, __NR_fork, &m));
 }

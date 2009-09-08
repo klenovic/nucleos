@@ -13,19 +13,19 @@
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <stdio.h>
 
 typedef int wait_arg;
 
 #include "../stdio/loc_incl.h"
 
-int _close(int d);
-int _dup2(int oldd, int newd);		/* not present in System 5 */
-int _execl(const char *name, const char *_arg, ... );
-pid_t _fork(void);
-int _pipe(int fildes[2]);
-pid_t _wait(wait_arg *status);
+int close(int d);
+int dup2(int oldd, int newd);		/* not present in System 5 */
+int execl(const char *name, const char *_arg, ... );
+pid_t fork(void);
+int pipe(int fildes[2]);
+pid_t wait(wait_arg *status);
 void _exit(int status);
 
 static int pids[OPEN_MAX];
@@ -40,25 +40,25 @@ const char *type;
 	int pid;
 
 	if (Xtype == 2 ||
-	    _pipe(piped) < 0 ||
-	    (pid = _fork()) < 0) return 0;
+	    pipe(piped) < 0 ||
+	    (pid = fork()) < 0) return 0;
 	
 	if (pid == 0) {
 		/* child */
 		register int *p;
 
 		for (p = pids; p < &pids[OPEN_MAX]; p++) {
-			if (*p) _close((int)(p - pids));
+			if (*p) close((int)(p - pids));
 		}
-		_close(piped[Xtype]);
-		_dup2(piped[!Xtype], !Xtype);
-		_close(piped[!Xtype]);
-		_execl("/bin/sh", "sh", "-c", command, (char *) 0);
+		close(piped[Xtype]);
+		dup2(piped[!Xtype], !Xtype);
+		close(piped[!Xtype]);
+		execl("/bin/sh", "sh", "-c", command, (char *) 0);
 		_exit(127);	/* like system() ??? */
 	}
 
 	pids[piped[Xtype]] = pid;
-	_close(piped[!Xtype]);
+	close(piped[!Xtype]);
 	return fdopen(piped[Xtype], type);
 }
 
@@ -76,7 +76,7 @@ FILE *stream;
 	void (*quitsave)(int) = signal(SIGQUIT, SIG_IGN);
 
 	fclose(stream);
-	while ((wret = _wait(&status)) != -1) {
+	while ((wret = wait(&status)) != -1) {
 		if (wret == pids[fd]) break;
 	}
 	if (wret == -1) ret_val = -1;

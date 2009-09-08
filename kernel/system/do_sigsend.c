@@ -19,8 +19,8 @@
 
 #include <kernel/system.h>
 #include <kernel/vm.h>
-#include <signal.h>
-#include <string.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
 #include <asm/sigcontext.h>
 
 #if USE_SIGSEND

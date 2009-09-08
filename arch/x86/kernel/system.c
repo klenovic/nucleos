@@ -10,9 +10,9 @@
 /* system dependent functions for use inside the whole kernel. */
 
 #include <kernel/kernel.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <ctype.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <ibm/cmos.h>
 #include <ibm/bios.h>
 #include <nucleos/portio.h>

@@ -16,7 +16,7 @@
  */
 
 #include <kernel/system.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 #include <asm/sigcontext.h>
 
 #if USE_KILL
@@ -32,7 +32,7 @@ message *m_ptr;			/* pointer to request message */
  * be registered. Any request, except for PM requests, is added to the map
  * of pending signals and the PM is informed about the new signal.
  * Since system servers cannot use normal POSIX signal handlers (because they
- * are usually blocked on a RECEIVE), they can request the PM to transform 
+ * are usually blocked on a KIPC_RECEIVE), they can request the PM to transform 
  * signals into messages. This is done by the PM with a call to sys_kill(). 
  */
   proc_nr_t proc_nr, proc_nr_e;

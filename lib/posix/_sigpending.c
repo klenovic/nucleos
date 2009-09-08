@@ -7,16 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sigpending _sigpending
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-int sigpending(set)
-sigset_t *set;
+int sigpending(sigset_t *set)
 {
   message m;
 
-  if (_syscall(MM, SIGPENDING, &m) < 0) return(-1);
+  if (_syscall(PM_PROC_NR, __NR_sigpending, &m) < 0) return(-1);
   *set = (sigset_t) m.m2_l1;
   return(m.m_type);
 }

@@ -7,9 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include "sysutil.h"
-#include <timers.h>
+#include <nucleos/timer.h>
 
 /*===========================================================================*
  *                               tickdelay			    	     *
@@ -34,7 +34,7 @@ long ticks;				/* number of ticks to wait */
     s = _taskcall(SYSTASK, SYS_SETALARM, &m);
     if (s != 0) return(s);
 
-    receive(CLOCK,&m_alarm);		/* await synchronous alarm */
+    kipc_receive(CLOCK,&m_alarm);		/* await synchronous alarm */
 
     /* Check if we must reschedule the current alarm. */
     if (m.ALRM_TIME_LEFT > 0 && m.ALRM_TIME_LEFT != TMR_NEVER) {

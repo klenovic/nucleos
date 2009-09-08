@@ -65,7 +65,7 @@ extern "C" {
 
 //#ifdef __minix
 #include <assert.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <nucleos/types.h>
 #include <nucleos/u64.h>
 

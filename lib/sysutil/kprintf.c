@@ -11,7 +11,7 @@
  *								15 Jan 1994
  */
 #define nil 0
-#include <nucleos/nucleos.h>
+#include <nucleos/kernel.h>
 #include <nucleos/types.h>
 #include <stdarg.h>
 #include <nucleos/stddef.h>

@@ -10,10 +10,8 @@
 /*
  * clock - determine the processor time used
  */
-
-#define times _times
-#include <time.h>
-#include <sys/times.h>
+#include <nucleos/time.h>
+#include <nucleos/times.h>
 
 clock_t clock(void)
 {

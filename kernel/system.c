@@ -40,12 +40,12 @@
 #include <kernel/kernel.h>
 #include <kernel/system.h>
 #include <kernel/proc.h>
-#include <kernel/ipc.h>
+#include <kernel/kipc.h>
 #include <kernel/vm.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <string.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <asm/sigcontext.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/safecopies.h>
@@ -99,7 +99,7 @@ void sys_task()
 	/* Get work. Block and wait until a request message arrives. */
 	if(softnotify)
 		minix_panic("softnotify non-NULL before receive (2)", NO_NUM);
-	if((r=receive(ANY, &m)) != 0)
+	if((r=kipc_receive(ANY, &m)) != 0)
 		minix_panic("receive() failed", r);
 	if(m.m_source == SYSTEM)
 		continue;
@@ -372,7 +372,7 @@ int sig_nr;			/* signal to be sent, 1 to _NSIG */
 /* A system process wants to send a signal to a process.  Examples are:
  *  - HARDWARE wanting to cause a SIGSEGV after a CPU exception
  *  - TTY wanting to cause SIGINT upon getting a DEL
- *  - FS wanting to cause SIGPIPE for a broken pipe 
+ *  - FS_PROC_NR wanting to cause SIGPIPE for a broken pipe 
  * Signals are handled by sending a message to PM.  This function handles the 
  * signals and makes sure the PM gets them by sending a notification. The 
  * process being signaled is blocked while PM has not finished all signals 

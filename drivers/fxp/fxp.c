@@ -70,7 +70,7 @@
 #include <ibm/pci.h>
 #include <servers/ds/ds.h>
 
-#include <timers.h>
+#include <nucleos/timer.h>
 
 #define tmra_ut			timer_t
 #define tmra_inittimer(tp)	tmr_inittimer(tp)
@@ -314,19 +314,19 @@ int main(int argc, char *argv[])
 	/* Try to notify inet that we are present (again) */
 	r= ds_retrieve_u32("inet", &tasknr);
 	if (r == 0)
-		notify(tasknr);
+		kipc_notify(tasknr);
 	else if (r != -ESRCH)
 		printf("fxp: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 
 	while (TRUE)
 	{
-		if ((r= receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("FXP","receive failed", r);
 
 		switch (m.m_type)
 		{
-		case DEV_PING:  notify(m.m_source);		continue;
+		case DEV_PING:  kipc_notify(m.m_source);		continue;
 		case DL_WRITEV:	fxp_writev(&m, FALSE, TRUE);	break;
 		case DL_WRITE:	fxp_writev(&m, FALSE, FALSE);	break;
 		case DL_WRITEV_S: fxp_writev_s(&m, FALSE);	break;
@@ -1968,9 +1968,9 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
-		panic(__FILE__, "fxp_getstat: send failed: %d\n", r);
+		panic(__FILE__, "fxp_getstat: kipc_send failed: %d\n", r);
 }
 
 
@@ -2052,9 +2052,9 @@ message *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= 0;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
-		panic(__FILE__, "fxp_getstat_s: send failed: %d\n", r);
+		panic(__FILE__, "fxp_getstat_s: kipc_send failed: %d\n", r);
 }
 
 
@@ -2069,9 +2069,9 @@ message *mp;
 	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
 	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
 	mp->m_type= DL_NAME_REPLY;
-	r= send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
-		panic("FXP", "fxp_getname: send failed", r);
+		panic("FXP", "fxp_getname: kipc_send failed", r);
 }
 
 /*===========================================================================*
@@ -2654,18 +2654,18 @@ int may_block;
 	reply.DL_CLCK = 0;
 #endif
 
-	r= send(fp->fxp_client, &reply);
+	r= kipc_send(fp->fxp_client, &reply);
 
 	if (r == -ELOCKED && may_block)
 	{
 #if 0
-		printW(); printf("send locked\n");
+		printW(); printf("kipc_send locked\n");
 #endif
 		return;
 	}
 
 	if (r < 0)
-		panic("FXP","fxp: send failed:", r);
+		panic("FXP","fxp: kipc_send failed:", r);
 	
 	fp->fxp_read_s = 0;
 	fp->fxp_flags &= ~(FF_PACK_SENT | FF_PACK_RECV);
@@ -2678,7 +2678,7 @@ static void mess_reply(req, reply_mess)
 message *req;
 message *reply_mess;
 {
-	if (send(req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("FXP","fxp: unable to mess_reply", NO_NUM);
 }
 
@@ -2977,7 +2977,7 @@ int pci_func;
 	m.m2_l1= buf;
 	m.m2_l2= size;
 
-	r= sendrec(dev_e, &m);
+	r= kipc_sendrec(dev_e, &m);
 	if (r != 0)
 	{
 		printf("fxp`tell_dev: sendrec to %d failed: %d\n",

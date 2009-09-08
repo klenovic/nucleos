@@ -101,7 +101,7 @@ void main()
 
 	while(TRUE) {
 		/* Wait for an incoming message */
-		receive(ANY, &mess);
+		kipc_receive(ANY, &mess);
 
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;
@@ -126,7 +126,7 @@ void main()
 		}
 
 		/* Finally, prepare and send the reply message. */
-		reply(TASK_REPLY, caller, proc_nr, r);
+		reply(__NR_task_reply, caller, proc_nr, r);
 	}
 
 }
@@ -227,15 +227,15 @@ message *m_ptr;
 	dprint("sb16_dsp.c: dsp_write()\n");
 
 	if(m_ptr->COUNT != DspFragmentSize) {
-		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
+		reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
 		return;
 	}
 	if(m_ptr->m_type != DmaMode && DmaBusy >= 0) {
-		reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
+		reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
 		return;
 	}
 	
-	reply(TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, SUSPEND);
+	reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, SUSPEND);
 
 	if(DmaBusy < 0) { /* Dma tranfer not yet started */
 
@@ -263,7 +263,7 @@ message *m_ptr;
 	} else { /* Dma buffer is full, filling second buffer */ 
 
 		while(BufReadNext == BufFillNext) { /* Second buffer also full, wait for space to become available */ 
-			receive(HARDWARE, &mess);
+			kipc_receive(HARDWARE, &mess);
 			dsp_hardware_msg();
 		}
 		sys_datacopy(m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, SELF, (vir_bytes)Buffer + BufFillNext * DspFragmentSize, (phys_bytes)DspFragmentSize);
@@ -275,7 +275,7 @@ message *m_ptr;
 	revivePending = 1;
 	reviveStatus = DspFragmentSize;
 	reviveProcNr = m_ptr->IO_ENDPT;
-	notify(m_ptr->m_source);
+	kipc_notify(m_ptr->m_source);
 }
 
 
@@ -336,7 +336,7 @@ message *m_ptr;	/* pointer to the newly arrived message */
 		m_ptr->m_type = DEV_NO_STATUS;
 	}
 
-	send(m_ptr->m_source, m_ptr);			/* send the message */
+	kipc_send(m_ptr->m_source, m_ptr);			/* send the message */
 }
 
 
@@ -355,7 +355,7 @@ int status;
 	m.REP_STATUS = status;	/* result of device operation */
 	m.REP_ENDPT = process;	/* which user made the request */
 
-	send(replyee, &m);
+	kipc_send(replyee, &m);
 }
 
 

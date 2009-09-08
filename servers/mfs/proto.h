@@ -9,7 +9,7 @@
  */
 /* Function prototypes. */
 
-#include "timers.h"
+#include <nucleos/timer.h>
 
 /* Structs used in prototypes must be declared as such first. */
 struct buf;

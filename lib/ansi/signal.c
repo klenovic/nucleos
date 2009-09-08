@@ -9,14 +9,15 @@
  */
 /* SYSVR4 and ANSI compatible signal(2). */
 
-#include <lib.h>
-#define sigaction	_sigaction
-#define sigemptyset	_sigemptyset
-#include <signal.h>
+#include <nucleos/lib.h>
+#include <nucleos/signal.h>
 
-sighandler_t signal(sig, disp)
-int sig;			/* signal number */
-sighandler_t disp;		/* signal handler, or SIG_DFL, or SIG_IGN */
+/**
+ * @brief signal
+ * @param sig  signal number 
+ * @param disp  signal handler, or SIG_DFL, or SIG_IGN
+ */
+sighandler_t signal(int sig, sighandler_t disp)
 {
   struct sigaction sa, osa;
 

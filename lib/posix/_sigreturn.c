@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <lib.h>
-#define sigfillset	_sigfillset
-#define sigprocmask	_sigprocmask
-#define sigreturn	_sigreturn
+#include <nucleos/lib.h>
 #include <asm/sigcontext.h>
-#include <signal.h>
+#include <nucleos/signal.h>
 
-int sigreturn(scp)
-register struct sigcontext *scp;
+int sigreturn(register struct sigcontext *scp)
 {
   sigset_t set;
 
@@ -33,5 +29,5 @@ register struct sigcontext *scp;
   m.m2_l1 = scp->sc_mask;
   m.m2_i2 = scp->sc_flags;
   m.m2_p1 = (char *) scp;
-  return(_syscall(MM, SIGRETURN, &m));	/* normally this doesn't return */
+  return(_syscall(PM_PROC_NR, __NR_sigreturn, &m));	/* normally this doesn't return */
 }

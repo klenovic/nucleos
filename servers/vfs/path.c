@@ -16,14 +16,12 @@
  */
 
 #include "fs.h"
-#include <string.h>
-#include <nucleos/callnr.h>
+#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
 #include <nucleos/const.h>
 #include <nucleos/endpoint.h>
-#include <unistd.h>
-
 #include <nucleos/vfsif.h>
 #include "fproc.h"
 #include "vmnt.h"
@@ -77,7 +75,7 @@ struct vnode **vpp;
   /* Check whether vnode is already in use or not */
   if ((vp = find_vnode(res.fs_e, res.inode_nr)) != NIL_VNODE) {
         vp->v_ref_count++;
-	vp->v_fs_count++;	/* We got a reference from the FS */
+	vp->v_fs_count++;	/* We got a reference from the FS_PROC_NR */
 	*vpp= vp;
 	return 0;
   }
@@ -346,7 +344,7 @@ node_details_t *node;
 		dir_vp = vmp->m_mounted_on;
 	}
 
-	/* Set the starting directories inode number and FS endpoint */
+	/* Set the starting directories inode number and FS_PROC_NR endpoint */
 	fs_e = dir_vp->v_fs_e;
 	dir_ino = dir_vp->v_inode_nr;
 	/* Is the process' root directory on the same partition?,

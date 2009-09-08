@@ -13,7 +13,7 @@
 #include	<ctype.h>
 #include	<stdio.h>
 #include	<stdarg.h>
-#include	<string.h>
+#include	<nucleos/string.h>
 #include	"loc_incl.h"
 
 /* gnum() is used to get the width and precision fields of a format. */

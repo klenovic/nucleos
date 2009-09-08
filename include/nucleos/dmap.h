@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _DMAP_H
-#define _DMAP_H
+#ifndef __NUCLEOS_DMAP_H
+#define __NUCLEOS_DMAP_H
 
-#include <nucleos/ipc.h>
+#include <nucleos/kipc.h>
 
 enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };
 
@@ -34,7 +34,7 @@ enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };
 
 #define CTRLR(n) ((n)==0 ? 3 : (8 + 2*((n)-1)))	/* magic formula */
 
-/* Full device numbers that are special to the boot monitor and FS. */
+/* Full device numbers that are special to the boot monitor and FS_PROC_NR. */
 #  define DEV_RAM	      0x0100	/* device number of /dev/ram */
 #  define DEV_IMGRD	      0x0106	/* device number of /dev/imgrd */
 
@@ -49,4 +49,4 @@ enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };
 #define LOG_MAJOR		  15	/* major device for log driver */
 #  define IS_KLOG_DEV		   0	/* minor device for /dev/klog */
 
-#endif /* _DMAP_H */
+#endif /* __NUCLEOS_DMAP_H */

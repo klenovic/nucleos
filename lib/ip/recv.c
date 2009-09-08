@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <stdlib.h>
-#include <sys/socket.h>
+#include <nucleos/socket.h>
 
 ssize_t recv(int socket, void *buffer, size_t length, int flags)
 {

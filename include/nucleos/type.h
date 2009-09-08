@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef _TYPE_H
-#define _TYPE_H
+#ifndef __NUCLEOS_TYPE_H
+#define __NUCLEOS_TYPE_H
 
 #include <nucleos/types.h>
 #include <kernel/const.h>
@@ -71,7 +71,7 @@ struct sigmsg {
 	int sm_signo;			/* signal number being caught */
 	unsigned long sm_mask;	/* mask to restore when handler returns */
 	vir_bytes sm_sighandler;	/* address of handler */
-	vir_bytes sm_sigreturn;	/* address of _sigreturn in C library */
+	vir_bytes sm_sigreturn;	/* address of sigreturn in C library */
 	vir_bytes sm_stkptr;		/* user stack pointer */
 };
 
@@ -193,5 +193,4 @@ struct k_randomness {
 	} bin[RANDOM_SOURCES];
 };
 
-#endif /* _TYPE_H */
-
+#endif /* __NUCLEOS_TYPE_H */

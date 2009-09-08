@@ -28,14 +28,14 @@
  */
 
 #include "pm.h"
-#include <sys/stat.h>
-#include <nucleos/callnr.h>
+#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/com.h>
 #include <nucleos/vm.h>
 #include <nucleos/a.out.h>
-#include <signal.h>
-#include <string.h>
+#include <nucleos/signal.h>
+#include <nucleos/string.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -55,16 +55,16 @@ int do_exec()
 	mp->mp_exec_frame = m_in.stack_ptr;
 	mp->mp_exec_frame_len = m_in.stack_bytes;
 
-	/* Forward call to FS */
+	/* Forward call to FS_PROC_NR */
 	if (mp->mp_fs_call != PM_IDLE) {
 		panic(__FILE__, "do_exec: not idle", mp->mp_fs_call);
 	}
 
 	mp->mp_fs_call = PM_EXEC;
-	r = notify(FS_PROC_NR);
+	r = kipc_notify(FS_PROC_NR);
 
 	if (r != 0)
-		panic(__FILE__, "do_getset: unable to notify FS", r);
+		panic(__FILE__, "do_getset: unable to notify FS_PROC_NR", r);
 
 	/* Do not reply */
 	return SUSPEND;

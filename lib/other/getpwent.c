@@ -13,15 +13,11 @@
  *								31 Jan 1994
  */
 #define nil 0
-#define open _open
-#define fcntl _fcntl
-#define read _read
-#define close _close
 #include <nucleos/types.h>
 #include <pwd.h>
-#include <string.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <nucleos/unistd.h>
 #include <nucleos/fcntl.h>
 
 #define arraysize(a)	(sizeof(a) / sizeof((a)[0]))

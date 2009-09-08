@@ -11,11 +11,11 @@
  * (c) copyright 1987 by the Vrije Universiteit, Amsterdam, The Netherlands.
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
-#include	<string.h>
+#include	<nucleos/string.h>
 
 /*
  * I don't know why, but X3J11 says that strerror() should be in declared
- * in <string.h>.  That is why the function is defined here.
+ * in <nucleos/string.h>.  That is why the function is defined here.
  */
 char *
 strerror(register int errnum)

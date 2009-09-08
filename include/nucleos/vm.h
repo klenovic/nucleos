@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Prototypes and definitions for VM interface. */
-#ifndef __VM_H
-#define __VM_H
+#ifndef __NUCLEOS_VM_H
+#define __NUCLEOS_VM_H
 
 #include <nucleos/types.h>
 #include <nucleos/endpoint.h>
@@ -29,4 +29,4 @@ int vm_unmap_phys(endpoint_t who, void *vaddr, size_t len);
 
 int vm_allocmem(phys_clicks memclicks, phys_clicks *retmembase);
 
-#endif /* __VM_H */
+#endif /* __NUCLEOS_VM_H */
