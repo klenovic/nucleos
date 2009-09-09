@@ -55,17 +55,17 @@
 #define NR_CTRLRS	CONFIG_NR_CTRLRS
 
 /* User-space processes, that is, device drivers, servers, and INIT. */
-#define PM_PROC_NR	0	/* process manager */
-#define FS_PROC_NR 	1	/* file system */
-#define VFS_PROC_NR 	FS_PROC_NR /* FS_PROC_NR has been renamed to VFS. */
-#define RS_PROC_NR 	2  	/* memory driver (RAM disk, null, etc.) */
-#define MEM_PROC_NR 	3  	/* memory driver (RAM disk, null, etc.) */
-#define LOG_PROC_NR	4	/* log device driver */
-#define TTY_PROC_NR	5	/* terminal (TTY) driver */
-#define DS_PROC_NR	6    	/* data store server */
-#define MFS_PROC_NR	7     /* minix root filesystem */
-#define VM_PROC_NR	8     /* memory server */
-#define INIT_PROC_NR	9    	/* init -- goes multiuser */
+#define PM_PROC_NR	0		/* process manager */
+#define FS_PROC_NR	1		/* file system */
+#define VFS_PROC_NR	FS_PROC_NR	/* FS_PROC_NR has been renamed to VFS. */
+#define RS_PROC_NR	2		/* memory driver (RAM disk, null, etc.) */
+#define MEM_PROC_NR	3		/* memory driver (RAM disk, null, etc.) */
+#define LOG_PROC_NR	4		/* log device driver */
+#define TTY_PROC_NR	5		/* terminal (TTY) driver */
+#define DS_PROC_NR	6		/* data store server */
+#define MFS_PROC_NR	7		/* nucleos root filesystem */
+#define VM_PROC_NR	8		/* memory server */
+#define INIT_PROC_NR	9		/* init -- goes multiuser */
 
 /* Number of processes contained in the system image. */
 #define NR_BOOT_PROCS 	(NR_TASKS + INIT_PROC_NR + 1)

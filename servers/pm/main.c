@@ -90,24 +90,20 @@ int main()
 		result = SUSPEND;		/* don't reply */
 		break;
 	case PM_GET_WORK:
-		if (who_e == FS_PROC_NR)
-		{
+		if (who_e == FS_PROC_NR) {
 			send_work();
 			result= SUSPEND;		/* don't reply */
-		}
-		else
+		} else
 			result= -ENOSYS;
 		break;
 	case PM_EXIT_REPLY:
 	case PM_REBOOT_REPLY:
 	case PM_EXEC_REPLY:
 	case PM_CORE_REPLY:
-		if (who_e == FS_PROC_NR)
-		{
+		if (who_e == FS_PROC_NR) {
 			handle_fs_reply(&m_in);
 			result= SUSPEND;		/* don't reply */
-	}
-		else
+		} else
 			result= -ENOSYS;
 		break;
 	case __NR_allocmem:
@@ -136,14 +132,12 @@ int main()
 		 * call.
 		 */
 		if ((unsigned) call_nr >= __NR_SYSCALLS) {
-		result = -ENOSYS;
-	} else {
+			result = -ENOSYS;
+		} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
-
-		result = (*call_vec[call_nr])();
-
+			result = (*call_vec[call_nr])();
 		}
 		break;
 	}
@@ -179,25 +173,26 @@ int main()
  *===========================================================================*/
 static void get_work()
 {
-/* Wait for the next message and extract useful information from it. */
-  if (kipc_receive(ANY, &m_in) != 0)
-	panic(__FILE__,"PM receive error", NO_NUM);
-  who_e = m_in.m_source;	/* who sent the message */
+	/* Wait for the next message and extract useful information from it. */
+	if (kipc_receive(ANY, &m_in) != 0)
+		panic(__FILE__,"PM receive error", NO_NUM);
 
-  if(pm_isokendpt(who_e, &who_p) != 0)
-	  panic(__FILE__, "PM got message from invalid endpoint", who_e);
+	who_e = m_in.m_source;	/* who sent the message */
 
-  call_nr = m_in.m_type;	/* system call number */
+	if(pm_isokendpt(who_e, &who_p) != 0)
+		panic(__FILE__, "PM got message from invalid endpoint", who_e);
 
-  /* Process slot of caller. Misuse PM's own process slot if the kernel is
-   * calling. This can happen in case of synchronous alarms (CLOCK) or or 
-   * event like pending kernel signals (SYSTEM).
-   */
-  mp = &mproc[who_p < 0 ? PM_PROC_NR : who_p];
-  if(who_p >= 0 && mp->mp_endpoint != who_e) {
-	panic(__FILE__, "PM endpoint number out of sync with source",
-		mp->mp_endpoint);
-  }
+	call_nr = m_in.m_type;	/* system call number */
+
+	/* Process slot of caller. Misuse PM's own process slot if the kernel is
+	 * calling. This can happen in case of synchronous alarms (CLOCK) or or 
+	 * event like pending kernel signals (SYSTEM).
+	 */
+	mp = &mproc[who_p < 0 ? PM_PROC_NR : who_p];
+
+	if(who_p >= 0 && mp->mp_endpoint != who_e) {
+		panic(__FILE__, "PM endpoint number out of sync with source", mp->mp_endpoint);
+	}
 }
 
 /*===========================================================================*
@@ -614,12 +609,11 @@ message *m_ptr;
 
 	case PM_EXEC_REPLY:
 		proc_e= m_ptr->PM_EXEC_PROC;
-		if (pm_isokendpt(proc_e, &proc_n) != 0)
-		{
+		if (pm_isokendpt(proc_e, &proc_n) != 0) {
 			panic(__FILE__,
 				"PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR",
 				proc_e);
-}
+		}
 		rmp= &mproc[proc_n];
 
 		/* Call is finished */
@@ -663,7 +657,6 @@ message *m_ptr;
 static void restart_sigs(rmp)
 struct mproc *rmp;
 {
-
 	if (rmp->mp_fs_call != PM_IDLE || rmp->mp_fs_call2 != PM_IDLE)
 		return;
 

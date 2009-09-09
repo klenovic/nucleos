@@ -12,19 +12,19 @@
 
 void _exit(int status)
 {
-  void (*suicide)(void);
-  message m;
+	void (*suicide)(void);
+	message m;
 
-  m.m1_i1 = status;
-  _syscall(PM_PROC_NR, __NR_exit, &m);
+	m.m1_i1 = status;
+	_syscall(PM_PROC_NR, __NR_exit, &m);
 
-  /* If exiting nicely through PM fails for some reason, try to
-   * commit suicide. E.g., message to PM might fail due to deadlock.
-   */
-  suicide = (void (*)(void)) -1;
-  suicide();
+	/* If exiting nicely through PM fails for some reason, try to
+	 * commit suicide. E.g., message to PM might fail due to deadlock.
+	 */
+	suicide = (void (*)(void)) -1;
+	suicide();
 
-  /* If committing suicide fails for some reason, hang. */
-  for(;;) { }
+	/* If committing suicide fails for some reason, hang. */
+	for(;;);
 }
 
