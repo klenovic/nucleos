@@ -55,17 +55,17 @@
 #define NR_CTRLRS	CONFIG_NR_CTRLRS
 
 /* User-space processes, that is, device drivers, servers, and INIT. */
-#define PM_PROC_NR	  0	/* process manager */
-#define FS_PROC_NR 	  1	/* file system */
-#define VFS_PROC_NR 	  FS_PROC_NR /* FS_PROC_NR has been renamed to VFS. */
-#define RS_PROC_NR 	  2  	/* memory driver (RAM disk, null, etc.) */
-#define MEM_PROC_NR 	  3  	/* memory driver (RAM disk, null, etc.) */
-#define LOG_PROC_NR	  4	/* log device driver */
-#define TTY_PROC_NR	  5	/* terminal (TTY) driver */
-#define DS_PROC_NR	  6    	/* data store server */
-#define MFS_PROC_NR       7     /* minix root filesystem */
-#define VM_PROC_NR        8     /* memory server */
-#define INIT_PROC_NR	  9    	/* init -- goes multiuser */
+#define PM_PROC_NR	0	/* process manager */
+#define FS_PROC_NR 	1	/* file system */
+#define VFS_PROC_NR 	FS_PROC_NR /* FS_PROC_NR has been renamed to VFS. */
+#define RS_PROC_NR 	2  	/* memory driver (RAM disk, null, etc.) */
+#define MEM_PROC_NR 	3  	/* memory driver (RAM disk, null, etc.) */
+#define LOG_PROC_NR	4	/* log device driver */
+#define TTY_PROC_NR	5	/* terminal (TTY) driver */
+#define DS_PROC_NR	6    	/* data store server */
+#define MFS_PROC_NR	7     /* minix root filesystem */
+#define VM_PROC_NR	8     /* memory server */
+#define INIT_PROC_NR	9    	/* init -- goes multiuser */
 
 /* Number of processes contained in the system image. */
 #define NR_BOOT_PROCS 	(NR_TASKS + INIT_PROC_NR + 1)
@@ -97,7 +97,6 @@
 #  define SYN_ALARM	NOTIFY_FROM(CLOCK) 	/* synchronous alarm */
 #  define SYS_SIG	NOTIFY_FROM(SYSTEM) 	/* system signal */
 #  define HARD_INT	NOTIFY_FROM(HARDWARE) 	/* hardware interrupt */
-#  define NEW_KSIG	NOTIFY_FROM(HARDWARE)  	/* new kernel signal */
 #  define FKEY_PRESSED	NOTIFY_FROM(TTY_PROC_NR)/* function key press */
 #  define DEV_PING	NOTIFY_FROM(RS_PROC_NR) /* driver liveness ping */
 #  define DS_UPDATE	NOTIFY_FROM(DS_PROC_NR) /* subscription update */
@@ -434,7 +433,6 @@
 #  define IRQ_BYTE      0x100	/* byte values */      
 #  define IRQ_WORD      0x200	/* word values */
 #  define IRQ_LONG      0x400	/* long values */
-#define IRQ_ENDPT	m5_i2   /* endpoint number, SELF, NONE */
 #define IRQ_HOOK_ID	m5_l3   /* id of irq hook at kernel */
 
 /* Field names for SYS_SEGCTL. */
@@ -526,7 +524,6 @@
 /* Field names for SYS_TRACE, SYS_PRIVCTL. */
 #define CTL_ENDPT    m2_i1	/* process number of the caller */
 #define CTL_REQUEST    m2_i2	/* server control request */
-#define CTL_MM_PRIV    m2_i3	/* privilege as seen by PM */
 #define CTL_ARG_PTR    m2_p1	/* pointer to argument */
 #define CTL_ADDRESS    m2_l1	/* address at traced process' space */
 #define CTL_DATA       m2_l2	/* data field for tracing */

@@ -76,7 +76,6 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 
 #define PROCESS_MAX	16      /* Must match the space in kernel/mpx.x */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
-#define FS_PROC_NR	2       /* The third must be fs. */
 
 struct process {  /* Per-process memory adresses. */
 	u32_t entry;    /* Entry point. */

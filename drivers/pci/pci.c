@@ -313,7 +313,7 @@ int devind;
 int proc;
 {
 	int i, r;
-	u8_t ilr;
+	int ilr;
 	struct io_range ior;
 	struct mem_range mr;
 
@@ -345,7 +345,7 @@ int proc;
 		"pci_reserve3: for proc %d, adding I/O range [0x%x..0x%x]\n",
 				proc, ior.ior_base, ior.ior_limit);
 			}
-			r= sys_privctl(proc, SYS_PRIV_ADD_IO, 0, &ior);
+			r= sys_privctl(proc, SYS_PRIV_ADD_IO, &ior);
 			if (r != 0)
 			{
 				printf("sys_privctl failed for proc %d: %d\n",
@@ -363,7 +363,7 @@ int proc;
 	"pci_reserve3: for proc %d, should add memory range [0x%x..0x%x]\n",
 				proc, mr.mr_base, mr.mr_limit);
 			}
-			r= sys_privctl(proc, SYS_PRIV_ADD_MEM, 0, &mr);
+			r= sys_privctl(proc, SYS_PRIV_ADD_MEM, &mr);
 			if (r != 0)
 			{
 				printf("sys_privctl failed for proc %d: %d\n",
@@ -375,7 +375,7 @@ int proc;
 	if (ilr != PCI_ILR_UNKNOWN)
 	{
 		if(debug) printf("pci_reserve3: adding IRQ %d\n", ilr);
-		r= sys_privctl(proc, SYS_PRIV_ADD_IRQ, ilr, NULL);
+		r= sys_privctl(proc, SYS_PRIV_ADD_IRQ, &ilr);
 		if (r != 0)
 		{
 			printf("sys_privctl failed for proc %d: %d\n",

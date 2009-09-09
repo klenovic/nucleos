@@ -59,7 +59,7 @@ kipc_notify:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp), %eax      // ebx = destination 
+	mov	KIPC_SRCDST(%ebp), %eax      // eax = destination 
 	mov	$KIPC_NOTIFY, %ecx            // kipc_notify(srcdst)
 	int	$KERN_SYSVEC                  // trap to the kernel
 	pop	%ebx

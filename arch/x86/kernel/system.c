@@ -96,9 +96,8 @@ void arch_get_aout_headers(int i, struct exec *h)
 	phys_copy(aout + i * A_MINHDR, vir2phys(h), (phys_bytes) A_MINHDR);
 }
 
-void system_init(void)
+void arch_init(void)
 {
-	prot_init();
 	idt_init();
 
 #if 0

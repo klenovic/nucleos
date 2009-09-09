@@ -47,8 +47,8 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 	kinfo.data_base = seg2phys(ds);
 	kinfo.data_size = (phys_bytes)((char*)&__end - (char*)&__data); /* size of data segment */
 
-	/* Architecture-dependent initialization. */
-	system_init();
+	/* protection initialization. */
+	prot_init();
 
 	/* Copy the boot parameters to the local buffer. */
 	arch_get_params(params_buffer, sizeof(params_buffer));

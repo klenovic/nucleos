@@ -44,6 +44,7 @@
  */
 #include <nucleos/types.h>
 #include <nucleos/ioctl.h>
+#include <nucleos/select.h>
 #include <nucleos/stat.h>
 #include <assert.h>
 #include <nucleos/errno.h>
@@ -75,11 +76,10 @@ static int tcpip_writeall(int fd, const char *buf, size_t siz);
 static int udp_connect(void);
 static int udp_sendto(int fd, const char *buf, unsigned buflen, ipaddr_t addr, udpport_t port);
 static int udp_receive(int fd, char *buf, unsigned buflen, time_t timeout);
-static void alarm_handler(int sig);
 
 static int s = -1;	/* socket used for communications */
 
-res_send(buf, buflen, answer, anslen)
+int res_send(buf, buflen, answer, anslen)
 	const char *buf;
 	int buflen;
 	char *answer;
@@ -519,13 +519,6 @@ udpport_t port;
 	return r;
 }
 
-static void alarm_handler(sig)
-int sig;
-{
-	signal(SIGALRM, alarm_handler);
-	alarm(1);
-}
-
 static int udp_receive(fd, buf, buflen, timeout)
 int fd;
 char *buf;
@@ -535,43 +528,47 @@ time_t timeout;
 	char *newbuf;
 	udp_io_hdr_t *udp_io_hdr;
 	int r, terrno;
-	void (*u_handler)(int sig);
-	time_t u_timeout;
+	fd_set readfds;
+	struct timeval timeval;
 
-	newbuf= malloc(sizeof(*udp_io_hdr) + buflen);
+	newbuf = malloc(sizeof(*udp_io_hdr) + buflen);
 	if (newbuf == NULL)
 	{
-		errno= ENOMEM;
+		errno = ENOMEM;
 		return -1;
 	}
 
-	u_handler= signal(SIGALRM, alarm_handler);
-	u_timeout= alarm(timeout);
+	/* only read if there is something to be read within timeout seconds */
+	FD_ZERO(&readfds);
+	FD_SET(fd, &readfds);
+	timeval.tv_sec = timeout;
+	timeval.tv_usec = 0;
+	r = select(fd + 1, &readfds, NULL, NULL, &timeval);
 
-	r= read(fd, newbuf, sizeof(*udp_io_hdr) + buflen);
-	terrno= errno;
+	if (r >= 0 && !FD_ISSET(fd, &readfds)) {
+		errno = EINTR;
+		r = -1;
+	}
+
+	if (r >= 0)
+		r= read(fd, newbuf, sizeof(*udp_io_hdr) + buflen);
+
+	terrno = errno;
 
 	if (r < 0 || r <= sizeof(*udp_io_hdr))
 	{
 		if (r > 0)
 			r= 0;
+
 		free(newbuf);
-
-
-		alarm(0);
-		signal(SIGALRM, u_handler);
-		alarm(u_timeout);
-
 		errno= terrno;
+
 		return r;
 	}
 
+	/* copy packet body to caller-provided buffer */
 	memcpy(buf, newbuf + sizeof(*udp_io_hdr), r - sizeof(*udp_io_hdr));
 	free(newbuf);
 
-	alarm(0);
-	signal(SIGALRM, u_handler);
-	alarm(u_timeout);
-
-	return r-sizeof(*udp_io_hdr);
+	return r - sizeof(*udp_io_hdr);
 }

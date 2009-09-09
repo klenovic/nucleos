@@ -39,7 +39,7 @@ int sys_newmap(endpoint_t proc, struct mem_map *ptr);
 int sys_exit(endpoint_t proc);
 int sys_trace(int req, endpoint_t proc, long addr, long *data_p);
 
-int sys_privctl(endpoint_t proc, int req, int i, void *p);
+int sys_privctl(endpoint_t proc, int req, void *p);
 int sys_setgrant(cp_grant_t *grants, int ngrants);
 int sys_nice(endpoint_t proc, int priority);
 
@@ -95,8 +95,8 @@ int sys_vtimer(endpoint_t proc_nr, int which, clock_t *newval, clock_t *oldval);
     sys_irqctl(IRQ_ENABLE, 0, 0, hook_id) 
 #define sys_irqsetpolicy(irq_vec, policy, hook_id) \
     sys_irqctl(IRQ_SETPOLICY, irq_vec, policy, hook_id)
-#define sys_irqrmpolicy(irq_vec, hook_id) \
-    sys_irqctl(IRQ_RMPOLICY, irq_vec, 0, hook_id)
+#define sys_irqrmpolicy(hook_id) \
+    sys_irqctl(IRQ_RMPOLICY, 0, 0, hook_id)
 
 int sys_irqctl(int request, int irq_vec, int policy, int *irq_hook_id);
 

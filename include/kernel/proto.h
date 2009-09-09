@@ -150,7 +150,7 @@ int intr_disabled(void);
 int intr_unmask(irq_hook_t* hook);
 int intr_mask(irq_hook_t* hook);
 void idle_task(void);
-void system_init(void);
+void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
 void arch_get_aout_headers(int i, struct exec *h);

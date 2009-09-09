@@ -50,6 +50,9 @@ void main(void)
 	reg_t ktsb;			/* kernel task stack base */
 	struct exec e_hdr;		/* for a copy of an a.out header */
 
+	/* Architecture-dependent initialization */
+	arch_init();
+
 	/* Clear the process table. Anounce each slot as empty and set up mappings 
 	 * for proc_addr() and proc_nr() macros. Do the same for the table with 
 	 * privilege structures for the system processes.

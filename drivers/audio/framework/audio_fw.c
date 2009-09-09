@@ -607,7 +607,7 @@ static void msg_sig_stop(void)
 			error("Msg SIG_STOP Couldn't get IRQ");
 		}
 		/* remove the policy */
-		if (sys_irqrmpolicy(irq, &irq_hook_id) != 0) {
+		if (sys_irqrmpolicy(&irq_hook_id) != 0) {
 			error("%s: Could not disable IRQ\n",drv.DriverName);
 		}
 	}
