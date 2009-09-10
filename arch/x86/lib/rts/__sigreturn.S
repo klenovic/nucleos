@@ -14,5 +14,5 @@
 
 .globl __sigreturn
 __sigreturn:
-  add $16, %esp
-  jmp sigreturn
+	add $16, %esp
+	jmp sigreturn

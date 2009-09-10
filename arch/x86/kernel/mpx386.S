@@ -571,7 +571,7 @@ load_kernel_cr3:
 
 /* Kernel stack */
 k_stack:
-	.space   CONFIG_KERNEL_STACK_SIZE  
+	.space   CONFIG_KERNEL_STACK_SIZE
 
 /* Top of kernel stack */
 k_stktop:

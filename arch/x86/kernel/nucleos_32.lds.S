@@ -32,7 +32,7 @@ SECTIONS
     /* kernel data starts with this magic number */
     SHORT(0x526f);
     /* Fist page unmaped */
-    . = 0x1000;
+    . = PAGE_SIZE;
     *(.rodata)
     *(.rodata.*)
     *(.data)

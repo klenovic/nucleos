@@ -14,16 +14,15 @@
 //                           IPC assembly routines
 //========================================================================
 // all message passing routines save ebp, but destroy eax and ecx.
-.section .text
 .globl kipc_send
 kipc_send:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp), %eax      // eax = dest-src
-	mov	KIPC_MESSAGE(%ebp), %ebx      // ebx = message pointer
-	mov	$KIPC_SEND,%ecx               // kipc_send(dest, ptr)
-	int	$KERN_SYSVEC                  // trap to the kernel
+	mov	KIPC_SRCDST(%ebp), %eax		// eax = dest-src
+	mov	KIPC_MESSAGE(%ebp), %ebx	// ebx = message pointer
+	mov	$KIPC_SEND,%ecx			// kipc_send(dest, ptr)
+	int	$KERN_SYSVEC			// trap to the kernel
 	pop	%ebx
 	pop	%ebp
 	ret
@@ -33,10 +32,10 @@ kipc_receive:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp), %eax     // eax = dest-src
-	mov	KIPC_MESSAGE(%ebp), %ebx     // ebx = message pointer
-	mov	$KIPC_RECEIVE, %ecx          // kipc_receive(src, ptr)
-	int	$KERN_SYSVEC                 // trap to the kernel
+	mov	KIPC_SRCDST(%ebp), %eax		// eax = dest-src
+	mov	KIPC_MESSAGE(%ebp), %ebx	// ebx = message pointer
+	mov	$KIPC_RECEIVE, %ecx		// kipc_receive(src, ptr)
+	int	$KERN_SYSVEC			// trap to the kernel
 	pop	%ebx
 	pop	%ebp
 	ret
@@ -46,10 +45,10 @@ kipc_sendrec:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp), %eax      // eax = dest-src
-	mov	KIPC_MESSAGE(%ebp), %ebx      // ebx = message pointer
-	mov	$KIPC_SENDREC, %ecx           // kipc_sendrec(srcdest, ptr)
-	int	$KERN_SYSVEC                  // trap to the kernel
+	mov	KIPC_SRCDST(%ebp), %eax		// eax = dest-src
+	mov	KIPC_MESSAGE(%ebp), %ebx	// ebx = message pointer
+	mov	$KIPC_SENDREC, %ecx		// kipc_sendrec(srcdest, ptr)
+	int	$KERN_SYSVEC			// trap to the kernel
 	pop	%ebx
 	pop	%ebp
 	ret
@@ -59,9 +58,9 @@ kipc_notify:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp), %eax      // eax = destination 
-	mov	$KIPC_NOTIFY, %ecx            // kipc_notify(srcdst)
-	int	$KERN_SYSVEC                  // trap to the kernel
+	mov	KIPC_SRCDST(%ebp), %eax		// eax = destination 
+	mov	$KIPC_NOTIFY, %ecx		// kipc_notify(srcdst)
+	int	$KERN_SYSVEC			// trap to the kernel
 	pop	%ebx
 	pop	%ebp
 	ret
@@ -71,10 +70,10 @@ kipc_sendnb:
 	push	%ebp
 	mov	%esp, %ebp
 	push	%ebx
-	mov	KIPC_SRCDST(%ebp),%eax        // eax = dest-src
-	mov	KIPC_MESSAGE(%ebp),%ebx        // ebx = message pointer
-	mov	$KIPC_SENDNB, %ecx             // kipc_sendnb(dest, ptr)
-	int	$KERN_SYSVEC                   // trap to the kernel
+	mov	KIPC_SRCDST(%ebp),%eax		// eax = dest-src
+	mov	KIPC_MESSAGE(%ebp),%ebx		// ebx = message pointer
+	mov	$KIPC_SENDNB, %ecx		// kipc_sendnb(dest, ptr)
+	int	$KERN_SYSVEC			// trap to the kernel
 	pop	%ebx
 	pop	%ebp
 	ret
