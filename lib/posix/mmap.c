@@ -8,7 +8,6 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/lib.h>
-#define munmap	_munmap
 #include <nucleos/mman.h>
 #include <stdarg.h>
 #include <nucleos/string.h>
