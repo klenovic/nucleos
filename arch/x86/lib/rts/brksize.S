@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-.sect .data
+.section .data /* place it into .data section */
 
 .globl _brksize
 _brksize: .long __ebss

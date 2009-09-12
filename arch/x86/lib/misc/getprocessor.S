@@ -15,7 +15,6 @@
 //       Return 386, 486, 586, ...
 
 .globl getprocessor
-
 getprocessor:
         push    %ebp
         mov     %esp, %ebp

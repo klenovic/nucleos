@@ -10,6 +10,8 @@
 /* See include/kernel/kipc.h for C definitions */
 #include <kernel/kipc.h>
 
+.section .text
+
 //========================================================================
 //                           IPC assembly routines
 //========================================================================

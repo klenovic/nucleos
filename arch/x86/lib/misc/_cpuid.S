@@ -7,13 +7,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-// _cpuid() - interface to cpuid instruction
 
-// int _cpuid(u32_t eax, u32_t *eax, u32_t *ebx, u32_t *ecx, u32_t *edx);
-// 0 for OK, nonzero for unsupported
+.section .text
 
-.globl	_cpuid
+/* _cpuid() - interface to cpuid instruction
+ * int _cpuid(u32_t eax, u32_t *eax, u32_t *ebx, u32_t *ecx, u32_t *edx);
+ * 0 if OK, nonzero for unsupported
+ */
 
+.globl _cpuid
 _cpuid:
 	push	%ebp
 

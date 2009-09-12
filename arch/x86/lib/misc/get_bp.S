@@ -12,7 +12,8 @@
 // based on code by Philip Homburg
 
 .section .text
+
 .globl get_bp
 get_bp:
-        mov     %ebp, %eax
-        ret
+	mov	%ebp, %eax
+	ret

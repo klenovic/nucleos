@@ -11,14 +11,15 @@
 // based on code by Kees J. Bot
 
 .section .text
-        .p2align  4
+
+	.p2align  4
 .globl alloca
 alloca:
-        pop     %ecx             // Return address
-        pop     %eax             // Bytes to allocate
-        add     $3, %eax
-        andb    $0xFC, %al       // Align
-        sub     %eax, %esp       // Lower stack
-        mov     %esp, %eax       // Return value
-        push    %eax             // Dummy argument
-        jmp     *%ecx
+	pop	%ecx             // Return address
+	pop	%eax             // Bytes to allocate
+	add	$3, %eax
+	andb	$0xfc, %al       // Align
+	sub	%eax, %esp       // Lower stack
+	mov	%esp, %eax       // Return value
+	push	%eax             // Dummy argument
+	jmp	*%ecx

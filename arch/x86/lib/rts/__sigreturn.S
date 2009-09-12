@@ -7,9 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-// This routine is the low-level code for returning from signals.
-// It calls __sigreturn, which is the normal "system call" routine.
-// Both __sigreturn and sigreturn are needed.
+/* This routine is the low-level code for returning from signals.
+ * It calls __sigreturn, which is the normal "system call" routine.
+ * Both __sigreturn and sigreturn are needed.
+ */
 .section .text
 
 .globl __sigreturn

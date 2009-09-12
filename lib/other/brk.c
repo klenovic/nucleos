@@ -23,13 +23,17 @@ extern char *_brksize;
  */
 int brk(char *addr)
 {
-  message m;
+	message m;
 
-  if (addr != _brksize) {
-	m.m1_p1 = addr;
-	if (_syscall(PM_PROC_NR, __NR_brk, &m) < 0) return(-1);
-	_brksize = m.m2_p1;
-  }
-  return(0);
+	if (addr != _brksize) {
+		m.m1_p1 = addr;
+
+		if (_syscall(PM_PROC_NR, __NR_brk, &m) < 0)
+			return(-1);
+
+		_brksize = m.m2_p1;
+	}
+
+	return(0);
 }
 

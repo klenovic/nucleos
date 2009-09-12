@@ -13,13 +13,15 @@
 
 int lstat(const char *name, struct stat *buffer)
 {
-  message m;
-  int r;
+	message m;
+	int r;
 
-  m.m1_i1 = strlen(name) + 1;
-  m.m1_p1 = (char *) name;
-  m.m1_p2 = (char *) buffer;
-  if((r = _syscall(FS_PROC_NR, __NR_lstat, &m)) >= 0 || errno != ENOSYS)
-     return r;
-  return stat(name, buffer);
+	m.m1_i1 = strlen(name) + 1;
+	m.m1_p1 = (char *) name;
+	m.m1_p2 = (char *) buffer;
+
+	if((r = _syscall(FS_PROC_NR, __NR_lstat, &m)) >= 0 || errno != ENOSYS)
+		return r;
+
+	return stat(name, buffer);
 }
