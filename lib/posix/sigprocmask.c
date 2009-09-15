@@ -12,16 +12,21 @@
 
 int sigprocmask(int how, const sigset_t *set, sigset_t *oset)
 {
-  message m;
+	message m;
 
-  if (set == (sigset_t *) NULL) {
-	m.m2_i1 = SIG_INQUIRE;
-	m.m2_l1 = 0;
-  } else {
-	m.m2_i1 = how;
-	m.m2_l1 = (long) *set;
-  }
-  if (_syscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0) return(-1);
-  if (oset != (sigset_t *) NULL) *oset = (sigset_t) (m.m2_l1);
-  return(m.m_type);
+	if (set == (sigset_t *) NULL) {
+		m.m2_i1 = SIG_INQUIRE;
+		m.m2_l1 = 0;
+	} else {
+		m.m2_i1 = how;
+		m.m2_l1 = (long) *set;
+	}
+
+	if (_syscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0)
+		return(-1);
+
+	if (oset != (sigset_t *) NULL)
+		*oset = (sigset_t) (m.m2_l1);
+
+	return(m.m_type);
 }

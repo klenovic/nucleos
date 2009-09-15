@@ -321,7 +321,7 @@ int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size);
 int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep);
 
 /* For compatibility with other Unix systems */
-int getpagesize(void);
+size_t getpagesize(void);
 int setgroups(int ngroups, const gid_t *gidset);
 int initgroups(const char *name, gid_t basegid);
 

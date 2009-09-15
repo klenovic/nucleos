@@ -16,14 +16,14 @@ gettimeofday.c
 
 int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp)
 {
-  message m;
+	message m;
 
-  if (_syscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
-  	return -1;
+	if (_syscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
+		return -1;
 
-  tp->tv_sec = m.m2_l1;
-  tp->tv_usec = m.m2_l2;
+	tp->tv_sec = m.m2_l1;
+	tp->tv_usec = m.m2_l2;
 
-  return 0;
+	return 0;
 }
 

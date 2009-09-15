@@ -13,6 +13,7 @@
 /* This header file defines constants for MINIX inter-process communication.
  * These definitions are used in the file proc.c.
  */
+#include <nucleos/types.h>
 #include <nucleos/type.h>
 
 /*==========================================================================* 

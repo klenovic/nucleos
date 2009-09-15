@@ -12,8 +12,9 @@
 
 int sigsuspend(const sigset_t *set)
 {
-  message m;
+	message m;
 
-  m.m2_l1 = (long) *set;
-  return(_syscall(PM_PROC_NR, __NR_sigsuspend, &m));
+	m.m2_l1 = (long) *set;
+
+	return(_syscall(PM_PROC_NR, __NR_sigsuspend, &m));
 }

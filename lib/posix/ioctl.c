@@ -13,10 +13,10 @@
 
 int ioctl(int fd, int request, void *data)
 {
-  message m;
+	message m;
 
-  m.TTY_LINE = fd;
-  m.TTY_REQUEST = request;
-  m.ADDRESS = (char *) data;
-  return(_syscall(FS_PROC_NR, __NR_ioctl, &m));
+	m.TTY_LINE = fd;
+	m.TTY_REQUEST = request;
+	m.ADDRESS = (char *) data;
+	return(_syscall(FS_PROC_NR, __NR_ioctl, &m));
 }

@@ -9,6 +9,7 @@
  */
 #include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <nucleos/signal.h>
 
 /**
  * @brief
@@ -16,10 +17,14 @@
  */
 int getsigset(sigset_t *sp)
 {
-  message m;
-  m.m2_i1 = SELF;			/* request own signal set */
-  if (_syscall(PM_PROC_NR, __NR_procstat, &m) < 0) return(-1);
-  *sp = m.m2_l1;
-  return(0);
+	message m;
+	m.m2_i1 = SELF;			/* request own signal set */
+
+	if (_syscall(PM_PROC_NR, __NR_procstat, &m) < 0)
+		return(-1);
+
+	*sp = m.m2_l1;
+
+	return(0);
 }
 

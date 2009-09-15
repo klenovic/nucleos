@@ -17,9 +17,10 @@
  */
 int kill(int proc, int sig)
 {
-  message m;
+	message m;
 
-  m.m1_i1 = proc;
-  m.m1_i2 = sig;
-  return(_syscall(PM_PROC_NR, __NR_kill, &m));
+	m.m1_i1 = proc;
+	m.m1_i2 = sig;
+
+	return(_syscall(PM_PROC_NR, __NR_kill, &m));
 }

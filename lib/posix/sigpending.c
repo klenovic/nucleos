@@ -12,9 +12,9 @@
 
 int sigpending(sigset_t *set)
 {
-  message m;
+	message m;
 
-  if (_syscall(PM_PROC_NR, __NR_sigpending, &m) < 0) return(-1);
-  *set = (sigset_t) m.m2_l1;
-  return(m.m_type);
+	if (_syscall(PM_PROC_NR, __NR_sigpending, &m) < 0) return(-1);
+	*set = (sigset_t) m.m2_l1;
+	return(m.m_type);
 }

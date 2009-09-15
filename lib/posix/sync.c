@@ -12,7 +12,7 @@
 
 int sync(void)
 {
-  message m;
+	message m;
 
-  return(_syscall(FS_PROC_NR, __NR_sync, &m));
+	return(_syscall(FS_PROC_NR, __NR_sync, &m));
 }

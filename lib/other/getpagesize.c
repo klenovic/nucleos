@@ -13,7 +13,7 @@ getpagesize.c
 
 #include <nucleos/unistd.h>
 
-int getpagesize(void)
+size_t getpagesize(void)
 {
 	/* We don't have paging. Pretend that we do. */
 	return 4096;

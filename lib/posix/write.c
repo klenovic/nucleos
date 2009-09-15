@@ -12,10 +12,11 @@
 
 ssize_t write(int fd, const void *buffer, size_t nbytes)
 {
-  message m;
+	message m;
 
-  m.m1_i1 = fd;
-  m.m1_i2 = nbytes;
-  m.m1_p1 = (char *) buffer;
-  return(_syscall(FS_PROC_NR, __NR_write, &m));
+	m.m1_i1 = fd;
+	m.m1_i2 = nbytes;
+	m.m1_p1 = (char *) buffer;
+
+	return(_syscall(FS_PROC_NR, __NR_write, &m));
 }

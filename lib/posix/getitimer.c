@@ -19,11 +19,11 @@
  */
 int getitimer(int which, struct itimerval *value)
 {
-  message m;
+	message m;
 
-  m.m1_i1 = which;
-  m.m1_p1 = NULL;		/* only retrieve the timer */
-  m.m1_p2 = (char *) value;
+	m.m1_i1 = which;
+	m.m1_p1 = NULL;		/* only retrieve the timer */
+	m.m1_p2 = (char *) value;
 
-  return _syscall(PM_PROC_NR, __NR_itimer, &m);
+	return _syscall(PM_PROC_NR, __NR_itimer, &m);
 }

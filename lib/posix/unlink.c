@@ -12,8 +12,9 @@
 
 int unlink(const char *name)
 {
-  message m;
+	message m;
 
-  _loadname(name, &m);
-  return(_syscall(FS_PROC_NR, __NR_unlink, &m));
+	_loadname(name, &m);
+
+	return(_syscall(FS_PROC_NR, __NR_unlink, &m));
 }

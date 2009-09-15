@@ -12,7 +12,7 @@
 
 pid_t getpid()
 {
-  message m;
+	message m;
 
-  return(_syscall(PM_PROC_NR, __NR_getpid, &m));
+	return(_syscall(PM_PROC_NR, __NR_getpid, &m));
 }
