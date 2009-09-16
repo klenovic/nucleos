@@ -64,7 +64,7 @@ int do_exec()
 	r = kipc_notify(FS_PROC_NR);
 
 	if (r != 0)
-		panic(__FILE__, "do_getset: unable to notify FS_PROC_NR", r);
+		panic(__FILE__, "do_exec: unable to notify FS_PROC_NR", r);
 
 	/* Do not reply */
 	return SUSPEND;

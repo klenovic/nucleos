@@ -207,15 +207,15 @@ struct proc {
 #define NIL_PROC	((struct proc *) 0)
 #define NIL_SYS_PROC	((struct proc *) 1)
 #define cproc_addr(n)	(&(proc + NR_TASKS)[(n)])
-#define proc_addr(n)	(pproc_addr + NR_TASKS)[(n)]
+#define proc_addr(n)	(&(proc[NR_TASKS + (n)]))
 #define proc_nr(p)	((p)->p_nr)
 
 #define isokprocn(n)	((unsigned) ((n) + NR_TASKS) < NR_PROCS + NR_TASKS)
 #define isemptyn(n)	isemptyp(proc_addr(n)) 
 #define isemptyp(p)	((p)->p_rts_flags == SLOT_FREE)
-#define iskernelp(p)	iskerneln((p)->p_nr)
+#define iskernelp(p)	((p) < BEG_USER_ADDR)
 #define iskerneln(n)	((n) < 0)
-#define isuserp(p)	isusern((p)->p_nr)
+#define isuserp(p)	isusern((p) >= BEG_USER_ADDR)
 #define isusern(n)	((n) >= 0)
 
 /* The process table and pointers to process table slots. The pointers allow
@@ -224,7 +224,6 @@ struct proc {
  * with sizeof(struct proc) to determine the address. 
  */
 extern struct proc proc[];		/* process table */
-extern struct proc *pproc_addr[];
 extern struct proc *rdy_head[];		/* ptrs to ready list headers */
 extern struct proc *rdy_tail[];		/* ptrs to ready list tails */
 

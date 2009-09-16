@@ -63,7 +63,6 @@
  * with sizeof(struct proc) to determine the address.
  */
 struct proc proc[NR_TASKS + NR_PROCS];   /* process table */
-struct proc *pproc_addr[NR_TASKS + NR_PROCS];
 struct proc *rdy_head[NR_SCHED_QUEUES]; /* ptrs to ready list headers */
 struct proc *rdy_tail[NR_SCHED_QUEUES]; /* ptrs to ready list tails */
 
