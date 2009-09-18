@@ -42,11 +42,14 @@
 #define ARG_MAX          262144 /* # bytes of args + environ for exec() */
 #define CHILD_MAX    _NO_LIMIT	/* MINIX does not limit children */
 #define OPEN_MAX            32	/* # open files a process may have */
-#if 0			/* V1 file system */
-#define LINK_MAX      CHAR_MAX	/* # links a file may have */
-#else			/* V2 or better file system */
-#define LINK_MAX      	 32767  /* # links a file may have; @klenovic: the value of SHORT_MAX */
+
+#if 0
+#define LINK_MAX      CHAR_MAX	/* # links a file may have (/* V1 file system */) */
+#else
+#define LINK_MAX      	 32767  /* # links a file may have (V2 or better file system)
+				 * @klenovic: the value of SHORT_MAX */
 #endif
+
 #define MAX_CANON          255	/* size of the canonical input queue */
 #define MAX_INPUT          255	/* size of the type-ahead buffer */
 #define NAME_MAX            60  /* # chars in a file name; @klenovic: the value of DIRSIZ */
