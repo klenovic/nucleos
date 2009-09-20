@@ -62,12 +62,14 @@ typedef unsigned long sigset_t;
 
 #define SIGIOT		SIGABRT	/* for people who speak PDP-11 */
 
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 /* Nucleos specific signals. These signals are not used by user proceses, 
  * but meant to inform system processes, like the PM, about system events.
  */
 #define SIGKMESS	29	/* new kernel message */
 #define SIGKSIG		30	/* kernel signal pending */
 #define SIGKSTOP	31	/* kernel shutting down */
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 /* Fields for sa_flags. */
 #define SA_ONSTACK	0x0001	/* deliver signal on alternate stack */
