@@ -12,7 +12,6 @@
  *							Author: Kees J. Bot
  *								31 Jan 1994
  */
-#define nil 0
 #include <nucleos/types.h>
 #include <grp.h>
 #include <nucleos/string.h>
@@ -50,7 +49,7 @@ static inline int __setgrent(void)
 {
 	if (grfd >= 0) endgrent();
 
-	if (grfile == nil) grfile= GROUP;
+	if (grfile == 0) grfile= GROUP;
 
 	if ((grfd= open(grfile, O_RDONLY)) < 0) return -1;
 	(void) fcntl(grfd, F_SETFD, fcntl(grfd, F_GETFD) | FD_CLOEXEC);
@@ -97,10 +96,10 @@ static char *scan_punct(int punct)
 
 	for (;;) {
 		last= lineptr;
-		if (*lineptr == 0) return nil;
+		if (*lineptr == 0) return 0;
 		if (*lineptr == '\n') break;
 		if (*lineptr++ == punct) break;
-		if (lineptr[-1] == ':') return nil;	/* :::,,,:,,,? */
+		if (lineptr[-1] == ':') return 0;	/* :::,,,:,,,? */
 	}
 	*last= 0;
 	return field;
@@ -113,25 +112,25 @@ struct group *getgrent(void)
 	char **mem;
 
 	/* Open the file if not yet open. */
-	if (grfd < 0 && __setgrent() < 0) return nil;
+	if (grfd < 0 && __setgrent() < 0) return 0;
 
 	/* Until a good line is read. */
 	for (;;) {
-		if (!getline()) return nil;	/* EOF or corrupt. */
+		if (!getline()) return 0;	/* EOF or corrupt. */
 
-		if ((entry.gr_name= scan_punct(':')) == nil) continue;
-		if ((entry.gr_passwd= scan_punct(':')) == nil) continue;
-		if ((p= scan_punct(':')) == nil) continue;
-		entry.gr_gid= strtol(p, nil, 0);
+		if ((entry.gr_name= scan_punct(':')) == 0) continue;
+		if ((entry.gr_passwd= scan_punct(':')) == 0) continue;
+		if ((p= scan_punct(':')) == 0) continue;
+		entry.gr_gid= strtol(p, 0, 0);
 
 		entry.gr_mem= mem= members;
 		if (*lineptr != '\n') {
 			do {
-				if ((*mem= scan_punct(',')) == nil) goto again;
+				if ((*mem= scan_punct(',')) == 0) goto again;
 				if (mem < arraylimit(members) - 1) mem++;
 			} while (*lineptr != 0);
 		}
-		*mem= nil;
+		*mem= 0;
 		return &entry;
 	again:;
 	}
@@ -143,7 +142,7 @@ struct group *getgrgid(gid_t gid)
 	struct group *gr;
 
 	endgrent();
-	while ((gr= getgrent()) != nil && gr->gr_gid != gid) {}
+	while ((gr= getgrent()) != 0 && gr->gr_gid != gid) {}
 	endgrent();
 	return gr;
 }
@@ -154,7 +153,7 @@ struct group *getgrnam(const char *name)
 	struct group *gr;
 
 	endgrent();
-	while ((gr= getgrent()) != nil && strcmp(gr->gr_name, name) != 0) {}
+	while ((gr= getgrent()) != 0 && strcmp(gr->gr_name, name) != 0) {}
 	endgrent();
 	return gr;
 }
