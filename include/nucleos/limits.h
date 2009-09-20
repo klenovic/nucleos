@@ -44,7 +44,7 @@
 #define OPEN_MAX            32	/* # open files a process may have */
 
 #if 0
-#define LINK_MAX      CHAR_MAX	/* # links a file may have (/* V1 file system */) */
+#define LINK_MAX      CHAR_MAX	/* # links a file may have (V1 file system ) */
 #else
 #define LINK_MAX      	 32767  /* # links a file may have (V2 or better file system)
 				 * @klenovic: the value of SHORT_MAX */
