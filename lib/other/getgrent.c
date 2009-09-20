@@ -45,7 +45,7 @@ void endgrent(void)
 	}
 }
 
-int setgrent(void)
+static inline int __setgrent(void)
 /* Open the group file. */
 {
 	if (grfd >= 0) endgrent();
@@ -55,6 +55,11 @@ int setgrent(void)
 	if ((grfd= open(grfile, O_RDONLY)) < 0) return -1;
 	(void) fcntl(grfd, F_SETFD, fcntl(grfd, F_GETFD) | FD_CLOEXEC);
 	return 0;
+}
+
+void setgrent(void)
+{
+	__setgrent();
 }
 
 void setgrfile(const char *file)
@@ -108,7 +113,7 @@ struct group *getgrent(void)
 	char **mem;
 
 	/* Open the file if not yet open. */
-	if (grfd < 0 && setgrent() < 0) return nil;
+	if (grfd < 0 && __setgrent() < 0) return nil;
 
 	/* Until a good line is read. */
 	for (;;) {

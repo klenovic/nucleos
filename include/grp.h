@@ -27,7 +27,7 @@ struct group *getgrnam(const char *_name);
 
 void endgrent(void);
 struct group *getgrent(void);
-int setgrent(void);
+void setgrent(void);
 void setgrfile(const char *_file);
 
 #endif /* _GRP_H */
