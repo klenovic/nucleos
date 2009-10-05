@@ -60,11 +60,14 @@ static struct boot_param boot_param;	/* boot parameters */
 
 extern int errno;			/* error number for PM calls */
 
+static int openct[NR_DEVS];
+
 static char *m_name(void);
 static struct device *m_prepare(int device);
 static int m_transfer(int proc_nr, int opcode, u64_t position,
 		      iovec_t *iov, unsigned nr_req, int safe);
 static int m_do_open(struct driver *dp, message *m_ptr);
+static int m_do_close(struct driver *dp, message *m_ptr);
 static void m_init(void);
 static int m_ioctl(struct driver *dp, message *m_ptr, int safe);
 static void m_geometry(struct partition *entry);
@@ -73,7 +76,7 @@ static void m_geometry(struct partition *entry);
 static struct driver m_dtab = {
   m_name,	/* current device's name */
   m_do_open,	/* open or mount */
-  do_nop,	/* nothing on a close */
+  m_do_close,	/* nothing on a close */
   m_ioctl,	/* specify ram disk geometry */
   m_prepare,	/* prepare for I/O on a given minor device */
   m_transfer,	/* do the I/O */
@@ -321,8 +324,39 @@ message *m_ptr;
 		return r;
 	}
   }
-  return 0;
+
+  if(m_device < 0 || m_device >= NR_DEVS) {
+      panic("MEM","wrong m_device",m_device);
+  }
+
+  openct[m_device]++;
+
+  return(0);
 }
+
+/*===========================================================================*
+ *				m_do_close				     *
+ *===========================================================================*/
+static int m_do_close(dp, m_ptr)
+struct driver *dp;
+message *m_ptr;
+{
+  int r;
+
+  if (m_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
+
+  if(m_device < 0 || m_device >= NR_DEVS) {
+      panic("MEM","wrong m_device",m_device);
+  }
+
+  if(openct[m_device] < 1) {
+      panic("MEM","closed too often",NO_NUM);
+  }
+  openct[m_device]--;
+
+  return(0);
+}
+
 
 /*===========================================================================*
  *				m_init					     *
@@ -371,6 +405,9 @@ static void m_init()
   for (i=0; i<ZERO_BUF_SIZE; i++) {
        dev_zero[i] = '\0';
   }
+
+  for(i = 0; i < NR_DEVS; i++)
+	openct[i] = 0;
 
   /* Set up memory range for /dev/mem. */
   m_geom[MEM_DEV].dv_base = cvul64(0);
@@ -422,9 +459,20 @@ int safe;
 	if(m_vaddrs[dev] && !cmp64(dv->dv_size, cvul64(ramdev_size))) {
 		return 0;
 	}
+	/* openct is 1 for the ioctl(). */
+	if(openct[dev] != 1) {
+		printf("MEM: MIOCRAMSIZE: %d in use (count %d)\n",
+			dev, openct[dev]);
+		return(-EBUSY);
+	}
 	if(m_vaddrs[dev]) {
-		printf("MEM: MIOCRAMSIZE: %d already has a ramdisk\n", dev);
-		return(-EPERM);
+		u32_t size;
+		if(ex64hi(dv->dv_size)) {
+			panic("MEM","huge old ramdisk", NO_NUM);
+		}
+		size = ex64lo(dv->dv_size);
+		munmap((void *) m_vaddrs[dev], size);
+		m_vaddrs[dev] = (vir_bytes) NULL;
 	}
 
 #if DEBUG
@@ -432,7 +480,8 @@ int safe;
 #endif
 
 	/* Try to allocate a piece of memory for the RAM disk. */
-	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
+	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE,
+		MAP_PREALLOC|MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
 	    printf("MEM: failed to get memory for ramdisk\n");
             return(-ENOMEM);
         }

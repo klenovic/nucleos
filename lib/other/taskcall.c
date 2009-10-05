@@ -16,7 +16,7 @@
 #include <nucleos/syslib.h>
 
 int _taskcall(who, syscallnr, msgptr)
-int who;
+endpoint_t who;
 int syscallnr;
 register message *msgptr;
 {

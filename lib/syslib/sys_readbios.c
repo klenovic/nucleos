@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 int sys_readbios(address, buf, size)
 phys_bytes address;		/* Absolute memory address */

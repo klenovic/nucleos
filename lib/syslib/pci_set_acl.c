@@ -12,7 +12,7 @@ pci_set_acl.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/unistd.h>
 #include <servers/rs/rs.h>
 #include <servers/ds/ds.h>

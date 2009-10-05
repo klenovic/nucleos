@@ -28,6 +28,7 @@
 #include <nucleos/minlib.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>
+#include <nucleos/mman.h>
 #include <nucleos/signal.h>
 #include <stdlib.h>
 #include <nucleos/fcntl.h>
@@ -215,6 +216,8 @@ int result;			/* result of call (usually 0 or error #) */
   rmp->mp_flags |= REPLY;	/* reply pending */
 }
 
+extern int unmap_ok;
+
 /*===========================================================================*
  *				pm_init					     *
  *===========================================================================*/
@@ -347,6 +350,17 @@ static void pm_init()
  if(f > 0) printf("PM: failed to register %d processes with DS.\n", f);
 
  system_hz = sys_hz();
+
+ /* Map out our own text and data. This is normally done in crtso.o
+  * but PM is an exception - we don't get to talk to VM so early on.
+  * That's why we override munmap() and munmap_text() in utility.c.
+  *
+  * unmap_page_zero() is the same code in crtso.o that normally does
+  * it on startup. It's best that it's there as crtso.o knows exactly
+  * what the ranges are of the filler data.
+  */
+  unmap_ok = 1;
+  unmap_page_zero();
 }
 
 /*===========================================================================*

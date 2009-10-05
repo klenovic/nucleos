@@ -18,6 +18,7 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
+#include <nucleos/bitmap.h>
 #include <asm/sigcontext.h>
 
 #include <nucleos/errno.h>

@@ -438,7 +438,7 @@ int cpid;	/* Child process id */
  *===========================================================================*/
 static void free_proc(struct fproc *exiter, int flags)
 {
-  int i, task;
+  int i;
   register struct fproc *rfp;
   register struct filp *rfilp;
   register struct vnode *vp;
@@ -452,9 +452,8 @@ static void free_proc(struct fproc *exiter, int flags)
 	panic(__FILE__, "free_proc: already free", NO_NUM);
   }
 
-  if (fp->fp_suspended == SUSPENDED) {
+  if (fp_is_blocked(fp)) {
  	SANITYCHECK;
-	task = -fp->fp_task;
 	unpause(fp->fp_endpoint);
  	SANITYCHECK;
   }

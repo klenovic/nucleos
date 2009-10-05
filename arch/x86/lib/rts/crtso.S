@@ -16,7 +16,12 @@
  * simplistic.  We simply check for some magic value, but there is no other
  * way.
  */
+#include <asm/servers/vm/vm.h>
+#include <asm/page.h> /* definition of PAGE_SHIFT */
+
 .section .text.init
+
+.globl __mainjump, unmap_page_zero
 
 .globl _start
 _start:
@@ -49,13 +54,32 @@ _start:
 	smsw	%ax
 	testb	$0x4, %al	// EM bit in MSW
 	setz	_fpu_present	// True if not set
+	jmp __mainjump
 
+.p2align PAGE_SHIFT
+__mainjump:
+	// unmap zero pages
+	call	unmap_page_zero
 	call	main	// main(argc, argv, envp)
-
 	push	%eax	// push exit status
-	call	exit
 
+	call	exit
 	hlt		// force a trap if exit fails
+
+/* unmap */
+unmap_page_zero:
+	// unmap 0-page code
+	push	$I386_PAGE_SIZE
+	push	_start
+	call	munmap_text	// munmap_text(crtso, I386_PAGE_SIZE)
+	add	$8, %esp
+
+	// unmap 0-page data
+	push	$I386_PAGE_SIZE
+	push	__data		// __data defined in linker script
+	call	munmap		// munmap(__data, I386_PAGE_SIZE)
+	add	$8, %esp
+	ret
 
 .section .data
 .globl _penviron

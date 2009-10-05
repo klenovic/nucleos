@@ -1297,7 +1297,7 @@ void delay(char *msec)
   alarm(1);
 
   do {
-    pause();
+    monitor_pause();
   } while (!interrupt() && !expired() && milli_since(base) < count);
 }
 

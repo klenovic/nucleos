@@ -101,9 +101,9 @@ int main(void)
 		continue;
 	  }
 
-	  /* Only root can make calls to rs */
+	  /* Only root can make calls to rs. unless it's RS_LOOKUP. */
 	  euid= getpeuid(m.m_source);
-	  if (euid != 0)
+	  if (euid != 0 && call_nr != RS_LOOKUP)
 	  {
 		printf("RS: got unauthorized request %d from endpoint %d\n",
 			call_nr, m.m_source);
@@ -121,6 +121,7 @@ int main(void)
           case RS_RESTART: 	result = do_restart(&m); 	break;
           case RS_SHUTDOWN: 	result = do_shutdown(&m); 	break;
           case __NR_getsysinfo: 	result = do_getsysinfo(&m); 	break;
+	  case RS_LOOKUP:	result = do_lookup(&m);		break;
           default: 
               printf("Warning, RS got unexpected request %d from %d\n",
                   m.m_type, m.m_source);

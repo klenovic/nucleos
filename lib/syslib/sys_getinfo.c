@@ -10,7 +10,7 @@
 
 #include <nucleos/string.h>
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 /*===========================================================================*
  *                                sys_getinfo				     *

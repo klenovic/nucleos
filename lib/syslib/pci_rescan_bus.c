@@ -12,7 +12,7 @@ pci_rescan_bus.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 /*===========================================================================*

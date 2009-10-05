@@ -28,6 +28,7 @@
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <kernel/proc.h>
+#include <kernel/debug.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
 
@@ -185,6 +186,9 @@ void main(void)
 			rp->p_reg.sp -= sizeof(reg_t);
 		}
 
+	/* scheduling functions depend on proc_ptr pointing somewhere. */
+	if(!proc_ptr) proc_ptr = rp;
+
 		/* If this process has its own page table, VM will set the
 		 * PT up and manage it. VM will signal the kernel when it has
 		 * done this; until then, don't let it run.
@@ -214,6 +218,23 @@ void main(void)
 	 */
 	bill_ptr = proc_addr(IDLE);		/* it has to point somewhere */
 	announce();				/* print MINIX startup banner */
+
+	/* Warnings for sanity checks that take time. These warnings are printed
+	 * so it's a clear warning no full release should be done with them
+	 * enabled.
+	 */
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+	FIXME("CONFIG_DEBUG_KERNEL_SCHED_CHECK enabled");
+#endif
+
+#ifdef CONFIG_DEBUG_KERNEL_VMASSERT
+	FIXME("CONFIG_DEBUG_KERNEL_VMASSERT enabled");
+#endif
+
+#ifdef CONFIG_DEBUG_PROC_CHECK
+	/* n/a */
+	FIXME("PROC check enabled");
+#endif
 
 	restart();
 }

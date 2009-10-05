@@ -62,6 +62,11 @@ void vir_insb(u16_t port, struct proc *proc, u32_t vir, size_t count);
 void vir_outsb(u16_t port, struct proc *proc, u32_t vir, size_t count);
 void vir_insw(u16_t port, struct proc *proc, u32_t vir, size_t count);
 void vir_outsw(u16_t port, struct proc *proc, u32_t vir, size_t count);
+void i386_updatepde(int pde, u32_t val);
+void i386_freepde(int pde);
+void getcr3val(void);
+void switchedcr3(void);
+void vm_set_cr3(struct proc *);
 
 /* prototype of an interrupt vector table entry */
 struct gate_table_s {
@@ -75,11 +80,12 @@ extern struct gate_table_s gate_table_pic[];
 /* copies an array of vectors to the IDT. The last vector must be zero filled */
 void idt_copy_vectors(struct gate_table_s * first);
 
-
 /* exception.c */
-void exception(unsigned vec_nr, u32_t trap_errno, u32_t old_eip, u16 old_cs, u32_t old_eflags);
+void exception(unsigned vec_nr, u32_t trap_errno,
+	       u32_t old_eip, u16_t old_cs, u32_t old_eflags,
+	       u32_t *old_eip_ptr, u32_t *old_eax_ptr, u32_t pagefaultcr2);
 
-/* klib386.s */
+/* klib386.S */
 void level0(void (*func)(void));
 void monitor(void);
 void reset(void);
@@ -94,13 +100,21 @@ void phys_insb(u16 port, phys_bytes buf, size_t count);
 void phys_insw(u16 port, phys_bytes buf, size_t count);
 void phys_outsb(u16 port, phys_bytes buf, size_t count);
 void phys_outsw(u16 port, phys_bytes buf, size_t count);
-void i386_invlpg(u32 addr);
+
+void i386_invlpg_level0(void);
+int _memcpy_k(void *dst, void *src, size_t n);
+int _memcpy_k_fault(void);
+u32_t read_cr3(void);
+void reload_cr3(void);
+void phys_memset(phys_bytes ph, u32_t c, phys_bytes bytes);
 
 /* protect.c */
 void prot_init(void);
 void init_codeseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);
 void init_dataseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);
 void enable_iop(struct proc *pp);
+int prot_set_kern_seg_limit(vir_bytes limit);
+void printseg(char *banner, int iscs, struct proc *pr, u32_t selector);
 
 #endif /* __KERNEL__ */
 #endif /* __ASM_X86_KERNEL_PROTO_H */

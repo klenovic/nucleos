@@ -36,9 +36,8 @@ register message *m_ptr;	/* pointer to request message */
  */
 	size_t length = 0;
 	vir_bytes src_vir; 
-	int proc_nr, nr_e, nr;
+	int proc_nr, nr_e, nr, r;
 	struct proc *caller;
-	phys_bytes ph;
 	int wipe_rnd_bin = -1;
 	int len = 0;
 	static struct k_randomness copy;	/* copy to keep counters */
@@ -79,20 +78,6 @@ register message *m_ptr;	/* pointer to request message */
 		src_vir = (vir_bytes) irq_hooks;
 		break;
 
-	case GET_SCHEDINFO:
-		/* This is slightly complicated because we need two data structures
-		 * at once, otherwise the scheduling information may be incorrect.
-		 * Copy the queue heads and fall through to copy the process table. 
-		 */
-		if((ph=umap_local(caller, D, (vir_bytes) m_ptr->I_VAL_PTR2,length)) == 0)
-			return -EFAULT;
-
-		length = sizeof(struct proc *) * NR_SCHED_QUEUES;
-		CHECKRANGE_OR_SUSPEND(proc_addr(who_p), ph, length, 1);
-		data_copy(SYSTEM, (vir_bytes) rdy_head,
-		who_e, (vir_bytes) m_ptr->I_VAL_PTR2, length);
-		/* fall through to GET_PROCTAB */
-
 	case GET_PROCTAB:
 		length = sizeof(struct proc) * (NR_PROCS + NR_TASKS);
 		src_vir = (vir_bytes) proc;
@@ -115,7 +100,6 @@ register message *m_ptr;	/* pointer to request message */
 		break;
 
 	case GET_WHOAMI:
-
 		/* GET_WHOAMI uses m3 and only uses the message contents for info. */
 		m_ptr->GIWHO_EP = caller->p_endpoint;
 		len = MIN(sizeof(m_ptr->GIWHO_NAME), sizeof(caller->p_name))-1;
@@ -187,19 +171,13 @@ register message *m_ptr;	/* pointer to request message */
 	}
 
 	/* Try to make the actual copy for the requested data. */
-	if (m_ptr->I_VAL_LEN > 0 && length > m_ptr->I_VAL_LEN)
-		return (-E2BIG);
+	r = data_copy_vmcheck(SYSTEM, src_vir, who_e, (vir_bytes) m_ptr->I_VAL_PTR, length);
 
-	if((ph=umap_local(caller, D, (vir_bytes) m_ptr->I_VAL_PTR,length)) == 0)
-		return -EFAULT;
+	if(r != 0) return r;
 
-	CHECKRANGE_OR_SUSPEND(caller, ph, length, 1);
-
-	if(data_copy(SYSTEM, src_vir, who_e, (vir_bytes) m_ptr->I_VAL_PTR, length) == 0) {
-		if(wipe_rnd_bin >= 0 && wipe_rnd_bin < RANDOM_SOURCES) {
-			krandom.bin[wipe_rnd_bin].r_size = 0;
-			krandom.bin[wipe_rnd_bin].r_next = 0;
-		}
+	if(wipe_rnd_bin >= 0 && wipe_rnd_bin < RANDOM_SOURCES) {
+		krandom.bin[wipe_rnd_bin].r_size = 0;
+		krandom.bin[wipe_rnd_bin].r_next = 0;
 	}
 
 	return 0;

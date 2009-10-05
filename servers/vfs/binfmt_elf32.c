@@ -303,8 +303,11 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 	char buf[1024];
 
 	/* Make sure that the file is big enough */
-	if (vp->v_size < off + seg_bytes)
+	if (vp->v_size < off + seg_bytes) {
+		printf("VFS: read_seg: file isn't big enough (size %ld, need %ld)\n",
+			vp->v_size, off+seg_bytes);
 		return -EIO;
+	}
 
 	if (seg != D) {
 		/* We have to use a copy loop until safecopies support segments */
@@ -323,8 +326,10 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 					    cvul64(off + k), READING, FS_PROC_NR, buf, n, &new_pos,
 					    &cum_io_incr);
 
-			if (err)
+			if (err) {
+				printf("VFS: read_seg: req_readwrite failed (text)\n");
 				return err;
+			}
 
 			if (cum_io_incr != n) {
 				app_err("Segment 0x%X has not been read properly!\n", seg);
@@ -333,8 +338,10 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 
 			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
-			if (err)
+			if (err) {
+				printf("VFS: read_seg: copy failed (text)\n");
 				return err;
+			}
 
 			k += n;
 		}
@@ -351,8 +358,10 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(off),
 			    READING, proc_e, (char*)addr_off, seg_bytes, &new_pos, &cum_io_incr);
 
-	if (err)
+	if (err) {
+		printf("VFS: read_seg: req_readwrite failed (data)\n");
 		return err;
+	}
 
 	if (!err && cum_io_incr != seg_bytes)
 		app_err("Segment 0x%X has not been read properly!\n", seg);

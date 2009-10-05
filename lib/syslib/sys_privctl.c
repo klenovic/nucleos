@@ -7,13 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
-int sys_privctl(endpoint_t proc, int request, void *p)
+int sys_privctl(endpoint_t proc_ep, int request, void *p)
 {
   message m;
 
-  m.CTL_ENDPT = proc;
+  m.CTL_ENDPT = proc_ep;
   m.CTL_REQUEST = request;
   m.CTL_ARG_PTR = p;
 

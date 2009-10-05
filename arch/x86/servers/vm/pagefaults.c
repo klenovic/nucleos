@@ -19,7 +19,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
-
+#include <nucleos/bitmap.h>
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
 #include <env.h>

@@ -12,7 +12,7 @@ pci_attr_w16.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 /*===========================================================================*

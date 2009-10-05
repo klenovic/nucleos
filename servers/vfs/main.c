@@ -33,6 +33,7 @@
 #include <nucleos/const.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/safecopies.h>
+#include <nucleos/debug.h>
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
 #include <nucleos/time.h>
@@ -91,6 +92,10 @@ int main(void)
 
 	SANITYCHECK;
 
+#if DO_SANITYCHECKS
+	FIXME("VFS: DO_SANITYCHECKS is on");
+#endif
+
 	/* This is the main loop that gets work, processes it, and sends replies. */
 	while (TRUE) {
 		SANITYCHECK;
@@ -138,12 +143,12 @@ int main(void)
 			continue;
 		}
 
-		/* Check for special control messages first. */
-		if ((call_nr & NOTIFY_MESSAGE)) {
-			if (call_nr == PROC_EVENT && who_e == PM_PROC_NR) {
-				/* PM tries to get FS_PROC_NR to do something */
+		/* Check for special control message first */
+		if (is_notify(call_nr)) {
+			if (who_p == PM_PROC_NR) {
+				/* PM tries to get FS to do something */
 				service_pm();
-			} else if (call_nr == SYN_ALARM && who_e == CLOCK) {
+			} else if (who_p == CLOCK) {
 				/* Alarm timer expired. Used only for select().
 				 * Check it.
 				 */
@@ -169,8 +174,8 @@ int main(void)
 		super_user = (fp->fp_effuid == SU_UID ? TRUE : FALSE);   /* su? */
 
 #if DO_SANITYCHECKS
-		if(fp->fp_suspended != NOT_SUSPENDED) {
-			printf("VFS: requester %d call %d: not not suspended\n", who_e, call_nr);
+		if(fp_is_blocked(fp)) {
+			printf("VFS: requester %d call %d: suspended\n",
 			panic(__FILE__, "requester suspended", NO_NUM);
 		}
 #endif
@@ -265,6 +270,7 @@ static void get_work(void)
 		/* Revive a suspended process. */
 		for (rp = &fproc[0]; rp < &fproc[NR_PROCS]; rp++) {
 			if (rp->fp_pid != PID_FREE && rp->fp_revived == REVIVING) {
+			int blocked_on = rp->fp_blocked_on;
 				found_one= TRUE;
 				who_p = (int)(rp - fproc);
 				who_e = rp->fp_endpoint;
@@ -273,7 +279,8 @@ static void get_work(void)
 				m_in.fd = (rp->fp_fd >>8) & BYTE;
 				m_in.buffer = rp->fp_buffer;
 				m_in.nbytes = rp->fp_nbytes;
-				rp->fp_suspended = NOT_SUSPENDED; /*no longer hanging*/
+			/*no longer hanging*/
+			rp->fp_blocked_on = FP_BLOCKED_ON_NONE;
 				rp->fp_revived = NOT_REVIVING;
 				reviving--;
 
@@ -282,7 +289,7 @@ static void get_work(void)
 				 */
 				assert(!GRANT_VALID(rp->fp_grant));
 
-				if (rp->fp_task == -XPIPE) {
+				if (blocked_on == FP_BLOCKED_ON_PIPE) {
 					fp= rp;
 					fd_nr= (rp->fp_fd >> 8);
 					f= get_filp(fd_nr);
@@ -315,19 +322,28 @@ static void get_work(void)
 		who_e = m_in.m_source;
 		who_p = _ENDPOINT_P(who_e);
 
-		if(who_p < -NR_TASKS || who_p >= NR_PROCS)
+    /* 
+     * negative who_p is never used to access the fproc array. Negative numbers
+     * (kernel tasks) are treated in a special way
+     */
+    if(who_p >= (int)(sizeof(fproc) / sizeof(struct fproc)))
 			panic(__FILE__,"receive process out of range", who_p);
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint == NONE) {
-			printf("FS_PROC_NR: ignoring request from %d, endpointless slot %d (%d)\n",
+			printf("FS: ignoring request from %d, endpointless slot %d (%d)\n",
 			m_in.m_source, who_p, m_in.m_type);
 			continue;
 		}
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint != who_e) {
-			printf("FS_PROC_NR: receive endpoint inconsistent (%d, %d, %d).\n",
-				who_e, fproc[who_p].fp_endpoint, who_e);
-			panic(__FILE__, "FS_PROC_NR: inconsistent endpoint ", NO_NUM);
+	if(fproc[who_p].fp_endpoint == NONE) { 
+		printf("slot unknown even\n");
+	}
+    	printf("FS: receive endpoint inconsistent (source %d, who_p %d, stored ep %d, who_e %d).\n",
+		m_in.m_source, who_p, fproc[who_p].fp_endpoint, who_e);
+#if 0
+			panic(__FILE__, "FS: inconsistent endpoint ", NO_NUM);
+#endif
 			continue;
 		}
 
@@ -394,7 +410,7 @@ static void fs_init(void)
 		rfp->fp_effgid = (gid_t) SYS_GID;
 		rfp->fp_umask = ~0;
 		rfp->fp_grant = GRANT_INVALID;
-		rfp->fp_suspended = NOT_SUSPENDED;
+	rfp->fp_blocked_on = FP_BLOCKED_ON_NONE;
 		rfp->fp_revived = NOT_REVIVING;
 	 
 	} while (TRUE);			/* continue until process NONE */
@@ -538,7 +554,6 @@ static void init_root(void)
 static void service_pm(void)
 {
 	int r, call;
-	struct vmnt *vmp;
 	message m;
 
 	/* Ask PM for work until there is nothing left to do */

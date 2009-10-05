@@ -64,7 +64,7 @@ int do_trace()
 	if ((child=find_proc(m_in.pid))==NIL_MPROC)
 		return(-ESRCH);
 
-	r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
+	r= sys_trace(m_in.request,child->mp_endpoint,m_in.PMTRACE_ADDR,&m_in.data);
 	if (r != 0) return(r);
 
 	mp->mp_reply.reply_trace = m_in.data;
@@ -89,7 +89,7 @@ int do_trace()
 	child->mp_ctime= 0;
 #endif
 
-	r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
+	r= sys_trace(m_in.request,child->mp_endpoint,m_in.PMTRACE_ADDR,&m_in.data);
 	if (r != 0) return(r);
 
 	mp->mp_reply.reply_trace = m_in.data;
@@ -144,7 +144,7 @@ int do_trace()
 	child->mp_flags &= ~STOPPED;
   	break;
   }
-  r= sys_trace(m_in.request,child->mp_endpoint,m_in.taddr,&m_in.data);
+  r= sys_trace(m_in.request,child->mp_endpoint,m_in.PMTRACE_ADDR,&m_in.data);
   if (r != 0) return(r);
 
   mp->mp_reply.reply_trace = m_in.data;

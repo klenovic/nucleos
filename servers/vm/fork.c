@@ -18,7 +18,10 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
+#include <nucleos/debug.h>
+#include <nucleos/bitmap.h>
 
+#include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <env.h>
 
@@ -36,6 +39,8 @@ int do_fork(message *msg)
 {
   int r, proc, s, childproc, fullvm;
   struct vmproc *vmp, *vmc;
+  pt_t origpt;
+  vir_bytes msgaddr;
 
   SANITYCHECK(SCL_FUNCTIONS);
 
@@ -54,6 +59,9 @@ int do_fork(message *msg)
 
   vmp = &vmproc[proc];		/* parent */
   vmc = &vmproc[childproc];	/* child */
+  vm_assert(vmc->vm_slot == childproc);
+
+  NOTRUNNABLE(vmp->vm_endpoint);
 
   if(vmp->vm_flags & VMF_HAS_DMA) {
 	printf("VM: %d has DMA memory and may not fork\n", msg->VMF_ENDPOINT);
@@ -63,13 +71,19 @@ int do_fork(message *msg)
   fullvm = vmp->vm_flags & VMF_HASPT;
 
   /* The child is basically a copy of the parent. */
+  origpt = vmc->vm_pt;
   *vmc = *vmp;
+  vmc->vm_slot = childproc;
   vmc->vm_regions = NULL;
   vmc->vm_endpoint = NONE;	/* In case someone tries to use it. */
+  vmc->vm_pt = origpt;
+  vmc->vm_flags &= ~VMF_HASPT;
 
 #if VMSTATS
   vmc->vm_bytecopies = 0;
 #endif
+
+  SANITYCHECK(SCL_DETAIL);
 
   if(fullvm) {
 	SANITYCHECK(SCL_DETAIL);
@@ -78,6 +92,8 @@ int do_fork(message *msg)
 		printf("VM: fork: pt_new failed\n");
 		return -ENOMEM;
 	}
+
+	vmc->vm_flags |= VMF_HASPT;
 
 	SANITYCHECK(SCL_DETAIL);
 
@@ -113,6 +129,7 @@ int do_fork(message *msg)
 	/* Create a copy of the parent's core image for the child. */
 	child_abs = (phys_bytes) child_base << CLICK_SHIFT;
 	parent_abs = (phys_bytes) vmp->vm_arch.vm_seg[D].mem_phys << CLICK_SHIFT;
+	FIXME("VM uses kernel for abscopy");
 	s = sys_abscopy(parent_abs, child_abs, prog_bytes);
 	if (s < 0) vm_panic("do_fork can't copy", s);
 
@@ -129,14 +146,30 @@ int do_fork(message *msg)
   /* Only inherit these flags. */
   vmc->vm_flags &= (VMF_INUSE|VMF_SEPARATE|VMF_HASPT);
 
+  /* inherit the priv call bitmaps */
+  memcpy(&vmc->vm_call_priv_mask, &vmp->vm_call_priv_mask,
+        sizeof(vmc->vm_call_priv_mask));
+
   /* Tell kernel about the (now successful) FORK. */
   if((r=sys_fork(vmp->vm_endpoint, childproc,
 	&vmc->vm_endpoint, vmc->vm_arch.vm_seg,
-	fullvm ? PFF_VMINHIBIT : 0)) != 0) {
+	fullvm ? PFF_VMINHIBIT : 0, &msgaddr)) != 0) {
         vm_panic("do_fork can't sys_fork", r);
   }
 
+  NOTRUNNABLE(vmp->vm_endpoint);
+  NOTRUNNABLE(vmc->vm_endpoint);
+
   if(fullvm) {
+	vir_bytes vir;
+	/* making these messages writable is an optimisation
+	 * and its return value needn't be checked.
+	 */
+	vir = arch_vir2map(vmc, msgaddr);
+	handle_memory(vmc, vir, sizeof(message), 1);
+	vir = arch_vir2map(vmp, msgaddr);
+	handle_memory(vmp, vir, sizeof(message), 1);
+
 	if((r=pt_bind(&vmc->vm_pt, vmc)) != 0)
 		vm_panic("fork can't pt_bind", r);
   }

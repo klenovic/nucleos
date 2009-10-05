@@ -12,7 +12,6 @@
 #include <asm/kernel/const.h>
 #include <kernel/const.h>
 
-#include "vm.S"
 #include "sconst.S"
 
 // The routines only guarantee to preserve the registers the C compiler
@@ -37,7 +36,6 @@ monitor:
         pop     %edi
         pop     %esi
         pop     %ebp
-//o16 retf
         lretw                             // return to the monitor
 
 //===========================================================================
@@ -88,7 +86,6 @@ int86:
         mov     %ax, %gs
         push    %cs
         push    $return                  // kernel return address and selector
-//    o16 jmpf    20+2*4+10*4+2*4(%esp)  // make the call
         ljmpw    *20+2*4+10*4+2*4(%esp)  // make the call
 return:
         pop     reg86+ 0
@@ -102,7 +99,6 @@ return:
         pop     reg86+32
         pop     reg86+36
         lgdt    gdt+GDT_SELECTOR      // reload global descriptor table
-//        jmpf    $CS_SELECTOR:csinit    // restore everything
         ljmp    $CS_SELECTOR, $csinit // restore everything
 csinit: 
         mov     $DS_SELECTOR, %eax
@@ -144,15 +140,12 @@ phys_insw:
         push    %edi
         push    %es
 
-        LOADKERNELCR3
-
         mov     $FLAT_DS_SELECTOR, %ecx
         mov     %cx, %es
         mov     8(%ebp), %edx             // port to read from
         mov     12(%ebp), %edi            // destination addr
         mov     16(%ebp), %ecx            // byte count
         shr     $1, %ecx                  // word count
-//rep o16 ins                             // input many words
         rep     insw                      // input many words
         pop     %es
         pop     %edi
@@ -171,8 +164,6 @@ phys_insb:
         cld
         push    %edi
         push    %es
-
-        LOADKERNELCR3
 
         mov     $FLAT_DS_SELECTOR, %ecx
         mov     %cx, %es
@@ -200,15 +191,12 @@ phys_outsw:
         push    %esi
         push    %ds
 
-        LOADKERNELCR3
-
         mov     $FLAT_DS_SELECTOR, %ecx
         mov     %cx, %ds
         mov     8(%ebp), %edx             // port to write to
         mov     12(%ebp), %esi            // source addr
         mov     16(%ebp), %ecx            // byte count
         shr     $1, %ecx                  // word count
-//        rep o16 outs                    // output many words
         rep     outsw                     // output many words
         pop     %ds
         pop     %esi
@@ -228,8 +216,6 @@ phys_outsb:
         cld
         push    %esi
         push    %ds
-
-        LOADKERNELCR3
 
         mov     $FLAT_DS_SELECTOR, %ecx
         mov     %cx, %ds
@@ -261,7 +247,6 @@ intr_unmask:
         mov     8(%eax), %ecx             // irq
         mov     12(%eax), %eax            // id bit
         not     %eax
-//        and     %eax,irq_actids(%ecx*4) // clear this id bit
         and     %eax, irq_actids(,%ecx,4) // clear this id bit
         jnz     en_done                   // still masked by other handlers?
         movb    $~1, %ah
@@ -298,7 +283,6 @@ intr_mask:
         mov     8(%ebp), %eax             // hook
         mov     8(%eax), %ecx             // irq
         mov     12(%eax), %eax            // id bit
-//        or      %eax,irq_actids(%ecx*4) // set this id bit
         or      %eax, irq_actids(,%ecx,4) // set this id bit
         movb    $1, %ah
         rolb    %cl, %ah                 // ah = (1 << (irq % 8))
@@ -324,7 +308,7 @@ dis_already:
 //===========================================================================
 //                             phys_copy
 //===========================================================================
-// void phys_copy(phys_bytes source, phys_bytes destination,
+// phys_bytes phys_copy(phys_bytes source, phys_bytes destination,
 //                      phys_bytes bytecount);
 // Copy a block of physical memory.
 
@@ -337,8 +321,6 @@ phys_copy:
         push    %esi
         push    %edi
         push    %es
-
-        LOADKERNELCR3
 
         mov     $FLAT_DS_SELECTOR, %eax
         mov     %ax, %es
@@ -365,6 +347,10 @@ pc_small:
         xchg    %eax, %ecx               // remainder
         rep
         movsb   %es:(%esi), %es:(%edi)
+	mov	$0, %eax			// 0 means no fault
+
+.globl phys_copy_fault
+phys_copy_fault:				// kernel can send us here
         pop     %es
         pop     %edi
         pop     %esi
@@ -384,8 +370,6 @@ phys_memset:
         push    %esi
         push    %ebx
         push    %ds
-
-        LOADKERNELCR3
 
         mov     8(%ebp), %esi
         mov     16(%ebp), %eax
@@ -543,17 +527,15 @@ write_cr4:
         pop     %ebp
         ret
 
-//===========================================================================
-//                           write_cr3                                      
-//===========================================================================
-// void write_cr3(unsigned long value);
-.globl write_cr3      // write a value in cr3 (root of the page table)
-write_cr3:
-        push    %ebp
-        mov     %esp, %ebp
-        LOADCR3WITHEAX(0x22,8(%ebp))
-        pop     %ebp
-        ret
+//===========================================================================*
+//                           getcr3val                                       *
+//===========================================================================*
+// unsigned long getcr3val(void);
+.globl getcr3val
+getcr3val:
+	mov	%cr3, %eax
+	mov	 %eax, thecr3
+	ret
 
 .section .data
 idt_zero: .long  0, 0

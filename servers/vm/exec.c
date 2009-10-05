@@ -18,7 +18,7 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
-
+#include <nucleos/bitmap.h>
 #include <nucleos/errno.h>
 #include <assert.h>
 #include <env.h>
@@ -35,7 +35,9 @@
 
 static int new_mem(struct vmproc *vmp, struct vmproc *sh_vmp, vir_bytes text_bytes,
 		   vir_bytes data_bytes, vir_bytes bss_bytes, vir_bytes stk_bytes,
-		   phys_bytes tot_bytes);
+		   phys_bytes tot_bytes, vir_bytes *stack_top);
+
+static int failcount;
 
 /*===========================================================================*
  *                              find_share                                   *
@@ -83,15 +85,17 @@ int do_exec_newmem(message *msg)
 
 	if (vm_isokendpt(proc_e, &proc_n) != 0)
 	{
-		printf("VM:exec_newmem: bad endpoint %d from %d\n",
+		printf("VM: exec_newmem: bad endpoint %d from %d\n",
 			proc_e, msg->m_source);
 		return -ESRCH;
 	}
 	vmp= &vmproc[proc_n];
 	ptr= msg->VMEN_ARGSPTR;
 
+	NOTRUNNABLE(vmp->vm_endpoint);
+
 	if (msg->VMEN_ARGSSIZE != sizeof(args)) {
-		printf("VM:exec_newmem: args size %d != %ld\n",
+		printf("VM: exec_newmem: args size %d != %ld\n",
 			msg->VMEN_ARGSSIZE, sizeof(args));
 		return -EINVAL;
 	}
@@ -109,15 +113,27 @@ int do_exec_newmem(message *msg)
 	totc = (args.tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 	sc = (args.args_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 
-	if (dc >= totc) return(-ENOEXEC); /* stack must be at least 1 click */
+	if (dc >= totc) {
+		printf("VM: newmem: no stack?\n");
+		return(-ENOEXEC); /* stack must be at least 1 click */
+	}
 
 	dvir = (args.sep_id ? 0 : tc);
 	s_vir = dvir + (totc - sc);
 
 	r = (dvir + dc > s_vir) ? -ENOMEM : 0;
 
-	if (r != 0)
+	if (r != 0) {
+		printf("VM: newmem: no virtual space?\n");
 		return r;
+	}
+
+	/* Minimum stack region (not preallocated)
+	 * Stopgap for better rlimit-based stack size system
+	 */
+	if (args.tot_bytes < MINSTACKREGION) {
+		args.tot_bytes = MINSTACKREGION;
+	}
 
 	/* Can the process' text be shared with that of one already running? */
 	if(!vm_paged) {
@@ -130,16 +146,17 @@ int do_exec_newmem(message *msg)
 	 * kernel.
 	 */
 	r = new_mem(vmp, sh_mp, args.text_bytes, args.data_bytes,
-		args.bss_bytes, args.args_bytes, args.tot_bytes);
-	if (r != 0) return(r);
+		args.bss_bytes, args.args_bytes, args.tot_bytes, &stack_top);
+
+	if (r != 0) {
+		printf("VM: newmem: new_mem failed\n");
+		return(r);
+	}
 
 	/* Save file identification to allow it to be shared. */
 	vmp->vm_ino = args.st_ino;
 	vmp->vm_dev = args.st_dev;
 	vmp->vm_ctime = args.st_ctime;
-
-	stack_top= ((vir_bytes)vmp->vm_arch.vm_seg[S].mem_vir << CLICK_SHIFT) +
-		((vir_bytes)vmp->vm_arch.vm_seg[S].mem_len << CLICK_SHIFT);
 
 	/* set/clear separate I&D flag */
 	if (args.sep_id)
@@ -153,6 +170,8 @@ int do_exec_newmem(message *msg)
 	if (!sh_mp)			 /* Load text if sh_mp = NULL */
 		msg->VMEN_FLAGS |= EXC_NM_RF_LOAD_TEXT;
 
+	NOTRUNNABLE(vmp->vm_endpoint);
+
 	return 0;
 }
 
@@ -160,7 +179,7 @@ int do_exec_newmem(message *msg)
  *				new_mem					     *
  *===========================================================================*/
 static int new_mem(rmp, sh_mp, text_bytes, data_bytes,
-	bss_bytes,stk_bytes,tot_bytes)
+	bss_bytes,stk_bytes,tot_bytes,stack_top)
 struct vmproc *rmp;		/* process to get a new memory map */
 struct vmproc *sh_mp;		/* text can be shared with this process */
 vir_bytes text_bytes;		/* text segment size in bytes */
@@ -168,6 +187,7 @@ vir_bytes data_bytes;		/* size of initialized data in bytes */
 vir_bytes bss_bytes;		/* size of bss in bytes */
 vir_bytes stk_bytes;		/* size of initial stack segment in bytes */
 phys_bytes tot_bytes;		/* total memory to allocate, including gap */
+vir_bytes *stack_top;		/* top of process stack */
 {
 /* Allocate new memory and release the old memory.  Change the map and report
  * the new map to the kernel.  Zero the new core image's bss, gap and stack.
@@ -175,9 +195,14 @@ phys_bytes tot_bytes;		/* total memory to allocate, including gap */
 
   vir_clicks text_clicks, data_clicks, gap_clicks, stack_clicks, tot_clicks;
   phys_bytes bytes, base, bss_offset;
-  int s, r2;
+  int s, r2, r, hadpt = 0;
+  struct vmproc *vmpold = &vmproc[VMP_EXECTMP];
 
   SANITYCHECK(SCL_FUNCTIONS);
+
+  if(rmp->vm_flags & VMF_HASPT) {
+	hadpt = 1;
+  }
 
   /* No need to allocate text if it can be shared. */
   if (sh_mp != NULL) {
@@ -194,19 +219,31 @@ phys_bytes tot_bytes;		/* total memory to allocate, including gap */
   stack_clicks = (stk_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
   tot_clicks = (tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
   gap_clicks = tot_clicks - data_clicks - stack_clicks;
-  if ( (int) gap_clicks < 0) return(-ENOMEM);
+  if ( (int) gap_clicks < 0) {
+	printf("VM: new_mem: no gap?\n");
+	return(-ENOMEM);
+  }
 
+
+  /* Keep previous process state for recovery; the sanity check functions
+   * know about the 'vmpold' slot, so the memory that the exec()ing
+   * process is still holding is referenced there.
+   *
+   * Throw away the old page table to avoid having two process slots
+   * using the same vm_pt.
+   * Just recreate it in the case that we have to revert.
+   */
+SANITYCHECK(SCL_DETAIL);
+  if(hadpt) {
+	  pt_free(&rmp->vm_pt);
+	  rmp->vm_flags &= ~VMF_HASPT;
+  }
+  vm_assert(!(vmpold->vm_flags & VMF_INUSE));
+  *vmpold = *rmp;	/* copy current state. */
+  rmp->vm_regions = NULL; /* exec()ing process regions thrown out. */
 SANITYCHECK(SCL_DETAIL);
 
-
-  /* We've got memory for the new core image.  Release the old one. */
-
-  if(rmp->vm_flags & VMF_HASPT) {
-  	/* Free page table and memory allocated by pagetable functions. */
-	rmp->vm_flags &= ~VMF_HASPT;
-	free_proc(rmp);
-  } else {
-
+  if(!hadpt) {
   	if (find_share(rmp, rmp->vm_ino, rmp->vm_dev, rmp->vm_ctime) == NULL) {
 		/* No other process shares the text segment, so free it. */
 		FREE_MEM(rmp->vm_arch.vm_seg[T].mem_phys, rmp->vm_arch.vm_seg[T].mem_len);
@@ -219,17 +256,20 @@ SANITYCHECK(SCL_DETAIL);
 		- rmp->vm_arch.vm_seg[D].mem_vir);
   }
 
-  /* We have now passed the point of no return.  The old core image has been
-   * forever lost, memory for a new core image has been allocated.  Set up
-   * and report new map.
+  /* Build new process in current slot, without freeing old
+   * one. If it fails, revert.
    */
 
   if(vm_paged) {
-	if(pt_new(&rmp->vm_pt) != 0)
-		vm_panic("exec_newmem: no new pagetable", NO_NUM);
+	int ptok = 1;
+	SANITYCHECK(SCL_DETAIL);
+	if((r=pt_new(&rmp->vm_pt)) != 0) {
+		ptok = 0;
+		printf("exec_newmem: no new pagetable\n");
+	}
 
 	SANITYCHECK(SCL_DETAIL);
-	proc_new(rmp,
+	if(r != 0 || (r=proc_new(rmp,
 	 VM_PROCSTART,	/* where to start the process in the page table */
 	 CLICK2ABS(text_clicks),/* how big is the text in bytes, page-aligned */
 	 CLICK2ABS(data_clicks),/* how big is data+bss, page-aligned */
@@ -237,13 +277,48 @@ SANITYCHECK(SCL_DETAIL);
 	 CLICK2ABS(gap_clicks),	/* how big is gap, page-aligned */
 	 0,0,			/* not preallocated */
 	 VM_STACKTOP		/* regular stack top */
-	 );
+	 )) != 0) {
+		SANITYCHECK(SCL_DETAIL);
+		printf("VM: new_mem: failed\n");
+		if(ptok) {
+			pt_free(&rmp->vm_pt);
+		}
+		*rmp = *vmpold;	/* undo. */
+		clear_proc(vmpold);	/* disappear. */
+		SANITYCHECK(SCL_DETAIL);
+		if(hadpt) {
+			if(pt_new(&rmp->vm_pt) != 0) {
+			/* We secretly know that making a new pagetable
+			 * in the same slot if one was there will never fail.
+			 */
+				vm_panic("new_mem: pt_new failed", s);
+			}
+			rmp->vm_flags |= VMF_HASPT;
+			SANITYCHECK(SCL_DETAIL);
+			if(map_writept(rmp) != 0) {
+				printf("VM: warning: exec undo failed\n");
+			}
+			SANITYCHECK(SCL_DETAIL);
+		}
+		return r;
+	}
 	SANITYCHECK(SCL_DETAIL);
+	/* new process is made; free and unreference
+	 * page table and memory still held by exec()ing process.
+	 */
+	SANITYCHECK(SCL_DETAIL);
+	free_proc(vmpold);
+	clear_proc(vmpold);	/* disappear. */
+	SANITYCHECK(SCL_DETAIL);
+	*stack_top = VM_STACKTOP;
   } else {
   	phys_clicks new_base;
 
 	new_base = ALLOC_MEM(text_clicks + tot_clicks, 0);
-	if (new_base == NO_MEM) return(-ENOMEM);
+	if (new_base == NO_MEM) {
+		printf("VM: new_mem: ALLOC_MEM failed\n");
+		return(-ENOMEM);
+	}
 
 	if (sh_mp != NULL) {
 		/* Share the text segment. */
@@ -303,6 +378,8 @@ SANITYCHECK(SCL_DETAIL);
 	  /* Tell kernel this thing has no page table. */
 	  if((s=pt_bind(NULL, rmp)) != 0)
 		vm_panic("exec_newmem: pt_bind failed", s);
+	*stack_top= ((vir_bytes)rmp->vm_arch.vm_seg[S].mem_vir << CLICK_SHIFT) +
+               ((vir_bytes)rmp->vm_arch.vm_seg[S].mem_len << CLICK_SHIFT);
   }
 
 SANITYCHECK(SCL_FUNCTIONS);
@@ -357,13 +434,6 @@ int proc_new(struct vmproc *vmp,
 	vm_assert(!(data_start % VM_PAGE_SIZE));
 	vm_assert((!text_start && !data_start) || (text_start && data_start));
 
-#if 0
-	if(!map_proc_kernel(vmp)) {
-		printf("VM: exec: map_proc_kernel failed\n");
-		return -ENOMEM;
-	}
-#endif
-
 	/* Place text at start of process. */
 	vmp->vm_arch.vm_seg[T].mem_phys = ABS2CLICK(vstart);
 	vmp->vm_arch.vm_seg[T].mem_vir = 0;
@@ -380,6 +450,8 @@ int proc_new(struct vmproc *vmp,
 		  VR_ANON | VR_WRITABLE, text_start ? 0 : MF_PREALLOC)) {
 			SANITYCHECK(SCL_DETAIL);
 			printf("VM: proc_new: map_page_region failed (text)\n");
+			map_free_proc(vmp);
+			SANITYCHECK(SCL_DETAIL);
 			return(-ENOMEM);
 		}
 		SANITYCHECK(SCL_DETAIL);
@@ -394,6 +466,8 @@ int proc_new(struct vmproc *vmp,
 	  data_bytes, data_start ? data_start : MAP_NONE, VR_ANON | VR_WRITABLE,
 		data_start ? 0 : MF_PREALLOC))) {
 		printf("VM: exec: map_page_region for data failed\n");
+		map_free_proc(vmp);
+		SANITYCHECK(SCL_DETAIL);
 		return -ENOMEM;
 	}
 
@@ -441,13 +515,8 @@ int proc_new(struct vmproc *vmp,
 
 	vmp->vm_flags |= VMF_HASPT;
 
-	if((s=sys_newmap(vmp->vm_endpoint, vmp->vm_arch.vm_seg)) != 0) {
+	if((s=sys_newmap(vmp->vm_endpoint, vmp->vm_arch.vm_seg)) != 0)
 		vm_panic("sys_newmap (vm) failed", s);
-	}
-
-
-	/* This is the real stack clicks. */
-	vmp->vm_arch.vm_seg[S].mem_len = ABS2CLICK(stack_bytes);
 
 	if((s=pt_bind(&vmp->vm_pt, vmp)) != 0)
 		vm_panic("exec_newmem: pt_bind failed", s);

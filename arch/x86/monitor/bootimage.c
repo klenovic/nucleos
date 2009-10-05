@@ -483,11 +483,10 @@ static void restore_screen(void)
 void exec_image(char *image)
 /* Get a Minix image into core, patch it up and execute. */
 {
-	char *delayvalue;
 	int i;
 	struct image_header hdr;
 	char *buf;
-	u32_t vsec, addr, limit, aout, n;
+	u32_t vsec, addr, limit, aout, n, totalmem = 0;
 	struct process *procp;    /* Process under construction. */
 	long a_text, a_data, a_bss, a_stack;
 	int banner= 0;
@@ -496,13 +495,18 @@ void exec_image(char *image)
 	char *console;
 	char params[SECTOR_SIZE];
 	extern char *sbrk(int);
+	char *verb;
+	int verbose = 0;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
 	(void) sbrk(0);
 
+	if ((verb= b_value("verbose")) != 0 && a2l(verb) > 0)
+		verbose = 1;
+
 	printf("\nLoading ");
 	pretty_image(image);
-	printf(".\n\n");
+	printf(".\n");
 
 	vsec = 0;           /* Load this sector from image next. */
 
@@ -521,6 +525,8 @@ void exec_image(char *image)
 
 	/* Read the many different processes: */
 	for (i= 0; vsec < image_size; i++) {
+		u32_t startaddr;
+		startaddr = addr;
 		if (i == PROCESS_MAX) {
 			printf("There are more then %d programs in %s\n", PROCESS_MAX, image);
 			errno= 0;
@@ -569,7 +575,7 @@ void exec_image(char *image)
 
 		raw_copy(aout + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
 
-		if (!banner) {
+		if (!banner && verbose) {
 			printf("       cs         ds     text     data      bss");
 
 			if (k_flags & K_CHMEM)
@@ -635,16 +641,15 @@ void exec_image(char *image)
 		if (i != KERNEL_IDX && (k_flags & K_CLAIM))
 			a_bss = a_stack = 0;
 
-		printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
-			procp->cs, procp->ds,
-			hdr.process.a_text, hdr.process.a_data,
-			hdr.process.a_bss
-		);
+		if (verbose) {
+			printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
+				procp->cs, procp->ds,
+				hdr.process.a_text, hdr.process.a_data,
+				hdr.process.a_bss);
+		}
 
-		if (k_flags & K_CHMEM)
+		if ((k_flags & K_CHMEM) && verbose)
 			printf(" %8ld", a_stack);
-
-		printf("  %s\n", hdr.name);
 
 		/* Note that a_data may be negative now, but we can look at it
 		 * as -a_data bss bytes.
@@ -675,12 +680,24 @@ void exec_image(char *image)
 		/* Process endpoint. */
 		procp->end= addr;
 
+		if(verbose)
+			printf("  %s\n", hdr.name);
+		else {
+			u32_t mem;
+			mem = addr-startaddr;
+			printf("%s ", hdr.name);
+			totalmem += mem;
+		}
+
 		if (i == 0 && (k_flags & K_HIGH)) {
 			/* Load the rest in extended memory. */
 			addr = mem[1].base;
 			limit = mem[1].base + mem[1].size;
 		}
 	}
+
+	if(!verbose)
+		printf("(%dk)\n", totalmem/1024);
 
 	if ((n_procs= i) == 0) {
 		printf("There are no programs in %s\n", image);
@@ -711,11 +728,6 @@ void exec_image(char *image)
 			return;
 	} else {
 		printf("builtin.\n");
-	}
-
-	/* Do delay if wanted. */
-	if(((delayvalue = b_value("bootdelay")) != 0) > 0) {
-		delay(delayvalue);
 	}
 
 	/* Run the trailer function just before starting Minix. */

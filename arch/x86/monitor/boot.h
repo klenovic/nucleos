@@ -125,7 +125,7 @@ int escape(void);
 void putch(int c);
 
 /* Wait for an interrupt. */
-void pause(void);
+void monitor_pause(void);
 
 /* Enable copying console I/O to a serial line. */
 void serial_init(int line);

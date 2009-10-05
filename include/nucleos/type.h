@@ -18,7 +18,7 @@
 typedef unsigned int vir_clicks;	/* virtual addr/length in clicks */
 typedef unsigned long phys_bytes;	/* physical addr/length in bytes */
 typedef unsigned int phys_clicks;	/* physical addr/length in clicks */
-typedef int endpoint_t;			/* process identifier */
+typedef u32_t endpoint_t;			/* process identifier */
 
 #ifdef CONFIG_X86_32
 typedef long unsigned int vir_bytes;	/* virtual addresses/lengths in bytes */
@@ -63,7 +63,7 @@ typedef struct {
 } iovec_s_t;
 
 /* PM passes the address of a structure of this type to KERNEL when
- * sys_sendsig() is invoked as part of the signal catching mechanism.
+ * sys_sigsend() is invoked as part of the signal catching mechanism.
  * The structure contain all the information that KERNEL needs to build
  * the signal stack.
  */
@@ -94,9 +94,6 @@ struct kinfo {
 	int nr_tasks;			/* number of kernel tasks */
 	char release[6];		/* kernel release number */
 	char version[6];		/* kernel version number */
-#if CONFIG_DEBUG_KERNEL_LOCK_CHECK
-	int relocking;		/* interrupt locking depth (should be 0) */
-#endif
 };
 
 /* Load data accounted every this no. of seconds. */

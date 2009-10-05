@@ -1,7 +1,7 @@
 # Makefile for x86 VM server
 app-y := vm.elf32
 vm.elf32-type := server
-vm.elf32-obj-y := vm.o pagetable.o arch_pagefaults.o util.o
+vm.elf32-obj-y := vm.o pagetable.o pagefaults.o util.o
 
 # add its generic part
 vm.elf32-extobj-y += servers/vm/built-in.o

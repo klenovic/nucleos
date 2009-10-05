@@ -7,16 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 /*===========================================================================*
  *                               sys_enable_iop				     *    
  *===========================================================================*/
-int sys_enable_iop(proc_nr_e)
-int proc_nr_e;			/* number of process to allow I/O */
+int sys_enable_iop(proc_ep)
+endpoint_t proc_ep;			/* number of process to allow I/O */
 {
     message m_iop;
-    m_iop.IO_ENDPT = proc_nr_e;
+    m_iop.IO_ENDPT = proc_ep;
     return _taskcall(SYSTASK, SYS_IOPENABLE, &m_iop);
 }
 

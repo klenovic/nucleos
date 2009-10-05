@@ -12,7 +12,7 @@ pci_del_acl.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/unistd.h>
 #include <servers/rs/rs.h>
 #include <servers/ds/ds.h>
@@ -21,8 +21,8 @@ pci_del_acl.c
 /*===========================================================================*
  *				pci_del_acl				     *
  *===========================================================================*/
-int pci_del_acl(proc_nr)
-endpoint_t proc_nr;
+int pci_del_acl(proc_ep)
+endpoint_t proc_ep;
 {
 	int r;
 	message m;
@@ -42,7 +42,7 @@ endpoint_t proc_nr;
 
 
 	m.m_type= BUSC_PCI_DEL_ACL;
-	m.m1_i1= proc_nr;
+	m.m1_i1= proc_ep;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)

@@ -34,6 +34,7 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
+#include <nucleos/bitmap.h>
 
 #include <nucleos/errno.h>
 #include <env.h>

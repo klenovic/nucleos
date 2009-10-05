@@ -12,6 +12,7 @@
 #define __NUCLEOS_VM_H
 
 #include <nucleos/types.h>
+#include <nucleos/type.h>
 #include <nucleos/endpoint.h>
 
 int vm_exit(endpoint_t ep);
@@ -28,5 +29,9 @@ void *vm_map_phys(endpoint_t who, void *physaddr, size_t len);
 int vm_unmap_phys(endpoint_t who, void *vaddr, size_t len);
 
 int vm_allocmem(phys_clicks memclicks, phys_clicks *retmembase);
+int vm_notify_sig(endpoint_t ep, endpoint_t ipc_ep);
+int vm_ctl(int what, int param);
+int vm_set_priv(int procnr, void *buf);
+int vm_query_exit(int *endpt);
 
 #endif /* __NUCLEOS_VM_H */

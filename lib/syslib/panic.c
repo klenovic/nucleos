@@ -12,7 +12,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/sysutil.h>
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 int panicing= 0;
 

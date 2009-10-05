@@ -83,9 +83,6 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 	/* Fetch the stack from the user before destroying the old core image. */
 	if (frame_len > ARG_MAX) {
-		printf("pm_exec: bad frame_len\n");
-		printf("return at %s, %d\n", __FILE__, __LINE__);
-
 		return(-ENOMEM);	/* stack too big */
 	}
 
@@ -220,7 +217,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 	if (r != 0) {
 		printf("vfs: datacopy returns %d trying to copy to %p\n", r, vsp);
-		panic(__FILE__,"pm_exec stack copy err on", proc_e);
+		return r;
 	}
 
 	put_vnode(vp);

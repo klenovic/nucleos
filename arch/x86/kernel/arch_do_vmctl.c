@@ -19,7 +19,9 @@
 #include <kernel/system.h>
 #include <nucleos/type.h>
 
-extern u32_t kernel_cr3;
+#include <kernel/proto.h>
+
+extern u32_t *vm_pagedirs;
 
 /*===========================================================================*
  *				arch_do_vmctl				     *
@@ -39,7 +41,7 @@ struct proc *p;
 			p->p_seg.p_cr3 = m_ptr->SVMCTL_VALUE;
 			p->p_misc_flags |= MF_FULLVM;
 		} else {
-			p->p_seg.p_cr3 = kernel_cr3;
+			p->p_seg.p_cr3 = 0;
 			p->p_misc_flags &= ~MF_FULLVM;
 		}
 		RTS_LOCK_UNSET(p, VMINHIBIT);
@@ -62,7 +64,32 @@ struct proc *p;
 		m_ptr->SVMCTL_PF_I386_ERR = rp->p_pagefault.pf_flags;
 		return 0;
 	}
+	case VMCTL_I386_KERNELLIMIT:
+	{
+		int r;
+		/* VM wants kernel to increase its segment. */
+		r = prot_set_kern_seg_limit(m_ptr->SVMCTL_VALUE);
+		return r;
+	}
+	case VMCTL_I386_PAGEDIRS:
+	{
+		int pde;
+		vm_pagedirs = (u32_t *) m_ptr->SVMCTL_VALUE;
+		return 0;
+	}
+	case VMCTL_I386_FREEPDE:
+	{
+		i386_freepde(m_ptr->SVMCTL_VALUE);
+		return 0;
+	}
+	case VMCTL_FLUSHTLB:
+	{
+		level0(reload_cr3);
+		return 0;
+	}
   }
+
+
 
   kprintf("arch_do_vmctl: strange param %d\n", m_ptr->SVMCTL_PARAM);
   return -EINVAL;

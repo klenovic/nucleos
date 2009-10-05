@@ -11,7 +11,7 @@
 #include <servers/ds/ds.h>
 #include <nucleos/string.h>
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 #define GRANTBAD -1001
 

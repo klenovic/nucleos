@@ -18,7 +18,23 @@
 #include <nucleos/types.h>
 
 void *mmap(void *, size_t, int, int, int, off_t);
-int munmap(void *, size_t);
+
+/* weak declaration since someone may want to overide it (see PM/VM) */
+__weak int munmap(void *, size_t);
+int __munmap(void *, size_t);
+
+__weak int munmap_text(void *, size_t);
+int __munmap_text(void *, size_t);
+
+/**
+ * @brief Unmap 0th page code and data
+ */
+void unmap_page_zero(void);
+
+void *vm_remap(int d, int s, void *da, void *sa, size_t si);
+int vm_unmap(int endpt, void *addr);
+unsigned long vm_getphys(int endpt, void *addr);
+u8_t vm_getrefcount(int endpt, void *addr);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 

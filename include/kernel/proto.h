@@ -9,8 +9,8 @@
  */
 /* Function prototypes. */
 
-#ifndef PROTO_H
-#define PROTO_H
+#ifndef __KERNEL_PROTO_H
+#define __KERNEL_PROTO_H
 
 #include <asm/kernel/proto.h>
 #include <nucleos/safecopies.h>
@@ -44,13 +44,12 @@ void minix_panic(char *s, int n);
 int sys_call(int call_nr, int src_dst, message *m_ptr, long bit_map);
 void sys_call_restart(struct proc *caller);
 int lock_notify(int src, int dst);
-int soft_notify(int dst);
+int mini_notify(struct proc *src, endpoint_t dst);
 int lock_send(int dst, message *m_ptr);
-void lock_enqueue(struct proc *rp);
-void lock_dequeue(struct proc *rp);
 void enqueue(struct proc *rp);
 void dequeue(struct proc *rp);
 void balance_queues(struct timer *tp);
+void schedcheck(void);
 struct proc *endpoint_lookup(endpoint_t ep);
 
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
@@ -103,6 +102,8 @@ void cons_seth(int pos, int n);
 #define CHECK_RUNQUEUES check_runqueues_f(__FILE__, __LINE__)
 void check_runqueues_f(char *file, int line);
 #endif
+char *rtsflagstr(int flags);
+char *miscflagstr(int flags);
 
 /* system/do_safecopy.c */
 int verify_grant(endpoint_t, endpoint_t, cp_grant_id_t, vir_bytes, int, vir_bytes, vir_bytes *,
@@ -118,19 +119,23 @@ void stop_profile_clock(void);
 #endif
 
 /* functions defined in architecture-dependent files. */
-void phys_copy(phys_bytes source, phys_bytes dest, phys_bytes count);
+phys_bytes phys_copy(phys_bytes source, phys_bytes dest, phys_bytes count);
+void phys_copy_fault(void);
 
 #define virtual_copy(src, dst, bytes) virtual_copy_f(src, dst, bytes, 0)
 #define virtual_copy_vmcheck(src, dst, bytes) virtual_copy_f(src, dst, bytes, 1)
 
 int virtual_copy_f(struct vir_addr *src, struct vir_addr *dst, vir_bytes bytes, int vmcheck);
-int data_copy(endpoint_t from, vir_bytes from_addr, endpoint_t to, vir_bytes to_addr, size_t bytes);
+int data_copy(endpoint_t from, vir_bytes from_addr, endpoint_t to, vir_bytes to_addr,
+	      size_t bytes);
+int data_copy_vmcheck(endpoint_t from, vir_bytes from_addr, endpoint_t to, vir_bytes to_addr,
+		      size_t bytes);
 
 #define data_copy_to(d, p, v, n) data_copy(SYSTEM, (d), (p), (v), (n));
 #define data_copy_from(d, p, v, n) data_copy((p), (v), SYSTEM, (d), (n));
 
 void alloc_segments(struct proc *rp);
-void vm_init(void);
+void vm_init(struct proc *first);
 void vm_map_range(u32_t base, u32_t size, u32_t offset);
 int vm_copy(vir_bytes src, struct proc *srcproc, vir_bytes dst, struct proc *dstproc,
 	    phys_bytes bytes);
@@ -140,7 +145,7 @@ void cp_mess(int src,phys_clicks src_clicks, vir_bytes src_offset, phys_clicks d
 phys_bytes umap_remote(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes bytes);
 phys_bytes umap_virtual(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes bytes);
 phys_bytes seg2phys(u16);
-void phys_memset(phys_bytes source, unsigned long pattern, phys_bytes count);
+int vm_phys_memset(phys_bytes source, u8_t pattern, phys_bytes count);
 vir_bytes alloc_remote_segment(u32_t *, segframe_t *, int, phys_bytes, vir_bytes, int);
 int arch_init_clock(void);
 clock_t read_clock(void);
@@ -171,6 +176,11 @@ int vm_checkrange(struct proc *caller, struct proc *target, vir_bytes start,
 		  vir_bytes length, int writeflag, int checkonly);
 void proc_stacktrace(struct proc *proc);
 int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *result, u32_t *ptent);
+int vm_suspend(struct proc *caller, struct proc *target,
+	phys_bytes lin, phys_bytes size, int wrflag, int type);
+int delivermsg(struct proc *target);
+phys_bytes arch_switch_copymsg(struct proc *rp, message *m,
+	phys_bytes lin);
 
 #endif /* __KERNEL__ */
-#endif /* PROTO_H */
+#endif /* __KERNEL_PROTO_H */

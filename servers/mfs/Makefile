@@ -22,6 +22,6 @@ $(src)/mfs.elf32: servers/server_32.lds
 mfs_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 mfs_a_hdrlen  := 0x20
 mfs_a_cpu     := i386
-mfs_stackheap := `expr $(NR_BUFS) \* $(BS) \* 3`
+mfs_stackheap := 32kb
 
 e2a-y        := mfs.elf32,mfs

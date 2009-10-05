@@ -17,7 +17,8 @@
 #include <nucleos/kipc.h>
 #include <nucleos/u64.h>
 #include <nucleos/devio.h>
-
+#include <nucleos/lib.h>
+#include <nucleos/com.h>
 #include <nucleos/safecopies.h>
 
 /* Forward declaration */
@@ -29,27 +30,28 @@ struct rs_pci;
 /*==========================================================================* 
  * Minix system library. 						    *
  *==========================================================================*/ 
-int _taskcall(int who, int syscallnr, message *msgptr);
+int _taskcall(endpoint_t who, int syscallnr, message *msgptr);
 
 int sys_abort(int how, ...);
-int sys_enable_iop(endpoint_t proc);
-int sys_exec(endpoint_t proc, char *ptr, char *aout, vir_bytes initpc);
-int sys_fork(endpoint_t parent, endpoint_t child, int *, struct mem_map *ptr, u32_t vm);
-int sys_newmap(endpoint_t proc, struct mem_map *ptr);
-int sys_exit(endpoint_t proc);
-int sys_trace(int req, endpoint_t proc, long addr, long *data_p);
+int sys_enable_iop(endpoint_t proc_ep);
+int sys_exec(endpoint_t proc_ep, char *ptr, char *aout, vir_bytes initpc);
+int sys_fork(endpoint_t parent, endpoint_t child, endpoint_t *, struct mem_map *ptr, u32_t vm, vir_bytes *);
+int sys_newmap(endpoint_t proc_ep, struct mem_map *ptr);
+int sys_exit(endpoint_t proc_ep);
+int sys_trace(int req, endpoint_t proc_ep, long addr, long *data_p);
 
-int sys_privctl(endpoint_t proc, int req, void *p);
+int sys_privctl(endpoint_t proc_ep, int req, void *p);
 int sys_setgrant(cp_grant_t *grants, int ngrants);
-int sys_nice(endpoint_t proc, int priority);
+int sys_nice(endpoint_t proc_ep, int priority);
 
 int sys_int86(struct reg86u *reg86p);
 int sys_vm_setbuf(phys_bytes base, phys_bytes size, phys_bytes high);
-int sys_vm_map(endpoint_t proc_nr, int do_map, phys_bytes base, phys_bytes size, phys_bytes offset);
+int sys_vm_map(endpoint_t proc_ep, int do_map, phys_bytes base, phys_bytes size, phys_bytes offset);
 int sys_vmctl(endpoint_t who, int param, u32_t value);
 int sys_vmctl_get_pagefault_i386(endpoint_t *who, u32_t *cr2, u32_t *err);
 int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3);
-int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem, vir_bytes *len, int *wrflag);
+int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem, vir_bytes *len, int *wrflag, endpoint_t *);
+int sys_vmctl_enable_paging(struct mem_map *);
 
 int sys_readbios(phys_bytes address, void *buf, size_t size);
 int sys_stime(time_t boottime);
@@ -57,14 +59,14 @@ int sys_sysctl(int ctl, char *arg1, int arg2);
 int sys_sysctl_stacktrace(endpoint_t who);
 
 /* Shorthands for sys_sdevio() system call. */
-#define sys_insb(port, proc_nr, buffer, count) \
-  sys_sdevio(DIO_INPUT_BYTE, port, proc_nr, buffer, count, 0)
-#define sys_insw(port, proc_nr, buffer, count) \
-  sys_sdevio(DIO_INPUT_WORD, port, proc_nr, buffer, count, 0)
-#define sys_outsb(port, proc_nr, buffer, count) \
-  sys_sdevio(DIO_OUTPUT_BYTE, port, proc_nr, buffer, count, 0)
-#define sys_outsw(port, proc_nr, buffer, count) \
-  sys_sdevio(DIO_OUTPUT_WORD, port, proc_nr, buffer, count, 0)
+#define sys_insb(port, proc_ep, buffer, count) \
+  sys_sdevio(DIO_INPUT_BYTE, port, proc_ep, buffer, count, 0)
+#define sys_insw(port, proc_ep, buffer, count) \
+  sys_sdevio(DIO_INPUT_WORD, port, proc_ep, buffer, count, 0)
+#define sys_outsb(port, proc_ep, buffer, count) \
+  sys_sdevio(DIO_OUTPUT_BYTE, port, proc_ep, buffer, count, 0)
+#define sys_outsw(port, proc_ep, buffer, count) \
+  sys_sdevio(DIO_OUTPUT_WORD, port, proc_ep, buffer, count, 0)
 #define sys_safe_insb(port, ept, grant, offset, count) \
   sys_sdevio(DIO_SAFE_INPUT_BYTE, port, ept, (void*)grant, count, offset)
 #define sys_safe_outsb(port, ept, grant, offset, count) \
@@ -74,17 +76,18 @@ int sys_sysctl_stacktrace(endpoint_t who);
 #define sys_safe_outsw(port, ept, grant, offset, count) \
   sys_sdevio(DIO_SAFE_OUTPUT_WORD, port, ept, (void*)grant, count, offset)
 
-int sys_sdevio(int req, long port, endpoint_t proc_nr, void *buffer, int count, vir_bytes offset);
+int sys_sdevio(int req, long port, endpoint_t proc_ep, void *buffer, int count, vir_bytes offset);
 void *alloc_contig(size_t len, int flags, phys_bytes *phys);
 
 #define AC_ALIGN4K	0x01
 #define AC_LOWER16M	0x02
 #define AC_ALIGN64K	0x04
+#define AC_LOWER1M	0x08
 
 /* Clock functionality: get system times,r (un)schedule an alarm call, or 
  * retrieve/set a process-virtual timer.
  */
-int sys_times(endpoint_t proc_nr, clock_t *user_time, clock_t *sys_time, clock_t *uptime);
+int sys_times(endpoint_t proc_ep, clock_t *user_time, clock_t *sys_time, clock_t *uptime);
 int sys_setalarm(clock_t exp_time, int abs_time);
 int sys_vtimer(endpoint_t proc_nr, int which, clock_t *newval, clock_t *oldval);
 
@@ -137,9 +140,9 @@ int sys_virvcopy(phys_cp_req *vec_ptr,int vec_size,int *nr_ok);
 int sys_physvcopy(phys_cp_req *vec_ptr,int vec_size,int *nr_ok);
 #endif
 
-int sys_umap(endpoint_t proc_nr, int seg, vir_bytes vir_addr, vir_bytes bytes,
+int sys_umap(endpoint_t proc_ep, int seg, vir_bytes vir_addr, vir_bytes bytes,
 	     phys_bytes *phys_addr);
-int sys_umap_data_fb(endpoint_t proc_nr, vir_bytes vir_addr, vir_bytes bytes,
+int sys_umap_data_fb(endpoint_t proc_ep, vir_bytes vir_addr, vir_bytes bytes,
 		     phys_bytes *phys_addr);
 int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_bytes size);
 
@@ -159,8 +162,6 @@ int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_byte
 #define sys_getmonparams(v,vl)	sys_getinfo(GET_MONPARAMS, v,vl, 0,0)
 #define sys_getschedinfo(v1,v2)	sys_getinfo(GET_SCHEDINFO, v1,0, v2,0)
 #define sys_getlocktimings(dst)	sys_getinfo(GET_LOCKTIMING, dst, 0,0,0)
-#define sys_getbiosbuffer(virp, sizep) \
-	sys_getinfo(GET_BIOSBUFFER, virp, sizeof(*virp), sizep, sizeof(*sizep))
 #define sys_getprivid(nr)	sys_getinfo(GET_PRIVID, 0, 0,0, nr)
 #define sys_getbootparam(dst)	sys_getinfo(GET_BOOTPARAM, dst, 0,0,0)
 
@@ -168,11 +169,11 @@ int sys_getinfo(int request, void *val_ptr, int val_len, void *val_ptr2, int val
 int sys_whoami(endpoint_t *ep, char *name, int namelen);
 
 /* Signal control. */
-int sys_kill(endpoint_t proc, int sig);
-int sys_sigsend(endpoint_t proc_nr, struct sigmsg *sig_ctxt); 
-int sys_sigreturn(endpoint_t proc_nr, struct sigmsg *sig_ctxt);
-int sys_getksig(endpoint_t *k_proc_nr, sigset_t *k_sig_map); 
-int sys_endksig(endpoint_t proc_nr);
+int sys_kill(endpoint_t proc_ep, int sig);
+int sys_sigsend(endpoint_t proc_ep, struct sigmsg *sig_ctxt); 
+int sys_sigreturn(endpoint_t proc_ep, struct sigmsg *sig_ctxt);
+int sys_getksig(endpoint_t *k_proc_ep, sigset_t *k_sig_map); 
+int sys_endksig(endpoint_t proc_ep);
 
 /* NOTE: two different approaches were used to distinguish the device I/O
  * types 'byte', 'word', 'long': the latter uses #define and results in a
@@ -218,11 +219,11 @@ void pci_attr_w32(int devind, int port, u32_t value);
 char *pci_dev_name(u16 vid, u16 did);
 char *pci_slot_name(int devind);
 int pci_set_acl(struct rs_pci *rs_pci);
-int pci_del_acl(endpoint_t proc_nr);
+int pci_del_acl(endpoint_t proc_ep);
 
 /* Profiling. */
-int sys_sprof(int action, int size, int freq, int endpt, void *ctl_ptr, void *mem_ptr);
-int sys_cprof(int action, int size, int endpt, void *ctl_ptr, void *mem_ptr);
+int sys_sprof(int action, int size, int freq, endpoint_t endpt, void *ctl_ptr, void *mem_ptr);
+int sys_cprof(int action, int size, endpoint_t endpt, void *ctl_ptr, void *mem_ptr);
 int sys_profbuf(void *ctl_ptr, void *mem_ptr);
 
 /* read_tsc() and friends. */

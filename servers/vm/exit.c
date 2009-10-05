@@ -18,6 +18,7 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
+#include <nucleos/bitmap.h>
 
 #include <nucleos/errno.h>
 #include <env.h>
@@ -29,8 +30,10 @@
 
 void free_proc(struct vmproc *vmp)
 {
-	vmp->vm_flags &= ~VMF_HASPT;
-	pt_free(&vmp->vm_pt);
+	if(vmp->vm_flags & VMF_HASPT) {
+		vmp->vm_flags &= ~VMF_HASPT;
+		pt_free(&vmp->vm_pt);
+	}
 	map_free_proc(vmp);
 	vmp->vm_regions = NULL;
 #if VMSTATS

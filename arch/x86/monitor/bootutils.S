@@ -656,7 +656,7 @@ getch:
 	test	%ax, %ax
 	jnz	gotch
 .Lgetch:
-//  hlt                   // Play dead until interrupted (see pause())
+//  hlt                   // Play dead until interrupted (see monitor_pause())
 	movb	$0x01, %ah    // Keyboard status
 	int	$0x16
 	jz	0f            // Nothing typed
@@ -791,11 +791,11 @@ nulch:
 	                      // cleanup the garbage from higher bits.
 	ret
 
-// void pause(void);
+// void monitor_pause(void);
 //       Wait for an interrupt using the HLT instruction.  This either saves
 //       power, or tells an x86 emulator that nothing is happening right now.
-.globl pause
-pause:
+.globl monitor_pause
+monitor_pause:
 //  hlt
 	ret
 

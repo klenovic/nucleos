@@ -58,7 +58,6 @@
 #include <kernel/const.h>
 #include <asm/page.h>
 
-#include "vm.S"
 #include "sconst.S"
 
 /* Selected 386 tss offsets. */
@@ -73,9 +72,8 @@
 .globl  restart
 .globl  save
 
-.globl  kernel_cr3
-.globl  pagefault_cr2
-.globl  pagefault_count
+.globl reload_cr3
+.globl write_cr3      // write cr3
 
 .globl  errexception
 .globl  xception1
@@ -101,6 +99,9 @@
 .globl  params_size
 .globl  params_offset
 .globl  mon_ds
+
+.globl schedcheck
+.globl dirtypde
 
 .globl  hwint00        // handlers for hardware interrupts
 .globl  hwint01
@@ -231,17 +232,11 @@ csinit:
         mov     %ax, %gs
         mov     %ax, %ss
 
-//    o16 mov     $TSS_SELECTOR,%ax       // no other TSS is used
         movw     $TSS_SELECTOR, %ax     // no other TSS is used
         ltr     %ax
         push    $0                      // set flags to known good state
         popf                            // esp, clear nested task and int enable
 
-#ifdef CONFIG_KERNEL_VM_NOPAGEZERO
-       jmp     laststep
-.p2align PAGE_SHIFT
-laststep:
-#endif
         jmp     main                    // main()
 
 .section .text
@@ -257,7 +252,6 @@ laststep:
 #define hwint_master(irq)       \
         call    save                 /* save interrupted process state */;\
         push    irq_handlers+4*irq   /* irq_handlers[irq]              */;\
-        LOADCR3WITHEAX(irq, kernel_cr3) /* switch to kernel page table */;\
         call    intr_handle          /* intr_handle(irq_handlers[irq]) */;\
         pop     %ecx                                                     ;\
         cmp     $0, irq_actids+4*irq /* interrupt still active?        */;\
@@ -302,7 +296,6 @@ hwint07:               // Interrupt routine for irq 7 (printer)
 #define hwint_slave(irq)        \
         call    save                 /* save interrupted process state */;\
         push    irq_handlers+4*irq   /* irq_handlers[irq]              */;\
-        LOADCR3WITHEAX(irq, kernel_cr3) /* switch to kernel page table */;\
         call    intr_handle          /* intr_handle(irq_handlers[irq]) */;\
         pop     %ecx                                                     ;\
         cmp     $0, irq_actids+4*irq /* interrupt still active?        */;\
@@ -400,8 +393,6 @@ p_s_call:
         push    %eax              // source / destination
         push    %ecx              // call number (ipc primitive to use)
 
-//      LOADCR3WITHEAX(0x20, kernel_cr3)
-
         call    sys_call          // sys_call(call_nr, src_dst, m_ptr, bit_map)
                                   // caller is now explicitly in proc_ptr
         mov     %eax, AXREG(%esi) // sys_call MUST PRESERVE si
@@ -413,17 +404,23 @@ p_s_call:
 //===========================================================================
 restart:
 // Restart the current process or the next process if it is set. 
-        cmp     $0, next_ptr           // see if another process is scheduled
-        jz      0f
-        mov     next_ptr, %eax
-        mov     %eax, proc_ptr         // schedule new process 
-        movl    $0, next_ptr
+	cli
+	call    schedcheck             // ask C function who we are running
+	mov     proc_ptr, %esp      //  will assume P_STACKBASE == 0
+	lldt    P_LDT_SEL(%esp)        // enable process'' segment descriptors
+	cmp     $0, P_CR3(%esp)        // process does not have its own PT
+	jz      0f
+	mov     P_CR3(%esp), %eax
+	cmp     loadedcr3, %eax
+	jz      0f
+	mov     %eax, %cr3
+	mov     %eax, loadedcr3
+	mov     proc_ptr, %eax
+	mov     %eax, ptproc
+	movl     $0, dirtypde
 0:
-        mov     proc_ptr, %esp         // will assume P_STACKBASE == 0
-        lldt    P_LDT_SEL(%esp)        // enable process'' segment descriptors 
-        LOADCR3WITHEAX(0x21, P_CR3(%esp)) // switch to process page table
-        lea     P_STACKTOP(%esp), %eax // arrange for next interrupt
-        mov     %eax, tss+TSS3_S_SP0   // to save state in process table
+	lea     P_STACKTOP(%esp), %eax // arrange for next interrupt
+	mov     %eax, tss+TSS3_S_SP0   // to save state in process table
 restart1:
         decb    k_reenter
         popw     %gs
@@ -497,8 +494,7 @@ page_fault:
         push    $PAGE_FAULT_VECTOR
         push    %eax
         mov     %cr2, %eax
-        mov     %eax, %ss:pagefault_cr2
-        incl    %ss:pagefault_count
+	mov     %eax, %ss:pagefaultcr2
         pop     %eax
 
         jmp     errexception
@@ -526,18 +522,29 @@ errexception:
         pop     %ss:ex_number
         pop     %ss:trap_errno
 exception1:                           // Common for all exceptions.
+	mov     %esp, %ss:old_eax_ptr       	// where will eax be saved?
+	sub     $PCREG-AXREG, %ss:old_eax_ptr       // here
+
         push    %eax                  // eax is scratch register
         mov     0+4(%esp), %eax       // old eip
         mov     %eax, %ss:old_eip
+
+	mov     %esp, %eax
+	add     $4, %eax
+	mov     %eax, %ss:old_eip_ptr
+
         movzwl  4+4(%esp), %eax       // old cs
         mov     %eax, %ss:old_cs
         mov     8+4(%esp), %eax       // old eflags
         mov     %eax, %ss:old_eflags
 
-        LOADCR3WITHEAX(0x24, kernel_cr3)
-
         pop     %eax
         call    save
+
+	push    pagefaultcr2
+	push    old_eax_ptr
+	push    old_eip_ptr
+
         push    old_eflags
         push    old_cs
         push    old_eip
@@ -546,8 +553,37 @@ exception1:                           // Common for all exceptions.
         call    exception_handler      // (ex_number, trap_errno, old_eip,
                                        //      old_cs, old_eflags)
                                        // @klenovic: defined inside C source
-        add     $5*4, %esp
+        add     $8*4, %esp
         ret
+//===========================================================================*
+//                             write_cr3                               *
+//===========================================================================*
+// void write_cr3(unsigned long value);
+write_cr3:
+       push    %ebp
+       mov     %esp, %ebp
+       mov     8(%ebp), %eax
+       cmp     loadedcr3, %eax
+       jz      0f
+       mov     %eax, %cr3
+       mov     %eax, loadedcr3
+       movl    $0, dirtypde
+0:
+       pop     %ebp
+       ret
+
+//===========================================================================*
+//                             reload_cr3                              *
+//===========================================================================*
+// PUBLIC void reload_cr3(void);
+reload_cr3:
+       push    %ebp
+       mov     %esp, %ebp
+       movl    $0, dirtypde
+       mov     %cr3, %eax
+       mov     %eax, %cr3
+       pop     %ebp
+       ret
 
 //===========================================================================
 //                            level0_call
@@ -555,14 +591,6 @@ exception1:                           // Common for all exceptions.
 level0_call:
         call    save
         jmp     *level0_func
-//===========================================================================
-//                             load_kernel_cr3
-//===========================================================================
-.p2align 4
-load_kernel_cr3:
-       mov     kernel_cr3, %eax
-       mov     %eax, %cr3
-       ret
 
 //===========================================================================
 //                             rodata
@@ -577,6 +605,10 @@ k_stack:
 k_stktop:
 	.lcomm   ex_number, 4
 	.lcomm   trap_errno, 4
+	.lcomm   old_eip_ptr, 4
+	.lcomm   old_eax_ptr, 4
 	.lcomm   old_eip, 4
 	.lcomm   old_cs, 4
 	.lcomm   old_eflags, 4
+	.lcomm   pagefaultcr2, 4
+	.lcomm   loadedcr3, 4

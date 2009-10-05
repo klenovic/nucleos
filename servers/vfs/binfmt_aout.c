@@ -194,7 +194,12 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 	char buf[1024];
 
 	/* Make sure that the file is big enough */
-	if (vp->v_size < off+seg_bytes) return -EIO;
+	if (vp->v_size < off+seg_bytes) {
+		printf("VFS: read_seg: file isn't big enough (size %ld, need %ld)\n",
+		vp->v_size, off+seg_bytes);
+
+		return -EIO;
+	}
 
 	if (seg != D) {
 		/* We have to use a copy loop until safecopies support segments */
@@ -215,7 +220,10 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 					  cvul64(off+k), READING, FS_PROC_NR, buf, n, &new_pos,
 					  &cum_io_incr);
 
-			if (err) return err;
+			if (err) {
+				printf("VFS: read_seg: req_readwrite failed (text)\n");
+				return err;
+			}
 
 			if (cum_io_incr != n) {
 				printf("read_seg segment has not been read properly by exec()\n");
@@ -224,8 +232,10 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 
 			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
-			if (err)
+			if (err) {
+				printf("VFS: read_seg: copy failed (text)\n");
 				return err;
+			}
 
 			k += n;
 		}
@@ -242,7 +252,10 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(off),
 			    READING, proc_e, 0, seg_bytes, &new_pos, &cum_io_incr);
 
-	if (err) return err;
+	if (err) {
+		printf("VFS: read_seg: req_readwrite failed (data)\n");
+		return err;
+	}
 
 	if (!err && cum_io_incr != seg_bytes)
 		printf("VFSread_seg segment has not been read properly by exec() \n");

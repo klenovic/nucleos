@@ -17,7 +17,7 @@ PATCHLEVEL = 1
 # grows if in case of bug fixes (current VERSION and PATCHLEVEL)
 SUBLEVEL = 0
 # extraversion string e.g. alpha, beta, -rc1, ...
-EXTRAVERSION = -alpha2
+EXTRAVERSION = -alpha3
 # name/motto/quote for release
 NAME = Get the ball rolling!
 

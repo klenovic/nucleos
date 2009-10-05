@@ -20,6 +20,7 @@
 #define ELOOP			40  /* too many levels of symlinks detected */
 
 #define ERESTART		41  /* driver restarted */
+#define EIDRM			43  /* Identifier removed */
 
 /* The following errors relate to networking. */
 #define EPACKSIZE		50  /* invalid packet size for some protocol */

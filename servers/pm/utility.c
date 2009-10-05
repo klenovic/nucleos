@@ -118,3 +118,23 @@ int pm_isokendpt(int endpoint, int *proc)
 	return 0;
 }
 
+int unmap_ok = 0;
+
+int munmap(void *addrstart, vir_bytes len)
+{
+	if(!unmap_ok)
+		return -ENOSYS;
+
+	/* call the definition from library */
+	return __munmap(addrstart, len);
+}
+
+int munmap_text(void *addrstart, vir_bytes len)
+{
+	if(!unmap_ok)
+		return -ENOSYS;
+
+	 /* call the definition from library */
+	return __munmap_text(addrstart, len);
+
+}

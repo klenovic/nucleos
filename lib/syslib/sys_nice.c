@@ -7,16 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 /*===========================================================================*
  *                                sys_nice			     	     *
  *===========================================================================*/
-int sys_nice(int proc, int prio)
+int sys_nice(endpoint_t proc_ep, int prio)
 {
   message m;
 
-  m.PR_ENDPT = proc;
+  m.PR_ENDPT = proc_ep;
   m.PR_PRIORITY = prio;
   return(_taskcall(SYSTASK, SYS_NICE, &m));
 }

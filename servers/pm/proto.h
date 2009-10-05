@@ -94,6 +94,7 @@ int do_sigprocmask(void);
 int do_sigreturn(void);
 int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
+int vm_notify_sig_wrapper(endpoint_t ep); 
 
 /* time.c */
 int do_stime(void);

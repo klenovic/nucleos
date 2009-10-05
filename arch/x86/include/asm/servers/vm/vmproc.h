@@ -11,6 +11,12 @@
 #define __ASM_X86_SERVERS_VM_VMPROC_H
 
 #include <asm/kernel/types.h>
+#include <nucleos/const.h>
+#include <nucleos/type.h>
+#include <nucleos/com.h>
+#include <nucleos/kipc.h>
+#include <nucleos/safecopies.h>
+#include <nucleos/timer.h>
 
 struct vm_arch {
 	struct mem_map	vm_seg[NR_LOCAL_SEGS];	/* text, data, stack */

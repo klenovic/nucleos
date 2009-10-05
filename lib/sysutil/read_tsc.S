@@ -28,3 +28,23 @@ read_tsc:
 	pop %edx
 	ret
 
+//===========================================================================*
+// PUBLIC void read_host_time_ns(unsigned long *high, unsigned long *low);
+// access real time in ns from host in vmware.
+.p2align 4
+read_host_time_ns:
+	push %edx
+	push %eax
+	push %ecx
+	mov $0x10001, %ecx
+	rdpmc		// it places the result in EDX:EAX
+	push %ebp
+	mov 20(%esp), %ebp
+	mov %edx, (%ebp)
+	mov 24(%esp), %ebp
+	mov %eax, (%ebp)
+	pop %ebp
+	pop %ecx
+	pop %eax
+	pop %edx
+	ret

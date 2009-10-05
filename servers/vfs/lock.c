@@ -106,7 +106,7 @@ int req;			/* either F_SETLK or F_SETLKW */
 			return(-EAGAIN);
 		} else {
 			/* For F_SETLKW, suspend the process. */
-			suspend(XLOCK);
+			suspend(FP_BLOCKED_ON_LOCK);
 			return(SUSPEND);
 		}
 	}
@@ -192,13 +192,11 @@ void lock_revive()
  * locking).
  */
 
-  int task;
   struct fproc *fptr;
 
   for (fptr = &fproc[INIT_PROC_NR + 1]; fptr < &fproc[NR_PROCS]; fptr++){
 	if(fptr->fp_pid == PID_FREE) continue;
-	task = -fptr->fp_task;
-	if (fptr->fp_suspended == SUSPENDED && task == XLOCK) {
+	if (fptr->fp_blocked_on == FP_BLOCKED_ON_LOCK) {
 		revive(fptr->fp_endpoint, 0);
 	}
   }

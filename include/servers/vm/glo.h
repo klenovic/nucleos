@@ -17,19 +17,20 @@
 #include <servers/vm/vm.h>
 #include <servers/vm/vmproc.h>
 
-extern struct vmproc vmproc[NR_PROCS+1];
+#define VMP_SYSTEM	NR_PROCS
+#define VMP_EXECTMP	NR_PROCS + 1
+#define VMP_NR		NR_PROCS + 2
+
+extern struct vmproc vmproc[];
 
 #if SANITYCHECKS
 extern int nocheck;
-u32_t data1[200];
-#define CHECKADDR 0
+extern int incheck;
 extern long vm_sanitychecklevel;
 #endif
 
-#define VMP_SYSTEM	NR_PROCS
-
 /* vm operation mode state and values */
 extern long vm_paged;
-extern phys_bytes kernel_top_bytes;
+extern int meminit_done;
 
 #endif /* __SERVERS_VM_GLO_H */

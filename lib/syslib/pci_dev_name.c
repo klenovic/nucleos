@@ -12,7 +12,7 @@ pci_dev_name.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 /*===========================================================================*

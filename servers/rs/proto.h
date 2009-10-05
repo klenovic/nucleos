@@ -22,6 +22,7 @@ int do_down(message *m);
 int do_refresh(message *m);
 int do_rescue(message *m);
 int do_restart(message *m);
+int do_lookup(message *m);
 int do_shutdown(message *m);
 void do_period(message *m);
 void do_exit(message *m);

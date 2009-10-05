@@ -11,6 +11,7 @@
 #ifndef __ASM_X86_PAGETABLE_H
 #define __ASM_X86_PAGETABLE_H
 
+#include <nucleos/vm.h>
 #include <nucleos/types.h>
 #include <asm/servers/vm/vm.h>
 
@@ -42,5 +43,11 @@ typedef struct {
  * the regular flags are set.
  */
 #define PTF_ALLFLAGS	(PTF_WRITE|PTF_PRESENT|PTF_USER|PTF_GLOBAL)
+
+#if SANITYCHECKS
+#define PT_SANE(p) { pt_sanitycheck((p), __FILE__, __LINE__); }
+#else
+#define PT_SANE(p)
+#endif
 
 #endif /* __ASM_X86_PAGETABLE_H */

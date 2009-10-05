@@ -12,7 +12,7 @@ pci_init1.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
 #include <servers/ds/ds.h>

@@ -7,17 +7,17 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
-int sys_newmap(proc, ptr)
-int proc;			/* process whose map is to be changed */
+int sys_newmap(proc_ep, ptr)
+endpoint_t proc_ep;		/* process whose map is to be changed */
 struct mem_map *ptr;		/* pointer to new map */
 {
 /* A process has been assigned a new memory map.  Tell the kernel. */
 
   message m;
 
-  m.PR_ENDPT = proc;
+  m.PR_ENDPT = proc_ep;
   m.PR_MEM_PTR = (char *) ptr;
   return(_taskcall(SYSTASK, SYS_NEWMAP, &m));
 }

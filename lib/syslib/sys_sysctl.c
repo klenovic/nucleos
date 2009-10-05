@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 int sys_sysctl(int code, char *arg1, int arg2)
 {

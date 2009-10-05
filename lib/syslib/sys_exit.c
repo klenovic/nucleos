@@ -7,13 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 /*===========================================================================*
  *                                sys_exit			     	     *
  *===========================================================================*/
-int sys_exit(proc)
-int proc;			/* which process has exited */
+int sys_exit(proc_ep)
+endpoint_t proc_ep;			/* which process has exited */
 {
 /* A process has exited. PM tells the kernel. In addition this call can be
  * used by system processes to directly exit without passing through the
@@ -21,6 +21,6 @@ int proc;			/* which process has exited */
  */
   message m;
 
-  m.PR_ENDPT = proc;
+  m.PR_ENDPT = proc_ep;
   return(_taskcall(SYSTASK, SYS_EXIT, &m));
 }

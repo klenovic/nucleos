@@ -12,7 +12,7 @@ pci_next_dev.c
 */
 
 #include "pci.h"
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 /*===========================================================================*

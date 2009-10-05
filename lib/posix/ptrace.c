@@ -16,7 +16,7 @@ long ptrace(int req, pid_t pid, long addr, long data)
 
   m.m2_i1 = pid;
   m.m2_i2 = req;
-  m.m2_l1 = addr;
+  m.PMTRACE_ADDR = addr;
   m.m2_l2 = data;
   if (_syscall(PM_PROC_NR, __NR_ptrace, &m) < 0) return(-1);
 

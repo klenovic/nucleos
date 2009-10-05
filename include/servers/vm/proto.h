@@ -34,13 +34,19 @@ int do_getdma(message *msg);
 int do_allocmem(message *msg);
 void release_dma(struct vmproc *vmp);
 
+void memstats(int *nodes, int *pages, int *largest);
+void printmemstats(void);
+void usedpages_reset(void);
+int usedpages_add_f(phys_bytes phys, phys_bytes len,
+       char *file, int line);
+
 void free_mem_f(phys_clicks base, phys_clicks clicks);
+#define usedpages_add(a, l) usedpages_add_f(a, l, __FILE__, __LINE__)
 
 #define ALLOC_MEM(clicks, flags) alloc_mem_f(clicks, flags)
 #define FREE_MEM(base, clicks) free_mem_f(base, clicks)
 
 void mem_init(struct memory *chunks);
-void memstats(void);
 
 /* utility.c */
 int get_mem_map(int proc_nr, struct mem_map *mem_map);
@@ -49,6 +55,7 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr);
 int reserve_initrd_mem(struct memory *mem_chunks);
 int vm_isokendpt(endpoint_t ep, int *proc);
 int get_stack_ptr(int proc_nr, vir_bytes *sp);
+int do_ctl(message *);
 
 /* exit.c */
 void clear_proc(struct vmproc *vmp);
@@ -83,27 +90,36 @@ int vfs_close(struct vmproc *for_who, callback_t callback, int fd);
 
 /* mmap.c */
 int do_mmap(message *msg);
+int do_munmap(message *msg);
 int do_map_phys(message *msg);
 int do_unmap_phys(message *msg);
+int do_remap(message *m);
+int do_get_phys(message *m);
+int do_shared_unmap(message *m);
+int do_get_refcount(message *m);
 
 /* pagefaults.c */
 void do_pagefaults(void);
 void do_memory(void);
 char *pf_errstr(u32_t err);
+int handle_memory(struct vmproc *vmp, vir_bytes mem,
+       vir_bytes len, int wrflag);
 
 /* $(ARCH)/pagetable.c */
 void pt_init(void);
+void pt_check(struct vmproc *vmp);
 int pt_new(pt_t *pt);
 void pt_free(pt_t *pt);
 void pt_freerange(pt_t *pt, vir_bytes lo, vir_bytes hi);
 int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr, size_t bytes, u32_t flags,
 		u32_t writemapflags);
+int pt_checkrange(pt_t *pt, vir_bytes v,  size_t bytes, int write);
 int pt_bind(pt_t *pt, struct vmproc *who);
-void *vm_allocpages(phys_bytes *p, int pages, int cat);
+void *vm_allocpage(phys_bytes *p, int cat);
+
 void pt_cycle(void);
 int pt_mapkernel(pt_t *pt);
-void phys_readaddr(phys_bytes addr, phys_bytes *v1, phys_bytes *v2);
-void phys_writeaddr(phys_bytes addr, phys_bytes v1, phys_bytes v2);
+void vm_pagelock(void *vir, int lockflag);
 
 #if SANITYCHECKS
 void pt_sanitycheck(pt_t *pt, char *file, int line);
@@ -116,19 +132,14 @@ int arch_get_pagefault(endpoint_t *who, vir_bytes *addr, u32_t *err);
 void *slaballoc(int bytes);
 void slabfree(void *mem, int bytes);
 void slabstats(void);
+void slab_sanitycheck(char *file, int line);
 
 #define SLABALLOC(var) (var = slaballoc(sizeof(*var)))
 #define SLABFREE(ptr) slabfree(ptr, sizeof(*(ptr)))
 #if SANITYCHECKS
-int slabsane(void *mem, int bytes);
-#define SLABSANE(ptr) { \
-       if(!slabsane(ptr, sizeof(*(ptr)))) { \
-               printf("VM:%s:%d: SLABSANE(%s)\n", __FILE__, __LINE__, #ptr); \
-               vm_panic("SLABSANE failed", NO_NUM);    \
-       } \
-}
-#else
-#define SLABSANE(ptr)
+void slabunlock,(void *mem, int bytes));
+void slablock,(void *mem, int bytes));
+int slabsane_f,(char *file, int line, void *mem, int bytes));
 #endif
 /* region.c */
 struct vir_region * map_page_region(struct vmproc *vmp, vir_bytes min, vir_bytes max,
@@ -136,7 +147,7 @@ struct vir_region * map_page_region(struct vmproc *vmp, vir_bytes min, vir_bytes
 struct vir_region * map_proc_kernel(struct vmproc *dst);
 int map_region_extend(struct vmproc *vmp, struct vir_region *vr, vir_bytes delta);
 int map_region_shrink(struct vir_region *vr, vir_bytes delta);
-int map_unmap_region(struct vmproc *vmp, struct vir_region *vr);
+int map_unmap_region(struct vmproc *vmp, struct vir_region *vr, vir_bytes len);
 int map_free_proc(struct vmproc *vmp);
 int map_proc_copy(struct vmproc *dst, struct vmproc *src);
 struct vir_region *map_lookup(struct vmproc *vmp, vir_bytes addr);
@@ -144,10 +155,18 @@ int map_pf(struct vmproc *vmp, struct vir_region *region, vir_bytes offset, int 
 int map_handle_memory(struct vmproc *vmp, struct vir_region *region, vir_bytes offset,
 		       vir_bytes len, int write);
 
+void map_printmap(struct vmproc *vmp);
+int map_writept(struct vmproc *vmp);
+void printregionstats(struct vmproc *vmp);
+
 struct vir_region * map_region_lookup_tag(struct vmproc *vmp, u32_t tag);
 void map_region_set_tag(struct vir_region *vr, u32_t tag);
 u32_t map_region_get_tag(struct vir_region *vr);
 
+int map_remap(struct vmproc *dvmp, vir_bytes da, size_t size,
+		struct vir_region *region, vir_bytes *r);
+int map_get_phys(struct vmproc *vmp, vir_bytes addr, phys_bytes *r);
+int map_get_ref(struct vmproc *vmp, vir_bytes addr, u8_t *cnt);
 
 #if SANITYCHECKS
 void map_sanitycheck(char *file, int line);
@@ -157,5 +176,16 @@ void map_sanitycheck(char *file, int line);
 void arch_init_vm(struct memory mem_chunks[NR_MEMS]);
 vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr);
 vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr);
+vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr);
+vir_bytes arch_vir2map_text(struct vmproc *vmp, vir_bytes addr);
+vir_bytes arch_addrok(struct vmproc *vmp, vir_bytes addr);
+
+/* rs.c */
+int do_rs_set_priv(message *m);
+
+/* queryexit.c */
+int do_query_exit(message *m);
+int do_notify_sig(message *m);
+void init_query_exit(void);
 
 #endif /* __SERVERS_VM_PROTO_H */

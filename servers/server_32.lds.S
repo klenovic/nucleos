@@ -30,14 +30,7 @@ SECTIONS
 
 	.data 0 : AT (SIZEOF(.text)) {
 		__data = .;
-#ifdef CONFIG_NULL_DEREFER
-		/* Since plenty of legacy code does null pointer
-		 *  dereferencing (*NULL). This hack ensures that
-		 *  *NULL == 0. Should be removed because it makes
-		 *  debugging harder.
-		 */
-		LONG(0);
-#endif
+		. = (. == 0) ? (PAGE_SIZE) : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
 		*(.rodata)
 		*(.rodata.*)
 		*(.data)

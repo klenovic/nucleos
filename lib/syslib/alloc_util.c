@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 #include <stdlib.h>
 #include <nucleos/errno.h>
@@ -38,6 +38,8 @@ void *alloc_contig(size_t len, int flags, phys_bytes *phys)
 
 	if(flags & AC_LOWER16M)
 		mmapflags |= MAP_LOWER16M;
+	if(flags & AC_LOWER1M)
+		mmapflags |= MAP_LOWER1M;
 	if(flags & AC_ALIGN64K)
 		mmapflags |= MAP_ALIGN64K;
 

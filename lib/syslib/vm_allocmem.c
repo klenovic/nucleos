@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 #include <nucleos/vm.h>
 

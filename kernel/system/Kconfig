@@ -27,12 +27,3 @@ config KERNEL_MESSAGES_BUFFER_SIZE
 	default 10000
 	---help---
 	  Size of buffer for kernel messages.
-
-config KERNEL_VM_NOPAGEZERO
-	bool "First page of code and data unmapped"
-	default y
-	---help---
-	  Say Y if you want to compile the kernel so that first page
-	  of code and data can be unmapped.
-
-	  If unsure say Y here.

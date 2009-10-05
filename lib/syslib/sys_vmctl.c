@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 int sys_vmctl(endpoint_t who, int param, u32_t value)
 {
@@ -52,7 +52,7 @@ int sys_vmctl_get_cr3_i386(endpoint_t who, u32_t *cr3)
 }
 
 int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem,
-	vir_bytes *len, int *wrflag)
+	vir_bytes *len, int *wrflag, endpoint_t *requestor)
 {
   message m;
   int r;
@@ -65,7 +65,16 @@ int sys_vmctl_get_memreq(endpoint_t *who, vir_bytes *mem,
 	*mem = (vir_bytes) m.SVMCTL_MRG_ADDR;
 	*len = m.SVMCTL_MRG_LEN;
 	*wrflag = m.SVMCTL_MRG_WRITE;
+	*requestor = (endpoint_t) m.SVMCTL_MRG_REQUESTOR;
   }
   return r;
 }
 
+int sys_vmctl_enable_paging(struct mem_map *map)
+{
+	message m;
+	m.SVMCTL_WHO = SELF;
+	m.SVMCTL_PARAM = VMCTL_ENABLE_PAGING;
+	m.SVMCTL_VALUE = (int) map;
+	return _taskcall(SYSTASK, SYS_VMCTL, &m);
+}

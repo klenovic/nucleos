@@ -21,6 +21,8 @@
 #include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
+#include <nucleos/bitmap.h>
+#include <nucleos/mman.h>
 
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
@@ -39,17 +41,18 @@
 
 extern int missing_spares;
 
-struct vmproc vmproc[NR_PROCS+1];
+struct vmproc vmproc[VMP_NR];
 
 #if SANITYCHECKS
 int nocheck;
-#define CHECKADDR 0
+int incheck;
 long vm_sanitychecklevel;
 #endif
 
 /* vm operation mode state and values */
 long vm_paged;
-phys_bytes kernel_top_bytes;
+
+int meminit_done;
 
 typedef u32_t mask_t;
 
@@ -59,6 +62,7 @@ typedef u32_t mask_t;
 #define MAXEPM (ANYEPM-1)
 #define EPM(e) ((1L) << ((e)-MINEPM))
 #define EPMOK(mask, ep) (((mask) & EPM(ANYEPM)) || ((ep) >= MINEPM && (ep) <= MAXEPM && (EPM(ep) & (mask))))
+#define EPMANYOK(mask, ep) ((mask) & EPM(ANYEPM))
 
 /* Table of calls and a macro to test for being in range. */
 struct {
@@ -90,10 +94,9 @@ int main(void)
   int result, who_e;
 
 #if SANITYCHECKS
-  nocheck = 0;
-  memcpy(data1, CHECKADDR, sizeof(data1));    
+  incheck = nocheck = 0;
+  FIXME("VM SANITYCHECKS are on");
 #endif
-	SANITYCHECK(SCL_TOP);
 
   vm_paged = 1;
   env_parse("vm_paged", "d", 0, &vm_paged, 0, 1);
@@ -101,10 +104,7 @@ int main(void)
   env_parse("vm_sanitychecklevel", "d", 0, &vm_sanitychecklevel, 0, SCL_MAX);
 #endif
 
-	SANITYCHECK(SCL_TOP);
-
   vm_init();
-	SANITYCHECK(SCL_TOP);
 
   /* This is VM's main loop. */
   while (TRUE) {
@@ -114,9 +114,6 @@ int main(void)
 	if(missing_spares > 0) {
 		pt_cycle();	/* pagetable code wants to be called */
 	}
-#if SANITYCHECKS
-	slabstats();
-#endif
 	SANITYCHECK(SCL_DETAIL);
 
   	if ((r=kipc_receive(ANY, &msg)) != 0)
@@ -128,20 +125,17 @@ int main(void)
 		switch(msg.m_source) {
 			case SYSTEM:
 				/* Kernel wants to have memory ranges
-				 * verified.
+				 * verified, and/or pagefaults handled.
 				 */
 				do_memory();
+				break;
+			case HARDWARE:
+				do_pagefaults();
 				break;
 			case PM_PROC_NR:
 				/* PM sends a notify() on shutdown, which
 				 * is OK and we ignore.
 				 */
-				break;
-			case HARDWARE:
-				/* This indicates a page fault has happened,
-				 * which we have to handle.
-				 */
-				do_pagefaults();
 				break;
 			default:
 				/* No-one else should send us notifies. */
@@ -161,6 +155,26 @@ int main(void)
 		printf("VM: restricted call %s from %d instead of 0x%lx\n",
 			vm_calls[c].vmc_name, msg.m_source,
 			vm_calls[c].vmc_callers);
+	} else if (EPMANYOK(vm_calls[c].vmc_callers, who_e) &&
+		   c != VM_MMAP-VM_RQ_BASE &&
+		   c != VM_MUNMAP_TEXT-VM_RQ_BASE &&
+		   c != VM_MUNMAP-VM_RQ_BASE) {
+		/* check VM acl, we care ANYEPM only,
+		 * and omit other hard-coded permission checks.
+		 */
+		int n;
+
+		if ((r = vm_isokendpt(who_e, &n)) != 0)
+			vm_panic("VM: from strange source.", who_e);
+
+		if (!GET_BIT(vmproc[n].vm_call_priv_mask, c))
+			printf("VM: restricted call %s from %d\n",
+			       vm_calls[c].vmc_name, who_e);
+		else {
+	SANITYCHECK(SCL_FUNCTIONS);
+			result = vm_calls[c].vmc_func(&msg);
+	SANITYCHECK(SCL_FUNCTIONS);
+		}
 	} else {
 	SANITYCHECK(SCL_FUNCTIONS);
 		result = vm_calls[c].vmc_func(&msg);
@@ -185,12 +199,15 @@ int main(void)
   return 0;
 }
 
+extern int unmap_ok;
+
 /*===========================================================================*
  *				vm_init					     *
  *===========================================================================*/
 static void vm_init(void)
 {
 	int s, i;
+	int click, clicksforgotten = 0;
 	struct memory mem_chunks[NR_MEMS];
 	struct boot_image image[NR_BOOT_PROCS];
 	struct boot_image *ip;
@@ -258,43 +275,18 @@ static void vm_init(void)
 #ifndef CONFIG_BUILTIN_INITRD
 	/* Remove initrd memory from the free list. We must do it right after we
 	   have reserved memory for boot image otherwise it may happen that initrd
-	   will be overwritten by other process.
+	   will be overwritten by other process (in arch_init_vm).
 	 */
 	if ((s = reserve_initrd_mem(mem_chunks)) < 0) {
 		panic("VM", "Couldn't reserve memory for initial ramdisk!", s);
 	}
 #endif
-
-	/* Let architecture-dependent VM initialization use some memory. */
-	arch_init_vm(mem_chunks);
-
 	/* Architecture-dependent initialization. */
 	pt_init();
 
 	/* Initialize tables to all physical memory. */
 	mem_init(mem_chunks);
-
-	/* Bits of code need to know where a process can
-	 * start in a pagetable.
-	 */
-        kernel_top_bytes = find_kernel_top();
-
-	/* Can first kernel pages of code and data be (left) mapped out?
-	 * If so, change the SYSTEM process' memory map to reflect this
-	 * (future mappings of SYSTEM into other processes will not include
-	 * first pages), and free the first pages.
-	 */
-	if(vm_paged && sys_vmctl(SELF, VMCTL_NOPAGEZERO, 0) == 0) {
-	  	struct vmproc *vmp;
-		vmp = &vmproc[VMP_SYSTEM];
-		if(vmp->vm_arch.vm_seg[T].mem_len > 0) {
-#define DIFF CLICKSPERPAGE
-			vmp->vm_arch.vm_seg[T].mem_phys += DIFF;
-			vmp->vm_arch.vm_seg[T].mem_len -= DIFF;
-		}
-		vmp->vm_arch.vm_seg[D].mem_phys += DIFF;
-		vmp->vm_arch.vm_seg[D].mem_len -= DIFF;
-	}
+	meminit_done = 1;
 
 	/* Give these processes their own page table. */
 	for (ip = &image[0]; ip < &image[NR_BOOT_PROCS]; ip++) {
@@ -306,13 +298,21 @@ static void vm_init(void)
 
 		GETVMP(vmp, ip->proc_nr);
 
+		if(!(ip->flags & PROC_FULLVM)) {
+			/* See if this process fits in kernel
+			 * mapping. VM has its own pagetable,
+			 * don't check it.
+			 */
+			if(!(vmp->vm_flags & VMF_HASPT)) {
+				pt_check(vmp);
+			}
+			continue;
+		}
+
 		old_stack = 
 			vmp->vm_arch.vm_seg[S].mem_vir +
 			vmp->vm_arch.vm_seg[S].mem_len - 
 			vmp->vm_arch.vm_seg[D].mem_len;
-
-		if(!(ip->flags & PROC_FULLVM))
-			continue;
 
         	if(pt_new(&vmp->vm_pt) != 0)
 			vm_panic("vm_init: no new pagetable", NO_NUM);
@@ -328,7 +328,7 @@ static void vm_init(void)
 			vmp->vm_arch.vm_seg[D].mem_len,
 			old_stack);
 
-		proc_new(vmp,
+		if(proc_new(vmp,
 			VM_PROCSTART,
 			CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_len),
 			CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_len),
@@ -338,7 +338,9 @@ static void vm_init(void)
 				vmp->vm_arch.vm_seg[D].mem_len) - BASICSTACK,
 			CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys),
 			CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys),
-				VM_STACKTOP);
+				VM_STACKTOP) != 0) {
+			vm_panic("failed proc_new for boot process", NO_NUM);
+		}
 	}
 
 	/* Set up table of calls. */
@@ -370,6 +372,7 @@ static void vm_init(void)
 	CALLMAP(VM_DELDMA, do_deldma, PM_PROC_NR);
 	CALLMAP(VM_GETDMA, do_getdma, PM_PROC_NR);
 	CALLMAP(VM_ALLOCMEM, do_allocmem, PM_PROC_NR);
+	CALLMAP(VM_NOTIFY_SIG, do_notify_sig, PM_PROC_NR);
 
 	/* Physical mapping requests.
 	 * tty (for /dev/video) does this.
@@ -382,22 +385,34 @@ static void vm_init(void)
 
 	/* Requests from userland (source unrestricted). */
 	CALLMAP(VM_MMAP, do_mmap, ANYEPM);
+	CALLMAP(VM_MUNMAP, do_munmap, ANYEPM);
+	CALLMAP(VM_MUNMAP_TEXT, do_munmap, ANYEPM);
+	CALLMAP(VM_REMAP, do_remap, ANYEPM);
+	CALLMAP(VM_GETPHYS, do_get_phys, ANYEPM);
+	CALLMAP(VM_SHM_UNMAP, do_shared_unmap, ANYEPM);
+	CALLMAP(VM_GETREF, do_get_refcount, ANYEPM);
+	CALLMAP(VM_CTL, do_ctl, ANYEPM);
+
+	/* Request only from IPC server */
+	CALLMAP(VM_QUERY_EXIT, do_query_exit, ANYEPM);
 
 	/* Requests (actually replies) from VFS (restricted to VFS only). */
 	CALLMAP(VM_VFS_REPLY_OPEN, do_vfs_reply, VFS_PROC_NR);
 	CALLMAP(VM_VFS_REPLY_MMAP, do_vfs_reply, VFS_PROC_NR);
 	CALLMAP(VM_VFS_REPLY_CLOSE, do_vfs_reply, VFS_PROC_NR);
 
+	/* Requests from RS */
+	CALLMAP(VM_RS_SET_PRIV, do_rs_set_priv, RS_PROC_NR);
+
 	/* Sanity checks */
 	if(find_kernel_top() >= VM_PROCSTART)
 		vm_panic("kernel loaded too high", NO_NUM);
+
+	/* Initialize the structures for queryexit */
+	init_query_exit();
+
+	/* Unmap our own low pages. */
+	unmap_ok = 1;
+	unmap_page_zero();
 }
 
-#if 0
-void kputc(int c)
-{
-	if(c == '\n')
-		ser_putc('\r');
-	ser_putc(c);
-}
-#endif

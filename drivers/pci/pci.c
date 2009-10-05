@@ -310,7 +310,7 @@ u16_t *didp;
  *===========================================================================*/
 int pci_reserve2(devind, proc)
 int devind;
-int proc;
+endpoint_t proc;
 {
 	int i, r;
 	int ilr;

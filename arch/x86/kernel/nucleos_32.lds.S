@@ -18,94 +18,94 @@ OUTPUT_ARCH("i386")
 SECTIONS
 {
 #ifdef CONFIG_KERNEL_LINKAGE_SEPID
-  .text 0 : AT (ADDR(.text)) {
-    __text = .;
-    *(.text.head)
-    *(.text)
-    *(.text.*)
-    . = ALIGN(PAGE_SIZE);
-    __etext = SIZEOF(.text);
-  }
+	.text 0 : AT (ADDR(.text)) {
+		__text = .;
+		*(.text.head)
+		*(.text)
+		*(.text.*)
+		. = ALIGN(PAGE_SIZE);
+		__etext = SIZEOF(.text);
+	}
 
-  .data 0 : AT (SIZEOF(.text)) {
-    __data = .;
-    /* kernel data starts with this magic number */
-    SHORT(0x526f);
-    /* Fist page unmaped */
-    . = PAGE_SIZE;
-    *(.rodata)
-    *(.rodata.*)
-    *(.data)
-    *(.data.*)
-    . = ALIGN(PAGE_SIZE);
-    __edata = SIZEOF(.data);
-  }
+	.data 0 : AT (SIZEOF(.text)) {
+		__data = .;
+		SHORT(0x526f);					/* kernel data starts
+								   with this magic number */
+		. = (. == 0) ? PAGE_SIZE : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
+		*(.rodata)
+		*(.rodata.*)
+		*(.data)
+		*(.data.*)
+		. = ALIGN(PAGE_SIZE);
+		__edata = SIZEOF(.data);
+	}
 
-  .bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-    __bss = .;
-    *(.bss)
-    *(.bss.*)
-    *(COMMON)
-    . = ALIGN(PAGE_SIZE);
-    __ebss = SIZEOF(.data) + SIZEOF(.bss);
-  }
-  __end = __ebss;
+	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
+		__bss = .;
+		*(.bss)
+		*(.bss.*)
+		*(COMMON)
+		. = ALIGN(PAGE_SIZE);
+		__ebss = SIZEOF(.data) + SIZEOF(.bss);
+	}
+
+	__end = __ebss;
 
 #else /* Common I&D */
 
 #define LOAD_OFFSET         __PAGE_OFFSET__
 #define LOAD_PHYSICAL_ADDR  __LOAD_PHYSICAL_ADDR__
 
-  . = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
+	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 
-  .text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
-    __text = .;
-    *(.text.head)
-    . = ALIGN(PAGE_SIZE);
-  }
+	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
+		__text = .;
+		*(.text.head)
+		. = ALIGN(PAGE_SIZE);
+	}
 
-  .text . : AT (ADDR(.text) - LOAD_OFFSET) {
-    *(.text)
-    *(.text.*)
-    . = ALIGN(PAGE_SIZE);
-    __etext = .;
-  }
+	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
+		*(.text)
+		*(.text.*)
+		. = ALIGN(PAGE_SIZE);
+		__etext = .;
+	}
 
-  .rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-    __data = .;
-    /* kernel data starts with this magic number */
-    SHORT(0x526f);
-    __rodata = .;
-    *(.rodata)
-    *(.rodata.*)
-    . = ALIGN(PAGE_SIZE);
-    __erodata = .;
-  }
+	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
+		__data = .;
+		/* kernel data starts with this magic number */
+		SHORT(0x526f);
+		__rodata = .;
+		*(.rodata)
+		*(.rodata.*)
+		. = ALIGN(PAGE_SIZE);
+		__erodata = .;
+	}
 
-  .data . : AT (ADDR(.data) - LOAD_OFFSET) {
-    *(.data)
-    *(.data.*)
-    . = ALIGN(PAGE_SIZE);
-    __edata = .;
-  }
+	.data . : AT (ADDR(.data) - LOAD_OFFSET) {
+		*(.data)
+		*(.data.*)
+		. = ALIGN(PAGE_SIZE);
+		__edata = .;
+	}
 
-  .bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-    __bss = .;
-    *(.bss)
-    *(.bss.*)
-    *(COMMON)
-    . = ALIGN(PAGE_SIZE);
-    __ebss = .;
-  }
-  __end = .;
+	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
+		__bss = .;
+		*(.bss)
+		*(.bss.*)
+		*(COMMON)
+		. = ALIGN(PAGE_SIZE);
+		__ebss = .;
+	}
+
+	__end = .;
 #endif
 
-  /DISCARD/ :
-  {
-    *(.eh_frame)
-    *(.comment)
-    *(.comment.*)
-    *(.note)
-    *(.note.*)
-  }
+	/DISCARD/ : {
+		*(.eh_frame)
+		*(.comment)
+		*(.comment.*)
+		*(.note)
+		*(.note.*)
+	}
 }

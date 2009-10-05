@@ -11,7 +11,7 @@
 pci_init.c
 */
 
-#include "syslib.h"
+#include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
 /*===========================================================================*

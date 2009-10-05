@@ -14,6 +14,8 @@
 #ifndef __SERVERS_RS_RS_H
 #define __SERVERS_RS_RS_H
 
+#include <nucleos/bitmap.h>
+
 #define RSS_NR_IRQ		16
 #define RSS_NR_IO		16
 #define RSS_NR_PCI_ID		16
@@ -45,7 +47,11 @@ struct rs_start
 	size_t rss_labellen;
 	char *rss_ipc;
 	size_t rss_ipclen;
+#define RSS_VM_CALL_SIZE BITMAP_CHUNKS(VM_NCALLS)
+	bitchunk_t rss_vm[RSS_VM_CALL_SIZE];
 };
+
+int minix_rs_lookup(const char *name, endpoint_t *value);
 
 #define RF_COPY		0x01	/* Copy the brinary into RS to make it possible
 				 * to restart the driver without accessing FS_PROC_NR

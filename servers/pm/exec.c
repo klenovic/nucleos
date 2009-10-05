@@ -124,11 +124,12 @@ int exec_newmem()
 
 		mp->mp_reply.reply_res2 = (vir_bytes) stack_top;
 		mp->mp_reply.reply_res3 = flags;
-
 		if (allow_setuid)
 			mp->mp_reply.reply_res3 |= EXC_NM_RF_ALLOW_SETUID;
 
 		rmp->entry_point = args.entry_point;
+	} else {
+		printf("PM: newmem failed for %s\n", args.progname);
 	}
 
 	return r;

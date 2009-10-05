@@ -23,6 +23,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
+#include <nucleos/bitmap.h>
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
 #include <env.h>
@@ -35,6 +36,7 @@
 #include <kernel/proc.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
+#include <asm/servers/vm/memory.h>
 
 /*===========================================================================*
  *                              get_mem_map                                  *
@@ -172,12 +174,14 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 int vm_isokendpt(endpoint_t endpoint, int *proc)
 {
         *proc = _ENDPOINT_P(endpoint);
-        if(*proc < -NR_TASKS || *proc >= NR_PROCS)
-                return -EINVAL;
-        if(*proc >= 0 && endpoint != vmproc[*proc].vm_endpoint)
+        if(*proc < 0 || *proc >= NR_PROCS)
+        	vm_panic("crazy slot number", *proc); 
+        if(*proc >= 0 && endpoint != vmproc[*proc].vm_endpoint) {
                 return -EDEADSRCDST;
-        if(*proc >= 0 && !(vmproc[*proc].vm_flags & VMF_INUSE))
+        }
+        if(*proc >= 0 && !(vmproc[*proc].vm_flags & VMF_INUSE)) {
                 return -EDEADSRCDST;
+        }
         return 0;
 }
 
@@ -216,5 +220,30 @@ char *brk_addr;
 		vm_panic("VM: brk() on myself failed\n", NO_NUM);
         _brksize = brk_addr;
         return 0;
+}
+
+/*===========================================================================*
+ *                              do_ctl                                        *
+ *===========================================================================*/
+int do_ctl(message *m)
+{
+	int pages, nodes;
+	int pr;
+	struct vmproc *vmp;
+
+	switch(m->VCTL_WHAT) {
+		case VCTLP_STATS_MEM:
+			printmemstats();
+			break;
+		case VCTLP_STATS_EP:
+			if(vm_isokendpt(m->VCTL_PARAM, &pr) != 0)
+				return -EINVAL;
+			printregionstats(&vmproc[pr]);
+			break;
+		default:
+			return -EINVAL;
+	}
+
+	return 0;
 }
 

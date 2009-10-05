@@ -46,7 +46,7 @@ char *mess;
 int nr;
 {
 /* The system has run aground of a fatal kernel error. Terminate execution. */
-  if (minix_panicing ++) return;		/* prevent recursive panics */
+if (!minix_panicing++) {
 
   if (mess != NULL) {
 	kprintf("kernel panic: %s", mess);
@@ -55,10 +55,11 @@ int nr;
 	kprintf("\n");
   }
 
-  kprintf("kernel stacktrace: ");
+  kprintf("kernel: ");
   util_stacktrace();
+}
 
-  /* Abort MINIX. */
+  /* Abort Nucleos. */
   nucleos_shutdown(NULL);
 }
 
@@ -89,12 +90,13 @@ int c;					/* character to append */
       kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
   } else {
       int p, outprocs[] = OUTPUT_PROCS_ARRAY;
-      if(do_serial_debug) return;
-      if(minix_panicing || do_serial_debug) return;
-      for(p = 0; outprocs[p] != NONE; p++) {
-	 if(isokprocn(outprocs[p]) && !isemptyn(outprocs[p])) {
-           send_sig(outprocs[p], SIGKMESS);
-	 }
-      }
+      if(!(minix_panicing || do_serial_debug)) {
+	      for(p = 0; outprocs[p] != NONE; p++) {
+		 if(isokprocn(outprocs[p]) && !isemptyn(outprocs[p])) {
+       	    send_sig(outprocs[p], SIGKMESS);
+		 }
+      	}
+     }
   }
+  return;
 }

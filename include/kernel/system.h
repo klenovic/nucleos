@@ -101,9 +101,6 @@ int do_memset(message *m_ptr);
 #define do_memset do_unused
 #endif
 
-int do_vm_setbuf(message *m_ptr);
-int do_vm_map(message *m_ptr);
-
 int do_abort(message *m_ptr);
 #if ! USE_ABORT
 #define do_abort do_unused

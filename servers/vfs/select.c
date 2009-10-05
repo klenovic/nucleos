@@ -492,7 +492,7 @@ int do_select(void)
 	selecttab[s].requestor = fp;
 
 	/* process now blocked */
-	suspend(XSELECT);
+	suspend(FP_BLOCKED_ON_SELECT);
 	return SUSPEND;
 }
 
@@ -756,7 +756,7 @@ void select_timeout_check(timer_t *timer)
 /*===========================================================================*
  *				select_unsuspend_by_endpt  	     	     *
  *===========================================================================*/
-void select_unsuspend_by_endpt(int proc_e)
+void select_unsuspend_by_endpt(endpoint_t proc_e)
 {
 	int fd, s;
 

@@ -10,7 +10,7 @@
 /* Copyright (c) 2009, Vrije Universiteit, Amsterdam.
  * See the copyright notice in file LICENSE.minix3.
  */
-#include "syslib.h"
+#include <nucleos/syslib.h>
 
 int sys_vtimer(proc, which, newval, oldval)
 endpoint_t proc;		/* proc to retrieve/set the timer for */

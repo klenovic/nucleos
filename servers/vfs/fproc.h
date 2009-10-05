@@ -37,9 +37,9 @@ struct fproc {
   char *fp_buffer;		/* place to save buffer if rd/wr can't finish*/
   int  fp_nbytes;		/* place to save bytes if rd/wr can't finish */
   int  fp_cum_io_partial;	/* partial byte count if rd/wr can't finish */
-  int fp_suspended;		/* set to indicate process hanging */
   int fp_revived;		/* set to indicate process being revived */
-  int fp_task;			/* which task is proc suspended on */
+  endpoint_t fp_task;		/* which task is proc suspended on */
+  int fp_blocked_on;		/* what is it blocked on */
 
   endpoint_t fp_ioproc;		/* proc no. in suspended-on i/o message */
   cp_grant_id_t fp_grant;	/* revoke this grant on unsuspend if > -1 */
@@ -60,14 +60,8 @@ extern struct fproc fproc[];
 				 * completed (after the restart of a driver). */
 
 /* Field values. */
-/* fp_suspended is one of these. */
-#define NOT_SUSPENDED      0xC0FFEE	/* process is not suspended on pipe or task */
-#define SUSPENDED          0xDEAD	/* process is suspended on pipe or task */
-
 #define NOT_REVIVING       0xC0FFEEE	/* process is not being revived */
 #define REVIVING           0xDEEAD	/* process is being revived from suspension */
 #define PID_FREE	   0	/* process slot free */
 
-/* Check is process number is acceptable - includes system processes. */
-#define isokprocnr(n)	((unsigned)((n)+NR_TASKS) < NR_PROCS + NR_TASKS)
 #endif /* __SERVERS_VFS_FPROC_H */
