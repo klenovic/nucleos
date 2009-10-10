@@ -19,24 +19,27 @@
 #define TRACE(code, statement)
 #endif /* CONFIG_DEBUG_KERNEL_TRACE */
 
-#define NOREC_ENTER(varname)						\
-	static int varname = 0;						\
-	int mustunlock = 0;						\
-	if (!intr_disabled()) { lock; mustunlock = 1; }			\
-	if (varname) {							\
-		minix_panic(#varname " recursive enter", __LINE__);	\
-	}								\
-	varname = 1;
 
-#define NOREC_RETURN(varname, v) do {					\
-	if (!varname)							\
-		minix_panic(#varname " flag off", __LINE__);		\
-	if (!intr_disabled())						\
-		minix_panic(#varname " interrupts on", __LINE__);	\
-	varname = 0;							\
-	if (mustunlock)	{ unlock;	}				\
-	return v;							\
-	} while(0)
+#define ENTERED		0xBA5E1514
+#define NOTENTERED	0x1415BEE1
+
+#define NOREC_ENTER(varname) 					\
+	static int varname = NOTENTERED;			\
+	int mustunlock = 0; 					\
+	if(!intr_disabled()) { lock; mustunlock = 1; }		\
+	vmassert(varname == ENTERED || varname == NOTENTERED);	\
+	vmassert(magictest == MAGICTEST);			\
+	vmassert(varname != ENTERED);				\
+	varname = ENTERED;
+
+#define NOREC_RETURN(varname, v) do {				\
+	vmassert(intr_disabled());				\
+	vmassert(magictest == MAGICTEST);			\
+	vmassert(varname == ENTERED || varname == NOTENTERED);	\
+	varname = NOTENTERED;					\
+	if(mustunlock)	{ unlock;	} 			\
+	return v;						\
+} while(0)
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 #define vmassert(t) { \

@@ -101,15 +101,18 @@ void phys_insw(u16 port, phys_bytes buf, size_t count);
 void phys_outsb(u16 port, phys_bytes buf, size_t count);
 void phys_outsw(u16 port, phys_bytes buf, size_t count);
 
-void i386_invlpg_level0(void);
 int _memcpy_k(void *dst, void *src, size_t n);
 int _memcpy_k_fault(void);
 u32_t read_cr3(void);
 void reload_cr3(void);
 void phys_memset(phys_bytes ph, u32_t c, phys_bytes bytes);
+u32 read_ds(void);
+u32 read_cs(void);
+u32 read_ss(void);
 
 /* protect.c */
 void prot_init(void);
+void idt_init(void);
 void init_codeseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);
 void init_dataseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);
 void enable_iop(struct proc *pp);

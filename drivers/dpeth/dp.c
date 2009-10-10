@@ -24,13 +24,9 @@
 **
 **    m_type       DL_PORT   DL_PROC  DL_COUNT DL_MODE DL_ADDR
 **  +------------+---------+---------+--------+-------+---------+
-**  | HARD_INT   |         |         |        |       |         | 
-**  +------------+---------+---------+--------+-------+---------+
-**  | SYN_ALARM  |         |         |        |       |         | 
+**  | NOTIFY from HARDWARE, CLOCK, TTY, RS, PM, SYSTEM          |
 **  +------------+---------+---------+--------+-------+---------+
 **  | HARD_STOP  |         |         |        |       |         | 
-**  +------------+---------+---------+--------+-------+---------+
-**  | FKEY_PRESSED         |         |        |       |         | (99)
 **  +------------+---------+---------+--------+-------+---------+
 **  | DL_WRITE   | port nr | proc nr | count  | mode  | address | (3)
 **  +------------+---------+---------+--------+-------+---------+
@@ -69,6 +65,7 @@
 
 #include <nucleos/drivers.h>
 #include <nucleos/keymap.h>
+#include <nucleos/endpoint.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
@@ -554,6 +551,41 @@ static void do_watchdog(void *message)
   return;
 }
 
+static void handle_system_signal(message *m)
+{
+	sigset_t set;
+	int port;
+
+	if (getsigset(&set) != 0) return;
+
+	if (sigismember(&set, SIGTERM)) {	/* Shut down */
+		for (port = 0; port < DE_PORT_NR; port += 1) {
+			if (de_table[port].de_mode == DEM_ENABLED) {
+				m->m_type = DL_STOP;
+				m->DL_PORT = port;
+				do_stop(m);
+			}
+		}
+	}
+}
+
+static void handle_hw_intr(void)
+{
+	dpeth_t *dep;
+
+	for (dep = de_table; dep < &de_table[DE_PORT_NR]; dep += 1) {
+		/* If device is enabled and interrupt pending */
+		if (dep->de_mode == DEM_ENABLED) {
+			dep->de_int_pending = TRUE;
+			(*dep->de_interruptf) (dep);
+			if (dep->de_flags & (DEF_ACK_SEND | DEF_ACK_RECV))
+				reply(dep, !0, DL_TASK_REPLY);
+			dep->de_int_pending = FALSE;
+			sys_irqenable(&dep->de_hook);
+		}
+	}
+}
+
 /*
 **  Name:	int dpeth_task(void)
 **  Function:	Main entry for dp task
@@ -593,10 +625,37 @@ int main(int argc, char **argv)
 
 	DEBUG(printf("eth: got message %d, ", m.m_type));
 
-	switch (m.m_type) {
-	    case DEV_PING:	/* Status request from RS */
-		kipc_notify(m.m_source);
+	if (is_notify(m.m_type)) {
+		switch(_ENDPOINT_P(m.m_source)) {
+			case CLOCK:
+				/* to be defined */
+				do_watchdog(&m);
+				break;
+			case RS_PROC_NR:	
+				/* Status request from RS */
+				kipc_notify(m.m_source);
+				break;
+			case HARDWARE:
+				/* Interrupt from device */
+				handle_hw_intr();
+				break;
+			case TTY_PROC_NR:
+				/* Function key pressed */
+				do_dump(&m);
+				break;
+			case PM_PROC_NR:
+				handle_system_signal(&m);
+				break;
+			default:	
+				/* Invalid message type */
+				panic(DevName, TypeErrMsg, m.m_type);
+				break;
+		}
+		/* message processed, get another one */
 		continue;
+	}
+
+	switch (m.m_type) {
 	    case DL_WRITEV_S:	/* Write message to device */
 		do_vwrite_s(&m);
 		break;
@@ -612,42 +671,8 @@ int main(int argc, char **argv)
 	    case DL_GETNAME:
 		do_getname(&m);
 		break;
-	    case SYN_ALARM:	/* to be defined */
-		do_watchdog(&m);
-		break;
 	    case DL_STOP:	/* Stop device */
 		do_stop(&m);
-		break;
-	    case SYS_SIG: {
-	    	sigset_t sigset = m.NOTIFY_ARG;
-	    	if (sigismember(&sigset, SIGKSTOP)) {	/* Shut down */
-		    for (rc = 0; rc < DE_PORT_NR; rc += 1) {
-			if (de_table[rc].de_mode == DEM_ENABLED) {
-				m.m_type = DL_STOP;
-				m.DL_PORT = rc;
-				do_stop(&m);
-			}
-		    }
-		}
-		break;
-	    }
-	    case HARD_INT:	/* Interrupt from device */
-		for (dep = de_table; dep < &de_table[DE_PORT_NR]; dep += 1) {
-			/* If device is enabled and interrupt pending */
-			if (dep->de_mode == DEM_ENABLED) {
-				dep->de_int_pending = TRUE;
-				(*dep->de_interruptf) (dep);
-				if (dep->de_flags & (DEF_ACK_SEND | DEF_ACK_RECV))
-					reply(dep, !0, DL_TASK_REPLY);
-				dep->de_int_pending = FALSE;
-				sys_irqenable(&dep->de_hook);
-			}
-		}
-		break;
-	    case FKEY_PRESSED:	/* Function key pressed */
-		do_dump(&m);
-		break;
-	    case PROC_EVENT:
 		break;
 	    default:		/* Invalid message type */
 		panic(DevName, TypeErrMsg, m.m_type);

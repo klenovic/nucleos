@@ -41,10 +41,6 @@ static eth_port_t *find_port(message *m);
 static void eth_restart(eth_port_t *eth_port, int tasknr);
 static void send_getstat(eth_port_t *eth_port);
 
-#if 0
-static int asynsend(endpoint_t dst, message *mp);
-#endif
-
 void osdep_eth_init()
 {
 	int i, j, r, rport;
@@ -123,8 +119,10 @@ void osdep_eth_init()
 			 * started after INET. So we always end up here. And
 			 * the findproc can be removed.
 			 */
+#if 0
 			printf("eth%d: unable to find task %s: %d\n",
 				i, ecp->ec_task, r);
+#endif
 			tasknr= ANY;
 		}
 
@@ -250,7 +248,9 @@ acc_t *pack;
 	eth_issue_send(eth_port);
 }
 
+#if 0
 static int notification_count;
+#endif
 
 void eth_rec(m)
 message *m;
@@ -264,9 +264,11 @@ message *m;
 	if (m_type == DL_NAME_REPLY)
 		{
 		drivername= m->m3_ca1;
+#if 0
 		printf("eth_rec: got name: %s\n", drivername);
 
 		notification_count= 0;
+#endif
 
 		/* Re-init ethernet interfaces */
 		for (i= 0, ecp= eth_conf, loc_port= eth_port_table;
@@ -498,12 +500,14 @@ message *m;
 	int i, r, tasknr;
 
 	tasknr= m->m_source;
+#if 0
 	if (notification_count < 100)
 	{
 		notification_count++;
 		printf("eth_check_drivers: got a notification #%d from %d\n",
 			notification_count, tasknr);
 	}
+#endif
 
 	m->m_type= DL_GETNAME;
 	r= asynsend(tasknr, m);
@@ -909,9 +913,11 @@ int tasknr;
 	cp_grant_id_t gid;
 	message mess;
 
-	printf("eth_restart: restarting eth%d, task %d, port %d\n",
-		eth_port-eth_port_table, tasknr,
-		eth_port->etp_osdep.etp_port);
+	if (eth_port->etp_osdep.etp_state != OEPS_INIT) {
+		printf("eth_restart: restarting eth%d, task %d, port %d\n",
+			eth_port-eth_port_table, tasknr,
+			eth_port->etp_osdep.etp_port);
+	}
 
 	if (eth_port->etp_osdep.etp_task == tasknr)
 	{
@@ -923,11 +929,13 @@ int tasknr;
 
 	switch(eth_port->etp_osdep.etp_state)
 	{
+	case OEPS_INIT:
 	case OEPS_CONF_SENT:
 	case OEPS_RECV_SENT:
 	case OEPS_SEND_SENT:
 		/* We can safely ignore the pending CONF, RECV, and SEND
-		 * requests.
+		 * requests. If this is the first time that we see this
+		 * driver at all, that's fine too.
 		 */
 		eth_port->etp_osdep.etp_state= OEPS_IDLE;
 		break;
@@ -1016,54 +1024,3 @@ eth_port_t *eth_port;
 	if (r != 0)
 		ip_panic(( "eth_get_stat: asynsend failed: %d", r));
 	}
-
-#if 0
-static asynmsg_t *msgtable= NULL;
-static size_t msgtable_n= 0;
-
-static int asynsend(dst, mp)
-endpoint_t dst;
-message *mp;
-	{
-	int i;
-	unsigned flags;
-
-	if (msgtable == NULL)
-	{
-		printf("asynsend: allocating msg table\n");
-		msgtable_n= 5;
-		msgtable= malloc(msgtable_n * sizeof(msgtable[0]));
-		for (i= 0; i<msgtable_n; i++)
-			msgtable[i].flags= AMF_EMPTY;
-	}
-
-	/* Find slot in table */
-	for (i= 0; i<msgtable_n; i++)
-	{
-		flags= msgtable[i].flags;
-		if ((flags & (AMF_VALID|AMF_DONE)) == (AMF_VALID|AMF_DONE))
-		{
-			if (msgtable[i].result != 0)
-			{
-				printf(
-			"asynsend: found completed entry %d with error %d\n",
-					i, msgtable[i].result);
-	}
-			break;
-}
-		if (flags == AMF_EMPTY)
-			break;
-	}
-	if (i >= msgtable_n)
-		ip_panic(( "asynsend: should resize table" ));
-	msgtable[i].dst= dst;
-	msgtable[i].msg= *mp;
-	msgtable[i].flags= AMF_VALID;	/* Has to be last. The kernel 
-					 * scans this table while we are
-					 * sleeping.
-					 */
-
-	/* Tell the kernel to rescan the table */
-	return kipc_senda(msgtable, msgtable_n);
-}
-#endif

@@ -251,7 +251,7 @@ static void *vm_checkspares(void)
 	for(s = 0; s < SPAREPAGES && missing_spares > 0; s++)
 	    if(!sparepages[s].page) {
 		n++;
-		if((sparepages[s].page = vm_allocpage(&sparepages[s].phys, 
+		if((sparepages[s].page = vm_allocpage((phys_bytes*)&sparepages[s].phys, 
 			VMP_SPARE))) {
 			missing_spares--;
 			vm_assert(missing_spares >= 0);
@@ -290,7 +290,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 	if(level > 1 || !(vmp->vm_flags & VMF_HASPT) || !meminit_done) {
 		int r;
 		void *s;
-		s=vm_getsparepage(phys);
+		s=vm_getsparepage((u32_t*)phys);
 		level--;
 		if(!s) {
 			util_stacktrace();
@@ -325,7 +325,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 	if((r=pt_writemap(pt, loc, *phys, I386_PAGE_SIZE,
 		I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE, 0)) != 0) {
 		FREE_MEM(newpage, CLICKSPERPAGE);
-		printf("vm_allocpage writemap failed\n", ret);
+		printf("vm_allocpage writemap failed\n", r);
 		level--;
 		return NULL;
 	}
@@ -394,7 +394,7 @@ static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
 	vm_assert(!pt->pt_pt[pde]);
 
 	/* Get storage for the page table. */
-        if(!(pt->pt_pt[pde] = vm_allocpage(&pt_phys, VMP_PAGETABLE)))
+        if(!(pt->pt_pt[pde] = vm_allocpage((phys_bytes*)&pt_phys, VMP_PAGETABLE)))
 		return -ENOMEM;
 
 	for(i = 0; i < I386_VM_PT_ENTRIES; i++)
@@ -598,7 +598,7 @@ int pt_new(pt_t *pt)
 	 * the page directories (the page_directories data).
 	 */
         if(!pt->pt_dir &&
-          !(pt->pt_dir = vm_allocpage(&pt->pt_dir_phys, VMP_PAGEDIR))) {
+          !(pt->pt_dir = vm_allocpage((phys_bytes*)&pt->pt_dir_phys, VMP_PAGEDIR))) {
 		return -ENOMEM;
 	}
 
@@ -734,7 +734,7 @@ void pt_init(void)
 	/* Allocate us a page table in which to remember page directory
 	 * pointers.
 	 */
-	if(!(page_directories = vm_allocpage(&page_directories_phys,
+	if(!(page_directories = vm_allocpage((phys_bytes*)&page_directories_phys,
 		VMP_PAGETABLE)))
                 vm_panic("no virt addr for vm mappings", NO_NUM);
 

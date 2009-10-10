@@ -69,6 +69,7 @@
 #include <net/gen/eth_io.h>
 #include <ibm/pci.h>
 #include <servers/ds/ds.h>
+#include <nucleos/endpoint.h>
 
 #include <nucleos/timer.h>
 
@@ -280,6 +281,29 @@ static void do_outb(port_t port, u8_t v);
 static void do_outl(port_t port, u32_t v);
 static void tell_dev(vir_bytes start, size_t size, int pci_bus, int pci_dev, int pci_func);
 
+static void handle_hw_intr(void)
+{
+	int i, r;
+	fxp_t *fp;
+
+	for (i= 0, fp= &fxp_table[0]; i<FXP_PORT_NR; i++, fp++)	{
+		if (fp->fxp_mode != FM_ENABLED)
+			return;
+		fxp_handler(fp);
+
+		r= sys_irqenable(&fp->fxp_hook);
+		if (r != 0) {
+			panic("FXP", "unable enable interrupts", r);
+		}
+
+		if (!fp->fxp_got_int)
+			return;
+		fp->fxp_got_int= 0;
+		assert(fp->fxp_flags & FF_ENABLED);
+		fxp_check_ints(fp);
+	}
+}
+
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
@@ -288,7 +312,6 @@ int main(int argc, char *argv[])
 	message m;
 	int i, r;
 	u32_t tasknr;
-	fxp_t *fp;
 	long v;
 	vir_bytes ft = sizeof(*fxp_table)*FXP_PORT_NR;
 
@@ -325,9 +348,38 @@ int main(int argc, char *argv[])
 		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("FXP","receive failed", r);
 
+		if (is_notify(m.m_type)) {
+			switch (_ENDPOINT_P(m.m_source)) {
+				case RS_PROC_NR:
+					kipc_notify(m.m_source);
+					break;
+				case HARDWARE:
+					handle_hw_intr();
+					break;
+				case PM_PROC_NR:
+				{
+					sigset_t set;
+
+					if (getsigset(&set) != 0) break;
+
+					if (sigismember(&set, SIGTERM))
+						fxp_stop();
+
+					break;
+				}
+				case CLOCK:
+					fxp_expire_timers();
+					break;
+				default:
+					panic("FXP"," illegal notify from", m.m_source);
+			}
+
+			/* get new message */
+			continue;
+		}
+
 		switch (m.m_type)
 		{
-		case DEV_PING:  kipc_notify(m.m_source);		continue;
 		case DL_WRITEV:	fxp_writev(&m, FALSE, TRUE);	break;
 		case DL_WRITE:	fxp_writev(&m, FALSE, FALSE);	break;
 		case DL_WRITEV_S: fxp_writev_s(&m, FALSE);	break;
@@ -338,34 +390,6 @@ int main(int argc, char *argv[])
 		case DL_GETSTAT: fxp_getstat(&m);		break;
 		case DL_GETSTAT_S: fxp_getstat_s(&m);		break;
 		case DL_GETNAME: fxp_getname(&m); 		break;
-		case HARD_INT:
-			for (i= 0, fp= &fxp_table[0]; i<FXP_PORT_NR; i++, fp++)
-			{
-				if (fp->fxp_mode != FM_ENABLED)
-					continue;
-				fxp_handler(fp);
-
-				r= sys_irqenable(&fp->fxp_hook);
-				if (r != 0)
-				{
-					panic("FXP",
-						"unable enable interrupts", r);
-				}
-
-				if (!fp->fxp_got_int)
-					continue;
-				fp->fxp_got_int= 0;
-				assert(fp->fxp_flags & FF_ENABLED);
-				fxp_check_ints(fp);
-			}
-			break;
-		case SYS_SIG:	{
-			sigset_t sigset = m.NOTIFY_ARG;
-			if (sigismember(&sigset, SIGKSTOP)) fxp_stop();
-			break;
-		}
-		case PROC_EVENT: break;
-		case SYN_ALARM:	fxp_expire_timers();		break;
 		default:
 			panic("FXP"," illegal message", m.m_type);
 		}
@@ -824,7 +848,7 @@ fxp_t *fp;
 
 	/* Set pointer to statistical counters */
 	r= sys_umap(SELF, VM_D, (vir_bytes)&fp->fxp_stat, sizeof(fp->fxp_stat),
-		&bus_addr);
+		(phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 	fxp_cu_ptr_cmd(fp, SC_CU_LOAD_DCA, bus_addr, TRUE /* check idle */);
@@ -908,7 +932,7 @@ fxp_t *fp;
 		if (i != fp->fxp_rx_nbuf-1)
 		{
 			r= sys_umap(SELF, VM_D, (vir_bytes)&rfdp[1],
-				sizeof(rfdp[1]), &rfdp->rfd_linkaddr);
+				sizeof(rfdp[1]), (phys_bytes*)&rfdp->rfd_linkaddr);
 			if (r != 0)
 				panic("FXP","sys_umap failed", r);
 		}
@@ -926,7 +950,7 @@ fxp_t *fp;
 
 	fp->fxp_tx_buf= (struct tx *)((char *)fp->fxp_rx_buf+rx_totbufsize);
 	r= sys_umap(SELF, VM_D, (vir_bytes)fp->fxp_tx_buf,
-		(phys_bytes)tx_totbufsize, &fp->fxp_tx_busaddr);
+		(phys_bytes)tx_totbufsize, (phys_bytes*)&fp->fxp_tx_busaddr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
@@ -937,8 +961,8 @@ fxp_t *fp;
 		if (i != fp->fxp_tx_nbuf-1)
 		{
 			r= sys_umap(SELF, VM_D, (vir_bytes)&txp[1],
-				(phys_bytes)sizeof(txp[1]),
-				&txp->tx_linkaddr);
+				sizeof(txp[1]),
+				(phys_bytes*)&txp->tx_linkaddr);
 			if (r != 0)
 				panic("FXP","sys_umap failed", r);
 		}
@@ -1025,7 +1049,7 @@ fxp_t *fp;
 	memcpy(tmpbufp->ias.ias_ethaddr, fp->fxp_address.ea_addr,
 		sizeof(tmpbufp->ias.ias_ethaddr));
 	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->ias,
-		(phys_bytes)sizeof(tmpbufp->ias), &bus_addr);
+		(phys_bytes)sizeof(tmpbufp->ias), (phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
@@ -1761,7 +1785,7 @@ fxp_t *fp;
 		sizeof(tmpbufp->cc.cc_bytes));
 
 	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->cc,
-		(phys_bytes)sizeof(tmpbufp->cc), &bus_addr);
+		(phys_bytes)sizeof(tmpbufp->cc), (phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
 
@@ -2623,7 +2647,7 @@ static void fxp_stop()
 			printf("%s: resetting device\n", fp->fxp_name);
 		fxp_outl(port, CSR_PORT, CP_CMD_SOFT_RESET);
 	}
-	sys_exit(0);
+	exit(0);
 }
 
 /*===========================================================================*

@@ -16,7 +16,7 @@
 #include <nucleos/endpoint.h>
 
 int vm_exit(endpoint_t ep);
-int vm_fork(endpoint_t ep, int slotno, int *child_ep);
+int vm_fork(endpoint_t ep, int slotno, endpoint_t *child_ep);
 int vm_brk(endpoint_t ep, char *newaddr);
 int vm_exec_newmem(endpoint_t ep, struct exec_newmem *args, int args_bytes, char **ret_stack_top,
 		   int *ret_flags);

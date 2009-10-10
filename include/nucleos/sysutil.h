@@ -64,9 +64,11 @@ void util_nstrcat(char *str, unsigned long n);
 void util_stacktrace_strcat(char *);
 int micro_delay(u32_t micros);
 u32_t micros_to_ticks(u32_t micros);
-int asynsend(endpoint_t ep, message *msg);
 void ser_putc(char c);
 void get_randomness(struct k_randomness *, int);
+
+int asynsend3(endpoint_t ep, message *msg, int flags);
+#define asynsend(ep, msg) asynsend3(ep, msg, 0)
 
 #define ASSERT(c) if(!(c)) { panic(__FILE__, "assert " #c " failed at line", __LINE__); }
 

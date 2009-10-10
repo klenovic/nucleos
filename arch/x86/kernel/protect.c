@@ -410,6 +410,10 @@ void printseg(char *banner, int iscs, struct proc *pr, u32_t selector)
 			kprintf("invalid index in ldt\n");
 			return;
 		}
+		if(!pr) {
+			kprintf("local selector but unknown process\n");
+			return;
+		}
 		desc = &pr->p_seg.p_ldt[index];
 	} else {
 		kprintf("GDT");

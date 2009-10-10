@@ -435,11 +435,11 @@ reset:
 idle_task:
 // This task is called when the system has nothing else to do.  The HLT
 // instruction puts the processor in a state where it draws minimum power.
-        push    $halt
+        push    $_halt
         call    level0         // level0(halt)
         pop     %eax
         jmp     idle_task
-halt:
+_halt:
         sti
         hlt
         cli
@@ -455,9 +455,14 @@ halt:
 .globl level0         // call a function at level 0
 level0:
         mov     4(%esp), %eax
-        mov     %eax, level0_func
+	cmpb	$-1, k_reenter
+	jne	direct
         int     $LEVEL0_VECTOR
         ret
+
+direct:
+	call	*%eax
+	ret
 
 //===========================================================================
 //                           read_flags
@@ -518,14 +523,32 @@ read_cr4:
 //void write_cr4(unsigned long value);
 .globl write_cr4
 write_cr4:
-        push    %ebp
-        mov     %esp, %ebp
-        mov     8(%ebp), %eax
-        mov     %eax, %cr4
-        jmp     0f
+	push	%ebp
+	mov	%esp, %ebp
+	mov	8(%ebp), %eax
+	mov	%eax, %cr4
+	jmp	0f
 0:
-        pop     %ebp
-        ret
+	pop	%ebp
+	ret
+
+.globl read_ds
+read_ds:
+	mov	$0, %eax
+	mov	%ds, %eax
+	ret
+
+.globl read_cs
+read_cs:
+	mov	$0, %eax
+	mov	%cs, %eax
+	ret
+
+.globl read_ss
+read_ss:
+	mov	$0, %eax
+	mov	%ss, %eax
+	ret
 
 //===========================================================================*
 //                           getcr3val                                       *

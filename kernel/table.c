@@ -65,6 +65,7 @@ time_t boottime;
 char params_buffer[512];         /* boot monitor parameters */
 int minix_panicing;
 int locklevel;
+u32_t magictest;
 
 unsigned long cr3switch;
 unsigned long cr3reload;

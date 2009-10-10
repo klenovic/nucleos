@@ -43,6 +43,7 @@
 #include <kernel/proc.h>
 #include <nucleos/signal.h>
 #include <nucleos/com.h>
+#include <nucleos/endpoint.h>
 #include <nucleos/portio.h>
 
 /* Function prototype for static functions.
@@ -85,17 +86,24 @@ void clock_task()
 	result = kipc_receive(ANY, &m);
 
 	if(result != 0)
-		minix_panic("receive() failed", result);
+		minix_panic("kipc_receive() failed", result);
 
 	/* Handle the request. Only clock ticks are expected. */
-	switch (m.m_type) {
-	case HARD_INT:      
-		do_clocktick(&m); /* handle clock tick */
-		break;
-	default: /* illegal request type */
+	if (is_notify(m.m_type)) {
+		switch (_ENDPOINT_P(m.m_source)) {
+			case HARDWARE:
+				do_clocktick(&m); /* handle clock tick */
+				break;
+			default:	/* illegal request type */
+				kprintf("CLOCK: illegal notify %d from %d.\n",
+					m.m_type, m.m_source);
+		}
+	}
+	else {
+		/* illegal request type */
 		kprintf("CLOCK: illegal request %d from %d.\n",
 			m.m_type, m.m_source);
-    }
+	}
   }
 }
 

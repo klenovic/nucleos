@@ -40,6 +40,12 @@ int sys_newmap(endpoint_t proc_ep, struct mem_map *ptr);
 int sys_exit(endpoint_t proc_ep);
 int sys_trace(int req, endpoint_t proc_ep, long addr, long *data_p);
 
+/* Shorthands for sys_runctl() system call. */
+#define sys_stop(proc_ep) sys_runctl(proc_ep, RC_STOP, 0)
+#define sys_delay_stop(proc_ep) sys_runctl(proc_ep, RC_STOP, RC_DELAY)
+#define sys_resume(proc_ep) sys_runctl(proc_ep, RC_RESUME, 0)
+int sys_runctl(endpoint_t proc_ep, int action, int flags);
+
 int sys_privctl(endpoint_t proc_ep, int req, void *p);
 int sys_setgrant(cp_grant_t *grants, int ngrants);
 int sys_nice(endpoint_t proc_ep, int priority);

@@ -7,6 +7,32 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+/* This file defines constants for use in message communication (mostly)
+ * between system processes.
+ *
+ * A number of protocol message request and response types are defined. For
+ * debugging purposes, each protocol is assigned its own unique number range.
+ * The following such message type ranges have been allocated:
+ *
+ *        1 -   0xFF	POSIX requests (see callnr.h)
+ *    0x200 -  0x2FF	Data link layer requests and responses
+ *    0x300 -  0x3FF	Bus controller requests and responses
+ *    0x400 -  0x4FF	Block and character device requests
+ *    0x500 -  0x5FF	Block and character device responses
+ *    0x600 -  0x6FF	Kernel calls to SYSTEM task
+ *    0x700 -  0x7FF	Reincarnation Server (RS) requests
+ *    0x800 -  0x8FF	Data Store (DS) requests
+ *    0x900 -  0x9FF	Requests from PM to VFS, and responses
+ *   (0xA00 -  0xAFF	old TTY and LOG requests, being phased out)
+ *    0xA00 -  0xAFF	Requests from VFS to file systems (see vfsif.h)
+ *    0xB00 -  0xBFF	Requests from VM to VFS
+ *    0xC00 -  0xCFF	Virtual Memory (VM) requests
+ *    0xD00 -  0xDFF	IPC server requests
+ *   0x1000 - 0x10FF	Notify messages
+ *
+ * Zero and negative values are widely used for OK and error responses.
+ */
+
 #ifndef __NUCLEOS_COM_H
 #define __NUCLEOS_COM_H
 
@@ -20,10 +46,8 @@
 #define ANY		0x7ace	/* used to indicate 'any process' */
 #define NONE 		0x6ace  /* used to indicate 'no process at all' */
 #define SELF		0x8ace 	/* used to indicate 'own process' */
-/* check if the magic process numbers are valid process table slot numbers */
-#if (ANY < NR_PROCS)
-#error "Magic process number in the process table range"
-#endif
+#define _MAX_MAGIC_PROC (SELF)	/* used by <minix/endpoint.h> 
+				   to determine generation size */
 
 /*===========================================================================*
  *            	Process numbers of processes in the system image	     *
@@ -44,6 +68,7 @@
 #define HARDWARE     KERNEL	/* for hardware interrupt handlers */
 
 /* Number of tasks. */
+#define MAX_NR_TASKS	1023
 #define NR_TASKS	4 
 
 /* Number of slots in the process table for non-kernel processes. The number
@@ -97,20 +122,10 @@
 /* FIXME will be is_notify(a)		((a) == NOTIFY_MESSAGE) */
 #define is_notify(a)		((a) & NOTIFY_MESSAGE)
 #define NOTIFY_FROM(p_nr)	 (NOTIFY_MESSAGE | ((p_nr) + NR_TASKS)) 
-#  define PROC_EVENT	NOTIFY_FROM(PM_PROC_NR) /* process status change */
-#  define SYN_ALARM	NOTIFY_FROM(CLOCK) 	/* synchronous alarm */
-#  define SYS_SIG	NOTIFY_FROM(SYSTEM) 	/* system signal */
-#  define HARD_INT	NOTIFY_FROM(HARDWARE) 	/* hardware interrupt */
-#  define FKEY_PRESSED	NOTIFY_FROM(TTY_PROC_NR)/* function key press */
-#  define DEV_PING	NOTIFY_FROM(RS_PROC_NR) /* driver liveness ping */
-#  define DS_UPDATE	NOTIFY_FROM(DS_PROC_NR) /* subscription update */
 
 /* Shorthands for message parameters passed with notifications. */
-#define NOTIFY_SOURCE		m_source
-#define NOTIFY_TYPE		m_type
 #define NOTIFY_ARG		m2_l1
 #define NOTIFY_TIMESTAMP	m2_l2
-#define NOTIFY_FLAGS		m2_i1
 
 /*===========================================================================*
  *                Messages for BUS controller drivers 			     *
@@ -258,8 +273,8 @@
 #define NW_CANCEL	CANCEL
 
 /* Base type for data link layer requests and responses. */
-#define DL_RQ_BASE	0x800		
-#define DL_RS_BASE	0x900		
+#define DL_RQ_BASE	0x200		
+#define DL_RS_BASE	0x280		
 
 /* Message types for data link layer requests. */
 #define DL_WRITE	(DL_RQ_BASE + 3)
@@ -363,8 +378,9 @@
 #  define SYS_SYSCTL	(KERNEL_CALL + 44)	/* sys_sysctl() */
 
 #  define SYS_VTIMER     (KERNEL_CALL + 45)	/* sys_vtimer() */
+#  define SYS_RUNCTL     (KERNEL_CALL + 46)	/* sys_runctl() */
 
-#define NR_SYS_CALLS	46	/* number of system calls */ 
+#define NR_SYS_CALLS	47	/* number of system calls */ 
 
 /* Pseudo call for use in kernel/table.c. */
 #define SYS_ALL_CALLS (NR_SYS_CALLS)
@@ -515,8 +531,6 @@
 #define T_BOOTTIME	m4_l3	/* Boottime in seconds (also for SYS_STIME) */
 #define T_BOOT_TICKS   m4_l5	/* number of clock ticks since boot time */
 
-
-
 /* vm_map */
 #define VM_MAP_ENDPT		m4_l1
 #define VM_MAP_MAPUNMAP		m4_l2
@@ -655,6 +669,14 @@
 #define VT_VALUE	m2_l1	/* new/previous value of the timer */
 #define VT_ENDPT	m2_l2	/* process to set/retrieve the timer for */
 
+/* Field names for SYS_RUNCTL. */
+#define RC_ENDPT	m1_i1	/* which process to stop or resume */
+#define RC_ACTION	m1_i2	/* set or clear stop flag */
+#  define RC_STOP           0	/* stop the process */
+#  define RC_RESUME         1	/* clear the stop flag */
+#define RC_FLAGS	m1_i3	/* request flags */
+#  define RC_DELAY          1	/* delay stop if process is sending */
+
 /*===========================================================================*
  *                Messages for the Reincarnation Server 		     *
  *===========================================================================*/
@@ -718,7 +740,7 @@
 #  define FKEY_FKEYS	      m2_l1	/* F1-F12 keys pressed */
 #  define FKEY_SFKEYS	      m2_l2	/* Shift-F1-F12 keys pressed */
 #define DIAG_BASE	0xa00
-#define DIAGNOSTICS_OLD 	(DIAG_BASE+1) 	/* output a string without FS_PROC_NR in between */
+#define DIAGNOSTICS_OLD 	(DIAG_BASE+1) 	/* output a string without FS in between */
 #define DIAGNOSTICS_S_OLD 	(DIAG_BASE+2) 	/* grant-based version of DIAGNOSTICS */
 #  define DIAG_PRINT_BUF_G    m1_p1
 #  define DIAG_BUF_COUNT      m1_i1
@@ -730,52 +752,58 @@
 
 #define DIAG_REPL_OLD 	(DIAG_BASE+0x80+0) 	/* reply to DIAGNOSTICS(_S) */
 
-#define PM_BASE	0x900
-#define PM_GET_WORK	(PM_BASE + 1)	/* Get work from PM */
-#define PM_IDLE		(PM_BASE + 2)	/* PM doesn't have any more work */
-#define PM_BUSY		(PM_BASE + 3)	/* A reply from FS_PROC_NR is needed */
-#define PM_SETSID	(PM_BASE + 5)	/* Tell FS_PROC_NR about the session leader */
-#define		PM_SETSID_PROC	m1_i1		/* process */
-#define PM_SETGID	(PM_BASE + 6)	/* Tell FS_PROC_NR about the new group IDs */
-#define		PM_SETGID_PROC	m1_i1		/* process */
-#define		PM_SETGID_EGID	m1_i2		/* effective group id */
-#define		PM_SETGID_RGID	m1_i3		/* real group id */
-#define PM_SETUID	(PM_BASE + 7)	/* Tell FS_PROC_NR about the new user IDs */
-#define		PM_SETUID_PROC	m1_i1		/* process */
-#define		PM_SETUID_EGID	m1_i2		/* effective user id */
-#define		PM_SETUID_RGID	m1_i3		/* real user id */
-#define PM_FORK		(PM_BASE + 8)	/* Tell FS_PROC_NR about the new process */
-#define		PM_FORK_PPROC	m1_i1		/* parent process */
-#define		PM_FORK_CPROC	m1_i2		/* child process */
-#define		PM_FORK_CPID	m1_i3		/* child pid */
-#define PM_EXIT		(PM_BASE + 9)	/* Tell FS_PROC_NR about the exiting process */
-#define		PM_EXIT_PROC	m1_i1		/* process */
-#define PM_UNPAUSE	(PM_BASE + 10)	/* interrupted process */
-#define		PM_UNPAUSE_PROC	m1_i1		/* process */
-#define PM_REBOOT	(PM_BASE + 11)	/* Tell FS_PROC_NR that we about to reboot */
-#define PM_EXEC		(PM_BASE + 12)	/* Forward exec call to FS_PROC_NR */
-#define		PM_EXEC_PROC		m1_i1	/* process */
-#define		PM_EXEC_PATH		m1_p1	/* executable */
-#define		PM_EXEC_PATH_LEN	m1_i2	/* length of path including
-						 * terminating nul
-						 */
-#define		PM_EXEC_FRAME		m1_p2	/* arguments and environment */
-#define		PM_EXEC_FRAME_LEN	m1_i3	/* size of frame */
-#define PM_FORK_NB	(PM_BASE + 13)	/* Tell FS_PROC_NR about the fork_nb call */
-#define PM_DUMPCORE	(PM_BASE + 14)	/* Ask FS_PROC_NR to generate a core dump */
-#define		PM_CORE_PROC		m1_i1
-#define		PM_CORE_SEGPTR		m1_p1
-#define PM_UNPAUSE_TR	(PM_BASE + 15)	/* interrupted process (for tracing) */
+/*===========================================================================*
+ *                Messages used between PM and VFS			     *
+ *===========================================================================*/
 
-/* Replies */
-#define PM_EXIT_REPLY	(PM_BASE + 20)	/* Reply from FS_PROC_NR */
-#define PM_REBOOT_REPLY	(PM_BASE + 21)	/* Reply from FS_PROC_NR */
-#define PM_EXEC_REPLY	(PM_BASE + 22)	/* Reply from FS_PROC_NR */
-		/* PM_EXEC_PROC m1_i1 */
-#define		PM_EXEC_STATUS m1_i2	/* OK or failure */
-#define PM_CORE_REPLY	(PM_BASE + 23)	/* Reply from FS_PROC_NR */
-		/* PM_CORE_PROC m1_i1 */
-#define		PM_CORE_STATUS m1_i2	/* OK or failure */
+#define PM_RQ_BASE	0x900
+#define PM_RS_BASE	0x980
+
+/* Requests from PM to VFS */
+#define PM_SETUID	(PM_RQ_BASE + 1)	/* Set new user ID */
+#define PM_SETGID	(PM_RQ_BASE + 2)	/* Set group ID */
+#define PM_SETSID	(PM_RQ_BASE + 3)	/* Set session leader */
+#define PM_EXIT		(PM_RQ_BASE + 4)	/* Process exits */
+#define PM_DUMPCORE	(PM_RQ_BASE + 5)	/* Process is to dump core */
+#define PM_EXEC		(PM_RQ_BASE + 6)	/* Forwarded exec call */
+#define PM_FORK		(PM_RQ_BASE + 7)	/* Newly forked process */
+#define PM_FORK_NB	(PM_RQ_BASE + 8)	/* Non-blocking fork */
+#define PM_UNPAUSE	(PM_RQ_BASE + 9)	/* Interrupt process call */
+#define PM_REBOOT	(PM_RQ_BASE + 10)	/* System reboot */
+
+/* Replies from VFS to PM */
+#define PM_SETUID_REPLY	(PM_RS_BASE + 21)
+#define PM_SETGID_REPLY	(PM_RS_BASE + 22)
+#define PM_SETSID_REPLY	(PM_RS_BASE + 23)
+#define PM_EXIT_REPLY	(PM_RS_BASE + 24)
+#define PM_CORE_REPLY	(PM_RS_BASE + 25)
+#define PM_EXEC_REPLY	(PM_RS_BASE + 26)
+#define PM_FORK_REPLY	(PM_RS_BASE + 27)
+#define PM_FORK_NB_REPLY	(PM_RS_BASE + 28)
+#define PM_UNPAUSE_REPLY	(PM_RS_BASE + 29)
+#define PM_REBOOT_REPLY	(PM_RS_BASE + 30)
+
+/* Standard parameters for all requests and replies, except PM_REBOOT */
+#  define PM_PROC		m1_i1	/* process */
+
+/* Additional parameters for PM_SETUID and PM_SETGID */
+#  define PM_EID		m1_i2	/* effective user/group id */
+#  define PM_RID		m1_i3	/* real user/group id */
+
+/* Additional parameters for PM_EXEC */
+#  define PM_PATH		m1_p1	/* executable */
+#  define PM_PATH_LEN		m1_i2	/* length of path including
+					 * terminating nul
+					 */
+#  define PM_FRAME		m1_p2	/* arguments and environment */
+#  define PM_FRAME_LEN		m1_i3	/* size of frame */
+
+/* Additional parameters for PM_EXEC_REPLY and PM_CORE_REPLY */
+#  define PM_STATUS		m1_i2	/* OK or failure */
+
+/* Additional parameters for PM_FORK and PM_FORK_NB */
+#  define PM_PPROC		m1_i2	/* parent process */
+#  define PM_CPID		m1_i3	/* child pid */
 
 /* Parameters for the EXEC_NEWMEM call */
 #define EXC_NM_PROC	m1_i1		/* process that needs new map */
@@ -789,7 +817,7 @@
 					 * text segment is already present)
 					 */
 #define EXC_NM_RF_ALLOW_SETUID	2	/* Setuid execution is allowed (tells
-					 * FS_PROC_NR to update its uid and gid 
+					 * FS to update its uid and gid 
 					 * fields.
 					 */
 #define EXC_NM_RF_FULLVM	4	
@@ -798,9 +826,17 @@
 #define EXC_RS_PROC	m1_i1		/* process that needs to be restarted */
 #define EXC_RS_RESULT	m1_i2		/* result of the exec */
 
+/*===========================================================================*
+ *                Messages used from VFS to file servers		     *
+ *===========================================================================*/
+
 #define VFS_BASE	0xA00		/* Requests sent by VFS to filesystem
 					 * implementations. See <nucleos/vfsif.h>
 					 */
+
+/*===========================================================================*
+ *                Messages used from VM to VFS				     *
+ *===========================================================================*/
 
 /* Requests sent by VM to VFS, done on behalf of a user process. */
 #define VM_VFS_BASE	0xB00		

@@ -27,10 +27,26 @@
 
 static void ser_debug(int c);
 
+void arch_monitor(void)
+{
+	level0(monitor);
+}
+
 void arch_shutdown(int how)
 {
 	/* Mask all interrupts, including the clock. */
 	outb( INT_CTLMASK, ~0);
+
+	if(minix_panicing) {
+		/* We're panicing? Then retrieve and decode currently
+		 * loaded segment selectors.
+		 */
+		printseg("cs: ", 1, proc_ptr, read_cs());
+		printseg("ds: ", 0, proc_ptr, read_ds());
+		if(read_ds() != read_ss()) {
+			printseg("ss: ", 0, NULL, read_ss());
+		}
+	}
 
 	if(how != RBT_RESET) {
 		/* return to boot monitor */
@@ -73,7 +89,7 @@ void arch_shutdown(int how)
 
 			arch_set_params(mybuffer, strlen(mybuffer)+1);
 		}
-		level0(monitor);
+		arch_monitor();
   } else {
 		/* Reset the system by forcing a processor shutdown. First stop
 		 * the BIOS memory test by setting a soft reset flag.
@@ -356,3 +372,23 @@ int arch_set_params(char *params, int size)
 	return 0;
 }
 
+void arch_do_syscall(struct proc *proc)
+{
+/* Perform a previously postponed system call.
+ */
+  int call_nr, src_dst_e;
+  message *m_ptr;
+  long bit_map;
+
+  /* Get the system call parameters from their respective registers. */
+  call_nr = proc->p_reg.cx;
+  src_dst_e = proc->p_reg.retreg;
+  m_ptr = (message *) proc->p_reg.bx;
+  bit_map = proc->p_reg.dx;
+
+  /* sys_call() expects the given process's memory to be accessible. */
+  vm_set_cr3(proc);
+
+  /* Make the system call, for real this time. */
+  proc->p_reg.retreg = sys_call(call_nr, src_dst_e, m_ptr, bit_map);
+}

@@ -33,9 +33,6 @@ extern time_t boottime;		/* time when the system was booted (for
 				 * reporting to FS_PROC_NR)
 				 */
 extern u32_t system_hz;		/* System clock frequency. */
-extern int report_reboot;	/* During reboot to report to FS_PROC_NR that we are 
-				 * rebooting.
-				 */
 extern int abort_flag;
 extern char monitor_code[256];
 		

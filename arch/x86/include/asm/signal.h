@@ -68,7 +68,7 @@ typedef unsigned long sigset_t;
  */
 #define SIGKMESS	29	/* new kernel message */
 #define SIGKSIG		30	/* kernel signal pending */
-#define SIGKSTOP	31	/* kernel shutting down */
+#define SIGNDELAY	31	/* kernel shutting down */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 /* Fields for sa_flags. */

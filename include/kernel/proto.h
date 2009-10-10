@@ -34,7 +34,6 @@ void ser_dump_proc(void);
 void main(void);
 void prepare_shutdown(int how);
 void nucleos_shutdown(struct timer *tp);
-void idle_task(void);
 
 /* utility.c */
 int kprintf(const char *fmt, ...);
@@ -69,6 +68,7 @@ void set_sendto_bit(struct proc *rc, int id);
 void unset_sendto_bit(struct proc *rc, int id);
 void send_sig(int proc_nr, int sig_nr);
 void cause_sig(int proc_nr, int sig_nr);
+void sig_delay_done(struct proc *rp);
 void sys_task(void);
 
 #define numap_local(proc_nr, vir_addr, bytes) \
@@ -158,9 +158,9 @@ void idle_task(void);
 void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
+void arch_monitor(void);
 void arch_get_aout_headers(int i, struct exec *h);
 void restart(void);
-void idle_task(void);
 void read_tsc(u32_t *high, u32_t *low);
 int arch_init_profile_clock(u32_t freq);
 void arch_stop_profile_clock(void);
@@ -181,6 +181,7 @@ int vm_suspend(struct proc *caller, struct proc *target,
 int delivermsg(struct proc *target);
 phys_bytes arch_switch_copymsg(struct proc *rp, message *m,
 	phys_bytes lin);
+void arch_do_syscall(struct proc *proc);
 
 #endif /* __KERNEL__ */
 #endif /* __KERNEL_PROTO_H */

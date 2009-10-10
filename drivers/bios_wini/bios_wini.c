@@ -227,7 +227,7 @@ int safe;			/* use safecopies? */
 		/* Copy from user space to the DMA buffer. */
 		count = 0;
 		for (iop = iov; count < nbytes; iop++) {
-			chunk = iov->iov_size;
+			chunk = iop->iov_size;
 			if (count + chunk > nbytes) chunk = nbytes - count;
 			assert(chunk <= rem_buf_size);
 
@@ -296,7 +296,7 @@ int safe;			/* use safecopies? */
 		/* Copy from the DMA buffer to user space. */
 		count = 0;
 		for (iop = iov; count < nbytes; iop++) {
-			chunk = iov->iov_size;
+			chunk = iop->iov_size;
 			if (count + chunk > nbytes) chunk = nbytes - count;
 			assert(chunk <= rem_buf_size);
 

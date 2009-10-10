@@ -59,6 +59,8 @@ extern time_t boottime;
 extern char params_buffer[512];		/* boot monitor parameters */
 extern int minix_panicing;
 extern int locklevel;
+#define MAGICTEST 0xC0FFEE23
+extern u32_t magictest;			/* global magic number */
 
 #ifdef CONFIG_DEBUG_KERNEL_TRACE
 extern int verboseflags;
@@ -76,8 +78,6 @@ extern util_timingdata_t timingdata[TIMING_CATEGORIES];
 extern struct boot_image image[]; 	/* system image processes */
 extern char *t_stack[];			/* task stack space */
 extern struct segdesc_s gdt[];		/* global descriptor table */
-
-extern void (*level0_func)(void);
 
 #endif /* __KERNEL__ */
 #endif /* __KERNEL_GLO_H */

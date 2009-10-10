@@ -9,8 +9,8 @@
  */
 /* This file contains the main program of the process manager and some related
  * procedures.  When MINIX starts up, the kernel runs for a little while,
- * initializing itself and its tasks, and then it runs PM and FS_PROC_NR.  Both PM
- * and FS_PROC_NR initialize themselves as far as they can. PM asks the kernel for
+ * initializing itself and its tasks, and then it runs PM and FS.  Both PM
+ * and FS initialize themselves as far as they can. PM asks the kernel for
  * all free memory and starts serving requests.
  *
  * The entry points into this file are:
@@ -53,9 +53,7 @@ extern unsigned long calls_stats[__NR_SYSCALLS];
 static void get_work(void);
 static void pm_init(void);
 static int get_nice_value(int queue);
-static void send_work(void);
-static void handle_fs_reply(message *m_ptr);
-static void restart_sigs(struct mproc *rmp);
+static void handle_fs_reply(void);
 
 #define click_to_round_k(n) \
 	((unsigned) ((((unsigned long) (n) << CLICK_SHIFT) + 512) / 1024))
@@ -76,33 +74,46 @@ int main()
   while (TRUE) {
 	get_work();		/* wait for an PM system call */
 
+	/* Drop delayed calls from exiting processes. */
+	if (mp->mp_flags & EXITING)
+		continue;
+
 	/* Check for system notifications first. Special cases. */
+	if (is_notify(call_nr)) {
+		switch(who_p) {
+		case CLOCK:
+			pm_expire_timers(m_in.NOTIFY_TIMESTAMP);
+			result = SUSPEND;       /* don't reply */
+			break;
+		case SYSTEM:                    /* signals pending */
+			sigset = m_in.NOTIFY_ARG;
+			if (sigismember(&sigset, SIGKSIG))  {
+				(void) ksig_pending();
+			}
+			result = SUSPEND;       /* don't reply */
+			break;
+		default :
+			result = -ENOSYS;
+		}
+
+		/* done, send reply and continue */
+		goto send_reply;
+	}
+
 	switch(call_nr)
 	{
-	case SYN_ALARM:
-		pm_expire_timers(m_in.NOTIFY_TIMESTAMP);
-		result = SUSPEND;		/* don't reply */
-		break;
-	case SYS_SIG:				/* signals pending */
-		sigset = m_in.NOTIFY_ARG;
-		if (sigismember(&sigset, SIGKSIG))  {
-			(void) ksig_pending();
-		} 
-		result = SUSPEND;		/* don't reply */
-		break;
-	case PM_GET_WORK:
-		if (who_e == FS_PROC_NR) {
-			send_work();
-			result= SUSPEND;		/* don't reply */
-		} else
-			result= -ENOSYS;
-		break;
-	case PM_EXIT_REPLY:
-	case PM_REBOOT_REPLY:
+	case PM_SETUID_REPLY:
+	case PM_SETGID_REPLY:
+	case PM_SETSID_REPLY:
 	case PM_EXEC_REPLY:
+	case PM_EXIT_REPLY:
 	case PM_CORE_REPLY:
+	case PM_FORK_REPLY:
+	case PM_FORK_NB_REPLY:
+	case PM_UNPAUSE_REPLY:
+	case PM_REBOOT_REPLY:
 		if (who_e == FS_PROC_NR) {
-			handle_fs_reply(&m_in);
+			handle_fs_reply();
 			result= SUSPEND;		/* don't reply */
 		} else
 			result= -ENOSYS;
@@ -143,6 +154,7 @@ int main()
 		break;
 	}
 
+send_reply:
 	/* Send the results back to the user to indicate completion. */
 	if (result != SUSPEND) setreply(who_p, result);
 
@@ -251,9 +263,6 @@ static void pm_init()
   /* Initialize process table, including timers. */
   for (rmp=&mproc[0]; rmp<&mproc[NR_PROCS]; rmp++) {
 	tmr_inittimer(&rmp->mp_timer);
-
-	rmp->mp_fs_call= PM_IDLE;
-	rmp->mp_fs_call2= PM_IDLE;
   }
 
   /* Build the set of signals which cause core dumps, and the set of signals
@@ -312,12 +321,12 @@ static void pm_init()
 		/* Get kernel endpoint identifier. */
 		rmp->mp_endpoint = ip->endpoint;
 
-		/* Tell FS_PROC_NR about this system process. */
+		/* Tell FS about this system process. */
 		mess.PR_SLOT = ip->proc_nr;
 		mess.PR_PID = rmp->mp_pid;
 		mess.PR_ENDPT = rmp->mp_endpoint;
   		if ((s=kipc_send(FS_PROC_NR, &mess)) != 0)
-			panic(__FILE__,"can't sync up with FS_PROC_NR", s);
+			panic(__FILE__,"can't sync up with FS", s);
 
 		/* Register proces with ds */
 		s= ds_publish_u32(rmp->mp_name, rmp->mp_endpoint);
@@ -330,17 +339,17 @@ static void pm_init()
 	printf("PM: failed to register %d/%d boot processes\n",
 		failed, NR_BOOT_PROCS);
 
-  /* Override some details. INIT, PM, FS_PROC_NR and RS are somewhat special. */
+  /* Override some details. INIT, PM, FS and RS are somewhat special. */
   mproc[PM_PROC_NR].mp_pid = PM_PID;		/* PM has magic pid */
 #if 0
   mproc[RS_PROC_NR].mp_parent = INIT_PROC_NR;	/* INIT is root */
 #endif
   sigfillset(&mproc[PM_PROC_NR].mp_ignore); 	/* guard against signals */
 
-  /* Tell FS_PROC_NR that no more system processes follow and synchronize. */
+  /* Tell FS that no more system processes follow and synchronize. */
   mess.PR_ENDPT = NONE;
   if (kipc_sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
-	panic(__FILE__,"can't sync up with FS_PROC_NR", NO_NUM);
+	panic(__FILE__,"can't sync up with FS", NO_NUM);
 
 #ifdef CONFIG_X86_32
         uts_val.machine[0] = 'i';
@@ -400,291 +409,109 @@ void checkme(char *str, int line)
 	}
 }
 
-/*=========================================================================*
- *				send_work				   *
- *=========================================================================*/
-static void send_work()
-{
-	int r, call;
-	struct mproc *rmp;
-	message m;
-
-	m.m_type= PM_IDLE;
-	for (rmp= mproc; rmp < &mproc[NR_PROCS]; rmp++)
-	{
-		call= rmp->mp_fs_call;
-		if (call == PM_IDLE)
-			call= rmp->mp_fs_call2;
-		if (call == PM_IDLE)
-			continue;
-		switch(call)
-		{
-		case PM_SETSID:
-			m.m_type= call;
-			m.PM_SETSID_PROC= rmp->mp_endpoint;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			/* Wakeup the original caller */
-			setreply(rmp-mproc, rmp->mp_procgrp);
-			break;
-
-		case PM_SETGID:
-			m.m_type= call;
-			m.PM_SETGID_PROC= rmp->mp_endpoint;
-			m.PM_SETGID_EGID= rmp->mp_effgid;
-			m.PM_SETGID_RGID= rmp->mp_realgid;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			/* Wakeup the original caller */
-			setreply(rmp-mproc, 0);
-			break;
-
-		case PM_SETUID:
-			m.m_type= call;
-			m.PM_SETUID_PROC= rmp->mp_endpoint;
-			m.PM_SETUID_EGID= rmp->mp_effuid;
-			m.PM_SETUID_RGID= rmp->mp_realuid;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			/* Wakeup the original caller */
-			setreply(rmp-mproc, 0);
-			break;
-
-		case PM_FORK:
-		{
-			int parent_p;
-			struct mproc *parent_mp;
-
-			parent_p = rmp->mp_parent;
-			parent_mp = &mproc[parent_p];
-
-			m.m_type= call;
-			m.PM_FORK_PPROC= parent_mp->mp_endpoint;
-			m.PM_FORK_CPROC= rmp->mp_endpoint;
-			m.PM_FORK_CPID= rmp->mp_pid;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			/* Wakeup the newly created process */
-			setreply(rmp-mproc, 0);
-
-			/* Wakeup the parent */
-			setreply(parent_mp-mproc, rmp->mp_pid);
-			break;
-  }
-
-		case PM_EXIT:
-			m.m_type= call;
-			m.PM_EXIT_PROC= rmp->mp_endpoint;
-
-			/* Mark the process as busy */
-			rmp->mp_fs_call= PM_BUSY;
-
-			break;
-
-		case PM_UNPAUSE:
-			m.m_type= call;
-			m.PM_UNPAUSE_PROC= rmp->mp_endpoint;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call2= PM_IDLE;
-
-			/* Ask the kernel to deliver the signal */
-			r= sys_sigsend(rmp->mp_endpoint,
-				&rmp->mp_sigmsg);
-			if (r != 0) {
-#if 0
-				panic(__FILE__,"sys_sigsend failed",r);
-#else
-				printf("PM: PM_UNPAUSE: sys_sigsend failed to %d: %d\n",
-					rmp->mp_endpoint, r);
-#endif
-}
-
-			break;
-
-		case PM_UNPAUSE_TR:
-			m.m_type= call;
-			m.PM_UNPAUSE_PROC= rmp->mp_endpoint;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			break;
-
-		case PM_EXEC:
-			m.m_type= call;
-			m.PM_EXEC_PROC= rmp->mp_endpoint;
-			m.PM_EXEC_PATH= rmp->mp_exec_path;
-			m.PM_EXEC_PATH_LEN= rmp->mp_exec_path_len;
-			m.PM_EXEC_FRAME= rmp->mp_exec_frame;
-			m.PM_EXEC_FRAME_LEN= rmp->mp_exec_frame_len;
-
-			/* Mark the process as busy */
-			rmp->mp_fs_call= PM_BUSY;
-
-			break;
-
-		case PM_FORK_NB:
-{
-			int parent_p;
-			struct mproc *parent_mp;
-
-			parent_p = rmp->mp_parent;
-			parent_mp = &mproc[parent_p];
-
-			m.m_type= PM_FORK;
-			m.PM_FORK_PPROC= parent_mp->mp_endpoint;
-			m.PM_FORK_CPROC= rmp->mp_endpoint;
-			m.PM_FORK_CPID= rmp->mp_pid;
-
-			/* FS_PROC_NR does not reply */
-			rmp->mp_fs_call= PM_IDLE;
-
-			break;
-		}
-
-		case PM_DUMPCORE:
-			m.m_type= call;
-			m.PM_CORE_PROC= rmp->mp_endpoint;
-			/* XXX
-			m.PM_CORE_SEGPTR= (char *)rmp->mp_seg;
- */
-
-			/* Mark the process as busy */
-			rmp->mp_fs_call= PM_BUSY;
-
-			break;
-
-		default:
-			printf("send_work: should report call 0x%x to FS_PROC_NR\n",
-				call);
-			break;
-	}
-		break;
-  }
-	if (m.m_type != PM_IDLE)
-	{
-		restart_sigs(rmp);
-	}
-	else if (report_reboot)
-	{
-		m.m_type= PM_REBOOT;
-		report_reboot= FALSE;
-	}
-	r= kipc_send(FS_PROC_NR, &m);
-	if (r != 0) panic("pm", "send_work: send failed", r);
-}
-
-static void handle_fs_reply(m_ptr)
-message *m_ptr;
-{
-	int r, proc_e, proc_n, s;
-	struct mproc *rmp;
-
-	switch(m_ptr->m_type)
-	{
-	case PM_EXIT_REPLY:
-		proc_e= m_ptr->PM_EXIT_PROC;
-
-		if (pm_isokendpt(proc_e, &proc_n) != 0)
-			panic(__FILE__,	"PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR", proc_e);
-
-		rmp= &mproc[proc_n];
-
-		/* Call is finished */
-		rmp->mp_fs_call= PM_IDLE;
-
-		exit_restart(rmp, FALSE /*dump_core*/);
-
-		break;
-
-	case PM_REBOOT_REPLY:
-	{
-		vir_bytes code_addr;
-		size_t code_size;
-
-		/* Ask the kernel to abort. All system services, including
-		 * the PM, will get a HARD_STOP notification. Await the
-		 * notification in the main loop.
-		 */
-		code_addr = (vir_bytes) monitor_code;
-		code_size = strlen(monitor_code) + 1;
-		sys_abort(abort_flag, PM_PROC_NR, code_addr, code_size);
-		break;
-	}
-
-	case PM_EXEC_REPLY:
-		proc_e= m_ptr->PM_EXEC_PROC;
-		if (pm_isokendpt(proc_e, &proc_n) != 0) {
-			panic(__FILE__,
-				"PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR",
-				proc_e);
-		}
-		rmp= &mproc[proc_n];
-
-		/* Call is finished */
-		rmp->mp_fs_call= PM_IDLE;
-
-		exec_restart(rmp, m_ptr->PM_EXEC_STATUS);
-
-		restart_sigs(rmp);
-
-		break;
-
-	case PM_CORE_REPLY:
-	{
-		proc_e= m_ptr->PM_CORE_PROC;
-
-		if (pm_isokendpt(proc_e, &proc_n) != 0)
-			panic(__FILE__, "PM_EXIT_REPLY: got bad endpoint from FS_PROC_NR", proc_e);
-
-		rmp= &mproc[proc_n];
-
-		if (m_ptr->PM_CORE_STATUS == 0)
-			rmp->mp_sigstatus |= DUMPED;
-
-		/* Call is finished */
-		rmp->mp_fs_call= PM_IDLE;
-
-		exit_restart(rmp, TRUE /*dump_core*/);
-
-		break;
-	}
-	default:
-		panic(__FILE__, "handle_fs_reply: unknown reply type",
-			m_ptr->m_type);
-		break;
-	}
-}
-
 /*===========================================================================*
- *                             restart_sigs                                 *
+ *				handle_fs_reply				     *
  *===========================================================================*/
-static void restart_sigs(rmp)
-struct mproc *rmp;
+static void handle_fs_reply()
 {
-	if (rmp->mp_fs_call != PM_IDLE || rmp->mp_fs_call2 != PM_IDLE)
-		return;
+  struct mproc *rmp;
+  endpoint_t proc_e;
+  int r, proc_n;
 
-	if (rmp->mp_flags & TRACE_EXIT) {
-		exit_proc(rmp, rmp->mp_exitstatus, FALSE /*dump_core*/);
-	}
+  /* PM_REBOOT is the only request not associated with a process.
+   * Handle its reply first.
+   */
+  if (call_nr == PM_REBOOT_REPLY) {
+	vir_bytes code_addr;
+	size_t code_size;
 
-	else if (rmp->mp_flags & PM_SIG_PENDING) {
-		rmp->mp_flags &= ~PM_SIG_PENDING;
-		check_pending(rmp);
+	/* Ask the kernel to abort. All system services, including
+	 * the PM, will get a HARD_STOP notification. Await the
+	 * notification in the main loop.
+	 */
+	code_addr = (vir_bytes) monitor_code;
+	code_size = strlen(monitor_code) + 1;
+	sys_abort(abort_flag, PM_PROC_NR, code_addr, code_size);
 
-		if (!(rmp->mp_flags & PM_SIG_PENDING)) {
-			/* Allow the process to be scheduled */
-			sys_nice(rmp->mp_endpoint, rmp->mp_nice);
-		}
-	}
+	return;
+  }
+
+  /* Get the process associated with this call */
+  proc_e = m_in.PM_PROC;
+
+  if (pm_isokendpt(proc_e, &proc_n) != 0) {
+	panic(__FILE__, "handle_fs_reply: got bad endpoint from FS", proc_e);
+  }
+
+  rmp = &mproc[proc_n];
+
+  /* Now that FS replied, mark the process as FS-idle again */
+  if (!(rmp->mp_flags & FS_CALL))
+	panic(__FILE__, "handle_fs_reply: reply without request", call_nr);
+
+  rmp->mp_flags &= ~FS_CALL;
+
+  if (rmp->mp_flags & UNPAUSED)
+  	panic(__FILE__, "handle_fs_reply: UNPAUSED set on entry", call_nr);
+
+  /* Call-specific handler code */
+  switch (call_nr) {
+  case PM_SETUID_REPLY:
+  case PM_SETGID_REPLY:
+	/* Wake up the original caller */
+	setreply(rmp-mproc, 0);
+
+	break;
+
+  case PM_SETSID_REPLY:
+	/* Wake up the original caller */
+	setreply(rmp-mproc, rmp->mp_procgrp);
+
+	break;
+
+  case PM_EXEC_REPLY:
+	exec_restart(rmp, m_in.PM_STATUS);
+
+	break;
+
+  case PM_EXIT_REPLY:
+	exit_restart(rmp, FALSE /*dump_core*/);
+
+	break;
+
+  case PM_CORE_REPLY:
+	if (m_in.PM_STATUS == 0)
+		rmp->mp_sigstatus |= DUMPED;
+
+	exit_restart(rmp, TRUE /*dump_core*/);
+
+	break;
+
+  case PM_FORK_REPLY:
+	/* Wake up the newly created process */
+	setreply(proc_n, 0);
+
+	/* Wake up the parent */
+	setreply(rmp->mp_parent, rmp->mp_pid);
+
+	break;
+
+  case PM_FORK_NB_REPLY:
+	/* Nothing to do */
+
+	break;
+
+  case PM_UNPAUSE_REPLY:
+	/* Process is now unpaused */
+	rmp->mp_flags |= UNPAUSED;
+
+	break;
+
+  default:
+	panic(__FILE__, "handle_fs_reply: unknown reply code", call_nr);
+  }
+
+  /* Now that the process is idle again, look at pending signals */
+  if ((rmp->mp_flags & (IN_USE | EXITING)) == IN_USE)
+	  restart_sigs(rmp);
 }

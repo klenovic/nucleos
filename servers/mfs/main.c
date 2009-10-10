@@ -135,7 +135,7 @@ message *m_in;				/* pointer to message */
 
 	if (src != FS_PROC_NR) {
 		if(src == PM_PROC_NR) {
-			if(fs_m_in.m_type == PROC_EVENT)
+			if(is_notify(fs_m_in.m_type))
 				srcok = 1; /* Normal exit request. */
 		    	else
 				printf("MFS: unexpected message from PM\n");
@@ -153,7 +153,7 @@ message *m_in;				/* pointer to message */
    } while(!srcok);
 
    assert((src == FS_PROC_NR && !unmountdone) || 
-	(src == PM_PROC_NR && fs_m_in.m_type == PROC_EVENT));
+	(src == PM_PROC_NR && is_notify(fs_m_in.m_type)));
 }
 
 

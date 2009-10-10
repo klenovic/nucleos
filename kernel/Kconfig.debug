@@ -42,10 +42,11 @@ config DEBUG_KERNEL_LOCK_CHECK
 
 config DEBUG_KERNEL_VMASSERT
 	bool "Sanity checking regarding virtual memory"
-	depends on DEBUG_KERNEL
+	depends on DEBUG_KERNEL && FRAME_POINTER
 	default n
 	---help---
-	  Say Y if you want interrupt lock/unlock sanity checking.
+	  Say Y if you want interrupt lock/unlock sanity checking. This
+	  option requires compile with frame pointer.
 
 config DEBUG_KERNEL_STATS_PROFILE
 	bool "Statistical profiling"

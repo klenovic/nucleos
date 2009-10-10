@@ -125,6 +125,7 @@ int maxchunks;			/* how many were found */
    */
   if(env_get_param("memory", memstr, sizeof(memstr)-1) != 0)
 	return -1;
+
   s = memstr;
   for (i = 0; i < maxchunks && !done; i++) {
   	phys_bytes base = 0, size = 0, limit;

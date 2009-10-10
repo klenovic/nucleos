@@ -304,8 +304,6 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 
 	/* Make sure that the file is big enough */
 	if (vp->v_size < off + seg_bytes) {
-		printf("VFS: read_seg: file isn't big enough (size %ld, need %ld)\n",
-			vp->v_size, off+seg_bytes);
 		return -EIO;
 	}
 

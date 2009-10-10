@@ -14,7 +14,9 @@
 #include <nucleos/types.h>
 #include <nucleos/time.h>
 
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
+#endif
 
 #endif /* __NUCLEOS_SELECT_H */
 

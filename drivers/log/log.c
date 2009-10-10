@@ -17,6 +17,8 @@
 
 #include "log.h"
 #include <nucleos/time.h>
+#include <nucleos/select.h>
+#include <nucleos/endpoint.h>
 
 #define LOG_DEBUG		0	/* enable/ disable debugging */
 
@@ -36,7 +38,7 @@ static int log_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov,
 static int log_do_open(struct driver *dp, message *m_ptr);
 static int log_cancel(struct driver *dp, message *m_ptr);
 static int log_select(struct driver *dp, message *m_ptr);
-static void log_signal(struct driver *dp, message *m_ptr);
+static void log_signal(struct driver *dp, sigset_t *set);
 static int log_other(struct driver *dp, message *m_ptr, int);
 static void log_geometry(struct partition *entry);
 static int subread(struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t, int safe);
@@ -376,13 +378,12 @@ message *m_ptr;
 /*============================================================================*
  *				log_signal				      *
  *============================================================================*/
-static void log_signal(dp, m_ptr)
+static void log_signal(dp, set)
 struct driver *dp;
-message *m_ptr;
+sigset_t *set;
 {
-  sigset_t sigset = m_ptr->NOTIFY_ARG;
-  if (sigismember(&sigset, SIGKMESS)) {
-	do_new_kmess(m_ptr);
+  if (sigismember(set, SIGKMESS)) {
+	do_new_kmess(SYSTEM);
   }	
 }
 
@@ -400,6 +401,19 @@ int safe;
 	/* This function gets messages that the generic driver doesn't
 	 * understand.
 	 */
+	if (is_notify(m_ptr->m_type)) {
+		switch (_ENDPOINT_P(m_ptr->m_source)) {
+			case TTY_PROC_NR:
+				do_new_kmess(m_ptr->m_source);
+				r = -EDONTREPLY;
+				break;
+			default:
+				r = -EINVAL;
+				break;
+		}
+		return r;
+	}
+
 	switch(m_ptr->m_type) {
 	case DIAGNOSTICS_OLD: {
 		r = do_diagnostics(m_ptr, 0);
@@ -414,10 +428,6 @@ int safe;
 		r = -EDONTREPLY;
 		break;
 	}
-	case NOTIFY_FROM(TTY_PROC_NR):
-		do_new_kmess(m_ptr);
-		r = -EDONTREPLY;
-		break;
 	default:
 		r = -EINVAL;
 		break;

@@ -58,6 +58,7 @@ from DL_ETH:
 #include <nucleos/unistd.h>
 #include <nucleos/svrctl.h>
 #include <servers/ds/ds.h>
+#include <nucleos/endpoint.h>
 
 #include "mq.h"
 #include "qp.h"
@@ -222,35 +223,27 @@ void main(void)
 		reset_time();
 		source= mq->mq_mess.m_source;
 		m_type= mq->mq_mess.m_type;
-		if (source == FS_PROC_NR)
-		{
+
+		if (source == FS_PROC_NR) {
 			sr_rec(mq);
-		}
-		else if (m_type == SYN_ALARM)
-		{
-			clck_tick(&mq->mq_mess);
-			mq_free(mq);
-		} 
-		else if (m_type == PROC_EVENT)
-		{
-			/* signaled */ 
-			/* probably SIGTERM */
-			mq_free(mq);
-		} 
-		else if (m_type & NOTIFY_MESSAGE)
-		{
-			/* A driver is (re)started. */
-			eth_check_drivers(&mq->mq_mess);
-			mq_free(mq);
-		}
-		else if (m_type == DL_CONF_REPLY || m_type == DL_TASK_REPLY ||
-			m_type == DL_NAME_REPLY || m_type == DL_STAT_REPLY)
-		{
+		} else if (is_notify(m_type)) {
+			if (_ENDPOINT_P(source) == CLOCK) {
+				clck_tick(&mq->mq_mess);
+				mq_free(mq);
+			} else if (_ENDPOINT_P(source) == PM_PROC_NR) {
+				/* signaled */
+				/* probably SIGTERM */
+				mq_free(mq);
+			} else {
+				/* A driver is (re)started. */
+				eth_check_drivers(&mq->mq_mess);
+				mq_free(mq);
+			}
+		} else if (m_type == DL_CONF_REPLY || m_type == DL_TASK_REPLY ||
+			m_type == DL_NAME_REPLY || m_type == DL_STAT_REPLY) {
 			eth_rec(&mq->mq_mess);
 			mq_free(mq);
-		}
-		else
-		{
+		} else {
 			printf("inet: got bad message type 0x%x from %d\n",
 				mq->mq_mess.m_type, mq->mq_mess.m_source);
 			mq_free(mq);

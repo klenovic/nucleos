@@ -46,7 +46,9 @@ char *mess;
 int nr;
 {
 /* The system has run aground of a fatal kernel error. Terminate execution. */
-if (!minix_panicing++) {
+if (minix_panicing++) {
+	arch_monitor();
+}
 
   if (mess != NULL) {
 	kprintf("kernel panic: %s", mess);
@@ -57,7 +59,6 @@ if (!minix_panicing++) {
 
   kprintf("kernel: ");
   util_stacktrace();
-}
 
   /* Abort Nucleos. */
   nucleos_shutdown(NULL);

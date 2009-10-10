@@ -36,6 +36,7 @@
 #include <nucleos/a.out.h>
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
+#include <nucleos/ptrace.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -47,24 +48,17 @@
  *===========================================================================*/
 int do_exec()
 {
+	message m;
 	int r;
 
-	/* Save parameters */
-	mp->mp_exec_path = m_in.exec_name;
-	mp->mp_exec_path_len = m_in.exec_len;
-	mp->mp_exec_frame = m_in.stack_ptr;
-	mp->mp_exec_frame_len = m_in.stack_bytes;
+	m.m_type = PM_EXEC;
+	m.PM_PROC = mp->mp_endpoint;
+	m.PM_PATH = m_in.exec_name;
+	m.PM_PATH_LEN = m_in.exec_len;
+	m.PM_FRAME = m_in.stack_ptr;
+	m.PM_FRAME_LEN = m_in.stack_bytes;
 
-	/* Forward call to FS_PROC_NR */
-	if (mp->mp_fs_call != PM_IDLE) {
-		panic(__FILE__, "do_exec: not idle", mp->mp_fs_call);
-	}
-
-	mp->mp_fs_call = PM_EXEC;
-	r = kipc_notify(FS_PROC_NR);
-
-	if (r != 0)
-		panic(__FILE__, "do_exec: unable to notify FS_PROC_NR", r);
+	tell_fs(mp, &m);
 
 	/* Do not reply */
 	return SUSPEND;
@@ -105,7 +99,7 @@ int exec_newmem()
 	if ((r = vm_exec_newmem(proc_e, &args, sizeof(args), &stack_top, &flags)) == 0) {
 		allow_setuid = 0; /* Do not allow setuid execution */
 
-		if ((rmp->mp_flags & TRACED) == 0) {
+		if (rmp->mp_tracer == NO_TRACER) {
 			/* Okay, setuid execution is allowed */
 			allow_setuid = 1;
 			rmp->mp_effuid = args.new_uid;
@@ -175,8 +169,6 @@ int result;
 	{
 		if (rmp->mp_flags & PARTIAL_EXEC)
 		{
-			printf("partial exec; killing process\n");
-
 			/* Use SIGILL signal that something went wrong */
 			rmp->mp_sigstatus = SIGILL;
 			exit_proc(rmp, 0, FALSE /*dump_core*/);
@@ -193,12 +185,20 @@ int result;
 	/* Fix 'mproc' fields, tell kernel that exec is done, reset caught
 	 * sigs.
 	 */
-	for (sn = 1; sn <= _NSIG; sn++) {
+	for (sn = 1; sn < _NSIG; sn++) {
 		if (sigismember(&rmp->mp_catch, sn)) {
 			sigdelset(&rmp->mp_catch, sn);
 			rmp->mp_sigact[sn].sa_handler = SIG_DFL;
 			sigemptyset(&rmp->mp_sigact[sn].sa_mask);
 		}
+	}
+
+	/* Cause a signal if this process is traced.
+	 * Do this before making the process runnable again!
+	 */
+	if (rmp->mp_tracer != NO_TRACER)  {
+		sn = (rmp->mp_trace_flags & TO_ALTEXEC) ? SIGSTOP : SIGTRAP;
+		check_sig(rmp->mp_pid, sn);
 	}
 
 	new_sp = (char *)rmp->mp_procargs;
@@ -207,6 +207,5 @@ int result;
 
 	if (r != 0) panic(__FILE__, "sys_exec failed", r);
 
-	/* Cause a signal if this process is traced. */
-	if (rmp->mp_flags & TRACED) check_sig(rmp->mp_pid, SIGTRAP);
+	return;
 }

@@ -371,10 +371,8 @@ set_restart1:
 s_call:
 p_s_call:
         cld                      // set direction flag to a known value
-        sub     $6*4, %esp       // skip RETADR, eax, ecx, edx, ebx, est
-        push    %ebp             // stack already points into proc table
-        push    %esi
-        push    %edi
+	sub	$4, %esp       // skip RETADR, eax, ecx, edx, ebx, est
+	pusha			// save general registers
         pushw    %ds
         pushw    %es
         pushw    %fs
@@ -422,14 +420,14 @@ restart:
 	lea     P_STACKTOP(%esp), %eax // arrange for next interrupt
 	mov     %eax, tss+TSS3_S_SP0   // to save state in process table
 restart1:
-        decb    k_reenter
-        popw     %gs
-        popw     %fs
-        popw     %es
-        popw     %ds
-        popa
-        add     $4, %esp        // skip return adr
-        iret                    // continue process
+	decb	k_reenter
+	popw	%gs
+	popw	%fs
+	popw	%es
+	popw	%ds
+	popa
+	add	$4, %esp        // skip return adr
+	iret                    // continue process
 
 //===========================================================================
 //                             exception handlers
@@ -588,9 +586,13 @@ reload_cr3:
 //===========================================================================
 //                            level0_call
 //===========================================================================
+// which level0 function to call was passed here by putting it in eax, so
+// we get that from the saved state.
 level0_call:
-        call    save
-        jmp     *level0_func
+	call	save
+	mov	proc_ptr, %eax
+	mov	AXREG(%eax), %eax
+	jmp	*%eax
 
 //===========================================================================
 //                             rodata

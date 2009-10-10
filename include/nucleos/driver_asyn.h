@@ -39,7 +39,7 @@ struct driver {
 		     unsigned nr_req, int safe);
   void (*dr_cleanup)(void);
   void (*dr_geometry)(struct partition *entry);
-  void (*dr_signal)(struct driver *dp, message *m_ptr);
+  void (*dr_signal)(struct driver *dp, sigset_t *set);
   void (*dr_alarm)(struct driver *dp, message *m_ptr);
   int (*dr_cancel)(struct driver *dp, message *m_ptr);
   int (*dr_select)(struct driver *dp, message *m_ptr);
@@ -62,7 +62,7 @@ int do_nop(struct driver *dp, message *m_ptr);
 struct device *nop_prepare(int device);
 void nop_cleanup(void);
 void nop_task(void);
-void nop_signal(struct driver *dp, message *m_ptr);
+void nop_signal(struct driver *dp, sigset_t *set);
 void nop_alarm(struct driver *dp, message *m_ptr);
 int nop_cancel(struct driver *dp, message *m_ptr);
 int nop_select(struct driver *dp, message *m_ptr);

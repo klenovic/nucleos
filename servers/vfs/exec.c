@@ -207,7 +207,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		return r;
 	}
 
-	/* Patch up stack and copy it from FS_PROC_NR to new core image. */
+	/* Patch up stack and copy it from FS to new core image. */
 	vsp = bfmt_param.stack_top;
 	vsp -= bfmt_param.ex.args_bytes;
 
@@ -221,11 +221,6 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	}
 
 	put_vnode(vp);
-
-	if (r != 0) {
-		printf("return at %s, %d\n", __FILE__, __LINE__);
-		return r;
-	}
 
 	clo_exec(rfp);
 

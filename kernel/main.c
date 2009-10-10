@@ -54,6 +54,9 @@ void main(void)
 	/* Architecture-dependent initialization */
 	arch_init();
 
+   /* Global value to test segment sanity. */
+   magictest = MAGICTEST;
+
 	/* Clear the process table. Anounce each slot as empty and set up mappings 
 	 * for proc_addr() and proc_nr() macros. Do the same for the table with 
 	 * privilege structures for the system processes.
@@ -103,7 +106,7 @@ void main(void)
 		priv(rp)->s_trap_mask = ip->trap_mask;		/* allowed traps */
 
 		/* Warn about violations of the boot image table order consistency. */
-		if (priv_id(rp) != s_nr_to_id(ip->proc_nr))
+	if (priv_id(rp) != s_nr_to_id(ip->proc_nr) && (ip->flags & SYS_PROC))
 			kprintf("Warning: boot image table has wrong process order\n");
 
 		/* Initialize call mask bitmap from unordered set.
@@ -198,7 +201,7 @@ void main(void)
 
 		/* Set ready. The HARDWARE task is never ready. */
 		if (rp->p_nr == HARDWARE)
-			RTS_SET(rp, NO_PRIORITY);
+			RTS_SET(rp, PROC_STOP);
 
 		RTS_UNSET(rp, SLOT_FREE); /* remove SLOT_FREE and schedule */
 		alloc_segments(rp);

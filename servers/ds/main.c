@@ -16,11 +16,12 @@
  * Created:
  *   Oct 19, 2005       by Jorrit N. Herder
  */
-#include <nucleos/kernel.h>
 #include "inc.h"        /* include master header file */
+#include <nucleos/kernel.h>
+#include <nucleos/endpoint.h>
 
 /* Allocate space for the global variables. */
-int who_e;              /* caller's proc number */
+endpoint_t who_e;       /* caller's proc number */
 int callnr;             /* system call number */
 int sys_panic;          /* flag to indicate system-wide panic */
 
@@ -55,10 +56,22 @@ int main(int argc, char **argv)
       /* Wait for incoming message, sets 'callnr' and 'who'. */
       get_work(&m);
 
+      if (is_notify(callnr)) {
+	      switch (_ENDPOINT_P(who_e)) {
+		      case PM_PROC_NR:
+			      sig_handler();
+			      break;
+		      default:
+			      report("DS","warning, got illegal notify from:",
+					     			 m.m_source);
+			      result = -EINVAL;
+			      goto send_reply;
+	      }
+
+	      /* done, get a new message */
+      }
+
       switch (callnr) {
-      case PROC_EVENT:
-          sig_handler();
-          continue;
       case DS_PUBLISH:
           result = do_publish(&m);
           break;
@@ -79,6 +92,7 @@ int main(int argc, char **argv)
           result = -EINVAL;
       }
 
+send_reply:
       /* Finally send reply message, unless disabled. */
       if (result != -EDONTREPLY) {
           m.m_type = result;            /* build reply message */

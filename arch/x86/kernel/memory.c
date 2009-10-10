@@ -41,9 +41,8 @@ static int nfreepdes = 0, freepdes[WANT_FREEPDES], inusepde = NOPDE;
 #define HASPT(procptr) ((procptr)->p_seg.p_cr3 != 0)
 
 static u32_t phys_get32(vir_bytes v);
-static void set_cr3(void);
 static void vm_enable_paging(void);
-
+static void set_cr3(void);
 	
 /* *** Internal VM Functions *** */
 
@@ -127,7 +126,6 @@ void vm_init(struct proc *newptproc)
 		PTR = I386_BIG_PAGE_SIZE*PDE + offset;			\
 		REMAIN = MIN(REMAIN, I386_BIG_PAGE_SIZE - offset); 	\
 		if(1 || mustinvl) {					\
-			FIXME("unconditional reload");			\
 			level0(reload_cr3); 				\
 		}							\
 	}								\
@@ -246,24 +244,21 @@ phys_bytes addr;
 
 static u32_t vm_cr3;	/* temp arg to level0() func */
 
+static void set_cr3()
+{
+	write_cr3(vm_cr3);
+}
+
 void vm_set_cr3(struct proc *newptproc)
 {
 	int u = 0;
 	if(!intr_disabled()) { lock; u = 1; }
 	vm_cr3= newptproc->p_seg.p_cr3;
 	if(vm_cr3) {
-		vmassert(intr_disabled());
 		level0(set_cr3);
-		vmassert(intr_disabled());
 		ptproc = newptproc;
-		vmassert(intr_disabled());
 	}
 	if(u) { unlock; }
-}
-
-static void set_cr3()
-{
-	write_cr3(vm_cr3);
 }
 
 char *cr0_str(u32_t e)

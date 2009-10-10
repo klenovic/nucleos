@@ -20,6 +20,7 @@
 #include <nucleos/version.h>
 #include <nucleos/compile.h>
 #include <nucleos/param.h>
+#include <kernel/proto.h>
 
 static char *get_value(const char *params, const char *key);
 

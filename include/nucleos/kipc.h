@@ -221,6 +221,7 @@ typedef struct asynmsg {
 				 * result is stored in 'result'
 				 */
 #define AMF_NOTIFY	4	/* Send a notification when AMF_DONE is set */
+#define AMF_NOREPLY	8	/* Not a reply message for a SENDREC */
 
 /* kernel ipc */
 int kipc_notify(endpoint_t dest);

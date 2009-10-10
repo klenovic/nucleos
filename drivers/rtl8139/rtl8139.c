@@ -80,6 +80,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/endpoint.h>
 #include <nucleos/timer.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
@@ -304,7 +305,7 @@ static void rl_watchdog_f(timer_t *tp);
 static void tell_dev(vir_bytes start, size_t size, int pci_bus, int pci_dev, int pci_func);
 
 /* The message used in the main loop is made global, so that rl_watchdog_f()
- * can change its message type to fake a HARD_INT message.
+ * can change its message type to fake an interrupt message.
  */
 static message m;
 static int int_event_check;		/* set to TRUE if events arrived */
@@ -358,9 +359,57 @@ int main(int argc, char *argv[])
 		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("rtl8139","receive failed", r);
 
+		if (is_notify(m.m_type)) {
+			switch (_ENDPOINT_P(m.m_source)) {
+				case RS_PROC_NR:
+					kipc_notify(m.m_source);
+					break;
+				case CLOCK:
+					/* 
+					 * Under MINIX, synchronous alarms are
+					 * used instead of watchdog functions.
+					 * The approach is very different: MINIX
+					 * VMD timeouts are handled within the
+					 * kernel (the watchdog is executed by
+					 * CLOCK), and notify() the driver in
+					 * some cases.  MINIX timeouts result in
+					 * a SYN_ALARM message to the driver and
+					 * thus are handled where they should be
+					 * handled. Locally, watchdog functions
+					 * are used again. 
+					 */
+					rl_watchdog_f(NULL);     
+					break;		 
+				case HARDWARE:
+					do_hard_int();
+					if (int_event_check)
+						check_int_events();
+					break ;
+				case TTY_PROC_NR:
+					rtl8139_dump(&m);
+					break;
+				case PM_PROC_NR:
+				{
+					sigset_t set;
+
+					if (getsigset(&set) != 0) break;
+
+					if (sigismember(&set, SIGTERM))
+						rtl8139_stop();
+
+					break;
+				}
+				default:
+					panic("rtl8139","illegal notify from",
+								m.m_source);
+			}
+
+			/* done, get nwe message */
+			continue;
+		}
+
 		switch (m.m_type)
 		{
-		case DEV_PING: kipc_notify(m.m_source);		break;
 		case DL_WRITE:	rl_writev(&m, FALSE, FALSE);	break;
 		case DL_WRITEV:	rl_writev(&m, FALSE, TRUE);	break;
 		case DL_WRITEV_S: rl_writev_s(&m, FALSE);	break;
@@ -374,33 +423,6 @@ int main(int argc, char *argv[])
 #if 0
 		case DL_STOP:	do_stop(&m);			break;
 #endif
-		case SYN_ALARM:
-			/* Under MINIX, synchronous alarms are used instead of
-			 * watchdog functions. The approach is very different:
-			 * MINIX VMD timeouts are handled within the kernel 
-			 * (the watchdog is executed by CLOCK), and notify()
-			 * the driver in some cases.
-			 * MINIX timeouts result in a SYN_ALARM message to the
-			 * driver and thus are handled where they should be
-			 * handled. Locally, watchdog functions are used again. 
-			 */
-			rl_watchdog_f(NULL);     
-			break;		 
-		case SYS_SIG:
-		{
-			sigset_t sigset = m.NOTIFY_ARG;
-			if ( sigismember( &sigset, SIGKSTOP ) )
-				rtl8139_stop();
-		}
-			break;
-		case HARD_INT:
-			do_hard_int();
-			if (int_event_check)
-				check_int_events();
-			break ;
-		case FKEY_PRESSED: rtl8139_dump(&m);		break;
-		case PROC_EVENT:
-			break;
 		default:
 			panic("rtl8139","illegal message", m.m_type);
 		}

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* _taskcall() is the same as _syscall() except it returns negative error
- * codes directly and not in errno.  This is a better interface for PM_PROC_NR and
- * FS_PROC_NR.
+ * codes directly and not in errno.  This is a better interface for PM and
+ * FS.
  */
 
 #include <nucleos/lib.h>
@@ -20,10 +20,13 @@ endpoint_t who;
 int syscallnr;
 register message *msgptr;
 {
-  int status;
+	int status = 0;
 
-  msgptr->m_type = syscallnr;
-  status = kipc_sendrec(who, msgptr);
-  if (status != 0) return(status);
-  return(msgptr->m_type);
+	msgptr->m_type = syscallnr;
+	status = kipc_sendrec(who, msgptr);
+
+	if (status != 0)
+		return(status);
+
+	return(msgptr->m_type);
 }

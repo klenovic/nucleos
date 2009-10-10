@@ -8,14 +8,9 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/lib.h>
-/* XXX - these have to be hidden because signal() uses them and signal() is
- * ANSI and not POSIX.  It would be surely be better to use macros for the
- * library and system uses, and perhaps macros as well as functions for the
- * POSIX user interface.  The macros would not need underlines.  It may be
- * inconvenient to match the exact semantics of the current functions
- * because the interface is bloated by reporting errors.  For library and
- * system uses, the signal number is mostly already known to be valid
- * before the sigset-changing routines are called.
+/* System processes use simpler macros with no range error checking (defined in
+ * signal.h). The ANSI signal() implementation now also uses the macro
+ * versions, which makes hiding of the functions here a historical remains.
  */
 #include <nucleos/signal.h>
 
@@ -26,7 +21,8 @@
 #define SIGMASK		(((SIGBIT_0 << _NSIG) << 1) - 1)
 
 #define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
-
+/*@nucleos: remove this*/
+#if 0
 int sigaddset(sigset_t *set, int signo)
 {
 	if (!sigisvalid(signo)) {
@@ -74,3 +70,4 @@ int sigismember(const sigset_t *set, int signo)
 
 	return 0;
 }
+#endif

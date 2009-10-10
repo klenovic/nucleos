@@ -65,6 +65,7 @@
 
 #include <stdlib.h>
 #include <nucleos/com.h>
+#include <nucleos/endpoint.h>
 #include <net/hton.h>
 #include <net/gen/ether.h>
 #include <net/gen/eth_io.h>
@@ -193,13 +194,42 @@ static void do_vir_insw(port_t port, int proc, vir_bytes buf, size_t size);
 static void do_vir_outsb(port_t port, int proc, vir_bytes buf, size_t size);
 static void do_vir_outsw(port_t port, int proc, vir_bytes buf, size_t size);
 
+static int handle_hw_intr(void)
+{
+	int i, r, irq;
+	dpeth_t *dep;
+
+	for (i= 0, dep= &de_table[0]; i<DE_PORT_NR; i++, dep++)
+	{
+		if (dep->de_mode != DEM_ENABLED)
+			continue;
+		assert(dep->de_flags & DEF_ENABLED);
+		irq= dep->de_irq;
+		assert(irq >= 0 && irq < NR_IRQ_VECTORS);
+		if (dep->de_int_pending || 1)
+		{
+			dep->de_int_pending= 0;
+			dp_check_ints(dep);
+			do_int(dep);
+			r= sys_irqenable(&dep->de_hook);
+			if (r != 0)
+			{
+				panic("DP8390", 
+					"unable enable interrupts", r);
+			}
+		}
+	}
+
+	return r;
+}
+
 /*===========================================================================*
  *				dpeth_task				     *
  *===========================================================================*/
 int main(int argc, char *argv[])
 {
 	message m;
-	int i, irq, r, tasknr;
+	int i, r, tasknr;
 	dpeth_t *dep;
 	long v;
 
@@ -234,9 +264,39 @@ int main(int argc, char *argv[])
 		if ((r= kipc_receive(ANY, &m)) != 0)
 			panic("", "dp8390: receive failed", r);
 
+		if (is_notify(m.m_type)) {
+			switch (_ENDPOINT_P(m.m_source)) {
+				case RS_PROC_NR:
+					kipc_notify(m.m_source);
+					break;
+				case HARDWARE:
+					r = handle_hw_intr();
+					break;
+				case PM_PROC_NR:
+				{
+					sigset_t set;
+
+					if (getsigset(&set) != 0) break;
+
+					if (sigismember(&set, SIGTERM))
+						dp8390_stop();
+
+					break;
+				}
+				case CLOCK:
+					printf("dp8390: notify from CLOCK\n");
+					break;
+				default:
+					panic("", "dp8390: illegal notify from",
+								m.m_source);
+			}
+
+			/* done, get a new message */
+			continue;
+		}
+
 		switch (m.m_type)
 		{
-		case DEV_PING:  kipc_notify(m.m_source);		continue;
 		case DL_WRITE:	do_vwrite(&m, FALSE, FALSE);	break;
 		case DL_WRITEV:	do_vwrite(&m, FALSE, TRUE);	break;
 		case DL_WRITEV_S: do_vwrite_s(&m, FALSE);	break;
@@ -248,38 +308,6 @@ int main(int argc, char *argv[])
 		case DL_GETSTAT_S: do_getstat_s(&m);		break;
 		case DL_GETNAME: do_getname(&m); 		break;
 		case DL_STOP:	do_stop(&m);			break;
-		case HARD_INT:
-			for (i= 0, dep= &de_table[0]; i<DE_PORT_NR; i++, dep++)
-			{
-				if (dep->de_mode != DEM_ENABLED)
-					continue;
-				assert(dep->de_flags & DEF_ENABLED);
-				irq= dep->de_irq;
-				assert(irq >= 0 && irq < NR_IRQ_VECTORS);
-				if (dep->de_int_pending || 1)
-				{
-					dep->de_int_pending= 0;
-					dp_check_ints(dep);
-					do_int(dep);
-					r= sys_irqenable(&dep->de_hook);
-					if (r != 0)
-					{
-						panic("DP8390", 
-						"unable enable interrupts", r);
-					}
-				}
-			}
-			break;
-		case SYS_SIG:	{
-			sigset_t sigset = m.NOTIFY_ARG;
-			if (sigismember(&sigset, SIGKSTOP)) dp8390_stop();
-			break;
-		}
-		case SYN_ALARM:
-			printf("dp8390: strange, got SYN_ALARM\n");
-			break;
-		case PROC_EVENT:
-			break;
 		default:
 			panic("", "dp8390: illegal message", m.m_type);
 		}

@@ -142,6 +142,7 @@ int select_match_pipe(struct filp *f);
 void unsuspend_by_endpt(endpoint_t);
 void select_reply1(void);
 void select_reply2(void);
+void wait_for(endpoint_t);
 #if DO_SANITYCHECKS
 int check_pipe(void);
 #endif

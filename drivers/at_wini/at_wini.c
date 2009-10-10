@@ -29,6 +29,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/type.h>
+#include <nucleos/endpoint.h>
 #include <ibm/pci.h>
 #include <nucleos/mman.h>
 #include <asm/ioctls.h>
@@ -1588,11 +1589,10 @@ struct command *cmd;		/* Command block */
 	return(ERR);
   }
 
-  /* Schedule a wakeup call, some controllers are flaky. This is done with
-   * a synchronous alarm. If a timeout occurs a SYN_ALARM message is sent
-   * from HARDWARE, so that w_intr_wait() can call w_timeout() in case the
-   * controller was not able to execute the command. Leftover timeouts are
-   * simply ignored by the main loop. 
+  /* Schedule a wakeup call, some controllers are flaky. This is done with a
+   * synchronous alarm. If a timeout occurs a notify from CLOCK is sent, so that
+   * w_intr_wait() can call w_timeout() in case the controller was not able to
+   * execute the command. Leftover timeouts are simply ignored by the main loop. 
    */
   sys_setalarm(wakeup_ticks, 0);
 
@@ -1641,11 +1641,10 @@ struct command *cmd;		/* Command block */
 	return(ERR);
   }
 
-  /* Schedule a wakeup call, some controllers are flaky. This is done with
-   * a synchronous alarm. If a timeout occurs a SYN_ALARM message is sent
-   * from HARDWARE, so that w_intr_wait() can call w_timeout() in case the
-   * controller was not able to execute the command. Leftover timeouts are
-   * simply ignored by the main loop. 
+  /* Schedule a wakeup call, some controllers are flaky. This is done with a
+   * synchronous alarm. If a timeout occurs a notify from CLOCK is sent, so that
+   * w_intr_wait() can call w_timeout() in case the controller was not able to
+   * execute the command. Leftover timeouts are simply ignored by the main loop. 
    */
   sys_setalarm(wakeup_ticks, 0);
 
@@ -2047,46 +2046,57 @@ static void w_intr_wait()
 {
 /* Wait for a task completion interrupt. */
 
-  int r;
-  unsigned long w_status;
-  message m;
+	int r;
+	unsigned long w_status;
+	message m;
 
-  if (w_wn->irq != NO_IRQ) {
-	/* Wait for an interrupt that sets w_status to "not busy".
-	 * (w_timeout() also clears w_status.)
-	 */
-	while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
-		int rr;
-		if((rr=kipc_receive(ANY, &m)) != 0)
-			panic("at_wini", "kipc_receive(ANY) failed", rr);
-		switch(m.m_type) {
-		  case SYN_ALARM:
-			/* Timeout. */
-			w_timeout();	      /* a.o. set w_status */
-			break;
-		  case HARD_INT:
-			/* Interrupt. */
-			r= sys_inb(w_wn->base_cmd + REG_STATUS, (u32_t*)&w_status);
-			if (r != 0)
-				panic("at_wini", "sys_inb failed", r);
-			w_wn->w_status= w_status;
-			ack_irqs(m.NOTIFY_ARG);
-			break;
-		  case DEV_PING:
-			/* RS monitor ping. */
-			kipc_notify(m.m_source);
-			break;
-		  default:
-			/* unhandled message.
-			 * queue it and handle it in the libdriver loop.
-			 */
-			mq_queue(&m);
+	if (w_wn->irq != NO_IRQ) {
+		/* Wait for an interrupt that sets w_status to "not busy".
+		 * (w_timeout() also clears w_status.)
+		 */
+		while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
+			int rr;
+
+			if((rr=kipc_receive(ANY, &m)) != 0)
+				panic("at_wini", "kipc_receive(ANY) failed", rr);
+
+			if (is_notify(m.m_type)) {
+				switch (_ENDPOINT_P(m.m_source)) {
+				case CLOCK:
+					/* Timeout. */
+					w_timeout(); /* a.o. set w_status */
+					break;
+				case HARDWARE:
+					/* Interrupt. */
+					r= sys_inb(w_wn->base_cmd + REG_STATUS, &w_status);
+					if (r != 0)
+						panic("at_wini", "sys_inb failed", r);
+						w_wn->w_status= w_status;
+						ack_irqs(m.NOTIFY_ARG);
+						break;
+				case RS_PROC_NR:
+					/* RS monitor ping. */
+					kipc_notify(m.m_source);
+					break;
+				default:
+					/*
+					 * unhandled message.  queue it and
+					 * handle it in the libdriver loop.
+					 */
+					mq_queue(&m);
+				}
+			} else {
+				/*
+				 * unhandled message.  queue it and handle it in the
+				 * libdriver loop.
+				 */
+				mq_queue(&m);
+			}
 		}
+	} else {
+		/* Interrupt not yet allocated; use polling. */
+		(void) w_waitfor(STATUS_BSY, 0);
 	}
-  } else {
-	/* Interrupt not yet allocated; use polling. */
-	(void) w_waitfor(STATUS_BSY, 0);
-  }
 }
 
 /*===========================================================================*

@@ -40,7 +40,7 @@
  * 
  * Note: since only 1 printer is supported, minor dev is not used at present.
  */
-
+#include <nucleos/endpoint.h>
 #include <nucleos/drivers.h>
 
 /* Control bits (in port_base + 2).  "+" means positive logic and "-" means
@@ -98,7 +98,7 @@ static int revive_pending;	/* set to true if revive is pending */
 static int revive_status;	/* revive status */
 static int done_status;	/* status of last output completion */
 static int oleft;		/* bytes of output left in obuf */
-static char obuf[128];		/* output buffer */
+static unsigned char obuf[128];	/* output buffer */
 static unsigned char *optr;		/* ptr to next char in obuf to print */
 static int orig_count;		/* original byte count */
 static int port_base;		/* I/O port for printer */
@@ -121,7 +121,7 @@ static void prepare_output(void);
 static void do_initialize(void);
 static void reply(int code,int replyee,int proc,int status);
 static void do_printer_output(void);
-static void do_signal(message *m_ptr);
+static void do_signal(void);
 
 
 /*===========================================================================*
@@ -142,6 +142,25 @@ void main(void)
   
   while (TRUE) {
 	kipc_receive(ANY, &pr_mess);
+
+	if (is_notify(pr_mess.m_type)) {
+		switch (_ENDPOINT_P(pr_mess.m_source)) {
+			case HARDWARE:
+				do_printer_output();
+				break;
+			case RS_PROC_NR:
+				kipc_notify(pr_mess.m_source);
+				break;
+			case PM_PROC_NR:
+				do_signal();
+				break;
+			default:
+				reply(__NR_task_reply, pr_mess.m_source,
+						pr_mess.IO_ENDPT, -EINVAL);
+		}
+		continue;
+	}
+
 	switch(pr_mess.m_type) {
 	    case DEV_OPEN:
                  do_initialize();		/* initialize */
@@ -152,10 +171,6 @@ void main(void)
 	    case DEV_WRITE_S:	do_write(&pr_mess, 1);	break;
 	    case DEV_STATUS:	do_status(&pr_mess);	break;
 	    case CANCEL:	do_cancel(&pr_mess);	break;
-	    case HARD_INT:	do_printer_output();	break;
-	    case SYS_SIG:	do_signal(&pr_mess); 	break;
-	    case DEV_PING:  	kipc_notify(pr_mess.m_source);	break;
-	    case PROC_EVENT:	break;
 	    default:
 		reply(__NR_task_reply, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
 	}
@@ -166,11 +181,11 @@ void main(void)
 /*===========================================================================*
  *				 do_signal	                             *
  *===========================================================================*/
-static void do_signal(m_ptr)
-message *m_ptr;					/* signal message */
+static void do_signal()
 {
-  int sig;
-  sigset_t sigset = m_ptr->NOTIFY_ARG;
+  sigset_t sigset;
+
+  if (getsigset(&sigset) != 0) return;
   
   /* Expect a SIGTERM signal when this server must shutdown. */
   if (sigismember(&sigset, SIGTERM)) {
@@ -394,10 +409,10 @@ static void prepare_output()
  *===========================================================================*/
 static void do_printer_output()
 {
-/* This function does the actual output to the printer. This is called on
- * a HARD_INT message sent from the generic interrupt handler that 'forwards'
- * interrupts to this driver. The generic handler did not reenable the 
- * printer IRQ yet! 
+/* This function does the actual output to the printer. This is called on an
+ * interrupt message sent from the generic interrupt handler that 'forwards'
+ * interrupts to this driver. The generic handler did not reenable the printer
+ * IRQ yet! 
  */
 
   unsigned long status;

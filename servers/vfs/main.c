@@ -101,10 +101,8 @@ int main(void)
 		SANITYCHECK;
 		get_work();		/* sets who and call_nr */
 
-		if (who_e == PM_PROC_NR && call_nr != PROC_EVENT)
-			printf("FS_PROC_NR: strange, got message %d from PM\n", call_nr);
-
-		if (call_nr == DEV_REVIVE) {
+		if (call_nr == DEV_REVIVE) 
+		{
 			endpoint_t endpt;
 
 			endpt = m_in.REP_ENDPT;
@@ -112,7 +110,7 @@ int main(void)
 				endpt = suspended_ep(m_in.m_source, m_in.REP_IO_GRANT);
 
 				if(endpt == NONE) {
-					printf("FS_PROC_NR: proc with "
+					printf("FS: proc with "
 					       "grant %d from %d not found (revive)\n",
 					m_in.REP_IO_GRANT, m_in.m_source);
 					continue;
@@ -145,10 +143,12 @@ int main(void)
 
 		/* Check for special control message first */
 		if (is_notify(call_nr)) {
-			if (who_p == PM_PROC_NR) {
-				/* PM tries to get FS to do something */
-				service_pm();
-			} else if (who_p == CLOCK) {
+			if (who_p == PM_PROC_NR)
+			{
+			/* Signaled by PM, ignore. */
+			}
+			else if (who_p == CLOCK)
+			{
 				/* Alarm timer expired. Used only for select().
 				 * Check it.
 				 */
@@ -164,7 +164,7 @@ int main(void)
 
 		/* We only expect notify()s from tasks. */
 		if(who_p < 0) {
-			printf("FS_PROC_NR: ignoring message from %d (%d)\n",
+			printf("FS: ignoring message from %d (%d)\n",
 			who_e, m_in.m_type);
 			continue;
 		}
@@ -179,6 +179,13 @@ int main(void)
 			panic(__FILE__, "requester suspended", NO_NUM);
 		}
 #endif
+
+	/* Calls from PM. */
+	if (who_e == PM_PROC_NR) {
+		service_pm();
+
+		continue;
+	}
 
 		/* Calls from VM. */
 		if(who_e == VM_PROC_NR) {
@@ -231,7 +238,7 @@ int main(void)
 					call_nr, who_e);
 			} else if (fp->fp_pid == PID_FREE) {
 				error = -ENOSYS;
-				printf("FS_PROC_NR, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
+				printf("FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
 					who_e, call_nr, m_in.endpt1);
 			} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
@@ -396,7 +403,7 @@ static void fs_init(void)
 	 */
 	do {
 		if ((s=kipc_receive(PM_PROC_NR, &mess)) != 0)
-			panic(__FILE__,"FS_PROC_NR couldn't receive from PM", s);
+			panic(__FILE__,"FS couldn't receive from PM", s);
 
 		if (NONE == mess.PR_ENDPT)
 			break;
@@ -418,7 +425,7 @@ static void fs_init(void)
 	mess.m_type = 0;			/* tell PM that we succeeded */
 	s = kipc_send(PM_PROC_NR, &mess);		/* kipc_send synchronization message */
 
-	/* All process table entries have been set. Continue with FS_PROC_NR initialization.
+	/* All process table entries have been set. Continue with FS initialization.
 	 * Certain relations must hold for the file system to work at all. Some 
 	 * extra block_size requirements are checked at super-block-read-in time.
 	 */
@@ -474,9 +481,9 @@ static void init_root(void)
 	root_dev = DEV_IMGRD;
 	ROOT_FS_E = MFS_PROC_NR;
 
-	/* Wait FS_PROC_NR login message */
+	/* Wait FS login message */
 	if (last_login_fs_e != ROOT_FS_E) {
-		/* Wait FS_PROC_NR login message */
+		/* Wait FS login message */
 		if (kipc_receive(ROOT_FS_E, &m) != 0) {
 			printf("VFS: Error receiving login request from FS_e %d\n", 
 				ROOT_FS_E);
@@ -553,112 +560,96 @@ static void init_root(void)
  *===========================================================================*/
 static void service_pm(void)
 {
-	int r, call;
-	message m;
+  int r;
 
-	/* Ask PM for work until there is nothing left to do */
-	for (;;) {
-		m.m_type= PM_GET_WORK;
-		r= kipc_sendrec(PM_PROC_NR, &m);
-		if (r != 0) {
-			panic("VFS", "service_pm: sendrec failed", r);
-		}
+  switch (call_nr) {
+  case PM_SETUID:
+	pm_setuid(m_in.PM_PROC, m_in.PM_EID, m_in.PM_RID);
 
-		if (m.m_type == PM_IDLE) {
-			break;
-		}
+	m_out.m_type = PM_SETUID_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
 
-		call= m.m_type;
-		switch (call) {
-		case PM_SETSID:
-			pm_setsid(m.PM_SETSID_PROC);
+	break;
 
-			/* No need to report status to PM */
-			break;
+  case PM_SETGID:
+	pm_setgid(m_in.PM_PROC, m_in.PM_EID, m_in.PM_RID);
 
-		case PM_SETGID:
-			pm_setgid(m.PM_SETGID_PROC, m.PM_SETGID_EGID,
-				  m.PM_SETGID_RGID);
+	m_out.m_type = PM_SETGID_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;  
 
-			/* No need to report status to PM */
-			break;
+	break;
 
-		case PM_SETUID:
-			pm_setuid(m.PM_SETUID_PROC, m.PM_SETUID_EGID,
-				  m.PM_SETUID_RGID);
+  case PM_SETSID:
+	pm_setsid(m_in.PM_PROC);
 
-			/* No need to report status to PM */
-			break;
+	m_out.m_type = PM_SETSID_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
 
-		case PM_FORK:
-			pm_fork(m.PM_FORK_PPROC, m.PM_FORK_CPROC,
-				m.PM_FORK_CPID);
+	break;
 
-			/* No need to report status to PM */
-			break;
+  case PM_EXEC:
+	r = pm_exec(m_in.PM_PROC, m_in.PM_PATH, m_in.PM_PATH_LEN,
+		m_in.PM_FRAME, m_in.PM_FRAME_LEN);
 
-		case PM_EXIT:
-			pm_exit(m.PM_EXIT_PROC);
+	/* Reply status to PM */
+	m_out.m_type = PM_EXEC_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
+	m_out.PM_STATUS = r;
 
-			/* Reply dummy status to PM for synchronization */
-			m.m_type = PM_EXIT_REPLY;
-			/* Keep m.PM_EXIT_PROC */
+	break;
 
-			r= kipc_send(PM_PROC_NR, &m);
+  case PM_EXIT:
+	pm_exit(m_in.PM_PROC);
 
-			if (r != 0)
-				panic(__FILE__, "service_pm: kipc_send failed", r);
-			break;
+	/* Reply dummy status to PM for synchronization */
+	m_out.m_type = PM_EXIT_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
 
-		case PM_UNPAUSE:
-		case PM_UNPAUSE_TR:
-			unpause(m.PM_UNPAUSE_PROC);
+	break;
 
-			/* No need to report status to PM */
-			break;
+  case PM_DUMPCORE:
+	r = pm_dumpcore(m_in.PM_PROC,
+		NULL /* (struct mem_map *) m_in.PM_SEGPTR */);
 
-		case PM_REBOOT:
-			pm_reboot();
+	/* Reply status to PM */
+	m_out.m_type = PM_CORE_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
+	m_out.PM_STATUS = r;
+	
+	break;
 
-			/* Reply dummy status to PM for synchronization */
-			m.m_type= PM_REBOOT_REPLY;
-			r = kipc_send(PM_PROC_NR, &m);
+  case PM_FORK:
+  case PM_FORK_NB:
+	pm_fork(m_in.PM_PPROC, m_in.PM_PROC, m_in.PM_CPID);
 
-			if (r != 0)
-				panic(__FILE__, "service_pm: kipc_send failed", r);
-			break;
+	m_out.m_type = (call_nr == PM_FORK) ? PM_FORK_REPLY : PM_FORK_NB_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
 
-		case PM_EXEC:
-			r = pm_exec(m.PM_EXEC_PROC, m.PM_EXEC_PATH,
-				    m.PM_EXEC_PATH_LEN, m.PM_EXEC_FRAME, 
-				    m.PM_EXEC_FRAME_LEN);
+	break;
 
-			/* Reply status to PM */
-			m.m_type = PM_EXEC_REPLY;
-			/* Keep m.PM_EXEC_PROC */
-			m.PM_EXEC_STATUS= r;
-			r = kipc_send(PM_PROC_NR, &m);
+  case PM_UNPAUSE:
+	unpause(m_in.PM_PROC);
 
-			if (r != 0)
-				panic(__FILE__, "service_pm: kipc_send failed", r);
-			break;
+	m_out.m_type = PM_UNPAUSE_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
 
-		case PM_DUMPCORE:
-			r = pm_dumpcore(m.PM_CORE_PROC,
-				(struct mem_map *)m.PM_CORE_SEGPTR);
+	break;
 
-			/* Reply status to PM */
-			m.m_type = PM_CORE_REPLY;
-			/* Keep m.PM_CORE_PROC */
-			m.PM_CORE_STATUS = r;
-			
-			r = kipc_send(PM_PROC_NR, &m);
-			if (r != 0)
-				panic(__FILE__, "service_pm: kipc_send failed", r);
-			break;
+  case PM_REBOOT:
+	pm_reboot();
 
-		default:
-			panic("VFS", "service_pm: unknown call", m.m_type);
-		}
-	}
+	/* Reply dummy status to PM for synchronization */
+	m_out.m_type = PM_REBOOT_REPLY;
+
+	break;
+
+  default:
+	printf("VFS: don't know how to handle PM request %x\n", call_nr);
+
+	return;
+  }
+
+  r = kipc_send(PM_PROC_NR, &m_out);
+  if (r != 0)
+	panic(__FILE__, "service_pm: send failed", r);
 }

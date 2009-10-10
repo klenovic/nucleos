@@ -27,18 +27,10 @@ void check_vtimer(int proc_nr, int sig);
 /* break.c */
 int do_brk(void);
 
-/* devio.c */
-int do_dev_io(void);
-int do_dev_io(void);
-
 /* dma.c */
 int do_adddma(void);
 int do_deldma(void);
 int do_getdma(void);
-void release_dma(endpoint_t proc_e, phys_clicks base, phys_clicks size);
-
-/* dmp.c */
-int do_fkey_pressed(void);
 
 /* exec.c */
 int do_exec(void);
@@ -50,18 +42,18 @@ void exec_restart(struct mproc *rmp, int result);
 int do_fork(void);
 int do_fork_nb(void);
 int do_exit(void);
-int do_waitpid(void);
 void exit_proc(struct mproc *rmp, int exit_status, int dump_core);
 void exit_restart(struct mproc *rmp, int dump_core);
+int do_waitpid(void);
+int wait_test(struct mproc *rmp, struct mproc *child);
 
 /* getset.c */
-int do_getset(void);
-
-/* kputc.c */
-void diag_repl(void);
+int do_get(void);
+int do_set(void);
 
 /* main.c */
 int main(void);
+void setreply(int proc_nr, int result);
 
 /* misc.c */
 int do_reboot(void);
@@ -76,8 +68,6 @@ int do_allocmem(void);
 int do_freemem(void);
 int do_getsetpriority(void);
 
-void setreply(int proc_nr, int result);
-
 /* profile.c */
 int do_sprofile(void);
 int do_cprofile(void);
@@ -87,14 +77,15 @@ int do_kill(void);
 int ksig_pending(void);
 int do_pause(void);
 int check_sig(pid_t proc_id, int signo);
-void sig_proc(struct mproc *rmp, int sig_nr);
+void sig_proc(struct mproc *rmp, int signo, int trace);
 int do_sigaction(void);
 int do_sigpending(void);
 int do_sigprocmask(void);
 int do_sigreturn(void);
 int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
-int vm_notify_sig_wrapper(endpoint_t ep); 
+void restart_sigs(struct mproc *rmp);
+void vm_notify_sig_wrapper(endpoint_t ep); 
 
 /* time.c */
 int do_stime(void);
@@ -114,9 +105,9 @@ void stop_proc(struct mproc *rmp, int sig_nr);
 /* utility.c */
 pid_t get_free_pid(void);
 int no_sys(void);
-void panic(char *who, char *mess, int num);
 char *find_param(const char *key);
-int proc_from_pid(pid_t p);
+struct mproc *find_proc(pid_t lpid);
 int pm_isokendpt(int ep, int *proc);
+void tell_fs(struct mproc *rmp, message *m_ptr);
 
 #endif /*  __SERVERS_PM_PROTO_H */

@@ -15,6 +15,7 @@ main.c
 
 #include <ibm/pci.h>
 #include <servers/rs/rs.h>
+#include <nucleos/endpoint.h>
 
 #include "pci.h"
 
@@ -64,6 +65,21 @@ int main(void)
 			printf("PCI: receive from ANY failed: %d\n", r);
 			break;
 		}
+
+		if (is_notify(m.m_type)) {
+			switch (_ENDPOINT_P(m.m_source)) {
+				case PM_PROC_NR:
+					break;
+				default:
+					printf("PCI: got notify from %d\n",
+								m.m_source);
+					break;
+			}
+
+			/* done, get a new message */
+			continue;
+		}
+
 		switch(m.m_type)
 		{
 		case BUSC_PCI_INIT: do_init(&m); break;
@@ -84,7 +100,6 @@ int main(void)
 		case BUSC_PCI_SLOT_NAME_S: do_slot_name_s(&m); break;
 		case BUSC_PCI_SET_ACL: do_set_acl(&m); break;
 		case BUSC_PCI_DEL_ACL: do_del_acl(&m); break;
-		case PROC_EVENT: break;
 		default:
 			printf("PCI: got message from %d, type %d\n",
 				m.m_source, m.m_type);
