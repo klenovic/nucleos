@@ -37,7 +37,7 @@
 #define WIFSTOPPED(w)	(((w) & 0xff) == 0x7f)				/* stopped */
 #define WEXITSTATUS(w)	(((w) >> 8) & 0xff)				/* exit status */
 #define WTERMSIG(w)	((w) & 0x7f)					/* sig value */
-#define WSTOPSIG(w)	WEXITSTATUS					/* stop signal */
+#define WSTOPSIG(w)	WEXITSTATUS(w)					/* stop signal */
 
 /* Function Prototypes. */
 pid_t wait(int *_stat_loc);
