@@ -10,10 +10,9 @@
 /*
 pci_dev_name.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/pci.h>
 
 /*===========================================================================*
  *				pci_dev_name				     *
@@ -22,7 +21,7 @@ char *pci_dev_name(vid, did)
 u16_t vid;
 u16_t did;
 {
-	static char name[80];	/* We need a better interface for this */
+	static char name[PCIINFO_ENTRY_SIZE];	/* We need a better interface for this */
 
 	int r;
 	cp_grant_id_t gid;
@@ -50,7 +49,9 @@ u16_t did;
 
 	if (m.m_type == -ENOENT)
 	{
+#if DEBUG
 		printf("pci_dev_name: got no name\n");
+#endif
 		return NULL;	/* No name for this device */
 	}
 	if (m.m_type != 0)

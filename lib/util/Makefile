@@ -1,4 +1,4 @@
 lib-y := libutil.a
 libutil.a-obj-y := openpty.o
 
-ccflags-y := -O2 -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

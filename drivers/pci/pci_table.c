@@ -23,7 +23,7 @@ See the Linux PCI ID Repository <http://pciids.sourceforge.net/>.
  */
 
 #include <nucleos/drivers.h>
-#include "pci.h"
+#include <nucleos/pci.h>
 
 struct pci_vendor pci_vendor_table[]=
 {

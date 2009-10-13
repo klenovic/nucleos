@@ -10,10 +10,9 @@
 /*
 pci_attr_w16.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/pci.h>
 
 /*===========================================================================*
  *				pci_attr_w16				     *

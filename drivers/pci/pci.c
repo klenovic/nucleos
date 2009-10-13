@@ -17,6 +17,7 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 */
 
 #include <nucleos/drivers.h>
+#include <nucleos/pci.h>
 #include <assert.h>
 #include <ibm/pci.h>
 #include <asm/servers/vm/vm.h>
@@ -24,7 +25,6 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include <servers/rs/rs.h>
 #include <nucleos/syslib.h>
 
-#include "pci.h"
 #include "pci_amd.h"
 #include "pci_intel.h"
 #include "pci_sis.h"
@@ -36,9 +36,6 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include <stdio.h>
 #include <nucleos/string.h>
 #include <nucleos/sysutil.h>
-
-#define NR_PCIBUS       40
-#define NR_PCIDEV       50
 
 #define PBT_INTEL_HOST	 1
 #define PBT_PCIBRIDGE	 2

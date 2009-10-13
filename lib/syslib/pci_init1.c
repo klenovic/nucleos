@@ -10,13 +10,12 @@
 /*
 pci_init1.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
-#include <servers/ds/ds.h>
 #include <nucleos/sysutil.h>
+#include <servers/ds/ds.h>
+#include <nucleos/pci.h>
 
 int pci_procnr= ANY;
 

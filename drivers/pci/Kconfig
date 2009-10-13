@@ -1,0 +1,13 @@
+config NR_PCIBUS
+	int "Number of PCI buses"
+	default 40
+	depends on PCI
+	---help---
+	  Specify the max. number of PCI bus.
+
+config NR_PCIDEV
+	int "Number of PCI devices"
+	default 50
+	depends on PCI
+	---help---
+	  Specify the max. number of PCI devices.

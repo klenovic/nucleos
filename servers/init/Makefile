@@ -3,8 +3,6 @@ app-y := init.elf32
 init.elf32-type := server
 init.elf32-obj-y := init.o
 
-ccflags-y += -O2
-
 LDFLAGS_init.elf32 := -L$(lib-arch) -Llib \
 		      -lnucc \
 		      -Tservers/server_32.lds

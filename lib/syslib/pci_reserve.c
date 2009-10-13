@@ -10,10 +10,9 @@
 /*
 pci_reserve.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/pci.h>
 
 /*===========================================================================*
  *				pci_reserve				     *

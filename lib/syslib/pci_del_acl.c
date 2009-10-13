@@ -10,13 +10,12 @@
 /*
 pci_del_acl.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/unistd.h>
 #include <servers/rs/rs.h>
 #include <servers/ds/ds.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/pci.h>
 
 /*===========================================================================*
  *				pci_del_acl				     *

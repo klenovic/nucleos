@@ -31,12 +31,14 @@
 #include <nucleos/sysinfo.h>
 #include <nucleos/type.h>
 #include <nucleos/vm.h>
-#include <kernel/proc.h>
 #include <nucleos/string.h>
+#include <nucleos/lib.h>
+#include <nucleos/pci.h>
+#include <assert.h>
+#include <kernel/proc.h>
+#include <asm/ioctls.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
-#include <nucleos/lib.h>
-#include <asm/ioctls.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -57,6 +59,8 @@ static char *uts_tbl[] = {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 unsigned long calls_stats[__NR_SYSCALLS];
 #endif
+
+static int getpciinfo(struct pciinfo *pciinfo);
 
 /*===========================================================================*
  *				do_allocmem				     *
@@ -198,6 +202,7 @@ int do_getsysinfo()
   vir_bytes src_addr, dst_addr;
   struct kinfo kinfo;
   struct loadinfo loadinfo;
+  struct pciinfo pciinfo;
   static struct proc proctab[NR_PROCS+NR_TASKS];
   size_t len;
   int s, r;
@@ -236,6 +241,12 @@ int do_getsysinfo()
         sys_getloadinfo(&loadinfo);
         src_addr = (vir_bytes) &loadinfo;
         len = sizeof(struct loadinfo);
+        break;
+  case SI_PCI_INFO:			/* PCI info is obtained via PM */
+        if ((r=getpciinfo(&pciinfo)) != 0)
+			return r;
+        src_addr = (vir_bytes) &pciinfo;
+        len = sizeof(struct pciinfo);
         break;
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
   case SI_CALL_STATS:
@@ -591,3 +602,44 @@ char *brk_addr;
 	return 0;
 }
 
+/*===========================================================================*
+ *				getpciinfo				     *
+ *===========================================================================*/
+
+static int getpciinfo(pciinfo)
+struct pciinfo *pciinfo;
+{
+	int devind, r;
+	struct pciinfo_entry *entry;
+	char *name;
+	u16_t vid, did;
+
+	/* look up PCI process number */
+	pci_init();
+
+	/* start enumerating devices */
+	entry = pciinfo->pi_entries;
+	r = pci_first_dev(&devind, &vid, &did);
+	while (r)
+	{
+		/* fetch device name */
+		name = pci_dev_name(vid, did);
+		if (!name)
+			name = "";
+
+		/* store device information in table */
+		assert((char *) entry < (char *) (pciinfo + 1));
+		entry->pie_vid = vid;
+		entry->pie_did = did;
+		strncpy(entry->pie_name, name, sizeof(entry->pie_name));
+		entry->pie_name[sizeof(entry->pie_name) - 1] = 0;
+		entry++;
+		
+		/* continue with the next device */
+		r = pci_next_dev(&devind, &vid, &did);
+	}
+	
+	/* store number of entries */
+	pciinfo->pi_count = entry - pciinfo->pi_entries;
+	return 0;
+}

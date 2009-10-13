@@ -8,4 +8,4 @@ libcurses.a-obj-y := beep.o charpick.o curs_set.o cursesio.o endwin.o flash.o \
 	       wgetch.o wgetstr.o windel.o winmove.o winsch.o winscrol.o \
 	       winsertln.o wintouch.o
 
-ccflags-y := -O -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

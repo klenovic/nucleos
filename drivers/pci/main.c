@@ -12,12 +12,10 @@ main.c
 */
 
 #include <nucleos/drivers.h>
-
+#include <nucleos/endpoint.h>
+#include <nucleos/pci.h>
 #include <ibm/pci.h>
 #include <servers/rs/rs.h>
-#include <nucleos/endpoint.h>
-
-#include "pci.h"
 
 #define NR_DRIVERS	16
 

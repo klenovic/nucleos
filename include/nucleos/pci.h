@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __NUCLEOS_PCI_H
+#define __NUCLEOS_PCI_H
+/* @nucleos: cleanup this header */
 /*
 pci.h
 
@@ -70,6 +73,10 @@ struct pci_pcibridge
 	int type;
 };
 
+/* PCI configuration parameters */
+#define NR_PCIBUS	CONFIG_NR_PCIBUS
+#define NR_PCIDEV	CONFIG_NR_PCIDEV
+
 #define PCI_IB_PIIX	1	/* Intel PIIX compatible ISA bridge */
 #define PCI_IB_VIA	2	/* VIA compatible ISA bridge */
 #define PCI_IB_AMD	3	/* AMD compatible ISA bridge */
@@ -79,6 +86,23 @@ struct pci_pcibridge
 #define PCI_PPB_CB	2	/* Cardbus bridge */
 /* Still needed? */
 #define PCI_AGPB_VIA	3	/* VIA compatible AGP bridge */
+
+#define PCIINFO_ENTRY_SIZE 80
+
+/*information on PCI devices */
+struct pciinfo_entry {
+	u16_t pie_vid;
+	u16_t pie_did;
+	char pie_name[PCIINFO_ENTRY_SIZE];
+};
+
+struct pciinfo {
+	size_t pi_count;
+	struct pciinfo_entry pi_entries[NR_PCIDEV];
+};
+
+/* Process number of PCI driver */
+extern int pci_procnr;
 
 extern struct pci_vendor pci_vendor_table[];
 extern struct pci_device pci_device_table[];
@@ -100,3 +124,5 @@ int pci_attr_r8_s(int devind, int port, u8_t *vp);
 int pci_attr_r32_s(int devind, int port, u32_t *vp);
 int pci_slot_name_s(int devind, char **cpp);
 int pci_ids_s(int devind, u16_t *vidp, u16_t *didp);
+
+#endif /* __NUCLEOS_PCI_H */

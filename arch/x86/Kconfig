@@ -33,6 +33,22 @@ source "mm/Kconfig"
 
 endmenu
 
+menu "Bus options (PCI etc.)"
+
+config PCI
+	bool "PCI support"
+	default y
+	---help---
+	  Find out whether you have a PCI motherboard. PCI is the name of a
+	  bus system, i.e. the way the CPU talks to the other stuff inside
+	  your box. Other bus systems are ISA, EISA, MicroChannel (MCA) or
+	  VESA. If you have PCI, say Y, otherwise N.
+
+# PCI driver
+source "drivers/pci/Kconfig"
+
+endmenu
+
 # Link kernel with separate I&D
 config ARCH_KERNEL_LINKAGE_SEPID
 	def_bool y

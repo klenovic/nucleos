@@ -10,10 +10,9 @@
 /*
 pci_slot_name.c
 */
-
-#include "pci.h"
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
+#include <nucleos/pci.h>
 
 /*===========================================================================*
  *				pci_slot_name				     *
