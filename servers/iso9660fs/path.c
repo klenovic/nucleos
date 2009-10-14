@@ -1,24 +1,30 @@
 #include "inc.h"
-#include <string.h>
-#include <minix/com.h>
-#include <minix/vfsif.h>
+#include <nucleos/string.h>
+#include <nucleos/com.h>
+#include <nucleos/vfsif.h>
 
 #include "buf.h"
 
-FORWARD _PROTOTYPE(char *get_name, (char *old_name, char string [NAME_MAX]));
-FORWARD _PROTOTYPE( char *get_name_s, (char *name, char string[NAME_MAX+1]) );
-FORWARD _PROTOTYPE( int parse_path_s, (ino_t dir_ino, ino_t root_ino,
+static char *get_name(char *old_name, char string [NAME_MAX]);
+static char *get_name_s(char *name, char string[NAME_MAX+1]);
+static int parse_path_s(ino_t dir_ino, ino_t root_ino,
 				       int flags, struct dir_record **res_inop,
-				       size_t *offsetp));
-FORWARD _PROTOTYPE( int advance_s, (struct dir_record *dirp,
-				    char string[NAME_MAX], struct dir_record **resp));
+				       size_t *offsetp);
+static int advance_s(struct dir_record *dirp,
+				    char string[NAME_MAX], struct dir_record **resp);
+
+
+int err_code;			/* temporary storage for error number */
+short path_processed;		/* number of characters processed */
+char user_path[PATH_MAX + 1];	/* pathname to be processed */
+int symloop;
 
 /* Lookup is a function used to ``look up" a particular path. It is called
  * very often. */
 /*===========================================================================*
  *                             lookup					     *
  *===========================================================================*/
-PUBLIC int lookup()
+int lookup()
 {
   char string[PATH_MAX];
   int s_error, flags;
@@ -29,13 +35,13 @@ PUBLIC int lookup()
   
   /* Check length. */
   len = fs_m_in.REQ_PATH_LEN;
-  if(len > sizeof(user_path)) return E2BIG;	/* too big for buffer */
-  if(len < 1) return EINVAL;			/* too small for \0 */
+  if(len > sizeof(user_path)) return -E2BIG;	/* too big for buffer */
+  if(len < 1) return -EINVAL;			/* too small for \0 */
 
   /* Copy the pathname and set up caller's user and group id */
   err_code = sys_datacopy(FS_PROC_NR, (vir_bytes) fs_m_in.REQ_PATH, SELF, 
             (vir_bytes) user_path, (phys_bytes) len);
-  if (err_code != OK) {
+  if (err_code != 0) {
     printf("i9660fs:%s:%d: sys_datacopy failed: %d\n", __FILE__, __LINE__, err_code);
     return err_code;
   }
@@ -43,24 +49,24 @@ PUBLIC int lookup()
   /* Verify this is a null-terminated path. */
   if(user_path[len-1] != '\0') {
     printf("i9660fs:lookup: didn't get null-terminated string.\n");
-    return EINVAL;
+    return -EINVAL;
   }
   
   caller_uid = fs_m_in.REQ_UID;
   caller_gid = fs_m_in.REQ_GID;
   flags = fs_m_in.REQ_FLAGS;
   
-  /* Clear RES_OFFSET for ENOENT */
+  /* Clear RES_OFFSET for -ENOENT */
   fs_m_out.RES_OFFSET= 0;
 
   /* Lookup inode */
   dir = parse_path(user_path, string, flags);
 
   /* Copy back the last name if it is required */
-  if (err_code != OK || (flags & PATH_PENULTIMATE)) {
+  if (err_code != 0 || (flags & PATH_PENULTIMATE)) {
     s_error = sys_datacopy(SELF_E, (vir_bytes) string, FS_PROC_NR,
 			   (vir_bytes) fs_m_in.REQ_USER_ADDR, (phys_bytes) NAME_MAX);
-    if (s_error != OK) {
+    if (s_error != 0) {
       printf("i9660fs:%s:%d: sys_datacopy failed: %d\n",
 	     __FILE__, __LINE__, s_error);
       return s_error;
@@ -87,7 +93,7 @@ PUBLIC int lookup()
 /*===========================================================================*
  *                             fs_lookup_s				     *
  *===========================================================================*/
-PUBLIC int fs_lookup_s() {
+int fs_lookup_s() {
   cp_grant_id_t grant;
   int r, r1, len, flags;
   size_t offset, size;
@@ -105,14 +111,14 @@ PUBLIC int fs_lookup_s() {
   caller_gid = fs_m_in.REQ_L_GID;
 
   /* Check length. */
-  if(len > sizeof(user_path)) return E2BIG;	/* too big for buffer */
-  if(len < 1)return EINVAL;			/* too small */
+  if(len > sizeof(user_path)) return -E2BIG;	/* too big for buffer */
+  if(len < 1)return -EINVAL;			/* too small */
 
   /* Copy the pathname and set up caller's user and group id */
   r = sys_safecopyfrom(FS_PROC_NR, grant, offset, 
             (vir_bytes) user_path, (phys_bytes) len, D);
 
-  if (r != OK) {
+  if (r != 0) {
 	printf("iso9660fs:fs_lookup_s: sys_safecopyfrom failed: %d\n", r);
 	return r;
   }
@@ -120,7 +126,7 @@ PUBLIC int fs_lookup_s() {
   /* Verify this is a null-terminated path. */
   if(user_path[len-1] != '\0') {
 	printf("iso9660fs:fs_lookup_s: didn't get null-terminated string.\n");
-	return EINVAL;
+	return -EINVAL;
   }
 
   /* Lookup inode */
@@ -136,7 +142,7 @@ PUBLIC int fs_lookup_s() {
     return r;
   }
 
-  if (r != OK && r != EENTERMOUNT) {
+  if (r != 0 && r != EENTERMOUNT) {
     if (dir)
       panic(__FILE__, "fs_lookup_s: dir should be clear",
 	    (unsigned)dir);
@@ -166,7 +172,7 @@ PUBLIC int fs_lookup_s() {
 /*===========================================================================*
  *				search_dir				     *
  *===========================================================================*/
-PUBLIC int search_dir(ldir_ptr,string,numb)
+int search_dir(ldir_ptr,string,numb)
      register struct dir_record *ldir_ptr; /*  dir record parent */
      char string[NAME_MAX];	      /* component to search for */
      ino_t *numb;		      /* pointer to new dir record */
@@ -184,20 +190,20 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
   memset(tmp_string,'\0',NAME_MAX);
 
   if ((ldir_ptr->d_mode & I_TYPE) != I_DIRECTORY) {
-    return(ENOTDIR);
+    return(-ENOTDIR);
   }
   
-  r = OK;
+  r = 0;
 
   if (strcmp(string,".") == 0) {
     *numb = ID_DIR_RECORD(ldir_ptr);
-    return OK;
+    return 0;
   }
 
   if (strcmp(string,"..") == 0 && ldir_ptr->loc_extent_l == v_pri.dir_rec_root->loc_extent_l) {
     *numb = ROOT_INO_NR;
 /*     *numb = ID_DIR_RECORD(ldir_ptr); */
-    return OK;
+    return 0;
   }
 
   /* Read the dir's content */
@@ -205,22 +211,22 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
   bp = get_block(ldir_ptr->loc_extent_l);
 
   if (bp == NIL_BUF)
-    return EINVAL;
+    return -EINVAL;
 
   while (pos < v_pri.logical_block_size_l) {
     if ((dir_tmp = get_free_dir_record()) == NULL) {
       put_block(bp);
-      return EINVAL;
+      return -EINVAL;
     }
 
     if (create_dir_record(dir_tmp,bp->b_data + pos,
-			  ldir_ptr->loc_extent_l*v_pri.logical_block_size_l + pos) == EINVAL)
-      return EINVAL;
+			  ldir_ptr->loc_extent_l*v_pri.logical_block_size_l + pos) == -EINVAL)
+      return -EINVAL;
 
     if (dir_tmp->length == 0) {
       release_dir_record(dir_tmp);
       put_block(bp);
-      return EINVAL;
+      return -EINVAL;
     }
     
     memcpy(tmp_string,dir_tmp->file_id,dir_tmp->length_file_id);
@@ -243,7 +249,7 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
 	*numb = 1;
  	release_dir_record(dir_tmp);
 	put_block(bp);
-	return OK;
+	return 0;
       }
 
       if (dir_tmp->ext_attr_rec_length != 0) {
@@ -255,7 +261,7 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
       release_dir_record(dir_tmp);
       put_block(bp);
       
-      return OK;
+      return 0;
     }
 
     pos += dir_tmp->length;
@@ -263,7 +269,7 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
   }
   
   put_block(bp);
-  return EINVAL;
+  return -EINVAL;
 }
 
 /* Parse path will parse a particular path and return the final dir record.
@@ -274,7 +280,7 @@ PUBLIC int search_dir(ldir_ptr,string,numb)
 /*===========================================================================*
  *                             parse_path				     *
  *===========================================================================*/
-PUBLIC struct dir_record *parse_path(path, string, action)
+struct dir_record *parse_path(path, string, action)
 char *path;                    /* the path name to be parsed */
 char string[NAME_MAX];         /* the final component is returned here */
 int action;                    /* action on last part of path */
@@ -295,7 +301,7 @@ int action;                    /* action on last part of path */
   if ((start_dir = get_dir_record(fs_m_in.REQ_INODE_NR)) == NULL) {
     printf("I9660FS: couldn't find starting inode req_nr: %d %s\n", req_nr,
 	   user_path);
-    err_code = ENOENT;
+    err_code = -ENOENT;
     printf("%s, %d\n", __FILE__, __LINE__);
     return NULL;
   }
@@ -324,7 +330,7 @@ int action;                    /* action on last part of path */
       slashes++;
       path_processed++;
     }
-    fs_m_out.RES_OFFSET = path_processed;	/* For ENOENT */
+    fs_m_out.RES_OFFSET = path_processed;	/* For -ENOENT */
 
     if ((new_name = get_name(path+slashes, string)) == (char*) 0) {
       release_dir_record(start_dir);	/* bad path in user space */
@@ -337,7 +343,7 @@ int action;                    /* action on last part of path */
       } else {
 	/* last file of path prefix is not a directory */
 	release_dir_record(start_dir);
-	err_code = ENOTDIR;
+	err_code = -ENOTDIR;
 	return(NULL);
       }
     }
@@ -350,7 +356,7 @@ int action;                    /* action on last part of path */
       if (*new_name == '\0' && (action & PATH_NONSYMBOLIC) != 0) {
 	return(old_dir);
       }
-      else if (err_code == ENOENT) {
+      else if (err_code == -ENOENT) {
 	return(old_dir);
       }
       else {
@@ -386,7 +392,7 @@ int action;                    /* action on last part of path */
 /*===========================================================================*
  *                             parse_path_s				     *
  *===========================================================================*/
-PRIVATE int parse_path_s(dir_ino, root_ino, flags, res_inop, offsetp)
+static int parse_path_s(dir_ino, root_ino, flags, res_inop, offsetp)
 ino_t dir_ino;
 ino_t root_ino;
 int flags;
@@ -403,7 +409,7 @@ size_t *offsetp;
     printf("I9660FS: couldn't find starting inode req_nr: %d %s\n", req_nr,
 	   user_path);
     printf("%s, %d\n", __FILE__, __LINE__);
-    return ENOENT;
+    return -ENOENT;
   }
   
   cp = user_path;
@@ -419,7 +425,7 @@ size_t *offsetp;
       if (start_dir->d_mountpoint)
        	return EENTERMOUNT;
 
-      return OK;
+      return 0;
     }
 
     if (cp[0] == '/') {
@@ -473,7 +479,7 @@ size_t *offsetp;
 
     r = advance_s(old_dir, string, &start_dir);
 
-    if (r != OK) {
+    if (r != 0) {
       release_dir_record(old_dir);
       return r;
     }
@@ -488,7 +494,7 @@ size_t *offsetp;
 /*===========================================================================*
  *				advance					     *
  *===========================================================================*/
-PUBLIC struct dir_record *advance(pdirp, string)
+struct dir_record *advance(pdirp, string)
 struct dir_record **pdirp;	/* inode for directory to be searched */
 char string[NAME_MAX];		/* component name to look for */
 {
@@ -515,7 +521,7 @@ char string[NAME_MAX];		/* component name to look for */
   }
 
   /* If 'string' is not present in the directory, signal error. */
-  if ( (r = search_dir(dirp, string, &numb)) != OK) {
+  if ( (r = search_dir(dirp, string, &numb)) != 0) {
     err_code = r;
     return(NULL);
   }
@@ -531,7 +537,7 @@ char string[NAME_MAX];		/* component name to look for */
 /*===========================================================================*
  *				advance_s				     *
  *===========================================================================*/
-PRIVATE int advance_s(dirp, string, resp)
+static int advance_s(dirp, string, resp)
 struct dir_record *dirp;		/* inode for directory to be searched */
 char string[NAME_MAX];		        /* component name to look for */
 struct dir_record **resp;		/* resulting inode */
@@ -548,16 +554,16 @@ struct dir_record **resp;		/* resulting inode */
 
   /* If 'string' is empty, yield same inode straight away. */
   if (string[0] == '\0') {
-    return ENOENT;
+    return -ENOENT;
   }
 
   /* Check for NULL. */
   if (dirp == NULL) {
-    return EINVAL;
+    return -EINVAL;
   }
 
   /* If 'string' is not present in the directory, signal error. */
-  if ( (r = search_dir(dirp, string, &numb)) != OK) {
+  if ( (r = search_dir(dirp, string, &numb)) != 0) {
     return r;
   }
 
@@ -567,13 +573,13 @@ struct dir_record **resp;		/* resulting inode */
   }
 
   *resp= rip;
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
  *				get_name				     *
  *===========================================================================*/
-PRIVATE char *get_name(old_name, string)
+static char *get_name(old_name, string)
 char *old_name;			/* path name to parse */
 char string[NAME_MAX];		/* component extracted from 'old_name' */
 {
@@ -609,7 +615,7 @@ char string[NAME_MAX];		/* component extracted from 'old_name' */
   if (np < &string[NAME_MAX]) *np = '\0';	/* Terminate string */
 
   if (rnp >= &old_name[PATH_MAX]) {
-	  err_code = ENAMETOOLONG;
+	  err_code = -ENAMETOOLONG;
 	  return((char *) 0);
   }
   return(rnp);
@@ -618,7 +624,7 @@ char string[NAME_MAX];		/* component extracted from 'old_name' */
 /*===========================================================================*
  *				get_name_s				     *
  *===========================================================================*/
-PRIVATE char *get_name_s(path_name, string)
+static char *get_name_s(path_name, string)
 char *path_name;		/* path name to parse */
 char string[NAME_MAX+1];	/* component extracted from 'old_name' */
 {

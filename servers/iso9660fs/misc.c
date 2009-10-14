@@ -1,14 +1,14 @@
 /* Some misc functions */
 
 #include "inc.h"
-#include <fcntl.h>
-#include <minix/vfsif.h>
+#include <nucleos/fcntl.h>
+#include <nucleos/vfsif.h>
 
 /*===========================================================================*
  *				fs_sync					     *
  *===========================================================================*/
-PUBLIC int fs_sync()		/* Calling of syncing the filesystem. No action
+int fs_sync()		/* Calling of syncing the filesystem. No action
 				 * is taken */
 {
-  return(OK);		/* sync() can't fail */
+  return(0);		/* sync() can't fail */
 }

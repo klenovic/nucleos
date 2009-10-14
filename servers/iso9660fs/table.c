@@ -7,7 +7,7 @@
 
 #include "inc.h"
 
-PUBLIC _PROTOTYPE (int (*fs_call_vec[]), (void) ) = {
+int (*fs_call_vec[])(void) = {
   no_sys,			/* 0: not used */
   fs_getnode,			/* 1 */
   fs_putnode,			/* 2 */

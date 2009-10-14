@@ -1,37 +1,37 @@
 
 /* This file handles the direct communication to the device */
 #include "inc.h"
-#include <minix/vfsif.h>
+#include <nucleos/vfsif.h>
 
-PRIVATE int dummyproc;
+static int dummyproc;
 
-FORWARD _PROTOTYPE( int safe_io_conversion, (endpoint_t, cp_grant_id_t *,
+static int safe_io_conversion(endpoint_t, cp_grant_id_t *,
 					     int *, cp_grant_id_t *, int,
 					     endpoint_t *, void **, int *,
-					     vir_bytes));
+					     vir_bytes);
 
-FORWARD _PROTOTYPE( void safe_io_cleanup, (cp_grant_id_t, cp_grant_id_t *,
-					   int));
-FORWARD _PROTOTYPE( int gen_opcl, (endpoint_t driver_e, int op,
-				   Dev_t dev, int proc_e, int flags));
-FORWARD _PROTOTYPE( int gen_io, (int task_nr, message *mess_ptr));
+static void safe_io_cleanup(cp_grant_id_t, cp_grant_id_t *,
+					   int);
+static int gen_opcl(endpoint_t driver_e, int op,
+				   dev_t dev, int proc_e, int flags);
+static int gen_io(int task_nr, message *mess_ptr);
 
 /*===========================================================================*
  *				fs_new_driver   			     *
  *===========================================================================*/
-PUBLIC int fs_new_driver(void)
+int fs_new_driver(void)
 {
  /* New driver endpoint for this device */
   driver_endpoints[(fs_m_in.REQ_DEV >> MAJOR) & BYTE].driver_e =
       fs_m_in.REQ_DRIVER_E;
-  return OK;
+  return 0;
 }
 
 
 /*===========================================================================*
  *				safe_io_conversion			     *
  *===========================================================================*/
-PRIVATE int safe_io_conversion(driver, gid, op, gids, gids_size,
+static int safe_io_conversion(driver, gid, op, gids, gids_size,
 	io_ept, buf, vec_grants, bytes)
 endpoint_t driver;
 cp_grant_id_t *gid;
@@ -121,7 +121,7 @@ vir_bytes bytes;
 /*===========================================================================*
  *			safe_io_cleanup					     *
  *===========================================================================*/
-PRIVATE void safe_io_cleanup(gid, gids, gids_size)
+static void safe_io_cleanup(gid, gids, gids_size)
 cp_grant_id_t gid;
 cp_grant_id_t *gids;
 int gids_size;
@@ -140,7 +140,7 @@ int gids_size;
 /*===========================================================================*
  *				dev_open				     *
  *===========================================================================*/
-PUBLIC int dev_open(driver_e, dev, proc, flags)
+int dev_open(driver_e, dev, proc, flags)
 endpoint_t driver_e;
 dev_t dev;			/* device to open */
 int proc;			/* process to open for */
@@ -162,7 +162,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *			block_dev_io					     *
  *===========================================================================*/
-PUBLIC int block_dev_io(op, dev, proc_e, buf, pos, bytes, flags)
+int block_dev_io(op, dev, proc_e, buf, pos, bytes, flags)
 int op;				/* MFS_DEV_READ, MFS_DEV_WRITE, etc. */
 dev_t dev;			/* major-minor device number */
 int proc_e;			/* in whose address space is buf? */
@@ -189,7 +189,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   /* See if driver is roughly valid. */
   if (driver_e == NONE) {
       printf("ISO9660FS(%d) block_dev_io: no driver for dev %x\n", SELF_E, dev);
-      return EDSTDIED;
+      return -EDSTDIED;
   }
   
   /* The io vector copying relies on this I/O being for FS itself. */
@@ -219,7 +219,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   m.HIGHPOS  = ex64hi(pos);
 
   /* Call the task. */
-  r = sendrec(driver_e, &m);
+  r = kipc_sendrec(driver_e, &m);
 
   /* As block I/O never SUSPENDs, safe cleanup must be done whether
    * the I/O succeeded or not. */
@@ -230,24 +230,24 @@ int flags;			/* special flags, like O_NONBLOCK */
    * - VFS unmaps it, waits for new driver
    * - VFS sends the new driver endp for the FS proc and the request again 
    */
-  if (r != OK) {
-      if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+  if (r != 0) {
+      if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           printf("ISO9660FS(%d) dead driver %d\n", SELF_E, driver_e);
           driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = NONE;
           return r;
           /*dmap_unmap_by_endpt(task_nr);    <- in the VFS proc...  */
       }
-      else if (r == ELOCKED) {
-          printf("ISO9660FS(%d) ELOCKED talking to %d\n", SELF_E, driver_e);
+      else if (r == -ELOCKED) {
+          printf("ISO9660FS(%d) -ELOCKED talking to %d\n", SELF_E, driver_e);
           return r;
       }
       else 
           panic(__FILE__,"call_task: can't send/receive", r);
   } else {
-      /* Did the process we did the sendrec() for get a result? */
+      /* Did the process we did the kipc_sendrec() for get a result? */
       if (m.REP_ENDPT != proc_e) {
           printf("I9660FS(%d) strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n", SELF_E, m.m_source, m.m_type, proc_e, m.REP_ENDPT);
-          r = EIO;
+          r = -EIO;
       }
   }
 
@@ -256,7 +256,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       panic(__FILE__, "ISO9660FS block_dev_io: driver returned SUSPEND", NO_NUM);
   }
 
-  if(buf != buf_used && r == OK) {
+  if(buf != buf_used && r == 0) {
       memcpy(buf, buf_used, bytes * sizeof(iovec_t));
   }
 
@@ -266,7 +266,7 @@ int flags;			/* special flags, like O_NONBLOCK */
 /*===========================================================================*
  *				gen_opcl				     *
  *===========================================================================*/
-PRIVATE int gen_opcl(driver_e, op, dev, proc_e, flags)
+static int gen_opcl(driver_e, op, dev, proc_e, flags)
 endpoint_t driver_e;
 int op;				/* operation, DEV_OPEN or DEV_CLOSE */
 dev_t dev;			/* device to open or close */
@@ -291,7 +291,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				gen_io					     *
  *===========================================================================*/
-PRIVATE int gen_io(task_nr, mess_ptr)
+static int gen_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
 message *mess_ptr;		/* pointer to message for task */
 {
@@ -303,23 +303,23 @@ message *mess_ptr;		/* pointer to message for task */
 
   proc_e = mess_ptr->IO_ENDPT;
 
-  r = sendrec(task_nr, mess_ptr);
-	if (r != OK) {
-		if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+  r = kipc_sendrec(task_nr, mess_ptr);
+	if (r != 0) {
+		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
 			panic(__FILE__, "should handle crashed drivers",
 				NO_NUM);
 			/* dmap_unmap_by_endpt(task_nr); */
 			return r;
 		}
-		if (r == ELOCKED) {
-			printf("fs: ELOCKED talking to %d\n", task_nr);
+		if (r == -ELOCKED) {
+			printf("fs: -ELOCKED talking to %d\n", task_nr);
 			return r;
 		}
 		panic(__FILE__,"call_task: can't send/receive", r);
 	}
 
-  	/* Did the process we did the sendrec() for get a result? */
+  	/* Did the process we did the kipc_sendrec() for get a result? */
   	if (mess_ptr->REP_ENDPT != proc_e) {
 		printf(
 		"fs: strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n",
@@ -327,16 +327,16 @@ message *mess_ptr;		/* pointer to message for task */
 			mess_ptr->m_type,
 			proc_e,
 			mess_ptr->REP_ENDPT);
-		return EIO;
+		return -EIO;
 	}
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
  *				dev_close				     *
  *===========================================================================*/
-PUBLIC void dev_close(driver_e, dev)
+void dev_close(driver_e, dev)
 endpoint_t driver_e;
 dev_t dev;			/* device to close */
 {

@@ -1,33 +1,28 @@
-
-#define _SYSTEM            1    /* get OK and negative error codes */
-#define _MINIX             1	/* tell headers to include MINIX stuff */
+#ifndef __SERVERS_ISO9660FS_INC_H
+#define __SERVERS_ISO9660FS_INC_H
 
 #define VERBOSE		   0	/* display diagnostics */
 
-#include <ansi.h>
-#include <sys/types.h>
-#include <limits.h>
-#include <errno.h>
-#include <signal.h>
-#include <unistd.h>
-
-#include <minix/callnr.h>
-#include <minix/config.h>
-#include <minix/type.h>
-#include <minix/const.h>
-#include <minix/com.h>
-#include <minix/syslib.h>
-#include <minix/sysutil.h>
-#include <minix/keymap.h>
-#include <minix/bitmap.h>
-
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <signal.h>
+
+#include <nucleos/types.h>
+#include <nucleos/limits.h>
+#include <nucleos/errno.h>
+#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
+#include <nucleos/type.h>
+#include <nucleos/const.h>
+#include <nucleos/com.h>
+#include <nucleos/syslib.h>
+#include <nucleos/sysutil.h>
+#include <nucleos/keymap.h>
+#include <nucleos/bitmap.h>
+#include <nucleos/string.h>
 
 #include "proto.h"
 #include "super.h"
 #include "glo.h"
 #include "drivers.h"
+
+#endif /* __SERVERS_ISO9660FS_INC_H */

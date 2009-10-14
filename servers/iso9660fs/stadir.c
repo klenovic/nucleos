@@ -1,15 +1,13 @@
 #include "inc.h"
-#include <sys/stat.h>
-#include <sys/statfs.h>
-#include <minix/com.h>
-#include <string.h>
-#include <time.h>
+#include <nucleos/stat.h>
+#include <nucleos/statfs.h>
+#include <nucleos/com.h>
+#include <nucleos/vfsif.h>
+#include <nucleos/string.h>
+#include <nucleos/time.h>
 
-#include <minix/vfsif.h>
-
-
-FORWARD _PROTOTYPE(int stat_dir_record, (struct dir_record *dir, int pipe_pos,
-					 int who_e, cp_grant_id_t gid));
+static int stat_dir_record(struct dir_record *dir, int pipe_pos,
+					 int who_e, cp_grant_id_t gid);
 
 /* This function returns all the info about a particular inode. It's missing
  * the recording date because of a bug in the standard functions stdtime.
@@ -18,7 +16,7 @@ FORWARD _PROTOTYPE(int stat_dir_record, (struct dir_record *dir, int pipe_pos,
 /*===========================================================================*
  *				stat_dir_record				     *
  *===========================================================================*/
-PRIVATE int stat_dir_record(dir, pipe_pos, who_e, gid)
+static int stat_dir_record(dir, pipe_pos, who_e, gid)
 register struct dir_record *dir;	/* pointer to dir record to stat */
 int pipe_pos;   		/* position in a pipe, supplied by fstat() */
 int who_e;			/* Caller endpoint */
@@ -70,11 +68,11 @@ cp_grant_id_t gid;		/* grant for the stat buf */
 /*===========================================================================*
  *                             fs_stat					     *
  *===========================================================================*/
-PUBLIC int fs_stat()
+int fs_stat()
 {
   register int r;              /* return value */
   struct dir_record *dir;
-  r = EINVAL;
+  r = -EINVAL;
 
   if ((dir = get_dir_record(fs_m_in.REQ_INODE_NR)) != NULL) {
     r = stat_dir_record(dir, 0, fs_m_in.m_source, fs_m_in.REQ_GRANT);
@@ -88,7 +86,7 @@ PUBLIC int fs_stat()
 /*===========================================================================*
  *				fs_fstatfs				     *
  *===========================================================================*/
-PUBLIC int fs_fstatfs()
+int fs_fstatfs()
 {
   struct statfs st;
   int r;

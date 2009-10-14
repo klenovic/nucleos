@@ -2,19 +2,21 @@
 /* Functions to reads_file */
 
 #include "inc.h"
-#include <minix/com.h>
-#include <minix/vfsif.h>
-#include <fcntl.h>
+#include <nucleos/com.h>
+#include <nucleos/vfsif.h>
+#include <nucleos/fcntl.h>
 #include "buf.h"
 
-FORWARD _PROTOTYPE( int read_chunk_s, (struct dir_record *rip, off_t position,
+static int read_chunk_s(struct dir_record *rip, off_t position,
 				     unsigned off, int chunk, unsigned left,cp_grant_id_t gid,
-				     unsigned buf_off, int block_size, int *completed));
+				     unsigned buf_off, int block_size, int *completed);
+
+int rdwt_err;	/* status of last disk i/o request */
 
 /*===========================================================================*
  *				fs_read_s				     *
  *===========================================================================*/
-PUBLIC int fs_read_s(void) {
+int fs_read_s(void) {
 
   int r, chunk, block_size;
   int nrbytes;
@@ -24,11 +26,11 @@ PUBLIC int fs_read_s(void) {
   int completed;
   struct dir_record *dir;
   
-  r = OK;
+  r = 0;
   
   /* Try to get inode according to its index */
   dir = get_dir_record(fs_m_in.REQ_FD_INODE_NR);
-  if (dir == NULL) return EINVAL; /* No inode found */
+  if (dir == NULL) return -EINVAL; /* No inode found */
 
 
   position = fs_m_in.REQ_FD_POS; /* start reading from this position */
@@ -37,7 +39,7 @@ PUBLIC int fs_read_s(void) {
   gid = fs_m_in.REQ_FD_GID;
   f_size = dir->d_file_size;
 
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to -EIO if disk error occurs */
   
   cum_io = 0;
   /* Split the transfer into chunks that don't span two blocks. */
@@ -55,7 +57,7 @@ PUBLIC int fs_read_s(void) {
       r = read_chunk_s(dir, position, off, chunk, (unsigned) nrbytes, 
 		   gid, cum_io, block_size, &completed);
 
-      if (r != OK) break;	/* EOF reached */
+      if (r != 0) break;	/* EOF reached */
       if (rdwt_err < 0) break;
 
       /* Update counters and pointers. */
@@ -67,8 +69,8 @@ PUBLIC int fs_read_s(void) {
   fs_m_out.RES_FD_POS = position; /* It might change later and the VFS has
 				     to know this value */
   
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
 /*   rip->i_update |= ATIME; */
   
@@ -84,17 +86,17 @@ PUBLIC int fs_read_s(void) {
 /*===========================================================================*
  *				fs_read		         		     *
  *===========================================================================*/
-PUBLIC int fs_read(void) {
+int fs_read(void) {
   struct dir_record *dir;
   int r,nrbytes,block_size, chunk, completed, seg, usr;
   char* user_addr;
   off_t bytes_left, position;
   unsigned int off, cum_io;
 
-  r = OK;
+  r = 0;
 
   dir = get_dir_record(fs_m_in.REQ_FD_INODE_NR);
-  if (dir == NULL) return EINVAL; /* No inode found */
+  if (dir == NULL) return -EINVAL; /* No inode found */
 
   /* Get values for reading */
   position = fs_m_in.REQ_FD_POS; /* start reading from this position */
@@ -117,7 +119,7 @@ PUBLIC int fs_read(void) {
     /* Read chunk of block. */
     r = read_chunk(dir, cvul64(position), off, chunk,
 		   user_addr, seg, usr, block_size, &completed);
-    if (r != OK)
+    if (r != 0)
       break;			/* EOF reached */
     if (rdwt_err < 0) break;
 
@@ -139,27 +141,27 @@ PUBLIC int fs_read(void) {
 /*===========================================================================*
  *				fs_bread_s				     *
  *===========================================================================*/
-PUBLIC int fs_bread_s(void) {
+int fs_bread_s(void) {
   return fs_bread();
 }
 
 /*===========================================================================*
  *				fs_bread				     *
  *===========================================================================*/
-PUBLIC int fs_bread(void)
+int fs_bread(void)
 {
   int r, usr, rw_flag, chunk, block_size, seg;
   int nrbytes;
   u64_t position;
   unsigned int off, cum_io;
   mode_t mode_word;
-  int completed, r2 = OK;
+  int completed, r2 = 0;
   char *user_addr;
   
   /* This function is called when it is requested a raw reading without any
    * conversion. It is similar to fs_read but here the data is returned
    * without any preprocessing. */
-  r = OK;
+  r = 0;
   
   /* Get the values from the request message */ 
   rw_flag = (fs_m_in.m_type == REQ_BREAD_S ? READING : WRITING);
@@ -171,7 +173,7 @@ PUBLIC int fs_bread(void)
   
   block_size = v_pri.logical_block_size_l;
 
-  rdwt_err = OK;		/* set to EIO if disk error occurs */
+  rdwt_err = 0;		/* set to EIO if disk error occurs */
   
   cum_io = 0;
   /* Split the transfer into chunks that don't span two blocks. */
@@ -185,7 +187,7 @@ PUBLIC int fs_bread(void)
     r = read_chunk(NULL, position, off, chunk,
 		   user_addr, seg, usr, block_size, &completed);
     
-    if (r != OK) break;	/* EOF reached */
+    if (r != 0) break;	/* EOF reached */
     if (rdwt_err < 0) break;
     
     /* Update counters and pointers. */
@@ -198,8 +200,8 @@ PUBLIC int fs_bread(void)
   fs_m_out.RES_XFD_POS_LO = ex64lo(position); 
   fs_m_out.RES_XFD_POS_HI = ex64hi(position); 
   
-  if (rdwt_err != OK) r = rdwt_err;	/* check for disk error */
-  if (rdwt_err == END_OF_FILE) r = OK;
+  if (rdwt_err != 0) r = rdwt_err;	/* check for disk error */
+  if (rdwt_err == END_OF_FILE) r = 0;
 
   fs_m_out.RES_XFD_CUM_IO = cum_io;
   
@@ -208,14 +210,14 @@ PUBLIC int fs_bread(void)
 
 #define GETDENTS_BUFSIZ	257
 
-PRIVATE char getdents_buf[GETDENTS_BUFSIZ];
+static char getdents_buf[GETDENTS_BUFSIZ];
 
 /* This function returns the content of a directory using the ``standard"
  * data structure (that are non FS dependent). */
 /*===========================================================================*
  *				fs_getdents				     *
  *===========================================================================*/
-PUBLIC int fs_getdents(void) {
+int fs_getdents(void) {
   struct dir_record *dir;
   ino_t ino;
   cp_grant_id_t gid;
@@ -247,7 +249,7 @@ PUBLIC int fs_getdents(void) {
 
   if ((dir = get_dir_record(ino)) == NULL) {
     printf("I9660FS(%d) get_dir_record by fs_getdents() failed\n", SELF_E);
-    return(EINVAL);
+    return(-EINVAL);
   }
 
   block = dir->loc_extent_l;	/* First block of the directory */
@@ -260,7 +262,7 @@ PUBLIC int fs_getdents(void) {
 
     if (bp == NIL_BUF) {
       release_dir_record(dir);
-      return EINVAL;
+      return -EINVAL;
     }
     
     block_pos = cur_pos % block_size; /* Position where to start read */
@@ -315,7 +317,7 @@ PUBLIC int fs_getdents(void) {
 	if (tmpbuf_offset + reclen > GETDENTS_BUFSIZ) {
 	  r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
 			    (vir_bytes)getdents_buf, tmpbuf_offset, D);
-	  if (r != OK)
+	  if (r != 0)
 	    panic(__FILE__,"fs_getdents: sys_safecopyto failed\n",r);
 	  
 	  userbuf_off += tmpbuf_offset;
@@ -349,13 +351,13 @@ PUBLIC int fs_getdents(void) {
   if (tmpbuf_offset != 0) {
     r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off,
 		      (vir_bytes)getdents_buf, tmpbuf_offset, D);
-    if (r != OK)
+    if (r != 0)
       panic(__FILE__, "fs_getdents: sys_safecopyto failed\n", r);
  
     userbuf_off += tmpbuf_offset;
   }
   
-  r= ENOSYS;
+  r= -ENOSYS;
   fs_m_out.RES_GDE_POS_CHANGE= 0;	/* No change in case of an error */
 
   /*  r= userbuf_off;*/
@@ -366,26 +368,26 @@ PUBLIC int fs_getdents(void) {
     fs_m_out.RES_GDE_POS_CHANGE= 0;
 
   release_dir_record(dir);		/* release the inode */
-  r= OK;
+  r= 0;
   return(r);
 }
 
 /*===========================================================================*
  *                           fs_getdents_s                                   *
  *===========================================================================*/
-PUBLIC int fs_getdents_o(void)
+int fs_getdents_o(void)
 {
   int r;
   r = fs_getdents();
 
-  if(r == OK)
+  if(r == 0)
     r = fs_m_out.RES_GDE_CUM_IO;
 
   return(r);
 }
 
 /* Read a chunk of data that does not span in two blocks. */
-PUBLIC int read_chunk(dir, position, off, chunk, buff, seg, usr, block_size, 
+int read_chunk(dir, position, off, chunk, buff, seg, usr, block_size, 
 		      completed)
      struct  dir_record *dir;		/* file to read */
      u64_t position;			/* position within file to read or write */
@@ -398,7 +400,7 @@ PUBLIC int read_chunk(dir, position, off, chunk, buff, seg, usr, block_size,
      int *completed;			/* number of bytes copied */
 {
   register struct buf *bp;
-  register int r = OK;
+  register int r = 0;
   block_t b;
 
   b = dir->loc_extent_l + div64u(position, block_size);	/* Physical position
@@ -406,24 +408,24 @@ PUBLIC int read_chunk(dir, position, off, chunk, buff, seg, usr, block_size,
 
   bp = get_block(b);		/* Get physical block */
   if (bp == NIL_BUF)
-    return EINVAL;
+    return -EINVAL;
 
   r = sys_vircopy(SELF_E, D, (phys_bytes) (bp->b_data+off),
 		  usr, seg, (phys_bytes) buff,
 		  (phys_bytes) chunk);
 
-  if (r != OK)
+  if (r != 0)
     panic(__FILE__,"fs_getdents: sys_vircopy failed\n",r);
 
   put_block(bp);		/* Return the block */
-  return OK;
+  return 0;
 }
 
 /* Read a chunk of data that does not span in two blocks. */
 /*===========================================================================*
  *				read_chunk_s				     *
  *===========================================================================*/
-PRIVATE int read_chunk_s(dir, position, off, chunk, left, gid, buf_off, block_size, completed)
+static int read_chunk_s(dir, position, off, chunk, left, gid, buf_off, block_size, completed)
 register struct dir_record *dir;/* pointer to inode for file to be rd/wr */
 off_t position;			/* position within file to read or write */
 unsigned off;			/* off within the current block */
@@ -437,7 +439,7 @@ int *completed;			/* number of bytes copied */
 /* Read or write (part of) a block. */
 
   register struct buf *bp;
-  register int r = OK;
+  register int r = 0;
   int n;
   block_t b;
   dev_t dev;

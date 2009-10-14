@@ -1,25 +1,25 @@
 #include "inc.h"
-#include <sys/stat.h>
-#include <string.h>
-#include <minix/com.h>
-#include <minix/callnr.h>
-#include <minix/vfsif.h>
+#include <nucleos/stat.h>
+#include <nucleos/string.h>
+#include <nucleos/com.h>
+#include <nucleos/unistd.h>
+#include <nucleos/vfsif.h>
 
 static int panicking;
 
 /*===========================================================================*
  *				no_sys					     *
  *===========================================================================*/
-PUBLIC int no_sys()
+int no_sys()
 {
 /* Somebody has used an illegal system call number */
-  return(EINVAL);
+  return(-EINVAL);
 }
 
 /*===========================================================================*
  *				panic					     *
  *===========================================================================*/
-PUBLIC void panic(who, mess, num)
+void panic(who, mess, num)
 char *who;			/* who caused the panic */
 char *mess;			/* panic message string */
 int num;			/* number to go with it */

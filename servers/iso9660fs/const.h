@@ -1,3 +1,6 @@
+#ifndef __SERVERS_ISO9660FS_CONST_H
+#define __SERVERS_ISO9660FS_CONST_H
+
 /* In this file are declared all the constant used by the server. */
 
 #define WRITE_LOG(TEXT) printf("iso9660fs: " TEXT "\n");
@@ -63,4 +66,4 @@
 
 #define END_OF_FILE   (-104)	/* eof detected */
 
-#define	offsetof(type, field)	((size_t)(&((type *)0)->field))
+#endif /* __SERVERS_ISO9660FS_CONST_H */

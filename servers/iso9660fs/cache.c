@@ -12,19 +12,19 @@
  */
 
 #include "inc.h"
-#include <minix/com.h>
-#include <minix/u64.h>
+#include <nucleos/com.h>
+#include <nucleos/u64.h>
 #include "buf.h"
 
-FORWARD _PROTOTYPE(int read_block, (struct buf *));
+static int read_block(struct buf *);
 
-PUBLIC struct buf *bp_to_pickup = buf; /* This is a pointer to the next node in the
+struct buf *bp_to_pickup = buf; /* This is a pointer to the next node in the
 					  * buffer cache to pick up*/
 
 /*===========================================================================*
  *				get_block				     *
  *===========================================================================*/
-PUBLIC struct buf *get_block(block)
+struct buf *get_block(block)
 register block_t block;		/* which block is wanted? */
 {
   int b;
@@ -57,7 +57,7 @@ register block_t block;		/* which block is wanted? */
   if (free_bp != NIL_BUF) {
     /* Set fields of data structure */
     free_bp->b_blocknr = block;
-    if (read_block(free_bp) != OK) return NIL_BUF;
+    if (read_block(free_bp) != 0) return NIL_BUF;
     free_bp->b_count = 1;
 
     if (bp_to_pickup < &buf[NR_BUFS] - 1)
@@ -75,7 +75,7 @@ register block_t block;		/* which block is wanted? */
 /*===========================================================================*
  *				put_block				     *
  *===========================================================================*/
-PUBLIC void put_block(bp)
+void put_block(bp)
 register struct buf *bp;	/* pointer to the buffer to be released */
 {
   if (bp == NIL_BUF) return;	/* it is easier to check here than in caller */
@@ -86,7 +86,7 @@ register struct buf *bp;	/* pointer to the buffer to be released */
 /*===========================================================================*
  *				read_block				     *
  *===========================================================================*/
-PRIVATE int read_block(bp)
+static int read_block(bp)
 register struct buf *bp;	/* buffer pointer */
 {
   int r, op;
@@ -108,8 +108,8 @@ register struct buf *bp;	/* buffer pointer */
 	     bp->b_blocknr);
 
     rdwt_err = r;
-    return EINVAL;
+    return -EINVAL;
   }    
 
-  return OK;
+  return 0;
 }

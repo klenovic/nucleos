@@ -4,12 +4,15 @@
 
 #include "inc.h"
 #include "buf.h"
-#include <minix/vfsif.h>
+#include <nucleos/vfsif.h>
+
+struct dir_record dir_records[NR_DIR_RECORDS];
+struct ext_attr_rec ext_attr_recs[NR_ATTR_RECS];
 
 /*===========================================================================*
  *				fs_getnode				     *
  *===========================================================================*/
-PUBLIC int fs_getnode()
+int fs_getnode()
 {
 /* Increase the inode's counter specified in the request message
  */
@@ -18,24 +21,24 @@ PUBLIC int fs_getnode()
   /* Get the dir record by the id */
   dir = get_dir_record(fs_m_in.REQ_INODE_NR);
   if (dir == NULL)
-    return EINVAL;
+    return -EINVAL;
 
   /* Transfer back the inode's details */
   fs_m_out.m_source = fs_dev;
   fs_m_out.RES_INODE_NR = fs_m_in.REQ_INODE_NR;
   fs_m_out.RES_MODE = dir->d_mode;
   fs_m_out.RES_FILE_SIZE = dir->d_file_size;
-  fs_m_out.RES_DEV = (Dev_t)fs_dev;
+  fs_m_out.RES_DEV = (dev_t)fs_dev;
   fs_m_out.RES_UID = 0;
   fs_m_out.RES_GID = 0;
 
-  return OK;
+  return 0;
 }
 
 /*===========================================================================*
  *				fs_putnode				     *
  *===========================================================================*/
-PUBLIC int fs_putnode()
+int fs_putnode()
 {
 /* Find the inode specified by the request message and decrease its counter.
  */
@@ -63,12 +66,12 @@ PUBLIC int fs_putnode()
   if (count <= 0) {
     printf("put_inode: bad value for count: %d\n", count);
     panic(__FILE__, "fs_putnode failed", NO_NUM);
-    return EINVAL;
+    return -EINVAL;
   }
   if (count > dir->d_count) {
     printf("put_inode: count too high: %d > %d\n", count, dir->d_count);
      panic(__FILE__, "fs_putnode failed", NO_NUM);
-     return EINVAL;
+     return -EINVAL;
   }
 
   if (dir->d_count > 1)
@@ -79,15 +82,15 @@ PUBLIC int fs_putnode()
 
   release_dir_record(dir);	/* I finally release it */
 
-  return OK;
+  return 0;
 }
 
 /* Release a dir record (decrement the counter) */
-PUBLIC int release_dir_record(dir)
+int release_dir_record(dir)
      register struct dir_record *dir;
 {
   if (dir == NULL)
-    return EINVAL;
+    return -EINVAL;
 
   if (--dir->d_count == 0) {    
     if (dir->ext_attr != NULL)
@@ -104,11 +107,11 @@ PUBLIC int release_dir_record(dir)
       release_dir_record(dir);
     dir->d_next = NULL;
   }
-return OK;
+return 0;
 }
 
 /* Get a free dir record */
-PUBLIC struct dir_record *get_free_dir_record(void)
+struct dir_record *get_free_dir_record(void)
 {
   struct dir_record *dir;
 
@@ -123,7 +126,7 @@ PUBLIC struct dir_record *get_free_dir_record(void)
 }
 
 /* This function is a wrapper. It calls dir_record_by_id */
-PUBLIC struct dir_record *get_dir_record(id_dir_record)
+struct dir_record *get_dir_record(id_dir_record)
      ino_t id_dir_record;
 {
   struct dir_record *dir = NULL;
@@ -151,7 +154,7 @@ PUBLIC struct dir_record *get_dir_record(id_dir_record)
 
 /* Get a free extended attribute structure in a similar way than the dir 
  * record */
-PUBLIC struct ext_attr_rec *get_free_ext_attr(void) {
+struct ext_attr_rec *get_free_ext_attr(void) {
   struct ext_attr_rec *dir;
   for(dir = ext_attr_recs;dir<&ext_attr_recs[NR_ATTR_RECS]; dir++) {
     if (dir->count == 0) {	/* The record is free */
@@ -163,9 +166,9 @@ PUBLIC struct ext_attr_rec *get_free_ext_attr(void) {
 }
 
 /* Fill an extent structure from the data read on the device */
-PUBLIC int create_ext_attr(struct ext_attr_rec *ext,char *buffer)
+int create_ext_attr(struct ext_attr_rec *ext,char *buffer)
 {
-  if (ext == NULL) return EINVAL;
+  if (ext == NULL) return -EINVAL;
 
   /* In input we have a stream of bytes that are physically read from the
    * device. This stream of data is copied in the data structure. */
@@ -184,13 +187,13 @@ PUBLIC int create_ext_attr(struct ext_attr_rec *ext,char *buffer)
   memcpy(&ext->ext_attr_rec_ver,buffer + 180,sizeof(u8_t));
   memcpy(&ext->len_esc_seq,buffer + 181,sizeof(u8_t));
 
-  return OK;
+  return 0;
 }
 
 /* Fills a dir record structure from the data read on the device */
 /* If the flag assign id is active it will return the id associated;
- * otherwise it will return OK. */
-PUBLIC int create_dir_record(dir,buffer,address)
+ * otherwise it will return 0. */
+int create_dir_record(dir,buffer,address)
      struct dir_record *dir;
      char *buffer;
      u32_t address;
@@ -198,7 +201,7 @@ PUBLIC int create_dir_record(dir,buffer,address)
   short size;
 
   size = buffer[0];
-  if (dir == NULL) return EINVAL;
+  if (dir == NULL) return -EINVAL;
   
   /* The data structure dir record is filled with the stream of data
    * that is read. */
@@ -241,12 +244,12 @@ PUBLIC int create_dir_record(dir,buffer,address)
 /*     assign_id_to_dir_record(dir); */
 /*     return ID_DIR_RECORD(dir->id); */
 /*   } else */
-  return OK;
+  return 0;
 }
 
 /* This function load a particular dir record from a specific address
  * on the device */
-PUBLIC struct dir_record *load_dir_record_from_disk(address)
+struct dir_record *load_dir_record_from_disk(address)
      u32_t address;
 {
   int block_nr, offset, block_size, new_pos;

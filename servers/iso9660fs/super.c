@@ -2,25 +2,27 @@
  * are called at the beginning and at the end of the server. */
 
 #include "inc.h"
-#include <string.h>
-#include <minix/com.h>
-#include <minix/u64.h>
+#include <nucleos/string.h>
+#include <nucleos/com.h>
+#include <nucleos/u64.h>
+
+struct iso9660_vd_pri v_pri; /* primary volume descriptor */
 
 /* This function is called when the filesystem is umounted. It releases the 
  * super block. */
-PUBLIC int release_v_pri(v_pri)
+int release_v_pri(v_pri)
      register struct iso9660_vd_pri *v_pri;
 {
   /* Release the root dir record */
   release_dir_record(v_pri->dir_rec_root);
   v_pri->count = 0;
-  return OK;
+  return 0;
 }
 
 /* This function fullfill the super block data structure using the information
  * contained in the stream buf. Such stream is physically read from the device
  * . */
-PUBLIC int create_v_pri(v_pri,buf,address)
+int create_v_pri(v_pri,buf,address)
      register struct iso9660_vd_pri *v_pri;
      register char* buf;
      register unsigned long address;
@@ -57,7 +59,7 @@ PUBLIC int create_v_pri(v_pri,buf,address)
 	 sizeof(v_pri->loc_opt_m_occ_path_table));
 
   dir = get_free_dir_record();
-  if (dir == NULL) return EINVAL;
+  if (dir == NULL) return -EINVAL;
   create_dir_record(dir,buf + 156,(u32_t)(address + 156));
   v_pri->dir_rec_root = dir;
   dir->d_ino_nr = ROOT_INO_NR;
@@ -74,12 +76,12 @@ PUBLIC int create_v_pri(v_pri,buf,address)
   memcpy(v_pri->volume_exp_date,buf + 847,sizeof(v_pri->volume_exp_date));
   memcpy(v_pri->volume_eff_date,buf + 864,sizeof(v_pri->volume_eff_date));
   v_pri->file_struct_ver = buf[881];
-  return OK;
+  return 0;
 }
 
 /* This function reads from a ISO9660 filesystem (in the device dev) the
  * super block and saves it in v_pri. */
-PUBLIC int read_vds(v_pri,dev)
+int read_vds(v_pri,dev)
      register struct iso9660_vd_pri *v_pri;
      register dev_t dev;
 {
@@ -110,7 +112,7 @@ PUBLIC int read_vds(v_pri,dev)
   }
 
   if (vol_ok == FALSE)
-    return EINVAL;		/* If no superblock was found... */
+    return -EINVAL;		/* If no superblock was found... */
   else
-    return OK;			/* otherwise. */
+    return 0;			/* otherwise. */
 }

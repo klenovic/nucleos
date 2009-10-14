@@ -1,6 +1,9 @@
+#ifndef __SERVERS_ISO9660FS_INODE_H
+#define __SERVERS_ISO9660FS_INODE_H
+
 #include "const.h"
 
-PUBLIC struct dir_record {
+struct dir_record {
   u8_t length;			/* The length of the record */
   u8_t ext_attr_rec_length;
   u32_t loc_extent_l;		/* The same data (in this case loc_extent)is */
@@ -28,9 +31,11 @@ PUBLIC struct dir_record {
   struct dir_record *d_prior;	/* The same as before, this points to the dir parent */
   u32_t d_file_size;		/* Total size of the file */
 
-} dir_records[NR_DIR_RECORDS];
+};
 
-PUBLIC struct ext_attr_rec {
+extern struct dir_record dir_records[];
+
+struct ext_attr_rec {
   u32_t own_id;
   u32_t group_id;
   u16_t permissions;
@@ -47,21 +52,25 @@ PUBLIC struct ext_attr_rec {
   u8_t len_esc_seq;
 
   int count;
-} ext_attr_recs[NR_ATTR_RECS];
+};
+
+extern struct ext_attr_rec ext_attr_recs[];
 
 #define D_DIRECTORY 0x2
 #define D_TYPE 0x8E
 
 /* Vector with all the ids of the dir records */
-/* PUBLIC struct hash_idi_entry { */
+/* struct hash_idi_entry { */
 /*   u32_t h_phy_addr; */
 /*   struct dir_record *h_dir_record; */
 /* } hash_idi[NR_ID_INODES]; */
 
-/* PUBLIC int size_hash_idi; */
+/* int size_hash_idi; */
 
 /* #define ID_DIR_RECORD(id) id - hash_idi + 1 */
 #define ID_DIR_RECORD(dir) dir->d_ino_nr
 
 /* #define ASSIGN_ID 1 */
 /* #define NOT_ASSIGN_ID 0 */
+
+#endif /* __SERVERS_ISO9660FS_INODE_H */

@@ -4,27 +4,43 @@
  * request and then send a response. */
 
 #include "inc.h"
-#include <minix/vfsif.h>
+#include <nucleos/vfsif.h>
+#include <nucleos/kipc.h>
+#include "buf.h"
 #include "const.h"
 #include "glo.h"
 
 /* Declare some local functions. */
-FORWARD _PROTOTYPE(void init_server, (void)				);
-FORWARD _PROTOTYPE(void get_work, (message *m_in)			);
+static void init_server(void);
+static void get_work(message *m_in);
+
+message fs_m_in;	/* contains the input message of the request */
+message fs_m_out;	/* contains the output message of the request */
+
+uid_t caller_uid;
+gid_t caller_gid;
+
+int req_nr;	/* request number to the server */
+int SELF_E;	/* process number */
+int use_getuptime2; /* Should be removed togetherwith boottime */
+int FS_STATE;
+
+struct driver_endpoints driver_endpoints[NR_DEVICES];
+struct buf buf[NR_BUFS];
 
 /*===========================================================================*
  *				main                                         *
  *===========================================================================*/
-PUBLIC int main(void) {
+int main(void) {
   int who_e, ind, error;
   message m;
 
   /* Initialize the server, then go to work. */
   init_server();
   
-  fs_m_in.m_type = FS_READY;
+  fs_m_in.m_type = __NR_fs_ready;
   
-  if (send(FS_PROC_NR, &fs_m_in) != OK) {
+  if (kipc_send(FS_PROC_NR, &fs_m_in) != 0) {
       printf("ISO9660FS(%d): Error sending login to VFS\n", SELF_E);
       return -1;
   }
@@ -33,7 +49,7 @@ PUBLIC int main(void) {
 
     /* Wait for request message. */
     get_work(&fs_m_in);
-    error = OK;
+    error = 0;
 
       caller_uid = -1;	/* To trap errors */
       caller_gid = -1;
@@ -55,7 +71,7 @@ PUBLIC int main(void) {
       ind= req_nr-VFS_BASE;
 
       if (ind < 0 || ind >= NREQS) {
-          error = EINVAL; 
+          error = -EINVAL; 
       }
       else
 	error = (*fs_call_vec[ind])(); /* Process the request calling
@@ -69,7 +85,7 @@ PUBLIC int main(void) {
 /*===========================================================================*
  *				init_server                                  *
  *===========================================================================*/
-PRIVATE void init_server(void)
+static void init_server(void)
 {
    int i;
 
@@ -85,21 +101,21 @@ PRIVATE void init_server(void)
 /*===========================================================================*
  *				get_work                                     *
  *===========================================================================*/
-PRIVATE void get_work(m_in)
+static void get_work(m_in)
 message *m_in;				/* pointer to message */
 {
   int s;				/* receive status */
-  if (OK != (s = receive(ANY, m_in))) 	/* wait for message */
+  if (0 != (s = kipc_receive(ANY, m_in))) 	/* wait for message */
     panic("I9660FS","receive failed", s);
 }
 
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
-PUBLIC void reply(who, m_out)
+void reply(who, m_out)
 int who;	
 message *m_out;                       	/* report result */
 {
-  if (OK != send(who, m_out))    /* send the message */
+  if (0 != kipc_send(who, m_out))    /* send the message */
     printf("I9660FS(%d) was unable to send reply\n", SELF_E);
 }
