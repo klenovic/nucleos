@@ -50,5 +50,6 @@
 #define ENOTSOCK		74  /* Socket operation on non-socket */
 #define ENOPROTOOPT		75  /* Protocol not available */
 #define EOPNOTSUPP		76  /* Operation not supported */
+#define EILSEQ			84  /* Illegal byte sequence */
 
 #endif /* __ASM_GENERIC_ERRNO_H */

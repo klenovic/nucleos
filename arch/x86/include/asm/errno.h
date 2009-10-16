@@ -12,8 +12,8 @@
 
 #include <asm-generic/errno.h>
 
-/* Don't show outside the kernel/ukernel */
 #if defined(__KERNEL__) || defined(__UKERNEL__)
+/* Don't show outside the kernel/ukernel */
 extern int errno;
 #endif
 
