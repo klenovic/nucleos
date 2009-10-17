@@ -59,10 +59,10 @@ struct proc {
 
 	endpoint_t p_endpoint;		/* endpoint number, generation-aware */
 
-  message p_sendmsg;		/* Message from this process if SENDING */
-  message p_delivermsg;		/* Message for this process if MF_DELIVERMSG */
-  vir_bytes p_delivermsg_vir;	/* Virtual addr this proc wants message at */
-  vir_bytes p_delivermsg_lin;	/* Linear addr this proc wants message at */
+	message p_sendmsg;		/* Message from this process if SENDING */
+	message p_delivermsg;		/* Message for this process if MF_DELIVERMSG */
+	vir_bytes p_delivermsg_vir;	/* Virtual addr this proc wants message at */
+	vir_bytes p_delivermsg_lin;	/* Linear addr this proc wants message at */
 
 	/* If handler functions detect a process wants to do something with
 	 * memory that isn't present, VM has to fix it. Until it has asked
@@ -72,32 +72,32 @@ struct proc {
 	 * VMREQUEST set.
 	 */
 	struct {
-	struct proc	*nextrestart;	/* next in vmrestart chain */
-	struct proc	*nextrequestor;	/* next in vmrequest chain */
+		struct proc	*nextrestart;	/* next in vmrestart chain */
+		struct proc	*nextrequestor;	/* next in vmrequest chain */
 #define VMSTYPE_SYS_NONE	0
 #define VMSTYPE_KERNELCALL	1
 #define VMSTYPE_DELIVERMSG	2
-	int		type;		/* suspended operation */
-	union {
-		/* VMSTYPE_SYS_MESSAGE */
-		message		reqmsg;	/* suspended request message */
-	} saved;
+		int		type;		/* suspended operation */
+		union {
+			/* VMSTYPE_SYS_MESSAGE */
+			message		reqmsg;	/* suspended request message */
+		} saved;
 
-	/* Parameters of request to VM */
-	vir_bytes start, length;	/* memory range */
-	u8_t writeflag;	/* nonzero for write access */
-	endpoint_t who;
+		/* Parameters of request to VM */
+		vir_bytes start, length;	/* memory range */
+		u8_t writeflag;	/* nonzero for write access */
+		endpoint_t who;
 
-	/* VM result when available */
-	int vmresult;
+		/* VM result when available */
+		int vmresult;
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
-	char stacktrace[200];
+		char stacktrace[200];
 #endif
 
-	/* If the suspended operation is a sys_call, its details are
-	 * stored here.
-	 */
+		/* If the suspended operation is a sys_call, its details are
+		 * stored here.
+		 */
 	} p_vmrequest;
 
 	struct proc *next_soft_notify;
@@ -110,25 +110,25 @@ struct proc {
 #endif
 
 #ifdef CONFIG_DEBUG_KERNEL_TRACE
-  int p_schedules;
+	int p_schedules;
 #endif
 };
 
 /* Bits for the runtime flags. A process is runnable iff p_rts_flags == 0. */
-#define SLOT_FREE	 0x01	/* process slot is free */
-#define PROC_STOP	 0x02	/* process has been stopped */
-#define SENDING		 0x04	/* process blocked trying to send */
-#define RECEIVING	 0x08	/* process blocked trying to receive */
-#define SIGNALED	 0x10	/* set when new kernel signal arrives */
-#define SIG_PENDING	 0x20	/* unready while signal being processed */
-#define P_STOP		 0x40	/* set when process is being traced */
-#define NO_PRIV		 0x80	/* keep forked system process from running */
-#define NO_ENDPOINT     0x100	/* process cannot send or receive messages */
-#define VMINHIBIT       0x200	/* not scheduled until pagetable set by VM */
-#define PAGEFAULT       0x400	/* process has unhandled pagefault */
-#define VMREQUEST       0x800	/* originator of vm memory request */
-#define VMREQTARGET    0x1000	/* target of vm memory request */
-#define SYS_LOCK       0x2000	/* temporary process lock flag for systask */
+#define SLOT_FREE	0x01	/* process slot is free */
+#define PROC_STOP	0x02	/* process has been stopped */
+#define SENDING		0x04	/* process blocked trying to send */
+#define RECEIVING	0x08	/* process blocked trying to receive */
+#define SIGNALED	0x10	/* set when new kernel signal arrives */
+#define SIG_PENDING	0x20	/* unready while signal being processed */
+#define P_STOP		0x40	/* set when process is being traced */
+#define NO_PRIV		0x80	/* keep forked system process from running */
+#define NO_ENDPOINT	0x100	/* process cannot send or receive messages */
+#define VMINHIBIT	0x200	/* not scheduled until pagetable set by VM */
+#define PAGEFAULT	0x400	/* process has unhandled pagefault */
+#define VMREQUEST	0x800	/* originator of vm memory request */
+#define VMREQTARGET	0x1000	/* target of vm memory request */
+#define SYS_LOCK	0x2000	/* temporary process lock flag for systask */
 
 /* These runtime flags can be tested and manipulated by these macros. */
 
@@ -211,9 +211,9 @@ struct proc {
 #define IDLE_Q		15	/* lowest, only IDLE process goes here */
 
 /* Magic process table addresses. */
-#define BEG_PROC_ADDR (&proc[0])
-#define BEG_USER_ADDR (&proc[NR_TASKS])
-#define END_PROC_ADDR (&proc[NR_TASKS + NR_PROCS])
+#define BEG_PROC_ADDR	(&proc[0])
+#define BEG_USER_ADDR	(&proc[NR_TASKS])
+#define END_PROC_ADDR	(&proc[NR_TASKS + NR_PROCS])
 
 #define NIL_PROC	((struct proc *) 0)
 #define NIL_SYS_PROC	((struct proc *) 1)

@@ -7,10 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-// Miscellaneous constants used in assembler code.
+/* Miscellaneous constants used in assembler code. */
 	.set W,		4		// Machine word size.
 
-// Offsets in struct proc. They MUST match proc.h.
+/* Offsets in struct proc. They MUST match proc.h. */
 	.set P_STACKBASE,	0
 	.set GSREG,	P_STACKBASE
 	.set FSREG,	GSREG + 2	// 386 introduces FS and GS segments

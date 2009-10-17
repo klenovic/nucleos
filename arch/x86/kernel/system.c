@@ -51,7 +51,7 @@ void arch_shutdown(int how)
 	if(how != RBT_RESET) {
 		/* return to boot monitor */
 
-		outb( INT_CTLMASK, 0);            
+		outb( INT_CTLMASK, 0);
 		outb( INT2_CTLMASK, 0);
 
 		/* Return to the boot monitor. Set
@@ -59,6 +59,7 @@ void arch_shutdown(int how)
 		 */
 		if (how != RBT_MONITOR)
 			arch_set_params("", 1);
+
 		if(minix_panicing) {
 			int source, dest;
 			static char mybuffer[sizeof(params_buffer)];
@@ -85,21 +86,20 @@ void arch_shutdown(int how)
 
 				source = ((source - 1 + KMESS_BUF_SIZE) % KMESS_BUF_SIZE);
 				dest--;
-  }
+			}
 
 			arch_set_params(mybuffer, strlen(mybuffer)+1);
 		}
 		arch_monitor();
-  } else {
+	} else {
 		/* Reset the system by forcing a processor shutdown. First stop
 		 * the BIOS memory test by setting a soft reset flag.
 		 */
 		u16_t magic = STOP_MEM_CHECK;
-		phys_copy(vir2phys(&magic), SOFT_RESET_FLAG_ADDR,
-       	 	SOFT_RESET_FLAG_SIZE);
+		phys_copy(vir2phys(&magic), SOFT_RESET_FLAG_ADDR, SOFT_RESET_FLAG_SIZE);
 		level0(reset);
-  }
-  }
+	}
+}
 
 /* address of a.out headers, set in mpx386.s */
 phys_bytes aout;
@@ -122,26 +122,26 @@ void arch_init(void)
 #endif
 }
 
-#define COM1_BASE       0x3F8
-#define COM1_THR        (COM1_BASE + 0)
-#define COM1_RBR (COM1_BASE + 0)
-#define COM1_LSR        (COM1_BASE + 5)
-#define		LSR_DR		0x01
-#define		LSR_THRE	0x20
+#define COM1_BASE	0x3F8
+#define COM1_THR	(COM1_BASE + 0)
+#define COM1_RBR	(COM1_BASE + 0)
+#define COM1_LSR	(COM1_BASE + 5)
+#define      LSR_DR		0x01
+#define      LSR_THRE	0x20
 
 void ser_putc(char c)
 {
-        int i;
-        int lsr, thr;
+	int i;
+	int lsr, thr;
 
-        lsr= COM1_LSR;
-        thr= COM1_THR;
-        for (i= 0; i<100000; i++)
-        {
-                if (inb( lsr) & LSR_THRE)
-                        break;
-  }
-        outb( thr, c);
+	lsr= COM1_LSR;
+	thr= COM1_THR;
+	for (i= 0; i<100000; i++) {
+		if (inb( lsr) & LSR_THRE)
+			break;
+	}
+
+	outb( thr, c);
 }
 
 /*===========================================================================*
@@ -160,33 +160,35 @@ void do_ser_debug()
 
 static void ser_dump_queues(void)
 {
-       int q;
-       for(q = 0; q < NR_SCHED_QUEUES; q++) {
-               struct proc *p;
-               if(rdy_head[q])
-                       printf("%2d: ", q);
-               for(p = rdy_head[q]; p; p = p->p_nextready) {
-                       printf("%s / %d  ", p->p_name, p->p_endpoint);
-               }
-               printf("\n");
-       }
+	int q;
+	for(q = 0; q < NR_SCHED_QUEUES; q++) {
+		struct proc *p;
 
+		if(rdy_head[q])
+			printf("%2d: ", q);
+
+		for(p = rdy_head[q]; p; p = p->p_nextready) {
+			printf("%s / %d  ", p->p_name, p->p_endpoint);
+		}
+		printf("\n");
+	}
 }
 
 static void ser_dump_segs(void)
 {
-       struct proc *pp;
-       for (pp= BEG_PROC_ADDR; pp < END_PROC_ADDR; pp++)
-       {
-               if (pp->p_rts_flags & SLOT_FREE)
-                       continue;
-               kprintf("%d: %s ep %d\n", proc_nr(pp), pp->p_name, pp->p_endpoint);
-               printseg("cs: ", 1, pp, pp->p_reg.cs);
-               printseg("ds: ", 0, pp, pp->p_reg.ds);
-               if(pp->p_reg.ss != pp->p_reg.ds) {
-                       printseg("ss: ", 0, pp, pp->p_reg.ss);
-               }
-       }
+	struct proc *pp;
+	for (pp= BEG_PROC_ADDR; pp < END_PROC_ADDR; pp++)
+	{
+		if (pp->p_rts_flags & SLOT_FREE)
+			continue;
+		kprintf("%d: %s ep %d\n", proc_nr(pp), pp->p_name, pp->p_endpoint);
+		printseg("cs: ", 1, pp, pp->p_reg.cs);
+		printseg("ds: ", 0, pp, pp->p_reg.ds);
+
+		if(pp->p_reg.ss != pp->p_reg.ds) {
+			printseg("ss: ", 0, pp, pp->p_reg.ss);
+		}
+	}
 }
 
 static void ser_debug(int c)
@@ -209,16 +211,16 @@ static void ser_debug(int c)
 		ser_dump_segs();
 		break;
 #ifdef CONFIG_DEBUG_KERNEL_TRACE
-#define TOGGLECASE(ch, flag)                           \
-	case ch: {                                      \
-			if(verboseflags & flag) {               \
-				verboseflags &= ~flag;          \
-				printf("%s disabled\n", #flag); \
-			} else {                                \
-				verboseflags |= flag;           \
-				printf("%s enabled\n", #flag);  \
-			}                                       \
-			break;                                  \
+#define TOGGLECASE(ch, flag)					\
+	case ch: {						\
+			if(verboseflags & flag) {		\
+				verboseflags &= ~flag;		\
+				printf("%s disabled\n", #flag);	\
+			} else {				\
+				verboseflags |= flag;		\
+				printf("%s enabled\n", #flag);	\
+			}					\
+			break;					\
 		}
 	TOGGLECASE('8', VF_SCHEDULING)
 	TOGGLECASE('9', VF_PICKPROC)
@@ -299,37 +301,37 @@ void ser_dump_proc()
 
 int arch_init_profile_clock(u32_t freq)
 {
-  int r;
-  /* Set CMOS timer frequency. */
-  outb(RTC_INDEX, RTC_REG_A);
-  outb(RTC_IO, RTC_A_DV_OK | freq);
-  /* Enable CMOS timer interrupts. */
-  outb(RTC_INDEX, RTC_REG_B);
-  r = inb(RTC_IO);
-  outb(RTC_INDEX, RTC_REG_B); 
-  outb(RTC_IO, r | RTC_B_PIE);
-  /* Mandatory read of CMOS register to enable timer interrupts. */
-  outb(RTC_INDEX, RTC_REG_C);
-  inb(RTC_IO);
+	int r;
+	/* Set CMOS timer frequency. */
+	outb(RTC_INDEX, RTC_REG_A);
+	outb(RTC_IO, RTC_A_DV_OK | freq);
+	/* Enable CMOS timer interrupts. */
+	outb(RTC_INDEX, RTC_REG_B);
+	r = inb(RTC_IO);
+	outb(RTC_INDEX, RTC_REG_B); 
+	outb(RTC_IO, r | RTC_B_PIE);
+	/* Mandatory read of CMOS register to enable timer interrupts. */
+	outb(RTC_INDEX, RTC_REG_C);
+	inb(RTC_IO);
 
-  return CMOS_CLOCK_IRQ;
+	return CMOS_CLOCK_IRQ;
 }
 
 void arch_stop_profile_clock(void)
 {
-  int r;
-  /* Disable CMOS timer interrupts. */
-  outb(RTC_INDEX, RTC_REG_B);
-  r = inb(RTC_IO);
-  outb(RTC_INDEX, RTC_REG_B);  
-  outb(RTC_IO, r & ~RTC_B_PIE);
+	int r;
+	/* Disable CMOS timer interrupts. */
+	outb(RTC_INDEX, RTC_REG_B);
+	r = inb(RTC_IO);
+	outb(RTC_INDEX, RTC_REG_B);  
+	outb(RTC_IO, r & ~RTC_B_PIE);
 }
 
 void arch_ack_profile_clock(void)
 {
-  /* Mandatory read of CMOS register to re-enable timer interrupts. */
-  outb(RTC_INDEX, RTC_REG_C);
-  inb(RTC_IO);
+	/* Mandatory read of CMOS register to re-enable timer interrupts. */
+	outb(RTC_INDEX, RTC_REG_C);
+	inb(RTC_IO);
 }
 
 #endif /* CONFIG_DEBUG_KERNEL_STATS_PROFILE */
@@ -342,7 +344,7 @@ void cons_setc(int pos, int c)
 
 	ch= c;
 	phys_copy(vir2phys((vir_bytes)&ch), COLOR_BASE+(20*80+pos)*2, 1);
-      }
+}
 
 void cons_seth(int pos, int n)
 {
@@ -362,7 +364,7 @@ int arch_get_params(char *params, int maxsize)
 		MIN(maxsize, params_size));
 	params[maxsize-1] = '\0';
 	return 0;
-      }
+}
 
 int arch_set_params(char *params, int size)
 {
@@ -374,21 +376,20 @@ int arch_set_params(char *params, int size)
 
 void arch_do_syscall(struct proc *proc)
 {
-/* Perform a previously postponed system call.
- */
-  int call_nr, src_dst_e;
-  message *m_ptr;
-  long bit_map;
+	/* Perform a previously postponed system call. */
+	int call_nr, src_dst_e;
+	message *m_ptr;
+	long bit_map;
 
-  /* Get the system call parameters from their respective registers. */
-  call_nr = proc->p_reg.cx;
-  src_dst_e = proc->p_reg.retreg;
-  m_ptr = (message *) proc->p_reg.bx;
-  bit_map = proc->p_reg.dx;
+	/* Get the system call parameters from their respective registers. */
+	call_nr = proc->p_reg.cx;
+	src_dst_e = proc->p_reg.retreg;
+	m_ptr = (message *) proc->p_reg.bx;
+	bit_map = proc->p_reg.dx;
 
-  /* sys_call() expects the given process's memory to be accessible. */
-  vm_set_cr3(proc);
+	/* sys_call() expects the given process's memory to be accessible. */
+	vm_set_cr3(proc);
 
-  /* Make the system call, for real this time. */
-  proc->p_reg.retreg = sys_call(call_nr, src_dst_e, m_ptr, bit_map);
+	/* Make the system call, for real this time. */
+	proc->p_reg.retreg = sys_call(call_nr, src_dst_e, m_ptr, bit_map);
 }
