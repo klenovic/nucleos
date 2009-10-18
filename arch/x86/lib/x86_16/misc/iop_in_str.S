@@ -16,15 +16,15 @@
  * @param m memory location to store data
  * @return pointer to data
  */
-BEGIN_FUNC(insb,P2ALIGN_16,0x90)
-  pushl %edi
-  movw  8(%esp), %dx
-  movl  12(%esp), %eax
-  movl  %eax, %edi
-  insb
-  popl  %edi
-  retl
-END_FUNC(insb)
+ENTRY16(insb)
+	pushl	%edi
+	movw	8(%esp), %dx
+	movl	12(%esp), %eax
+	movl	%eax, %edi
+	insb
+	popl	%edi
+	retl
+END(insb)
 
 /**
  * uint16_t* insw(uint16_t p, uint16_t* m);
@@ -33,15 +33,15 @@ END_FUNC(insb)
  * @param m memory location to store data
  * @return pointer to data
  */
-BEGIN_FUNC(insw,P2ALIGN_16,0x90)
-  pushl %edi
-  movw  8(%esp), %dx
-  movl  12(%esp), %eax
-  movl  %eax, %edi
-  insw
-  popl  %edi
-  retl
-END_FUNC(insw)
+ENTRY16(insw)
+	pushl	%edi
+	movw	8(%esp), %dx
+	movl	12(%esp), %eax
+	movl	%eax, %edi
+	insw
+	popl	%edi
+	retl
+END(insw)
 
 /**
  * uint32_t* insl(uint16_t p, uint32_t* m);
@@ -50,12 +50,12 @@ END_FUNC(insw)
  * @param m memory location to store data
  * @return pointer to data
  */
-BEGIN_FUNC(insl,P2ALIGN_16,0x90)
-  pushl %edi
-  movw  8(%esp), %dx
-  movl  12(%esp), %eax
-  movl  %eax, %edi
-  insl
-  popl  %edi
-  retl
-END_FUNC(insl)
+ENTRY16(insl)
+	pushl	%edi
+	movw	8(%esp), %dx
+	movl	12(%esp), %eax
+	movl	%eax, %edi
+	insl
+	popl	%edi
+	retl
+END(insl)

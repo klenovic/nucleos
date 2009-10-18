@@ -10,26 +10,26 @@
 #include <nucleos/linkage.h>
 
 /* char* strcat(char *dst, const char *src) __attribute__((cdecl)) */
-BEGIN_FUNC(strcat,P2ALIGN_16,0x90)
-  pushl	%edi
-  pushl	%esi
-  xorl %eax, %eax
-  orl $-1, %ecx        // set max. value 
-                       //  (see repne termination condition)
-  movl 16(%esp), %esi  // source
-  movl 12(%esp), %edi  // destination
-  movl %edi, %edx
-  cld
-  repne scasb  // find '\0' in string
-               //  pointed by %edi
-  decl %edi
+ENTRY16(strcat)
+	pushl	%edi
+	pushl	%esi
+	xorl	%eax, %eax
+	orl	$-1, %ecx		// set max. value 
+					//  (see repne termination condition)
+	movl	16(%esp), %esi		// source
+	movl	12(%esp), %edi		// destination
+	movl	%edi, %edx
+	cld
+	repne	scasb			// find '\0' in string
+					//  pointed by %edi
+	decl	%edi
 1:
-  lodsb        // load byte from %esi
-  stosb        // storre into %edi
-  testb %al, %al
-  jne 1b
-  movl %edx, %eax  // return value
-  popl %esi
-  popl %edi
-  retl
-END_FUNC(strcat)
+	lodsb				// load byte from %esi
+	stosb				// storre into %edi
+	testb	%al, %al
+	jne	1b
+	movl	%edx, %eax		// return value
+	popl	%esi
+	popl	%edi
+	retl
+END(strcat)

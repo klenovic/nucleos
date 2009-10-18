@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Nucleos kernel version: 1.1.0-alpha3
-# Tue Oct 13 12:46:11 2009
+# Sun Oct 18 13:42:04 2009
 #
 CONFIG_X86_32=y
 CONFIG_X86=y
@@ -54,6 +54,10 @@ CONFIG_DEBUG_KERNEL_LOCK_CHECK=y
 # Processor type and features
 #
 CONFIG_M386=y
+# CONFIG_M486 is not set
+# CONFIG_M586 is not set
+# CONFIG_M586TSC is not set
+# CONFIG_M586MMX is not set
 # CONFIG_M686 is not set
 # CONFIG_X86_GENERIC is not set
 CONFIG_HZ_60=y
@@ -130,8 +134,6 @@ CONFIG_BOOTMONITOR_LINKAGE_TYPE=0x20
 #
 # Linkage
 #
-CONFIG_X86_P2ALIGN_16=1
-CONFIG_X86_P2ALIGN=2
 
 #
 # Hacking and debugging

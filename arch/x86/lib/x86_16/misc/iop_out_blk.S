@@ -16,15 +16,15 @@
  * @param count number bytes to read
  * @param m pointer to data
  */
-BEGIN_FUNC(blk_outsb,P2ALIGN_16,0x90)
-  pushl %esi
-  movw  8(%esp), %dx
-  movl  12(%esp), %ecx
-  movl  16(%esp), %esi
-  rep   outsb
-  popl  %esi
-  retl
-END_FUNC(blk_outsb)
+ENTRY16(blk_outsb)
+	pushl	%esi
+	movw	8(%esp), %dx
+	movl	12(%esp), %ecx
+	movl	16(%esp), %esi
+	rep	outsb
+	popl	%esi
+	retl
+END(blk_outsb)
 
 /**
  * void blk_outsw(uint16_t p, uint16_t count, uint16_t* m) ATTR(cdecl);
@@ -34,15 +34,15 @@ END_FUNC(blk_outsb)
  * @param m pointer to data
  */
 
-BEGIN_FUNC(blk_outsw,P2ALIGN_16,0x90)
-  pushl %esi
-  movw  8(%esp), %dx
-  movl  12(%esp), %ecx
-  movl  16(%esp), %esi
-  rep   outsw
-  popl  %esi
-  retl
-END_FUNC(blk_outsw)
+ENTRY16(blk_outsw)
+	pushl	%esi
+	movw	8(%esp), %dx
+	movl	12(%esp), %ecx
+	movl	16(%esp), %esi
+	rep	outsw
+	popl	%esi
+	retl
+END(blk_outsw)
 
 /**
  * void blk_outsl(uint16_t p, uint16_t count, uint32_t* m) ATTR(cdecl);
@@ -51,12 +51,12 @@ END_FUNC(blk_outsw)
  * @param count number 4-bytes to read 
  * @param m pointer to data
  */
-BEGIN_FUNC(blk_outsl,P2ALIGN_16,0x90)
-  pushl %esi
-  movw  8(%esp), %dx
-  movl  12(%esp), %ecx
-  movl  16(%esp), %esi
-  rep   outsl
-  popl  %esi
-  retl
-END_FUNC(blk_outsl)
+ENTRY16(blk_outsl)
+	pushl	%esi
+	movw	8(%esp), %dx
+	movl	12(%esp), %ecx
+	movl	16(%esp), %esi
+	rep	outsl
+	popl	%esi
+	retl
+END(blk_outsl)

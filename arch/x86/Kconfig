@@ -71,19 +71,7 @@ source "drivers/Kconfig"
 source "arch/x86/monitor/Kconfig"
 
 menu "Linkage"
-config X86_P2ALIGN_16
-	int "Default 16-bit code alignment"
-	default "1" if X86_32
-	---help---
-	  Specify 16-bit code alignment. Only exponent value must
-	  be specified thus alignment is 2^exp.
-
-config X86_P2ALIGN
-	int "Default 32-bit code alignment"
-	default "2" if X86_32
-	---help---
-	  Specify 32-bit code alignment. Only exponent value must
-	  be specified thus alignment is 2^exp.
+# @nucleos: add some usefull configs
 endmenu
 
 # Hacking/debugging (common for all components, generic + arch if any)

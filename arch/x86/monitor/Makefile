@@ -9,10 +9,10 @@ BOOT_ENTRY  = bootcode_entry
 HDRLEN      = 0x20
 
 # %.c files
-ccflags-y := -D__CODE16__ -D__KERNEL__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
+ccflags-y := -D__KERNEL__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
 
 # %.S files
-asflags-y := -D__CODE16__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
+asflags-y := -include arch/$(SRCARCH)/include/asm/code16gcc.h
 
 ASFLAGS_boothead.o += -D__HDRLEN__=$(HDRLEN)
 CFLAGS_boot.o      += -I$(src)/../../../

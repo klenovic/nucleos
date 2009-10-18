@@ -24,19 +24,19 @@
 //===========================================================================
 // void monitor();
 // Return to the monitor.
-.globl monitor        // exit Minix and return to the monitor
+.globl monitor				// exit Minix and return to the monitor
 monitor:
-        mov     mon_sp, %esp      // restore monitor stack pointer
-        movw    $SS_SELECTOR, %dx // monitor data segment
-        mov     %dx, %ds
-        mov     %dx, %es
-        mov     %dx, %fs
-        mov     %dx, %gs
-        mov     %dx, %ss
-        pop     %edi
-        pop     %esi
-        pop     %ebp
-        lretw                             // return to the monitor
+	mov	mon_sp, %esp		// restore monitor stack pointer
+	movw	$SS_SELECTOR, %dx	// monitor data segment
+	mov	%dx, %ds
+	mov	%dx, %es
+	mov	%dx, %fs
+	mov	%dx, %gs
+	mov	%dx, %ss
+	pop	%edi
+	pop	%esi
+	pop	%ebp
+	lretw				// return to the monitor
 
 //===========================================================================
 //                             int86
@@ -44,88 +44,88 @@ monitor:
 // void int86();
 .globl int86          // let the monitor make an 8086 interrupt call
 int86:
-        cmpb    $0,mon_return  // is the monitor there?
-        jnz     0f
-        movb    $0x01, %ah     // an int 13 error seems appropriate
-        movb    %ah, reg86+ 0  // reg86.w.f = 1 (set carry flag)
-        movb    %ah, reg86+13  // reg86.b.ah = 0x01 = "invalid command"
-        ret
-0:      push    %ebp           // save C registers
-        push    %esi
-        push    %edi
-        push    %ebx
-        pushf                  // save flags
-        cli                    // no interruptions
+	cmpb	$0,mon_return  // is the monitor there?
+	jnz	0f
+	movb	$0x01, %ah     // an int 13 error seems appropriate
+	movb	%ah, reg86+ 0  // reg86.w.f = 1 (set carry flag)
+	movb	%ah, reg86+13  // reg86.b.ah = 0x01 = "invalid command"
+	ret
+0:      push	%ebp           // save C registers
+	push	%esi
+	push	%edi
+	push	%ebx
+	pushf			// save flags
+	cli			// no interruptions
 
-        inb     $INT2_CTLMASK
-        movb    %al, %ah
-        inb     $INT_CTLMASK
-        push    %eax                   // save interrupt masks
-        mov     irq_use, %eax          // map of in-use IRQ''s
-        and     $~[1<<CLOCK_IRQ], %eax // keep the clock ticking
-        outb    $INT_CTLMASK           // enable all unused IRQ''s and vv.
-        movb    %ah, %al
-        outb    $INT2_CTLMASK
+	inb	$INT2_CTLMASK
+	movb	%al, %ah
+	inb	$INT_CTLMASK
+	push	%eax                   // save interrupt masks
+	mov	irq_use, %eax          // map of in-use IRQ''s
+	and	$~[1<<CLOCK_IRQ], %eax // keep the clock ticking
+	outb	$INT_CTLMASK           // enable all unused IRQ''s and vv.
+	movb	%ah, %al
+	outb	$INT2_CTLMASK
 
-        mov     $SS_SELECTOR, %eax    // monitor data segment
-        mov     %ax, %ss
-        xchg    mon_sp, %esp          // switch stacks
-        push    reg86+36              // parameters used in INT call
-        push    reg86+32
-        push    reg86+28
-        push    reg86+24
-        push    reg86+20
-        push    reg86+16
-        push    reg86+12
-        push    reg86+ 8
-        push    reg86+ 4
-        push    reg86+ 0
-        mov     %ax, %ds              // remaining data selectors
-        mov     %ax, %es
-        mov     %ax, %fs
-        mov     %ax, %gs
-        push    %cs
-        push    $return                  // kernel return address and selector
-        ljmpw    *20+2*4+10*4+2*4(%esp)  // make the call
+	mov	$SS_SELECTOR, %eax    // monitor data segment
+	mov	%ax, %ss
+	xchg	mon_sp, %esp          // switch stacks
+	push	reg86+36              // parameters used in INT call
+	push	reg86+32
+	push	reg86+28
+	push	reg86+24
+	push	reg86+20
+	push	reg86+16
+	push	reg86+12
+	push	reg86+ 8
+	push	reg86+ 4
+	push	reg86+ 0
+	mov	%ax, %ds              // remaining data selectors
+	mov	%ax, %es
+	mov	%ax, %fs
+	mov	%ax, %gs
+	push	%cs
+	push	$return                  // kernel return address and selector
+	ljmpw	*20+2*4+10*4+2*4(%esp)  // make the call
 return:
-        pop     reg86+ 0
-        pop     reg86+ 4
-        pop     reg86+ 8
-        pop     reg86+12
-        pop     reg86+16
-        pop     reg86+20
-        pop     reg86+24
-        pop     reg86+28
-        pop     reg86+32
-        pop     reg86+36
-        lgdt    gdt+GDT_SELECTOR      // reload global descriptor table
-        ljmp    $CS_SELECTOR, $csinit // restore everything
+	pop	reg86+ 0
+	pop	reg86+ 4
+	pop	reg86+ 8
+	pop	reg86+12
+	pop	reg86+16
+	pop	reg86+20
+	pop	reg86+24
+	pop	reg86+28
+	pop	reg86+32
+	pop	reg86+36
+	lgdt	gdt+GDT_SELECTOR      // reload global descriptor table
+	ljmp	$CS_SELECTOR, $csinit // restore everything
 csinit: 
-        mov     $DS_SELECTOR, %eax
-        mov     %ax, %ds
-        mov     %ax, %es
-        mov     %ax, %fs
-        mov     %ax, %gs
-        mov     %ax, %ss
-        xchg    mon_sp, %esp         // unswitch stacks
-        lidt    gdt+IDT_SELECTOR     // reload interrupt descriptor table
-        andb    $~0x02,gdt+TSS_SELECTOR+DESC_ACCESS  // clear TSS busy bit
-        mov     $TSS_SELECTOR, %eax
-        ltr     %ax                 // set TSS register
+	mov	$DS_SELECTOR, %eax
+	mov	%ax, %ds
+	mov	%ax, %es
+	mov	%ax, %fs
+	mov	%ax, %gs
+	mov	%ax, %ss
+	xchg	mon_sp, %esp         // unswitch stacks
+	lidt	gdt+IDT_SELECTOR     // reload interrupt descriptor table
+	andb	$~0x02,gdt+TSS_SELECTOR+DESC_ACCESS  // clear TSS busy bit
+	mov	$TSS_SELECTOR, %eax
+	ltr	%ax                 // set TSS register
 
-        pop     %eax
-        outb    $INT_CTLMASK        // restore interrupt masks
-        movb    %ah, %al
-        outb    $INT2_CTLMASK
+	pop	%eax
+	outb	$INT_CTLMASK        // restore interrupt masks
+	movb	%ah, %al
+	outb	$INT2_CTLMASK
 
-        add     %ecx, lost_ticks    // record lost clock ticks
+	add	%ecx, lost_ticks    // record lost clock ticks
 
-        popf                        // restore flags
-        pop     %ebx                // restore C registers
-        pop     %edi
-        pop     %esi
-        pop     %ebp
-        ret
+	popf                        // restore flags
+	pop	%ebx                // restore C registers
+	pop	%edi
+	pop	%esi
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                             phys_insw
@@ -134,23 +134,23 @@ csinit:
 // Input an array from an I/O port.  Absolute address version of insw().
 .globl phys_insw      // transfer data from (disk controller) port to memory
 phys_insw:
-        push    %ebp
-        mov     %esp, %ebp
-        cld
-        push    %edi
-        push    %es
+	push	%ebp
+	mov	%esp, %ebp
+	cld
+	push	%edi
+	push	%es
 
-        mov     $FLAT_DS_SELECTOR, %ecx
-        mov     %cx, %es
-        mov     8(%ebp), %edx             // port to read from
-        mov     12(%ebp), %edi            // destination addr
-        mov     16(%ebp), %ecx            // byte count
-        shr     $1, %ecx                  // word count
-        rep     insw                      // input many words
-        pop     %es
-        pop     %edi
-        pop     %ebp
-        ret
+	mov	$FLAT_DS_SELECTOR, %ecx
+	mov	%cx, %es
+	mov	8(%ebp), %edx             // port to read from
+	mov	12(%ebp), %edi            // destination addr
+	mov	16(%ebp), %ecx            // byte count
+	shr	$1, %ecx                  // word count
+	rep	insw                      // input many words
+	pop	%es
+	pop	%edi
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                             phys_insb
@@ -159,74 +159,73 @@ phys_insw:
 // Input an array from an I/O port.  Absolute address version of insb().
 .globl phys_insb      // likewise byte by byte
 phys_insb:
-        push    %ebp
-        mov     %esp, %ebp
-        cld
-        push    %edi
-        push    %es
+	push	%ebp
+	mov	%esp, %ebp
+	cld
+	push	%edi
+	push	%es
 
-        mov     $FLAT_DS_SELECTOR, %ecx
-        mov     %cx, %es
-        mov     8(%ebp), %edx             // port to read from
-        mov     12(%ebp), %edi            // destination addr
-        mov     16(%ebp), %ecx            // byte count
-//      shr     $1, %ecx                  // word count
-        rep     insb                      // input many bytes
-        pop     %es
-        pop     %edi
-        pop     %ebp
-        ret
+	mov	$FLAT_DS_SELECTOR, %ecx
+	mov	%cx, %es
+	mov	8(%ebp), %edx             // port to read from
+	mov	12(%ebp), %edi            // destination addr
+	mov	16(%ebp), %ecx            // byte count
+	rep	insb                      // input many bytes
+	pop	%es
+	pop	%edi
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                             phys_outsw
 //===========================================================================
 // void phys_outsw(port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsw().
-        .p2align 4
+	.p2align 4
 .globl phys_outsw     // transfer data from memory to (disk controller) port
 phys_outsw:
-        push    %ebp
-        mov     %esp, %ebp
-        cld
-        push    %esi
-        push    %ds
+	push	%ebp
+	mov	%esp, %ebp
+	cld
+	push	%esi
+	push	%ds
 
-        mov     $FLAT_DS_SELECTOR, %ecx
-        mov     %cx, %ds
-        mov     8(%ebp), %edx             // port to write to
-        mov     12(%ebp), %esi            // source addr
-        mov     16(%ebp), %ecx            // byte count
-        shr     $1, %ecx                  // word count
-        rep     outsw                     // output many words
-        pop     %ds
-        pop     %esi
-        pop     %ebp
-        ret
+	mov	$FLAT_DS_SELECTOR, %ecx
+	mov	%cx, %ds
+	mov	8(%ebp), %edx             // port to write to
+	mov	12(%ebp), %esi            // source addr
+	mov	16(%ebp), %ecx            // byte count
+	shr	$1, %ecx                  // word count
+	rep	outsw                     // output many words
+	pop	%ds
+	pop	%esi
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                             phys_outsb
 //===========================================================================
 // void phys_outsb(port_t port, phys_bytes buf, size_t count);
 // Output an array to an I/O port.  Absolute address version of outsb().
-        .p2align 4
+	.p2align 4
 .globl phys_outsb     // likewise byte by byte
 phys_outsb:
-        push    %ebp
-        mov     %esp, %ebp
-        cld
-        push    %esi
-        push    %ds
+	push	%ebp
+	mov	%esp, %ebp
+	cld
+	push	%esi
+	push	%ds
 
-        mov     $FLAT_DS_SELECTOR, %ecx
-        mov     %cx, %ds
-        mov     8(%ebp), %edx             // port to write to
-        mov     12(%ebp), %esi            // source addr
-        mov     16(%ebp), %ecx            // byte count
-        rep     outsb                     // output many bytes
-        pop     %ds
-        pop     %esi
-        pop     %ebp
-        ret
+	mov	$FLAT_DS_SELECTOR, %ecx
+	mov	%cx, %ds
+	mov	8(%ebp), %edx             // port to write to
+	mov	12(%ebp), %esi            // source addr
+	mov	16(%ebp), %ecx            // byte count
+	rep	outsb                     // output many bytes
+	pop	%ds
+	pop	%esi
+	pop	%ebp
+	ret
 
 //==========================================================================
 //                             enable_irq
@@ -236,32 +235,32 @@ phys_outsb:
 // Equivalent C code for hook->irq < 8:
 //   if ((irq_actids[hook->irq] &= ~hook->id) == 0)
 //      outb(INT_CTLMASK, inb(INT_CTLMASK) & ~(1 << irq));
-        .p2align 4
+	.p2align 4
 .globl intr_unmask     // enable an irq at the 8259 controller
 intr_unmask:
-        push    %ebp
-        mov     %esp, %ebp
-        pushf
-        cli
-        mov     8(%ebp), %eax             // hook
-        mov     8(%eax), %ecx             // irq
-        mov     12(%eax), %eax            // id bit
-        not     %eax
-        and     %eax, irq_actids(,%ecx,4) // clear this id bit
-        jnz     en_done                   // still masked by other handlers?
-        movb    $~1, %ah
-        rolb    %cl, %ah                  // ah = ~(1 << (irq % 8))
-        mov     $INT_CTLMASK, %edx        // enable irq < 8 at the master 8259
-        cmpb    $8, %cl
-        jb      0f
-        mov     $INT2_CTLMASK, %edx       // enable irq >= 8 at the slave 8259
-0:      inb     %dx
-        andb    %ah, %al
-        outb    %dx                       // clear bit at the 8259
+	push	%ebp
+	mov	%esp, %ebp
+	pushf
+	cli
+	mov	8(%ebp), %eax             // hook
+	mov	8(%eax), %ecx             // irq
+	mov	12(%eax), %eax            // id bit
+	not	%eax
+	and	%eax, irq_actids(,%ecx,4) // clear this id bit
+	jnz	en_done                   // still masked by other handlers?
+	movb	$~1, %ah
+	rolb	%cl, %ah                  // ah = ~(1 << (irq % 8))
+	mov	$INT_CTLMASK, %edx        // enable irq < 8 at the master 8259
+	cmpb	$8, %cl
+	jb	0f
+	mov	$INT2_CTLMASK, %edx       // enable irq >= 8 at the slave 8259
+0:      inb	%dx
+	andb	%ah, %al
+	outb	%dx                       // clear bit at the 8259
 en_done:
-        popf
-        leave
-        ret
+	popf
+	leave
+	ret
 
 
 //==========================================================================
@@ -273,37 +272,37 @@ en_done:
 //   irq_actids[hook->irq] |= hook->id;
 //   outb(INT_CTLMASK, inb(INT_CTLMASK) | (1 << irq));
 // Returns true iff the interrupt was not already disabled.
-        .p2align 4
+	.p2align 4
 .globl intr_mask    // disable an irq
 intr_mask:
-        push    %ebp
-        mov     %esp, %ebp
-        pushf
-        cli
-        mov     8(%ebp), %eax             // hook
-        mov     8(%eax), %ecx             // irq
-        mov     12(%eax), %eax            // id bit
-        or      %eax, irq_actids(,%ecx,4) // set this id bit
-        movb    $1, %ah
-        rolb    %cl, %ah                 // ah = (1 << (irq % 8))
-        mov     $INT_CTLMASK, %edx       // disable irq < 8 at the master 8259
-        cmpb    $8, %cl
-        jb      0f
-        mov     $INT2_CTLMASK, %edx      // disable irq >= 8 at the slave 8259
-0:      inb     %dx
-        testb   %ah, %al 
-        jnz     dis_already              // already disabled?
-        orb     %ah, %al
-        outb    %dx                      // set bit at the 8259
-        mov     $1, %eax                 // disabled by this function
-        popf
-        leave
-        ret
+	push	%ebp
+	mov	%esp, %ebp
+	pushf
+	cli
+	mov	8(%ebp), %eax             // hook
+	mov	8(%eax), %ecx             // irq
+	mov	12(%eax), %eax            // id bit
+	or	%eax, irq_actids(,%ecx,4) // set this id bit
+	movb	$1, %ah
+	rolb	%cl, %ah                 // ah = (1 << (irq % 8))
+	mov	$INT_CTLMASK, %edx       // disable irq < 8 at the master 8259
+	cmpb	$8, %cl
+	jb	0f
+	mov	$INT2_CTLMASK, %edx      // disable irq >= 8 at the slave 8259
+0:      inb	%dx
+	testb	%ah, %al 
+	jnz	dis_already              // already disabled?
+	orb	%ah, %al
+	outb	%dx                      // set bit at the 8259
+	mov	$1, %eax                 // disabled by this function
+	popf
+	leave
+	ret
 dis_already:
-        xor     %eax, %eax               // already disabled
-        popf
-        leave
-        ret
+	xor	%eax, %eax               // already disabled
+	popf
+	leave
+	ret
 
 //===========================================================================
 //                             phys_copy
@@ -314,47 +313,47 @@ dis_already:
 
 .set PC_ARGS, 4 + 4 + 4 + 4   // 4 + 4 + 4
 //              es edi esi eip   src dst len
-        .p2align 4
+	.p2align 4
 .globl phys_copy      // copy data from anywhere to anywhere in memory
 phys_copy:
-        cld
-        push    %esi
-        push    %edi
-        push    %es
+	cld
+	push	%esi
+	push	%edi
+	push	%es
 
-        mov     $FLAT_DS_SELECTOR, %eax
-        mov     %ax, %es
+	mov	$FLAT_DS_SELECTOR, %eax
+	mov	%ax, %es
 
-        mov     PC_ARGS(%esp), %esi
-        mov     PC_ARGS+4(%esp), %edi
-        mov     PC_ARGS+4+4(%esp), %eax
+	mov	PC_ARGS(%esp), %esi
+	mov	PC_ARGS+4(%esp), %edi
+	mov	PC_ARGS+4+4(%esp), %eax
 
-        cmp     $10, %eax                // avoid align overhead for small counts
-        jb      pc_small
-        mov     %esi, %ecx               // align source, hope target is too
-        neg     %ecx
-        and     $3, %ecx                 // count for alignment
-        sub     %ecx, %eax
-        rep
-        movsb   %es:(%esi), %es:(%edi)   // @klenovic: this long form is important here
-                                         //         otherwise the source %ds is used for source
-        mov     %eax, %ecx
-        shr     $2, %ecx                 // count of dwords
-        rep
-        movsl   %es:(%esi), %es:(%edi)
-        and     $3, %eax
+	cmp	$10, %eax                // avoid align overhead for small counts
+	jb	pc_small
+	mov	%esi, %ecx               // align source, hope target is too
+	neg	%ecx
+	and	$3, %ecx                 // count for alignment
+	sub	%ecx, %eax
+	rep
+	movsb	%es:(%esi), %es:(%edi)   // @klenovic: this long form is important here
+	                                 //         otherwise the source %ds is used for source
+	mov	%eax, %ecx
+	shr	$2, %ecx                 // count of dwords
+	rep
+	movsl	%es:(%esi), %es:(%edi)
+	and	$3, %eax
 pc_small:
-        xchg    %eax, %ecx               // remainder
-        rep
-        movsb   %es:(%esi), %es:(%edi)
+	xchg	%eax, %ecx               // remainder
+	rep
+	movsb	%es:(%esi), %es:(%edi)
 	mov	$0, %eax			// 0 means no fault
 
 .globl phys_copy_fault
 phys_copy_fault:				// kernel can send us here
-        pop     %es
-        pop     %edi
-        pop     %esi
-        ret
+	pop	%es
+	pop	%edi
+	pop	%esi
+	ret
 
 //===========================================================================
 //                             phys_memset
@@ -362,60 +361,59 @@ phys_copy_fault:				// kernel can send us here
 // void phys_memset(phys_bytes source, unsigned long pattern,
 //      phys_bytes bytecount);
 // Fill a block of physical memory with pattern.
-        .p2align 4
+	.p2align 4
 .globl phys_memset    // write pattern anywhere in memory
 phys_memset:
-        push    %ebp
-        mov     %esp, %ebp
-        push    %esi
-        push    %ebx
-        push    %ds
+	push	%ebp
+	mov	%esp, %ebp
+	push	%esi
+	push	%ebx
+	push	%ds
 
-        mov     8(%ebp), %esi
-        mov     16(%ebp), %eax
-        mov     $FLAT_DS_SELECTOR, %ebx
-        mov     %bx, %ds
-        mov     12(%ebp), %ebx
-        shr     $2, %eax
+	mov	8(%ebp), %esi
+	mov	16(%ebp), %eax
+	mov	$FLAT_DS_SELECTOR, %ebx
+	mov	%bx, %ds
+	mov	12(%ebp), %ebx
+	shr	$2, %eax
 fill_start:
-        mov     %ebx, (%esi)
-        add     $4, %esi
-        dec     %eax
-        jnz     fill_start
-        // Any remaining bytes?
-        mov     16(%ebp), %eax
-        and     $3, %eax
+	mov	%ebx, (%esi)
+	add	$4, %esi
+	dec	%eax
+	jnz	fill_start
+	// Any remaining bytes?
+	mov	16(%ebp), %eax
+	and	$3, %eax
 remain_fill:
-        cmp     $0, %eax
-        jz      fill_done
-        movb    12(%ebp), %bl
-        movb    %bl, (%esi)
-        add     $1, %esi
-        inc     %ebp
-        dec     %eax
-        jmp     remain_fill
+	cmp	$0, %eax
+	jz	fill_done
+	movb	12(%ebp), %bl
+	movb	%bl, (%esi)
+	add	$1, %esi
+	inc	%ebp
+	dec	%eax
+	jmp	remain_fill
 fill_done:
-        pop     %ds
-        pop     %ebx
-        pop     %esi
-        pop     %ebp
-        ret
+	pop	%ds
+	pop	%ebx
+	pop	%esi
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                             mem_rdw
 //===========================================================================
 // u16_t mem_rdw(u16 segment, u16_t *offset);
 // Load and return word at far pointer segment:offset.
-        .p2align 4
+	.p2align 4
 .globl mem_rdw        // copy one word from [segment:offset]
 mem_rdw:
-        mov     %ds, %cx
-        mov     4(%esp), %ds              // segment
-        mov     4+4(%esp), %eax           // offset
-//        movzx   (%eax), %eax              // word to return
-        movzwl  (%eax), %eax              // word to return
-        mov     %cx, %ds
-        ret
+	mov	%ds, %cx
+	mov	4(%esp), %ds              // segment
+	mov	4+4(%esp), %eax           // offset
+	movzwl	(%eax), %eax              // word to return
+	mov	%cx, %ds
+	ret
 
 
 //===========================================================================
@@ -425,8 +423,8 @@ mem_rdw:
 // Reset the system by loading IDT with offset 0 and interrupting.
 .globl reset          // reset the system
 reset:
-        lidt    idt_zero
-        int     $3               // anything goes, the 386 will not like it
+	lidt    idt_zero
+	int     $3               // anything goes, the 386 will not like it
 
 //===========================================================================
 //                             idle_task
@@ -435,15 +433,15 @@ reset:
 idle_task:
 // This task is called when the system has nothing else to do.  The HLT
 // instruction puts the processor in a state where it draws minimum power.
-        push    $_halt
-        call    level0         // level0(halt)
-        pop     %eax
-        jmp     idle_task
+	push	$_halt
+	call	level0         // level0(halt)
+	pop	%eax
+	jmp	idle_task
 _halt:
-        sti
-        hlt
-        cli
-        ret
+	sti
+	hlt
+	cli
+	ret
 
 //===========================================================================
 //                           level0
@@ -454,11 +452,11 @@ _halt:
 //
 .globl level0         // call a function at level 0
 level0:
-        mov     4(%esp), %eax
+	mov	4(%esp), %eax
 	cmpb	$-1, k_reenter
 	jne	direct
-        int     $LEVEL0_VECTOR
-        ret
+	int	$LEVEL0_VECTOR
+	ret
 
 direct:
 	call	*%eax
@@ -469,13 +467,13 @@ direct:
 //===========================================================================
 // unsigned long read_cpu_flags(void);
 // Read CPU status flags from C.
-        .p2align 4
+	.p2align 4
 .globl read_cpu_flags // read the cpu flags
 read_cpu_flags:
-        pushf
-        mov     (%esp), %eax
-        popf
-        ret
+	pushf
+	mov	(%esp), %eax
+	popf
+	ret
 
 
 //===========================================================================
@@ -484,11 +482,11 @@ read_cpu_flags:
 // unsigned long read_cr0(void);
 .globl read_cr0       // read cr0
 read_cr0:
-        push    %ebp
-        mov     %esp, %ebp
-        mov     %cr0, %eax
-        pop     %ebp
-        ret
+	push	%ebp
+	mov	%esp, %ebp
+	mov	%cr0, %eax
+	pop	%ebp
+	ret
 
 //===========================================================================
 //                           write_cr0                                      
@@ -496,14 +494,14 @@ read_cr0:
 // void write_cr0(unsigned long value);
 .globl write_cr0      // write a value in cr0
 write_cr0:
-        push    %ebp
-        mov     %esp, %ebp
-        mov     8(%ebp), %eax
-        mov     %eax, %cr0
-        jmp     0f              // A jump is required for some flags
+	push	%ebp
+	mov	%esp, %ebp
+	mov	8(%ebp), %eax
+	mov	%eax, %cr0
+	jmp	0f              // A jump is required for some flags
 0:
-        pop     %ebp
-        ret
+	pop	%ebp
+	ret
 
 //===========================================================================*
 //                            read_cr4                                       *
@@ -511,11 +509,11 @@ write_cr0:
 // unsigned long read_cr4(void);
 .globl read_cr4
 read_cr4:
-        push    %ebp
-        mov     %esp, %ebp
-        mov     %cr4, %eax
-        pop     %ebp
-        ret
+	push	%ebp
+	mov	%esp, %ebp
+	mov	%cr4, %eax
+	pop	%ebp
+	ret
 
 //===========================================================================*
 //                            write_cr4                                      *
@@ -557,8 +555,8 @@ read_ss:
 .globl getcr3val
 getcr3val:
 	mov	%cr3, %eax
-	mov	 %eax, thecr3
+	mov	%eax, thecr3
 	ret
 
 .section .data
-idt_zero: .long  0, 0
+idt_zero: .long 0, 0

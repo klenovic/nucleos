@@ -10,20 +10,20 @@
 #include <nucleos/linkage.h>
 
 /* char* strcpy(char* dst, const char* src) __attribute__((cdecl)) */
-BEGIN_FUNC(strcpy,P2ALIGN_16,0x90)
-  pushl %edi
-  pushl %esi
-  movl 16(%esp), %esi // get src
-  movl 12(%esp), %edi // get dst
-  movl %edi, %edx     // save dst
+ENTRY16(strcpy)
+	pushl	%edi
+	pushl	%esi
+	movl	16(%esp), %esi	// get src
+	movl	12(%esp), %edi	// get dst
+	movl	%edi, %edx	// save dst
 1:
-  cld
-  lodsb           // load byte
-  stosb           // set byte
-  testb %al,%al   // '\0'?
-  jne 1b          // repeat if not
-  movl %edx, %eax // set %eax = dst
-  popl %esi
-  popl %edi
-  retl
-END_FUNC(strcpy)
+	cld
+	lodsb			// load byte
+	stosb			// set byte
+	testb	%al,%al		// '\0'?
+	jne	1b		// repeat if not
+	movl	%edx, %eax	// set %eax = dst
+	popl	%esi
+	popl	%edi
+	retl
+END(strcpy)

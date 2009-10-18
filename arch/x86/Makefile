@@ -11,13 +11,23 @@ endif
 export BITS
 
 ifeq ($(CONFIG_X86_32),y)
-	BITS := 32
+        BITS := 32
+        UTS_MACHINE := i386
+        CHECKFLAGS += -D__i386__
+
         biarch := $(call cc-option,-m32)
         KBUILD_AFLAGS += $(biarch)
         KBUILD_CFLAGS += $(biarch)
 
+        # @nucleos: fp code will forbiden inside kernel (enable it then). Current code contains some
+        #           fp code (see readclock.drv) thus the kernel won't compile with this option.
+        # KBUILD_CFLAGS += -msoft-float
+
+        # @nucleos: doesn't work with these
+        # KBUILD_CFLAGS += -msoft-float -mregparm=3 -freg-struct-return
+
+        # prevent gcc from keeping the stack 16 byte aligned
         KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2)
-        KBUILD_CPPFLAGS += -D__CODE32__
 
         # include compiler stuffs
         include arch/$(SRCARCH)/Makefile_32.cpu

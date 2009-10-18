@@ -15,11 +15,11 @@
  * @param p port
  * @return 1-byte data
  */
-BEGIN_FUNC(inb,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  inb %dx, %al
-  retl
-END_FUNC(inb)
+ENTRY16(inb)
+	movw	4(%esp), %dx
+	inb	%dx, %al
+	retl
+END(inb)
 
 /**
  * uint16_t inw(uint16_t p)
@@ -27,11 +27,11 @@ END_FUNC(inb)
  * @param p port
  * @return 2-bytes data
  */
-BEGIN_FUNC(inw,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  inw %dx, %ax
-  retl
-END_FUNC(inb)
+ENTRY16(inw)
+	movw	4(%esp), %dx
+	inw	%dx, %ax
+	retl
+END(inb)
 
 /**
  * uint32_t inl(uint16_t p)
@@ -39,8 +39,8 @@ END_FUNC(inb)
  * @param p port
  * @return 4-bytes data
  */
-BEGIN_FUNC(inl,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  inl %dx, %eax
-  retl
-END_FUNC(inb)
+ENTRY16(inl)
+	movw	4(%esp), %dx
+	inl	%dx, %eax
+	retl
+END(inb)

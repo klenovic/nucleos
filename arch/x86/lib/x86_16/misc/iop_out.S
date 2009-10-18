@@ -15,12 +15,12 @@
  * @param p port
  * @param d data
  */
-BEGIN_FUNC(outb,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  movb 8(%esp), %al
-  outb %al, %dx
-  retl
-END_FUNC(outb)
+ENTRY16(outb)
+	movw	4(%esp), %dx
+	movb	8(%esp), %al
+	outb	%al, %dx
+	retl
+END(outb)
 
 /**
  * void outw(uint16_t p, uint16_t d) ATTR(cdecl);
@@ -28,12 +28,12 @@ END_FUNC(outb)
  * @param p port
  * @param d data
  */
-BEGIN_FUNC(outw,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  movw 8(%esp), %ax
-  outw %ax, %dx
-  retl
-END_FUNC(outw)
+ENTRY16(outw)
+	movw	4(%esp), %dx
+	movw	8(%esp), %ax
+	outw	%ax, %dx
+	retl
+END(outw)
 
 /**
  * void outl(uint16_t p, uint32_t d) ATTR(cdecl);
@@ -41,9 +41,9 @@ END_FUNC(outw)
  * @param p port
  * @param d data
  */
-BEGIN_FUNC(outl,P2ALIGN_16,0x90)
-  movw 4(%esp), %dx
-  movl 8(%esp), %eax
-  outl %eax, %dx
-  retl
-END_FUNC(outl)
+ENTRY16(outl)
+	movw	4(%esp), %dx
+	movl	8(%esp), %eax
+	outl	%eax, %dx
+	retl
+END(outl)

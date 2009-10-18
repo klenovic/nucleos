@@ -10,24 +10,24 @@
 #include <nucleos/linkage.h>
 
 /* void* memcpy(void* dst, const void* src, uint32_t n) __attribute__((cdecl)) */
-BEGIN_FUNC(memcpy,P2ALIGN_16,0x90)
-  pushl %esi
-  pushl %edi
-  movl 12(%esp), %edx // destination
-  movl 20(%esp), %ecx // count
-  testl %ecx, %ecx
-  je 1f
-  movl %edx, %edi
-  movl 16(%esp), %esi // source
-  shrl $2, %ecx  // copy per 4-byte
-  cld
-  rep movsl
-  movl 20(%esp), %ecx // count
-  andl $3, %ecx
-  rep movsb       // copy per 1-byte
+ENTRY16(memcpy)
+	pushl	%esi
+	pushl	%edi
+	movl	12(%esp), %edx	// destination
+	movl	20(%esp), %ecx	// count
+	testl	%ecx, %ecx
+	je	1f
+	movl	%edx, %edi
+	movl	16(%esp), %esi	// source
+	shrl	$2, %ecx	// copy per 4-byte
+	cld
+	rep	movsl
+	movl	20(%esp), %ecx	// count
+	andl	$3, %ecx
+	rep	movsb		// copy per 1-byte
 1:
-  movl %edx, %eax // return value
-  popl %edi
-  popl %esi
-  retl
-END_FUNC(memcpy)
+	movl	%edx, %eax	// return value
+	popl	%edi
+	popl	%esi
+	retl
+END(memcpy)

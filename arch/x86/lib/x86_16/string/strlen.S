@@ -10,17 +10,17 @@
 #include <nucleos/linkage.h>
 
 /* uint32_t strlen(const char* s) __attribute__((cdecl)) */
-BEGIN_FUNC(strlen,P2ALIGN_16,0x90)
-  pushl %edi
-  xorl %eax, %eax    // '\0' we are looking for
-  movl 8(%esp), %edi // destination
-  orl $-1, %ecx      // set max. value (for repne
-                     //  termination condition)
-  cld
-  repne scasb
-  notl %ecx          // get the value
-  decl %ecx
-  movl %ecx, %eax
-  popl %edi
-  retl
-END_FUNC(strlen)
+ENTRY16(strlen)
+	pushl %edi
+	xorl %eax, %eax		// '\0' we are looking for
+	movl 8(%esp), %edi	// destination
+	orl $-1, %ecx		// set max. value (for repne
+				//  termination condition)
+	cld
+	repne scasb
+	notl %ecx		// get the value
+	decl %ecx
+	movl %ecx, %eax
+	popl %edi
+	retl
+END(strlen)
