@@ -15,6 +15,7 @@
  */
 #include <nucleos/types.h>
 #include <nucleos/type.h>
+#include <kernel/kipc.h>
 
 /*==========================================================================* 
  * Types relating to messages. 						    *
@@ -223,12 +224,39 @@ typedef struct asynmsg {
 #define AMF_NOTIFY	4	/* Send a notification when AMF_DONE is set */
 #define AMF_NOREPLY	8	/* Not a reply message for a SENDREC */
 
-/* kernel ipc */
-int kipc_notify(endpoint_t dest);
-int kipc_sendrec(endpoint_t src_dest, message *m_ptr);
-int kipc_receive(endpoint_t src, message *m_ptr);
-int kipc_send(endpoint_t dest, message *m_ptr);
-int kipc_sendnb(endpoint_t dest, message *m_ptr);
-int kipc_senda(asynmsg_t *table, size_t count);
+#include <asm/kipc.h>
+
+/* Kernel ipc routines. The __kipc_* are the arch-dependent implementation.
+   Make them as fast as possible.
+ */
+static inline int kipc_notify(endpoint_t dst)
+{
+	return __kipc_notify(dst);
+}
+
+static inline int kipc_receive(endpoint_t src, message *m_ptr)
+{
+	return __kipc_receive(src, m_ptr);
+}
+
+static inline int kipc_send(endpoint_t dst, message *m_ptr)
+{
+	return __kipc_send(dst, m_ptr);
+}
+
+static inline int kipc_senda(asynmsg_t *table, size_t count)
+{
+	return __kipc_senda(table, count);
+}
+
+static inline int kipc_sendnb(endpoint_t dst, message *m_ptr)
+{
+	return __kipc_sendnb(dst, m_ptr);
+}
+
+static inline int kipc_sendrec(endpoint_t src_dst, message *m_ptr)
+{
+	return __kipc_sendrec(src_dst, m_ptr);
+}
 
 #endif /* __NUCLEOS_KIPC_H */
