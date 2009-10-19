@@ -226,7 +226,7 @@ typedef struct asynmsg {
 
 #include <asm/kipc.h>
 
-/* Kernel ipc routines. The __kipc_* are the arch-dependent implementation.
+/* Kernel ipc routines. The __kipc_* are the arch-dependent implementations.
    Make them as fast as possible.
  */
 static inline int kipc_notify(endpoint_t dst)
