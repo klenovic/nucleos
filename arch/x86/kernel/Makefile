@@ -1,8 +1,9 @@
 # Makefile for kernel
 app-y := kernel.elf32
 kernel.elf32-obj-y := arch_do_vmctl.o clock.o do_int86.o do_iopenable.o \
-	              do_readbios.o do_sdevio.o exception.o i8259.o \
-	              klib386.o memory.o mpx386.o protect.o system.o
+		      do_readbios.o do_sdevio.o exception.o i8259.o \
+		      klib386.o memory.o mpx386.o protect.o system.o \
+		      map_scall.o
 
 ccflags-y := -D__KERNEL__
 asflags-y := -D__KERNEL__

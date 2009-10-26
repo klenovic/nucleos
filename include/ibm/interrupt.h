@@ -31,9 +31,9 @@
 #define OVERFLOW_VECTOR    4	/* from INTO */
 
 /* Fixed system call vector. */
-#define SYS_VECTOR        32	/* system calls are made with int SYSVEC */
-#define SYS386_VECTOR     33	/* except 386 system calls use this */
-#define LEVEL0_VECTOR     34	/* for execution of a function at level 0 */
+#define SYSCALL_VECTOR	0x80	/* nucleos i386 system calls use this */
+#define SYS386_VECTOR	0x21	/* legacy minix i386 system calls use this */
+#define LEVEL0_VECTOR	0x22	/* for execution of a function at level 0 */
 
 /* Suitable irq bases for hardware interrupts.  Reprogram the 8259(s) from
  * the PC BIOS defaults since the BIOS doesn't respect all the processor's

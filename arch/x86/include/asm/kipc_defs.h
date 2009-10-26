@@ -7,18 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/unistd.h>
-#include <nucleos/string.h>
+#ifndef __ASM_X86_KIPC_DEFS_H
+#define __ASM_X86_KIPC_DEFS_H
 
-int readlink(const char *name, char *buffer, size_t bufsiz)
-{
-  message m;
+/* Note that this header can be included in assembly file */
 
-  m.m1_i1 = strlen(name) + 1;
-  m.m1_i2 = bufsiz;
-  m.m1_p1 = (char *) name;
-  m.m1_p2 = (char *) buffer;
+#define KIPC_MESSAGE_SIZE	36 /* size of `message' structure in bytes */
 
-  return(_syscall(FS_PROC_NR, __NR_readlink, &m));
-}
+#endif /* __ASM_X86_KIPC_DEFS_H */

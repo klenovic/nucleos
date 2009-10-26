@@ -52,6 +52,8 @@
 
 #include <nucleos/const.h>
 #include <nucleos/com.h>
+#include <nucleos/kipc_defs.h>
+#include <nucleos/linkage.h>
 #include <ibm/interrupt.h>
 #include <asm/kernel/const.h>
 #include <kernel/const.h>
@@ -121,7 +123,6 @@
 .globl hwint15
 
 .globl s_call
-.globl p_s_call
 .globl level0_call
 
 /* @nucleos: All these flags are used and defined by monitor. So this
@@ -355,11 +356,43 @@ set_restart1:
 	jmp	*RETADR-P_STACKBASE(%eax)
 
 //===========================================================================
+//                             system_call (0x80)
+//===========================================================================
+ENTRY(system_call)
+	cld			// set direction flag to a known value
+	sub	$4, %esp	// skip RETADR, eax, ecx, edx, ebx, est
+	pusha			// save general registers
+	pushw	%ds
+	pushw	%es
+	pushw	%fs
+	pushw	%gs
+
+	mov	%ss, %si		// ss is kernel data segment
+	mov	%si, %ds		// load rest of kernel segments
+	mov	%si, %es		// kernel does not use fs, gs
+	incb	k_reenter		// increment kernel entry count
+	mov	%esp, %esi		// assumes P_STACKBASE == 0
+	mov	$k_stktop, %esp
+	xor	%ebp, %ebp		// for stacktrace
+					// end of inline save
+					// now set up parameters for sys_call()
+
+	mov	SPREG(%esi), %ebx	/* user pointer (must create some extra space on stack) */
+	push	%esi			/* where we can read syscall arguments*/
+					/*   i.e. pt_regs structure */
+	push	%ebx			/* space for output message pointer */
+	call	map_scall_endpt		/* create a message from passed values
+					     and prepare registers for sys_call.
+					     and return the endpoint */
+	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
+
+	jmp	do_system_call		/* do the system call */
+
+//===========================================================================
 //                             _s_call
 //===========================================================================
 	.p2align 4
 s_call:
-p_s_call:
 	cld			// set direction flag to a known value
 	sub	$4, %esp	// skip RETADR, eax, ecx, edx, ebx, est
 	pusha			// save general registers
@@ -370,16 +403,20 @@ p_s_call:
 	mov	%ss, %si		// ss is kernel data segment
 	mov	%si, %ds		// load rest of kernel segments
 	mov	%si, %es		// kernel does not use fs, gs
+
 	incb	k_reenter		// increment kernel entry count
 	mov	%esp, %esi		// assumes P_STACKBASE == 0
 	mov	$k_stktop, %esp
 	xor	%ebp, %ebp		// for stacktrace
 					// end of inline save
 					// now set up parameters for sys_call()
-	push	%edx			// event set or flags bit map 
-	push	%ebx			// pointer to user message
-	push	%eax			// source / destination
-	push	%ecx			// call number (ipc primitive to use)
+
+do_system_call:
+	push	%edx			/* event set or flags bit map
+					   @nucleos: realy used? */
+	push	%ebx			/* pointer to user message */
+	push	%eax			/* source / destination */
+	push	%ecx			/* call number (ipc primitive to use) */
 
 	call	sys_call		// sys_call(call_nr, src_dst, m_ptr, bit_map)
 					// caller is now explicitly in proc_ptr
@@ -584,9 +621,6 @@ level0_call:
 	mov	AXREG(%eax), %eax
 	jmp	*%eax
 
-//===========================================================================
-//                             rodata
-//===========================================================================
 .section .bss
 
 /* Kernel stack */

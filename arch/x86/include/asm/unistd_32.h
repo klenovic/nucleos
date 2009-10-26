@@ -55,7 +55,7 @@
 #define __NR_setgid		46
 #define __NR_getgid		47
 #define __NR_signal		48
-#define __NR_rdlnk		49
+#define __NR_readlink		49
 #define __NR_lstat		50
 #define __NR_ioctl		54
 #define __NR_fcntl		55

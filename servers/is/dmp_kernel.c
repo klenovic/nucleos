@@ -17,7 +17,6 @@
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
-#include <kernel/kipc.h>
 
 #define LINES 22
 

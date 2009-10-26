@@ -22,6 +22,7 @@
  */
 #include <nucleos/com.h>
 #include <nucleos/signal.h>
+#include <nucleos/timer.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <asm/kernel/types.h>

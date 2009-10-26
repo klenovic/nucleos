@@ -10,22 +10,16 @@
 #ifndef __NUCLEOS_KIPC_H
 #define __NUCLEOS_KIPC_H
 
-/* This header file defines constants for MINIX inter-process communication.
+/* This header file defines constants for nucleos inter-process communication.
  * These definitions are used in the file proc.c.
  */
 #include <nucleos/types.h>
 #include <nucleos/type.h>
-#include <kernel/kipc.h>
+#include <nucleos/kipc_defs.h>
 
 /*==========================================================================* 
  * Types relating to messages. 						    *
  *==========================================================================*/ 
-
-/* message flags */
-#define KIPC_FLG_M1		1	/* string is not in messge? */
-#define KIPC_FLG_M3		3	/* string is in message */
-#define KIPC_FLG_M4		4	/* ? */
-#define KIPC_FLG_M3_STRLEN	14	/* string length */
 
 typedef struct {
 	int m1i1;
@@ -214,15 +208,6 @@ typedef struct asynmsg {
 	int result;
 	message msg;
 } asynmsg_t;
-
-/* Defines for flags field */
-#define AMF_EMPTY	0	/* slot is not inuse */
-#define AMF_VALID	1	/* slot contains message */
-#define AMF_DONE	2	/* Kernel has processed the message. The
-				 * result is stored in 'result'
-				 */
-#define AMF_NOTIFY	4	/* Send a notification when AMF_DONE is set */
-#define AMF_NOREPLY	8	/* Not a reply message for a SENDREC */
 
 #include <asm/kipc.h>
 

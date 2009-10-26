@@ -13,6 +13,8 @@
 #ifndef __NUCLEOS_PTRACE_H
 #define __NUCLEOS_PTRACE_H
 
+#include <asm/ptrace.h>
+
 /* Trace requests. */
 #define T_STOP	       -1	/* stop the process */
 #define T_OK		0	/* enable tracing by parent for this process */
@@ -41,7 +43,8 @@
 #define TO_TRACEFORK	0x1	/* automatically attach to forked children */
 #define TO_ALTEXEC	0x2	/* send SIGSTOP on successful exec() */
 
-/* Function Prototypes. */
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 long ptrace(int _req, pid_t _pid, long _addr, long _data);
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_PTRACE_H */

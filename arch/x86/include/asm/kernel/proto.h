@@ -54,7 +54,8 @@ void copr_error(void);
 
 /* Software interrupt handlers, in numerical order. */
 void trp(void);
-void s_call(void), p_s_call(void); 
+void s_call(void);		/* internal comunication */
+extern void system_call(void);	/* nucleos system call (C library) */
 void level0_call(void);
 
 /* memory.c */

@@ -256,7 +256,13 @@ void idt_init(void)
 		{ general_protection, PROTECTION_VECTOR, INTR_PRIVILEGE },
 		{ page_fault, PAGE_FAULT_VECTOR, INTR_PRIVILEGE },
 		{ copr_error, COPROC_ERR_VECTOR, INTR_PRIVILEGE },
-		{ s_call, SYS386_VECTOR, USER_PRIVILEGE },/* 386 system call */
+
+		/* internal communication */
+		{ s_call, SYS386_VECTOR, USER_PRIVILEGE },
+
+		/* nucleos i386 system call */
+		{ system_call, SYSCALL_VECTOR, USER_PRIVILEGE },
+
 		{ level0_call, LEVEL0_VECTOR, TASK_PRIVILEGE },
 		{ NULL, 0, 0}
 	};

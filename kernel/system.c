@@ -41,7 +41,7 @@
 #include <kernel/kernel.h>
 #include <kernel/system.h>
 #include <kernel/proc.h>
-#include <kernel/kipc.h>
+#include <nucleos/kipc.h>
 #include <kernel/vm.h>
 #include <stdlib.h>
 #include <nucleos/signal.h>

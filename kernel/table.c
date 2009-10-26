@@ -19,9 +19,9 @@
  *    Oct 17, 2004   updated above and tasktab comments  (Jorrit N. Herder)
  *    May 01, 2004   changed struct for system image  (Jorrit N. Herder)
  */
+#include <nucleos/kipc.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <kernel/kipc.h>
 #include <nucleos/com.h>
 
 /* Variables relating to shutting down MINIX. */

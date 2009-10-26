@@ -51,7 +51,7 @@
 #include <nucleos/u64.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
-#include <kernel/kipc.h>
+#include <nucleos/kipc.h>
 #include <kernel/vm.h>
 
 /* The process table and pointers to process table slots. The pointers allow
@@ -561,6 +561,7 @@ int flags;
 	sizeof(message)))) {
 	return -EFAULT;
   }
+
   dst_p = _ENDPOINT_P(dst_e);
   dst_ptr = proc_addr(dst_p);
 
@@ -597,6 +598,7 @@ int flags;
 	*xpp = caller_ptr;			/* add caller to end */
 	caller_ptr->p_q_link = NIL_PROC;	/* mark new end of list */
   }
+
   return 0;
 }
 
@@ -642,7 +644,6 @@ int flags;
 		return -ESRCDIED;
 	}
   }
-
 
   /* Check to see if a message from desired source is already available.
    * The caller's SENDING flag may be set if KIPC_SENDREC couldn't send. If it is
