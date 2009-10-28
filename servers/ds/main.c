@@ -171,6 +171,6 @@ message *m_ptr;				/* message buffer */
     s = kipc_send(who_e, m_ptr);    /* send the message */
 
     if (s != 0)
-        panic("DS", "unable to send reply!", s);
+        printf("DS: unable to send reply to %d: %d\n", who_e, s);
 }
 
