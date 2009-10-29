@@ -34,9 +34,6 @@ int report_reboot;       /* During reboot to report to FS_PROC_NR that we are re
 int abort_flag;
 char monitor_code[256];
 
-/* Miscellaneous */
-char core_name[] = "core";	/* file name where core images are produced */
-
 int (*call_vec[])(void) = {
 	no_sys,		/*  0 = unused	*/
 	do_exit,	/*  1 = exit	*/
