@@ -48,15 +48,14 @@
    Some data storage is also allocated at the end of this file. This data 
    will be at the start of the data segment of the kernel and will be read
    and modified by the boot monitor before the kernel starts. */
-#include <asm/servers/vm/vm.h>
-
 #include <nucleos/const.h>
 #include <nucleos/com.h>
 #include <nucleos/kipc_defs.h>
 #include <nucleos/linkage.h>
-#include <ibm/interrupt.h>
-#include <asm/kernel/const.h>
 #include <kernel/const.h>
+#include <asm/irq_vectors.h>
+#include <asm/servers/vm/vm.h>
+#include <asm/kernel/const.h>
 #include <asm/page.h>
 
 #include "sconst.S"

@@ -11,12 +11,12 @@
 #include <nucleos/kernel.h>
 #include "inc.h"
 #include <nucleos/timer.h>
-#include <ibm/interrupt.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/sysutil.h>
 #include <kernel/const.h>
 #include <kernel/type.h>
 #include <kernel/proc.h>
+#include <asm/irq_vectors.h>
 
 #define LINES 22
 

@@ -173,7 +173,7 @@ struct kmessages {
 	char km_buf[KMESS_BUF_SIZE];          /* buffer for messages */
 };
 
-#include <ibm/interrupt.h>
+#include <asm/irq_vectors.h>
 
 /* randomness struct: random sources after interrupts: */
 #define RANDOM_SOURCES			NR_IRQ_VECTORS

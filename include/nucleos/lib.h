@@ -23,6 +23,7 @@
 #include <nucleos/type.h>
 #include <nucleos/unistd.h>
 #include <nucleos/kipc.h>
+#include <asm/syscall.h>
 
 int _syscall(int _who, int _syscallnr, message *_msgptr);
 void _loadname(const char *_name, message *_msgptr);

@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/const.h>
-#include <ibm/interrupt.h>
+#include <asm/irq_vectors.h>
 #include <asm/kernel/const.h>
 #include <kernel/const.h>
 

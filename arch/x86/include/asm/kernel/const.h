@@ -11,7 +11,7 @@
 #ifndef __ASM_X86_KERNEL_CONST_H
 #define __ASM_X86_KERNEL_CONST_H
 
-#include <ibm/interrupt.h>
+#include <asm/irq_vectors.h>
 #include <ibm/memory.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)

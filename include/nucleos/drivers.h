@@ -22,7 +22,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/bitmap.h>
 
-#include <ibm/interrupt.h>	/* IRQ vectors and miscellaneous ports */
+#include <asm/irq_vectors.h>	/* IRQ vectors and miscellaneous ports */
 #include <ibm/bios.h>		/* BIOS index numbers */
 #include <ibm/ports.h>		/* Well-known ports */
 

@@ -11,7 +11,7 @@
 #define TYPE_H
 
 #include <nucleos/com.h>
-#include <ibm/interrupt.h>
+#include <asm/irq_vectors.h>
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
 
