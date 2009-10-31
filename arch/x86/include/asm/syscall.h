@@ -10,30 +10,24 @@
 #ifndef __ASM_X86_SYSCALL_H
 #define __ASM_X86_SYSCALL_H
 
-#include <nucleos/types.h>
-#include <nucleos/type.h>
-#include <nucleos/kipc_defs.h> /* for KIPC_MESSAGE_SIZE */
-#include <nucleos/stringify.h>
-#include <asm/irq_vectors.h>
-
 /*
  * @nucleos: This is just a brainstorming proposal (temporaly here).
  *           Took from glibc to test how this could work.
  */
 
-/* Alloc KIPC_MESSAGE_SIZE bytes on process stack. It is actually the message which
+/* Alloc 36 bytes (KIPC_MESSAGE_SIZE) on process's stack. It's actually the message which
  * used by kernel then.
  *
- * @nucleos: This allocation will be removed once the system call is re-designed
- *           in way that it doesn't the message in user space.
+ * @nucleos: This allocation will be removed once the system call stuff is re-designed
+ *           in way that it doesn't use the message from user space.
  */
-#define ASM_SYSCALL_ALLOC_MESSAGE	"sub $" __stringify(KIPC_MESSAGE_SIZE) ", %%esp\t\n"
+#define ASM_SYSCALL_ALLOC_MESSAGE	"sub $36, %%esp\t\n"
 
-/* Call the kernel to perform the system call */
-#define ASM_SYSCALL_CALL_SYSTEM		"int $" __stringify(SYSCALL_VECTOR) "\t\n"
+/* Call the kernel to perform the system call (SYSCALL_VECTOR) */
+#define ASM_SYSCALL_CALL_SYSTEM		"int $0x80\t\n"
 
 /* Cleanup stack from message */
-#define ASM_SYSCALL_DEALLOC_MESSAGE	"add $" __stringify(KIPC_MESSAGE_SIZE) ", %%esp\t\n"
+#define ASM_SYSCALL_DEALLOC_MESSAGE	"add $36, %%esp\t\n"
 
 /* Get return code which was saved in message */
 #define ASM_SYSCALL_GET_MSGRC		"mov 4(%%esp), %%eax\n\t"
@@ -225,5 +219,11 @@
 #else
 # define EXTRAVAR_5
 #endif
+
+#if defined(__KERNEL__) || defined(__UKERNEL__)
+
+/* @nucleos: define some usefull stuffs here (see linux source) */
+
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __ASM_X86_SYSCALL_H */
