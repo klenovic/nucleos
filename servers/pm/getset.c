@@ -35,22 +35,16 @@ int do_get()
 	case __NR_getuid:
 		r = rmp->mp_realuid;
 		rmp->mp_reply.reply_res2 = rmp->mp_effuid;
-		if (pm_isokendpt(m_in.PM_ENDPT, &proc) == 0 && proc >= 0)
-			rmp->mp_reply.reply_res3 = mproc[proc].mp_effuid;
 		break;
 
 	case __NR_getgid:
 		r = rmp->mp_realgid;
 		rmp->mp_reply.reply_res2 = rmp->mp_effgid;
-		if (pm_isokendpt(m_in.PM_ENDPT, &proc) == 0 && proc >= 0)
-			rmp->mp_reply.reply_res3 = mproc[proc].mp_effgid;
 		break;
 
 	case __NR_getpid:
 		r = mproc[who_p].mp_pid;
 		rmp->mp_reply.reply_res2 = mproc[rmp->mp_parent].mp_pid;
-		if(pm_isokendpt(m_in.PM_ENDPT, &proc) == 0 && proc >= 0)
-			rmp->mp_reply.reply_res3 = mproc[proc].mp_pid;
 		break;
 
 	case __NR_getpgrp:

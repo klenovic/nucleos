@@ -25,7 +25,6 @@ void privileges_dmp(void);
 void image_dmp(void);
 void irqtab_dmp(void);
 void kmessages_dmp(void);
-void sched_dmp(void);
 void monparams_dmp(void);
 void kenv_dmp(void);
 void timing_dmp(void);
@@ -33,7 +32,6 @@ void timing_dmp(void);
 /* dmp_pm.c */
 void mproc_dmp(void);
 void sigaction_dmp(void);
-void holes_dmp(void);
 
 /* dmp_fs.c */
 void dtab_dmp(void);

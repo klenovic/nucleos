@@ -136,8 +136,8 @@ int main()
 	case __NR_getprocnr:
 		result= do_getprocnr();
 		break;
-	case __NR_getpuid:
-		result= do_getpuid();
+	case __NR_getepinfo:
+		result= do_getepinfo();
 		break;
 	default:
 		/* Else, if the system call number is valid, perform the

@@ -65,9 +65,6 @@ int inval_filp(struct filp *);
 /* fscall.c */
 void nested_fs_call(message *m);
 
-/* kputc.c */
-void diag_repl(void);
-
 /* link.c */
 int do_link(void);
 int do_unlink(void);
@@ -137,7 +134,6 @@ void revive(int proc_nr, int bytes);
 void suspend(int task);
 void pipe_suspend(int rw_flag, int fd_nr, char *buf, size_t size);
 int select_request_pipe(struct filp *f, int *ops, int bl);
-int select_cancel_pipe(struct filp *f);
 int select_match_pipe(struct filp *f);
 void unsuspend_by_endpt(endpoint_t);
 void select_reply1(void);

@@ -84,33 +84,14 @@ int fs_unlink_s(void);
 int truncate_inode(struct inode *rip, off_t len);
 int freesp_inode(struct inode *rip, off_t st, off_t end);
 
-/* lock.c */
-int lock_op(struct filp *f, int req);
-void lock_revive(void);
-
 /* main.c */
 void reply(int who, message *m_out);
-
-/* misc.c */
-int do_dup(void);
-int do_exit(void);
-int do_fcntl(void);
-int do_exec(void);
-int do_revive(void);
-int do_set(void);
-int do_sync(void);
-int do_fsync(void);
-int do_reboot(void);
-int do_svrctl(void);
-int do_getsysinfo(void);
 
 /* mount.c */
 int fs_mountpoint_o(void);
 int fs_mountpoint_s(void);
 int fs_readsuper_o(void);
 int fs_readsuper_s(void);
-int do_mount(void);
-int do_umount(void);
 int unmount(dev_t dev);
 
 /* open.c */
@@ -123,13 +104,6 @@ int fs_mknod_s(void);
 int fs_slink_o(void);
 int fs_slink_s(void);
 int fs_newnode(void);
-int do_close(void);
-int do_creat(void);
-int do_lseek(void);
-int do_mknod(void);
-int do_mkdir(void);
-int do_open(void);
-int do_slink(void);
 
 /* path.c */
 int lookup_o(void);
@@ -144,10 +118,6 @@ struct inode *parse_path_o(char *path, char string[NAME_MAX], int action);
 
 /* protect.c */
 int fs_access_o(void);
-int do_access(void);
-int do_chmod(void);
-int do_chown(void);
-int do_umask(void);
 int forbidden(struct inode *rip, mode_t access_desired);
 int read_only(struct inode *ip);
 
@@ -156,22 +126,11 @@ int fs_breadwrite_o(void);
 int fs_breadwrite_s(void);
 int fs_readwrite_o(void);
 int fs_readwrite_s(void);
-int do_read(void);
 struct buf *rahead(struct inode *rip, block_t baseblock, u64_t position, unsigned bytes_ahead);
 void read_ahead(void);
 block_t read_map(struct inode *rip, off_t pos);
 int read_write(int rw_flag);
 zone_t rd_indir(struct buf *bp, int index);
-
-/* stadir.c */
-int do_chdir(void);
-int do_fchdir(void);
-int do_chroot(void);
-int do_fstat(void);
-int do_stat(void);
-int do_fstatfs(void);
-int do_rdlink(void);
-int do_lstat(void);
 
 /* super.c */
 bit_t alloc_bit(struct super_block *sp, int map, bit_t origin);
@@ -181,25 +140,16 @@ int mounted(struct inode *rip);
 int read_super(struct super_block *sp);
 int get_block_size(dev_t dev);
 
-/* time.c */
-int do_stime(void);
-int do_utime(void);
-
 /* utility.c */
 time_t clock_time(void);
 unsigned conv2(int norm, int w);
 long conv4(int norm, long x);
-int fetch_name(char *path, int len, int flag);
 int no_sys(void);
-int isokendpt_f(char *f, int l, int e, int *p, int ft);
 void mfs_nul_f(char *file, int line, char *str, int len, int maxlen);
 int mfs_min_f(char *file, int line, int len1, int len2);
 void sanitycheck(char *file, int line);
 
 #define SANITYCHECK sanitycheck(__FILE__, __LINE__)
-
-#define okendpt(e, p) isokendpt_f(__FILE__, __LINE__, (e), (p), 1)
-#define isokendpt(e, p) isokendpt_f(__FILE__, __LINE__, (e), (p), 0)
 
 /* write.c */
 void clear_zone(struct inode *rip, off_t pos, int flag);

@@ -110,7 +110,6 @@ void pt_init(void);
 void pt_check(struct vmproc *vmp);
 int pt_new(pt_t *pt);
 void pt_free(pt_t *pt);
-void pt_freerange(pt_t *pt, vir_bytes lo, vir_bytes hi);
 int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr, size_t bytes, u32_t flags,
 		u32_t writemapflags);
 int pt_checkrange(pt_t *pt, vir_bytes v,  size_t bytes, int write);
@@ -173,7 +172,6 @@ void map_sanitycheck(char *file, int line);
 #endif
 
 /* $(ARCH)/vm.c */
-void arch_init_vm(struct memory mem_chunks[NR_MEMS]);
 vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr);
 vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr);
 vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr);

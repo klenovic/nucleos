@@ -62,7 +62,7 @@ int do_sysuname(void);
 int do_getsysinfo(void);
 int do_getsysinfo_up(void);
 int do_getprocnr(void);
-int do_getpuid(void);
+int do_getepinfo(void);
 int do_svrctl(void);
 int do_allocmem(void);
 int do_freemem(void);
@@ -91,7 +91,6 @@ void vm_notify_sig_wrapper(endpoint_t ep);
 int do_stime(void);
 int do_time(void);
 int do_times(void);
-int do_gettimeofday(void);
 
 /* timers.c */
 void pm_set_timer(timer_t *tp, int delta, tmr_func_t watchdog, int arg);

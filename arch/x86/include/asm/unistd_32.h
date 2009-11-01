@@ -99,8 +99,8 @@
 
 /* Calls provided by PM and FS_PROC_NR that are not part of the API */
 #define __NR_exec_newmem	100	/* from FS_PROC_NR or RS to PM: new memory map for
-				 * exec
-				 */
+					 * exec
+					 */
 #define __NR_fork_nb		101	/* to PM: special fork call for RS */
 #define __NR_exec_restart	102	/* to PM: final part of exec for RS */
 #define __NR_procstat		103	/* to PM */
@@ -109,22 +109,21 @@
 #if 0
 #define __NR_freemem		106	/* to PM, not used, not implemented */
 #endif
-#define __NR_getpuid		107	/* to PM: get the uid of a process (endpoint) */
+#define __NR_getepinfo		107	/* to PM: get pid/gid/uid of an endpoint */
 #define __NR_adddma		108	/* to PM: inform PM about a region of memory
-				 * that is used for bus-master DMA
-				 */
+					 * that is used for bus-master DMA
+					 */
 #define __NR_deldma		109	/* to PM: inform PM that a region of memory
-				 * that is no longer used for bus-master DMA
-				 */
+					 * that is no longer used for bus-master DMA
+					 */
 #define __NR_getdma		110	/* to PM: ask PM for a region of memory
-				 * that should not be used for bus-master DMA
-				 * any longer
-				 */
-
+					 * that should not be used for bus-master DMA
+					 * any longer
+					 */
 #define __NR_devctl		120	/* to FS_PROC_NR, map or unmap a device */
 #define __NR_task_reply		121	/* to FS_PROC_NR: reply code from drivers, not
-				 * really a standalone call.
-				 */
+					 * really a standalone call.
+					 */
 #define __NR_mapdriver		122	/* to FS_PROC_NR, map a device */
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
@@ -243,9 +242,7 @@ int getgroups(int _gidsetsize, gid_t _grouplist[]);
 char *getlogin(void);
 pid_t getpgrp(void);
 pid_t getpid(void);
-pid_t getnpid(int proc_nr);
-uid_t getnuid(int proc_nr);
-gid_t getngid(int proc_nr);
+
 pid_t getppid(void);
 uid_t getuid(void);
 int isatty(int _fd);
@@ -318,10 +315,13 @@ int freemem(phys_bytes size, phys_bytes base);
 
 int devctl(int ctl_req, int driver, int device, int style, int force);
 int mapdriver5(char *label, size_t len, int major, int style, int force);
-uid_t getpeuid(endpoint_t ep);
 int adddma(endpoint_t proc_e, phys_bytes start, phys_bytes size);
 int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size);
 int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep);
+
+pid_t getnpid(endpoint_t proc_nr);
+uid_t getnuid(endpoint_t proc_nr);
+gid_t getngid(endpoint_t proc_nr);
 
 /* For compatibility with other Unix systems */
 size_t getpagesize(void);

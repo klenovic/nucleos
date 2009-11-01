@@ -10,10 +10,9 @@
 #include <nucleos/lib.h>
 #include <nucleos/unistd.h>
 
-pid_t getnpid(int proc_nr)
+pid_t getnpid(endpoint_t proc_ep)
 {
   message m;
-  m.m1_i1 = proc_nr;		/* search pid for this process */
-  if (_syscall(PM_PROC_NR, __NR_getpid, &m) < 0) return ( (pid_t) -1);
-  return( (pid_t) m.m2_i2);	/* return search result */
+  m.m1_i1 = proc_ep;		/* search pid for this process */
+  return _syscall(PM_PROC_NR, __NR_getepinfo, &m);
 }

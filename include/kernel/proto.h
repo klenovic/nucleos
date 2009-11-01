@@ -41,7 +41,6 @@ void minix_panic(char *s, int n);
 
 /* proc.c */
 int sys_call(int call_nr, int src_dst, message *m_ptr, long bit_map);
-void sys_call_restart(struct proc *caller);
 int lock_notify(int src, int dst);
 int mini_notify(struct proc *src, endpoint_t dst);
 int lock_send(int dst, message *m_ptr);
@@ -75,8 +74,6 @@ void sys_task(void);
 	umap_local(proc_addr(proc_nr), D, (vir_addr), (bytes))
 
 phys_bytes umap_grant(struct proc *, cp_grant_id_t, vir_bytes);
-vir_bytes vir_verify_grant(struct proc *, endpoint_t, cp_grant_id_t, vir_bytes, vir_bytes,
-			   int, endpoint_t *);
 void clear_endpoint(struct proc *rc);
 phys_bytes umap_bios(vir_bytes vir_addr, vir_bytes bytes);
 phys_bytes umap_verify_grant(struct proc *rp, endpoint_t grantee,  cp_grant_id_t grant,
@@ -136,7 +133,6 @@ int data_copy_vmcheck(endpoint_t from, vir_bytes from_addr, endpoint_t to, vir_b
 
 void alloc_segments(struct proc *rp);
 void vm_init(struct proc *first);
-void vm_map_range(u32_t base, u32_t size, u32_t offset);
 int vm_copy(vir_bytes src, struct proc *srcproc, vir_bytes dst, struct proc *dstproc,
 	    phys_bytes bytes);
 phys_bytes umap_local(register struct proc *rp, int seg, vir_bytes vir_addr, vir_bytes bytes);
@@ -172,15 +168,11 @@ int arch_pre_exec(struct proc *pr, u32_t, u32_t);
 int arch_umap(struct proc *pr, vir_bytes, vir_bytes, int, phys_bytes *);
 int arch_do_vmctl(message *m_ptr, struct proc *p);
 int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t count);
-int vm_checkrange(struct proc *caller, struct proc *target, vir_bytes start,
-		  vir_bytes length, int writeflag, int checkonly);
 void proc_stacktrace(struct proc *proc);
 int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *result, u32_t *ptent);
 int vm_suspend(struct proc *caller, struct proc *target,
 	phys_bytes lin, phys_bytes size, int wrflag, int type);
 int delivermsg(struct proc *target);
-phys_bytes arch_switch_copymsg(struct proc *rp, message *m,
-	phys_bytes lin);
 void arch_do_syscall(struct proc *proc);
 
 #endif /* __KERNEL__ */

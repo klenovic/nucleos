@@ -58,14 +58,8 @@ void s_call(void), p_s_call(void);
 void level0_call(void);
 
 /* memory.c */
-void vir_insb(u16_t port, struct proc *proc, u32_t vir, size_t count);
-void vir_outsb(u16_t port, struct proc *proc, u32_t vir, size_t count);
-void vir_insw(u16_t port, struct proc *proc, u32_t vir, size_t count);
-void vir_outsw(u16_t port, struct proc *proc, u32_t vir, size_t count);
-void i386_updatepde(int pde, u32_t val);
 void i386_freepde(int pde);
 void getcr3val(void);
-void switchedcr3(void);
 void vm_set_cr3(struct proc *);
 
 /* prototype of an interrupt vector table entry */
@@ -101,14 +95,9 @@ void phys_insw(u16 port, phys_bytes buf, size_t count);
 void phys_outsb(u16 port, phys_bytes buf, size_t count);
 void phys_outsw(u16 port, phys_bytes buf, size_t count);
 
-int _memcpy_k(void *dst, void *src, size_t n);
-int _memcpy_k_fault(void);
 u32_t read_cr3(void);
 void reload_cr3(void);
 void phys_memset(phys_bytes ph, u32_t c, phys_bytes bytes);
-u32 read_ds(void);
-u32 read_cs(void);
-u32 read_ss(void);
 
 /* protect.c */
 void prot_init(void);

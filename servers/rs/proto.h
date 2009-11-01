@@ -20,7 +20,6 @@ int do_up(message *m, int do_copy, int flags);
 int do_start(message *m);
 int do_down(message *m);
 int do_refresh(message *m);
-int do_rescue(message *m);
 int do_restart(message *m);
 int do_lookup(message *m);
 int do_shutdown(message *m);
