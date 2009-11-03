@@ -9,8 +9,8 @@
  */
 /* For kernel and user-kernel return negative error values. */
 
-#ifndef __NUCLEOS_ERRNO_H		/* check if <nucleos/errno.h> is already included */
-#define __NUCLEOS_ERRNO_H		/* it is not included; note that fact */
+#ifndef __NUCLEOS_ERRNO_H
+#define __NUCLEOS_ERRNO_H
 
 #include <asm/errno.h>
 
