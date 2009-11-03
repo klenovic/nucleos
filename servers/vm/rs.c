@@ -47,6 +47,7 @@ int do_rs_set_priv(message *m)
 		if (r != 0)
 			return r;
 	}
+
 	return 0;
 }
 

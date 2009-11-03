@@ -40,6 +40,7 @@ register message *m_ptr;	/* pointer to request message */
   phys_bytes bytes;		/* number of bytes to copy */
   int i;
 
+#if 0
   if (m_ptr->m_source != PM_PROC_NR && m_ptr->m_source != VFS_PROC_NR &&
 	m_ptr->m_source != RS_PROC_NR && m_ptr->m_source != MEM_PROC_NR &&
 	m_ptr->m_source != VM_PROC_NR)
@@ -57,6 +58,7 @@ register message *m_ptr;	/* pointer to request message */
 			m_ptr->CP_DST_SPACE);
 	}
   }
+#endif
 
   /* Dismember the command message. */
   vir_addr[_SRC_].proc_nr_e = m_ptr->CP_SRC_ENDPT;

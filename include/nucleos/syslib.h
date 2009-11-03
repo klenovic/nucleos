@@ -47,6 +47,7 @@ int sys_trace(int req, endpoint_t proc_ep, long addr, long *data_p);
 int sys_runctl(endpoint_t proc_ep, int action, int flags);
 
 int sys_privctl(endpoint_t proc_ep, int req, void *p);
+int sys_privquery_mem(endpoint_t proc_ep, phys_bytes physstart, phys_bytes physlen);
 int sys_setgrant(cp_grant_t *grants, int ngrants);
 int sys_nice(endpoint_t proc_ep, int priority);
 

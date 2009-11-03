@@ -24,6 +24,8 @@
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/keymap.h>
+#include <nucleos/timer.h>
+#include <kernel/proc.h>
 
 #include <asm/ioctls.h>
 
@@ -1197,17 +1199,33 @@ int scode;			/* scan code for a function key */
  *===========================================================================*/
 static void show_key_mappings()
 {
-    int i;
+    int i,s;
+    struct proc proc;
+
     printf("\n");
     printf("System information.   Known function key mappings to request debug dumps:\n");
     printf("-------------------------------------------------------------------------\n");
     for (i=0; i<12; i++) {
 
       printf(" %sF%d: ", i+1<10? " ":"", i+1);
+      if (fkey_obs[i].proc_nr != NONE) {
+          if ((s = sys_getproc(&proc, fkey_obs[i].proc_nr))!=0)
+              printf("%-14.14s", "<unknown>");
+          else
+              printf("%-14.14s", proc.p_name);
+      } else {
           printf("%-14.14s", "<none>");
+      }
 
       printf("    %sShift-F%d: ", i+1<10? " ":"", i+1);
+      if (sfkey_obs[i].proc_nr != NONE) {
+          if ((s = sys_getproc(&proc, sfkey_obs[i].proc_nr))!=0)
+              printf("%-14.14s", "<unknown>");
+          else
+              printf("%-14.14s", proc.p_name);
+      } else {
           printf("%-14.14s", "<none>");
+      }
       printf("\n");
     }
     printf("\n");
