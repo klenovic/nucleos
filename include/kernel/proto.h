@@ -84,7 +84,6 @@ int newmap(struct proc *rp, struct mem_map *map_ptr);
 void vtimer_check(struct proc *rp);
 
 /* interrupt.c */
-void intr_handle(irq_hook_t *hook);
 void put_irq_handler(irq_hook_t *hook, int irq, irq_handler_t handler);
 void rm_irq_handler(irq_hook_t *hook);
 void enable_irq(irq_hook_t *hook);
@@ -146,8 +145,6 @@ clock_t read_clock(void);
 void clock_stop(void);
 int intr_init(int);
 int intr_disabled(void);
-int intr_unmask(irq_hook_t* hook);
-int intr_mask(irq_hook_t* hook);
 void idle_task(void);
 void arch_init(void);
 void ser_putc(char);
