@@ -43,7 +43,7 @@
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 #define vmassert(t) { \
-	if (!(t)) { minix_panic("vm: assert " #t " failed\n", __LINE__); } }
+	if (!(t)) { minix_panic("vm: assert " #t " failed in " __FILE__, __LINE__); } }
 #else
 #define vmassert(t)
 #endif /* CONFIG_DEBUG_KERNEL_VMASSERT */
