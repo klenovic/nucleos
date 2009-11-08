@@ -13,6 +13,8 @@
 
 #ifdef __KERNEL__
 
+#include <kernel/types.h>
+
 struct proc;
 struct segdesc_s;
 
@@ -54,7 +56,7 @@ void copr_error(void);
 
 /* Software interrupt handlers, in numerical order. */
 void trp(void);
-void s_call(void);		/* internal comunication */
+void syscall_entry(void);		/* internal comunication */
 extern void system_call(void);	/* nucleos system call (C library) */
 void level0_call(void);
 
@@ -75,17 +77,27 @@ extern struct gate_table_s gate_table_pic[];
 /* copies an array of vectors to the IDT. The last vector must be zero filled */
 void idt_copy_vectors(struct gate_table_s * first);
 
+
 /* exception.c */
-void exception(unsigned vec_nr, u32_t trap_errno,
-	       u32_t old_eip, u16_t old_cs, u32_t old_eflags,
-	       u32_t *old_eip_ptr, u32_t *old_eax_ptr, u32_t pagefaultcr2);
+struct exception_frame {
+	reg_t   vector;         /* which interrupt vector was triggered */
+	reg_t   errcode;        /* zero if no exception does not push err code */
+	reg_t   eip;
+	reg_t   cs;
+	reg_t   eflags;
+	reg_t   esp;            /* undefined if trap is nested */
+	reg_t   ss;             /* undefined if trap is nested */
+};
+
+void exception(struct exception_frame * frame);
 
 /* klib386.S */
 void level0(void (*func)(void));
 void monitor(void);
 void reset(void);
 void int86(void);
-unsigned long read_cr0(void);
+reg_t read_cr0(void);
+reg_t read_cr2(void);
 void write_cr0(unsigned long value);
 unsigned long read_cr4(void);
 void write_cr4(unsigned long value);
@@ -101,6 +113,42 @@ void reload_cr3(void);
 void phys_memset(phys_bytes ph, u32_t c, phys_bytes bytes);
 
 /* protect.c */
+struct tss_s {
+	reg_t backlink;
+	reg_t sp0;                    /* stack pointer to use during interrupt */
+	reg_t ss0;                    /*   "   segment  "  "    "        "     */
+	reg_t sp1;
+	reg_t ss1;
+	reg_t sp2;
+	reg_t ss2;
+	reg_t cr3;
+	reg_t ip;
+	reg_t flags;
+	reg_t ax;
+	reg_t cx;
+	reg_t dx;
+	reg_t bx;
+	reg_t sp;
+	reg_t bp;
+	reg_t si;
+	reg_t di;
+	reg_t es;
+	reg_t cs;
+	reg_t ss;
+	reg_t ds;
+	reg_t fs;
+	reg_t gs;
+	reg_t ldt;
+	u16_t trap;
+	u16_t iobase;
+/*	u8_t iomap[0]; */
+};
+
+extern struct tss_s tss;
+
+extern void *k_boot_stktop;
+void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu);
+
 void prot_init(void);
 void idt_init(void);
 void init_codeseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);

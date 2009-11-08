@@ -146,7 +146,7 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 /*===========================================================================*
  *				schedcheck				     * 
  *===========================================================================*/
-void schedcheck(void)
+struct proc * schedcheck(void)
 {
 	/* This function is called an instant before proc_ptr is
 	 * to be scheduled again.
@@ -235,7 +235,10 @@ void schedcheck(void)
 #if DEBUG_TRACE
 	proc_ptr->p_schedules++;
 #endif
-	NOREC_RETURN(schedch, );
+
+	proc_ptr = arch_finish_schedcheck();
+
+	NOREC_RETURN(schedch, proc_ptr);
 }
 
 /*===========================================================================*
@@ -1213,9 +1216,8 @@ register struct proc *rp;	/* this process is now runnable */
    * process yet or current process isn't ready any more, or
    * it's PREEMPTIBLE.
    */
-	vmassert(proc_ptr);
-  if((proc_ptr->p_priority > rp->p_priority) &&
-   (priv(proc_ptr)->s_flags & PREEMPTIBLE)) 
+  if(!proc_ptr || (proc_ptr->p_priority > rp->p_priority) ||
+		  (priv(proc_ptr)->s_flags & PREEMPTIBLE))
      pick_proc();
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK

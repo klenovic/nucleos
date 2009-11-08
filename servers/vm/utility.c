@@ -32,10 +32,9 @@
 #include <servers/vm/glo.h>
 #include <servers/vm/util.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <kernel/proc.h>
 #include <asm/kernel/const.h>
-#include <asm/kernel/types.h>
 #include <asm/servers/vm/memory.h>
 
 /*===========================================================================*

@@ -26,7 +26,7 @@
 #include <nucleos/tty.h>
 #include <nucleos/video.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <ibm/partition.h>
 #include "rawfs.h"
 #include "image.h"

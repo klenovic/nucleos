@@ -32,7 +32,7 @@
 #include <nucleos/vm.h>
 #include <nucleos/mman.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <servers/vm/vm.h>
 #include <asm/servers/vm/vm.h>
 #include <assert.h>

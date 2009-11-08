@@ -32,9 +32,8 @@
 #include <nucleos/timer.h>
 #include <nucleos/string.h>
 #include <asm/kernel/const.h>
-#include <asm/kernel/types.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <kernel/proc.h>
 
 /*===========================================================================*

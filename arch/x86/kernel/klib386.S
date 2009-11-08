@@ -12,8 +12,6 @@
 #include <asm/kernel/const.h>
 #include <kernel/const.h>
 
-#include "sconst.S"
-
 // The routines only guarantee to preserve the registers the C compiler
 // expects to be preserved (ebx, esi, edi, ebp, esp, segment registers, and
 // direction bit in the flags).
@@ -278,6 +276,14 @@ phys_copy_fault:				// kernel can send us here
 	pop	%esi
 	ret
 
+.globl phys_copy_fault_in_kernel
+phys_copy_fault_in_kernel:                     /* kernel can send us here */
+	pop	%es
+	pop	%edi
+	pop	%esi
+	mov	%cr2, %eax
+	ret
+
 //===========================================================================
 //                             phys_memset
 //===========================================================================
@@ -358,7 +364,7 @@ idle_task:
 // instruction puts the processor in a state where it draws minimum power.
 	push	$_halt
 	call	level0         // level0(halt)
-	pop	%eax
+	add	$4, %esp
 	jmp	idle_task
 _halt:
 	sti
@@ -375,14 +381,21 @@ _halt:
 //
 .globl level0         // call a function at level 0
 level0:
+	/* check whether we are already running in kernel, the kernel cs
+	 * selector has 3 lower bits zeroed */
+	mov	%cs, %ax
+	cmpw	$CS_SELECTOR, %ax
+	jne	0f
+
+	/* call the function directly as if it was a normal function call */
 	mov	4(%esp), %eax
-	cmpb	$-1, k_reenter
-	jne	direct
-	int	$LEVEL0_VECTOR
+	call	*%eax
 	ret
 
-direct:
-	call	*%eax
+	/* if not runnig in the kernel yet, trap to kernel */
+0:
+	mov	4(%esp), %eax
+	int	$LEVEL0_VECTOR
 	ret
 
 //===========================================================================
@@ -412,7 +425,7 @@ read_cr0:
 	ret
 
 //===========================================================================
-//                           write_cr0                                      
+//                           write_cr0
 //===========================================================================
 // void write_cr0(unsigned long value);
 .globl write_cr0      // write a value in cr0
@@ -424,6 +437,15 @@ write_cr0:
 	jmp	0f              // A jump is required for some flags
 0:
 	pop	%ebp
+	ret
+
+/*===========================================================================*/
+/*                            read_cr2                                       */
+/*===========================================================================*/
+/* reg_t read_cr2(void); */
+.globl read_cr2
+read_cr2:
+	mov	%cr2, %eax
 	ret
 
 //===========================================================================*

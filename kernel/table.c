@@ -37,7 +37,6 @@ struct loadinfo kloadinfo;       /* status of load average */
 struct boot_param boot_param;    /* boot parameters */
 
 /* Process scheduling information and the kernel reentry count. */
-struct proc *prev_ptr;   /* previously running process */
 struct proc *proc_ptr;   /* pointer to currently running process */
 struct proc *next_ptr;   /* next process to run after restart() */
 struct proc *bill_ptr;   /* process to bill for clock ticks */
@@ -45,7 +44,6 @@ struct proc *vmrestart;  /* first process on vmrestart queue */
 struct proc *vmrequest;  /* first process on vmrequest queue */
 struct proc *pagefaults; /* first process on pagefault queue */
 struct proc *softnotify; /* first process on softnotify queue */
-char k_reenter;          /* kernel reentry count (entry count less 1) */
 unsigned lost_ticks;     /* clock ticks counted outside clock task */
 
 /* Interrupt related variables. */

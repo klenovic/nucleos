@@ -47,7 +47,8 @@ int lock_send(int dst, message *m_ptr);
 void enqueue(struct proc *rp);
 void dequeue(struct proc *rp);
 void balance_queues(struct timer *tp);
-void schedcheck(void);
+struct proc* schedcheck(void);
+struct proc* arch_finish_schedcheck(void);
 struct proc *endpoint_lookup(endpoint_t ep);
 
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
@@ -115,6 +116,7 @@ void stop_profile_clock(void);
 /* functions defined in architecture-dependent files. */
 phys_bytes phys_copy(phys_bytes source, phys_bytes dest, phys_bytes count);
 void phys_copy_fault(void);
+void phys_copy_fault_in_kernel(void);
 
 #define virtual_copy(src, dst, bytes) virtual_copy_f(src, dst, bytes, 0)
 #define virtual_copy_vmcheck(src, dst, bytes) virtual_copy_f(src, dst, bytes, 1)
@@ -140,9 +142,6 @@ phys_bytes umap_virtual(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes 
 phys_bytes seg2phys(u16);
 int vm_phys_memset(phys_bytes source, u8_t pattern, phys_bytes count);
 vir_bytes alloc_remote_segment(u32_t *, segframe_t *, int, phys_bytes, vir_bytes, int);
-int arch_init_clock(void);
-clock_t read_clock(void);
-void clock_stop(void);
 int intr_init(int);
 int intr_disabled(void);
 void idle_task(void);

@@ -92,7 +92,7 @@
 #include <assert.h>
 #include <nucleos/unistd.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 
 #include <asm/ioctls.h>
 

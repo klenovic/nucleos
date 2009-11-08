@@ -23,7 +23,7 @@
 
 /* Important kernel header files. */
 #include <kernel/const.h>		/* constants, MUST be second */
-#include <kernel/type.h>		/* type definitions, MUST be third */
+#include <kernel/types.h>		/* type definitions, MUST be third */
 #include <kernel/proto.h>		/* function prototypes */
 #include <kernel/glo.h>			/* global variables */
 #include <nucleos/kipc.h>		/* IPC constants */

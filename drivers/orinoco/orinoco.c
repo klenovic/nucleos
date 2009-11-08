@@ -75,7 +75,7 @@
 #include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 
 #define		tmra_ut			timer_t
 #define		tmra_inittimer(tp)	tmr_inittimer(tp)

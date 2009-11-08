@@ -24,8 +24,7 @@
 #include <nucleos/signal.h>
 #include <nucleos/timer.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
-#include <asm/kernel/types.h>
+#include <kernel/types.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 

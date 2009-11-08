@@ -21,7 +21,7 @@
 #include <nucleos/fcntl.h>
 #include <nucleos/endpoint.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 
 /* Declare some local functions. */
 static void init_server(void);

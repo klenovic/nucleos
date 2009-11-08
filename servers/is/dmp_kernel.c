@@ -14,7 +14,7 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/sysutil.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <kernel/proc.h>
 #include <asm/irq_vectors.h>
 

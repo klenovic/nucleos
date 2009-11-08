@@ -33,7 +33,7 @@ char version[]=   "2.20";
 #include <nucleos/minlib.h>
 #include <nucleos/syslib.h>
 #include <kernel/const.h>
-#include <kernel/type.h>
+#include <kernel/types.h>
 #include <nucleos/video.h>
 #include "rawfs.h"
 #include "boot.h"

@@ -34,12 +34,10 @@ extern struct boot_param boot_param;	/* boot parameters */
 /* Process scheduling information and the kernel reentry count. */
 extern struct proc *proc_ptr;	/* pointer to currently running process */
 extern struct proc *next_ptr;	/* next process to run after restart() */
-extern struct proc *prev_ptr;	/* previously running process */
 extern struct proc *bill_ptr;	/* process to bill for clock ticks */
 extern struct proc *vmrestart;  /* first process on vmrestart queue */
 extern struct proc *vmrequest;  /* first process on vmrequest queue */
 extern struct proc *pagefaults; /* first process on pagefault queue */
-extern char k_reenter;		/* kernel reentry count (entry count less 1) */
 extern unsigned lost_ticks;	/* clock ticks counted outside clock task */
 
 /* Interrupt related variables. */
