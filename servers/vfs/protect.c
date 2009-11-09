@@ -47,7 +47,7 @@ int do_chmod()
     
   if (call_nr == __NR_chmod) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
+      if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
 
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
@@ -107,7 +107,7 @@ int do_chown()
   
   if (call_nr == __NR_chown) {
       /* Perform the chmod(name, mode) system call. */
-      if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
+      if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
       
       /* Request lookup */
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
@@ -186,7 +186,7 @@ int do_access()
   if ( (m_in.mode & ~(R_OK | W_OK | X_OK)) != 0 && m_in.mode != F_OK)
 	return(-EINVAL);
 
-  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
 
   /* Request lookup */
   r = lookup_vp(0 /*flags*/, TRUE /*use_realuid*/, &vp);

@@ -33,15 +33,11 @@
 /*===========================================================================*
  *				fetch_name				     *
  *===========================================================================*/
-int fetch_name(path, len, flag)
+int fetch_name(path, len)
 char *path;			/* pointer to the path in user space */
 int len;			/* path length, including 0 byte */
-int flag;			/* KIPC_FLG_M3 means path may be in message */
 {
-/* Go get path and put it in 'user_fullpath'.
- * If 'flag' = KERN_KIPC_FLG_M3 and 'len' <= KIPC_FLG_M3_STRLEN, the path is present in 'message'.
- * If it is not, go copy it from user space.
- */
+/* Go get path and put it in 'user_fullpath'. Copy it from user space. */
   register char *rpu, *rpm;
   int r, count;
 
@@ -66,18 +62,9 @@ int flag;			/* KIPC_FLG_M3 means path may be in message */
 	return(-EGENERIC);
   }
 
-  if (flag == KIPC_FLG_M3 && len <= KIPC_FLG_M3_STRLEN) {
-	/* Just copy the path from the message to 'user_fullpath'. */
-	rpu = &user_fullpath[0];
-	rpm = m_in.pathname;		/* contained in input message */
-	count = len;
-	do { *rpu++ = *rpm++; } while (--count);
-	r = 0;
-  } else {
 	/* String is not contained in the message.  Get it from user space. */
 	r = sys_datacopy(who_e, (vir_bytes) path,
 		FS_PROC_NR, (vir_bytes) user_fullpath, (phys_bytes) len);
-  }
 
   if(user_fullpath[len-1] != '\0') {
 	int i;

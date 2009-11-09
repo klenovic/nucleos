@@ -157,7 +157,9 @@ const char *name;
 	return -1;
   }
 
-  _loadname(name, &m);
+  m.m3_i1 = strlen(name) + 1;
+  m.m3_p1 = (char *) name;
+
   r = _syscall(FS_PROC_NR, __NR_umount, &m);
 
   if(r == 0) {

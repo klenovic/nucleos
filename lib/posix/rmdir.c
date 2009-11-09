@@ -14,6 +14,8 @@ int rmdir(const char *name)
 {
   message m;
 
-  _loadname(name, &m);
+  m.m3_i1 = strlen(name) + 1;
+  m.m3_p1 = (char *) name;
+
   return(_syscall(FS_PROC_NR, __NR_rmdir, &m));
 }

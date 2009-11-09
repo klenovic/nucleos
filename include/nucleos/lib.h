@@ -26,7 +26,6 @@
 #include <asm/syscall.h>
 
 int _syscall(int _who, int _syscallnr, message *_msgptr);
-void _loadname(const char *_name, message *_msgptr);
 int _len(const char *_s);
 
 #endif /* __NUCLEOS_LIB_H */

@@ -136,7 +136,7 @@ static int mount_fs(endpoint_t fs_e)
   mount_m_in.m1_p3 = (char *) NONE;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name1, m_in.name1_length, KIPC_FLG_M1) != 0) return(err_code);
+  if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
   
   /* Convert name to device number */
   if ((dev = name_to_dev()) == NO_DEV) return(err_code);
@@ -196,7 +196,7 @@ static int mount_fs(endpoint_t fs_e)
 		panic("fs", "inconsistency remounting old root", NO_NUM);
 
 	/* Now get the inode of the file to be mounted on. */
-	if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0) {
+	if (fetch_name(m_in.name2, m_in.name2_length) != 0) {
 		return(err_code);
 	}
 
@@ -247,7 +247,7 @@ static int mount_fs(endpoint_t fs_e)
   }
 
   /* Fetch the name of the mountpoint */
-  if (fetch_name(m_in.name2, m_in.name2_length, KIPC_FLG_M1) != 0) {
+  if (fetch_name(m_in.name2, m_in.name2_length) != 0) {
 	return(err_code);
   }
 
@@ -400,7 +400,7 @@ int do_umount()
   	SANITYCHECK;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name, m_in.name_length, KIPC_FLG_M3) != 0) return(err_code);
+  if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
   	SANITYCHECK;
   if ( (dev = name_to_dev()) == NO_DEV) return(err_code);
   	SANITYCHECK;

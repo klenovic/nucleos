@@ -29,9 +29,6 @@
  *==========================================================================*/ 
 
 /* message flags */
-#define KIPC_FLG_M1		1	/* string is not in messge? */
-#define KIPC_FLG_M3		3	/* string is in message */
-#define KIPC_FLG_M4		4	/* ? */
 #define KIPC_FLG_M3_STRLEN	14	/* string length */
 
 /* Defines for flags field */

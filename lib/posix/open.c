@@ -25,7 +25,8 @@ int open(const char *name, int flags, ...)
 	m.m1_i3 = va_arg(argp, int); /* mode_t is automatically promoted to int */
 	m.m1_p1 = (char *) name;
   } else {
-	_loadname(name, &m);
+	m.m3_i1 = strlen(name) + 1;
+	m.m3_p1 = (char *) name;
 	m.m3_i2 = flags;
   }
   va_end(argp);

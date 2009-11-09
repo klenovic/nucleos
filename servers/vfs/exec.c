@@ -72,7 +72,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	bfmt_param.proc_e = proc_e;
 
 	/* Get the exec file name. */
-	r = fetch_name(path, path_len, 0);
+	r = fetch_name(path, path_len);
 
 	if (r != 0) {
 		printf("pm_exec: fetch_name failed\n");
@@ -171,7 +171,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		app_dbg("Continue processing...\n");
 #endif
 		/* Get fresh copy of the file name. */
-		r = fetch_name(path, path_len, 0);
+		r = fetch_name(path, path_len);
 
 		if (r != 0) {
 			printf("pm_exec: 2nd fetch_name failed\n");
