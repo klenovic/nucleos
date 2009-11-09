@@ -52,7 +52,7 @@
 #define CORE_MODE	0777	/* mode to use on core image files */
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-unsigned long calls_stats[__NR_SYSCALLS];
+unsigned long calls_stats[NR_syscalls];
 #endif
 
 static void free_proc(struct fproc *freed, int flags);

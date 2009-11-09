@@ -57,7 +57,7 @@ static char *uts_tbl[] = {
 };
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-unsigned long calls_stats[__NR_SYSCALLS];
+unsigned long calls_stats[NR_syscalls];
 #endif
 
 static int getpciinfo(struct pciinfo *pciinfo);

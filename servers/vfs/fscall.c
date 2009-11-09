@@ -40,7 +40,7 @@ static struct {
 static int depth = 0;			/* current globals stack level */
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[__NR_SYSCALLS];
+extern unsigned long calls_stats[NR_syscalls];
 #endif
 
 static int push_globals(void);
@@ -140,7 +140,7 @@ message *m;				/* request/reply message pointer */
 	set_globals(m);
 
 	/* Perform the nested call */
-	if (call_nr < 0 || call_nr >= __NR_SYSCALLS) {
+	if (call_nr < 0 || call_nr >= NR_syscalls) {
 		printf("VFS: invalid nested call %d from FS_PROC_NR %d\n", call_nr,
 			who_e);
 

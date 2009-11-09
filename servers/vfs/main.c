@@ -47,7 +47,7 @@
 #include "vnode.h"
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[__NR_SYSCALLS];
+extern unsigned long calls_stats[NR_syscalls];
 #endif
 
 static void fs_init(void);
@@ -231,7 +231,7 @@ int main(void)
 
 		default:
 			/* Call the internal function that does the work. */
-			if (call_nr < 0 || call_nr >= __NR_SYSCALLS) {
+			if (call_nr < 0 || call_nr >= NR_syscalls) {
 				error = SUSPEND;
 				/* Not supposed to happen. */
 				printf("VFS: illegal %d system call by %d\n",

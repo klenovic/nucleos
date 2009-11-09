@@ -47,7 +47,7 @@
 struct mproc mproc[NR_PROCS];
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
-extern unsigned long calls_stats[__NR_SYSCALLS];
+extern unsigned long calls_stats[NR_syscalls];
 #endif
 
 static void get_work(void);
@@ -143,7 +143,7 @@ int main()
 		/* Else, if the system call number is valid, perform the
 		 * call.
 		 */
-		if ((unsigned) call_nr >= __NR_SYSCALLS) {
+		if ((unsigned) call_nr >= NR_syscalls) {
 			result = -ENOSYS;
 		} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS

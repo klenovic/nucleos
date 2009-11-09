@@ -10,7 +10,7 @@
 #ifndef __ASM_X86_UNISTD_32_H
 #define __ASM_X86_UNISTD_32_H
 
-#define __NR_SYSCALLS		111	/* number of system calls allowed */
+
 
 #define __NR_exit		1
 #define __NR_fork		2
@@ -131,6 +131,8 @@
 #include <nucleos/types.h>
 #include <nucleos/type.h>
 #include <nucleos/signal.h>
+
+#define NR_syscalls		111	/* number of system calls allowed */
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */
