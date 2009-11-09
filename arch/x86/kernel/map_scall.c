@@ -13,6 +13,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/types.h>
 #include <kernel/proc.h>
+#include <kernel/proto.h>
 #include <kernel/glo.h>
 
 /*
@@ -45,6 +46,11 @@ __attribute__((regparm(0))) endpoint_t map_scall_endpt(message *msg, struct pt_r
 	/* kprintf("ax=%d bx=%d cx=%d dx=%d si=%si di=%d\n", r->ax, r->bx, r->cx, r->dx,
 		    r->si, r->di); */
 
+	/* @nucleos: The syscall numbers used by user (_NR_*) and kernel may be different.
+	             E.g. user calls mmap via __NR_mmap but system knows it as VM_MMAP. In
+	             this case the m_type can be changed to appropriate number in msg_* function.
+	             Thing to change ???
+	 */
 	kmsg.m_type = r->ax;
 
 	/* fill the message according to passed arguments */
@@ -52,7 +58,7 @@ __attribute__((regparm(0))) endpoint_t map_scall_endpt(message *msg, struct pt_r
 		scall_endpt_args[r->ax].fill_msg(&kmsg, r);
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
- 		     current kIPC. It requires to have message in caller's (user's) space. */
+ 		     kIPC. It requires to have message in caller's (user's) space. */
 
 	/* Map the message from user space. */
 	phys_bytes linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
@@ -77,10 +83,56 @@ static void msg_exit(message *msg, struct pt_regs *r)
 
 static void msg_ptrace(message *msg, struct pt_regs *r)
 {
-	msg->m2_i1 = r->cx;	/* pid */
-	msg->m2_i2 = r->bx;	/* req */
+	msg->m2_i1 = r->cx;		/* pid */
+	msg->m2_i2 = r->bx;		/* req */
 	msg->PMTRACE_ADDR = r->dx;	/* addr */
 	msg->m2_l2 = r->si;		/* data */
+}
+
+static void msg_mmap(message *msg, struct pt_regs *r)
+{
+	struct mmap_arg_struct {
+		unsigned long addr;
+		unsigned long len;
+		unsigned long prot;
+		unsigned long flags;
+		unsigned long fd;
+		unsigned long offset;
+	} mmap_arg;
+
+	/* In this case the (real) syscall number is not as in ax register */
+	msg->m_type = VM_MMAP;
+
+	/* This is passed via structure (6 args).  Map args from user space. */
+	phys_bytes linaddr = umap_local(proc_ptr, D, (vir_bytes)r->bx, sizeof(message));
+
+	/* copy args from user space */
+	phys_copy(vir2phys(linaddr), (vir_bytes)&mmap_arg, sizeof(mmap_arg));
+
+	msg->VMM_ADDR = (vir_bytes)mmap_arg.addr;
+	msg->VMM_LEN = mmap_arg.len;
+	msg->VMM_PROT = mmap_arg.prot;
+	msg->VMM_FLAGS = mmap_arg.flags;
+	msg->VMM_FD = mmap_arg.fd;
+	msg->VMM_OFFSET = mmap_arg.offset;
+}
+
+static void msg_munmap(message *msg, struct pt_regs *r)
+{
+	/* In this case the (real) syscall number is not as in ax register */
+	msg->m_type = VM_MUNMAP;
+
+	msg->VMUM_ADDR = (void*)r->bx;
+	msg->VMUM_LEN = r->cx;
+}
+
+static void msg_munmap_text(message *msg, struct pt_regs *r)
+{
+	/* In this case the (real) syscall number is not as in ax register */
+	msg->m_type = VM_MUNMAP_TEXT;
+
+	msg->VMUM_ADDR = (void*)r->bx;
+	msg->VMUM_LEN = r->cx;
 }
 
 struct endpt_args scall_endpt_args[] = {
@@ -143,9 +195,12 @@ struct endpt_args scall_endpt_args[] = {
 	[__NR_alarm]		= { PM_PROC_NR, 0, },
 	/* [__NR_ptrace]		= { PM_PROC_NR, msg_ptrace, }, (doesn't work correctly ) */
 	[__NR_link]		= { FS_PROC_NR, 0, },
-	/* [VM_MMAP]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_MUNMAP]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_MUNMAP_TEXT]	= { VM_PROC_NR, 0, }, (add later) */
+	[__NR_mmap]		= { VM_PROC_NR, msg_mmap, },
+	[__NR_munmap]		= { VM_PROC_NR, msg_munmap, },
+	[__NR_munmap_text]	= { VM_PROC_NR, msg_munmap_text, },
+	/* [VM_MMAP]		= { VM_PROC_NR, 0, }, (is __NR_mmap) */
+	/* [VM_MUNMAP]		= { VM_PROC_NR, 0, }, (is __NR_munmap) */
+	/* [VM_MUNMAP_TEXT]	= { VM_PROC_NR, 0, }, (is __NR_munmap_text) */
 	/* [VM_REMAP]		= { VM_PROC_NR, 0, }, (add later) */
 	/* [VM_SHM_UNMAP]	= { VM_PROC_NR, 0, }, (add later) */
 	/* [VM_GETPHYS]		= { VM_PROC_NR, 0, }, (add later) */

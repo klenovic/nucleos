@@ -66,6 +66,9 @@
 #define __NR_setsid		62
 #define __NR_getpgrp		63
 #define __NR_itimer		64
+#define __NR_mmap		65
+#define __NR_munmap		66
+#define __NR_munmap_text	67
 
 /* Posix signal handling. */
 #define __NR_sigaction		71
