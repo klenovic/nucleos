@@ -20,7 +20,7 @@ clock_t *ticks;				/* uptime in ticks */
 
     m.m_type = SYS_TIMES;		/* request time information */
     m.T_ENDPT = NONE;			/* ignore process times */
-    s = _taskcall(SYSTASK, SYS_TIMES, &m);
+    s = ktaskcall(SYSTASK, SYS_TIMES, &m);
     *ticks = m.T_BOOT_TICKS;
     return(s);
 }

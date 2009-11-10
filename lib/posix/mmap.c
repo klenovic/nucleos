@@ -25,7 +25,7 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 	m.VMM_FD = fd;
 	m.VMM_OFFSET = offset;
 
-	r = _syscall(VM_PROC_NR, VM_MMAP, &m);
+	r = ksyscall(VM_PROC_NR, VM_MMAP, &m);
 
 	if(r != 0) {
 		return MAP_FAILED;
@@ -41,7 +41,7 @@ int __munmap(void *addr, size_t len)
 	m.VMUM_ADDR = addr;
 	m.VMUM_LEN = len;
 
-	return _syscall(VM_PROC_NR, VM_MUNMAP, &m);
+	return ksyscall(VM_PROC_NR, VM_MUNMAP, &m);
 }
 /* munamp just a weak definition since PM/VM may override it */
 int munmap(void *addr, size_t len) __attribute__((weak,alias("__munmap")));
@@ -52,7 +52,7 @@ int __munmap_text(void *addr, size_t len)
 	m.VMUM_ADDR = addr;
 	m.VMUM_LEN = len;
 
-	return _syscall(VM_PROC_NR, VM_MUNMAP_TEXT, &m);
+	return ksyscall(VM_PROC_NR, VM_MUNMAP_TEXT, &m);
 }
 /* munamp just a weak definition since PM/VM may override it */
 int munmap_text(void *addr, size_t len) __attribute__((weak,alias("__munmap_text")));
@@ -68,7 +68,7 @@ void *vm_remap(int d, int s, void *da, void *sa, size_t size)
 	m.VMRE_SA = (char *) sa;
 	m.VMRE_SIZE = size;
 
-	r = _syscall(VM_PROC_NR, VM_REMAP, &m);
+	r = ksyscall(VM_PROC_NR, VM_REMAP, &m);
 	if (r != 0)
 		return MAP_FAILED;
 	return (void *) m.VMRE_RETA;
@@ -81,7 +81,7 @@ int vm_unmap(int endpt, void *addr)
 	m.VMUN_ENDPT = endpt;
 	m.VMUN_ADDR = (long) addr;
 
-	return _syscall(VM_PROC_NR, VM_SHM_UNMAP, &m);
+	return ksyscall(VM_PROC_NR, VM_SHM_UNMAP, &m);
 }
 
 unsigned long vm_getphys(int endpt, void *addr)
@@ -93,7 +93,7 @@ unsigned long vm_getphys(int endpt, void *addr)
 	m.VMPHYS_ENDPT = endpt;
 	m.VMPHYS_ADDR = (long) addr;
 
-	r = _syscall(VM_PROC_NR, VM_GETPHYS, &m);
+	r = ksyscall(VM_PROC_NR, VM_GETPHYS, &m);
 	if (r != 0)
 		return 0;
 	return m.VMPHYS_RETA;
@@ -108,7 +108,7 @@ u8_t vm_getrefcount(int endpt, void *addr)
 	m.VMREFCNT_ENDPT = endpt;
 	m.VMREFCNT_ADDR = (long) addr;
 
-	r = _syscall(VM_PROC_NR, VM_GETREF, &m);
+	r = ksyscall(VM_PROC_NR, VM_GETREF, &m);
 	if (r != 0)
 		return (u8_t) -1;
 	return (u8_t) m.VMREFCNT_RETC;

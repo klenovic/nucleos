@@ -18,6 +18,6 @@ int signr;			/* signal number: 1 - 16 */
 
   m.SIG_ENDPT = proc_ep;
   m.SIG_NUMBER = signr;
-  return(_taskcall(SYSTASK, SYS_KILL, &m));
+  return(ktaskcall(SYSTASK, SYS_KILL, &m));
 }
 

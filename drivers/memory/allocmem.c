@@ -16,7 +16,7 @@ phys_bytes *base;			/* return base address */
 {
   message m;
   m.m4_l1 = size;		
-  if (_syscall(PM_PROC_NR, __NR_allocmem, &m) < 0) return(-1);
+  if (ksyscall(PM_PROC_NR, __NR_allocmem, &m) < 0) return(-1);
   *base = m.m4_l2;
   return(0);
 }

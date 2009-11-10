@@ -12,7 +12,7 @@ int vm_notify_sig(endpoint_t ep, endpoint_t ipc_ep)
     m.VM_NOTIFY_SIG_ENDPOINT = ep;
     m.VM_NOTIFY_SIG_IPC = ipc_ep;
 
-    result = _taskcall(VM_PROC_NR, VM_NOTIFY_SIG, &m);
+    result = ktaskcall(VM_PROC_NR, VM_NOTIFY_SIG, &m);
     return(result);
 }
 

@@ -26,5 +26,5 @@ int sys_abort(int how, ...)
   }
   va_end(ap);
 
-  return(_taskcall(SYSTASK, SYS_ABORT, &m));
+  return(ktaskcall(SYSTASK, SYS_ABORT, &m));
 }

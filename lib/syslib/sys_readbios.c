@@ -20,5 +20,5 @@ size_t size;			/* Amount of data to read */
   m.RDB_SIZE = size;
   m.RDB_ADDR = address;
   m.RDB_BUF = buf;
-  return(_taskcall(SYSTASK, SYS_READBIOS, &m));
+  return(ktaskcall(SYSTASK, SYS_READBIOS, &m));
 }

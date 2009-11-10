@@ -16,7 +16,7 @@ void _exit(int status)
 	message m;
 
 	m.m1_i1 = status;
-	_syscall(PM_PROC_NR, __NR_exit, &m);
+	ksyscall(PM_PROC_NR, __NR_exit, &m);
 
 	/* If exiting nicely through PM fails for some reason, try to
 	 * commit suicide. E.g., message to PM might fail due to deadlock.

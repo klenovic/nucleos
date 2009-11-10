@@ -17,7 +17,7 @@ int sys_privctl(endpoint_t proc_ep, int request, void *p)
   m.CTL_REQUEST = request;
   m.CTL_ARG_PTR = p;
 
-  return _taskcall(SYSTASK, SYS_PRIVCTL, &m);
+  return ktaskcall(SYSTASK, SYS_PRIVCTL, &m);
 }
 
 int sys_privquery_mem(endpoint_t proc_ep, phys_bytes start, phys_bytes len)
@@ -29,5 +29,5 @@ int sys_privquery_mem(endpoint_t proc_ep, phys_bytes start, phys_bytes len)
   m.CTL_PHYSSTART = start;
   m.CTL_PHYSLEN = len;
 
-  return _taskcall(SYSTASK, SYS_PRIVCTL, &m);
+  return ktaskcall(SYSTASK, SYS_PRIVCTL, &m);
 }

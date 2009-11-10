@@ -16,5 +16,5 @@ int sigsuspend(const sigset_t *set)
 
 	m.m2_l1 = (long) *set;
 
-	return(_syscall(PM_PROC_NR, __NR_sigsuspend, &m));
+	return(ksyscall(PM_PROC_NR, __NR_sigsuspend, &m));
 }

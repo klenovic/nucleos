@@ -15,7 +15,7 @@
  *           Took from glibc to test how this could work.
  */
 
-/* Alloc 36 bytes (KIPC_MESSAGE_SIZE) on process's stack. It's actually the message which
+/* Alloc 36 bytes (KIPC_MESSAGE_SIZE) on process's stack. It's actually the message which is
  * used by kernel then.
  *
  * @nucleos: This allocation will be removed once the system call stuff is re-designed
@@ -221,8 +221,44 @@
 #endif
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-
 /* @nucleos: define some usefull stuffs here (see linux source) */
+
+#include <nucleos/kipc.h>
+
+extern int errno;
+static inline int ksyscall(int who, int syscallnr, message *msgptr)
+{
+	int status;
+
+	msgptr->m_type = syscallnr;
+	status = kipc_sendrec(who, msgptr);
+
+	if (status != 0) {
+		/* 'sendrec' itself failed. */
+		/* XXX - strerror doesn't know all the codes */
+		msgptr->m_type = status;
+	}
+
+	if (msgptr->m_type < 0) {
+		errno = -msgptr->m_type;
+		return(-1);
+	}
+
+	return(msgptr->m_type);
+}
+
+static inline int ktaskcall(endpoint_t who, int syscallnr, register message *msgptr)
+{
+	int status;
+
+	msgptr->m_type = syscallnr;
+	status = kipc_sendrec(who, msgptr);
+
+	if (status != 0)
+		return(status);
+
+	return(msgptr->m_type);
+}
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 

@@ -10,5 +10,5 @@
 /*	sysutil.h - System library utilities.	*/
 #include <nucleos/lib.h>		/* common to all libraries */
 #include <nucleos/com.h>		/* need task numbers + message types */
-#include <nucleos/syslib.h>	/* need sendrec, _taskcall, etc */
+#include <nucleos/syslib.h>	/* need sendrec, etc */
 #include <nucleos/sysutil.h>	/* prototypes in this library */

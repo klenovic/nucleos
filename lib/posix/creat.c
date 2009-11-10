@@ -18,5 +18,5 @@ int creat(const char *name, mode_t mode)
   m.m3_i1 = strlen(name) + 1;
   m.m3_p1 = (char *) name;
 
-  return(_syscall(FS_PROC_NR, __NR_creat, &m));
+  return(ksyscall(FS_PROC_NR, __NR_creat, &m));
 }

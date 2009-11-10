@@ -22,7 +22,7 @@ clock_t *uptime;		/* time the system is running */
   int r;
 
   m.T_ENDPT = proc_ep;
-  r = _taskcall(SYSTASK, SYS_TIMES, &m);
+  r = ktaskcall(SYSTASK, SYS_TIMES, &m);
   if (user_time) *user_time = m.T_USER_TIME;
   if (sys_time) *sys_time = m.T_SYSTEM_TIME;
   if (uptime) *uptime = m.T_BOOT_TICKS;

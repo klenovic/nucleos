@@ -19,6 +19,6 @@ int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
   m.PROF_CTL_PTR        = (void *) ctl_ptr;
   m.PROF_MEM_PTR        = (void *) mem_ptr;
 
-  return _syscall(PM_PROC_NR, __NR_sprof, &m);
+  return ksyscall(PM_PROC_NR, __NR_sprof, &m);
 }
 

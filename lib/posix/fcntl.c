@@ -45,5 +45,5 @@ int fcntl(int fd, int cmd, ...)
 	m.m1_i1 = fd;
 	m.m1_i2 = cmd;
 
-	return(_syscall(FS_PROC_NR, __NR_fcntl, &m));
+	return(ksyscall(FS_PROC_NR, __NR_fcntl, &m));
 }

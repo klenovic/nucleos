@@ -24,7 +24,7 @@ int minix_rs_lookup(const char *name, endpoint_t *value)
 	m.RS_NAME = (char *) name;
 	m.RS_NAME_LEN = len_key;
 
-	r = _taskcall(RS_PROC_NR, RS_LOOKUP, &m);
+	r = ktaskcall(RS_PROC_NR, RS_LOOKUP, &m);
 
 	if(r == 0) {
 		*value = m.RS_ENDPOINT;

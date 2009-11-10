@@ -20,5 +20,5 @@ int readlink(const char *name, char *buffer, size_t bufsiz)
   m.m1_p1 = (char *) name;
   m.m1_p2 = (char *) buffer;
 
-  return(_syscall(FS_PROC_NR, __NR_readlink, &m));
+  return(ksyscall(FS_PROC_NR, __NR_readlink, &m));
 }

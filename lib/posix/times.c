@@ -17,7 +17,7 @@ clock_t times(struct tms *buf)
 
 	m.m4_l5 = 0;			/* return this if system is pre-1.6 */
 
-	if (_syscall(PM_PROC_NR, __NR_times, &m) < 0)
+	if (ksyscall(PM_PROC_NR, __NR_times, &m) < 0)
 		return( (clock_t) -1);
 
 	buf->tms_utime = m.m4_l1;

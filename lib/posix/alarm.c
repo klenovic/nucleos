@@ -15,5 +15,5 @@ unsigned int alarm(unsigned int sec)
   message m;
 
   m.m1_i1 = (int) sec;
-  return( (unsigned) _syscall(PM_PROC_NR, __NR_alarm, &m));
+  return( (unsigned) ksyscall(PM_PROC_NR, __NR_alarm, &m));
 }

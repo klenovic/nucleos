@@ -18,7 +18,7 @@ int truncate(const char *_path, off_t _length)
   m.m2_i1 = strlen(_path)+1;
   m.m2_l1 = _length;
 
-  return(_syscall(FS_PROC_NR, __NR_truncate, &m));
+  return(ksyscall(FS_PROC_NR, __NR_truncate, &m));
 }
 
 int ftruncate(int _fd, off_t _length)
@@ -27,5 +27,5 @@ int ftruncate(int _fd, off_t _length)
   m.m2_l1 = _length;
   m.m2_i1 = _fd;
 
-  return(_syscall(FS_PROC_NR, __NR_ftruncate, &m));
+  return(ksyscall(FS_PROC_NR, __NR_ftruncate, &m));
 }

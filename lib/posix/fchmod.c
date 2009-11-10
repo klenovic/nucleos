@@ -16,5 +16,5 @@ int fchmod(int fd, mode_t mode)
 
   m.m3_i1 = fd;
   m.m3_i2 = mode;
-  return(_syscall(FS_PROC_NR, __NR_fchmod, &m));
+  return(ksyscall(FS_PROC_NR, __NR_fchmod, &m));
 }

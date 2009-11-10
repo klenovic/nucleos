@@ -21,7 +21,7 @@ struct sigmsg *sig_ctxt;		/* POSIX style handling */
 
     m.SIG_ENDPT = proc_ep;
     m.SIG_CTXT_PTR = (char *) sig_ctxt;
-    result = _taskcall(SYSTASK, SYS_SIGRETURN, &m);
+    result = ktaskcall(SYSTASK, SYS_SIGRETURN, &m);
     return(result);
 }
 

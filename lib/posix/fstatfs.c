@@ -18,5 +18,5 @@ int fstatfs(int fd, struct statfs *buffer)
 	m.m1_i1 = fd;
 	m.m1_p1 = (char *) buffer;
 
-	return(_syscall(FS_PROC_NR, __NR_fstatfs, &m));
+	return(ksyscall(FS_PROC_NR, __NR_fstatfs, &m));
 }

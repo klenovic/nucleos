@@ -18,5 +18,5 @@ ssize_t write(int fd, const void *buffer, size_t nbytes)
 	m.m1_i2 = nbytes;
 	m.m1_p1 = (char *) buffer;
 
-	return(_syscall(FS_PROC_NR, __NR_write, &m));
+	return(ksyscall(FS_PROC_NR, __NR_write, &m));
 }

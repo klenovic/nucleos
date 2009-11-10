@@ -17,7 +17,7 @@ int chdir(const char *name)
   m.m3_i1 = strlen(name) + 1;
   m.m3_p1 = (char *) name;
 
-  return(_syscall(FS_PROC_NR, __NR_chdir, &m));
+  return(ksyscall(FS_PROC_NR, __NR_chdir, &m));
 }
 
 int fchdir(int fd)
@@ -25,5 +25,5 @@ int fchdir(int fd)
   message m;
 
   m.m1_i1 = fd;
-  return(_syscall(FS_PROC_NR, __NR_fchdir, &m));
+  return(ksyscall(FS_PROC_NR, __NR_fchdir, &m));
 }

@@ -17,7 +17,7 @@ int getsysinfo(endpoint_t who, int what, void *where)
 	m.m1_i1 = what;
 	m.m1_p1 = where;
 
-	if (_syscall(who, __NR_getsysinfo, &m) < 0)
+	if (ksyscall(who, __NR_getsysinfo, &m) < 0)
 		return(-1);
 
 	return(0);
@@ -38,6 +38,6 @@ ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where)
 	m.SIU_WHERE = where;
 	m.SIU_LEN = size;
 
-	return _syscall(who, __NR_getsysinfo_up, &m);
+	return ksyscall(who, __NR_getsysinfo_up, &m);
 }
 

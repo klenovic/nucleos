@@ -24,7 +24,7 @@ void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)
 	m.VMMP_PHADDR = phaddr;
 	m.VMMP_LEN = len;
 
-	r = _taskcall(VM_PROC_NR, VM_MAP_PHYS, &m);
+	r = ktaskcall(VM_PROC_NR, VM_MAP_PHYS, &m);
 
 	if(r != 0) return MAP_FAILED;
 
@@ -39,6 +39,6 @@ int vm_unmap_phys(endpoint_t who, void *vaddr, size_t len)
 	m.VMUP_EP = who;
 	m.VMUP_VADDR = vaddr;
 
-	return _taskcall(VM_PROC_NR, VM_UNMAP_PHYS, &m);
+	return ktaskcall(VM_PROC_NR, VM_UNMAP_PHYS, &m);
 }
 

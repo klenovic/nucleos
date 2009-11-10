@@ -18,7 +18,7 @@ int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp)
 {
 	message m;
 
-	if (_syscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
+	if (ksyscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
 		return -1;
 
 	tp->tv_sec = m.m2_l1;

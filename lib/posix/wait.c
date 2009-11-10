@@ -14,7 +14,7 @@ pid_t wait(int *status)
 {
 	message m;
 
-	if (_syscall(PM_PROC_NR, __NR_wait, &m) < 0)
+	if (ksyscall(PM_PROC_NR, __NR_wait, &m) < 0)
 		return(-1);
 
 	if (status != 0)

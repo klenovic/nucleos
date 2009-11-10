@@ -17,7 +17,7 @@ endpoint_t proc_nr_e;			/* number of process to allow I/O */
 {
     message m_iop;
     m_iop.IO_ENDPT = proc_nr_e;
-    return _taskcall(SYSTASK, SYS_IOPENABLE, &m_iop);
+    return ktaskcall(SYSTASK, SYS_IOPENABLE, &m_iop);
 }
 
 

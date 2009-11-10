@@ -16,6 +16,6 @@ time_t boottime;		/* New boottime */
   int r;
 
   m.T_BOOTTIME = boottime;
-  r = _taskcall(SYSTASK, SYS_STIME, &m);
+  r = ktaskcall(SYSTASK, SYS_STIME, &m);
   return(r);
 }

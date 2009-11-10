@@ -19,7 +19,7 @@ endpoint_t proc_ep;				/* process number */
     int result;
 
     m.SIG_ENDPT = proc_ep;
-    result = _taskcall(SYSTASK, SYS_ENDKSIG, &m);
+    result = ktaskcall(SYSTASK, SYS_ENDKSIG, &m);
     return(result);
 }
 

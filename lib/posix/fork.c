@@ -14,5 +14,5 @@ pid_t fork(void)
 {
   message m;
 
-  return(_syscall(PM_PROC_NR, __NR_fork, &m));
+  return(ksyscall(PM_PROC_NR, __NR_fork, &m));
 }

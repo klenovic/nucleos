@@ -14,5 +14,5 @@ pid_t getpid()
 {
 	message m;
 
-	return(_syscall(PM_PROC_NR, __NR_getpid, &m));
+	return(ksyscall(PM_PROC_NR, __NR_getpid, &m));
 }

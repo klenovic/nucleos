@@ -57,7 +57,7 @@ char *rindex(const char *_s, int _charwanted);
 void bcopy(const void *_src, void *_dst, __kernel_size_t _length);
 int bcmp(const void *_s1, const void *_s2, __kernel_size_t _length);
 void bzero(void *_dst, __kernel_size_t _length);
-void *memccpy(char *_dst, const char *_src, int _ucharstop, __kernel_size_t _size);
+void *memccpy(void *_dst, const void *_src, int _ucharstop, __kernel_size_t _size);
 
 /* Misc. extra functions */
 int strcasecmp(const char *_s1, const char *_s2);

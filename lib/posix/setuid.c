@@ -15,7 +15,7 @@ int setuid(uid_t usr)
   message m;
 
   m.m1_i1 = usr;
-  return(_syscall(PM_PROC_NR, __NR_setuid, &m));
+  return(ksyscall(PM_PROC_NR, __NR_setuid, &m));
 }
 
 int seteuid(uid_t usr)
@@ -23,5 +23,5 @@ int seteuid(uid_t usr)
   message m;
 
   m.m1_i1 = usr;
-  return(_syscall(PM_PROC_NR, __NR_seteuid, &m));
+  return(ksyscall(PM_PROC_NR, __NR_seteuid, &m));
 }

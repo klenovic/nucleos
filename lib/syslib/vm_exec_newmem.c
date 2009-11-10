@@ -25,7 +25,7 @@ int vm_exec_newmem(endpoint_t ep, struct exec_newmem *args,
     m.VMEN_ARGSPTR = (void *) args;
     m.VMEN_ARGSSIZE = argssize;
 
-    result = _taskcall(VM_PROC_NR, VM_EXEC_NEWMEM, &m);
+    result = ktaskcall(VM_PROC_NR, VM_EXEC_NEWMEM, &m);
 
     *ret_stack_top = m.VMEN_STACK_TOP;
     *ret_flags = m.VMEN_FLAGS;

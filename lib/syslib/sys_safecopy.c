@@ -30,7 +30,7 @@ int sys_safecopyfrom(endpoint_t src_e,
   copy_mess.SCP_ADDRESS = (char *) address;
   copy_mess.SCP_BYTES = (long) bytes;
 
-  return(_taskcall(SYSTASK, SYS_SAFECOPYFROM, &copy_mess));
+  return(ktaskcall(SYSTASK, SYS_SAFECOPYFROM, &copy_mess));
 
 }
 
@@ -52,6 +52,6 @@ int sys_safecopyto(endpoint_t dst_e,
   copy_mess.SCP_ADDRESS = (char *) address;
   copy_mess.SCP_BYTES = (long) bytes;
 
-  return(_taskcall(SYSTASK, SYS_SAFECOPYTO, &copy_mess));
+  return(ktaskcall(SYSTASK, SYS_SAFECOPYTO, &copy_mess));
 
 }

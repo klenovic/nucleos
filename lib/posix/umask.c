@@ -15,5 +15,5 @@ mode_t umask(mode_t complmode)
   message m;
 
   m.m1_i1 = complmode;
-  return( (mode_t) _syscall(FS_PROC_NR, __NR_umask, &m));
+  return( (mode_t) ksyscall(FS_PROC_NR, __NR_umask, &m));
 }

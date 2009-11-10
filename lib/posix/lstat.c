@@ -20,7 +20,7 @@ int lstat(const char *name, struct stat *buffer)
 	m.m1_p1 = (char *) name;
 	m.m1_p2 = (char *) buffer;
 
-	if((r = _syscall(FS_PROC_NR, __NR_lstat, &m)) >= 0 || errno != ENOSYS)
+	if((r = ksyscall(FS_PROC_NR, __NR_lstat, &m)) >= 0 || errno != ENOSYS)
 		return r;
 
 	return stat(name, buffer);

@@ -17,6 +17,6 @@ off_t lseek(int fd, off_t offset, int whence)
   m.m2_i1 = fd;
   m.m2_l1 = offset;
   m.m2_i2 = whence;
-  if (_syscall(FS_PROC_NR, __NR_lseek, &m) < 0) return( (off_t) -1);
+  if (ksyscall(FS_PROC_NR, __NR_lseek, &m) < 0) return( (off_t) -1);
   return( (off_t) m.m2_l1);
 }

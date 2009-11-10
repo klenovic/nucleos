@@ -120,7 +120,7 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	m.m1_i3 = 0;
 	m.m1_p3 = NULL;
 
-	(void) _syscall(PM_PROC_NR, __NR_exec, &m);
+	(void) ksyscall(PM_PROC_NR, __NR_exec, &m);
 	/* Failure, return the memory used for the frame and exit. */
 	(void) sbrk(-frame_size);
 

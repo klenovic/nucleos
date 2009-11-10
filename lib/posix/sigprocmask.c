@@ -22,7 +22,7 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oset)
 		m.m2_l1 = (long) *set;
 	}
 
-	if (_syscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0)
+	if (ksyscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0)
 		return(-1);
 
 	if (oset != (sigset_t *) NULL)

@@ -22,7 +22,7 @@ vir_bytes bytes;			/* number of bytes to be copied */
     m.CP_SRC_ADDR = vir_addr;
     m.CP_NR_BYTES = bytes;
 
-    result = _taskcall(SYSTASK, SYS_MAPDMA, &m);
+    result = ktaskcall(SYSTASK, SYS_MAPDMA, &m);
     return(result);
 }
 

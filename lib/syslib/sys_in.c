@@ -23,7 +23,7 @@ int type;				/* byte, word, long */
     m_io.DIO_REQUEST = _DIO_INPUT | type;
     m_io.DIO_PORT = port;
 
-    result = _taskcall(SYSTASK, SYS_DEVIO, &m_io);
+    result = ktaskcall(SYSTASK, SYS_DEVIO, &m_io);
     *value = m_io.DIO_VALUE;
     return(result);
 }

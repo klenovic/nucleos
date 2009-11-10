@@ -25,5 +25,5 @@ int getitimer(int which, struct itimerval *value)
 	m.m1_p1 = NULL;		/* only retrieve the timer */
 	m.m1_p2 = (char *) value;
 
-	return _syscall(PM_PROC_NR, __NR_itimer, &m);
+	return ksyscall(PM_PROC_NR, __NR_itimer, &m);
 }

@@ -22,7 +22,7 @@ int vm_adddma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_b
   m.VMAD_START= start;
   m.VMAD_SIZE= size;
 
-  return _syscall(VM_PROC_NR, VM_ADDDMA, &m);
+  return ksyscall(VM_PROC_NR, VM_ADDDMA, &m);
 }
 
 int vm_deldma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_bytes size)
@@ -34,7 +34,7 @@ int vm_deldma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_b
   m.VMDD_START= start;
   m.VMDD_SIZE= size;
 
-  return _syscall(VM_PROC_NR, VM_DELDMA, &m);
+  return ksyscall(VM_PROC_NR, VM_DELDMA, &m);
 }
 
 int vm_getdma(endpoint_t req_proc_e, endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
@@ -44,7 +44,7 @@ int vm_getdma(endpoint_t req_proc_e, endpoint_t *procp, phys_bytes *basep, phys_
 
   m.VMGD_REQ = req_proc_e;
 
-  r= _syscall(VM_PROC_NR, VM_GETDMA, &m);
+  r= ksyscall(VM_PROC_NR, VM_GETDMA, &m);
   if (r == 0)
   {
 	*procp= m.VMGD_PROCP;

@@ -18,5 +18,5 @@ int fchown(int fd, uid_t owner, gid_t grp)
   m.m1_i1 = fd;
   m.m1_i2 = owner;
   m.m1_i3 = grp;
-  return(_syscall(FS_PROC_NR, __NR_fchown, &m));
+  return(ksyscall(FS_PROC_NR, __NR_fchown, &m));
 }

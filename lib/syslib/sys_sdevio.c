@@ -30,6 +30,6 @@ vir_bytes offset;			/* offset from grant */
     m_io.DIO_VEC_SIZE = count;
     m_io.DIO_OFFSET = offset;
 
-    return(_taskcall(SYSTASK, SYS_SDEVIO, &m_io));
+    return(ktaskcall(SYSTASK, SYS_SDEVIO, &m_io));
 }
 

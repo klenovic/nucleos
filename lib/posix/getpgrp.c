@@ -14,5 +14,5 @@ pid_t getpgrp()
 {
   message m;
 
-  return(_syscall(PM_PROC_NR, __NR_getpgrp, &m));
+  return(ksyscall(PM_PROC_NR, __NR_getpgrp, &m));
 }

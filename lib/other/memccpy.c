@@ -15,8 +15,6 @@
  */
 #include <nucleos/stddef.h>
 
-void *memccpy(void *dst, const void *src, int ucharstop, size_t size);
-
 #ifndef CHARBITS
 #	define	UNSCHAR(c)	((unsigned char)(c))
 #else

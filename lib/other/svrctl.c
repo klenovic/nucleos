@@ -25,11 +25,11 @@ int svrctl(int request, void *argp)
 	case 'M':
 	case 'S':
 		/* PM_PROC_NR handles calls for itself and the kernel. */
-		return _syscall(PM_PROC_NR, __NR_svrctl, &m);
+		return ksyscall(PM_PROC_NR, __NR_svrctl, &m);
 	case 'F':
 	case 'I':
 		/* FS_PROC_NR handles calls for itself and inet. */
-		return _syscall(FS_PROC_NR, __NR_svrctl, &m);
+		return ksyscall(FS_PROC_NR, __NR_svrctl, &m);
 	default:
 		errno = EINVAL;
 		return -1;

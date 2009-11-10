@@ -18,7 +18,7 @@ int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style, int force)
   m.m4_l3 = dev_nr;
   m.m4_l4 = dev_style;
   m.m4_l5 = force;
-  if (_syscall(FS_PROC_NR, __NR_devctl, &m) < 0) return(-1);
+  if (ksyscall(FS_PROC_NR, __NR_devctl, &m) < 0) return(-1);
   return(0);
 }
 

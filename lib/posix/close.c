@@ -15,5 +15,5 @@ int close(int fd)
   message m;
 
   m.m1_i1 = fd;
-  return(_syscall(FS_PROC_NR, __NR_close, &m));
+  return(ksyscall(FS_PROC_NR, __NR_close, &m));
 }

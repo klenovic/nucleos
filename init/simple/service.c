@@ -1043,7 +1043,7 @@ int main(int argc, char **argv)
       m.RS_CMD_LEN = strlen(command);
       m.RS_DEV_MAJOR = req_major;
       m.RS_PERIOD = req_period;
-      if ((s=_taskcall(RS_PROC_NR, request, &m)) != 0) 
+      if ((s=ktaskcall(RS_PROC_NR, request, &m)) != 0) 
           failure(-s);
       result = m.m_type;
       break;
@@ -1097,7 +1097,7 @@ int main(int argc, char **argv)
       m.RS_CMD_ADDR = (char *) &rs_start;
 
       /* Build request message and send the request. */
-      if ((s=_taskcall(RS_PROC_NR, request, &m)) != 0)
+      if ((s=ktaskcall(RS_PROC_NR, request, &m)) != 0)
           failure(-s);
       else if(req_printep)
 	printf("%d\n", m.RS_ENDPOINT);
@@ -1109,11 +1109,11 @@ int main(int argc, char **argv)
   case RS_RESTART:
       m.RS_CMD_ADDR = req_label;
       m.RS_CMD_LEN = strlen(req_label);
-      if ((s=_taskcall(RS_PROC_NR, request, &m)) != 0) 
+      if ((s=ktaskcall(RS_PROC_NR, request, &m)) != 0) 
           failure(-s);
       break;
   case RS_SHUTDOWN:
-      if ((s=_taskcall(RS_PROC_NR, request, &m)) != 0)
+      if ((s=ktaskcall(RS_PROC_NR, request, &m)) != 0)
           failure(-s);
       break;
   default:

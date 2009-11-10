@@ -34,5 +34,5 @@ phys_bytes bytes;		/* how many bytes */
   copy_mess.CP_DST_SPACE = dst_seg;
   copy_mess.CP_DST_ADDR = (long) dst_vir;
   copy_mess.CP_NR_BYTES = (long) bytes;
-  return(_taskcall(SYSTASK, SYS_VIRCOPY, &copy_mess));
+  return(ktaskcall(SYSTASK, SYS_VIRCOPY, &copy_mess));
 }

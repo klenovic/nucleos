@@ -31,5 +31,5 @@ int setitimer(int which, const struct itimerval *__restrict value,
   m.m1_p1 = (char *) value;
   m.m1_p2 = (char *) ovalue;
 
-  return _syscall(PM_PROC_NR, __NR_itimer, &m);
+  return ksyscall(PM_PROC_NR, __NR_itimer, &m);
 }

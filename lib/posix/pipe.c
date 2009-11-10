@@ -14,7 +14,7 @@ int pipe(int fild[2])
 {
   message m;
 
-  if (_syscall(FS_PROC_NR, __NR_pipe, &m) < 0) return(-1);
+  if (ksyscall(FS_PROC_NR, __NR_pipe, &m) < 0) return(-1);
   fild[0] = m.m1_i1;
   fild[1] = m.m1_i2;
   return(0);

@@ -26,5 +26,5 @@ int utime(const char *name, const struct utimbuf *timp)
 	m.m2_i1 = strlen(name) + 1;
   }
   m.m2_p1 = (char *) name;
-  return(_syscall(FS_PROC_NR, __NR_utime, &m));
+  return(ksyscall(FS_PROC_NR, __NR_utime, &m));
 }

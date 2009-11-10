@@ -20,7 +20,7 @@ int freemem(phys_bytes size, phys_bytes base)
   message m;
   m.m4_l1 = size;		
   m.m4_l2 = base;		
-  if (_syscall(PM_PROC_NR, __NR_freemem, &m) < 0) return(-1);
+  if (ksyscall(PM_PROC_NR, __NR_freemem, &m) < 0) return(-1);
   return(0);
 }
 

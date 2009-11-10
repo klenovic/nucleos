@@ -39,7 +39,7 @@ int flags;
 	m.DS_KEY_LEN = len;
 	m.DS_FLAGS = flags | (type & DS_TYPE_MASK);
 
-	r = _taskcall(DS_PROC_NR, DS_SUBSCRIBE, &m);
+	r = ktaskcall(DS_PROC_NR, DS_SUBSCRIBE, &m);
 
 	cpf_revoke(g);
 
@@ -68,7 +68,7 @@ u32_t value;
 	m.DS_VAL = value;
 	m.DS_VAL_LEN = sizeof(value);
 
-	r = _taskcall(DS_PROC_NR, DS_PUBLISH, &m);
+	r = ktaskcall(DS_PROC_NR, DS_PUBLISH, &m);
 
 	cpf_revoke(g);
 
@@ -107,7 +107,7 @@ char *value;
 	m.DS_VAL = g_str;
 	m.DS_VAL_LEN = len_str;
 
-	r = _taskcall(DS_PROC_NR, DS_PUBLISH, &m);
+	r = ktaskcall(DS_PROC_NR, DS_PUBLISH, &m);
 
 	cpf_revoke(g_key);
 	cpf_revoke(g_str);
@@ -136,7 +136,7 @@ u32_t *value;
 	m.DS_KEY_LEN = len_key;
 	m.DS_FLAGS = DS_TYPE_U32;
 
-	r = _taskcall(DS_PROC_NR, DS_RETRIEVE, &m);
+	r = ktaskcall(DS_PROC_NR, DS_RETRIEVE, &m);
 
 	cpf_revoke(g_key);
 
@@ -182,7 +182,7 @@ size_t len_str;
 	m.DS_VAL = g_str;
 	m.DS_VAL_LEN = len_str;
 
-	r = _taskcall(DS_PROC_NR, DS_RETRIEVE, &m);
+	r = ktaskcall(DS_PROC_NR, DS_RETRIEVE, &m);
 
 	cpf_revoke(g_key);
 	cpf_revoke(g_str);
@@ -225,7 +225,7 @@ size_t len_str;
 	m.DS_VAL = g_str;
 	m.DS_VAL_LEN = len_str;
 
-	r = _taskcall(DS_PROC_NR, DS_CHECK, &m);
+	r = ktaskcall(DS_PROC_NR, DS_CHECK, &m);
 
 	cpf_revoke(g_key);
 	cpf_revoke(g_str);
@@ -258,7 +258,7 @@ u32_t *value;
 	m.DS_KEY_LEN = len_key;
 	m.DS_FLAGS = DS_TYPE_U32;
 
-	r = _taskcall(DS_PROC_NR, DS_CHECK, &m);
+	r = ktaskcall(DS_PROC_NR, DS_CHECK, &m);
 
 	cpf_revoke(g_key);
 

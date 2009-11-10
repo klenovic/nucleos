@@ -11,7 +11,7 @@ libsys.a-obj-y := alloc_util.o assert.o panic.o pci_attr_r16.o pci_attr_r32.o pc
 	       sys_sysctl.o sys_vsafecopy.o sys_profbuf.o sys_sdevio.o sys_segctl.o sys_setalarm.o \
 	       sys_sigreturn.o sys_sigsend.o sys_privctl.o sys_setgrant.o sys_sprof.o sys_stime.o \
 	       sys_times.o sys_trace.o sys_umap.o sys_vinb.o sys_vinl.o sys_vinw.o sys_vircopy.o \
-	       sys_vmctl.o sys_voutb.o sys_voutl.o sys_voutw.o sys_vtimer.o taskcall.o ds.o \
+	       sys_vmctl.o sys_voutb.o sys_voutl.o sys_voutw.o sys_vtimer.o ds.o \
 	       vm_allocmem.o vm_brk.o vm_exec_newmem.o vm_exit.o vm_fork.o vm_map_phys.o vm_umap.o \
 	       vm_push_sig.o vm_ctl.o vm_notify_sig.o sys_runctl.o
 

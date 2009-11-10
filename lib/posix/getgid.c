@@ -14,5 +14,5 @@ gid_t getgid()
 {
   message m;
 
-  return( (gid_t) _syscall(PM_PROC_NR, __NR_getgid, &m));
+  return( (gid_t) ksyscall(PM_PROC_NR, __NR_getgid, &m));
 }

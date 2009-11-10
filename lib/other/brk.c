@@ -28,7 +28,7 @@ int brk(char *addr)
 	if (addr != _brksize) {
 		m.PMBRK_ADDR = addr;
 
-		if (_syscall(PM_PROC_NR, __NR_brk, &m) < 0)
+		if (ksyscall(PM_PROC_NR, __NR_brk, &m) < 0)
 			return(-1);
 
 		_brksize = m.m2_p1;

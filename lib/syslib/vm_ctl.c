@@ -13,6 +13,6 @@ int vm_ctl(int what, int param)
 
     m.VCTL_WHAT = what;
     m.VCTL_PARAM = param;
-    return _taskcall(VM_PROC_NR, VM_CTL, &m);
+    return ktaskcall(VM_PROC_NR, VM_CTL, &m);
 }
 

@@ -17,5 +17,5 @@ ssize_t read(int fd, void *buffer, size_t nbytes)
   m.m1_i1 = fd;
   m.m1_i2 = nbytes;
   m.m1_p1 = (char *) buffer;
-  return(_syscall(FS_PROC_NR, __NR_read, &m));
+  return(ksyscall(FS_PROC_NR, __NR_read, &m));
 }

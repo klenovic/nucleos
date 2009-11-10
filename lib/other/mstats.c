@@ -20,7 +20,7 @@ int mstats(struct message_statentry *ms, int entries, int reset)
 	m.m1_i2 = reset;
 	m.m1_p1 = (void *) ms;
 
-	if(_syscall(PM_PROC_NR, MSTATS, &m) < 0) {
+	if(ksyscall(PM_PROC_NR, MSTATS, &m) < 0) {
 		return -1;
 	}
 

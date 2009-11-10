@@ -16,5 +16,5 @@ int stime(long *top)
   message m;
 
   m.m2_l1 = *top;
-  return(_syscall(PM_PROC_NR, __NR_stime, &m));
+  return(ksyscall(PM_PROC_NR, __NR_stime, &m));
 }

@@ -22,9 +22,8 @@
 #include <nucleos/com.h>
 #include <nucleos/type.h>
 #include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <nucleos/kipc.h>
 #include <asm/syscall.h>
-
-int _syscall(int _who, int _syscallnr, message *_msgptr);
 
 #endif /* __NUCLEOS_LIB_H */

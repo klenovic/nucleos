@@ -16,5 +16,5 @@ int fsync(int fd)
 
   m.m1_i1 = fd;
 
-  return(_syscall(FS_PROC_NR, __NR_fsync, &m));
+  return(ksyscall(FS_PROC_NR, __NR_fsync, &m));
 }

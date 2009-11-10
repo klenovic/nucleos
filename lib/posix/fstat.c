@@ -17,5 +17,5 @@ int fstat(int fd, struct stat *buffer)
 	m.m1_i1 = fd;
 	m.m1_p1 = (char *) buffer;
 
-	return(_syscall(FS_PROC_NR, __NR_fstat, &m));
+	return(ksyscall(FS_PROC_NR, __NR_fstat, &m));
 }

@@ -23,6 +23,6 @@ int vm_brk(endpoint_t ep, char *addr)
     m.VMB_ENDPOINT = ep;
     m.VMB_ADDR = (void *) addr;
 
-    return _taskcall(VM_PROC_NR, VM_BRK, &m);
+    return ktaskcall(VM_PROC_NR, VM_BRK, &m);
 }
 

@@ -22,7 +22,7 @@ int vm_exit(endpoint_t ep)
 
     m.VME_ENDPOINT = ep;
 
-    result = _taskcall(VM_PROC_NR, VM_EXIT, &m);
+    result = ktaskcall(VM_PROC_NR, VM_EXIT, &m);
     return(result);
 }
 
@@ -37,7 +37,7 @@ int vm_willexit(endpoint_t ep)
 
     m.VMWE_ENDPOINT = ep;
 
-    result = _taskcall(VM_PROC_NR, VM_WILLEXIT, &m);
+    result = ktaskcall(VM_PROC_NR, VM_WILLEXIT, &m);
     return(result);
 }
 

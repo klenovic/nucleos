@@ -30,5 +30,5 @@ int sigreturn(register struct sigcontext *scp)
 	m.m2_i2 = scp->sc_flags;
 	m.m2_p1 = (char *) scp;
 
-	return(_syscall(PM_PROC_NR, __NR_sigreturn, &m));	/* normally this doesn't return */
+	return(ksyscall(PM_PROC_NR, __NR_sigreturn, &m));	/* normally this doesn't return */
 }

@@ -18,5 +18,5 @@ int ioctl(int fd, int request, void *data)
 	m.TTY_LINE = fd;
 	m.TTY_REQUEST = request;
 	m.ADDRESS = (char *) data;
-	return(_syscall(FS_PROC_NR, __NR_ioctl, &m));
+	return(ksyscall(FS_PROC_NR, __NR_ioctl, &m));
 }

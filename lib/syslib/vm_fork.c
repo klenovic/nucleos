@@ -23,7 +23,7 @@ int vm_fork(endpoint_t ep, int slot, endpoint_t *childep)
     m.VMF_ENDPOINT = ep;
     m.VMF_SLOTNO = slot;
 
-    result = _taskcall(VM_PROC_NR, VM_FORK, &m);
+    result = ktaskcall(VM_PROC_NR, VM_FORK, &m);
 
     *childep = m.VMF_CHILD_ENDPOINT;
 

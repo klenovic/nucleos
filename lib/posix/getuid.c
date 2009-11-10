@@ -14,5 +14,5 @@ uid_t getuid()
 {
   message m;
 
-  return( (uid_t) _syscall(PM_PROC_NR, __NR_getuid, &m));
+  return( (uid_t) ksyscall(PM_PROC_NR, __NR_getuid, &m));
 }

@@ -11,5 +11,5 @@ int sys_runctl(endpoint_t proc_ep, int action, int flags)
   m.RC_ACTION = action;
   m.RC_FLAGS = flags;
 
-  return(_taskcall(SYSTASK, SYS_RUNCTL, &m));
+  return(ktaskcall(SYSTASK, SYS_RUNCTL, &m));
 }

@@ -18,5 +18,5 @@ int mkdir(const char *name, mode_t mode)
   m.m1_i1 = strlen(name) + 1;
   m.m1_i2 = mode;
   m.m1_p1 = (char *) name;
-  return(_syscall(FS_PROC_NR, __NR_mkdir, &m));
+  return(ksyscall(FS_PROC_NR, __NR_mkdir, &m));
 }

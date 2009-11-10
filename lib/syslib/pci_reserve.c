@@ -45,6 +45,6 @@ int devind;
 
         m.m1_i1= devind;
 
-        return(_taskcall(pci_procnr, BUSC_PCI_RESERVE, &m));
+        return(ktaskcall(pci_procnr, BUSC_PCI_RESERVE, &m));
 }
 

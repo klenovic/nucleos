@@ -17,5 +17,5 @@ ssize_t getdents(int fd, struct dirent *buffer, size_t nbytes)
   m.m1_i1 = fd;
   m.m1_i2 = nbytes;
   m.m1_p1 = (char *) buffer;
-  return _syscall(FS_PROC_NR, __NR_getdents, &m);
+  return ksyscall(FS_PROC_NR, __NR_getdents, &m);
 }

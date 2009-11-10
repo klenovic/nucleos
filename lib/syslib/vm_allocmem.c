@@ -21,7 +21,7 @@ int vm_allocmem(phys_clicks bytes, phys_clicks *retmembase)
     int result;
 
     m.VMAM_BYTES = (char *) bytes;
-    result = _taskcall(VM_PROC_NR, VM_ALLOCMEM, &m);
+    result = ktaskcall(VM_PROC_NR, VM_ALLOCMEM, &m);
     if(result == 0)
 	    *retmembase = m.VMAM_MEMBASE;
 

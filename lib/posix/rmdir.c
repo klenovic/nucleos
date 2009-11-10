@@ -17,5 +17,5 @@ int rmdir(const char *name)
   m.m3_i1 = strlen(name) + 1;
   m.m3_p1 = (char *) name;
 
-  return(_syscall(FS_PROC_NR, __NR_rmdir, &m));
+  return(ksyscall(FS_PROC_NR, __NR_rmdir, &m));
 }

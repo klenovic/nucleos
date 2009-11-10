@@ -22,6 +22,6 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
   m.SEL_ERRORFDS = (char *) errorfds;
   m.SEL_TIMEOUT = (char *) timeout;
 
-  return (_syscall(FS_PROC_NR, __NR_select, &m));
+  return (ksyscall(FS_PROC_NR, __NR_select, &m));
 }
 

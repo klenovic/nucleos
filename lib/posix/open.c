@@ -31,5 +31,5 @@ int open(const char *name, int flags, ...)
   }
   va_end(argp);
 
-  return (_syscall(FS_PROC_NR, __NR_open, &m));
+  return (ksyscall(FS_PROC_NR, __NR_open, &m));
 }

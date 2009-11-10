@@ -24,5 +24,5 @@ int sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 	m.m1_p2 = (char *) oact;
 	m.m1_p3 = (char *) __sigreturn;
 
-	return(_syscall(PM_PROC_NR, __NR_sigaction, &m));
+	return(ksyscall(PM_PROC_NR, __NR_sigaction, &m));
 }

@@ -19,7 +19,7 @@ pid_t getppid()
 	 * are not always successful and Minix returns the reserved value
 	 * (pid_t) -1 when there is an error.
 	 */
-	if (_syscall(PM_PROC_NR, __NR_getpid, &m) < 0)
+	if (ksyscall(PM_PROC_NR, __NR_getpid, &m) < 0)
 		return ( (pid_t) -1);
 
 	return( (pid_t) m.m2_i1);

@@ -19,5 +19,5 @@ int chown(const char *name, uid_t owner, gid_t grp)
   m.m1_i2 = owner;
   m.m1_i3 = grp;
   m.m1_p1 = (char *) name;
-  return(_syscall(FS_PROC_NR, __NR_chown, &m));
+  return(ksyscall(FS_PROC_NR, __NR_chown, &m));
 }

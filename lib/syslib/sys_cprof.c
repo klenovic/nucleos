@@ -27,6 +27,6 @@ void *mem_ptr;				/* location of allocated memory */
   m.PROF_CTL_PTR        = ctl_ptr;
   m.PROF_MEM_PTR        = mem_ptr;
 
-  return(_taskcall(SYSTASK, SYS_CPROF, &m));
+  return(ktaskcall(SYSTASK, SYS_CPROF, &m));
 }
 

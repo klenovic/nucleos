@@ -21,7 +21,7 @@ long addr, *data_p;
   m.CTL_REQUEST = req;
   m.CTL_ADDRESS = addr;
   if (data_p) m.CTL_DATA = *data_p;
-  r = _taskcall(SYSTASK, SYS_TRACE, &m);
+  r = ktaskcall(SYSTASK, SYS_TRACE, &m);
   if (data_p) *data_p = m.CTL_DATA;
   return(r);
 }

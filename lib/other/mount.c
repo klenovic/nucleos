@@ -133,7 +133,7 @@ int mountflags;
   m.m1_p1 = special;
   m.m1_p2 = name;
   m.m1_p3 = (char*) ep;
-  r = _syscall(FS_PROC_NR, __NR_mount, &m);
+  r = ksyscall(FS_PROC_NR, __NR_mount, &m);
 
   if(r != 0) {
 	/* If mount() failed, tell RS to shutdown MFS process.
@@ -160,7 +160,7 @@ const char *name;
   m.m3_i1 = strlen(name) + 1;
   m.m3_p1 = (char *) name;
 
-  r = _syscall(FS_PROC_NR, __NR_umount, &m);
+  r = ksyscall(FS_PROC_NR, __NR_umount, &m);
 
   if(r == 0) {
 	rs_down(label);

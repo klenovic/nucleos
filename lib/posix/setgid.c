@@ -15,7 +15,7 @@ int setgid(gid_t grp)
   message m;
 
   m.m1_i1 = (int) grp;
-  return(_syscall(PM_PROC_NR, __NR_setgid, &m));
+  return(ksyscall(PM_PROC_NR, __NR_setgid, &m));
 }
 
 int setegid(gid_t grp)
@@ -23,5 +23,5 @@ int setegid(gid_t grp)
   message m;
 
   m.m1_i1 = (int) grp;
-  return(_syscall(PM_PROC_NR, __NR_setegid, &m));
+  return(ksyscall(PM_PROC_NR, __NR_setegid, &m));
 }

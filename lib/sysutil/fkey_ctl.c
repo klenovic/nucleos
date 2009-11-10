@@ -27,7 +27,7 @@ int *sfkeys;				/* bit masks for Shift F1-F12 keys */
     m.FKEY_REQUEST = request;
     m.FKEY_FKEYS = (fkeys) ? *fkeys : 0;
     m.FKEY_SFKEYS = (sfkeys) ? *sfkeys : 0;
-    s = _taskcall(TTY_PROC_NR, FKEY_CONTROL, &m);
+    s = ktaskcall(TTY_PROC_NR, FKEY_CONTROL, &m);
     if (fkeys) *fkeys = m.FKEY_FKEYS;
     if (sfkeys) *sfkeys = m.FKEY_SFKEYS;
     return(s);

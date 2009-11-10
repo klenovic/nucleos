@@ -19,5 +19,5 @@ int sys_setgrant(cp_grant_t *grants, int ngrants)
   m.SG_ADDR = (char *) grants;
   m.SG_SIZE = ngrants;
 
-  return _taskcall(SYSTASK, SYS_SETGRANT, &m);
+  return ktaskcall(SYSTASK, SYS_SETGRANT, &m);
 }

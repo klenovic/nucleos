@@ -64,7 +64,7 @@ int max_len;				/* maximum length of value */
   m.I_ENDPT = SELF;
   m.I_VAL_LEN = sizeof(mon_params);
   m.I_VAL_PTR = mon_params;
-  if ((s=_taskcall(SYSTASK, SYS_GETINFO, &m)) != 0) {
+  if ((s=ktaskcall(SYSTASK, SYS_GETINFO, &m)) != 0) {
 	printf("SYS_GETINFO: %d (size %u)\n", s, sizeof(mon_params));
 	return(s);
   }

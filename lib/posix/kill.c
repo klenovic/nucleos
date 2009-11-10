@@ -22,5 +22,5 @@ int kill(int proc, int sig)
 	m.m1_i1 = proc;
 	m.m1_i2 = sig;
 
-	return(_syscall(PM_PROC_NR, __NR_kill, &m));
+	return(ksyscall(PM_PROC_NR, __NR_kill, &m));
 }
