@@ -491,7 +491,7 @@ static u8_t do_inb(port_t port)
 	int r;
 	u32_t value;
 
-	r= sys_inb(port, &value);
+	r= sys_inb(port, (unsigned long*)&value);
 	if (r != 0)
 		panic("ti1225","sys_inb failed", r);
 	return value;

@@ -12,7 +12,7 @@
 #include <asm/cpufeature.h>
 #include <asm/servers/vm/vm.h>
 
-int _cpufeature(int cpufeature)
+int cpufeature(int featureno)
 {
 	u32_t cpuid_feature_edx = 0;
 	int proc;
@@ -30,11 +30,15 @@ int _cpufeature(int cpufeature)
 		}
 	}
 
-	switch(cpufeature) {
+	switch(featureno) {
 		case _CPUF_I386_PSE:
 			return cpuid_feature_edx & CPUID1_EDX_PSE;
 		case _CPUF_I386_PGE:
 			return cpuid_feature_edx & CPUID1_EDX_PGE;
+		case _CPUF_I386_APIC_ON_CHIP:
+			return cpuid_feature_edx & CPUID1_EDX_APIC_ON_CHIP;
+		case _CPUF_I386_TSC:
+			return cpuid_feature_edx & CPUID1_EDX_TSC;
 	}
 
 	return 0;

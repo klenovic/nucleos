@@ -50,8 +50,8 @@
 #define NON_BLOCKING    0x0080  /* do not block if target not ready */
 
 #define WILLRECEIVE(target, source_ep) \
-  ((RTS_ISSET(target, RECEIVING) && !RTS_ISSET(target, SENDING)) &&	\
-    (target->p_getfrom_e == ANY || target->p_getfrom_e == source_ep))
+	((RTS_ISSET(target, RTS_RECEIVING) && !RTS_ISSET(target, RTS_SENDING)) && \
+		(target->p_getfrom_e == ANY || target->p_getfrom_e == source_ep))
 
 #endif /* __ASSEMBLY__ */
 #endif /* __KERNEL__ */

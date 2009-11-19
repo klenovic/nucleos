@@ -64,6 +64,8 @@ int sys_readbios(phys_bytes address, void *buf, size_t size);
 int sys_stime(time_t boottime);
 int sys_sysctl(int ctl, char *arg1, int arg2);
 int sys_sysctl_stacktrace(endpoint_t who);
+int sys_vmctl_get_mapping(int index, phys_bytes *addr, phys_bytes *len, int *flags);
+int sys_vmctl_reply_mapping(int index, vir_bytes addr);
 
 /* Shorthands for sys_sdevio() system call. */
 #define sys_insb(port, proc_ep, buffer, count) \

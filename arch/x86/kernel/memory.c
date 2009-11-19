@@ -7,19 +7,22 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-#include <kernel/kernel.h>
-#include <kernel/proc.h>
-#include <kernel/vm.h>
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
-#include <asm/cpufeature.h>
 #include <nucleos/string.h>
-#include <asm/servers/vm/vm.h>
 #include <nucleos/portio.h>
-#include <asm/kernel/proto.h>
 #include <kernel/proto.h>
+#include <kernel/kernel.h>
+#include <kernel/proc.h>
+#include <kernel/vm.h>
+#include <kernel/debug.h>
+#include <asm/servers/vm/vm.h>
+#include <asm/cpufeature.h>
+
+#ifdef CONFIG_X86_LOCAL_APIC
+#include <asm/apic.h>
+#endif
 
 static int psok = 0;
 
@@ -298,8 +301,8 @@ static void vm_enable_paging(void)
 	u32_t cr0, cr4;
 	int pgeok;
 
-	psok = _cpufeature(_CPUF_I386_PSE);
-	pgeok = _cpufeature(_CPUF_I386_PGE);
+	psok = cpufeature(_CPUF_I386_PSE);
+	pgeok = cpufeature(_CPUF_I386_PGE);
 
 	cr0= read_cr0();
 	cr4= read_cr4();
@@ -431,7 +434,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 			kprintf("SYSTEM:umap_virtual: umap_local failed\n");
 			phys = 0;
 		} else {
-			if(vm_lookup(rp, linear, &phys, NULL) != 0) {
+			if(vm_lookup(rp, linear, (vir_bytes*)&phys, NULL) != 0) {
 				kprintf("SYSTEM:umap_virtual: vm_lookup of %s: seg 0x%lx: 0x%lx failed\n", rp->p_name, seg, vir_addr);
 				phys = 0;
 			}
@@ -475,7 +478,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 
 	vmassert(proc);
 	vmassert(physical);
-	vmassert(!(proc->p_rts_flags & SLOT_FREE));
+	vmassert(!isemptyp(proc));
 
 	if(!HASPT(proc)) {
 		*physical = virtual;
@@ -564,7 +567,7 @@ int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
 	while(bytes > 0) {
 		u32_t phys;
 
-		if((r=vm_lookup(targetproc, vir_buf, &phys, NULL)) != 0) {
+		if((r=vm_lookup(targetproc, vir_buf, (vir_bytes*)&phys, NULL)) != 0) {
 			kprintf("vm_contiguous: vm_lookup failed, %d\n", r);
 			kprintf("kernel stack: ");
 			util_stacktrace();
@@ -602,10 +605,10 @@ int vm_suspend(struct proc *caller, struct proc *target,
 	/* This range is not OK for this process. Set parameters  
 	 * of the request and notify VM about the pending request. 
 	 */								
-	vmassert(!RTS_ISSET(caller, VMREQUEST));
-	vmassert(!RTS_ISSET(target, VMREQUEST));
+	vmassert(!RTS_ISSET(caller, RTS_VMREQUEST));
+	vmassert(!RTS_ISSET(target, RTS_VMREQUEST));
 
-	RTS_LOCK_SET(caller, VMREQUEST);
+	RTS_LOCK_SET(caller, RTS_VMREQUEST);
 
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 	caller->p_vmrequest.stacktrace[0] = '\0';
@@ -718,7 +721,7 @@ void vm_print(u32_t *root)
 
 	printf("page table 0x%lx:\n", root);
 
-	for(pde = 10; pde < I386_VM_DIR_ENTRIES; pde++) {
+	for(pde = 0; pde < I386_VM_DIR_ENTRIES; pde++) {
 		u32_t pde_v;
 		u32_t *pte_a;
 		pde_v = phys_get32((u32_t) (root + pde));
@@ -878,11 +881,11 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 
 	caller = proc_addr(who_p);
 
-	if(RTS_ISSET(caller, VMREQUEST)) {
+	if(RTS_ISSET(caller, RTS_VMREQUEST)) {
 		struct proc *target;
 		int pn;
 		vmassert(caller->p_vmrequest.vmresult != VMSUSPEND);
-		RTS_LOCK_UNSET(caller, VMREQUEST);
+		RTS_LOCK_UNSET(caller, RTS_VMREQUEST);
 		if(caller->p_vmrequest.vmresult != 0) {
 			printf("virtual_copy: returning VM error %d\n",
 				caller->p_vmrequest.vmresult);
@@ -1026,4 +1029,44 @@ void i386_freepde(int pde)
 	if(nfreepdes >= WANT_FREEPDES)
 		return;
 	freepdes[nfreepdes++] = pde;
+}
+
+arch_phys_map(int index, phys_bytes *addr, phys_bytes *len, int *flags)
+{
+#ifdef CONFIG_X86_LOCAL_APIC
+	/* map the local APIC if enabled */
+	if (index == 0 && lapic_addr) {
+		*addr = vir2phys(lapic_addr);
+		*len = 4 << 10 /* 4kB */;
+		*flags = VMMF_UNCACHED;
+		return 0;
+	}
+	return -EINVAL;
+#else
+	/* we don't want anything */
+	return -EINVAL;
+#endif
+}
+
+arch_phys_map_reply(int index, vir_bytes addr)
+{
+#ifdef CONFIG_X86_LOCAL_APIC
+	/* if local APIC is enabled */
+	if (index == 0 && lapic_addr) {
+		lapic_addr_vaddr = addr;
+	}
+#endif
+	return 0;
+}
+
+int arch_enable_paging(void)
+{
+#ifdef CONFIG_X86_LOCAL_APIC
+	/* if local APIC is enabled */
+	if (lapic_addr) {
+		lapic_addr = lapic_addr_vaddr;
+		lapic_eoi_addr = LAPIC_EOI;
+	}
+#endif
+	return 0;
 }

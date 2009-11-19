@@ -12,6 +12,7 @@
 #define __KERNEL_CONST_H
 
 #include <nucleos/bitmap.h>
+#include <asm/kernel/const.h>
 
 #if defined (__KERNEL__) || defined (__UKERNEL__)
 

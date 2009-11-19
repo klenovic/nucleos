@@ -7,17 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-main.c
-*/
-
 #include <nucleos/drivers.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/pci.h>
 #include <ibm/pci.h>
 #include <servers/rs/rs.h>
 
-#define NR_DRIVERS	16
+#define NR_DRIVERS	NR_SYS_PROCS
 
 static struct acl
 {

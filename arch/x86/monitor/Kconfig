@@ -1,24 +1,29 @@
 menu "Legacy boot monitor"
+
+config BOOT_VERBOSE
+	bool "Boot verbose"
+	default y
+
 choice
-  prompt "Type of linkage of monitor"
-  default BOOTMONITOR_LINKAGE_SEPID
+	prompt "Type of linkage of monitor"
+	default BOOTMONITOR_LINKAGE_SEPID
 
 config BOOTMONITOR_LINKAGE_COMID
-  bool "Common I&D"
-  ---help---
-    This will link boot monitor with common I&D.
+	bool "Common I&D"
+	---help---
+	  This will link boot monitor with common I&D.
 
 config BOOTMONITOR_LINKAGE_SEPID
-  bool "Separate I&D"
-  ---help---
-    This will link boot monitor with separate I&D.
+	bool "Separate I&D"
+	---help---
+	  This will link boot monitor with separate I&D.
 
 endchoice
 
 config BOOTMONITOR_LINKAGE_TYPE
-  hex
-  default "0x00" if BOOTMONITOR_LINKAGE_COMID=y
-  default "0x20" if BOOTMONITOR_LINKAGE_SEPID=y
+	hex
+	default "0x00" if BOOTMONITOR_LINKAGE_COMID=y
+	default "0x20" if BOOTMONITOR_LINKAGE_SEPID=y
 
 endmenu
 

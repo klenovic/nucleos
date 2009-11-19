@@ -124,7 +124,7 @@ void sys_task()
 	 * until VM tells us it's allowed. VM has been notified
 	 * and we must wait for its reply to restart the call.
 	 */
-        vmassert(RTS_ISSET(caller_ptr, VMREQUEST));
+        vmassert(RTS_ISSET(caller_ptr, RTS_VMREQUEST));
 	vmassert(caller_ptr->p_vmrequest.type == VMSTYPE_KERNELCALL);
 	memcpy(&caller_ptr->p_vmrequest.saved.reqmsg, &m, sizeof(m));
       } else if (result != -EDONTREPLY) {
@@ -133,9 +133,9 @@ void sys_task()
 	 * call trap.
 	 */
 		if(restarting) {
-        		vmassert(!RTS_ISSET(restarting, VMREQUEST));
+        		vmassert(!RTS_ISSET(restarting, RTS_VMREQUEST));
 #if 0
-        		vmassert(!RTS_ISSET(restarting, VMREQTARGET));
+        		vmassert(!RTS_ISSET(restarting, RTS_VMREQTARGET));
 #endif
 		}
 		m.m_type = result;		/* report status of call */
@@ -369,8 +369,8 @@ int sig_nr;			/* signal to be sent, 1 to _NSIG */
   rp = proc_addr(proc_nr);
   if (! sigismember(&rp->p_pending, sig_nr)) {
       sigaddset(&rp->p_pending, sig_nr);
-      if (! (RTS_ISSET(rp, SIGNALED))) {		/* other pending */
-	  RTS_LOCK_SET(rp, SIGNALED | SIG_PENDING);
+      if (! (RTS_ISSET(rp, RTS_SIGNALED))) {		/* other pending */
+	  RTS_LOCK_SET(rp, RTS_SIGNALED | RTS_SIG_PENDING);
           send_sig(PM_PROC_NR, SIGKSIG);
       }
   }
@@ -481,7 +481,7 @@ register struct proc *rc;		/* slot of process to clean up */
   }
 
   /* Make sure that the exiting process is no longer scheduled. */
-  RTS_LOCK_SET(rc, NO_ENDPOINT);
+  RTS_LOCK_SET(rc, RTS_NO_ENDPOINT);
   if (priv(rc)->s_flags & SYS_PROC)
   {
 	if (priv(rc)->s_asynsize) {
@@ -495,7 +495,7 @@ register struct proc *rc;		/* slot of process to clean up */
   /* If the process happens to be queued trying to send a
    * message, then it must be removed from the message queues.
    */
-  if (RTS_ISSET(rc, SENDING)) {
+  if (RTS_ISSET(rc, RTS_SENDING)) {
       int target_proc;
 
       okendpt(rc->p_sendto_e, &target_proc);
@@ -511,9 +511,9 @@ register struct proc *rc;		/* slot of process to clean up */
           }
           xpp = &(*xpp)->p_q_link;		/* proceed to next queued */
       }
-      rc->p_rts_flags &= ~SENDING;
+      rc->p_rts_flags &= ~RTS_SENDING;
   }
-  rc->p_rts_flags &= ~RECEIVING;
+  rc->p_rts_flags &= ~RTS_RECEIVING;
 
   /* Likewise, if another process was sending or receive a message to or from 
    * the exiting process, it must be alerted that process no longer is alive.
@@ -527,18 +527,18 @@ register struct proc *rc;		/* slot of process to clean up */
       unset_sys_bit(priv(rp)->s_notify_pending, priv(rc)->s_id);
 
       /* Check if process is receiving from exiting process. */
-      if (RTS_ISSET(rp, RECEIVING) && rp->p_getfrom_e == rc->p_endpoint) {
+      if (RTS_ISSET(rp, RTS_RECEIVING) && rp->p_getfrom_e == rc->p_endpoint) {
           rp->p_reg.retreg = -ESRCDIED;		/* report source died */
-	  RTS_LOCK_UNSET(rp, RECEIVING);	/* no longer receiving */
+	  RTS_LOCK_UNSET(rp, RTS_RECEIVING);	/* no longer receiving */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s receiving from dead src ep %d / %s\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
 #endif
       } 
-      if (RTS_ISSET(rp, SENDING) &&
+      if (RTS_ISSET(rp, RTS_SENDING) &&
 	  rp->p_sendto_e == rc->p_endpoint) {
           rp->p_reg.retreg = -EDSTDIED;		/* report destination died */
-	  RTS_LOCK_UNSET(rp, SENDING);
+	  RTS_LOCK_UNSET(rp, RTS_SENDING);
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 	  kprintf("endpoint %d / %s send to dying dst ep %d (%s)\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
@@ -560,8 +560,8 @@ static struct proc *vmrestart_check(message *m)
 	if(!(restarting = vmrestart))
 		return NULL;
 
-	vmassert(!RTS_ISSET(restarting, SLOT_FREE));
-	vmassert(RTS_ISSET(restarting, VMREQUEST));
+	vmassert(!RTS_ISSET(restarting, RTS_SLOT_FREE));
+	vmassert(RTS_ISSET(restarting, RTS_VMREQUEST));
 
 	type = restarting->p_vmrequest.type;
 	restarting->p_vmrequest.type = VMSTYPE_SYS_NONE;
@@ -594,4 +594,7 @@ static struct proc *vmrestart_check(message *m)
 	   		minix_panic("strange restart type", type);
 	}
 	minix_panic("fell out of switch", NO_NUM);
+
+	/* just to shut up the compiler */
+	return NULL;
 }

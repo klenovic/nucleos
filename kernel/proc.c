@@ -83,7 +83,8 @@ static int try_async(struct proc *caller_ptr);
 static int try_one(struct proc *src_ptr, struct proc *dst_ptr,
 		int *postponed);
 static void sched(struct proc *rp, int *queue, int *front);
-static void pick_proc(void);
+static struct proc * pick_proc(void);
+static void enqueue_head(struct proc *rp);
 
 #define PICK_ANY	1
 #define PICK_HIGHERONLY	2
@@ -153,28 +154,59 @@ struct proc * schedcheck(void)
 	 */
   	NOREC_ENTER(schedch);
 	vmassert(intr_disabled());
-	if(next_ptr) {
-		proc_ptr = next_ptr;
-		next_ptr = NULL;
+
+	/*
+	 * if the current process is still runnable check the misc flags and let
+	 * it run unless it becomes not runnable in the meantime
+	 */
+	if (proc_is_runnable(proc_ptr))
+		goto check_misc_flags;
+
+	/*
+	 * if a process becomes not runnable while handling the misc flags, we
+	 * need to pick a new one here and start from scratch. Also if the
+	 * current process wasn' runnable, we pick a new one here
+	 */
+not_runnable_pick_new:
+	if (proc_is_preempted(proc_ptr)) {
+		proc_ptr->p_rts_flags &= ~RTS_PREEMPTED;
+		if (proc_is_runnable(proc_ptr))
+			enqueue_head(proc_ptr);
 	}
+	/* this enqueues the process again */
+	if (proc_no_quantum(proc_ptr))
+		RTS_UNSET(proc_ptr, RTS_NO_QUANTUM);
+
+	/*
+	 * if we have no process to run, set IDLE as the current process for
+	 * time accounting and put the cpu in and idle state. After the next
+	 * timer interrupt the execution resumes here and we can pick another
+	 * process. If there is still nothing runnable we "schedule" IDLE again
+	 */
+	while (!(proc_ptr = pick_proc())) {
+		proc_ptr = proc_addr(IDLE);
+		if (priv(proc_ptr)->s_flags & BILLABLE)
+			bill_ptr = proc_ptr;
+		halt_cpu();
+	}
+
+check_misc_flags:
+
 	vmassert(proc_ptr);
-	vmassert(!proc_ptr->p_rts_flags);
+	vmassert(proc_is_runnable(proc_ptr));
 	while (proc_ptr->p_misc_flags &
 		(MF_DELIVERMSG | MF_SC_DEFER | MF_SC_TRACE | MF_SC_ACTIVE)) {
 
-		vmassert(!next_ptr);
-		vmassert(!proc_ptr->p_rts_flags);
+		vmassert(proc_is_runnable(proc_ptr));
 		if (proc_ptr->p_misc_flags & MF_DELIVERMSG) {
 			TRACE(VF_SCHEDULING, printf("delivering to %s / %d\n",
 				proc_ptr->p_name, proc_ptr->p_endpoint););
 			if(delivermsg(proc_ptr) == VMSUSPEND) {
-				vmassert(next_ptr);
 				TRACE(VF_SCHEDULING,
 					printf("suspending %s / %d\n",
 					proc_ptr->p_name,
 					proc_ptr->p_endpoint););
-				vmassert(proc_ptr->p_rts_flags);
-				vmassert(next_ptr != proc_ptr);
+				vmassert(!proc_is_runnable(proc_ptr));
 			}
 		}
 		else if (proc_ptr->p_misc_flags & MF_SC_DEFER) {
@@ -193,7 +225,7 @@ struct proc * schedcheck(void)
 			 * inform PM.
 			 */
 			if ((proc_ptr->p_misc_flags & MF_SIG_DELAY) &&
-					!RTS_ISSET(proc_ptr, SENDING))
+					!RTS_ISSET(proc_ptr, RTS_SENDING))
 				sig_delay_done(proc_ptr);
 		}
 		else if (proc_ptr->p_misc_flags & MF_SC_TRACE) {
@@ -222,13 +254,12 @@ struct proc * schedcheck(void)
 			break;
 		}
 
-		/* If proc_ptr is now descheduled,
-		 * continue with another process.
+		/*
+		 * the selected process might not be runnable anymore. We have
+		 * to checkit and schedule another one
 		 */
-		if (next_ptr) {
-			proc_ptr = next_ptr;
-			next_ptr = NULL;
-		}
+		if (!proc_is_runnable(proc_ptr))
+			goto not_runnable_pick_new;
 	}
 	TRACE(VF_SCHEDULING, printf("starting %s / %d\n",
 		proc_ptr->p_name, proc_ptr->p_endpoint););
@@ -315,7 +346,7 @@ long bit_map;			/* notification event set or flags */
 #endif
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
-  if (RTS_ISSET(caller_ptr, SLOT_FREE))
+  if (RTS_ISSET(caller_ptr, RTS_SLOT_FREE))
   {
 	kprintf("called by the dead?!?\n");
 	return -EINVAL;
@@ -422,7 +453,7 @@ long bit_map;			/* notification event set or flags */
 
   /* Check for a possible deadlock for blocking KIPC_SEND(REC) and KIPC_RECEIVE. */
   if (call_nr == KIPC_SEND || call_nr == KIPC_SENDREC || call_nr == KIPC_RECEIVE) {
-      if (group_size = deadlock(call_nr, caller_ptr, src_dst_p)) {
+      if ((group_size = deadlock(call_nr, caller_ptr, src_dst_p))) {
 #if 0
           kprintf("sys_call: trap %d from %d to %d deadlocked, group size %d\n",
               call_nr, proc_nr(caller_ptr), src_dst_p, group_size);
@@ -504,10 +535,10 @@ int src_dst;					/* src or dst process */
       /* Check whether the last process in the chain has a dependency. If it 
        * has not, the cycle cannot be closed and we are done.
        */
-      if (RTS_ISSET(xp, RECEIVING)) {	/* xp has dependency */
+      if (RTS_ISSET(xp, RTS_RECEIVING)) {	/* xp has dependency */
 	  if(xp->p_getfrom_e == ANY) src_dst = ANY;
 	  else okendpt(xp->p_getfrom_e, &src_dst);
-      } else if (RTS_ISSET(xp, SENDING)) {	/* xp has dependency */
+      } else if (RTS_ISSET(xp, RTS_SENDING)) {	/* xp has dependency */
 	  okendpt(xp->p_sendto_e, &src_dst);
       } else {
 	  return(0);				/* not a deadlock */
@@ -520,7 +551,7 @@ int src_dst;					/* src or dst process */
       if (src_dst == proc_nr(cp)) {		/* possible deadlock */
 	  if (group_size == 2) {		/* caller and src_dst */
 	      /* The function number is magically converted to flags. */
-	      if ((xp->p_rts_flags ^ (function << 2)) & SENDING) { 
+	      if ((xp->p_rts_flags ^ (function << 2)) & RTS_SENDING) { 
 	          return(0);			/* not a deadlock */
 	      }
 	  }
@@ -568,20 +599,20 @@ int flags;
   dst_p = _ENDPOINT_P(dst_e);
   dst_ptr = proc_addr(dst_p);
 
-  if (RTS_ISSET(dst_ptr, NO_ENDPOINT))
+  if (RTS_ISSET(dst_ptr, RTS_NO_ENDPOINT))
   {
 	return -EDSTDIED;
   }
 
   /* Check if 'dst' is blocked waiting for this message. The destination's 
-   * SENDING flag may be set when its KIPC_SENDREC call blocked while sending.  
+   * RTS_SENDING flag may be set when its SENDREC call blocked while sending.  
    */
   if (WILLRECEIVE(dst_ptr, caller_ptr->p_endpoint)) {
 	/* Destination is indeed waiting for this message. */
 	vmassert(!(dst_ptr->p_misc_flags & MF_DELIVERMSG));	
 	if((r=QueueMess(caller_ptr->p_endpoint, linaddr, dst_ptr)) != 0)
 		return r;
-	RTS_UNSET(dst_ptr, RECEIVING);
+	RTS_UNSET(dst_ptr, RTS_RECEIVING);
   } else {
 	if(flags & NON_BLOCKING) {
 		return(-ENOTREADY);
@@ -592,7 +623,7 @@ int flags;
 		sizeof(message), addr);
 
 	if(addr) { return -EFAULT; }
-	RTS_SET(caller_ptr, SENDING);
+	RTS_SET(caller_ptr, RTS_SENDING);
 	caller_ptr->p_sendto_e = dst_e;
 
 	/* Process is now blocked.  Put in on the destination's queue. */
@@ -642,19 +673,19 @@ int flags;
   else
   {
 	okendpt(src_e, &src_p);
-	if (RTS_ISSET(proc_addr(src_p), NO_ENDPOINT))
+	if (RTS_ISSET(proc_addr(src_p), RTS_NO_ENDPOINT))
 	{
 		return -ESRCDIED;
 	}
   }
 
-  /* Check to see if a message from desired source is already available.
-   * The caller's SENDING flag may be set if KIPC_SENDREC couldn't send. If it is
+  /* Check to see if a message from desired source is already available. The
+   * caller's RTS_SENDING flag may be set if SENDREC couldn't send. If it is
    * set, the process should be blocked.
    */
-  if (!RTS_ISSET(caller_ptr, SENDING)) {
+  if (!RTS_ISSET(caller_ptr, RTS_SENDING)) {
 
-    /* Check if there are pending notifications, except for KIPC_SENDREC. */
+    /* Check if there are pending notifications, except for SENDREC. */
     if (! (caller_ptr->p_misc_flags & MF_REPLY_PEND)) {
 
         map = &priv(caller_ptr)->s_notify_pending;
@@ -692,7 +723,7 @@ int flags;
     while (*xpp != NIL_PROC) {
         if (src_e == ANY || src_p == proc_nr(*xpp)) {
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
-	    if (RTS_ISSET(*xpp, SLOT_FREE) || RTS_ISSET(*xpp, NO_ENDPOINT))
+	    if (RTS_ISSET(*xpp, RTS_SLOT_FREE) || RTS_ISSET(*xpp, RTS_NO_ENDPOINT))
 	    {
 		kprintf("%d: receive from %d; found dead %d (%s)?\n",
 			caller_ptr->p_endpoint, src_e, (*xpp)->p_endpoint,
@@ -707,9 +738,9 @@ int flags;
 		vir2phys(&(*xpp)->p_sendmsg), caller_ptr);
 	    if ((*xpp)->p_misc_flags & MF_SIG_DELAY)
 		sig_delay_done(*xpp);
-	    RTS_UNSET(*xpp, SENDING);
+	    RTS_UNSET(*xpp, RTS_SENDING);
             *xpp = (*xpp)->p_q_link;		/* remove from queue */
-            return 0;				/* report success */
+            return(0);				/* report success */
 	}
 	xpp = &(*xpp)->p_q_link;		/* proceed to next */
     }
@@ -732,7 +763,7 @@ int flags;
    */
   if ( ! (flags & NON_BLOCKING)) {
       caller_ptr->p_getfrom_e = src_e;		
-      RTS_SET(caller_ptr, RECEIVING);
+      RTS_SET(caller_ptr, RTS_RECEIVING);
       return(0);
   } else {
 	return(-ENOTREADY);
@@ -777,8 +808,8 @@ endpoint_t dst_e;			/* which process to notify */
       if((r=QueueMess(caller_ptr->p_endpoint, vir2phys(&m), dst_ptr)) != 0) {
 	minix_panic("mini_notify: local QueueMess failed", NO_NUM);
       }
-      RTS_UNSET(dst_ptr, RECEIVING);
-      return 0;
+      RTS_UNSET(dst_ptr, RTS_RECEIVING);
+      return(0);
   } 
 
   /* Destination is not ready to receive the notification. Add it to the 
@@ -927,8 +958,8 @@ size_t size;
 
 		dst_ptr = proc_addr(dst_p);
 
-		/* NO_ENDPOINT should be removed */
-		if (dst_ptr->p_rts_flags & NO_ENDPOINT)
+		/* RTS_NO_ENDPOINT should be removed */
+		if (dst_ptr->p_rts_flags & RTS_NO_ENDPOINT)
 		{
 			tabent.result= -EDSTDIED;
 			A_INSERT(i, result);
@@ -957,7 +988,7 @@ size_t size;
 				linaddr + (vir_bytes) &table[i].msg -
 					(vir_bytes) table, dst_ptr);
 			if(tabent.result == 0)
-				RTS_UNSET(dst_ptr, RECEIVING);
+				RTS_UNSET(dst_ptr, RTS_RECEIVING);
 
 			A_INSERT(i, result);
 			tabent.flags= flags | AMF_DONE;
@@ -1190,7 +1221,6 @@ register struct proc *rp;	/* this process is now runnable */
   sched(rp, &q, &front);
 
   vmassert(q >= 0);
-  vmassert(q < IDLE_Q || rp->p_endpoint == IDLE);
 
   /* Now add the process to the queue. */
   if (rdy_head[q] == NIL_PROC) {		/* add to empty queue */
@@ -1212,19 +1242,64 @@ register struct proc *rp;	/* this process is now runnable */
   CHECK_RUNQUEUES;
 #endif
 
-  /* Now select the next process to run, if there isn't a current
-   * process yet or current process isn't ready any more, or
-   * it's PREEMPTIBLE.
+  /*
+   * enqueueing a process with a higher priority than the current one, it gets
+   * preempted. The current process must be preemptible. Testing the priority
+   * also makes sure that a process does not preempt itself
    */
-  if(!proc_ptr || (proc_ptr->p_priority > rp->p_priority) ||
+  vmassert(proc_ptr);
+  if ((proc_ptr->p_priority > rp->p_priority) &&
 		  (priv(proc_ptr)->s_flags & PREEMPTIBLE))
-     pick_proc();
+     RTS_SET(proc_ptr, RTS_PREEMPTED); /* calls dequeue() */
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   CHECK_RUNQUEUES;
 #endif
 
   NOREC_RETURN(enqueuefunc, );
+}
+
+/*===========================================================================*
+ *				enqueue_head				     *
+ *===========================================================================*/
+/*
+ * put a process at the front of its run queue. It comes handy when a process is
+ * preempted and removed from run queue to not to have a currently not-runnable
+ * process on a run queue. We have to put this process back at the fron to be
+ * fair
+ */
+static void enqueue_head(struct proc *rp)
+{
+  int q;	 				/* scheduling queue to use */
+
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+  if(!intr_disabled()) { minix_panic("enqueue with interrupts enabled", NO_NUM); }
+  if (rp->p_ready) minix_panic("enqueue already ready process", NO_NUM);
+#endif
+
+  /*
+   * the process was runnable without its quantum expired when dequeued. A
+   * process with no time left should vahe been handled else and differently
+   */
+  vmassert(rp->p_ticks_left);
+
+  vmassert(q >= 0);
+
+  q = rp->p_priority;
+
+  /* Now add the process to the queue. */
+  if (rdy_head[q] == NIL_PROC) {		/* add to empty queue */
+      rdy_head[q] = rdy_tail[q] = rp; 		/* create a new queue */
+      rp->p_nextready = NIL_PROC;		/* mark new end */
+  }
+  else						/* add to head of queue */
+      rp->p_nextready = rdy_head[q];		/* chain head of queue */
+      rdy_head[q] = rp;				/* set new queue head */
+
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+  rp->p_ready = 1;
+  CHECK_RUNQUEUES;
+#endif
 }
 
 /*===========================================================================*
@@ -1272,8 +1347,6 @@ register struct proc *rp;	/* this process is no longer runnable */
   		rp->p_ready = 0;
 		  CHECK_RUNQUEUES;
 #endif
-          if (rp == proc_ptr || rp == next_ptr)	/* active process removed */
-              pick_proc();		/* pick new process to run */
           break;
       }
       prev_xp = *xpp;				/* save previous in chain */
@@ -1306,7 +1379,7 @@ int *front;					/* return: front or back */
    */
   if (! time_left) {				/* quantum consumed ? */
       rp->p_ticks_left = rp->p_quantum_size; 	/* give new quantum */
-      if (rp->p_priority < (IDLE_Q-1)) {  	 
+      if (rp->p_priority < (NR_SCHED_QUEUES-1)) {
           rp->p_priority += 1;			/* lower priority */
       }
   }
@@ -1322,16 +1395,14 @@ int *front;					/* return: front or back */
 /*===========================================================================*
  *				pick_proc				     * 
  *===========================================================================*/
-static void pick_proc()
+static struct proc * pick_proc(void)
 {
-/* Decide who to run now.  A new process is selected by setting 'next_ptr'.
+/* Decide who to run now.  A new process is selected an returned.
  * When a billable process is selected, record it in 'bill_ptr', so that the 
  * clock task can tell who to bill for system time.
  */
   register struct proc *rp;			/* process to run */
   int q;				/* iterate over queues */
-
-  NOREC_ENTER(pick);
 
   /* Check each of the scheduling queues for ready processes. The number of
    * queues is defined in proc.h, and priorities are set in the task table.
@@ -1345,14 +1416,12 @@ static void pick_proc()
 	}
 	TRACE(VF_PICKPROC, printf("found %s / %d on queue %d\n", 
 		rp->p_name, rp->p_endpoint, q););
-	next_ptr = rp;			/* run process 'rp' next */
-	vmassert(proc_ptr != next_ptr);
-	vmassert(!next_ptr->p_rts_flags);
+	vmassert(!proc_is_runnable(rp));
 	if (priv(rp)->s_flags & BILLABLE)	 	
 		bill_ptr = rp;		/* bill for system time */
-	NOREC_RETURN(pick, );
+	return rp;
   }
-  minix_panic("no runnable processes", NO_NUM);
+  return NULL;
 }
 
 /*===========================================================================*
@@ -1377,10 +1446,10 @@ timer_t *tp;					/* watchdog timer pointer */
   for (rp=BEG_PROC_ADDR; rp<END_PROC_ADDR; rp++) {
       if (! isemptyp(rp)) {				/* check slot use */
 	  if (rp->p_priority > rp->p_max_priority) {	/* update priority? */
-	      if (rp->p_rts_flags == 0) dequeue(rp);	/* take off queue */
+	      if (proc_is_runnable(rp)) dequeue(rp);	/* take off queue */
 	      ticks_added += rp->p_quantum_size;	/* do accounting */
 	      rp->p_priority -= 1;			/* raise priority */
-	      if (rp->p_rts_flags == 0) enqueue(rp);	/* put on queue */
+	      if (proc_is_runnable(rp)) enqueue(rp);	/* put on queue */
 	  }
 	  else {
 	      ticks_added += rp->p_quantum_size - rp->p_ticks_left;

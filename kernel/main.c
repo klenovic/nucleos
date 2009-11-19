@@ -52,18 +52,15 @@ void main(void)
 	reg_t ktsb;			/* kernel task stack base */
 	struct exec e_hdr;		/* for a copy of an a.out header */
 
-	/* Architecture-dependent initialization */
-	arch_init();
-
-   /* Global value to test segment sanity. */
-   magictest = MAGICTEST;
+	/* Global value to test segment sanity. */
+	magictest = MAGICTEST;
 
 	/* Clear the process table. Anounce each slot as empty and set up mappings 
 	 * for proc_addr() and proc_nr() macros. Do the same for the table with 
 	 * privilege structures for the system processes.
 	 */
 	for (rp = BEG_PROC_ADDR, i = -NR_TASKS; rp < END_PROC_ADDR; ++rp, ++i) {
-		rp->p_rts_flags = SLOT_FREE;		/* initialize free slot */
+  	rp->p_rts_flags = RTS_SLOT_FREE;		/* initialize free slot */
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 		rp->p_magic = PMAGIC;
 #endif
@@ -172,7 +169,7 @@ void main(void)
 		 * at address 0.
 		 */
 		if (!iskerneln(proc_nr(rp)))
-			ip->initial_pc = e_hdr.a_entry;
+			ip->initial_pc = (task_t*)e_hdr.a_entry;
 
 		/* Set initial register values.  The processor status word for tasks 
 		 * is different from that of other processes because tasks can
@@ -198,15 +195,17 @@ void main(void)
 		 * done this; until then, don't let it run.
 		 */
 		if(priv(rp)->s_flags & PROC_FULLVM)
-			RTS_SET(rp, VMINHIBIT);
+			RTS_SET(rp, RTS_VMINHIBIT);
 
-		/* Set ready. The HARDWARE task is never ready. */
-		if (rp->p_nr == HARDWARE)
-			RTS_SET(rp, PROC_STOP);
-
-		RTS_UNSET(rp, SLOT_FREE); /* remove SLOT_FREE and schedule */
+		if (rp->p_nr == HARDWARE) RTS_SET(rp, RTS_PROC_STOP);
+		/* IDLE task is never put on a run queue as it is never ready to run */
+		if (rp->p_nr == IDLE) RTS_SET(rp, RTS_PROC_STOP);
+		RTS_UNSET(rp, RTS_SLOT_FREE); /* remove RTS_SLOT_FREE and schedule */
 		alloc_segments(rp);
 	}
+
+	/* Architecture-dependent initialization. */
+	arch_init();
 
 #ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 	sprofiling = 0;      /* we're not profiling until instructed to */
@@ -217,11 +216,11 @@ void main(void)
 	krandom.random_sources = RANDOM_SOURCES;
 	krandom.random_elements = RANDOM_ELEMENTS;
 
-	/* MINIX is now ready. All boot image processes are on the ready queue.
+	/* Nucleos is now ready. All boot image processes are on the ready queue.
 	 * Return to the assembly code to start running the current process. 
 	 */
 	bill_ptr = proc_addr(IDLE);		/* it has to point somewhere */
-	announce();				/* print MINIX startup banner */
+	announce();				/* print Nucleos startup banner */
 
 	/*
 	 * enable timer interrupts and clock task on the boot CPU
@@ -266,7 +265,7 @@ static void announce(void)
  *===========================================================================*/
 void prepare_shutdown(int how)
 {
-/* This function prepares to shutdown MINIX. */
+	/* This function prepares to shutdown Nucleos. */
 	static timer_t shutdown_timer;
 	register struct proc *rp;
 	message m;
@@ -286,10 +285,10 @@ void prepare_shutdown(int how)
 void nucleos_shutdown(timer_t *tp)
 {
 /* This function is called from prepare_shutdown or stop_sequence to bring
- * down MINIX. How to shutdown is in the argument: RBT_HALT (return to the
+ * down Nucleos. How to shutdown is in the argument: RBT_HALT (return to the
  * monitor), RBT_MONITOR (execute given code), RBT_RESET (hard reset).
  */
-	intr_init(INTS_ORIG);
 	arch_stop_local_timer();
+  intr_init(INTS_ORIG, 0);
 	arch_shutdown(tp ? tmr_arg(tp)->ta_int : RBT_PANIC);
 }

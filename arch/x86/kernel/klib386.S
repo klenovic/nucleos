@@ -8,9 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/const.h>
-#include <asm/irq_vectors.h>
-#include <asm/kernel/const.h>
 #include <kernel/const.h>
+#include <asm/irq_vectors.h>
 
 // The routines only guarantee to preserve the registers the C compiler
 // expects to be preserved (ebx, esi, edi, ebp, esp, segment registers, and
@@ -107,15 +106,42 @@ csinit:
 	mov	%ax, %ss
 	xchg	mon_sp, %esp         // unswitch stacks
 	lidt	gdt+IDT_SELECTOR     // reload interrupt descriptor table
-	andb	$~0x02,gdt+TSS_SELECTOR+DESC_ACCESS  // clear TSS busy bit
-	mov	$TSS_SELECTOR, %eax
-	ltr	%ax                 // set TSS register
+
+#ifdef CONFIG_X86_LOCAL_APIC
+	cmpl	$0x0, lapic_addr
+	jne	3f
+	mov	$0, %ebx
+	jmp	4f
+3:
+	mov	$FLAT_DS_SELECTOR, %ebx
+	mov	%bx, %fs
+	movl	lapic_addr, %eax
+	add	$0x20, %eax
+	mov	%fs:(%eax), %ebx
+	and	$0xFF000000, %ebx
+	shr	$24, %ebx
+	movzb	%bl, %ebx
+
+4:
+	add	$apicid2cpuid, %ebx
+	movzb	(%ebx), %eax
+	shl	$3, %eax
+	mov	%eax, %ebx
+	add	$TSS_SELECTOR, %eax
+	addl	gdt+DESC_ACCESS, %eax
+	and	$~0x02, %eax
+	ltr	%bx     /* set TSS register */
+
+	mov	$DS_SELECTOR, %eax
+	mov	%ax, %fs
+#endif /* CONFIG_X86_LOCAL_APIC */
 
 	pop	%eax
 	outb	$INT_CTLMASK        // restore interrupt masks
 	movb	%ah, %al
 	outb	$INT2_CTLMASK
 
+6:
 	add	%ecx, lost_ticks    // record lost clock ticks
 
 	popf                        // restore flags
@@ -344,7 +370,6 @@ mem_rdw:
 	mov	%cx, %ds
 	ret
 
-
 //===========================================================================
 //                             reset
 //===========================================================================
@@ -355,18 +380,16 @@ reset:
 	lidt    idt_zero
 	int     $3               // anything goes, the 386 will not like it
 
-//===========================================================================
-//                             idle_task
-//===========================================================================
-.globl idle_task      // task executed when there is no work
-idle_task:
-// This task is called when the system has nothing else to do.  The HLT
-// instruction puts the processor in a state where it draws minimum power.
-	push	$_halt
-	call	level0         // level0(halt)
-	add	$4, %esp
-	jmp	idle_task
-_halt:
+/*===========================================================================*/
+/*                             halt_cpu                                     */
+/*===========================================================================*/
+/*
+ * void halt_cpu(void);
+ * reanables interrupts and puts the cpu in the halts state. Once an interrupt
+ * is handled the execution resumes by disabling interrupts and continues
+ */
+.globl halt_cpu
+halt_cpu:
 	sti
 	hlt
 	cli
@@ -408,9 +431,69 @@ level0:
 read_cpu_flags:
 	pushf
 	mov	(%esp), %eax
-	popf
+	add	$4, %esp
 	ret
 
+/*
+ * Read the Model Specific Register (MSR) of IA32 architecture
+ *
+ * void ia32_msr_read(u32_t reg, u32_t * hi, u32_t * lo)
+ */
+.globl ia32_msr_read
+ia32_msr_read:
+	push	%ebp
+	mov	%esp, %ebp
+	mov	8(%ebp), %ecx
+	rdmsr
+	mov	12(%ebp), %ecx
+	mov	%edx, (%ecx)
+	mov	16(%ebp), %ecx
+	mov	%eax, (%ecx)
+
+	pop	%ebp
+	ret
+
+/*
+ * Write the Model Specific Register (MSR) of IA32 architecture
+ *
+ * void ia32_msr_write(u32_t reg, u32_t hi, u32_t lo)
+ */
+.globl ia32_msr_write
+ia32_msr_write:
+	push	%ebp
+	mov	%esp, %ebp
+
+	mov	12(%ebp), %edx
+	mov	16(%ebp), %eax
+	mov	8(%ebp), %ecx
+	wrmsr
+
+	pop	%ebp
+	ret
+
+/*===========================================================================*/
+/*                           idt_reload                                     */
+/*===========================================================================*/
+/* void idt_reload (void); 
+ * Reload idt when returning to monitor. 
+ */
+	.p2align 4
+.globl idt_reload
+idt_reload:
+	lidt	gdt+IDT_SELECTOR	/*  reload interrupt descriptor table */
+	ret
+
+/*
+ * void reload_segment_regs(void)
+ */
+#define RELOAD_SEG_REG(reg) \
+	mov	reg, %ax	;\
+	mov	%ax, reg	;
+
+.globl reload_ds
+reload_ds:
+	RELOAD_SEG_REG(%ds)
+	ret
 
 //===========================================================================
 //                           read_cr0

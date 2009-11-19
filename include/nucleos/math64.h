@@ -7,6 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+/* linux */
 #ifndef __NUCLEOS_MATH64_H
 #define __NUCLEOS_MATH64_H
 
@@ -51,7 +52,7 @@ static inline u64 div_u64_rem(u64 dividend, u32 divisor, u32 *remainder)
 {
 	u64 __dividend = dividend;
 
-	/* @klenovic: do_div modifies dividend in place so safe it */
+	/* @nucleos: do_div modifies dividend in place so safe it */
 	*remainder = do_div(__dividend, divisor);
 
 	return __dividend;

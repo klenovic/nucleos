@@ -33,7 +33,6 @@ extern struct boot_param boot_param;	/* boot parameters */
 
 /* Process scheduling information and the kernel reentry count. */
 extern struct proc *proc_ptr;	/* pointer to currently running process */
-extern struct proc *next_ptr;	/* next process to run after restart() */
 extern struct proc *bill_ptr;	/* process to bill for clock ticks */
 extern struct proc *vmrestart;  /* first process on vmrestart queue */
 extern struct proc *vmrequest;  /* first process on vmrequest queue */
@@ -62,6 +61,10 @@ extern u32_t magictest;			/* global magic number */
 
 #ifdef CONFIG_DEBUG_KERNEL_TRACE
 extern int verboseflags;
+#endif
+
+#ifdef CONFIG_X86_LOCAL_APIC
+extern int config_no_apic; /* optionaly turn off apic */
 #endif
 
 /* VM */

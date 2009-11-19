@@ -38,7 +38,6 @@ struct segdesc_s gdt[GDT_SIZE];		/* used in klib.s and mpx.s */
 static struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
 struct tss_s tss;			/* zero init */
 
-static void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type);
 static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size);
 
 /*===========================================================================*
@@ -142,6 +141,11 @@ void prot_init(void)
   struct desctableptr_s *dtp;
   unsigned ldt_index;
   register struct proc *rp;
+
+  /* Click-round kernel. */
+  if(kinfo.data_base % CLICK_SIZE)
+	minix_panic("kinfo.data_base not aligned", NO_NUM);
+  kinfo.data_size = ((kinfo.data_size+CLICK_SIZE-1)/CLICK_SIZE) * CLICK_SIZE;
 
   /* Click-round kernel. */
   if(kinfo.data_base % CLICK_SIZE)
@@ -263,7 +267,7 @@ vir_bytes size;
 /*===========================================================================*
  *				int_gate				     *
  *===========================================================================*/
-static void int_gate(vec_nr, offset, dpl_type)
+void int_gate(vec_nr, offset, dpl_type)
 unsigned vec_nr;
 vir_bytes offset;
 unsigned dpl_type;
@@ -328,7 +332,7 @@ for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
   int privilege;
   int cs, ds;
 
-		if (RTS_ISSET(rp, SLOT_FREE))
+		if (isemptyp(rp))
 			continue;
 
       if( (iskernelp(rp)))
@@ -469,10 +473,11 @@ int prot_set_kern_seg_limit(vir_bytes limit)
 
 	/* Increase kernel processes too. */
 	for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
-		if (RTS_ISSET(rp, SLOT_FREE) || !iskernelp(rp))
+		if (isemptyp(rp) || !iskernelp(rp))
 			continue;
 		rp->p_memmap[S].mem_len += incr_clicks;
 		alloc_segments(rp);
+		rp->p_memmap[S].mem_len -= incr_clicks;
 	}
 
 	return 0;

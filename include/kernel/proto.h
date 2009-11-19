@@ -12,9 +12,10 @@
 #ifndef __KERNEL_PROTO_H
 #define __KERNEL_PROTO_H
 
-#include <asm/kernel/proto.h>
+#include <nucleos/timer.h>
 #include <nucleos/safecopies.h>
 #include <asm/kernel/types.h>
+#include <asm/kernel/proto.h>
 #include <nucleos/a.out.h>
 
 #ifdef __KERNEL__
@@ -31,7 +32,6 @@ void reset_timer(struct timer *tp);
 void ser_dump_proc(void);
 
 /* main.c */
-void main(void);
 void prepare_shutdown(int how);
 void nucleos_shutdown(struct timer *tp);
 
@@ -142,9 +142,9 @@ phys_bytes umap_virtual(struct proc* rp, int seg, vir_bytes vir_addr, vir_bytes 
 phys_bytes seg2phys(u16);
 int vm_phys_memset(phys_bytes source, u8_t pattern, phys_bytes count);
 vir_bytes alloc_remote_segment(u32_t *, segframe_t *, int, phys_bytes, vir_bytes, int);
-int intr_init(int);
+int intr_init(int, int);
 int intr_disabled(void);
-void idle_task(void);
+void halt_cpu(void);
 void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
@@ -168,6 +168,10 @@ int vm_suspend(struct proc *caller, struct proc *target,
 	phys_bytes lin, phys_bytes size, int wrflag, int type);
 int delivermsg(struct proc *target);
 void arch_do_syscall(struct proc *proc);
+int arch_phys_map(int index, phys_bytes *addr,
+	phys_bytes *len, int *flags);
+int arch_phys_map_reply(int index, vir_bytes addr);
+int arch_enable_paging(void);
 
 #endif /* __KERNEL__ */
 #endif /* __KERNEL_PROTO_H */

@@ -10,9 +10,14 @@
 #ifndef __ASM_X86_CPUFEATURE_H
 #define __ASM_X86_CPUFEATURE_H
 
-#define _CPUF_I386_PSE 1	/* Page Size Extension */
-#define _CPUF_I386_PGE 2	/* Page Global Enable */
+#define _CPUF_I386_PSE			1       /* Page Size Extension */
+#define _CPUF_I386_PGE			2       /* Page Global Enable */
+#define _CPUF_I386_APIC_ON_CHIP		3       /* APIC is present on the chip */
+#define _CPUF_I386_TSC			4       /* Timestamp counter present */
 
-int _cpufeature(int featureno);
+int cpufeature(int featureno);
+
+extern int cpu_has_tsc;		/* signal whether this cpu has time stamp register. This
+				   feature was introduced by Pentium */
 
 #endif

@@ -46,7 +46,7 @@ message *m_ptr;			/* pointer to request message */
 
   /* Check whether caller is allowed to make this call. Privileged proceses 
    * can only update the privileges of processes that are inhibited from 
-   * running by the NO_PRIV flag. This flag is set when a privileged process
+   * running by the RTS_NO_PRIV flag. This flag is set when a privileged process
    * forks. 
    */
   caller_ptr = proc_addr(who_p);
@@ -58,7 +58,7 @@ message *m_ptr;			/* pointer to request message */
   switch(m_ptr->CTL_REQUEST)
   {
   case SYS_PRIV_INIT:
-	if (! RTS_ISSET(rp, NO_PRIV)) return(-EPERM);
+	if (! RTS_ISSET(rp, RTS_NO_PRIV)) return(-EPERM);
 
 	/* Make sure this process has its own privileges structure. This may
 	 * fail, since there are only a limited number of system processes.
@@ -154,17 +154,17 @@ message *m_ptr;			/* pointer to request message */
 	}
 
 	/* Done. Privileges have been set. Allow process to run again. */
-	RTS_LOCK_UNSET(rp, NO_PRIV);
-	return 0;
+	RTS_LOCK_UNSET(rp, RTS_NO_PRIV);
+	return(0);
   case SYS_PRIV_USER:
 	/* Make this process an ordinary user process. */
-	if (!RTS_ISSET(rp, NO_PRIV)) return(-EPERM);
+	if (!RTS_ISSET(rp, RTS_NO_PRIV)) return(-EPERM);
 	if ((i=get_priv(rp, 0)) != 0) return(i);
-	RTS_LOCK_UNSET(rp, NO_PRIV);
-	return 0;
+	RTS_LOCK_UNSET(rp, RTS_NO_PRIV);
+	return(0);
 
   case SYS_PRIV_ADD_IO:
-	if (RTS_ISSET(rp, NO_PRIV))
+	if (RTS_ISSET(rp, RTS_NO_PRIV))
 		return(-EPERM);
 
 	/* Only system processes get I/O resources? */
@@ -195,7 +195,7 @@ message *m_ptr;			/* pointer to request message */
 	return 0;
 
   case SYS_PRIV_ADD_MEM:
-	if (RTS_ISSET(rp, NO_PRIV))
+	if (RTS_ISSET(rp, RTS_NO_PRIV))
 		return(-EPERM);
 
 	/* Only system processes get memory resources? */
@@ -218,7 +218,7 @@ message *m_ptr;			/* pointer to request message */
 	return 0;
 
   case SYS_PRIV_ADD_IRQ:
-	if (RTS_ISSET(rp, NO_PRIV))
+	if (RTS_ISSET(rp, RTS_NO_PRIV))
 		return(-EPERM);
 
 	/* Only system processes get IRQs? */

@@ -224,21 +224,21 @@ static unsigned my_inl(u16 port);
 static unsigned my_inb(u16 port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inb(port, &value)) != 0)
+	if ((s=sys_inb(port, (unsigned long*)&value)) != 0)
 		printf("RTL8139: warning, sys_inb failed: %d\n", s);
 	return value;
 }
 static unsigned my_inw(u16 port) {
 	u32_t value;
 	int s;
-	if ((s=sys_inw(port, &value)) != 0)
+	if ((s=sys_inw(port, (unsigned long*)&value)) != 0)
 		printf("RTL8139: warning, sys_inw failed: %d\n", s);
 	return value;
 }
 static unsigned my_inl(u16 port) {
 	u32 value;
 	int s;
-	if ((s=sys_inl(port, &value)) != 0)
+	if ((s=sys_inl(port, (unsigned long*)&value)) != 0)
 		printf("RTL8139: warning, sys_inl failed: %d\n", s);
 	return value;
 }

@@ -8,20 +8,23 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* system dependent functions for use inside the whole kernel. */
-
-#include <kernel/kernel.h>
-#include <nucleos/unistd.h>
 #include <ctype.h>
+#include <nucleos/unistd.h>
 #include <nucleos/string.h>
-#include <ibm/cmos.h>
-#include <ibm/bios.h>
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/a.out.h>
-#include <asm/kernel/proto.h>
+#include <kernel/proto.h>
+#include <kernel/kernel.h>
 #include <kernel/proc.h>
 #include <kernel/debug.h>
+#include <ibm/cmos.h>
+#include <ibm/bios.h>
+
+#ifdef CONFIG_X86_LOCAL_APIC
+#include <asm/apic.h>
+#endif
 
 #define CR0_EM	0x0004		/* set to enable trap on any FP instruction */
 
@@ -31,6 +34,8 @@ void arch_monitor(void)
 {
 	level0(monitor);
 }
+
+int cpu_has_tsc;
 
 void arch_shutdown(int how)
 {
@@ -130,14 +135,34 @@ void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)
 
 void arch_init(void)
 {
+#ifdef CONFIG_X86_LOCAL_APIC
+	/*
+	 * this is setting kernel segments to cover most of the phys memory. The
+	 * value is high enough to reach local APIC nad IOAPICs before paging is
+	 * turned on.
+	 */
+	prot_set_kern_seg_limit(0xfff00000);
+	reload_ds();
+#endif
+
 	idt_init();
 
 	tss_init(&tss, &k_boot_stktop, 0);
+
+#if defined(CONFIG_X86_LOCAL_APIC) && !defined(CONFIG_SMP)
+	if (config_no_apic) {
+		BOOT_VERBOSE(kprintf("APIC disabled, using legacy PIC\n"));
+	}
+	else if (!apic_single_cpu_init()) {
+		BOOT_VERBOSE(kprintf("APIC not present, using legacy PIC\n"));
+	}
+#endif
 
 #if 0
 	/* Set CR0_EM until we get FP context switching */
 	write_cr0(read_cr0() | CR0_EM);
 #endif
+
 }
 
 #define COM1_BASE	0x3F8
@@ -197,7 +222,7 @@ static void ser_dump_segs(void)
 	struct proc *pp;
 	for (pp= BEG_PROC_ADDR; pp < END_PROC_ADDR; pp++)
 	{
-		if (pp->p_rts_flags & SLOT_FREE)
+		if (isemptyp(pp))
 			continue;
 		kprintf("%d: %s ep %d\n", proc_nr(pp), pp->p_name, pp->p_endpoint);
 		printseg("cs: ", 1, pp, pp->p_reg.cs);
@@ -267,10 +292,10 @@ static void printslot(struct proc *pp, int level)
 		pp->p_sys_time, pp->p_seg.p_cr3,
 		rtsflagstr(pp->p_rts_flags), miscflagstr(pp->p_misc_flags));
 
-	if(pp->p_rts_flags & SENDING) {
+	if(pp->p_rts_flags & RTS_SENDING) {
 		dep = pp->p_sendto_e;
 		kprintf(" to: ");
-	} else if(pp->p_rts_flags & RECEIVING) {
+	} else if(pp->p_rts_flags & RTS_RECEIVING) {
 		dep = pp->p_getfrom_e;
 		kprintf(" from: ");
 	}
@@ -284,7 +309,7 @@ static void printslot(struct proc *pp, int level)
 				kprintf(" ??? %d\n", dep);
 			} else {
 				depproc = proc_addr(procno);
-				if(depproc->p_rts_flags & SLOT_FREE) {
+				if(isemptyp(depproc)) {
 					kprintf(" empty slot %d???\n", procno);
 					depproc = NULL;
 				} else {
@@ -309,7 +334,7 @@ void ser_dump_proc()
 
 	for (pp= BEG_PROC_ADDR; pp < END_PROC_ADDR; pp++)
 	{
-		if (pp->p_rts_flags & SLOT_FREE)
+		if (isemptyp(pp))
 			continue;
 		printslot(pp, 0);
 	}

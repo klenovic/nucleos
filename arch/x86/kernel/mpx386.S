@@ -55,7 +55,6 @@
 #include <kernel/const.h>
 #include <asm/irq_vectors.h>
 #include <asm/servers/vm/vm.h>
-#include <asm/kernel/const.h>
 #include <asm/ptrace_abi.h>
 #include <asm/page.h>
 

@@ -31,6 +31,54 @@ source "arch/x86/Kconfig.cpu"
 source "kernel/Kconfig.hz"
 source "mm/Kconfig"
 
+config SMP
+	bool "Symmetric multi-processing support"
+	default n
+	---help---
+	  NOTE: NOT IMPLEMETED AD INTERIM
+
+	  This enables support for systems with more than one CPU. If you have
+	  a system with only one CPU, like most personal computers, say N. If
+	  you have a system with more than one CPU, say Y.
+
+	  If you don't know what to do here, say N.
+
+config X86_UP_APIC
+	bool "Local APIC support on uniprocessors"
+	depends on X86_32 && !SMP
+	---help---
+	  A local APIC (Advanced Programmable Interrupt Controller) is an
+	  integrated interrupt controller in the CPU. If you have a single-CPU
+	  system which has a processor with a local APIC, you can say Y here to
+	  enable and use it. The local APIC supports CPU-generated self-interrupts
+	  (timer, performance counters), and the NMI watchdog which detects hard
+	  lockups.
+
+config X86_UP_IOAPIC
+	bool "IO-APIC support on uniprocessors"
+	depends on X86_UP_APIC
+	---help---
+	  An IO-APIC (I/O Advanced Programmable Interrupt Controller) is an
+	  SMP-capable replacement for PC-style interrupt controllers. Most
+	  SMP systems and many recent uniprocessor systems have one.
+
+	  If you have a single-CPU system with an IO-APIC, you can say Y here
+	  to use it.
+
+config X86_LOCAL_APIC
+	def_bool y
+	depends on SMP || X86_UP_APIC
+
+config DEBUG_X86_LOCAL_APIC
+	def_bool n
+	depends on X86_LOCAL_APIC
+	---help---
+	  Debug APIC.
+
+config X86_IO_APIC
+	def_bool y
+	depends on SMP || X86_UP_APIC
+
 endmenu
 
 menu "Bus options (PCI etc.)"

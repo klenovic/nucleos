@@ -66,13 +66,13 @@ message *m_ptr;			/* pointer to request message */
   /* Initialize the sigframe structure. */
   frp = (struct sigframe *) scp - 1;
   fr.sf_scpcopy = scp;
-  fr.sf_retadr2= (void (*)()) rp->p_reg.pc;
+  fr.sf_retadr2= (void (*)(void)) rp->p_reg.pc;
   fr.sf_fp = rp->p_reg.fp;
   rp->p_reg.fp = (reg_t) &frp->sf_fp;
   fr.sf_scp = scp;
   fr.sf_code = 0;	/* XXX - should be used for type of FP exception */
   fr.sf_signo = smsg.sm_signo;
-  fr.sf_retadr = (void (*)()) smsg.sm_sigreturn;
+  fr.sf_retadr = (void (*)(void)) smsg.sm_sigreturn;
 
   /* Copy the sigframe structure to the user's stack. */
   if((r=data_copy_vmcheck(SYSTEM, (vir_bytes) &fr,
@@ -84,7 +84,7 @@ message *m_ptr;			/* pointer to request message */
   rp->p_reg.sp = (reg_t) frp;
   rp->p_reg.pc = (reg_t) smsg.sm_sighandler;
 
-  if(!RTS_ISSET(rp, PROC_STOP)) {
+  if(!RTS_ISSET(rp, RTS_PROC_STOP)) {
 	struct proc *caller;
 	caller = proc_addr(who_p);
 	kprintf("system: warning: sigsend a running process\n");

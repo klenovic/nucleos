@@ -110,6 +110,14 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 	if(value && atoi(value) == 0)
 		do_serial_debug=1;
 
+#ifdef CONFIG_X86_LOCAL_APIC
+	value = get_value(params_buffer, "no_apic");
+	if(value)
+		config_no_apic = atoi(value);
+	else
+		config_no_apic = 0;
+#endif
+
 #ifndef CONFIG_BUILTIN_INITRD
 	/* Initial ramdisk */
 	value = get_value(params_buffer, "initrdbase");
@@ -125,7 +133,7 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 	/* Return to assembler code to switch to protected mode (if 286), 
 	 * reload selectors and call main().
 	 */
-	intr_init(INTS_MINIX);
+	intr_init(INTS_MINIX, 0);
 }
 
 /**

@@ -94,7 +94,7 @@ register message *m_ptr;
   if (isemptyp(rp)) return(-EINVAL);
   switch (tr_request) {
   case T_STOP:			/* stop process */
-	RTS_LOCK_SET(rp, P_STOP);
+	RTS_LOCK_SET(rp, RTS_P_STOP);
 	rp->p_reg.psw &= ~TRACEBIT;	/* clear trace bit */
 	rp->p_misc_flags &= ~MF_SC_TRACE;	/* clear syscall trace flag */
 	return(0);
@@ -170,20 +170,24 @@ register message *m_ptr;
 	m_ptr->CTL_DATA = 0;
 	break;
 
+  case T_DETACH:		/* detach tracer */
+	rp->p_misc_flags &= ~MF_SC_ACTIVE;
+
+	/* fall through */
   case T_RESUME:		/* resume execution */
-	RTS_LOCK_UNSET(rp, P_STOP);
+	RTS_LOCK_UNSET(rp, RTS_P_STOP);
 	m_ptr->CTL_DATA = 0;
 	break;
 
   case T_STEP:			/* set trace bit */
 	rp->p_reg.psw |= TRACEBIT;
-	RTS_LOCK_UNSET(rp, P_STOP);
+	RTS_LOCK_UNSET(rp, RTS_P_STOP);
 	m_ptr->CTL_DATA = 0;
 	break;
 
   case T_SYSCALL:		/* trace system call */
 	rp->p_misc_flags |= MF_SC_TRACE;
-	RTS_LOCK_UNSET(rp, P_STOP);
+	RTS_LOCK_UNSET(rp, RTS_P_STOP);
 	m_ptr->CTL_DATA = 0;
 	break;
 
