@@ -855,7 +855,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
           seg_index = vir_addr[i]->segment & SEGMENT_INDEX;
           phys_addr[i] = umap_remote(p, seg_index, vir_addr[i]->offset, bytes);
           break;
-#if _MINIX_CHIP == _CHIP_INTEL
+#ifdef CONFIG_X86
       case BIOS_SEG:
           phys_addr[i] = umap_bios(vir_addr[i]->offset, bytes );
           break;
