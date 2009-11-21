@@ -44,7 +44,4 @@ int ds_retrieve_str(char *name, char *val, size_t len);
 int ds_check_u32(char *n, size_t namelen, u32_t *val);
 int ds_check_str(char *n, size_t namelen, char *v, size_t vlen);
 
-/* lib/sysvipc/ds.c */
-int mini_ds_retrieve_u32(char *name, u32_t *val);
-
 #endif /* __SERVERS_DS_DS_H */
