@@ -37,6 +37,7 @@
 #define __deprecated			__attribute__((deprecated))
 #define __packed			__attribute__((packed))
 #define __weak				__attribute__((weak))
+#define __alias(x)			__attribute__((alias(x)))
 
 /*
  * it doesn't make sense on ARM (currently the only user of __naked) to trace

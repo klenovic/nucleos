@@ -44,7 +44,7 @@ int __munmap(void *addr, size_t len)
 	return ksyscall(VM_PROC_NR, VM_MUNMAP, &m);
 }
 /* munamp just a weak definition since PM/VM may override it */
-int munmap(void *addr, size_t len) __attribute__((weak,alias("__munmap")));
+int munmap(void *addr, size_t len) __weak __alias("__munmap");
 
 int __munmap_text(void *addr, size_t len)
 {
@@ -55,7 +55,7 @@ int __munmap_text(void *addr, size_t len)
 	return ksyscall(VM_PROC_NR, VM_MUNMAP_TEXT, &m);
 }
 /* munamp just a weak definition since PM/VM may override it */
-int munmap_text(void *addr, size_t len) __attribute__((weak,alias("__munmap_text")));
+int munmap_text(void *addr, size_t len) __weak __alias("__munmap_text");
 
 void *vm_remap(int d, int s, void *da, void *sa, size_t size)
 {
