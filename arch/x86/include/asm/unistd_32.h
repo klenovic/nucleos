@@ -132,7 +132,8 @@
 #include <nucleos/type.h>
 #include <nucleos/signal.h>
 
-#define NR_syscalls		111	/* number of system calls allowed */
+#define __syscall_offset	130
+#define NR_syscalls		256	/* number of system calls allowed */
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */

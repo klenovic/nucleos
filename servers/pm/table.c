@@ -148,4 +148,4 @@ int (*call_vec[])(void) = {
 	do_getdma,	/* 110 = getdma */
 };
 /* This should not fail with "array size is negative": */
-extern int dummy[sizeof(call_vec) == NR_syscalls * sizeof(call_vec[0]) ? 1 : -1];
+extern int dummy[sizeof(call_vec) <= NR_syscalls * sizeof(call_vec[0]) ? 1 : -1];
