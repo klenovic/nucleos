@@ -89,7 +89,7 @@ int sys_vmctl_get_mapping(int index,
 	m.SVMCTL_PARAM = VMCTL_KERN_PHYSMAP;
 	m.SVMCTL_VALUE = (int) index;
 
-	r = _taskcall(SYSTASK, SYS_VMCTL, &m);
+	r = ktaskcall(SYSTASK, SYS_VMCTL, &m);
 
 	if(r != 0)
 		return r;
@@ -111,5 +111,5 @@ int sys_vmctl_reply_mapping(int index, vir_bytes addr)
 	m.SVMCTL_VALUE = index;
 	m.SVMCTL_MAP_VIR_ADDR = (char *) addr;
 
-	return _taskcall(SYSTASK, SYS_VMCTL, &m);
+	return ktaskcall(SYSTASK, SYS_VMCTL, &m);
 }
