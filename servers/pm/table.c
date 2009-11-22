@@ -34,6 +34,9 @@ int report_reboot;       /* During reboot to report to FS_PROC_NR that we are re
 int abort_flag;
 char monitor_code[256];
 
+#define SCALL_HANDLER(syscall, handler) \
+	[ __NNR_ ## syscall ] = handler
+
 int (*call_vec[])(void) = {
 	no_sys,		/*  0 = unused	*/
 	do_exit,	/*  1 = exit	*/
@@ -146,6 +149,47 @@ int (*call_vec[])(void) = {
 	do_adddma,	/* 108 = adddma */
 	do_deldma,	/* 109 = deldma */
 	do_getdma,	/* 110 = getdma */
+
+	/* Nucleos syscalls */
+	SCALL_HANDLER(alarm,		no_sys),
+	SCALL_HANDLER(brk,		no_sys),
+	SCALL_HANDLER(cprof,		no_sys),
+	SCALL_HANDLER(exec,		no_sys),
+	SCALL_HANDLER(exit,		no_sys),
+	SCALL_HANDLER(fork,		no_sys),
+	SCALL_HANDLER(getegid,		no_sys),
+	SCALL_HANDLER(getgid,		no_sys),
+	SCALL_HANDLER(getitimer,	no_sys),
+	SCALL_HANDLER(getpgrp,		no_sys),
+	SCALL_HANDLER(getpid,		no_sys),
+	SCALL_HANDLER(getppid,		no_sys),
+	SCALL_HANDLER(getpriority,	no_sys),
+	SCALL_HANDLER(gettimeofday,	no_sys),
+	SCALL_HANDLER(getuid,		no_sys),
+	SCALL_HANDLER(kill,		no_sys),
+	SCALL_HANDLER(pause,		no_sys),
+	SCALL_HANDLER(ptrace,		no_sys),
+	SCALL_HANDLER(reboot,		no_sys),
+	SCALL_HANDLER(setegid,		no_sys),
+	SCALL_HANDLER(seteuid,		no_sys),
+	SCALL_HANDLER(setgid,		no_sys),
+	SCALL_HANDLER(setitimer,	no_sys),
+	SCALL_HANDLER(setpriority,	no_sys),
+	SCALL_HANDLER(setsid,		no_sys),
+	SCALL_HANDLER(setuid,		no_sys),
+	SCALL_HANDLER(sigaction,	no_sys),
+	SCALL_HANDLER(signal,		no_sys),
+	SCALL_HANDLER(sigpending,	no_sys),
+	SCALL_HANDLER(sigprocmask,	no_sys),
+	SCALL_HANDLER(sigreturn,	no_sys),
+	SCALL_HANDLER(sigsuspend,	no_sys),
+	SCALL_HANDLER(sprof,		no_sys),
+	SCALL_HANDLER(stime,		no_sys),
+	SCALL_HANDLER(sysuname,		no_sys),
+	SCALL_HANDLER(time,		no_sys),
+	SCALL_HANDLER(times,		no_sys),
+	SCALL_HANDLER(waitpid,		no_sys),
+	SCALL_HANDLER(wait,		no_sys),
 };
 /* This should not fail with "array size is negative": */
 extern int dummy[sizeof(call_vec) <= NR_syscalls * sizeof(call_vec[0]) ? 1 : -1];

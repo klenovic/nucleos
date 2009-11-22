@@ -45,6 +45,9 @@ short cum_path_processed;        /* number of characters processed */
 /* The following variables are used for returning results to the caller. */
 int err_code;            /* temporary storage for error number */
 
+#define SCALL_HANDLER(syscall, handler) \
+	[ __NNR_ ## syscall ] = handler
+
 int (*call_vec[])(void) = {
 	no_sys,		/*  0 = unused */
 	no_sys,		/*  1 = (exit) */
@@ -157,6 +160,49 @@ int (*call_vec[])(void) = {
 	no_sys,		/* 108 = (adddma) */
 	no_sys,		/* 109 = unused */
 	no_sys,		/* 110 = unused */
+
+	/* Nucleos syscalls */
+	SCALL_HANDLER(access,		no_sys),
+	SCALL_HANDLER(chdir,		no_sys),
+	SCALL_HANDLER(chmod,		no_sys),
+	SCALL_HANDLER(chown,		no_sys),
+	SCALL_HANDLER(chroot,		no_sys),
+	SCALL_HANDLER(close,		no_sys),
+	SCALL_HANDLER(creat,		no_sys),
+	SCALL_HANDLER(dup,		no_sys),
+	SCALL_HANDLER(fchdir,		no_sys),
+	SCALL_HANDLER(fchmod,		no_sys),
+	SCALL_HANDLER(fchown,		no_sys),
+	SCALL_HANDLER(fcntl,		no_sys),
+	SCALL_HANDLER(fstat,		no_sys),
+	SCALL_HANDLER(fstatfs,		no_sys),
+	SCALL_HANDLER(fsync,		no_sys),
+	SCALL_HANDLER(ftruncate,	no_sys),
+	SCALL_HANDLER(getdents,		no_sys),
+	SCALL_HANDLER(ioctl,		no_sys),
+	SCALL_HANDLER(link,		no_sys),
+	SCALL_HANDLER(llseek,		no_sys),
+	SCALL_HANDLER(lseek,		no_sys),
+	SCALL_HANDLER(lstat,		no_sys),
+	SCALL_HANDLER(mkdir,		no_sys),
+	SCALL_HANDLER(mknod,		no_sys),
+	SCALL_HANDLER(mount,		no_sys),
+	SCALL_HANDLER(open,		no_sys),
+	SCALL_HANDLER(pipe,		no_sys),
+	SCALL_HANDLER(read,		no_sys),
+	SCALL_HANDLER(readlink,		no_sys),
+	SCALL_HANDLER(rename,		no_sys),
+	SCALL_HANDLER(rmdir,		no_sys),
+	SCALL_HANDLER(select,		no_sys),
+	SCALL_HANDLER(stat,		no_sys),
+	SCALL_HANDLER(symlink,		no_sys),
+	SCALL_HANDLER(sync,		no_sys),
+	SCALL_HANDLER(truncate,		no_sys),
+	SCALL_HANDLER(umask,		no_sys),
+	SCALL_HANDLER(umount,		no_sys),
+	SCALL_HANDLER(unlink,		no_sys),
+	SCALL_HANDLER(utime,		no_sys),
+	SCALL_HANDLER(write,		no_sys),
 };
 
 /* This should not fail with "array size is negative": */
