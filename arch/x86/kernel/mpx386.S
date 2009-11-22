@@ -337,6 +337,7 @@ hwint15:			// Interrupt routine for irq 15
 //===========================================================================
 //                             system_call (0x80)
 //===========================================================================
+	.p2align 4
 ENTRY(system_call)
 	SAVE_PROCESS_CTX(0)
 
@@ -355,7 +356,7 @@ ENTRY(system_call)
 /*
  * syscall is only from a process to kernel (legacy call)
  */
-.p2align 4
+	.p2align 4
 .globl syscall_entry
 syscall_entry:
 	SAVE_PROCESS_CTX(0)

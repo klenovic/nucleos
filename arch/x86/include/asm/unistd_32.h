@@ -119,7 +119,7 @@
 					 * any longer
 					 */
 #define __NR_devctl		120	/* to FS, map or unmap a device */
-#define __NR_task_reply		121	/* to FS_PROC_NR: reply code from drivers, not
+#define __NR_task_reply		121	/* to FS: reply code from drivers, not
 					 * really a standalone call.
 					 */
 #define __NR_mapdriver		122	/* to FS, map a device */
