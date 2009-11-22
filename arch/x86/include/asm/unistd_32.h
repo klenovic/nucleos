@@ -92,25 +92,6 @@
 #define __NR_sprof		98	/* to PM */
 #define __NR_cprof		99	/* to PM */
 
-/* Calls provided by PM and FS that are not part of the API */
-
-#define __NR_procstat		103	/* to PM */
-#define __NR_getprocnr		104	/* to PM */
-#if 0
-#define __NR_freemem		106	/* to PM, not used, not implemented */
-#endif
-#define __NR_getepinfo		107	/* to PM: get pid/gid/uid of an endpoint */
-#define __NR_adddma		108	/* to PM: inform PM about a region of memory
-					 * that is used for bus-master DMA
-					 */
-#define __NR_deldma		109	/* to PM: inform PM that a region of memory
-					 * that is no longer used for bus-master DMA
-					 */
-#define __NR_getdma		110	/* to PM: ask PM for a region of memory
-					 * that should not be used for bus-master DMA
-					 * any longer
-					 */
-
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
 #include <nucleos/types.h>
@@ -206,25 +187,11 @@
 #define __NNR_fchown		(76 + __syscall_offset)	/* to FS */
 #define __NNR_sprof		(77 + __syscall_offset)	/* to PM */
 #define __NNR_cprof		(78 + __syscall_offset)	/* to PM */
-#define __NNR_procstat		(79 + __syscall_offset)	/* to PM */
-#define __NNR_getprocnr		(80 + __syscall_offset)	/* to PM */
-
-#define __NNR_getepinfo		(81 + __syscall_offset)	/* to PM: get pid/gid/uid of an endpoint */
-#define __NNR_adddma		(82 + __syscall_offset)	/* to PM: inform PM about a region of memory
-							 * that is used for bus-master DMA
-							 */
-#define __NNR_deldma		(83 + __syscall_offset)	/* to PM: inform PM that a region of memory
-							 * that is no longer used for bus-master DMA
-					 */
-#define __NNR_getdma		(84 + __syscall_offset)	/* to PM: ask PM for a region of memory
-							 * that should not be used for bus-master DMA
-							 * any longer
-							 */
-#define __NNR_getegid		(85 + __syscall_offset)
-#define __NNR_getppid		(86 + __syscall_offset)
+#define __NNR_getegid		(79 + __syscall_offset)
+#define __NNR_getppid		(80 + __syscall_offset)
 
 /* Kernel message numbers. These are used only by u/kernel and
- * never by C library
+ * never by C library.
  */
 #define KCNR_FS_READY		57
 #define KCNR_EXEC_NEWMEM	100	/* from FS or RS to PM: new memory map for
@@ -232,7 +199,23 @@
 					 */
 #define KCNR_FORK_NB		101	/* to PM: special fork call for RS */
 #define KCNR_EXEC_RESTART	102	/* to PM: final part of exec for RS */
+#define KCNR_PROCSTAT		103	/* to PM */
+#define KCNR_GETPROCNR		104	/* to PM */
 #define KCNR_ALLOCMEM		105	/* to PM */
+#if 0
+#define __NR_freemem		106	/* to PM, not used, not implemented */
+#endif
+#define KCNR_GETEPINFO		107	/* to PM: get pid/gid/uid of an endpoint */
+#define KCNR_ADDDMA		108	/* to PM: inform PM about a region of memory
+					 * that is used for bus-master DMA
+					 */
+#define KCNR_DELDMA		109	/* to PM: inform PM that a region of memory
+					 * that is no longer used for bus-master DMA
+					 */
+#define KCNR_GETDMA		110	/* to PM: ask PM for a region of memory
+					 * that should not be used for bus-master DMA
+					 * any longer
+					 */
 #define KCNR_DEVCTL		120	/* to FS, map or unmap a device */
 #define KCNR_TASK_REPLY		121	/* to FS: reply code from drivers, not
 					 * really a standalone call.

@@ -101,7 +101,6 @@ endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
 }
 
 void msg_access(message *msg, struct pt_regs *r){}
-void msg_adddma(message *msg, struct pt_regs *r){}
 void msg_alarm(message *msg, struct pt_regs *r){}
 void msg_brk(message *msg, struct pt_regs *r){}
 void msg_chdir(message *msg, struct pt_regs *r){}
@@ -111,7 +110,6 @@ void msg_chroot(message *msg, struct pt_regs *r){}
 void msg_close(message *msg, struct pt_regs *r){}
 void msg_cprof(message *msg, struct pt_regs *r){}
 void msg_creat(message *msg, struct pt_regs *r){}
-void msg_deldma(message *msg, struct pt_regs *r){}
 void msg_dup(message *msg, struct pt_regs *r){}
 void msg_exec(message *msg, struct pt_regs *r){}
 void msg_exit(message *msg, struct pt_regs *r){}
@@ -125,16 +123,13 @@ void msg_fstat(message *msg, struct pt_regs *r){}
 void msg_fsync(message *msg, struct pt_regs *r){}
 void msg_ftruncate(message *msg, struct pt_regs *r){}
 void msg_getdents(message *msg, struct pt_regs *r){}
-void msg_getdma(message *msg, struct pt_regs *r){}
 void msg_getegid(message *msg, struct pt_regs *r){}
-void msg_getepinfo(message *msg, struct pt_regs *r){}
 void msg_getgid(message *msg, struct pt_regs *r){}
 void msg_getitimer(message *msg, struct pt_regs *r){}
 void msg_getpgrp(message *msg, struct pt_regs *r){}
 void msg_getpid(message *msg, struct pt_regs *r){}
 void msg_getppid(message *msg, struct pt_regs *r){}
 void msg_getpriority(message *msg, struct pt_regs *r){}
-void msg_getprocnr(message *msg, struct pt_regs *r){}
 void msg_gettimeofday(message *msg, struct pt_regs *r){}
 void msg_getuid(message *msg, struct pt_regs *r){}
 void msg_ioctl(message *msg, struct pt_regs *r){}
@@ -149,7 +144,6 @@ void msg_mount(message *msg, struct pt_regs *r){}
 void msg_open(message *msg, struct pt_regs *r){}
 void msg_pause(message *msg, struct pt_regs *r){}
 void msg_pipe(message *msg, struct pt_regs *r){}
-void msg_procstat(message *msg, struct pt_regs *r){}
 void msg_ptrace(message *msg, struct pt_regs *r){}
 void msg_readlink(message *msg, struct pt_regs *r){}
 void msg_read(message *msg, struct pt_regs *r){}
@@ -189,7 +183,6 @@ void msg_write(message *msg, struct pt_regs *r){}
 
 static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(access,		FS),
-	SCALL_TO_SRV(adddma,		PM),
 	SCALL_TO_SRV(alarm,		PM),
 	SCALL_TO_SRV(brk,		PM),
 	SCALL_TO_SRV(chdir,		FS),
@@ -197,10 +190,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(chown,		FS),
 	SCALL_TO_SRV(chroot,		FS),
 	SCALL_TO_SRV(close,		FS),
-	SCALL_TO_SRV(cprof,		PM),	/* 10 */
+	SCALL_TO_SRV(cprof,		PM),
+	SCALL_TO_SRV(creat,		FS),	/* 10 */
 
-	SCALL_TO_SRV(creat,		FS),
-	SCALL_TO_SRV(deldma,		PM),
 	SCALL_TO_SRV(dup,		FS),
 	SCALL_TO_SRV(exec,		PM),
 	SCALL_TO_SRV(exit,		PM),
@@ -208,78 +200,73 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(fchmod,		FS),
 	SCALL_TO_SRV(fchown,		FS),
 	SCALL_TO_SRV(fcntl,		FS),
-	SCALL_TO_SRV(fork,		PM),	/* 20 */
-
+	SCALL_TO_SRV(fork,		PM),
 	SCALL_TO_SRV(fstat,		FS),
-	SCALL_TO_SRV(fstatfs,		FS),
+	SCALL_TO_SRV(fstatfs,		FS),	/* 20 */
+
 	SCALL_TO_SRV(fsync,		FS),
 	SCALL_TO_SRV(ftruncate,		FS),
 	SCALL_TO_SRV(getdents,		FS),
-	SCALL_TO_SRV(getdma,		PM),
 	SCALL_TO_SRV(getegid,		PM),
-	SCALL_TO_SRV(getepinfo,		PM),
 	SCALL_TO_SRV(getgid,		PM),
-	SCALL_TO_SRV(getitimer,		PM),	/* 30 */
-
+	SCALL_TO_SRV(getitimer,		PM),
 	SCALL_TO_SRV(getpgrp,		PM),
 	SCALL_TO_SRV(getpid,		PM),
 	SCALL_TO_SRV(getppid,		PM),
-	SCALL_TO_SRV(getpriority,	PM),
-	SCALL_TO_SRV(getprocnr,		PM),
+	SCALL_TO_SRV(getpriority,	PM),	/* 30 */
+
 	SCALL_TO_SRV(gettimeofday,	PM),
 	SCALL_TO_SRV(getuid,		PM),
 	SCALL_TO_SRV(ioctl,		FS),
 	SCALL_TO_SRV(kill,		PM),
-	SCALL_TO_SRV(link,		FS),	/* 40 */
-
+	SCALL_TO_SRV(link,		FS),
 	SCALL_TO_SRV(llseek,		FS),
 	SCALL_TO_SRV(lseek,		FS),
 	SCALL_TO_SRV(lstat,		FS),
 	SCALL_TO_SRV(mkdir,		FS),
-	SCALL_TO_SRV(mknod,		FS),
+	SCALL_TO_SRV(mknod,		FS),	/* 40 */
+
 	SCALL_TO_SRV(mount,		FS),
 	SCALL_TO_SRV(open,		FS),
 	SCALL_TO_SRV(pause,		PM),
 	SCALL_TO_SRV(pipe,		FS),
-	SCALL_TO_SRV(procstat,		PM),	/* 50 */
-
 	SCALL_TO_SRV(ptrace,		PM),
 	SCALL_TO_SRV(read,		FS),
 	SCALL_TO_SRV(readlink,		FS),
 	SCALL_TO_SRV(reboot,		PM),
 	SCALL_TO_SRV(rename,		FS),
-	SCALL_TO_SRV(rmdir,		FS),
+	SCALL_TO_SRV(rmdir,		FS),	/* 50 */
+
 	SCALL_TO_SRV(select,		FS),
 	SCALL_TO_SRV(setegid,		PM),
 	SCALL_TO_SRV(seteuid,		PM),
-	SCALL_TO_SRV(setgid,		PM),	/* 60 */
-
+	SCALL_TO_SRV(setgid,		PM),
 	SCALL_TO_SRV(setitimer,		PM),
 	SCALL_TO_SRV(setpriority,	PM),
 	SCALL_TO_SRV(setsid,		PM),
 	SCALL_TO_SRV(setuid,		PM),
 	SCALL_TO_SRV(sigaction,		PM),
-	SCALL_TO_SRV(signal,		PM),
+	SCALL_TO_SRV(signal,		PM),	/* 60 */
+
 	SCALL_TO_SRV(sigpending,	PM),
 	SCALL_TO_SRV(sigprocmask,	PM),
 	SCALL_TO_SRV(sigreturn,		PM),
-	SCALL_TO_SRV(sigsuspend,	PM),	/* 70 */
-
+	SCALL_TO_SRV(sigsuspend,	PM),
 	SCALL_TO_SRV(sprof,		PM),
 	SCALL_TO_SRV(stat,		FS),
 	SCALL_TO_SRV(stime,		PM),
 	SCALL_TO_SRV(symlink,		FS),
 	SCALL_TO_SRV(sync,		FS),
-	SCALL_TO_SRV(sysuname,		PM),
+	SCALL_TO_SRV(sysuname,		PM),	/* 70 */
+
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
 	SCALL_TO_SRV(truncate,		FS),
-	SCALL_TO_SRV(umask,		FS),	/* 80 */
-
+	SCALL_TO_SRV(umask,		FS),
 	SCALL_TO_SRV(umount,		FS),
 	SCALL_TO_SRV(unlink,		FS),
 	SCALL_TO_SRV(utime,		FS),
 	SCALL_TO_SRV(waitpid,		PM),
 	SCALL_TO_SRV(wait,		PM),
-	SCALL_TO_SRV(write,		FS),
+	SCALL_TO_SRV(write,		FS),	/* 80 */
 };

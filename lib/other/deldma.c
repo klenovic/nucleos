@@ -21,5 +21,5 @@ int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size)
   m.m2_l1= start;
   m.m2_l2= size;
 
-  return ksyscall(PM_PROC_NR, __NR_deldma, &m);
+  return ksyscall(PM_PROC_NR, KCNR_DELDMA, &m);
 }

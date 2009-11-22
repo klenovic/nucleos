@@ -130,13 +130,13 @@ int main()
 	case KCNR_EXEC_RESTART:
 		result= do_execrestart();
 		break;
-	case __NR_procstat:
+	case KCNR_PROCSTAT:
 		result= do_procstat();
 		break;
-	case __NR_getprocnr:
+	case KCNR_GETPROCNR:
 		result= do_getprocnr();
 		break;
-	case __NR_getepinfo:
+	case KCNR_GETEPINFO:
 		result= do_getepinfo();
 		break;
 	default:

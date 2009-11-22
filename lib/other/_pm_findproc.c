@@ -23,7 +23,7 @@ int _pm_findproc(char *proc_name, int *proc_nr)
   m.m1_p1 = proc_name;
   m.m1_i1 = -1;			/* search by name */
   m.m1_i2 = strlen(proc_name) + 1;
-  if (ksyscall(PM_PROC_NR, __NR_getprocnr, &m) < 0) return(-1);
+  if (ksyscall(PM_PROC_NR, KCNR_GETPROCNR, &m) < 0) return(-1);
   *proc_nr = m.m1_i1;
   return(0);
 }
