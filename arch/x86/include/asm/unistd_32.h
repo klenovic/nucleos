@@ -202,9 +202,6 @@
 #define KCNR_PROCSTAT		103	/* to PM */
 #define KCNR_GETPROCNR		104	/* to PM */
 #define KCNR_ALLOCMEM		105	/* to PM */
-#if 0
-#define __NR_freemem		106	/* to PM, not used, not implemented */
-#endif
 #define KCNR_GETEPINFO		107	/* to PM: get pid/gid/uid of an endpoint */
 #define KCNR_ADDDMA		108	/* to PM: inform PM about a region of memory
 					 * that is used for bus-master DMA
