@@ -10,8 +10,6 @@
 #ifndef __ASM_X86_UNISTD_32_H
 #define __ASM_X86_UNISTD_32_H
 
-
-
 #define __NR_exit		1
 #define __NR_fork		2
 #define __NR_read		3
@@ -77,28 +75,28 @@
 #define __NR_reboot		76
 #define __NR_svrctl		77
 #define __NR_sysuname		78
-#define __NR_getsysinfo		79	/* to PM or FS_PROC_NR */
-#define __NR_getdents		80	/* to FS_PROC_NR */
-#define __NR_llseek		81	/* to FS_PROC_NR */
-#define __NR_fstatfs		82	/* to FS_PROC_NR */
-#define __NR_select		85	/* to FS_PROC_NR */
-#define __NR_fchdir		86	/* to FS_PROC_NR */
-#define __NR_fsync		87	/* to FS_PROC_NR */
+#define __NR_getsysinfo		79	/* to PM or FS */
+#define __NR_getdents		80	/* to FS */
+#define __NR_llseek		81	/* to FS */
+#define __NR_fstatfs		82	/* to FS */
+#define __NR_select		85	/* to FS */
+#define __NR_fchdir		86	/* to FS */
+#define __NR_fsync		87	/* to FS */
 #define __NR_getpriority	88	/* to PM */
 #define __NR_setpriority	89	/* to PM */
 #define __NR_gettimeofday	90	/* to PM */
 #define __NR_seteuid		91	/* to PM */
 #define __NR_setegid		92	/* to PM */
-#define __NR_truncate		93	/* to FS_PROC_NR */
-#define __NR_ftruncate		94	/* to FS_PROC_NR */
-#define __NR_fchmod		95	/* to FS_PROC_NR */
-#define __NR_fchown		96	/* to FS_PROC_NR */
-#define __NR_getsysinfo_up	97	/* to PM or FS_PROC_NR */
+#define __NR_truncate		93	/* to FS */
+#define __NR_ftruncate		94	/* to FS */
+#define __NR_fchmod		95	/* to FS */
+#define __NR_fchown		96	/* to FS */
+#define __NR_getsysinfo_up	97	/* to PM or FS */
 #define __NR_sprof		98	/* to PM */
 #define __NR_cprof		99	/* to PM */
 
-/* Calls provided by PM and FS_PROC_NR that are not part of the API */
-#define __NR_exec_newmem	100	/* from FS_PROC_NR or RS to PM: new memory map for
+/* Calls provided by PM and FS that are not part of the API */
+#define __NR_exec_newmem	100	/* from FS or RS to PM: new memory map for
 					 * exec
 					 */
 #define __NR_fork_nb		101	/* to PM: special fork call for RS */
@@ -120,11 +118,11 @@
 					 * that should not be used for bus-master DMA
 					 * any longer
 					 */
-#define __NR_devctl		120	/* to FS_PROC_NR, map or unmap a device */
+#define __NR_devctl		120	/* to FS, map or unmap a device */
 #define __NR_task_reply		121	/* to FS_PROC_NR: reply code from drivers, not
 					 * really a standalone call.
 					 */
-#define __NR_mapdriver		122	/* to FS_PROC_NR, map a device */
+#define __NR_mapdriver		122	/* to FS, map a device */
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -134,6 +132,109 @@
 
 #define __syscall_offset	130
 #define NR_syscalls		256	/* number of system calls allowed */
+
+#define __NNR_exit		(1 + __syscall_offset)
+#define __NNR_fork		(2 + __syscall_offset)
+#define __NNR_read		(3 + __syscall_offset)
+#define __NNR_write		(4 + __syscall_offset)
+#define __NNR_open		(5 + __syscall_offset)
+#define __NNR_close		(6 + __syscall_offset)
+#define __NNR_wait		(7 + __syscall_offset)
+#define __NNR_creat		(8 + __syscall_offset)
+#define __NNR_link		(9 + __syscall_offset)
+#define __NNR_unlink		(10 + __syscall_offset)
+
+#define __NNR_waitpid		(11 + __syscall_offset)
+#define __NNR_chdir		(12 + __syscall_offset)
+#define __NNR_time		(13 + __syscall_offset)
+#define __NNR_mknod		(14 + __syscall_offset)
+#define __NNR_chmod		(15 + __syscall_offset)
+#define __NNR_chown		(16 + __syscall_offset)
+#define __NNR_brk		(17 + __syscall_offset)
+#define __NNR_stat		(18 + __syscall_offset)
+#define __NNR_lseek		(19 + __syscall_offset)
+#define __NNR_getpid		(20 + __syscall_offset)
+
+#define __NNR_mount		(21 + __syscall_offset)
+#define __NNR_umount		(22 + __syscall_offset)
+#define __NNR_setuid		(23 + __syscall_offset)
+#define __NNR_getuid		(24 + __syscall_offset)
+#define __NNR_stime		(25 + __syscall_offset)
+#define __NNR_ptrace		(26 + __syscall_offset)
+#define __NNR_alarm		(27 + __syscall_offset)
+#define __NNR_fstat		(28 + __syscall_offset)
+#define __NNR_pause		(29 + __syscall_offset)
+#define __NNR_utime		(30 + __syscall_offset)
+
+#define __NNR_access		(31 + __syscall_offset)
+#define __NNR_sync		(32 + __syscall_offset)
+#define __NNR_kill		(33 + __syscall_offset)
+#define __NNR_rename		(34 + __syscall_offset)
+#define __NNR_mkdir		(35 + __syscall_offset)
+#define __NNR_rmdir		(36 + __syscall_offset)
+#define __NNR_dup		(37 + __syscall_offset)
+#define __NNR_pipe		(38 + __syscall_offset)
+#define __NNR_times		(39 + __syscall_offset)
+#define __NNR_symlink		(40 + __syscall_offset)
+
+#define __NNR_setgid		(41 + __syscall_offset)
+#define __NNR_getgid		(42 + __syscall_offset)
+#define __NNR_signal		(43 + __syscall_offset)
+#define __NNR_readlink		(44 + __syscall_offset)
+#define __NNR_lstat		(45 + __syscall_offset)
+#define __NNR_ioctl		(46 + __syscall_offset)
+#define __NNR_fcntl		(47 + __syscall_offset)
+#define __NNR_exec		(48 + __syscall_offset)
+#define __NNR_umask		(49 + __syscall_offset)
+#define __NNR_chroot		(50 + __syscall_offset)
+
+#define __NNR_setsid		(51 + __syscall_offset)
+#define __NNR_getpgrp		(52 + __syscall_offset)
+#define __NNR_getitimer		(53 + __syscall_offset)
+#define __NNR_setitimer		(54 + __syscall_offset)
+/* Posix signal handling. */
+#define __NNR_sigaction		(55 + __syscall_offset)
+#define __NNR_sigsuspend	(56 + __syscall_offset)
+#define __NNR_sigpending	(57 + __syscall_offset)
+#define __NNR_sigprocmask	(58 + __syscall_offset)
+#define __NNR_sigreturn		(59 + __syscall_offset)
+#define __NNR_reboot		(60 + __syscall_offset)
+
+#define __NNR_sysuname		(61 + __syscall_offset)
+#define __NNR_getdents		(62 + __syscall_offset)	/* to FS */
+#define __NNR_llseek		(63 + __syscall_offset)	/* to FS */
+#define __NNR_fstatfs		(64 + __syscall_offset)	/* to FS */
+#define __NNR_select		(65 + __syscall_offset)	/* to FS */
+#define __NNR_fchdir		(66 + __syscall_offset)	/* to FS */
+#define __NNR_fsync		(67 + __syscall_offset)	/* to FS */
+#define __NNR_getpriority	(68 + __syscall_offset)	/* to PM */
+#define __NNR_setpriority	(69 + __syscall_offset)	/* to PM */
+#define __NNR_gettimeofday	(70 + __syscall_offset)	/* to PM */
+
+#define __NNR_seteuid		(71 + __syscall_offset)	/* to PM */
+#define __NNR_setegid		(72 + __syscall_offset)	/* to PM */
+#define __NNR_truncate		(73 + __syscall_offset)	/* to FS */
+#define __NNR_ftruncate		(74 + __syscall_offset)	/* to FS */
+#define __NNR_fchmod		(75 + __syscall_offset)	/* to FS */
+#define __NNR_fchown		(76 + __syscall_offset)	/* to FS */
+#define __NNR_sprof		(77 + __syscall_offset)	/* to PM */
+#define __NNR_cprof		(78 + __syscall_offset)	/* to PM */
+#define __NNR_procstat		(79 + __syscall_offset)	/* to PM */
+#define __NNR_getprocnr		(80 + __syscall_offset)	/* to PM */
+
+#define __NNR_getepinfo		(81 + __syscall_offset)	/* to PM: get pid/gid/uid of an endpoint */
+#define __NNR_adddma		(82 + __syscall_offset)	/* to PM: inform PM about a region of memory
+							 * that is used for bus-master DMA
+							 */
+#define __NNR_deldma		(83 + __syscall_offset)	/* to PM: inform PM that a region of memory
+							 * that is no longer used for bus-master DMA
+					 */
+#define __NNR_getdma		(84 + __syscall_offset)	/* to PM: ask PM for a region of memory
+							 * that should not be used for bus-master DMA
+							 * any longer
+							 */
+#define __NNR_getegid		(85 + __syscall_offset)
+#define __NNR_getppid		(86 + __syscall_offset)
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */

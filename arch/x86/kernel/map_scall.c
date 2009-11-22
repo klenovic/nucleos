@@ -12,8 +12,13 @@
 #include <nucleos/ptrace.h>
 #include <nucleos/unistd.h>
 #include <nucleos/types.h>
+#include <nucleos/string.h>
+#include <nucleos/errno.h>
 #include <kernel/proc.h>
+#include <kernel/proto.h>
 #include <kernel/glo.h>
+#include <kernel/vm.h>
+#include <asm/servers/vm/memory.h>
 
 /*
  * @nucleos: Ideally the C library should know _nothing_ about character of kernel i.e. whether
@@ -36,23 +41,55 @@ struct endpt_args {
 	void (*fill_msg)(message *msg, struct pt_regs *r);
 };
 
-struct endpt_args scall_endpt_args[];
+static struct endpt_args scall_to_srv[];
 
-__attribute__((regparm(0))) endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
+#define SCALL_TO_SRV(syscall, server) \
+	[__NNR_ ## syscall] = { server ## _PROC_NR, msg_ ## syscall }
+
+static inline long strnlen_user(const char *s, size_t maxlen)
+{
+	char name[PATH_MAX];
+	unsigned long len = 0;
+	phys_bytes linaddr;
+
+	/* We must not cross the top of stack during copy */
+	len = ((VM_STACKTOP - (unsigned long)s) < maxlen) ? (VM_STACKTOP - (unsigned long)s) : maxlen;
+
+	/* Map the string from user space.
+	 * @nucleos: Fix this let `fetch_name' takes care.
+	 */
+	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len))) {
+		return -EFAULT;
+	}
+
+	phys_copy(linaddr, vir2phys((vir_bytes)name), len);
+
+	return strnlen(name, len);
+}
+
+endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
 {
 	message kmsg;
+
+	memset(&kmsg, 0, sizeof(message));
+
 	/* this code right below totaly kill the kernel!!! */
 	/* kprintf("ax=%d bx=%d cx=%d dx=%d si=%si di=%d\n", r->ax, r->bx, r->cx, r->dx,
 		    r->si, r->di); */
 
+	/* @nucleos: The syscall numbers used by user (_NR_*) and kernel may be different.
+	 *           E.g. user calls mmap via __NR_mmap but system knows it as VM_MMAP. In
+	 *           this case the m_type can be changed to appropriate number in msg_* function.
+	 *           Thing to change ???
+	 */
 	kmsg.m_type = r->ax;
 
 	/* fill the message according to passed arguments */
-	if (scall_endpt_args[r->ax].fill_msg)
-		scall_endpt_args[r->ax].fill_msg(&kmsg, r);
+	if (scall_to_srv[r->ax].fill_msg)
+		scall_to_srv[r->ax].fill_msg(&kmsg, r);
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
- 		     current kIPC. It requires to have message in caller's (user's) space. */
+		     kIPC. It requires to have message in caller's (user's) space. */
 
 	/* Map the message from user space. */
 	phys_bytes linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
@@ -60,140 +97,189 @@ __attribute__((regparm(0))) endpoint_t map_scall_endpt(message *msg, struct pt_r
 	/* copy the filled message into caller (user) space */
 	phys_copy(vir2phys(&kmsg), linaddr, sizeof(message));
 
-	return scall_endpt_args[r->ax].endpt;
+	return scall_to_srv[r->ax].endpt;
 }
 
-static void msg_read(message *msg, struct pt_regs *r)
-{
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (void*)r->cx;	/* buffer */
-	msg->m1_i2 = r->dx;		/* count */
-}
+void msg_access(message *msg, struct pt_regs *r){}
+void msg_adddma(message *msg, struct pt_regs *r){}
+void msg_alarm(message *msg, struct pt_regs *r){}
+void msg_brk(message *msg, struct pt_regs *r){}
+void msg_chdir(message *msg, struct pt_regs *r){}
+void msg_chmod(message *msg, struct pt_regs *r){}
+void msg_chown(message *msg, struct pt_regs *r){}
+void msg_chroot(message *msg, struct pt_regs *r){}
+void msg_close(message *msg, struct pt_regs *r){}
+void msg_cprof(message *msg, struct pt_regs *r){}
+void msg_creat(message *msg, struct pt_regs *r){}
+void msg_deldma(message *msg, struct pt_regs *r){}
+void msg_dup(message *msg, struct pt_regs *r){}
+void msg_exec(message *msg, struct pt_regs *r){}
+void msg_exit(message *msg, struct pt_regs *r){}
+void msg_fchdir(message *msg, struct pt_regs *r){}
+void msg_fchmod(message *msg, struct pt_regs *r){}
+void msg_fchown(message *msg, struct pt_regs *r){}
+void msg_fcntl(message *msg, struct pt_regs *r){}
+void msg_fork(message *msg, struct pt_regs *r){}
+void msg_fstatfs(message *msg, struct pt_regs *r){}
+void msg_fstat(message *msg, struct pt_regs *r){}
+void msg_fsync(message *msg, struct pt_regs *r){}
+void msg_ftruncate(message *msg, struct pt_regs *r){}
+void msg_getdents(message *msg, struct pt_regs *r){}
+void msg_getdma(message *msg, struct pt_regs *r){}
+void msg_getegid(message *msg, struct pt_regs *r){}
+void msg_getepinfo(message *msg, struct pt_regs *r){}
+void msg_getgid(message *msg, struct pt_regs *r){}
+void msg_getitimer(message *msg, struct pt_regs *r){}
+void msg_getpgrp(message *msg, struct pt_regs *r){}
+void msg_getpid(message *msg, struct pt_regs *r){}
+void msg_getppid(message *msg, struct pt_regs *r){}
+void msg_getpriority(message *msg, struct pt_regs *r){}
+void msg_getprocnr(message *msg, struct pt_regs *r){}
+void msg_gettimeofday(message *msg, struct pt_regs *r){}
+void msg_getuid(message *msg, struct pt_regs *r){}
+void msg_ioctl(message *msg, struct pt_regs *r){}
+void msg_kill(message *msg, struct pt_regs *r){}
+void msg_link(message *msg, struct pt_regs *r){}
+void msg_llseek(message *msg, struct pt_regs *r){}
+void msg_lseek(message *msg, struct pt_regs *r){}
+void msg_lstat(message *msg, struct pt_regs *r){}
+void msg_mkdir(message *msg, struct pt_regs *r){}
+void msg_mknod(message *msg, struct pt_regs *r){}
+void msg_mount(message *msg, struct pt_regs *r){}
+void msg_open(message *msg, struct pt_regs *r){}
+void msg_pause(message *msg, struct pt_regs *r){}
+void msg_pipe(message *msg, struct pt_regs *r){}
+void msg_procstat(message *msg, struct pt_regs *r){}
+void msg_ptrace(message *msg, struct pt_regs *r){}
+void msg_readlink(message *msg, struct pt_regs *r){}
+void msg_read(message *msg, struct pt_regs *r){}
+void msg_reboot(message *msg, struct pt_regs *r){}
+void msg_rename(message *msg, struct pt_regs *r){}
+void msg_rmdir(message *msg, struct pt_regs *r){}
+void msg_select(message *msg, struct pt_regs *r){}
+void msg_setegid(message *msg, struct pt_regs *r){}
+void msg_seteuid(message *msg, struct pt_regs *r){}
+void msg_setgid(message *msg, struct pt_regs *r){}
+void msg_setitimer(message *msg, struct pt_regs *r){}
+void msg_setpriority(message *msg, struct pt_regs *r){}
+void msg_setsid(message *msg, struct pt_regs *r){}
+void msg_setuid(message *msg, struct pt_regs *r){}
+void msg_sigaction(message *msg, struct pt_regs *r){}
+void msg_signal(message *msg, struct pt_regs *r){}
+void msg_sigpending(message *msg, struct pt_regs *r){}
+void msg_sigprocmask(message *msg, struct pt_regs *r){}
+void msg_sigreturn(message *msg, struct pt_regs *r){}
+void msg_sigsuspend(message *msg, struct pt_regs *r){}
+void msg_sprof(message *msg, struct pt_regs *r){}
+void msg_stat(message *msg, struct pt_regs *r){}
+void msg_stime(message *msg, struct pt_regs *r){}
+void msg_symlink(message *msg, struct pt_regs *r){}
+void msg_sync(message *msg, struct pt_regs *r){}
+void msg_sysuname(message *msg, struct pt_regs *r){}
+void msg_time(message *msg, struct pt_regs *r){}
+void msg_times(message *msg, struct pt_regs *r){}
+void msg_truncate(message *msg, struct pt_regs *r){}
+void msg_umask(message *msg, struct pt_regs *r){}
+void msg_umount(message *msg, struct pt_regs *r){}
+void msg_unlink(message *msg, struct pt_regs *r){}
+void msg_utime(message *msg, struct pt_regs *r){}
+void msg_wait(message *msg, struct pt_regs *r){}
+void msg_waitpid(message *msg, struct pt_regs *r){}
+void msg_write(message *msg, struct pt_regs *r){}
 
-static void msg_exit(message *msg, struct pt_regs *r)
-{
-	msg->m1_i1 = r->bx;
-}
+static struct endpt_args scall_to_srv[] = {
+	SCALL_TO_SRV(access,		FS),
+	SCALL_TO_SRV(adddma,		PM),
+	SCALL_TO_SRV(alarm,		PM),
+	SCALL_TO_SRV(brk,		PM),
+	SCALL_TO_SRV(chdir,		FS),
+	SCALL_TO_SRV(chmod,		FS),
+	SCALL_TO_SRV(chown,		FS),
+	SCALL_TO_SRV(chroot,		FS),
+	SCALL_TO_SRV(close,		FS),
+	SCALL_TO_SRV(cprof,		PM),	/* 10 */
 
-static void msg_ptrace(message *msg, struct pt_regs *r)
-{
-	msg->m2_i1 = r->cx;	/* pid */
-	msg->m2_i2 = r->bx;	/* req */
-	msg->PMTRACE_ADDR = r->dx;	/* addr */
-	msg->m2_l2 = r->si;		/* data */
-}
+	SCALL_TO_SRV(creat,		FS),
+	SCALL_TO_SRV(deldma,		PM),
+	SCALL_TO_SRV(dup,		FS),
+	SCALL_TO_SRV(exec,		PM),
+	SCALL_TO_SRV(exit,		PM),
+	SCALL_TO_SRV(fchdir,		FS),
+	SCALL_TO_SRV(fchmod,		FS),
+	SCALL_TO_SRV(fchown,		FS),
+	SCALL_TO_SRV(fcntl,		FS),
+	SCALL_TO_SRV(fork,		PM),	/* 20 */
 
-struct endpt_args scall_endpt_args[] = {
-	[__NR_getdma]		= { PM_PROC_NR, 0, },
-	/* [VM_RS_SET_PRIV]	= { VM_PROC_NR, 0, }, (RS: internal) */
-	/* [VM_ADDDMA]		= { VM_PROC_NR, 0, }, (PM: internal) */
-	/* [VM_DELDMA]		= { VM_PROC_NR, 0, }, (PM: internal) */
-	/* [VM_GETDMA]		= { VM_PROC_NR, 0, }, (PM: internal) */
-	[__NR_getprocnr]	= { PM_PROC_NR, 0, },
-	[__NR_deldma]		= { PM_PROC_NR, 0, },
-	/* [__NR_freemem]	= { PM_PROC_NR, 0, }, (not used) */
-	[__NR_llseek]		= { FS_PROC_NR, 0, },
-	[__NR_getepinfo]	= { PM_PROC_NR, 0, },
-	[__NR_reboot]		= { PM_PROC_NR, 0, },
-	[__NR_getpid]		= { PM_PROC_NR, 0, },
-	[__NR_procstat]		= { PM_PROC_NR, 0, },
-	[__NR_mapdriver]	= { FS_PROC_NR, 0, },
-	[__NR_brk]		= { PM_PROC_NR, 0, },
-	[__NR_getgid]		= { PM_PROC_NR, 0, },
-	[__NR_getuid]		= { PM_PROC_NR, 0, },
-	[__NR_sprof]		= { PM_PROC_NR, 0, },
-	/* issue: two different enpoints
-	[__NR_svrctl]		= { PM_PROC_NR, 0, },
-	[__NR_svrctl]		= { FS_PROC_NR, 0, },
-	 */
-	[__NR_sysuname]		= { PM_PROC_NR, 0, },
-	[__NR_getdents]		= { FS_PROC_NR, 0, },
-	[__NR_cprof]		= { PM_PROC_NR, 0, },
-	[__NR_mount]		= { FS_PROC_NR, 0, },
-	[__NR_umount]		= { FS_PROC_NR, 0, },
-	/* [__NR_getsysinfo]	= ? (PM/VM/VFS issue) */
-	/* [__NR_getsysinfo_up]	= ? (PM/VM/VFS issue) */
-	[__NR_adddma]		= { PM_PROC_NR, 0, },
-	/* VM_QUERY_EXIT]	= { VM_PROC_NR, 0, }, */
-	[__NR_devctl]		= { FS_PROC_NR, 0, },
-	/* MSTATS]		= { PM_PROC_NR, 0, }, (never used) */
-	/* IPC_SHMCTL]		= ? (add later) */
-	/* IPC_SHMGET]		= ? (add later) */
-	/* IPC_SHMAT]		= ? (add later) */
-	/* IPC_SHMDT]		= ? (add later) */
-	/* IPC_SEMGET]		= ? (add later) */
-	/* IPC_SEMCTL]		= ? (add later) */
-	/* IPC_SEMOP]		= ? (add later) */
-	[__NR_fork]		= { PM_PROC_NR, 0, },
-	[__NR_close]		= { FS_PROC_NR, 0, },
-	[__NR_setuid]		= { PM_PROC_NR, 0, },
-	[__NR_seteuid]		= { PM_PROC_NR, 0, },
-	[__NR_pause]		= { PM_PROC_NR, 0, },
-	[__NR_itimer]		= { PM_PROC_NR, 0, },
-	[__NR_write]		= { FS_PROC_NR, 0, },
-	[__NR_unlink]		= { FS_PROC_NR, 0, },
-	[__NR_chown]		= { FS_PROC_NR, 0, },
-	[__NR_lstat]		= { FS_PROC_NR, 0, },
-	[__NR_mknod]		= { FS_PROC_NR, 0, },
-	[__NR_getpgrp]		= { PM_PROC_NR, 0, },
-	[__NR_pipe]		= { FS_PROC_NR, 0, },
-	[__NR_umask]		= { FS_PROC_NR, 0, },
-	[__NR_fchmod]		= { FS_PROC_NR, 0, },
-	[__NR_mkdir]		= { FS_PROC_NR, 0, },
-	[__NR_alarm]		= { PM_PROC_NR, 0, },
-	/* [__NR_ptrace]		= { PM_PROC_NR, msg_ptrace, }, (doesn't work correctly ) */
-	[__NR_link]		= { FS_PROC_NR, 0, },
-	/* [VM_MMAP]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_MUNMAP]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_MUNMAP_TEXT]	= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_REMAP]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_SHM_UNMAP]	= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_GETPHYS]		= { VM_PROC_NR, 0, }, (add later) */
-	/* [VM_GETREF]		= { VM_PROC_NR, 0, }, (add later) */
-	[__NR_fstat]		= { FS_PROC_NR, 0, },
-	[__NR_sigprocmask]	= { PM_PROC_NR, 0, },
-	[__NR_getpriority]	= { PM_PROC_NR, 0, },
-	[__NR_setpriority]	= { PM_PROC_NR, 0, },
-	[__NR_read]		= { FS_PROC_NR, msg_read, },
-	[__NR_setgid]		= { PM_PROC_NR, 0, },
-	[__NR_setegid]		= { PM_PROC_NR, 0, },
-	[__NR_creat]		= { FS_PROC_NR, 0, },
-	[__NR_fstatfs]		= { FS_PROC_NR, 0, },
-	[__NR_sigsuspend]	= { PM_PROC_NR, 0, },
-	[__NR_time]		= { PM_PROC_NR, 0, },
-	[__NR_times]		= { PM_PROC_NR, 0, },
-	[__NR_stime]		= { PM_PROC_NR, 0, },
-	[__NR_fsync]		= { FS_PROC_NR, 0, },
-	[__NR_rmdir]		= { FS_PROC_NR, 0, },
-	[__NR_fcntl]		= { FS_PROC_NR, 0, },
-	[__NR_gettimeofday]	= { PM_PROC_NR, 0, },
-	[__NR_chmod]		= { FS_PROC_NR, 0, },
-	[__NR_utime]		= { FS_PROC_NR, 0, },
-	[__NR_lseek]		= { FS_PROC_NR, 0, },
-	[__NR_exit]		= { PM_PROC_NR, msg_exit, },
-	[__NR_sigpending]	= { PM_PROC_NR, 0, },
-	[__NR_sigreturn]	= { PM_PROC_NR, 0, },
-	[__NR_chdir]		= { FS_PROC_NR, 0, },
-	[__NR_fchdir]		= { FS_PROC_NR, 0, },
-	[__NR_wait]		= { PM_PROC_NR, 0, },
-	[__NR_sigaction]	= { PM_PROC_NR, 0, },
-	[__NR_sync]		= { FS_PROC_NR, 0, },
-	[__NR_select]		= { FS_PROC_NR, 0, },
-	[__NR_exec]		= { PM_PROC_NR, 0, },
-	[__NR_readlink]		= { FS_PROC_NR, 0, },
-	[__NR_setsid]		= { PM_PROC_NR, 0, },
-	[__NR_ioctl]		= { FS_PROC_NR, 0, },
-	[__NR_truncate]		= { FS_PROC_NR, 0, },
-	[__NR_ftruncate]	= { FS_PROC_NR, 0, },
-	[__NR_access]		= { FS_PROC_NR, 0, },
-	[__NR_kill]		= { PM_PROC_NR, 0, },
-	[__NR_rename]		= { FS_PROC_NR, 0, },
-	[__NR_symlink]		= { FS_PROC_NR, 0, },
-	[__NR_stat]		= { FS_PROC_NR, 0, },
-	[__NR_open]		= { FS_PROC_NR, 0, },
-	[__NR_fchown]		= { FS_PROC_NR, 0, },
-	[__NR_chroot]		= { FS_PROC_NR, 0, },
-	[__NR_waitpid]		= { PM_PROC_NR, 0, },
-	[__NR_fork_nb]		= { PM_PROC_NR, 0, },
-	[__NR_allocmem]		= { PM_PROC_NR, 0, },
+	SCALL_TO_SRV(fstat,		FS),
+	SCALL_TO_SRV(fstatfs,		FS),
+	SCALL_TO_SRV(fsync,		FS),
+	SCALL_TO_SRV(ftruncate,		FS),
+	SCALL_TO_SRV(getdents,		FS),
+	SCALL_TO_SRV(getdma,		PM),
+	SCALL_TO_SRV(getegid,		PM),
+	SCALL_TO_SRV(getepinfo,		PM),
+	SCALL_TO_SRV(getgid,		PM),
+	SCALL_TO_SRV(getitimer,		PM),	/* 30 */
+
+	SCALL_TO_SRV(getpgrp,		PM),
+	SCALL_TO_SRV(getpid,		PM),
+	SCALL_TO_SRV(getppid,		PM),
+	SCALL_TO_SRV(getpriority,	PM),
+	SCALL_TO_SRV(getprocnr,		PM),
+	SCALL_TO_SRV(gettimeofday,	PM),
+	SCALL_TO_SRV(getuid,		PM),
+	SCALL_TO_SRV(ioctl,		FS),
+	SCALL_TO_SRV(kill,		PM),
+	SCALL_TO_SRV(link,		FS),	/* 40 */
+
+	SCALL_TO_SRV(llseek,		FS),
+	SCALL_TO_SRV(lseek,		FS),
+	SCALL_TO_SRV(lstat,		FS),
+	SCALL_TO_SRV(mkdir,		FS),
+	SCALL_TO_SRV(mknod,		FS),
+	SCALL_TO_SRV(mount,		FS),
+	SCALL_TO_SRV(open,		FS),
+	SCALL_TO_SRV(pause,		PM),
+	SCALL_TO_SRV(pipe,		FS),
+	SCALL_TO_SRV(procstat,		PM),	/* 50 */
+
+	SCALL_TO_SRV(ptrace,		PM),
+	SCALL_TO_SRV(read,		FS),
+	SCALL_TO_SRV(readlink,		FS),
+	SCALL_TO_SRV(reboot,		PM),
+	SCALL_TO_SRV(rename,		FS),
+	SCALL_TO_SRV(rmdir,		FS),
+	SCALL_TO_SRV(select,		FS),
+	SCALL_TO_SRV(setegid,		PM),
+	SCALL_TO_SRV(seteuid,		PM),
+	SCALL_TO_SRV(setgid,		PM),	/* 60 */
+
+	SCALL_TO_SRV(setitimer,		PM),
+	SCALL_TO_SRV(setpriority,	PM),
+	SCALL_TO_SRV(setsid,		PM),
+	SCALL_TO_SRV(setuid,		PM),
+	SCALL_TO_SRV(sigaction,		PM),
+	SCALL_TO_SRV(signal,		PM),
+	SCALL_TO_SRV(sigpending,	PM),
+	SCALL_TO_SRV(sigprocmask,	PM),
+	SCALL_TO_SRV(sigreturn,		PM),
+	SCALL_TO_SRV(sigsuspend,	PM),	/* 70 */
+
+	SCALL_TO_SRV(sprof,		PM),
+	SCALL_TO_SRV(stat,		FS),
+	SCALL_TO_SRV(stime,		PM),
+	SCALL_TO_SRV(symlink,		FS),
+	SCALL_TO_SRV(sync,		FS),
+	SCALL_TO_SRV(sysuname,		PM),
+	SCALL_TO_SRV(time,		PM),
+	SCALL_TO_SRV(times,		PM),
+	SCALL_TO_SRV(truncate,		FS),
+	SCALL_TO_SRV(umask,		FS),	/* 80 */
+
+	SCALL_TO_SRV(umount,		FS),
+	SCALL_TO_SRV(unlink,		FS),
+	SCALL_TO_SRV(utime,		FS),
+	SCALL_TO_SRV(waitpid,		PM),
+	SCALL_TO_SRV(wait,		PM),
+	SCALL_TO_SRV(write,		FS),
 };
