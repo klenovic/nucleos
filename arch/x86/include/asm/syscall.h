@@ -112,7 +112,7 @@
 		ASM_SYSCALL_DEALLOC_MESSAGE		\
 		RESTOREARGS_##nr			\
 		: "=a" (resultvar)			\
-		: "i" (__NR_##name) ASMFMT_##nr(args)	\
+		: "i" (__NNR_##name) ASMFMT_##nr(args)	\
 		: "memory", "cc"			\
 	);						\
 	(int) resultvar;				\
