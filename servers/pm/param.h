@@ -43,9 +43,9 @@
 #define reboot_strlen	m1_i2
 #define svrctl_req	m2_i1
 #define svrctl_argp	m2_p1
-#define stime      	m2_l1
-#define memsize      	m4_l1
-#define membase      	m4_l2
+#define stime		m2_l1
+#define memsize		m4_l1
+#define membase		m4_l2
 #define sysuname_req	m1_i1
 #define sysuname_field	m1_i2
 #define sysuname_len	m1_i3
@@ -56,14 +56,14 @@
 #define reply_res2	m2_i1
 #define reply_res3	m2_i2
 #define reply_ptr	m2_p1
-#define reply_mask	m2_l1 	
-#define reply_trace	m2_l2 	
-#define reply_time      m2_l1
-#define reply_utime     m2_l2
-#define reply_t1 	m4_l1
-#define reply_t2 	m4_l2
-#define reply_t3 	m4_l3
-#define reply_t4 	m4_l4
-#define reply_t5 	m4_l5
+#define reply_mask	m2_l1
+#define reply_trace	m2_l2
+#define reply_time	m2_l1
+#define reply_utime	m2_l2
+#define reply_t1	m4_l1
+#define reply_t2	m4_l2
+#define reply_t3	m4_l3
+#define reply_t4	m4_l4
+#define reply_t5	m4_l5
 
 #endif /*  __SERVERS_PM_PARAM_H */

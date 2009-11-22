@@ -32,7 +32,7 @@ struct mproc {
 	pid_t mp_procgrp;	/* pid of process group (used for signals) */
 	pid_t mp_wpid;		/* pid this process is waiting for */
 	int mp_parent;		/* index of parent process */
-  int mp_tracer;		/* index of tracer process, or NO_TRACER */
+	int mp_tracer;		/* index of tracer process, or NO_TRACER */
 
 	/* Child user and system times. Accounting done on child exit. */
 	clock_t mp_child_utime;	/* cumulative user time of children */

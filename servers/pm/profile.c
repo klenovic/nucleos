@@ -107,14 +107,14 @@ int info_size;
   if ((r = sys_umap(who_e, D, (vir_bytes) m_in.PROF_CTL_PTR,
 	 					 1, &p)) != 0) {
 	printf("PM: PROFILE: umap failed for process %d\n", who_e);
-	return r;                                    
-  }  
+	return r;
+  }
 
   if ((r =sys_umap(who_e, D, (vir_bytes) m_in.PROF_MEM_PTR,
  					 1, &p)) != 0) {
 	printf("PM: PROFILE: umap failed for process %d\n", who_e);
-	return r;                                    
-  }  
+	return r;
+  }
   return 0;
 }
 
