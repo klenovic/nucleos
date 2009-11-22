@@ -44,7 +44,7 @@ struct endpt_args {
 static struct endpt_args scall_to_srv[];
 
 #define SCALL_TO_SRV(syscall, server) \
-	[__NNR_ ## syscall] = { server ## _PROC_NR, msg_ ## syscall }
+	[ __NNR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
 
 static inline long strnlen_user(const char *s, size_t maxlen)
 {
@@ -100,86 +100,86 @@ endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
 	return scall_to_srv[r->ax].endpt;
 }
 
-void msg_access(message *msg, struct pt_regs *r){}
-void msg_alarm(message *msg, struct pt_regs *r){}
-void msg_brk(message *msg, struct pt_regs *r){}
-void msg_chdir(message *msg, struct pt_regs *r){}
-void msg_chmod(message *msg, struct pt_regs *r){}
-void msg_chown(message *msg, struct pt_regs *r){}
-void msg_chroot(message *msg, struct pt_regs *r){}
-void msg_close(message *msg, struct pt_regs *r){}
-void msg_cprof(message *msg, struct pt_regs *r){}
-void msg_creat(message *msg, struct pt_regs *r){}
-void msg_dup(message *msg, struct pt_regs *r){}
-void msg_exec(message *msg, struct pt_regs *r){}
-void msg_exit(message *msg, struct pt_regs *r){}
-void msg_fchdir(message *msg, struct pt_regs *r){}
-void msg_fchmod(message *msg, struct pt_regs *r){}
-void msg_fchown(message *msg, struct pt_regs *r){}
-void msg_fcntl(message *msg, struct pt_regs *r){}
-void msg_fork(message *msg, struct pt_regs *r){}
-void msg_fstatfs(message *msg, struct pt_regs *r){}
-void msg_fstat(message *msg, struct pt_regs *r){}
-void msg_fsync(message *msg, struct pt_regs *r){}
-void msg_ftruncate(message *msg, struct pt_regs *r){}
-void msg_getdents(message *msg, struct pt_regs *r){}
-void msg_getegid(message *msg, struct pt_regs *r){}
-void msg_getgid(message *msg, struct pt_regs *r){}
-void msg_getitimer(message *msg, struct pt_regs *r){}
-void msg_getpgrp(message *msg, struct pt_regs *r){}
-void msg_getpid(message *msg, struct pt_regs *r){}
-void msg_getppid(message *msg, struct pt_regs *r){}
-void msg_getpriority(message *msg, struct pt_regs *r){}
-void msg_gettimeofday(message *msg, struct pt_regs *r){}
-void msg_getuid(message *msg, struct pt_regs *r){}
-void msg_ioctl(message *msg, struct pt_regs *r){}
-void msg_kill(message *msg, struct pt_regs *r){}
-void msg_link(message *msg, struct pt_regs *r){}
-void msg_llseek(message *msg, struct pt_regs *r){}
-void msg_lseek(message *msg, struct pt_regs *r){}
-void msg_lstat(message *msg, struct pt_regs *r){}
-void msg_mkdir(message *msg, struct pt_regs *r){}
-void msg_mknod(message *msg, struct pt_regs *r){}
-void msg_mount(message *msg, struct pt_regs *r){}
-void msg_open(message *msg, struct pt_regs *r){}
-void msg_pause(message *msg, struct pt_regs *r){}
-void msg_pipe(message *msg, struct pt_regs *r){}
-void msg_ptrace(message *msg, struct pt_regs *r){}
-void msg_readlink(message *msg, struct pt_regs *r){}
-void msg_read(message *msg, struct pt_regs *r){}
-void msg_reboot(message *msg, struct pt_regs *r){}
-void msg_rename(message *msg, struct pt_regs *r){}
-void msg_rmdir(message *msg, struct pt_regs *r){}
-void msg_select(message *msg, struct pt_regs *r){}
-void msg_setegid(message *msg, struct pt_regs *r){}
-void msg_seteuid(message *msg, struct pt_regs *r){}
-void msg_setgid(message *msg, struct pt_regs *r){}
-void msg_setitimer(message *msg, struct pt_regs *r){}
-void msg_setpriority(message *msg, struct pt_regs *r){}
-void msg_setsid(message *msg, struct pt_regs *r){}
-void msg_setuid(message *msg, struct pt_regs *r){}
-void msg_sigaction(message *msg, struct pt_regs *r){}
-void msg_signal(message *msg, struct pt_regs *r){}
-void msg_sigpending(message *msg, struct pt_regs *r){}
-void msg_sigprocmask(message *msg, struct pt_regs *r){}
-void msg_sigreturn(message *msg, struct pt_regs *r){}
-void msg_sigsuspend(message *msg, struct pt_regs *r){}
-void msg_sprof(message *msg, struct pt_regs *r){}
-void msg_stat(message *msg, struct pt_regs *r){}
-void msg_stime(message *msg, struct pt_regs *r){}
-void msg_symlink(message *msg, struct pt_regs *r){}
-void msg_sync(message *msg, struct pt_regs *r){}
-void msg_sysuname(message *msg, struct pt_regs *r){}
-void msg_time(message *msg, struct pt_regs *r){}
-void msg_times(message *msg, struct pt_regs *r){}
-void msg_truncate(message *msg, struct pt_regs *r){}
-void msg_umask(message *msg, struct pt_regs *r){}
-void msg_umount(message *msg, struct pt_regs *r){}
-void msg_unlink(message *msg, struct pt_regs *r){}
-void msg_utime(message *msg, struct pt_regs *r){}
-void msg_wait(message *msg, struct pt_regs *r){}
-void msg_waitpid(message *msg, struct pt_regs *r){}
-void msg_write(message *msg, struct pt_regs *r){}
+static void msg_access(message *msg, struct pt_regs *r){}
+static void msg_alarm(message *msg, struct pt_regs *r){}
+static void msg_brk(message *msg, struct pt_regs *r){}
+static void msg_chdir(message *msg, struct pt_regs *r){}
+static void msg_chmod(message *msg, struct pt_regs *r){}
+static void msg_chown(message *msg, struct pt_regs *r){}
+static void msg_chroot(message *msg, struct pt_regs *r){}
+static void msg_close(message *msg, struct pt_regs *r){}
+static void msg_cprof(message *msg, struct pt_regs *r){}
+static void msg_creat(message *msg, struct pt_regs *r){}
+static void msg_dup(message *msg, struct pt_regs *r){}
+static void msg_exec(message *msg, struct pt_regs *r){}
+static void msg_exit(message *msg, struct pt_regs *r){}
+static void msg_fchdir(message *msg, struct pt_regs *r){}
+static void msg_fchmod(message *msg, struct pt_regs *r){}
+static void msg_fchown(message *msg, struct pt_regs *r){}
+static void msg_fcntl(message *msg, struct pt_regs *r){}
+static void msg_fork(message *msg, struct pt_regs *r){}
+static void msg_fstatfs(message *msg, struct pt_regs *r){}
+static void msg_fstat(message *msg, struct pt_regs *r){}
+static void msg_fsync(message *msg, struct pt_regs *r){}
+static void msg_ftruncate(message *msg, struct pt_regs *r){}
+static void msg_getdents(message *msg, struct pt_regs *r){}
+static void msg_getegid(message *msg, struct pt_regs *r){}
+static void msg_getgid(message *msg, struct pt_regs *r){}
+static void msg_getitimer(message *msg, struct pt_regs *r){}
+static void msg_getpgrp(message *msg, struct pt_regs *r){}
+static void msg_getpid(message *msg, struct pt_regs *r){}
+static void msg_getppid(message *msg, struct pt_regs *r){}
+static void msg_getpriority(message *msg, struct pt_regs *r){}
+static void msg_gettimeofday(message *msg, struct pt_regs *r){}
+static void msg_getuid(message *msg, struct pt_regs *r){}
+static void msg_ioctl(message *msg, struct pt_regs *r){}
+static void msg_kill(message *msg, struct pt_regs *r){}
+static void msg_link(message *msg, struct pt_regs *r){}
+static void msg_llseek(message *msg, struct pt_regs *r){}
+static void msg_lseek(message *msg, struct pt_regs *r){}
+static void msg_lstat(message *msg, struct pt_regs *r){}
+static void msg_mkdir(message *msg, struct pt_regs *r){}
+static void msg_mknod(message *msg, struct pt_regs *r){}
+static void msg_mount(message *msg, struct pt_regs *r){}
+static void msg_open(message *msg, struct pt_regs *r){}
+static void msg_pause(message *msg, struct pt_regs *r){}
+static void msg_pipe(message *msg, struct pt_regs *r){}
+static void msg_ptrace(message *msg, struct pt_regs *r){}
+static void msg_readlink(message *msg, struct pt_regs *r){}
+static void msg_read(message *msg, struct pt_regs *r){}
+static void msg_reboot(message *msg, struct pt_regs *r){}
+static void msg_rename(message *msg, struct pt_regs *r){}
+static void msg_rmdir(message *msg, struct pt_regs *r){}
+static void msg_select(message *msg, struct pt_regs *r){}
+static void msg_setegid(message *msg, struct pt_regs *r){}
+static void msg_seteuid(message *msg, struct pt_regs *r){}
+static void msg_setgid(message *msg, struct pt_regs *r){}
+static void msg_setitimer(message *msg, struct pt_regs *r){}
+static void msg_setpriority(message *msg, struct pt_regs *r){}
+static void msg_setsid(message *msg, struct pt_regs *r){}
+static void msg_setuid(message *msg, struct pt_regs *r){}
+static void msg_sigaction(message *msg, struct pt_regs *r){}
+static void msg_signal(message *msg, struct pt_regs *r){}
+static void msg_sigpending(message *msg, struct pt_regs *r){}
+static void msg_sigprocmask(message *msg, struct pt_regs *r){}
+static void msg_sigreturn(message *msg, struct pt_regs *r){}
+static void msg_sigsuspend(message *msg, struct pt_regs *r){}
+static void msg_sprof(message *msg, struct pt_regs *r){}
+static void msg_stat(message *msg, struct pt_regs *r){}
+static void msg_stime(message *msg, struct pt_regs *r){}
+static void msg_symlink(message *msg, struct pt_regs *r){}
+static void msg_sync(message *msg, struct pt_regs *r){}
+static void msg_sysuname(message *msg, struct pt_regs *r){}
+static void msg_time(message *msg, struct pt_regs *r){}
+static void msg_times(message *msg, struct pt_regs *r){}
+static void msg_truncate(message *msg, struct pt_regs *r){}
+static void msg_umask(message *msg, struct pt_regs *r){}
+static void msg_umount(message *msg, struct pt_regs *r){}
+static void msg_unlink(message *msg, struct pt_regs *r){}
+static void msg_utime(message *msg, struct pt_regs *r){}
+static void msg_wait(message *msg, struct pt_regs *r){}
+static void msg_waitpid(message *msg, struct pt_regs *r){}
+static void msg_write(message *msg, struct pt_regs *r){}
 
 static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(access,		FS),
