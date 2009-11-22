@@ -381,7 +381,7 @@ static int elf32_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_
 	int err;
 	message m;
 
-	m.m_type = __NR_exec_newmem;
+	m.m_type = KCNR_EXEC_NEWMEM;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)ex;
 

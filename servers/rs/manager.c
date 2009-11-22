@@ -1022,7 +1022,7 @@ static pid_t fork_nb()
 {
   message m;
 
-  return(ksyscall(PM_PROC_NR, __NR_fork_nb, &m));
+  return(ksyscall(PM_PROC_NR, KCNR_FORK_NB, &m));
 }
 
 static int copy_exec(rp_dst, rp_src)

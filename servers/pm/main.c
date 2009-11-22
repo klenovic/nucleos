@@ -118,16 +118,16 @@ int main()
 		} else
 			result= -ENOSYS;
 		break;
-	case __NR_allocmem:
+	case KCNR_ALLOCMEM:
 		result= do_allocmem();
 		break;
-	case __NR_fork_nb:
+	case KCNR_FORK_NB:
 		result= do_fork_nb();
 		break;
-	case __NR_exec_newmem:
+	case KCNR_EXEC_NEWMEM:
 		result= exec_newmem();
 		break;
-	case __NR_exec_restart:
+	case KCNR_EXEC_RESTART:
 		result= do_execrestart();
 		break;
 	case __NR_procstat:

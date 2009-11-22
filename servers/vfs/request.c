@@ -1147,7 +1147,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
                   panic(__FILE__, "VFSdead_driver: unable to receive from RS", 
 				  r);
               }
-              if (m.m_type == __NR_devctl) {
+              if (m.m_type == KCNR_DEVCTL) {
                   /* Map new driver */
                   r = fs_devctl(m.ctl_req, m.dev_nr, m.driver_nr,
                           m.dev_style, m.m_force);

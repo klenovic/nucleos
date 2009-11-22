@@ -228,7 +228,7 @@ send_reply:
 			printf("driver_task: TASK_REPLY to req %d\n",
 				mess.m_type);
 #endif
-			reply_mess.m_type = __NR_task_reply;
+			reply_mess.m_type = KCNR_TASK_REPLY;
 			reply_mess.REP_ENDPT = proc_nr;
 			/* Status is # of bytes transferred or error code. */
 			reply_mess.REP_STATUS = r;	

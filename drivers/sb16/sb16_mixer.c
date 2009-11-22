@@ -87,7 +87,7 @@ message mess;
 		}
 
 		/* Finally, prepare and send the reply message. */
-		mess.m_type = __NR_task_reply;
+		mess.m_type = KCNR_TASK_REPLY;
 		mess.REP_ENDPT = proc_nr;
 	
 		dprint("%d %d", err, 0);

@@ -65,7 +65,7 @@
 #include "sr_int.h"
 
 #define DEV_CANCEL NW_CANCEL
-#define DEVICE_REPLY __NR_task_reply
+#define DEVICE_REPLY KCNR_TASK_REPLY
 #define DEV_IOCTL3 DEV_IOCTL
 #define NDEV_BUFFER ADDRESS
 #define NDEV_COUNT COUNT

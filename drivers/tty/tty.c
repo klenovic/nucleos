@@ -311,7 +311,7 @@ int main(void)
 			tty_mess.m_type, tty_mess.m_source);
 		if (tty_mess.m_source != LOG_PROC_NR)
 		{
-			tty_reply(__NR_task_reply, tty_mess.m_source,
+			tty_reply(KCNR_TASK_REPLY, tty_mess.m_source,
 						tty_mess.IO_ENDPT, -ENXIO);
 		}
 		continue;
@@ -329,7 +329,7 @@ int main(void)
 	    default:		
 		printf("Warning, TTY got unexpected request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
-	    tty_reply(__NR_task_reply, tty_mess.m_source,
+	    tty_reply(KCNR_TASK_REPLY, tty_mess.m_source,
 						tty_mess.IO_ENDPT, -EINVAL);
 	}
   }
@@ -445,7 +445,7 @@ int safe;			/* use safecopies? */
 	r = -EINVAL;
   } else {
 	/* Copy information from the message to the tty struct. */
-	tp->tty_inrepcode = __NR_task_reply;
+	tp->tty_inrepcode = KCNR_TASK_REPLY;
 	tp->tty_incaller = m_ptr->m_source;
 	tp->tty_inproc = m_ptr->IO_ENDPT;
 	tp->tty_in_vir_g = (vir_bytes) m_ptr->ADDRESS;
@@ -488,7 +488,7 @@ int safe;			/* use safecopies? */
 		r = SUSPEND;				/* suspend the caller */
 	tp->tty_inrepcode = TTY_REVIVE;
   }
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
   if (tp->tty_select_ops)
   	select_retry(tp);
 }
@@ -514,7 +514,7 @@ int safe;
 	r = -EINVAL;
   } else {
 	/* Copy message parameters to the tty structure. */
-	tp->tty_outrepcode = __NR_task_reply;
+	tp->tty_outrepcode = KCNR_TASK_REPLY;
 	tp->tty_outcaller = m_ptr->m_source;
 	tp->tty_outproc = m_ptr->IO_ENDPT;
 	tp->tty_out_vir_g = (vir_bytes) m_ptr->ADDRESS;
@@ -533,7 +533,7 @@ int safe;
 		r = SUSPEND;				/* suspend the caller */
 	tp->tty_outrepcode = TTY_REVIVE;
   }
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -726,7 +726,7 @@ int safe;
   }
 
   /* Send the reply. */
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -752,7 +752,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	}
 	tp->tty_openct++;
   }
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -773,7 +773,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	tp->tty_winsize = winsize_defaults;
 	setattr(tp);
   }
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, 0);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, 0);
 }
 
 /*===========================================================================*
@@ -812,7 +812,7 @@ message *m_ptr;			/* pointer to message sent to task */
 	tp->tty_ioreq = 0;
   }
   tp->tty_events = 1;
-  tty_reply(__NR_task_reply, m_ptr->m_source, proc_nr, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, proc_nr, r);
 }
 
 int select_try(struct tty *tp, int ops)
@@ -1696,7 +1696,7 @@ register message *m_ptr;	/* pointer to message sent to the task */
 		tp->tty_select_proc = m_ptr->m_source;
 	}
 
-        tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, ready_ops);
+        tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, ready_ops);
 
         return;
 }

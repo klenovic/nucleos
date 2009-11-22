@@ -155,7 +155,7 @@ void main(void)
 				do_signal();
 				break;
 			default:
-				reply(__NR_task_reply, pr_mess.m_source,
+				reply(KCNR_TASK_REPLY, pr_mess.m_source,
 						pr_mess.IO_ENDPT, -EINVAL);
 		}
 		continue;
@@ -166,13 +166,13 @@ void main(void)
                  do_initialize();		/* initialize */
 	        /* fall through */
 	    case DEV_CLOSE:
-		reply(__NR_task_reply, pr_mess.m_source, pr_mess.IO_ENDPT, 0);
+		reply(KCNR_TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, 0);
 		break;
 	    case DEV_WRITE_S:	do_write(&pr_mess, 1);	break;
 	    case DEV_STATUS:	do_status(&pr_mess);	break;
 	    case CANCEL:	do_cancel(&pr_mess);	break;
 	    default:
-		reply(__NR_task_reply, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
+		reply(KCNR_TASK_REPLY, pr_mess.m_source, pr_mess.IO_ENDPT, -EINVAL);
 	}
   }
 }
@@ -214,7 +214,7 @@ int safe;			/* use virtual addresses or grant id's? */
     else if (m_ptr->COUNT <= 0)  	r = -EINVAL;
 
     /* Reply to FS_PROC_NR, no matter what happened, possible SUSPEND caller. */
-    reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+    reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 
     /* If no errors occurred, continue printing with SUSPENDED caller.
      * First wait until the printer is online to prevent stupid errors.
@@ -325,7 +325,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
 	writing = FALSE;
 	revive_pending = FALSE;
   }
-  reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EINTR);
+  reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINTR);
 }
 
 /*===========================================================================*

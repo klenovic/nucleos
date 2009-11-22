@@ -407,7 +407,7 @@ message *m;
 			m->m_type, m->m_source);
 		r= -EINVAL;
 	}
-	tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
+	tty_reply(KCNR_TASK_REPLY, m->m_source, m->IO_ENDPT, r);
 }
 
 

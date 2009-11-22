@@ -140,7 +140,7 @@ void main()
 
 send_reply:
 		/* Finally, prepare and send the reply message. */
-		reply(__NR_task_reply, caller, proc_nr, r);
+		reply(KCNR_TASK_REPLY, caller, proc_nr, r);
 	}
 
 }
@@ -241,15 +241,15 @@ message *m_ptr;
 	dprint("sb16_dsp.c: dsp_write()\n");
 
 	if(m_ptr->COUNT != DspFragmentSize) {
-		reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
+		reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EINVAL);
 		return;
 	}
 	if(m_ptr->m_type != DmaMode && DmaBusy >= 0) {
-		reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
+		reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, -EBUSY);
 		return;
 	}
 	
-	reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, SUSPEND);
+	reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, SUSPEND);
 
 	if(DmaBusy < 0) { /* Dma tranfer not yet started */
 

@@ -216,14 +216,14 @@ int main(void)
 
 		/* Other calls. */
 		switch (call_nr) {
-		case __NR_devctl:
+		case KCNR_DEVCTL:
 			error= do_devctl();
 
 			if (error != SUSPEND)
 				reply(who_e, error);
 			break;
 
-		case __NR_mapdriver:
+		case KCNR_MAPDRIVER:
 			error= do_mapdriver();
 			if (error != SUSPEND)
 				reply(who_e, error);
@@ -491,7 +491,7 @@ static void init_root(void)
 			      ROOT_FS_E);
 		}
 
-		if (m.m_type != __NR_fs_ready) {
+		if (m.m_type != KCNR_FS_READY) {
 			printf("VFS: Invalid login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",

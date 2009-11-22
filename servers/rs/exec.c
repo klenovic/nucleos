@@ -260,7 +260,7 @@ vir_bytes entry_point;
 	e.progname[sizeof(e.progname)-1]= '\0';
 	e.entry_point = entry_point;
 
-	m.m_type = __NR_exec_newmem;
+	m.m_type = KCNR_EXEC_NEWMEM;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)&e;
 	r = kipc_sendrec(PM_PROC_NR, &m);
@@ -290,7 +290,7 @@ int result;
 	int r;
 	message m;
 
-	m.m_type= __NR_exec_restart;
+	m.m_type= KCNR_EXEC_RESTART;
 	m.EXC_RS_PROC= proc_e;
 	m.EXC_RS_RESULT= result;
 	r= kipc_sendrec(PM_PROC_NR, &m);

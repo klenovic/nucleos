@@ -18,7 +18,7 @@ int mapdriver5(char *label, size_t len, int major, int dev_style, int force)
   m.m2_i1 = major;
   m.m2_i2 = dev_style;
   m.m2_i3 = force;
-  if (ksyscall(FS_PROC_NR, __NR_mapdriver, &m) < 0) return(-1);
+  if (ksyscall(FS_PROC_NR, KCNR_MAPDRIVER, &m) < 0) return(-1);
   return(0);
 }
 

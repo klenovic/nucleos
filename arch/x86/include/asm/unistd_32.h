@@ -57,21 +57,18 @@
 #define __NR_lstat		50
 #define __NR_ioctl		54
 #define __NR_fcntl		55
-#define __NR_fs_ready		57
 #define __NR_exec		59
 #define __NR_umask		60
 #define __NR_chroot		61
 #define __NR_setsid		62
 #define __NR_getpgrp		63
 #define __NR_itimer		64
-
 /* Posix signal handling. */
 #define __NR_sigaction		71
 #define __NR_sigsuspend		72
 #define __NR_sigpending		73
 #define __NR_sigprocmask	74
 #define __NR_sigreturn		75
-
 #define __NR_reboot		76
 #define __NR_svrctl		77
 #define __NR_sysuname		78
@@ -96,14 +93,9 @@
 #define __NR_cprof		99	/* to PM */
 
 /* Calls provided by PM and FS that are not part of the API */
-#define __NR_exec_newmem	100	/* from FS or RS to PM: new memory map for
-					 * exec
-					 */
-#define __NR_fork_nb		101	/* to PM: special fork call for RS */
-#define __NR_exec_restart	102	/* to PM: final part of exec for RS */
+
 #define __NR_procstat		103	/* to PM */
 #define __NR_getprocnr		104	/* to PM */
-#define __NR_allocmem		105	/* to PM */
 #if 0
 #define __NR_freemem		106	/* to PM, not used, not implemented */
 #endif
@@ -118,11 +110,6 @@
 					 * that should not be used for bus-master DMA
 					 * any longer
 					 */
-#define __NR_devctl		120	/* to FS, map or unmap a device */
-#define __NR_task_reply		121	/* to FS: reply code from drivers, not
-					 * really a standalone call.
-					 */
-#define __NR_mapdriver		122	/* to FS, map a device */
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -235,6 +222,22 @@
 							 */
 #define __NNR_getegid		(85 + __syscall_offset)
 #define __NNR_getppid		(86 + __syscall_offset)
+
+/* Kernel message numbers. These are used only by u/kernel and
+ * never by C library
+ */
+#define KCNR_FS_READY		57
+#define KCNR_EXEC_NEWMEM	100	/* from FS or RS to PM: new memory map for
+					 * exec
+					 */
+#define KCNR_FORK_NB		101	/* to PM: special fork call for RS */
+#define KCNR_EXEC_RESTART	102	/* to PM: final part of exec for RS */
+#define KCNR_ALLOCMEM		105	/* to PM */
+#define KCNR_DEVCTL		120	/* to FS, map or unmap a device */
+#define KCNR_TASK_REPLY		121	/* to FS: reply code from drivers, not
+					 * really a standalone call.
+					 */
+#define KCNR_MAPDRIVER		122	/* to FS, map a device */
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */

@@ -847,7 +847,7 @@ void do_video(message *m)
 			if (r != 0)
 			{
 				printf("tty: sys_safecopyfrom failed\n");
-				tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT,
+				tty_reply(KCNR_TASK_REPLY, m->m_source, m->IO_ENDPT,
 					r);
 				return;
 			}
@@ -870,7 +870,7 @@ void do_video(message *m)
 				r = vm_unmap_phys(m->POSITION, 
 					mapreqvm.vaddr, mapreqvm.size);
 			}
-			tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
+			tty_reply(KCNR_TASK_REPLY, m->m_source, m->IO_ENDPT, r);
 			return;
 		   }
 		}
@@ -883,7 +883,7 @@ void do_video(message *m)
 			m->m_type, m->m_source);
 		r= -EINVAL;
 	}
-	tty_reply(__NR_task_reply, m->m_source, m->IO_ENDPT, r);
+	tty_reply(KCNR_TASK_REPLY, m->m_source, m->IO_ENDPT, r);
 }
 
 

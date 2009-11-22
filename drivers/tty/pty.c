@@ -205,7 +205,7 @@ message *m_ptr;
     default:
 	r = -EINVAL;
   }
-  tty_reply(__NR_task_reply, m_ptr->m_source, m_ptr->IO_ENDPT, r);
+  tty_reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 }
 
 /*===========================================================================*
@@ -371,7 +371,7 @@ pty_t *pp;
  */
   if (pp->rdcum > 0) {
         if (pp->rdsendreply) {
-		tty_reply(__NR_task_reply, pp->rdcaller, pp->rdproc, pp->rdcum);
+		tty_reply(KCNR_TASK_REPLY, pp->rdcaller, pp->rdproc, pp->rdcum);
 		pp->rdleft = pp->rdcum = 0;
 	}
 	else
@@ -441,7 +441,7 @@ int try;
 	pp->wrcum++;
 	if (--pp->wrleft == 0) {
 		if (pp->wrsendreply) {
-			tty_reply(__NR_task_reply, pp->wrcaller, pp->wrproc,
+			tty_reply(KCNR_TASK_REPLY, pp->wrcaller, pp->wrproc,
 				pp->wrcum);
 			pp->wrcum = 0;
 		}

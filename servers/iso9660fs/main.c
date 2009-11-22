@@ -38,7 +38,7 @@ int main(void) {
   /* Initialize the server, then go to work. */
   init_server();
   
-  fs_m_in.m_type = __NR_fs_ready;
+  fs_m_in.m_type = KCNR_FS_READY;
   
   if (kipc_send(FS_PROC_NR, &fs_m_in) != 0) {
       printf("ISO9660FS(%d): Error sending login to VFS\n", SELF_E);

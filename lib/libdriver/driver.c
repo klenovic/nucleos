@@ -174,7 +174,7 @@ send_reply:
 
 	/* Finally, prepare and send the reply message. */
 	if (r != -EDONTREPLY) {
-		mess.m_type = __NR_task_reply;
+		mess.m_type = KCNR_TASK_REPLY;
 		mess.REP_ENDPT = proc_nr;
 		/* Status is # of bytes transferred or error code. */
 		mess.REP_STATUS = r;	
