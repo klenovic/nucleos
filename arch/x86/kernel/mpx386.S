@@ -341,17 +341,51 @@ hwint15:			// Interrupt routine for irq 15
 ENTRY(system_call)
 	SAVE_PROCESS_CTX(0)
 
-	mov	SPREG(%ebp), %ebx	/* user message pointer (saved on user stack) */
-	push	%ebp			/* where we can read syscall arguments */
-					/*   i.e. from pt_regs structure */
-	push	%ebx			/* space for output message pointer */
-	call	map_scall_endpt		/* create a message from passed values
-					     and prepare registers for sys_call.
-					     and return the endpoint */
-	add	$8, %esp		/* remove args from stack */
-	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
+	/* save the pointer to the current process */
+	push	%ebp
 
-	jmp	do_system_call		/* do the system call */
+	/* The map_scall_endpt takes two parameter the (1.) message pointer and (2.) pt_regs */
+	push	SPREG(%ebp)		/* output message pointer (saved on user stack) */
+	call	map_scall_endpt		/* create a message from passed values
+					 *   and prepare registers for sys_call
+					 *   and return the endpoint */
+	add	$4, %esp		/* remove message argument from stack */
+
+	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
+	mov	SPREG(%ebp), %ebx	/* user message pointer (saved on user stack) */
+
+	/* @nucleos: kipc_sendrec (if any kipc_*) doesn't not setup %edx register so set zero */
+	xor	%edx, %edx
+
+	/* save the obtained infos into process's frame */
+	mov	%eax, AXREG(%ebp)
+	mov	%ebx, BXREG(%ebp)
+	mov	%ecx, CXREG(%ebp)
+	mov	%edx, DXREG(%ebp)
+
+	/*
+	 * pass the syscall arguments from userspace to the handler.
+	 * SAVE_PROCESS_CTX() does not clobber these registers, they are still
+	 * set as the userspace have set them
+	 */
+	push	%edx
+	push	%ebx
+	push	%eax
+	push	%ecx
+
+	/* for stack trace */
+	movl	$0, %ebp
+
+	call	sys_call
+
+	/* remove sys_call args */
+	add	$4 * 4, %esp
+
+	/* restore the current process pointer and save the return value */
+	pop	%esi
+	mov	%eax, AXREG(%esi)
+
+	jmp	restart
 
 /*
  * syscall is only from a process to kernel (legacy call)
@@ -361,7 +395,6 @@ ENTRY(system_call)
 syscall_entry:
 	SAVE_PROCESS_CTX(0)
 
-do_system_call:
 	/* save the pointer to the current process */
 	push	%ebp
 
