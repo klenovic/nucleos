@@ -112,7 +112,12 @@ static void msg_cprof(message *msg, struct pt_regs *r){}
 static void msg_creat(message *msg, struct pt_regs *r){}
 static void msg_dup(message *msg, struct pt_regs *r){}
 static void msg_exec(message *msg, struct pt_regs *r){}
-static void msg_exit(message *msg, struct pt_regs *r){}
+
+static void msg_exit(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;
+}
+
 static void msg_fchdir(message *msg, struct pt_regs *r){}
 static void msg_fchmod(message *msg, struct pt_regs *r){}
 static void msg_fchown(message *msg, struct pt_regs *r){}
