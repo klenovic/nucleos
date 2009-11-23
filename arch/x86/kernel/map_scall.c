@@ -100,7 +100,13 @@ endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
 	return scall_to_srv[r->ax].endpt;
 }
 
-static void msg_access(message *msg, struct pt_regs *r){}
+static void msg_access(message *msg, struct pt_regs *r)
+{
+	msg->m3_p1 = (char*)r->bx;	/* pathname */
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i2 = r->cx;		/* mode */
+}
+
 static void msg_alarm(message *msg, struct pt_regs *r){}
 static void msg_brk(message *msg, struct pt_regs *r){}
 static void msg_chdir(message *msg, struct pt_regs *r){}

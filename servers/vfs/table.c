@@ -162,7 +162,7 @@ int (*call_vec[])(void) = {
 	no_sys,		/* 110 = unused */
 
 	/* Nucleos syscalls */
-	SCALL_HANDLER(access,		no_sys),
+	SCALL_HANDLER(access,		do_access),
 	SCALL_HANDLER(chdir,		no_sys),
 	SCALL_HANDLER(chmod,		no_sys),
 	SCALL_HANDLER(chown,		no_sys),
