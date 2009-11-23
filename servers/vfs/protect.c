@@ -45,7 +45,7 @@ int do_chmod()
   gid_t gid;
   mode_t new_mode;
     
-  if (call_nr == __NR_chmod) {
+  if (call_nr == __NR_chmod || call_nr == __NNR_chmod) {
       /* Perform the chmod(name, mode) system call. */
       if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
 
