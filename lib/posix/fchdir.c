@@ -7,10 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
-#include <asm/syscall.h>
 
-int chdir(const char *name)
+int fchdir(int fd)
 {
-	return INLINE_SYSCALL(chdir, 1, name);
+  message m;
+
+  m.m1_i1 = fd;
+  return(ksyscall(FS_PROC_NR, __NR_fchdir, &m));
 }
