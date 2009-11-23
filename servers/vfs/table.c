@@ -165,7 +165,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(access,		do_access),
 	SCALL_HANDLER(chdir,		do_chdir),
 	SCALL_HANDLER(chmod,		do_chmod),
-	SCALL_HANDLER(chown,		no_sys),
+	SCALL_HANDLER(chown,		do_chown),
 	SCALL_HANDLER(chroot,		no_sys),
 	SCALL_HANDLER(close,		no_sys),
 	SCALL_HANDLER(creat,		no_sys),

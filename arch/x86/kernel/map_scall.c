@@ -123,7 +123,14 @@ static void msg_chmod(message *msg, struct pt_regs *r)
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_chown(message *msg, struct pt_regs *r){}
+static void msg_chown(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char*)r->bx;	/* name */
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i2 = (uid_t)r->cx;	/* owner */
+	msg->m1_i3 = (gid_t)r->dx;	/* group */
+}
+
 static void msg_chroot(message *msg, struct pt_regs *r){}
 static void msg_close(message *msg, struct pt_regs *r){}
 static void msg_cprof(message *msg, struct pt_regs *r){}

@@ -105,7 +105,7 @@ int do_chown()
   gid_t gid;
   mode_t new_mode;
   
-  if (call_nr == __NR_chown) {
+  if (call_nr == __NR_chown || call_nr == __NNR_chown) {
       /* Perform the chmod(name, mode) system call. */
       if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
       
