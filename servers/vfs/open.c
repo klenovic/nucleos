@@ -521,7 +521,7 @@ static int pipe_open(register struct vnode *vp, register mode_t bits,
 	}
   } else if (susp_count > 0) {/* revive blocked processes */
 	release(vp, __NR_open, susp_count);
-	release(vp, __NR_creat, susp_count);
+	release(vp, __NNR_creat, susp_count);
   }
   return 0;
 }

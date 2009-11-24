@@ -143,7 +143,15 @@ static void msg_close(message *msg, struct pt_regs *r)
 }
 
 static void msg_cprof(message *msg, struct pt_regs *r){}
-static void msg_creat(message *msg, struct pt_regs *r){}
+
+static void msg_creat(message *msg, struct pt_regs *r)
+{
+	msg->m3_p1 = (char*)r->bx;	/* pathname */
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i2 = (mode_t)r->cx;	/* mode */
+
+}
+
 static void msg_dup(message *msg, struct pt_regs *r){}
 static void msg_exec(message *msg, struct pt_regs *r){}
 
