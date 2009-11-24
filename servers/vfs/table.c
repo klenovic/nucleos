@@ -176,7 +176,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(fchown,		do_fchown),
 	SCALL_HANDLER(fcntl,		do_fcntl),
 	SCALL_HANDLER(fstat,		do_fstat),
-	SCALL_HANDLER(fstatfs,		no_sys),
+	SCALL_HANDLER(fstatfs,		do_fstatfs),
 	SCALL_HANDLER(fsync,		no_sys),
 	SCALL_HANDLER(ftruncate,	no_sys),
 	SCALL_HANDLER(getdents,		no_sys),

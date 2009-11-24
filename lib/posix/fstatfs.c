@@ -7,16 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
 #include <nucleos/statfs.h>
+#include <asm/syscall.h>
 
 int fstatfs(int fd, struct statfs *buffer)
 {
-	message m;
-
-	m.m1_i1 = fd;
-	m.m1_p1 = (char *) buffer;
-
-	return(ksyscall(FS_PROC_NR, __NR_fstatfs, &m));
+	return INLINE_SYSCALL(fstatfs, 2, fd, buffer);
 }
