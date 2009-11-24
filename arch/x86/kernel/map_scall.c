@@ -188,7 +188,14 @@ static void msg_fchown(message *msg, struct pt_regs *r)
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 }
 
-static void msg_fcntl(message *msg, struct pt_regs *r){}
+static void msg_fcntl(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_i2 = r->cx;		/* cmd */
+	msg->m1_i3 = r->dx;		/* flags */
+	msg->m1_p1 = (void*)r->dx;	/* lock */
+}
+
 static void msg_fork(message *msg, struct pt_regs *r){}
 static void msg_fstatfs(message *msg, struct pt_regs *r){}
 static void msg_fstat(message *msg, struct pt_regs *r){}
