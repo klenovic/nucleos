@@ -170,7 +170,11 @@ static void msg_exit(message *msg, struct pt_regs *r)
 	msg->m1_i1 = r->bx;
 }
 
-static void msg_fchdir(message *msg, struct pt_regs *r){}
+static void msg_fchdir(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* descriptor */
+}
+
 static void msg_fchmod(message *msg, struct pt_regs *r){}
 static void msg_fchown(message *msg, struct pt_regs *r){}
 static void msg_fcntl(message *msg, struct pt_regs *r){}
