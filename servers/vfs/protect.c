@@ -115,7 +115,7 @@ int do_chown()
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
       if (r != 0) return r;
   } 
-  else if (call_nr == __NR_fchown) {
+  else if (call_nr == __NR_fchown || call_nr == __NNR_fchown ) {
       if (!(flp = get_filp(m_in.m1_i1))) return err_code;
       vp= flp->filp_vno;
       dup_vnode(vp);
@@ -160,6 +160,7 @@ int do_chown()
   return r;
 }
 
+int do_fchown(void) __alias("do_chown");
 
 /*===========================================================================*
  *				do_umask				     *

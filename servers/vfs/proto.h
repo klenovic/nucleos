@@ -149,6 +149,7 @@ int do_access(void);
 int do_chmod(void);
 int do_fchmod(void);
 int do_chown(void);
+int do_fchown(void);
 int do_umask(void);
 int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid);
 int read_only(struct vnode *vp);

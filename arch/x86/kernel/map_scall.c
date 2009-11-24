@@ -181,7 +181,13 @@ static void msg_fchmod(message *msg, struct pt_regs *r)
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_fchown(message *msg, struct pt_regs *r){}
+static void msg_fchown(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_i2 = (uid_t)r->cx;	/* owner */
+	msg->m1_i3 = (gid_t)r->dx;	/* group */
+}
+
 static void msg_fcntl(message *msg, struct pt_regs *r){}
 static void msg_fork(message *msg, struct pt_regs *r){}
 static void msg_fstatfs(message *msg, struct pt_regs *r){}

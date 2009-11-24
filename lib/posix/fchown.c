@@ -7,16 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/string.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int fchown(int fd, uid_t owner, gid_t grp)
 {
-  message m;
-
-  m.m1_i1 = fd;
-  m.m1_i2 = owner;
-  m.m1_i3 = grp;
-  return(ksyscall(FS_PROC_NR, __NR_fchown, &m));
+  return INLINE_SYSCALL(fchown, 3, fd, owner, grp);
 }
