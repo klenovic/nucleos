@@ -150,7 +150,41 @@ int do_dup()
   return(m_in.fd2);
 }
 
+/*===========================================================================*
+ *				do_dup2					     *
+ *===========================================================================*/
+int do_dup2(void)
+{
+	/* Perform the dup2(oldfd, newfd) system call. */
+	register int oldfd;
+	register struct filp *f;
 
+	oldfd = m_in.fd;
+
+	/* Check whether oldfd is a valid file descriptor */
+	if ((f = get_filp(oldfd)) == NIL_FILP)
+		return -EBADF;
+
+	if (m_in.fd2 < 0 || m_in.fd2 >= OPEN_MAX)
+		return -EBADF;
+
+	if (oldfd == m_in.fd2)
+		return(m_in.fd2);	/* ignore the call: dup2(x, x) */
+
+	m_in.fd = m_in.fd2;		/* prepare to close fd2 */
+
+	/* close newfd */
+	(void) do_close();		/* cannot fail */
+
+	/* Success. Set up new file descriptors. */
+	f->filp_count++;
+
+	fp->fp_filp[m_in.fd2] = f;
+
+	FD_SET(m_in.fd2, &fp->fp_filp_inuse);
+
+	return(m_in.fd2);
+}
 
 /*===========================================================================*
  *				do_fcntl				     *

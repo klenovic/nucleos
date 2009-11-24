@@ -157,6 +157,12 @@ static void msg_dup(message *msg, struct pt_regs *r)
 	msg->m1_i1 = r->bx;	/* descriptor */
 }
 
+static void msg_dup2(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* descriptor */
+	msg->m1_i2 = r->cx;	/* descriptor */
+}
+
 static void msg_exec(message *msg, struct pt_regs *r){}
 
 static void msg_exit(message *msg, struct pt_regs *r)
@@ -245,6 +251,7 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(creat,		FS),	/* 10 */
 
 	SCALL_TO_SRV(dup,		FS),
+	SCALL_TO_SRV(dup2,		FS),
 	SCALL_TO_SRV(exec,		PM),
 	SCALL_TO_SRV(exit,		PM),
 	SCALL_TO_SRV(fchdir,		FS),
@@ -252,9 +259,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(fchown,		FS),
 	SCALL_TO_SRV(fcntl,		FS),
 	SCALL_TO_SRV(fork,		PM),
-	SCALL_TO_SRV(fstat,		FS),
-	SCALL_TO_SRV(fstatfs,		FS),	/* 20 */
+	SCALL_TO_SRV(fstat,		FS),	/* 20 */
 
+	SCALL_TO_SRV(fstatfs,		FS),
 	SCALL_TO_SRV(fsync,		FS),
 	SCALL_TO_SRV(ftruncate,		FS),
 	SCALL_TO_SRV(getdents,		FS),
@@ -263,9 +270,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(getitimer,		PM),
 	SCALL_TO_SRV(getpgrp,		PM),
 	SCALL_TO_SRV(getpid,		PM),
-	SCALL_TO_SRV(getppid,		PM),
-	SCALL_TO_SRV(getpriority,	PM),	/* 30 */
+	SCALL_TO_SRV(getppid,		PM),	/* 30 */
 
+	SCALL_TO_SRV(getpriority,	PM),
 	SCALL_TO_SRV(gettimeofday,	PM),
 	SCALL_TO_SRV(getuid,		PM),
 	SCALL_TO_SRV(ioctl,		FS),
@@ -274,9 +281,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(llseek,		FS),
 	SCALL_TO_SRV(lseek,		FS),
 	SCALL_TO_SRV(lstat,		FS),
-	SCALL_TO_SRV(mkdir,		FS),
-	SCALL_TO_SRV(mknod,		FS),	/* 40 */
+	SCALL_TO_SRV(mkdir,		FS),	/* 40 */
 
+	SCALL_TO_SRV(mknod,		FS),
 	SCALL_TO_SRV(mount,		FS),
 	SCALL_TO_SRV(open,		FS),
 	SCALL_TO_SRV(pause,		PM),
@@ -285,9 +292,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(read,		FS),
 	SCALL_TO_SRV(readlink,		FS),
 	SCALL_TO_SRV(reboot,		PM),
-	SCALL_TO_SRV(rename,		FS),
-	SCALL_TO_SRV(rmdir,		FS),	/* 50 */
+	SCALL_TO_SRV(rename,		FS),	/* 50 */
 
+	SCALL_TO_SRV(rmdir,		FS),
 	SCALL_TO_SRV(select,		FS),
 	SCALL_TO_SRV(setegid,		PM),
 	SCALL_TO_SRV(seteuid,		PM),
@@ -296,9 +303,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(setpriority,	PM),
 	SCALL_TO_SRV(setsid,		PM),
 	SCALL_TO_SRV(setuid,		PM),
-	SCALL_TO_SRV(sigaction,		PM),
-	SCALL_TO_SRV(signal,		PM),	/* 60 */
+	SCALL_TO_SRV(sigaction,		PM),	/* 60 */
 
+	SCALL_TO_SRV(signal,		PM),
 	SCALL_TO_SRV(sigpending,	PM),
 	SCALL_TO_SRV(sigprocmask,	PM),
 	SCALL_TO_SRV(sigreturn,		PM),
@@ -307,9 +314,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(stat,		FS),
 	SCALL_TO_SRV(stime,		PM),
 	SCALL_TO_SRV(symlink,		FS),
-	SCALL_TO_SRV(sync,		FS),
-	SCALL_TO_SRV(sysuname,		PM),	/* 70 */
+	SCALL_TO_SRV(sync,		FS),	/* 70 */
 
+	SCALL_TO_SRV(sysuname,		PM),
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
 	SCALL_TO_SRV(truncate,		FS),
@@ -318,6 +325,6 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(unlink,		FS),
 	SCALL_TO_SRV(utime,		FS),
 	SCALL_TO_SRV(waitpid,		PM),
-	SCALL_TO_SRV(wait,		PM),
-	SCALL_TO_SRV(write,		FS),	/* 80 */
+	SCALL_TO_SRV(wait,		PM),	/* 80 */
+	SCALL_TO_SRV(write,		FS),
 };

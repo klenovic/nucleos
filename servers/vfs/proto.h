@@ -83,6 +83,7 @@ void reply(int whom, int result);
 
 /* misc.c */
 int do_dup(void);
+int do_dup2(void);
 void pm_exit(int proc);
 int do_fcntl(void);
 void pm_fork(int pproc, int cproc, int cpid);
