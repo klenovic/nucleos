@@ -7,11 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/fcntl.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int dup(int fd)
 {
-  return(fcntl(fd, F_DUPFD, 0));
+	return INLINE_SYSCALL(dup, 1, fd);
 }

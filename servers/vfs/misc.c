@@ -121,12 +121,7 @@ int do_getsysinfo()
  *===========================================================================*/
 int do_dup()
 {
-/* Perform the dup(fd) or dup2(fd,fd2) system call. These system calls are
- * obsolete.  In fact, it is not even possible to invoke them using the
- * current library because the library routines call fcntl().  They are
- * provided to permit old binary programs to continue to run.
- */
-
+/* Perform the dup(fd) or dup2(fd,fd2) system call. */
   register int rfd;
   register struct filp *f;
   struct filp *dummy;
