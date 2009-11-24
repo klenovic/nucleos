@@ -53,7 +53,7 @@ int do_chmod()
       r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp);
       if (r != 0) return r;
   } 
-  else if (call_nr == __NR_fchmod) {
+  else if (call_nr == __NR_fchmod || call_nr == __NNR_fchmod) {
       if (!(flp = get_filp(m_in.m3_i1))) return err_code;
       vp= flp->filp_vno;
       dup_vnode(vp);
@@ -90,6 +90,8 @@ int do_chmod()
 
   return 0;
 }
+
+int do_fchmod(void) __alias("do_chmod");
 
 /*===========================================================================*
  *				do_chown				     *

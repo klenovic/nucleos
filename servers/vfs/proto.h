@@ -147,6 +147,7 @@ int check_pipe(void);
 /* protect.c */
 int do_access(void);
 int do_chmod(void);
+int do_fchmod(void);
 int do_chown(void);
 int do_umask(void);
 int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid);

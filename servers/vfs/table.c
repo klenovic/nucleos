@@ -172,7 +172,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(dup,		do_dup),
 	SCALL_HANDLER(dup2,		do_dup2),
 	SCALL_HANDLER(fchdir,		do_fchdir),
-	SCALL_HANDLER(fchmod,		no_sys),
+	SCALL_HANDLER(fchmod,		do_fchmod),
 	SCALL_HANDLER(fchown,		no_sys),
 	SCALL_HANDLER(fcntl,		no_sys),
 	SCALL_HANDLER(fstat,		no_sys),
