@@ -137,7 +137,11 @@ static void msg_chroot(message *msg, struct pt_regs *r)
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_close(message *msg, struct pt_regs *r){}
+static void msg_close(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;
+}
+
 static void msg_cprof(message *msg, struct pt_regs *r){}
 static void msg_creat(message *msg, struct pt_regs *r){}
 static void msg_dup(message *msg, struct pt_regs *r){}
