@@ -7,14 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int fsync(int fd)
 {
-  message m;
-
-  m.m1_i1 = fd;
-
-  return(ksyscall(FS_PROC_NR, __NR_fsync, &m));
+	return INLINE_SYSCALL(fsync, 1, fd);
 }
