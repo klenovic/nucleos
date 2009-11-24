@@ -7,15 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/string.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-int ftruncate(int _fd, off_t _length)
+int ftruncate(int fd, off_t length)
 {
-  message m;
-  m.m2_l1 = _length;
-  m.m2_i1 = _fd;
-
-  return(ksyscall(FS_PROC_NR, __NR_ftruncate, &m));
+	return INLINE_SYSCALL(ftruncate, 2, fd, length);
 }
