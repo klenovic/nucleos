@@ -131,7 +131,12 @@ static void msg_chown(message *msg, struct pt_regs *r)
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 }
 
-static void msg_chroot(message *msg, struct pt_regs *r){}
+static void msg_chroot(message *msg, struct pt_regs *r)
+{
+	msg->m3_p1 = (char*)r->bx;	/* path */
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+}
+
 static void msg_close(message *msg, struct pt_regs *r){}
 static void msg_cprof(message *msg, struct pt_regs *r){}
 static void msg_creat(message *msg, struct pt_regs *r){}
