@@ -703,6 +703,65 @@ int do_llseek()
 }
 
 /*===========================================================================*
+ *				sys_lseek				     *
+ *===========================================================================*/
+int sys_lseek()
+{
+	/* Perform the lseek(ls_fd, offset, whence) system call. */
+	register struct filp *rfilp;
+	int r;
+	long offset;
+	u64_t pos, newpos;
+
+	/* Check to see if the file descriptor is valid. */
+	if ( (rfilp = get_filp(m_in.ls_fd)) == NIL_FILP)
+		return(err_code);
+
+	/* No lseek on pipes. */
+	if (rfilp->filp_vno->v_pipe == I_PIPE)
+		return -ESPIPE;
+
+	/* The value of 'whence' determines the start position to use. */
+	switch(m_in.whence) {
+	case SEEK_SET:
+		pos = cvu64(0);
+		break;
+
+	case SEEK_CUR:
+		pos = rfilp->filp_pos;
+		break;
+
+	case SEEK_END:
+		pos = cvul64(rfilp->filp_vno->v_size);
+		break;
+
+	default:
+		return(-EINVAL);
+	}
+
+	offset= m_in.offset_lo;
+	if (offset >= 0)
+		newpos= add64ul(pos, offset);
+	else
+		newpos= sub64ul(pos, -offset);
+
+	/* Check for overflow. */
+	if (ex64hi(newpos) != 0)
+		return -EINVAL;
+
+	if (cmp64(newpos, rfilp->filp_pos) != 0) { /* Inhibit read ahead request */
+		r = req_inhibread(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr);
+
+		if (r != 0)
+			return r;
+	}
+
+	rfilp->filp_pos = newpos;
+
+	return ex64lo(newpos);
+}
+
+/*===========================================================================*
  *				sys_llseek				     *
  *===========================================================================*/
 int sys_llseek(void)

@@ -112,6 +112,7 @@ void close_filp(struct filp *fp);
 void close_reply(void);
 int do_creat(void);
 int do_lseek(void);
+int sys_lseek(void);
 int do_llseek(void);
 int sys_llseek(void);
 int do_mknod(void);

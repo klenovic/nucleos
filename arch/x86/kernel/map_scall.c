@@ -265,7 +265,13 @@ static void msg_llseek(message *msg, struct pt_regs *r)
 	msg->m2_i2 = r->di;		/* whence */
 }
 
-static void msg_lseek(message *msg, struct pt_regs *r){}
+static void msg_lseek(message *msg, struct pt_regs *r)
+{
+	msg->m2_i1 = r->bx;		/* descriptor */
+	msg->m2_l1 = (off_t)r->cx;	/* offset */
+	msg->m2_i2 = r->dx;		/* whence */
+}
+
 static void msg_lstat(message *msg, struct pt_regs *r){}
 static void msg_mkdir(message *msg, struct pt_regs *r){}
 static void msg_mknod(message *msg, struct pt_regs *r){}
