@@ -246,7 +246,16 @@ static void msg_ioctl(message *msg, struct pt_regs *r)
 }
 
 static void msg_kill(message *msg, struct pt_regs *r){}
-static void msg_link(message *msg, struct pt_regs *r){}
+
+static void msg_link(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char*)r->bx;	/* oldpath */
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+
+	msg->m1_p2 = (char*)r->cx;	/* newpath */
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+}
+
 static void msg_llseek(message *msg, struct pt_regs *r){}
 static void msg_lseek(message *msg, struct pt_regs *r){}
 static void msg_lstat(message *msg, struct pt_regs *r){}
