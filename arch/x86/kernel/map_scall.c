@@ -221,7 +221,13 @@ static void msg_ftruncate(message *msg, struct pt_regs *r)
 	msg->m2_l1 = (off_t)r->cx;	/* length */
 }
 
-static void msg_getdents(message *msg, struct pt_regs *r){}
+static void msg_getdents(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_p1 = (void*)r->cx;	/* struct. dirent */
+	msg->m1_i2 = (size_t)r->dx;		/* count */
+}
+
 static void msg_getegid(message *msg, struct pt_regs *r){}
 static void msg_getgid(message *msg, struct pt_regs *r){}
 static void msg_getitimer(message *msg, struct pt_regs *r){}
