@@ -237,7 +237,14 @@ static void msg_getppid(message *msg, struct pt_regs *r){}
 static void msg_getpriority(message *msg, struct pt_regs *r){}
 static void msg_gettimeofday(message *msg, struct pt_regs *r){}
 static void msg_getuid(message *msg, struct pt_regs *r){}
-static void msg_ioctl(message *msg, struct pt_regs *r){}
+
+static void msg_ioctl(message *msg, struct pt_regs *r)
+{
+	msg->TTY_LINE = r->bx;		/* descriptor */
+	msg->TTY_REQUEST = r->cx;	/* request */
+	msg->ADDRESS = (char *)r->dx;	/* data */
+}
+
 static void msg_kill(message *msg, struct pt_regs *r){}
 static void msg_link(message *msg, struct pt_regs *r){}
 static void msg_llseek(message *msg, struct pt_regs *r){}
