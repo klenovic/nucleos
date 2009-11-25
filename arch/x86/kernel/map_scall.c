@@ -286,7 +286,15 @@ static void msg_mkdir(message *msg, struct pt_regs *r)
 	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_mknod(message *msg, struct pt_regs *r){}
+static void msg_mknod(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char *) r->bx;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i2 = (mode_t)r->cx;
+	msg->m1_i3 = (dev_t)r->dx;
+	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
+}
+
 static void msg_mount(message *msg, struct pt_regs *r){}
 static void msg_open(message *msg, struct pt_regs *r){}
 static void msg_pause(message *msg, struct pt_regs *r){}
