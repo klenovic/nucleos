@@ -45,6 +45,7 @@
 
 #define offset_lo	m2_l1
 #define offset_high	m2_l2
+#define result_addr	m2_p1
  
 static int common_open(int oflags, mode_t omode);
 static int create_open(mode_t omode, int excl, struct vnode **vpp, int *created);
@@ -701,6 +702,66 @@ int do_llseek()
   return 0;
 }
 
+/*===========================================================================*
+ *				sys_llseek				     *
+ *===========================================================================*/
+int sys_llseek(void)
+{
+	/* Perform the llseek(fd, offset, whence) system call. */
+	register struct filp *rfilp;
+	loff_t pos, newpos;
+	int r;
+
+	/* Check to see if the file descriptor is valid. */
+	if ((rfilp = get_filp(m_in.ls_fd)) == NIL_FILP)
+		return -EBADF;
+
+	/* No lseek on pipes. */
+	if (rfilp->filp_vno->v_pipe == I_PIPE)
+		return -ESPIPE;
+
+	/* The value of 'whence' determines the start position to use. */
+	switch(m_in.whence) {
+	case SEEK_SET:
+		pos = (loff_t)0;
+		break;
+
+	case SEEK_CUR:
+		pos = rfilp->filp_pos;
+		break;
+
+	case SEEK_END:
+		pos = (loff_t)rfilp->filp_vno->v_size;
+		break;
+
+	default:
+		return -EINVAL;
+	}
+
+	newpos = pos + (((loff_t)m_in.offset_high << 32) | m_in.offset_lo);
+
+	/* Check for overflow. */
+	if (((long)m_in.offset_high > 0) && newpos < pos)
+		return -EINVAL;
+
+	if (((long)m_in.offset_high < 0) && newpos > pos)
+		return -EINVAL;
+
+	if (newpos != rfilp->filp_pos) { /* Inhibit read ahead request */
+		r = req_inhibread(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr);
+
+		if (r != 0)
+			return r;
+	}
+
+	rfilp->filp_pos = newpos;
+
+	/* Copy the result to user space */
+	if (sys_datacopy(SELF, (vir_bytes)&newpos, who_e, (vir_bytes)m_in.result_addr, sizeof(newpos)))
+		return -EFAULT;
+
+	return 0;
+}
 
 /*===========================================================================*
  *				do_close				     *

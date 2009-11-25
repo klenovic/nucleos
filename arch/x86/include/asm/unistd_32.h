@@ -372,7 +372,7 @@ extern int optreset;	/* Reset getopt state */
 
 int brk(char *_addr);
 int chroot(const char *_name);
-int lseek64(int _fd, u64_t _offset, int _whence, u64_t *_newpos);
+loff_t lseek64(int fd, loff_t offset, int whence);
 int mknod(const char *_name, mode_t _mode, dev_t _addr);
 int mknod4(const char *_name, mode_t _mode, dev_t _addr, long _size);
 char *mktemp(char *_template);

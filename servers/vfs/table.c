@@ -182,7 +182,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(getdents,		do_getdents),
 	SCALL_HANDLER(ioctl,		do_ioctl),
 	SCALL_HANDLER(link,		do_link),
-	SCALL_HANDLER(llseek,		no_sys),
+	SCALL_HANDLER(llseek,		sys_llseek),
 	SCALL_HANDLER(lseek,		no_sys),
 	SCALL_HANDLER(lstat,		no_sys),
 	SCALL_HANDLER(mkdir,		no_sys),

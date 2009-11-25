@@ -256,7 +256,15 @@ static void msg_link(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_llseek(message *msg, struct pt_regs *r){}
+static void msg_llseek(message *msg, struct pt_regs *r)
+{
+	msg->m2_i1 = r->bx;		/* descriptor */
+	msg->m2_l2 = r->cx;		/* offset (high) */
+	msg->m2_l1 = r->dx;		/* offset (low) */
+	msg->m2_p1 = (void*)r->si;	/* result (address) */
+	msg->m2_i2 = r->di;		/* whence */
+}
+
 static void msg_lseek(message *msg, struct pt_regs *r){}
 static void msg_lstat(message *msg, struct pt_regs *r){}
 static void msg_mkdir(message *msg, struct pt_regs *r){}

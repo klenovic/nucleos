@@ -113,6 +113,7 @@ void close_reply(void);
 int do_creat(void);
 int do_lseek(void);
 int do_llseek(void);
+int sys_llseek(void);
 int do_mknod(void);
 int do_mkdir(void);
 int do_open(void);
