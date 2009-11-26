@@ -203,7 +203,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(umount,		no_sys),
 	SCALL_HANDLER(unlink,		do_unlink),
 	SCALL_HANDLER(utime,		sys_utime),
-	SCALL_HANDLER(write,		no_sys),
+	SCALL_HANDLER(write,		do_write),
 };
 
 /* This should not fail with "array size is negative": */

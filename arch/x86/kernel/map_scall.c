@@ -423,7 +423,13 @@ static void msg_utime(message *msg, struct pt_regs *r)
 
 static void msg_wait(message *msg, struct pt_regs *r){}
 static void msg_waitpid(message *msg, struct pt_regs *r){}
-static void msg_write(message *msg, struct pt_regs *r){}
+
+static void msg_write(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_p1 = (char *)r->cx;	/* buffer */
+	msg->m1_i2 = (size_t)r->dx;	/* count */
+}
 
 static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(access,		FS),

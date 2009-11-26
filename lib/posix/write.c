@@ -7,16 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 ssize_t write(int fd, const void *buffer, size_t nbytes)
 {
-	message m;
-
-	m.m1_i1 = fd;
-	m.m1_i2 = nbytes;
-	m.m1_p1 = (char *) buffer;
-
-	return(ksyscall(FS_PROC_NR, __NR_write, &m));
+	return INLINE_SYSCALL(write, 3, fd, buffer, nbytes);
 }
