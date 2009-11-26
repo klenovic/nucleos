@@ -287,10 +287,10 @@ static void msg_mkdir(message *msg, struct pt_regs *r)
 
 static void msg_mknod(message *msg, struct pt_regs *r)
 {
-	msg->m1_p1 = (char *) r->bx;
+	msg->m1_p1 = (char *) r->bx;		/* pathname */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
-	msg->m1_i2 = (mode_t)r->cx;
-	msg->m1_i3 = (dev_t)r->dx;
+	msg->m1_i2 = (mode_t)r->cx;		/* mode */
+	msg->m1_i3 = (dev_t)r->dx;		/* device */
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
 }
 
@@ -356,11 +356,11 @@ static void msg_rmdir(message *msg, struct pt_regs *r)
 
 static void msg_select(message *msg, struct pt_regs *r)
 {
-	msg->SEL_NFDS = r->bx;
-	msg->SEL_READFDS = (char *) r->cx;
-	msg->SEL_WRITEFDS = (char *) r->dx;
-	msg->SEL_ERRORFDS = (char *) r->si;
-	msg->SEL_TIMEOUT = (char *) r->di;
+	msg->SEL_NFDS = r->bx;			/* nfds */
+	msg->SEL_READFDS = (char *) r->cx;	/* readfds */
+	msg->SEL_WRITEFDS = (char *) r->dx;	/* writefds */
+	msg->SEL_ERRORFDS = (char *) r->si;	/* errorfds */
+	msg->SEL_TIMEOUT = (char *) r->di;	/* timeout */
 }
 
 static void msg_setegid(message *msg, struct pt_regs *r){}
@@ -389,9 +389,9 @@ static void msg_stime(message *msg, struct pt_regs *r){}
 
 static void msg_symlink(message *msg, struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;
+	msg->m1_p1 = (char *)r->bx;		/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
-	msg->m1_p2 = (char *)r->cx;
+	msg->m1_p2 = (char *)r->cx;		/* newpath */
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
@@ -406,14 +406,14 @@ static void msg_times(message *msg, struct pt_regs *r){}
 
 static void msg_truncate(message *msg, struct pt_regs *r)
 {
-	msg->m2_p1 = (char *)r->bx;
+	msg->m2_p1 = (char *)r->bx;		/* path */
 	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
-	msg->m2_l1 = (off_t)r->cx;
+	msg->m2_l1 = (off_t)r->cx;		/* length */
 }
 
 static void msg_umask(message *msg, struct pt_regs *r)
 {
-	msg->m1_i1 = (mode_t)r->bx;
+	msg->m1_i1 = (mode_t)r->bx;	/* mask */
 }
 
 static void msg_umount(message *msg, struct pt_regs *r)
@@ -424,7 +424,7 @@ static void msg_umount(message *msg, struct pt_regs *r)
 
 static void msg_unlink(message *msg, struct pt_regs *r)
 {
-	msg->m3_p1 = (char *)r->bx;
+	msg->m3_p1 = (char *)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
