@@ -329,7 +329,15 @@ static void msg_readlink(message *msg, struct pt_regs *r)
 }
 
 static void msg_reboot(message *msg, struct pt_regs *r){}
-static void msg_rename(message *msg, struct pt_regs *r){}
+
+static void msg_rename(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char *)r->bx;	/* oldpath */
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_p2 = (void *)r->cx;	/* newpath */
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+}
+
 static void msg_rmdir(message *msg, struct pt_regs *r){}
 static void msg_select(message *msg, struct pt_regs *r){}
 static void msg_setegid(message *msg, struct pt_regs *r){}
