@@ -131,6 +131,7 @@ int lookup_lastdir(int use_realuid, struct vnode **vpp);
 
 /* pipe.c */
 int do_pipe(void);
+int sys_pipe(void);
 void unpause(int proc_nr_e);
 int Xpipe_check(struct vnode *vp, int rw_flag, int oflags, int bytes, u64_t position, int notouch);
 void release(struct vnode *vp, int call_nr, int count);

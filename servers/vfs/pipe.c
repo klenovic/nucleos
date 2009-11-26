@@ -130,6 +130,93 @@ int do_pipe()
 
   return 0;
 }
+/*===========================================================================*
+ *                              sys_pipe                                      *
+ *===========================================================================*/
+int sys_pipe(void)
+{
+	/* Perform the pipe(fil_des) system call. */
+	register struct fproc *rfp;
+	int r;
+	struct filp *fil_ptr0, *fil_ptr1;
+	int fil_des[2];		/* reply goes here */
+	struct vnode *vp;
+	struct vmnt *vmp;
+	struct node_details res;
+
+	/* See if a free vnode is available */
+	if ( (vp = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
+		printf("VFS: no vnode available!\n");
+		return err_code;
+	}
+
+	/* Acquire two file descriptors. */
+	rfp = fp;
+
+	if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0)
+		return(r);
+
+	rfp->fp_filp[fil_des[0]] = fil_ptr0;
+	FD_SET(fil_des[0], &rfp->fp_filp_inuse);
+	fil_ptr0->filp_count = 1;
+
+	if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
+
+		return(r);
+	}
+
+	rfp->fp_filp[fil_des[1]] = fil_ptr1;
+	FD_SET(fil_des[1], &rfp->fp_filp_inuse);
+	fil_ptr1->filp_count = 1;
+
+	/* Send request */
+	r = req_newnode(ROOT_FS_E, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE, (dev_t)0, &res);
+
+	/* Handle error */
+	if (r != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
+		rfp->fp_filp[fil_des[1]] = NIL_FILP;
+		FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
+		fil_ptr1->filp_count = 0;
+		return r;
+	}
+
+	/* Fill in vnode */
+	vp->v_fs_e = res.fs_e;
+	vp->v_inode_nr = res.inode_nr;
+	vp->v_mode = res.fmode;
+	vp->v_index = res.inode_index;
+	vp->v_pipe = I_PIPE;
+	vp->v_pipe_rd_pos= 0;
+	vp->v_pipe_wr_pos= 0;
+	vp->v_fs_count = 1;
+	vp->v_ref_count = 1;
+	vp->v_size = 0;
+
+	if ( (vmp = find_vmnt(vp->v_fs_e)) == NIL_VMNT) {
+		printf("VFS: vmnt not found by pipe() ==>> USING ROOT VMNT\n");
+		vp->v_vmnt = &vmnt[0];
+	} else {
+		vp->v_vmnt = vmp;
+		vp->v_dev = vmp->m_dev;
+	}
+
+	/* Fill in filp objects */
+	fil_ptr0->filp_vno = vp;
+	dup_vnode(vp);
+	fil_ptr1->filp_vno = vp;
+	fil_ptr0->filp_flags = O_RDONLY;
+	fil_ptr1->filp_flags = O_WRONLY;
+
+	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
+
+	return (r < 0) ? -EFAULT : 0;
+}
 
 /*===========================================================================*
  *				pipe_check				     *

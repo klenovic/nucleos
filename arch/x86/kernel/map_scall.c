@@ -305,7 +305,12 @@ static void msg_open(message *msg, struct pt_regs *r)
 }
 
 static void msg_pause(message *msg, struct pt_regs *r){}
-static void msg_pipe(message *msg, struct pt_regs *r){}
+
+static void msg_pipe(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (void*)r->bx;	/* pointer to fild */
+}
+
 static void msg_ptrace(message *msg, struct pt_regs *r){}
 static void msg_readlink(message *msg, struct pt_regs *r){}
 static void msg_read(message *msg, struct pt_regs *r){}
