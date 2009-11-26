@@ -385,7 +385,11 @@ static void msg_symlink(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_sync(message *msg, struct pt_regs *r){}
+static void msg_sync(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
+
 static void msg_sysuname(message *msg, struct pt_regs *r){}
 static void msg_time(message *msg, struct pt_regs *r){}
 static void msg_times(message *msg, struct pt_regs *r){}
