@@ -9,10 +9,16 @@
  */
 /* utime(2) for POSIX		Authors: Terrence W. Holm & Edwin L. Froese */
 
-#include <nucleos/lib.h>
-#include <nucleos/string.h>
+#include <nucleos/unistd.h>
 #include <nucleos/utime.h>
+#include <asm/syscall.h>
 
+int utime(const char *filename, const struct utimbuf *times)
+{
+	return INLINE_SYSCALL(utime, 2, filename, times);
+}
+
+#if 0
 int utime(const char *name, const struct utimbuf *timp)
 {
   message m;
@@ -28,3 +34,4 @@ int utime(const char *name, const struct utimbuf *timp)
   m.m2_p1 = (char *) name;
   return(ksyscall(FS_PROC_NR, __NR_utime, &m));
 }
+#endif

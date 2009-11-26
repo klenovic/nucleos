@@ -221,6 +221,7 @@ int do_lstat(void);
 
 /* time.c */
 int do_utime(void);
+int sys_utime(void);
 
 /* utility.c */
 time_t clock_time(void);
