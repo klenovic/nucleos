@@ -7,18 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
-#include <nucleos/string.h>
+#include <asm/syscall.h>
 
-int readlink(const char *name, char *buffer, size_t bufsiz)
+int readlink(const char *path, char *buffer, size_t bufsiz)
 {
-  message m;
-
-  m.m1_i1 = strlen(name) + 1;
-  m.m1_i2 = bufsiz;
-  m.m1_p1 = (char *) name;
-  m.m1_p2 = (char *) buffer;
-
-  return(ksyscall(FS_PROC_NR, __NR_readlink, &m));
+	return INLINE_SYSCALL(readlink, 3, path, buffer, bufsiz);
 }

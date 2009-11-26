@@ -191,7 +191,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(open,		sys_open),
 	SCALL_HANDLER(pipe,		sys_pipe),
 	SCALL_HANDLER(read,		do_read),
-	SCALL_HANDLER(readlink,		no_sys),
+	SCALL_HANDLER(readlink,		do_rdlink),
 	SCALL_HANDLER(rename,		no_sys),
 	SCALL_HANDLER(rmdir,		no_sys),
 	SCALL_HANDLER(select,		no_sys),
