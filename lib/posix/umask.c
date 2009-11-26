@@ -7,13 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/stat.h>
+#include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-mode_t umask(mode_t complmode)
+mode_t umask(mode_t mask)
 {
-  message m;
-
-  m.m1_i1 = complmode;
-  return( (mode_t) ksyscall(FS_PROC_NR, __NR_umask, &m));
+	return (mode_t)INLINE_SYSCALL(umask, 1, mask);
 }

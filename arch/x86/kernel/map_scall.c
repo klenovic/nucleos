@@ -401,7 +401,11 @@ static void msg_truncate(message *msg, struct pt_regs *r)
 	msg->m2_l1 = (off_t)r->cx;
 }
 
-static void msg_umask(message *msg, struct pt_regs *r){}
+static void msg_umask(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = (mode_t)r->bx;
+}
+
 static void msg_umount(message *msg, struct pt_regs *r){}
 static void msg_unlink(message *msg, struct pt_regs *r){}
 static void msg_utime(message *msg, struct pt_regs *r){}
