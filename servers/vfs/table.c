@@ -194,7 +194,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(readlink,		do_rdlink),
 	SCALL_HANDLER(rename,		do_rename),
 	SCALL_HANDLER(rmdir,		sys_rmdir),
-	SCALL_HANDLER(select,		no_sys),
+	SCALL_HANDLER(select,		do_select),
 	SCALL_HANDLER(stat,		no_sys),
 	SCALL_HANDLER(symlink,		no_sys),
 	SCALL_HANDLER(sync,		no_sys),

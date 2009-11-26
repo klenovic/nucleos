@@ -344,7 +344,15 @@ static void msg_rmdir(message *msg, struct pt_regs *r)
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_select(message *msg, struct pt_regs *r){}
+static void msg_select(message *msg, struct pt_regs *r)
+{
+	msg->SEL_NFDS = r->bx;
+	msg->SEL_READFDS = (char *) r->cx;
+	msg->SEL_WRITEFDS = (char *) r->dx;
+	msg->SEL_ERRORFDS = (char *) r->si;
+	msg->SEL_TIMEOUT = (char *) r->di;
+}
+
 static void msg_setegid(message *msg, struct pt_regs *r){}
 static void msg_seteuid(message *msg, struct pt_regs *r){}
 static void msg_setgid(message *msg, struct pt_regs *r){}

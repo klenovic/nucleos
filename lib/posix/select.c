@@ -7,21 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/time.h>
 #include <nucleos/select.h>
+#include <asm/syscall.h>
 
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
 	   struct timeval *timeout)
 {
-  message m;
-
-  m.SEL_NFDS = nfds;
-  m.SEL_READFDS = (char *) readfds;
-  m.SEL_WRITEFDS = (char *) writefds;
-  m.SEL_ERRORFDS = (char *) errorfds;
-  m.SEL_TIMEOUT = (char *) timeout;
-
-  return (ksyscall(FS_PROC_NR, __NR_select, &m));
+	return INLINE_SYSCALL(select, 5, nfds, readfds, writefds, errorfds, timeout);
 }
-
