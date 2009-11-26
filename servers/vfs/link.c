@@ -150,6 +150,7 @@ int do_unlink()
   return r;
 }
 
+int sys_rmdir(void) __alias("do_unlink");
 
 /*===========================================================================*
  *				do_rename				     *

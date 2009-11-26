@@ -338,7 +338,12 @@ static void msg_rename(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_rmdir(message *msg, struct pt_regs *r){}
+static void msg_rmdir(message *msg, struct pt_regs *r)
+{
+	msg->m3_p1 = (char *)r->bx;	/* pathname */
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+}
+
 static void msg_select(message *msg, struct pt_regs *r){}
 static void msg_setegid(message *msg, struct pt_regs *r){}
 static void msg_seteuid(message *msg, struct pt_regs *r){}

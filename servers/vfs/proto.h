@@ -68,6 +68,7 @@ void nested_fs_call(message *m);
 /* link.c */
 int do_link(void);
 int do_unlink(void);
+int sys_rmdir(void);
 int do_rename(void);
 int do_truncate(void);
 int do_ftruncate(void);

@@ -7,15 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-int rmdir(const char *name)
+int rmdir(const char *pathname)
 {
-  message m;
-
-  m.m3_i1 = strlen(name) + 1;
-  m.m3_p1 = (char *) name;
-
-  return(ksyscall(FS_PROC_NR, __NR_rmdir, &m));
+	return INLINE_SYSCALL(rmdir, 1, pathname);
 }
