@@ -201,7 +201,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(truncate,		do_truncate),
 	SCALL_HANDLER(umask,		do_umask),
 	SCALL_HANDLER(umount,		no_sys),
-	SCALL_HANDLER(unlink,		no_sys),
+	SCALL_HANDLER(unlink,		do_unlink),
 	SCALL_HANDLER(utime,		no_sys),
 	SCALL_HANDLER(write,		no_sys),
 };

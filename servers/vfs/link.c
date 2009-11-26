@@ -142,7 +142,7 @@ int do_unlink()
    */
   
   /* Issue request */
-  r= ((call_nr == __NR_unlink) ? req_unlink : req_rmdir)(vp->v_fs_e,
+  r= ((call_nr == __NR_unlink) || (call_nr == __NNR_unlink) ? req_unlink : req_rmdir)(vp->v_fs_e,
 	vp->v_inode_nr, user_fullpath);
 
   put_vnode(vp);
