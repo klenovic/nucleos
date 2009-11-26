@@ -188,7 +188,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(mkdir,		do_mkdir),
 	SCALL_HANDLER(mknod,		do_mknod),
 	SCALL_HANDLER(mount,		no_sys),
-	SCALL_HANDLER(open,		no_sys),
+	SCALL_HANDLER(open,		sys_open),
 	SCALL_HANDLER(pipe,		no_sys),
 	SCALL_HANDLER(read,		no_sys),
 	SCALL_HANDLER(readlink,		no_sys),

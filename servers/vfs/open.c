@@ -90,6 +90,25 @@ int do_open()
 }
 
 /*===========================================================================*
+ *				sys_open				     *
+ *===========================================================================*/
+int sys_open()
+{
+	/* Perform the open(name, flags,...) system call. */
+	int r;
+
+	r = fetch_name(m_in.m1_p1, m_in.m1_i1);
+
+	if (r != 0) {
+		return(err_code); /* name was bad */
+	}
+
+	r = common_open(m_in.m1_i2, m_in.m1_i3);
+
+	return r;
+}
+
+/*===========================================================================*
  *				common_open				     *
  *===========================================================================*/
 static int common_open(register int oflags, mode_t omode)
@@ -521,7 +540,7 @@ static int pipe_open(register struct vnode *vp, register mode_t bits,
 		return(SUSPEND);
 	}
   } else if (susp_count > 0) {/* revive blocked processes */
-	release(vp, __NR_open, susp_count);
+	release(vp, __NNR_open, susp_count);
 	release(vp, __NNR_creat, susp_count);
   }
   return 0;

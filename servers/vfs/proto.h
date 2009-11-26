@@ -118,6 +118,7 @@ int sys_llseek(void);
 int do_mknod(void);
 int do_mkdir(void);
 int do_open(void);
+int sys_open(void);
 int do_slink(void);
 int do_vm_open(void);
 int do_vm_close(void);

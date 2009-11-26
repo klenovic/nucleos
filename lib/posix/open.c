@@ -7,29 +7,21 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/fcntl.h>
+#include <asm/syscall.h>
 #include <stdarg.h>
-#include <nucleos/string.h>
 
 int open(const char *name, int flags, ...)
 {
-  message m;
+	mode_t mode = 0;
 
-  va_list argp;
-  va_start(argp, flags);
+	if (flags & O_CREAT) {
+		va_list arg;
+		va_start(arg, flags);
+		mode = va_arg(arg, int);
+		va_end(arg);
+	}
 
-  if (flags & O_CREAT) {
-	m.m1_i1 = strlen(name) + 1;
-	m.m1_i2 = flags;
-	m.m1_i3 = va_arg(argp, int); /* mode_t is automatically promoted to int */
-	m.m1_p1 = (char *) name;
-  } else {
-	m.m3_i1 = strlen(name) + 1;
-	m.m3_p1 = (char *) name;
-	m.m3_i2 = flags;
-  }
-  va_end(argp);
-
-  return (ksyscall(FS_PROC_NR, __NR_open, &m));
+	return INLINE_SYSCALL(open, 3, name, flags, mode);
 }
