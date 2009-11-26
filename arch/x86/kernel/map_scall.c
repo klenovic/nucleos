@@ -376,7 +376,15 @@ static void msg_stat(message *msg, struct pt_regs *r)
 }
 
 static void msg_stime(message *msg, struct pt_regs *r){}
-static void msg_symlink(message *msg, struct pt_regs *r){}
+
+static void msg_symlink(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char *)r->bx;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_p2 = (char *)r->cx;
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+}
+
 static void msg_sync(message *msg, struct pt_regs *r){}
 static void msg_sysuname(message *msg, struct pt_regs *r){}
 static void msg_time(message *msg, struct pt_regs *r){}

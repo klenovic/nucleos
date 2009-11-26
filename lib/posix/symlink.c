@@ -7,17 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/string.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-int symlink(const char *name, const char *name2)
+int symlink(const char *oldpath, const char *newpath)
 {
-  message m;
-
-  m.m1_i1 = strlen(name) + 1;
-  m.m1_i2 = strlen(name2) + 1;
-  m.m1_p1 = (char *) name;
-  m.m1_p2 = (char *) name2;
-  return(ksyscall(FS_PROC_NR, __NR_symlink, &m));
+	return INLINE_SYSCALL(symlink, 2, oldpath, newpath);
 }
