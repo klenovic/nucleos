@@ -12,5 +12,5 @@
 
 int fchown(int fd, uid_t owner, gid_t grp)
 {
-  return INLINE_SYSCALL(fchown, 3, fd, owner, grp);
+	return INLINE_SYSCALL(fchown, 3, fd, owner, grp);
 }

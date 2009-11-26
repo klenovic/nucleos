@@ -112,7 +112,7 @@ static void msg_brk(message *msg, struct pt_regs *r){}
 
 static void msg_chdir(message *msg, struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;      /* pathname */
+	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
@@ -149,7 +149,6 @@ static void msg_creat(message *msg, struct pt_regs *r)
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
-
 }
 
 static void msg_dup(message *msg, struct pt_regs *r)
@@ -200,8 +199,8 @@ static void msg_fork(message *msg, struct pt_regs *r){}
 
 static void msg_fstat(message *msg, struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;             /* descriptor */
-	msg->m1_p1 = (void*)r->cx;      /* buffer */
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_p1 = (void*)r->cx;	/* buffer */
 }
 
 static void msg_fstatfs(message *msg, struct pt_regs *r)
