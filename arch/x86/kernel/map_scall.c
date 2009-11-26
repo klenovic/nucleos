@@ -393,7 +393,14 @@ static void msg_sync(message *msg, struct pt_regs *r)
 static void msg_sysuname(message *msg, struct pt_regs *r){}
 static void msg_time(message *msg, struct pt_regs *r){}
 static void msg_times(message *msg, struct pt_regs *r){}
-static void msg_truncate(message *msg, struct pt_regs *r){}
+
+static void msg_truncate(message *msg, struct pt_regs *r)
+{
+	msg->m2_p1 = (char *)r->bx;
+	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m2_l1 = (off_t)r->cx;
+}
+
 static void msg_umask(message *msg, struct pt_regs *r){}
 static void msg_umount(message *msg, struct pt_regs *r){}
 static void msg_unlink(message *msg, struct pt_regs *r){}

@@ -198,7 +198,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(stat,		do_stat),
 	SCALL_HANDLER(symlink,		sys_symlink),
 	SCALL_HANDLER(sync,		do_sync),
-	SCALL_HANDLER(truncate,		no_sys),
+	SCALL_HANDLER(truncate,		do_truncate),
 	SCALL_HANDLER(umask,		no_sys),
 	SCALL_HANDLER(umount,		no_sys),
 	SCALL_HANDLER(unlink,		no_sys),

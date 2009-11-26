@@ -7,16 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/string.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-int truncate(const char *_path, off_t _length)
+int truncate(const char *path, off_t length)
 {
-  message m;
-  m.m2_p1 = (char *) _path;
-  m.m2_i1 = strlen(_path)+1;
-  m.m2_l1 = _length;
-
-  return(ksyscall(FS_PROC_NR, __NR_truncate, &m));
+	return INLINE_SYSCALL(truncate, 2, path, length);
 }
