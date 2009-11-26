@@ -7,16 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/stat.h>
-#include <nucleos/string.h>
+#include <asm/syscall.h>
 
-int stat(const char *name, struct stat *buffer)
+int stat(const char *path, struct stat *buf)
 {
-	message m;
-
-	m.m1_i1 = strlen(name) + 1;
-	m.m1_p1 = (char *) name;
-	m.m1_p2 = (char *) buffer;
-	return(ksyscall(FS_PROC_NR, __NR_stat, &m));
+	return INLINE_SYSCALL(stat, 2, path, buf);
 }
