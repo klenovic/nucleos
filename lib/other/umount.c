@@ -57,23 +57,19 @@ static char *makelabel(const char *special)
 	return label;
 }
 
-int umount(const char *name)
+int umount(const char *target)
 {
-	message m;
 	char *label;
 	int r;
 
-	/* Make MFS process label for RS from special name. */
-	if(!(label=makelabel(name))) {
+	/* Make MFS process label for RS from special target. */
+	if(!(label = makelabel(target))) {
 		return -1;
 	}
 
-	m.m3_i1 = strlen(name) + 1;
-	m.m3_p1 = (char *) name;
+	r = INLINE_SYSCALL(umount, 1, target);
 
-	r = ksyscall(FS_PROC_NR, __NR_umount, &m);
-
-	if(r == 0) {
+	if (r == 0) {
 		rs_down(label);
 	}
 

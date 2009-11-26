@@ -416,7 +416,11 @@ static void msg_umask(message *msg, struct pt_regs *r)
 	msg->m1_i1 = (mode_t)r->bx;
 }
 
-static void msg_umount(message *msg, struct pt_regs *r){}
+static void msg_umount(message *msg, struct pt_regs *r)
+{
+	msg->m3_p1 = (char *)r->bx;	/* target */
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+}
 
 static void msg_unlink(message *msg, struct pt_regs *r)
 {
