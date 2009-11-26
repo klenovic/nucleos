@@ -294,7 +294,17 @@ static void msg_mknod(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
 }
 
-static void msg_mount(message *msg, struct pt_regs *r){}
+static void msg_mount(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char *)r->bx;	/* special */
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+
+	msg->m1_p2 = (char *)r->cx;	/* name */
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+
+	msg->m1_i3 = r->dx;		/* mountflags */
+	msg->m1_p3 = (char *)r->si;	/* ep */
+}
 
 static void msg_open(message *msg, struct pt_regs *r)
 {

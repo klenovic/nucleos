@@ -61,7 +61,6 @@ static char *makelabel(const char *special)
 int mount(char *special, char *name, int mountflags, char *type, char *args)
 {
 	int r;
-	message m;
 	struct stat statbuf;
 	char *label;
 	char path[60];
@@ -134,14 +133,7 @@ int mount(char *special, char *name, int mountflags, char *type, char *args)
 	pclose(pipe);
 
 	/* Now perform mount(). */
-	m.m1_i1 = strlen(special) + 1;
-	m.m1_i2 = strlen(name) + 1;
-	m.m1_i3 = mountflags;
-	m.m1_p1 = special;
-	m.m1_p2 = name;
-	m.m1_p3 = (char*) ep;
-
-	r = ksyscall(FS_PROC_NR, __NR_mount, &m);
+	r = INLINE_SYSCALL(mount, 4, special, name, mountflags, ep);
 
 	if (r != 0) {
 		/* If mount() failed, tell RS to shutdown MFS process.
