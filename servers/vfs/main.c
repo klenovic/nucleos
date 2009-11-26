@@ -303,7 +303,7 @@ static void get_work(void)
 
 					assert(f != NULL);
 
-					r= rw_pipe((call_nr == __NR_read) ? READING :
+					r= rw_pipe((call_nr == __NR_read) || (call_nr == __NNR_read) ? READING :
 						   WRITING, who_e, fd_nr, f,
 						   rp->fp_buffer, rp->fp_nbytes);
 

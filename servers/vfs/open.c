@@ -923,7 +923,7 @@ struct filp *fp;
 
   /* If the inode being closed is a pipe, release everyone hanging on it. */
   if (vp->v_pipe == I_PIPE) {
-	rw = (fp->filp_mode & R_BIT ? __NR_write : __NR_read);
+	rw = (fp->filp_mode & R_BIT ? __NNR_write : __NNR_read);
 	release(vp, rw, NR_PROCS);
   }
 

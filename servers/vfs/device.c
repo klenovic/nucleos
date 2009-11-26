@@ -461,8 +461,8 @@ int suspend_reopen;		/* Just suspend the process */
 		 * logic. Mode is expected in the COUNT field.
 		 */
 		dev_mess.COUNT = 0;
-		if(call_nr == __NR_read) 		dev_mess.COUNT = R_BIT;
-		else if(call_nr == __NR_write)	dev_mess.COUNT = W_BIT;
+		if(call_nr == __NR_read || call_nr == __NNR_read) 		dev_mess.COUNT = R_BIT;
+		else if(call_nr == __NR_write || call_nr == __NNR_write)	dev_mess.COUNT = W_BIT;
 		dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 		(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 		if (dev_mess.REP_STATUS == -EINTR) dev_mess.REP_STATUS = -EAGAIN;
@@ -486,8 +486,8 @@ int suspend_reopen;		/* Just suspend the process */
 			 * logic. Mode is expected in the COUNT field.
 			 */
 			dev_mess.COUNT = 0;
-			if(call_nr == __NR_read) 		dev_mess.COUNT = R_BIT;
-			else if(call_nr == __NR_write)	dev_mess.COUNT = W_BIT;
+			if(call_nr == __NR_read || call_nr == __NNR_read) 		dev_mess.COUNT = R_BIT;
+			else if(call_nr == __NR_write || call_nr == __NNR_write)	dev_mess.COUNT = W_BIT;
 			dev_mess.DEVICE = (dev >> MINOR) & BYTE;
 			(*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 
