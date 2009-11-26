@@ -312,8 +312,15 @@ static void msg_pipe(message *msg, struct pt_regs *r)
 }
 
 static void msg_ptrace(message *msg, struct pt_regs *r){}
+
+static void msg_read(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_p1 = (void*)r->cx;	/* buffer */
+	msg->m1_i2 = r->dx;		/* count */
+}
+
 static void msg_readlink(message *msg, struct pt_regs *r){}
-static void msg_read(message *msg, struct pt_regs *r){}
 static void msg_reboot(message *msg, struct pt_regs *r){}
 static void msg_rename(message *msg, struct pt_regs *r){}
 static void msg_rmdir(message *msg, struct pt_regs *r){}
