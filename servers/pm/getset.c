@@ -60,9 +60,13 @@ int do_get()
 
 int sys_getegid(void)
 {
-	return mp->mp_effgid;;
+	return mp->mp_effgid;
 }
 
+int sys_getgid(void)
+{
+	return mp->mp_realgid;
+}
 
 /*===========================================================================*
  *				do_set					     *

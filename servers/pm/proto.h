@@ -52,6 +52,7 @@ int wait_test(struct mproc *rmp, struct mproc *child);
 int do_get(void);
 int do_set(void);
 int sys_getegid(void);
+int sys_getgid(void);
 
 /* main.c */
 int main(void);

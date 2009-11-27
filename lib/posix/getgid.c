@@ -7,12 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-gid_t getgid()
+gid_t getgid(void)
 {
-  message m;
-
-  return( (gid_t) ksyscall(PM_PROC_NR, __NR_getgid, &m));
+	return INLINE_SYSCALL(getgid, 0);
 }
