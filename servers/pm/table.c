@@ -156,7 +156,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(cprof,		do_cprofile),
 	SCALL_HANDLER(exec,		do_exec),
 	SCALL_HANDLER(exit,		do_exit),
-	SCALL_HANDLER(fork,		no_sys),
+	SCALL_HANDLER(fork,		do_fork),
 	SCALL_HANDLER(getegid,		no_sys),
 	SCALL_HANDLER(getgid,		no_sys),
 	SCALL_HANDLER(getitimer,	no_sys),

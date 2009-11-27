@@ -214,7 +214,10 @@ static void msg_fcntl(message *msg, struct pt_regs *r)
 	msg->m1_p1 = (void*)r->dx;	/* lock */
 }
 
-static void msg_fork(message *msg, struct pt_regs *r){}
+static void msg_fork(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
 
 static void msg_fstat(message *msg, struct pt_regs *r)
 {

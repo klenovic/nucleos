@@ -7,12 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 pid_t fork(void)
 {
-  message m;
-
-  return(ksyscall(PM_PROC_NR, __NR_fork, &m));
+	return INLINE_SYSCALL(fork, 0);
 }
