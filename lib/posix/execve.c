@@ -10,11 +10,14 @@
 /*	execve() - basic program execution call		Author: Kees J. Bot
  *								21 Jan 1994
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
 #include <nucleos/string.h>
-#include <nucleos/stddef.h>
+#include <nucleos/errno.h>
+#include <asm/syscall.h>
 
+/**
+ * @nucleos: Change let kernel side setup the stack.
+ */
 int execve(const char *path, char * const *argv, char * const *envp)
 {
 	char * const *ap;
@@ -27,7 +30,6 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	size_t string_off;
 	size_t n;
 	int ov;
-	message m;
 
 	/* Assumptions: size_t and char *, it's all the same thing. */
 
@@ -110,17 +112,8 @@ int execve(const char *path, char * const *argv, char * const *envp)
 	/* Padding. */
 	while (sp < frame + frame_size) *sp++ = 0;
 
-	/* We can finally make the system call. */
-	m.m1_i1 = strlen(path) + 1;
-	m.m1_i2 = frame_size;
-	m.m1_p1 = (char *) path;
-	m.m1_p2 = frame;
+	INLINE_SYSCALL(exec, 3, path, frame, frame_size);
 
-	/* Clear unused fields */
-	m.m1_i3 = 0;
-	m.m1_p3 = NULL;
-
-	(void) ksyscall(PM_PROC_NR, __NR_exec, &m);
 	/* Failure, return the memory used for the frame and exit. */
 	(void) sbrk(-frame_size);
 

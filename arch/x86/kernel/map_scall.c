@@ -175,7 +175,13 @@ static void msg_dup2(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->cx;	/* descriptor */
 }
 
-static void msg_exec(message *msg, struct pt_regs *r){}
+static void msg_exec(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (char*)r->bx;	/* filename */
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_p2 = (char*)r->cx;	/* frame */
+	msg->m1_i2 = r->dx;		/* frame_size */
+}
 
 static void msg_exit(message *msg, struct pt_regs *r)
 {
