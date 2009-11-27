@@ -370,7 +370,7 @@ int usleep(useconds_t _useconds);
 
 extern int optreset;	/* Reset getopt state */
 
-int brk(char *_addr);
+int brk(void *addr);
 int chroot(const char *_name);
 loff_t lseek64(int fd, loff_t offset, int whence);
 int mknod(const char *_name, mode_t _mode, dev_t _addr);

@@ -585,10 +585,10 @@ int do_svrctl()
  *				brk				             *
  *===========================================================================*/
 
-extern char *_brksize;
+extern void *__curbrk;
 /* redefine brk */
 int brk(brk_addr)
-char *brk_addr;
+void *brk_addr;
 {
 	int r;
 /* PM wants to call brk() itself. */
@@ -599,7 +599,7 @@ char *brk_addr;
 #endif
 		return -1;
 	}
-	_brksize = brk_addr;
+	__curbrk = brk_addr;
 	return 0;
 }
 

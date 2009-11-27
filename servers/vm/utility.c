@@ -205,11 +205,11 @@ vir_bytes *sp;                                  /* put stack pointer here */
 /*===========================================================================*
  *                              brk                                          *
  *===========================================================================*/
-extern char *_brksize;
+extern void *__curbrk;
 
 /* Our brk() must redefine brk(). */
 int brk(brk_addr)
-char *brk_addr;
+void *brk_addr;
 {
         int r;
 	struct vmproc *vmm = &vmproc[VM_PROC_NR];
@@ -217,7 +217,7 @@ char *brk_addr;
 /* VM wants to call brk() itself. */
         if((r=real_brk(vmm, (vir_bytes) brk_addr)) != 0)
 		vm_panic("VM: brk() on myself failed\n", NO_NUM);
-        _brksize = brk_addr;
+        __curbrk = brk_addr;
         return 0;
 }
 

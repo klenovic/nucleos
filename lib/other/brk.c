@@ -10,7 +10,7 @@
 #include <nucleos/lib.h>
 #include <nucleos/unistd.h>
 
-extern char *_brksize;
+extern char *__curbrk;
 
 /* Both OSF/1 and SYSVR4 man pages specify that brk(2) returns int.
  * However, BSD4.3 specifies that brk() returns char*.  POSIX omits
@@ -21,17 +21,17 @@ extern char *_brksize;
  * as with system calls.  In this way, if a user inadvertently defines a
  * procedure brk, MINIX may continue to work because the true call is brk.
  */
-int brk(char *addr)
+int brk(void *addr)
 {
 	message m;
 
-	if (addr != _brksize) {
+	if (addr != __curbrk) {
 		m.PMBRK_ADDR = addr;
 
 		if (ksyscall(PM_PROC_NR, __NR_brk, &m) < 0)
 			return(-1);
 
-		_brksize = m.m2_p1;
+		__curbrk = m.m2_p1;
 	}
 
 	return(0);

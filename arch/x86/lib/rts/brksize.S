@@ -9,5 +9,5 @@
  */
 .section .data /* place it into .data section */
 
-.globl _brksize
-_brksize: .long __ebss
+.globl __curbrk
+__curbrk: .long __ebss

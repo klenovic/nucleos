@@ -10,14 +10,14 @@
 #include <nucleos/lib.h>
 #include <nucleos/unistd.h>
 
-extern char *_brksize;
+extern void *__curbrk;
 
 char *sbrk(int incr)
 {
   char *newsize, *oldsize;
 
-  oldsize = _brksize;
-  newsize = _brksize + incr;
+  oldsize = __curbrk;
+  newsize = __curbrk + incr;
   if ((incr > 0 && newsize < oldsize) || (incr < 0 && newsize > oldsize))
 	return( (char *) -1);
   if (brk(newsize) == 0)
