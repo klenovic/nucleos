@@ -25,6 +25,7 @@ void set_alarm(struct mproc *rmp, clock_t ticks);
 void check_vtimer(int proc_nr, int sig);
 
 /* break.c */
+long sys_brk(void);
 int do_brk(void);
 
 /* dma.c */

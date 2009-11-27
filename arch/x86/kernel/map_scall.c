@@ -112,7 +112,10 @@ static void msg_alarm(message *msg, struct pt_regs *r)
 	msg->m1_i1 = r->bx;	/* seconds */
 }
 
-static void msg_brk(message *msg, struct pt_regs *r){}
+static void msg_brk(message *msg, struct pt_regs *r)
+{
+	msg->PMBRK_ADDR = (void*)r->bx;		/* addr */
+}
 
 static void msg_chdir(message *msg, struct pt_regs *r)
 {
