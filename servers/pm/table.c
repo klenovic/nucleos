@@ -151,7 +151,7 @@ int (*call_vec[])(void) = {
 	do_getdma,	/* 110 = getdma */
 
 	/* Nucleos syscalls */
-	SCALL_HANDLER(alarm,		no_sys),
+	SCALL_HANDLER(alarm,		do_alarm),
 	SCALL_HANDLER(brk,		no_sys),
 	SCALL_HANDLER(cprof,		no_sys),
 	SCALL_HANDLER(exec,		no_sys),

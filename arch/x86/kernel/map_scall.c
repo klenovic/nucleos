@@ -107,7 +107,11 @@ static void msg_access(message *msg, struct pt_regs *r)
 	msg->m3_i2 = r->cx;		/* mode */
 }
 
-static void msg_alarm(message *msg, struct pt_regs *r){}
+static void msg_alarm(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* seconds */
+}
+
 static void msg_brk(message *msg, struct pt_regs *r){}
 
 static void msg_chdir(message *msg, struct pt_regs *r)

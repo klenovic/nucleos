@@ -7,13 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-unsigned int alarm(unsigned int sec)
+unsigned int alarm(unsigned int seconds)
 {
-  message m;
-
-  m.m1_i1 = (int) sec;
-  return( (unsigned) ksyscall(PM_PROC_NR, __NR_alarm, &m));
+	return INLINE_SYSCALL(alarm, 1, seconds);
 }
