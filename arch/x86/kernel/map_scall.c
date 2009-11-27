@@ -249,7 +249,11 @@ static void msg_getdents(message *msg, struct pt_regs *r)
 	msg->m1_i2 = (size_t)r->dx;		/* count */
 }
 
-static void msg_getegid(message *msg, struct pt_regs *r){}
+static void msg_getegid(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
+
 static void msg_getgid(message *msg, struct pt_regs *r){}
 static void msg_getitimer(message *msg, struct pt_regs *r){}
 static void msg_getpgrp(message *msg, struct pt_regs *r){}
