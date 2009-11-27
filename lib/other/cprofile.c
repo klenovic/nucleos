@@ -7,17 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int cprofile(int action, int size, char *ctl_ptr, int *mem_ptr)
 {
-  message m;
-
-  m.PROF_ACTION         = action;
-  m.PROF_MEM_SIZE       = size;
-  m.PROF_CTL_PTR        = (void *) ctl_ptr;
-  m.PROF_MEM_PTR        = (void *) mem_ptr;
-
-  return ksyscall(PM_PROC_NR, __NR_cprof, &m);
+	return INLINE_SYSCALL(cprof, 4, action, size, ctl_ptr, mem_ptr);
 }
-

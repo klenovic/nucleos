@@ -153,7 +153,7 @@ int (*call_vec[])(void) = {
 	/* Nucleos syscalls */
 	SCALL_HANDLER(alarm,		do_alarm),
 	SCALL_HANDLER(brk,		sys_brk),
-	SCALL_HANDLER(cprof,		no_sys),
+	SCALL_HANDLER(cprof,		do_cprofile),
 	SCALL_HANDLER(exec,		no_sys),
 	SCALL_HANDLER(exit,		do_exit),
 	SCALL_HANDLER(fork,		no_sys),

@@ -149,7 +149,13 @@ static void msg_close(message *msg, struct pt_regs *r)
 	msg->m1_i1 = r->bx;
 }
 
-static void msg_cprof(message *msg, struct pt_regs *r){}
+static void msg_cprof(message *msg, struct pt_regs *r)
+{
+	msg->PROF_ACTION	= r->bx;		/* action */
+	msg->PROF_MEM_SIZE	= r->cx;		/* size */
+	msg->PROF_CTL_PTR	= (void *)r->dx;	/* ctl_ptr */
+	msg->PROF_MEM_PTR	= (void *)r->si;	/* mem_ptr */
+}
 
 static void msg_creat(message *msg, struct pt_regs *r)
 {
