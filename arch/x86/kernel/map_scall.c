@@ -265,7 +265,11 @@ static void msg_getitimer(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (void*)r->cx;	/* value */
 }
 
-static void msg_getpgrp(message *msg, struct pt_regs *r){}
+static void msg_getpgrp(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
+
 static void msg_getpid(message *msg, struct pt_regs *r){}
 static void msg_getppid(message *msg, struct pt_regs *r){}
 static void msg_getpriority(message *msg, struct pt_regs *r){}
