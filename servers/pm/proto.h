@@ -23,6 +23,7 @@ int do_alarm(void);
 int do_itimer(void);
 void set_alarm(struct mproc *rmp, clock_t ticks);
 void check_vtimer(int proc_nr, int sig);
+int sys_getitimer(void);
 
 /* break.c */
 long sys_brk(void);

@@ -382,3 +382,43 @@ struct timer *tp;
 
   check_sig(rmp->mp_pid, SIGALRM);
 }
+
+/*===========================================================================*
+ *                             sys_getitimer                                 *
+ *===========================================================================*/
+int sys_getitimer(void)
+{
+	struct itimerval ovalue;	/* old interval timers */
+	int r = 0;
+
+	/* Make sure 'which' is one of the defined timers. */
+	  if (m_in.which_timer < 0 || m_in.which_timer >= NR_ITIMERS)
+		return -EINVAL;
+
+	if (!m_in.old_val)
+		return -EINVAL;
+
+	switch (m_in.which_timer) {
+	case ITIMER_REAL:
+		get_realtimer(mp, &ovalue);
+		r = 0;
+		break;
+
+	case ITIMER_VIRTUAL:
+	case ITIMER_PROF:
+		getset_vtimer(mp, m_in.which_timer, NULL, &ovalue);
+		r = 0;
+		break;
+	default:
+		r = -1;
+		break;
+	}
+
+	/* If requested, copy the old interval timer to user space. */
+	if (r == 0) {
+		r = sys_datacopy(PM_PROC_NR, (vir_bytes)&ovalue, who_e, (vir_bytes)m_in.old_val,
+				 (phys_bytes)sizeof(ovalue));
+	}
+
+	return r;
+}

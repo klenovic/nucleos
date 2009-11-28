@@ -10,8 +10,9 @@
 /* Copyright (c) 2009 Vrije Universiteit, Amsterdam.
  * See the copyright notice in file LICENSE.minix3.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/time.h>
+#include <asm/syscall.h>
 
 /*
  * This is the implementation for the function to
@@ -19,11 +20,5 @@
  */
 int getitimer(int which, struct itimerval *value)
 {
-	message m;
-
-	m.m1_i1 = which;
-	m.m1_p1 = NULL;		/* only retrieve the timer */
-	m.m1_p2 = (char *) value;
-
-	return ksyscall(PM_PROC_NR, __NR_itimer, &m);
+	return INLINE_SYSCALL(getitimer, 2, which, value);
 }
