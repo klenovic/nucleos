@@ -7,12 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int pause(void)
 {
-  message m;
-
-  return(ksyscall(PM_PROC_NR, __NR_pause, &m));
+	return INLINE_SYSCALL(pause, 0);
 }

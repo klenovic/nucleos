@@ -378,7 +378,10 @@ static void msg_open(message *msg, struct pt_regs *r)
 	msg->m1_i3 = (mode_t)r->dx;	/* mode */
 }
 
-static void msg_pause(message *msg, struct pt_regs *r){}
+static void msg_pause(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
 
 static void msg_pipe(message *msg, struct pt_regs *r)
 {
