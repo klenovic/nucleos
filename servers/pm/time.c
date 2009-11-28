@@ -19,6 +19,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/signal.h>
+#include <nucleos/time.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -89,3 +90,28 @@ int do_times()
   return 0;
 }
 
+#define ptimeval	m2_p1
+
+int sys_gettimeofday(void)
+{
+	/* Perform the time(tp) system call. This returns the time in seconds since
+	 * 1.1.1970.  Nucleos is an astrophysically naive system that assumes the earth
+	 * rotates at a constant rate and that such things as leap seconds do not
+	 * exist.
+	 */
+	clock_t uptime;
+	struct timeval tv;
+	int ret;
+	int s;
+
+	if ((s = getuptime(&uptime)) != 0)
+		panic(__FILE__,"do_gettimeofday couldn't get uptime", s);
+
+	tv.tv_sec = (boottime + (uptime/system_hz));
+	tv.tv_usec = (uptime%system_hz)*1000000/system_hz;
+
+	ret = sys_vircopy(SELF, D, (vir_bytes)&tv, mp->mp_endpoint, D, (vir_bytes)m_in.ptimeval,
+			  sizeof(struct timeval));
+
+	return (ret < 0) ? -EFAULT : 0;
+}

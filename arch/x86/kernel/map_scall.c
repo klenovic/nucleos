@@ -286,7 +286,12 @@ static void msg_getpriority(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->cx;	/* who */
 }
 
-static void msg_gettimeofday(message *msg, struct pt_regs *r){}
+static void msg_gettimeofday(message *msg, struct pt_regs *r)
+{
+	msg->m2_p1 = (void*)r->bx;	/* timeval */
+	msg->m2_l1 = r->cx;		/* timezone (expected NULL) */
+}
+
 static void msg_getuid(message *msg, struct pt_regs *r){}
 
 static void msg_ioctl(message *msg, struct pt_regs *r)

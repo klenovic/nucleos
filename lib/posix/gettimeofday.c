@@ -7,23 +7,17 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-gettimeofday.c
-*/
-
+#include <nucleos/unistd.h>
 #include <nucleos/time.h>
-#include <nucleos/lib.h>
+#include <asm/syscall.h>
 
-int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp)
+int gettimeofday(struct timeval *tv, void *tz)
 {
-	message m;
-
-	if (ksyscall(PM_PROC_NR, __NR_gettimeofday, &m) < 0)
-		return -1;
-
-	tp->tv_sec = m.m2_l1;
-	tp->tv_usec = m.m2_l2;
-
-	return 0;
+	/* @nucleos: The  use  of  the timezone structure is obsolete;
+	 *           the tz argument should normally be specified as NULL.
+	 *           It has not been and will not be supported by libc or
+	 *           glibc. Each and every occurrence of this field in the
+	 *           kernel source (other than the declaration) is a bug.
+	 */
+	return INLINE_SYSCALL(gettimeofday, 2, tv, tz);
 }
-
