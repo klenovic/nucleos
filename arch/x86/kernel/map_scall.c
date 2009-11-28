@@ -270,7 +270,11 @@ static void msg_getpgrp(message *msg, struct pt_regs *r)
 	/* no args */
 }
 
-static void msg_getpid(message *msg, struct pt_regs *r){}
+static void msg_getpid(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
+
 static void msg_getppid(message *msg, struct pt_regs *r){}
 static void msg_getpriority(message *msg, struct pt_regs *r){}
 static void msg_gettimeofday(message *msg, struct pt_regs *r){}
