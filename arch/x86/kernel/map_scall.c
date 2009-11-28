@@ -292,7 +292,10 @@ static void msg_gettimeofday(message *msg, struct pt_regs *r)
 	msg->m2_l1 = r->cx;		/* timezone (expected NULL) */
 }
 
-static void msg_getuid(message *msg, struct pt_regs *r){}
+static void msg_getuid(message *msg, struct pt_regs *r)
+{
+	/* no args */
+}
 
 static void msg_ioctl(message *msg, struct pt_regs *r)
 {

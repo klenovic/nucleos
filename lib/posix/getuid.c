@@ -7,12 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
-uid_t getuid()
+uid_t getuid(void)
 {
-  message m;
-
-  return( (uid_t) ksyscall(PM_PROC_NR, __NR_getuid, &m));
+	return INLINE_SYSCALL(getuid, 0);
 }
