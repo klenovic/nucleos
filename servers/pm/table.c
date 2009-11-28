@@ -166,7 +166,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(getpriority,	sys_getpriority),
 	SCALL_HANDLER(gettimeofday,	sys_gettimeofday),
 	SCALL_HANDLER(getuid,		sys_getuid),
-	SCALL_HANDLER(kill,		no_sys),
+	SCALL_HANDLER(kill,		do_kill),
 	SCALL_HANDLER(pause,		no_sys),
 	SCALL_HANDLER(ptrace,		no_sys),
 	SCALL_HANDLER(reboot,		no_sys),

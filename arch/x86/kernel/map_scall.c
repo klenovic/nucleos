@@ -304,7 +304,11 @@ static void msg_ioctl(message *msg, struct pt_regs *r)
 	msg->ADDRESS = (char *)r->dx;	/* data */
 }
 
-static void msg_kill(message *msg, struct pt_regs *r){}
+static void msg_kill(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = (pid_t)r->bx;	/* pid */
+	msg->m1_i2 = r->cx;	/* sig */
+}
 
 static void msg_link(message *msg, struct pt_regs *r)
 {

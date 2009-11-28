@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
-#include <nucleos/signal.h>
+#include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 /**
  * @brief kill
@@ -17,10 +17,5 @@
  */
 int kill(int proc, int sig)
 {
-	message m;
-
-	m.m1_i1 = proc;
-	m.m1_i2 = sig;
-
-	return(ksyscall(PM_PROC_NR, __NR_kill, &m));
+	return INLINE_SYSCALL(kill, 2, proc, sig);
 }
