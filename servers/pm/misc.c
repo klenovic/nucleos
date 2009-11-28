@@ -645,9 +645,12 @@ struct pciinfo *pciinfo;
 	return 0;
 }
 
-/*===========================================================================*
- *				sys_getpriority				     *
- *===========================================================================*/
+/*
+ * To avoid negative return values, "getpriority()" will
+ * not return the normal nice-value, but a negated value that
+ * has been offset by 20 (i.e. it returns 40..1 instead of -20..19)
+ * to stay compatible.
+ */
 int sys_getpriority(void)
 {
 	int arg_which, arg_who;
