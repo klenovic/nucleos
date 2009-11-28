@@ -19,29 +19,6 @@ priority.c
 #include <nucleos/string.h>
 #include <nucleos/stddef.h>
 
-
-int getpriority(int which, int who)
-{
-	int v;
-	message m;
-
-	m.m1_i1 = which;
-	m.m1_i2 = who;
-
-	/* GETPRIORITY returns negative for error.
-	 * Otherwise, it returns the priority plus the minimum
-	 * priority, to distiginuish from error. We have to
-	 * correct for this. (The user program has to check errno
-	 * to see if something really went wrong.)
-	 */
-
-	if((v = ksyscall(PM_PROC_NR, __NR_getpriority, &m)) < 0) {
-		return v;
-	}
-
-	return v + PRIO_MIN;
-}
-
 int setpriority(int which, int who, int prio)
 {
 	message m;
@@ -52,4 +29,3 @@ int setpriority(int which, int who, int prio)
 
 	return ksyscall(PM_PROC_NR, __NR_setpriority, &m);
 }
-

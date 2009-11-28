@@ -644,3 +644,42 @@ struct pciinfo *pciinfo;
 	pciinfo->pi_count = entry - pciinfo->pi_entries;
 	return 0;
 }
+
+/*===========================================================================*
+ *				sys_getpriority				     *
+ *===========================================================================*/
+int sys_getpriority(void)
+{
+	int arg_which, arg_who;
+	int retval = -ESRCH;
+	int niceval;
+	struct mproc *rmp;
+
+	arg_which = m_in.m1_i1;
+	arg_who = m_in.m1_i2;
+
+	switch (arg_which) {
+	case PRIO_PROCESS: /* Only support PRIO_PROCESS for now. */
+		if (arg_who)
+			rmp = find_proc(arg_who);
+		else
+			rmp = mp; /* current process */
+
+		if (rmp) {
+			niceval = PRIO_MIN - rmp->mp_nice;
+			if (niceval > retval)
+				retval = niceval;
+		}
+
+		break;
+
+	default:
+		return -EINVAL;
+	}
+
+	if (mp->mp_effuid != SUPER_USER && mp->mp_effuid != rmp->mp_effuid &&
+	    mp->mp_effuid != rmp->mp_realuid)
+		return -EPERM;
+
+	return retval;
+}

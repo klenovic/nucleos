@@ -280,7 +280,12 @@ static void msg_getppid(message *msg, struct pt_regs *r)
 	/* no args */
 }
 
-static void msg_getpriority(message *msg, struct pt_regs *r){}
+static void msg_getpriority(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* which */
+	msg->m1_i2 = r->cx;	/* who */
+}
+
 static void msg_gettimeofday(message *msg, struct pt_regs *r){}
 static void msg_getuid(message *msg, struct pt_regs *r){}
 

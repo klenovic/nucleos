@@ -74,6 +74,7 @@ int do_svrctl(void);
 int do_allocmem(void);
 int do_freemem(void);
 int do_getsetpriority(void);
+int sys_getpriority(void);
 
 /* profile.c */
 int do_sprofile(void);
