@@ -62,6 +62,7 @@ int sys_getuid(void);
 int sys_setegid(void);
 int sys_seteuid(void);
 int sys_setgid(void);
+int sys_setsid(void);
 
 /* main.c */
 int main(void);

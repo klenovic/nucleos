@@ -217,3 +217,23 @@ int sys_setgid(void)
 	/* Do not reply until FS has processed the request */
 	return SUSPEND;
 }
+
+int sys_setsid(void)
+{
+	register struct mproc *rmp = mp;
+	message m;
+
+	if (rmp->mp_procgrp == rmp->mp_pid)
+		return(-EPERM);
+
+	rmp->mp_procgrp = rmp->mp_pid;
+
+	m.m_type = PM_SETSID;
+	m.PM_PROC = rmp->mp_endpoint;
+
+	/* Send the request to FS */
+	tell_fs(rmp, &m);
+
+	/* Do not reply until FS has processed the request */
+	return SUSPEND;
+}
