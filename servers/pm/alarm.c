@@ -422,3 +422,58 @@ int sys_getitimer(void)
 
 	return r;
 }
+
+int sys_setitimer(void)
+{
+	struct itimerval ovalue, value;	/* old and new interval timers */
+	int r;
+
+	/* Make sure 'which' is one of the defined timers. */
+	if (m_in.which_timer < 0 || m_in.which_timer >= NR_ITIMERS)
+		return(-EINVAL);
+
+	if (!m_in.new_val)
+		return(-EINVAL);
+
+	/* Copy the new timer from user space.
+	 * Also, make sure its fields have sane values.
+	 */
+	r = sys_datacopy(who_e, (vir_bytes)m_in.new_val, PM_PROC_NR, (vir_bytes)&value,
+			 (phys_bytes)sizeof(value));
+
+	if (r != 0)
+		return r;
+
+	if (!is_sane_timeval(&value.it_value) || !is_sane_timeval(&value.it_interval))
+		return -EINVAL;
+
+	switch (m_in.which_timer) {
+	case ITIMER_REAL :
+		/* save the old value */
+		if (m_in.old_val)
+			get_realtimer(mp, &ovalue);
+
+		set_realtimer(mp, &value);
+
+		r = 0;
+		break;
+
+	case ITIMER_VIRTUAL :
+	case ITIMER_PROF :
+		getset_vtimer(mp, m_in.which_timer, &value, (m_in.old_val) ? &ovalue : NULL);
+		r = 0;
+		break;
+
+	default:
+		r = -1;
+		break;
+	}
+
+	/* If requested, copy the old interval timer to user space. */
+	if (r == 0 && m_in.old_val) {
+		r = sys_datacopy(PM_PROC_NR, (vir_bytes) &ovalue, who_e, (vir_bytes) m_in.old_val,
+				 (phys_bytes) sizeof(ovalue));
+	}
+
+	return r;
+}

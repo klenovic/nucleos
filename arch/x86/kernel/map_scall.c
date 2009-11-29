@@ -450,7 +450,13 @@ static void msg_setgid(message *msg, struct pt_regs *r)
 	msg->m1_i1 = (gid_t)r->bx;	/* gid */
 }
 
-static void msg_setitimer(message *msg, struct pt_regs *r){}
+static void msg_setitimer(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* which */
+	msg->m1_p1 = (void*)r->cx;	/* value */
+	msg->m1_p2 = (void*)r->dx;	/* ovalue */
+}
+
 static void msg_setpriority(message *msg, struct pt_regs *r){}
 static void msg_setsid(message *msg, struct pt_regs *r){}
 static void msg_setuid(message *msg, struct pt_regs *r){}
