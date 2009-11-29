@@ -60,6 +60,7 @@ int sys_getppid(void);
 int sys_getuid(void);
 int sys_setegid(void);
 int sys_seteuid(void);
+int sys_setgid(void);
 
 /* main.c */
 int main(void);
