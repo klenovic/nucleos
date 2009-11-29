@@ -469,7 +469,11 @@ static void msg_setsid(message *msg, struct pt_regs *r)
 	/* no args */
 }
 
-static void msg_setuid(message *msg, struct pt_regs *r){}
+static void msg_setuid(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = (uid_t)r->bx;	/* uid */
+}
+
 static void msg_sigaction(message *msg, struct pt_regs *r){}
 static void msg_signal(message *msg, struct pt_regs *r){}
 static void msg_sigpending(message *msg, struct pt_regs *r){}
