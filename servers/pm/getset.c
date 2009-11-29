@@ -155,7 +155,6 @@ int sys_setegid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
-	int r;
 
 	if (rmp->mp_realgid != (gid_t) m_in.grp_id && rmp->mp_effuid != SUPER_USER)
 		return -EPERM;
@@ -166,6 +165,28 @@ int sys_setegid(void)
 	m.PM_PROC = rmp->mp_endpoint;
 	m.PM_EID = rmp->mp_effgid;
 	m.PM_RID = rmp->mp_realgid;
+
+	/* Send the request to FS */
+	tell_fs(rmp, &m);
+
+	/* Do not reply until FS has processed the request */
+	return SUSPEND;
+}
+
+int sys_seteuid(void)
+{
+	register struct mproc *rmp = mp;
+	message m;
+
+	if (rmp->mp_realuid != (uid_t) m_in.usr_id && rmp->mp_effuid != SUPER_USER)
+		return -EPERM;
+
+	rmp->mp_effuid = (uid_t) m_in.usr_id;
+
+	m.m_type = PM_SETUID;
+	m.PM_PROC = rmp->mp_endpoint;
+	m.PM_EID = rmp->mp_effuid;
+	m.PM_RID = rmp->mp_realuid;
 
 	/* Send the request to FS */
 	tell_fs(rmp, &m);
