@@ -435,7 +435,11 @@ static void msg_select(message *msg, struct pt_regs *r)
 	msg->SEL_TIMEOUT = (char *) r->di;	/* timeout */
 }
 
-static void msg_setegid(message *msg, struct pt_regs *r){}
+static void msg_setegid(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = (gid_t)r->bx;	/* gid */
+}
+
 static void msg_seteuid(message *msg, struct pt_regs *r){}
 static void msg_setgid(message *msg, struct pt_regs *r){}
 static void msg_setitimer(message *msg, struct pt_regs *r){}
