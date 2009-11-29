@@ -457,7 +457,13 @@ static void msg_setitimer(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (void*)r->dx;	/* ovalue */
 }
 
-static void msg_setpriority(message *msg, struct pt_regs *r){}
+static void msg_setpriority(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* which */
+	msg->m1_i2 = r->cx;	/* who */
+	msg->m1_i3 = r->dx;	/* prio */
+}
+
 static void msg_setsid(message *msg, struct pt_regs *r){}
 static void msg_setuid(message *msg, struct pt_regs *r){}
 static void msg_sigaction(message *msg, struct pt_regs *r){}

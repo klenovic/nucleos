@@ -686,3 +686,56 @@ int sys_getpriority(void)
 
 	return retval;
 }
+
+int sys_setpriority(void)
+{
+	int r, which, who, niceval;
+	int error = -EINVAL;
+	struct mproc *rmp;
+
+	which = m_in.m1_i1;
+	who = m_in.m1_i2;
+	niceval = m_in.m1_i3;
+
+	/* @nucleos: Only PRIO_PROCESS is supported */
+	if (which > PRIO_USER || which < PRIO_PROCESS)
+		goto out;
+
+	/* normalize: avoid signed division (rounding problems) */
+	error = -ESRCH;
+	if (niceval < -20)
+		niceval = -20;
+	if (niceval > 19)
+		niceval = 19;
+
+	switch (which) {
+	case PRIO_PROCESS:
+		if (who)
+			rmp = find_proc(who);
+		else
+			rmp = mp; /* current process */
+
+		if (rmp != NIL_PROC)
+			error = 0;
+		break;
+
+	default:
+		return -EINVAL;
+	}
+
+	if (mp->mp_effuid != SUPER_USER && mp->mp_effuid != rmp->mp_effuid &&
+	    mp->mp_effuid != rmp->mp_realuid)
+		return -EPERM;
+
+	/* Only root is allowed to reduce the nice level. */
+	if (rmp->mp_nice > niceval && mp->mp_effuid != SUPER_USER)
+		return -EACCES;
+	
+	if ((r = sys_nice(rmp->mp_endpoint, niceval)) != 0)
+		return r;
+
+	rmp->mp_nice = niceval;
+
+out:
+	return error;
+}

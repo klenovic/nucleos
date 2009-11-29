@@ -7,25 +7,17 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-priority.c
-*/
-
-#include <nucleos/errno.h>
-#include <nucleos/types.h>
-#include <nucleos/resource.h>
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
-#include <nucleos/string.h>
-#include <nucleos/stddef.h>
+#include <asm/syscall.h>
 
 int setpriority(int which, int who, int prio)
 {
-	message m;
+	/* We have to scale prio between MIN_USER_Q and MAX_USER_Q to match
+	 * the kernel's scheduling queues.
+	 * The final nice value is:
+	 * niceval = MAX_USER_Q + (prio - PRIO_MIN) * (MIN_USER_Q - MAX_USER_Q + 1) /
+	 *           (PRIO_MAX-PRIO_MIN+1);
+	 */
 
-	m.m1_i1 = which;
-	m.m1_i2 = who;
-	m.m1_i3 = prio;
-
-	return ksyscall(PM_PROC_NR, __NR_setpriority, &m);
+	return INLINE_SYSCALL(setpriority, 3, which, who, prio);
 }

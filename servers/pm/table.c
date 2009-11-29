@@ -174,7 +174,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(seteuid,		sys_seteuid),
 	SCALL_HANDLER(setgid,		sys_setgid),
 	SCALL_HANDLER(setitimer,	sys_setitimer),
-	SCALL_HANDLER(setpriority,	no_sys),
+	SCALL_HANDLER(setpriority,	sys_setpriority),
 	SCALL_HANDLER(setsid,		no_sys),
 	SCALL_HANDLER(setuid,		no_sys),
 	SCALL_HANDLER(sigaction,	no_sys),
