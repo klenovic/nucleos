@@ -480,7 +480,15 @@ static void msg_sigpending(message *msg, struct pt_regs *r){}
 static void msg_sigprocmask(message *msg, struct pt_regs *r){}
 static void msg_sigreturn(message *msg, struct pt_regs *r){}
 static void msg_sigsuspend(message *msg, struct pt_regs *r){}
-static void msg_sprof(message *msg, struct pt_regs *r){}
+
+static void msg_sprof(message *msg, struct pt_regs *r)
+{
+	msg->PROF_ACTION = r->bx;		/* action */
+	msg->PROF_MEM_SIZE = r->cx;		/* size */
+	msg->PROF_FREQ = r->dx;			/* freq */
+	msg->PROF_CTL_PTR = (void*)r->si;	/* ctl_ptr */
+	msg->PROF_MEM_PTR = (void*)r->di;	/* mem_ptr */
+}
 
 static void msg_stat(message *msg, struct pt_regs *r)
 {

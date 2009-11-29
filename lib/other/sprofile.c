@@ -7,18 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
+#include <asm/syscall.h>
 
 int sprofile(int action, int size, int freq, char *ctl_ptr, int *mem_ptr)
 {
-  message m;
-
-  m.PROF_ACTION         = action;
-  m.PROF_MEM_SIZE       = size;
-  m.PROF_FREQ           = freq;
-  m.PROF_CTL_PTR        = (void *) ctl_ptr;
-  m.PROF_MEM_PTR        = (void *) mem_ptr;
-
-  return ksyscall(PM_PROC_NR, __NR_sprof, &m);
+	return INLINE_SYSCALL(sprof, 5, action, size, freq, ctl_ptr, mem_ptr);
 }
-
