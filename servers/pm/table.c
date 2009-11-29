@@ -169,7 +169,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(kill,		do_kill),
 	SCALL_HANDLER(pause,		do_pause),
 	SCALL_HANDLER(ptrace,		no_sys),
-	SCALL_HANDLER(reboot,		no_sys),
+	SCALL_HANDLER(reboot,		do_reboot),
 	SCALL_HANDLER(setegid,		no_sys),
 	SCALL_HANDLER(seteuid,		no_sys),
 	SCALL_HANDLER(setgid,		no_sys),

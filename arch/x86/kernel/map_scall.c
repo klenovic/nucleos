@@ -405,7 +405,12 @@ static void msg_readlink(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->dx;		/* bufsiz */
 }
 
-static void msg_reboot(message *msg, struct pt_regs *r){}
+static void msg_reboot(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* how */
+	msg->m1_p1 = (void*)r->cx;	/* code */
+	msg->m1_i2 = (size_t)r->dx	/* size of code */;
+}
 
 static void msg_rename(message *msg, struct pt_regs *r)
 {

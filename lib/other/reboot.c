@@ -18,15 +18,16 @@
 
 int reboot(int how, ...)
 {
-  message m;
-  va_list ap;
+	void *code = 0;
+	size_t size = 0;
+	va_list ap;
 
-  va_start(ap, how);
-  if ((m.m1_i1 = how) == RBT_MONITOR) {
-	m.m1_p1 = va_arg(ap, char *);
-	m.m1_i2 = va_arg(ap, size_t);
-  }
-  va_end(ap);
+	va_start(ap, how);
+	if (how == RBT_MONITOR) {
+		code = va_arg(ap, void*);
+		size = va_arg(ap, size_t);
+	}
+	va_end(ap);
 
-  return ksyscall(PM_PROC_NR, __NR_reboot, &m);
+	return INLINE_SYSCALL(reboot, 3, how, code, size);
 }
