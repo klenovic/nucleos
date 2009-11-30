@@ -110,6 +110,7 @@ int do_time(void);
 int do_times(void);
 int sys_gettimeofday(void);
 int scall_stime(void);
+int sys_time(void);
 
 /* timers.c */
 void pm_set_timer(timer_t *tp, int delta, tmr_func_t watchdog, int arg);

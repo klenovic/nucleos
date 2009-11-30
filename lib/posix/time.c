@@ -7,14 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/time.h>
+#include <asm/syscall.h>
 
 time_t time(time_t *tp)
 {
-  message m;
-
-  if (ksyscall(PM_PROC_NR, __NR_time, &m) < 0) return( (time_t) -1);
-  if (tp != (time_t *) 0) *tp = m.m2_l1;
-  return(m.m2_l1);
+	return INLINE_SYSCALL(time, 1, tp);
 }

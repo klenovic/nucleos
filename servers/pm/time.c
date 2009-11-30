@@ -149,3 +149,34 @@ int scall_stime(void)
 
 	return 0;
 }
+
+#define p_time		m1_p1
+
+int sys_time(void)
+{
+	/* Perform the time(tp) system call. This returns the time in seconds since 
+	 * 1.1.1970.  MINIX is an astrophysically naive system that assumes the earth 
+	 * rotates at a constant rate and that such things as leap seconds do not 
+	 * exist.
+	 */
+	clock_t uptime, boottime;
+	time_t t;
+	int err;
+	int s;
+
+	if ((s = getuptime2(&uptime, &boottime)) != 0) 
+		panic(__FILE__,"do_time couldn't get uptime", s);
+
+	t = (time_t)(boottime + (uptime/system_hz));
+
+	/* if argument is not NULL then make a copy there too */
+	if (m_in.p_time != 0) {
+		err = sys_vircopy(SELF, D, (vir_bytes)&t, mp->mp_endpoint, D, (vir_bytes)m_in.p_time,
+				  sizeof(time_t));
+
+		if (err != 0)
+			return -EFAULT;
+	}
+
+	return t;
+}
