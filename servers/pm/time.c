@@ -115,3 +115,37 @@ int sys_gettimeofday(void)
 
 	return (ret < 0) ? -EFAULT : 0;
 }
+
+#define pstime		m2_p1
+
+int scall_stime(void)
+{
+	/* Perform the stime(tp) system call. Retrieve the system's uptime (ticks 
+	 * since boot) and pass the new time in seconds at system boot to the kernel.
+	 */
+	clock_t uptime, boottime;
+	time_t t;
+	int err;
+	int s;
+
+	if (mp->mp_effuid != SUPER_USER) { 
+		return -EPERM;
+	}
+
+	if ((s=getuptime(&uptime)) != 0)
+		panic(__FILE__,"do_stime couldn't get uptime", s);
+
+	err = sys_vircopy(mp->mp_endpoint, D, (vir_bytes)m_in.pstime, SELF, D, (vir_bytes)&t, sizeof(time_t));
+
+	if (err != 0)
+		return -EFAULT;
+
+	boottime = (long)t - (uptime/system_hz);
+
+	s = sys_stime(boottime);		/* Tell kernel about boottime */
+
+	if (s != 0)
+		panic(__FILE__, "pm: sys_stime failed", s);
+
+	return 0;
+}
