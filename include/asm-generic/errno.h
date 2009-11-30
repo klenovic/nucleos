@@ -24,12 +24,12 @@
 
 /* The following errors relate to networking. */
 #define EPACKSIZE		50  /* invalid packet size for some protocol */
-#define EOUTOFBUFS		51  /* not enough buffers left */
+#define ENOBUFS			51  /* not enough buffers left */
 #define EBADIOCTL		52  /* illegal ioctl for device */
 #define EBADMODE		53  /* badmode in ioctl */
 #define EWOULDBLOCK		54  /* call would block on nonblocking socket */
-#define EBADDEST		55  /* not a valid destination address */
-#define EDSTNOTRCH		56  /* destination not reachable */
+#define ENETUNREACH		55  /* network unreachable */
+#define EHOSTUNREACH		56  /* host unreachable */
 #define EISCONN			57  /* already connected */
 #define EADDRINUSE		58  /* address in use */
 #define ECONNREFUSED		59  /* connection refused */
@@ -50,6 +50,7 @@
 #define ENOTSOCK		74  /* Socket operation on non-socket */
 #define ENOPROTOOPT		75  /* Protocol not available */
 #define EOPNOTSUPP		76  /* Operation not supported */
+#define ENETDOWN		77  /* network is down */
 #define EILSEQ			84  /* Illegal byte sequence */
 
 #endif /* __ASM_GENERIC_ERRNO_H */

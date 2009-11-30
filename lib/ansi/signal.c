@@ -21,7 +21,7 @@ sighandler_t signal(int sig, sighandler_t disp)
 {
 	struct sigaction sa, osa;
 
-	if (sig <= 0 || sig > _NSIG || sig == SIGKILL) {
+	if (sig <= 0 || sig >= _NSIG || sig == SIGKILL) {
 		errno = EINVAL;
 		return(SIG_ERR);
 	}

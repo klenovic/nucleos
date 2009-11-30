@@ -28,9 +28,6 @@ extern int (*call_vec[])(void);	/* system call handlers */
 extern sigset_t core_sset;	/* which signals cause core images */
 extern sigset_t ign_sset;	/* which signals are by default ignored */
 
-extern time_t boottime;		/* time when the system was booted (for
-				 * reporting to FS_PROC_NR)
-				 */
 extern u32_t system_hz;		/* System clock frequency. */
 extern int abort_flag;
 extern char monitor_code[256];

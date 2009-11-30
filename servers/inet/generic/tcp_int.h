@@ -245,7 +245,7 @@ int tcp_su4listen(tcp_fd_t *tcp_fd, tcp_conn_t *tcp_conn, int do_listenq);
 void tcp_reply_ioctl(tcp_fd_t *tcp_fd, int reply);
 void tcp_reply_write(tcp_fd_t *tcp_fd, size_t reply);
 void tcp_reply_read(tcp_fd_t *tcp_fd, size_t reply);
-void tcp_notreach(tcp_conn_t *tcp_conn);
+void tcp_notreach(tcp_conn_t *tcp_conn, int error);
 void tcp_mtu_exceeded(tcp_conn_t *tcp_conn);
 void tcp_mtu_incr(tcp_conn_t *tcp_conn);
 

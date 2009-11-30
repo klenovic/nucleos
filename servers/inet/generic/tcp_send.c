@@ -128,12 +128,13 @@ tcp_port_t *tcp_port;
 					tcp_mtu_exceeded(tcp_conn);
 					continue;
 				}
-				if (r == -EDSTNOTRCH)
+				if (r == -EHOSTUNREACH || r == -ENETUNREACH ||
+					r == -ENETDOWN)
 				{
-					tcp_notreach(tcp_conn);
+					tcp_notreach(tcp_conn, r);
 					continue;
 				}
-				if (r == -EBADDEST)
+				if (r == -EAFNOSUPPORT)
 					continue;
 			}
 			assert(r == 0 ||

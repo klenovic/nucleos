@@ -347,10 +347,10 @@ int type;
 			ip_port->ip_dl.dl_eth.de_arp_tail= eth_pack;
 			return 0;
 		}
-		if (r == -EDSTNOTRCH)
+		if (r == -EHOSTUNREACH)
 		{
 			bf_afree(eth_pack);
-			return -EDSTNOTRCH;
+			return r;
 		}
 		assert(r == 0);
 	}
@@ -600,7 +600,7 @@ ether_addr_t *eth_addr;
 		/* Dequeue the packet */
 		ip_port->ip_dl.dl_eth.de_arp_head= eth_pack->acc_ext_link;
 
-		if (r == -EDSTNOTRCH)
+		if (r == -EHOSTUNREACH)
 		{
 			bf_afree(eth_pack);
 			continue;

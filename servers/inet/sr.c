@@ -91,8 +91,8 @@ static int sr_select(message *m);
 static void sr_status(message *m);
 static void sr_reply_(mq_t *m, int reply, int is_revive);
 static sr_fd_t *sr_getchannel(int minor);
-static acc_t *sr_get_userdata(int fd, vir_bytes offset, vir_bytes count, int for_ioctl);
-static int sr_put_userdata(int fd, vir_bytes offset, acc_t *data, int for_ioctl);
+static acc_t *sr_get_userdata(int fd, size_t offset, size_t count, int for_ioctl);
+static int sr_put_userdata(int fd, size_t offset, acc_t *data, int for_ioctl);
 static void sr_select_res(int fd, unsigned ops);
 static int sr_repl_queue(int proc, int ref, int operation);
 static int walk_queue(sr_fd_t *sr_fd, mq_t **q_head_ptr, mq_t **q_tail_ptr, int type,
@@ -810,8 +810,8 @@ int is_revive;
 
 static acc_t *sr_get_userdata (fd, offset, count, for_ioctl)
 int fd;
-vir_bytes offset;
-vir_bytes count;
+size_t offset;
+size_t count;
 int for_ioctl;
 {
 	sr_fd_t *loc_fd;
@@ -900,7 +900,7 @@ assert (loc_fd->srf_flags & ip_flag);
 
 static int sr_put_userdata (fd, offset, data, for_ioctl)
 int fd;
-vir_bytes offset;
+size_t offset;
 acc_t *data;
 int for_ioctl;
 {

@@ -13,7 +13,7 @@
 
 #define BLOCK_SIZE	1024
 
-static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname, char *frame,
+static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname, char *frame,
 		    int frame_len);
 static int read_header(char *exec, size_t exec_len, int *sep_id, vir_bytes *text_bytes,
 		       vir_bytes *data_bytes, vir_bytes *bss_bytes, phys_bytes *tot_bytes,
@@ -27,8 +27,6 @@ static int exec_restart(int proc_e, int result);
 static void patch_ptr(char stack[ARG_MAX],vir_bytes base);
 static int read_seg(char *exec, size_t exec_len, off_t off, int proc_e, int seg,
 		    phys_bytes seg_bytes);
-
-static int self_e= NONE;
 
 int dev_execve(int proc_e, char *exec, size_t exec_len, char **argv,
 	char **Xenvp)
@@ -44,6 +42,7 @@ int dev_execve(int proc_e, char *exec, size_t exec_len, char **argv,
 	size_t n;
 	int ov;
 	message m;
+	int r;
 
 	/* Assumptions: size_t and char *, it's all the same thing. */
 
@@ -122,14 +121,14 @@ printf("here: %s, %d\n", __FILE__, __LINE__);
 	while (sp < frame + frame_size) *sp++= 0;
 
 	(progname=strrchr(argv[0], '/')) ? progname++ : (progname=argv[0]);
-	do_exec(proc_e, exec, exec_len, progname, frame, frame_size);
+	r = do_exec(proc_e, exec, exec_len, progname, frame, frame_size);
 
-	/* Failure, return the memory used for the frame and exit. */
+	/* Return the memory used for the frame and exit. */
 	(void) sbrk(-frame_size);
-	return -1;
+	return r;
 }
 
-static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
+static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	char *frame, int frame_len)
 {
 	int r;
@@ -144,8 +143,6 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 
 	need_restart= 0;
 	error= 0;
-
-	self_e = getnprocnr(getpid());
 
 	/* Read the file header and extract the segment sizes. */
 	r = read_header(exec, exec_len, &sep_id,
@@ -172,7 +169,7 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		goto fail;
 	}
 
-	/* Patch up stack and copy it from FS_PROC_NR to new core image. */
+	/* Patch up stack and copy it from RS to new core image. */
 	vsp = stack_top;
 	vsp -= frame_len;
 	patch_ptr(frame, vsp);
@@ -181,7 +178,9 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	if (r != 0) {
 		printf("RS: stack_top is 0x%lx; tried to copy to 0x%lx in %d\n",
 			stack_top, vsp);
-		panic("RS", "do_exec: stack copy err on", proc_e);
+		printf("do_exec: copying out new stack failed: %d\n", r);
+		error= r;
+		goto fail;
 	}
 
 	off = hdrlen;
@@ -208,14 +207,14 @@ static void do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		goto fail;
 	}
 
-	exec_restart(proc_e, 0);
-
-	return;
+	return exec_restart(proc_e, 0);
 
 fail:
 	printf("do_exec(fail): error = %d\n", error);
 	if (need_restart)
 		exec_restart(proc_e, error);
+
+	return error;
 }
 
 /*===========================================================================*

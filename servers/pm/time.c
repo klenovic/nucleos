@@ -32,10 +32,10 @@ int do_time()
  * rotates at a constant rate and that such things as leap seconds do not 
  * exist.
  */
-  clock_t uptime;
+  clock_t uptime, boottime;
   int s;
 
-  if ( (s=getuptime(&uptime)) != 0) 
+  if ( (s=getuptime2(&uptime, &boottime)) != 0) 
   	panic(__FILE__,"do_time couldn't get uptime", s);
 
   mp->mp_reply.reply_time = (time_t) (boottime + (uptime/system_hz));
@@ -49,10 +49,9 @@ int do_time()
 int do_stime()
 {
 /* Perform the stime(tp) system call. Retrieve the system's uptime (ticks 
- * since boot) and store the time in seconds at system boot in the global
- * variable 'boottime'.
+ * since boot) and pass the new time in seconds at system boot to the kernel.
  */
-  clock_t uptime;
+  clock_t uptime, boottime;
   int s;
 
   if (mp->mp_effuid != SUPER_USER) { 

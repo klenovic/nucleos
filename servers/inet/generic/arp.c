@@ -924,7 +924,7 @@ ether_addr_t *ethaddr;
 			return 0;
 		}
 		if (ce->ac_state == ACS_UNREACHABLE)
-			return -EDSTNOTRCH;
+			return -EHOSTUNREACH;
 		assert(ce->ac_state == ACS_INCOMPLETE);
 
 		return NW_SUSPEND;

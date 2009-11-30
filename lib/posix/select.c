@@ -9,6 +9,7 @@
  */
 #include <nucleos/lib.h>
 #include <nucleos/time.h>
+#include <nucleos/select.h>
 
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
 	   struct timeval *timeout)

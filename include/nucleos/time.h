@@ -12,6 +12,7 @@
 
 #include <nucleos/types.h>
 
+
 /* Open Group Base Specifications Issue 6 (not complete) */
 struct timeval
 {
@@ -43,6 +44,8 @@ struct itimerval
 int getitimer(int which, struct itimerval *value);
 int setitimer(int which, const struct itimerval *__restrict value,
 	      struct itimerval *__restrict ovalue);
+
+#include <nucleos/select.h>
 
 #define NFDBITS			__NFDBITS
 
@@ -93,5 +96,7 @@ struct timespec
 int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
+
+
 
 #endif /* __NUCLEOS_TIME_H */
