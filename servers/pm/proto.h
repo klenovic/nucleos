@@ -83,6 +83,7 @@ int do_freemem(void);
 int do_getsetpriority(void);
 int sys_getpriority(void);
 int sys_setpriority(void);
+int sys_uname(void);
 
 /* profile.c */
 int do_sprofile(void);

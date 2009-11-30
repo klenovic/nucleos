@@ -28,8 +28,7 @@ struct utsname uts_val = {
 	.release	= UTS_RELEASE,
 	.version	= UTS_VERSION,
 	.machine	= UTS_MACHINE,
-//	.domainname	= UTS_DOMAINNAME,
-	.arch	= "i386",
+	.domainname	= UTS_DOMAINNAME,
 };
 
 /* FIXED STRINGS! Don't touch! */

@@ -185,7 +185,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(sigsuspend,	no_sys),
 	SCALL_HANDLER(sprof,		do_sprofile),
 	SCALL_HANDLER(stime,		scall_stime),
-	SCALL_HANDLER(sysuname,		no_sys),
+	SCALL_HANDLER(uname,		sys_uname),
 	SCALL_HANDLER(time,		no_sys),
 	SCALL_HANDLER(times,		no_sys),
 	SCALL_HANDLER(waitpid,		no_sys),

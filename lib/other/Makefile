@@ -2,7 +2,7 @@
 lib-y := libnucc.a
 libnucc.a-obj-y := _pm_findproc.o adddma.o brk.o cprofile.o deldma.o devctl.o getdents.o getdma.o \
 		   getnpid.o getnprocnr.o getpprocnr.o getprocnr.o getsigset.o getsysinfo.o lseek64.o \
-		   mapdriver5.o mount.o reboot.o sbrk.o seekdir.o sprofile.o svrctl.o sysuname.o vm_dmacalls.o \
+		   mapdriver5.o mount.o reboot.o sbrk.o seekdir.o sprofile.o svrctl.o vm_dmacalls.o \
 		   asynchio.o basename.o bcmp.o bcopy.o bzero.o configfile.o crypt.o ctermid.o cuserid.o \
 		   environ.o errno.o fdopen.o ffs.o flock.o fslib.o fts.o fsversion.o getgrent.o getlogin.o \
 		   getpagesize.o getpass.o getpwent.o getttyent.o getw.o hypot.o index.o itoa.o \

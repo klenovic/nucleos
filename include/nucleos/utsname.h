@@ -10,13 +10,15 @@
 #ifndef __NUCLEOS_UTSNAME_H
 #define __NUCLEOS_UTSNAME_H
 
+#define __UTS_LEN	64
+
 struct utsname {
-	char sysname[64+1];
-	char nodename[64+1];
-	char release[64+1];
-	char version[64];
-	char machine[64+1];
-	char arch[64+1];
+	char sysname[__UTS_LEN + 1];
+	char nodename[__UTS_LEN + 1];
+	char release[__UTS_LEN + 1];
+	char version[__UTS_LEN + 1];
+	char machine[__UTS_LEN + 1];
+	char domainname[__UTS_LEN + 1];
 };
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)

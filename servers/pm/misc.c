@@ -45,7 +45,6 @@
 extern struct utsname uts_val;
 
 static char *uts_tbl[] = {
-  uts_val.arch,
   NULL,			/* No kernel architecture */
   uts_val.machine,
   NULL,			/* No hostname */
@@ -738,4 +737,20 @@ int sys_setpriority(void)
 
 out:
 	return error;
+}
+
+#define p_utsbuf	m1_p1
+
+int sys_uname(void)
+{
+	int err;
+
+	err = sys_vircopy(SELF, D, (vir_bytes)&uts_val,
+			  mp->mp_endpoint, D, (vir_bytes)m_in.p_utsbuf,
+			  sizeof(struct utsname));
+
+	if (err != 0)
+		return -EFAULT;
+
+	return 0;
 }

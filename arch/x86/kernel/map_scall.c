@@ -515,7 +515,11 @@ static void msg_sync(message *msg, struct pt_regs *r)
 	/* no args */
 }
 
-static void msg_sysuname(message *msg, struct pt_regs *r){}
+static void msg_uname(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (void*)r->bx;	/* utsname */
+}
+
 static void msg_time(message *msg, struct pt_regs *r){}
 static void msg_times(message *msg, struct pt_regs *r){}
 
@@ -638,7 +642,7 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(symlink,		FS),
 	SCALL_TO_SRV(sync,		FS),	/* 70 */
 
-	SCALL_TO_SRV(sysuname,		PM),
+	SCALL_TO_SRV(uname,		PM),
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
 	SCALL_TO_SRV(truncate,		FS),
