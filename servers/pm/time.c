@@ -99,12 +99,12 @@ int sys_gettimeofday(void)
 	 * rotates at a constant rate and that such things as leap seconds do not
 	 * exist.
 	 */
-	clock_t uptime;
+	clock_t uptime, boottime;
 	struct timeval tv;
 	int ret;
 	int s;
 
-	if ((s = getuptime(&uptime)) != 0)
+	if ((s = getuptime2(&uptime, &boottime)) != 0)
 		panic(__FILE__,"do_gettimeofday couldn't get uptime", s);
 
 	tv.tv_sec = (boottime + (uptime/system_hz));
