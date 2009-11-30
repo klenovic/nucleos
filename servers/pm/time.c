@@ -20,6 +20,7 @@
 #include <nucleos/com.h>
 #include <nucleos/signal.h>
 #include <nucleos/time.h>
+#include <nucleos/times.h>
 #include "mproc.h"
 #include "param.h"
 
@@ -179,4 +180,32 @@ int sys_time(void)
 	}
 
 	return t;
+}
+
+#define p_timesbuf	m1_p1
+
+int scall_times(void)
+{
+	/* Perform the times(buffer) system call. */
+	register struct mproc *rmp = mp;
+	clock_t user_time, sys_time, uptime;
+	struct tms buf;
+	int err;
+	int s;
+
+	if ((s = sys_times(who_e, &user_time, &sys_time, &uptime)) != 0)
+		panic(__FILE__,"do_times couldn't get times", s);
+
+	buf.tms_utime = user_time;		/* user time */
+	buf.tms_stime = sys_time;		/* system time */
+	buf.tms_cutime = rmp->mp_child_utime;	/* child user time */
+	buf.tms_cstime = rmp->mp_child_stime;	/* child system time */
+
+	err = sys_vircopy(SELF, D, (vir_bytes)&buf, mp->mp_endpoint, D, (vir_bytes)m_in.p_timesbuf,
+			  sizeof(struct tms));
+
+	if (err != 0)
+		return -EFAULT;
+
+	return uptime;
 }

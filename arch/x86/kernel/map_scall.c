@@ -525,7 +525,10 @@ static void msg_time(message *msg, struct pt_regs *r)
 	msg->m1_p1 = (void*)r->bx;	/* time */
 }
 
-static void msg_times(message *msg, struct pt_regs *r){}
+static void msg_times(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (void*)r->bx;	/* times */
+}
 
 static void msg_truncate(message *msg, struct pt_regs *r)
 {
