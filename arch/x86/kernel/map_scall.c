@@ -499,7 +499,7 @@ static void msg_stat(message *msg, struct pt_regs *r)
 
 static void msg_stime(message *msg, struct pt_regs *r)
 {
-	msg->m2_p1 = (time_t*)r->bx;	/* time */
+	msg->m2_p1 = (void*)r->bx;	/* time */
 }
 
 static void msg_symlink(message *msg, struct pt_regs *r)
