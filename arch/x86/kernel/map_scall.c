@@ -492,7 +492,13 @@ static void msg_sigpending(message *msg, struct pt_regs *r)
 	msg->m1_p1 = (void*)r->bx;	/* set */
 }
 
-static void msg_sigprocmask(message *msg, struct pt_regs *r){}
+static void msg_sigprocmask(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;		/* how */
+	msg->m1_p1 = (void*)r->cx;	/* set */
+	msg->m1_p2 = (void*)r->dx;	/* oldset */
+}
+
 static void msg_sigreturn(message *msg, struct pt_regs *r){}
 static void msg_sigsuspend(message *msg, struct pt_regs *r){}
 

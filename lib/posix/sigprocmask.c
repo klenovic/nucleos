@@ -7,26 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/signal.h>
+#include <asm/syscall.h>
 
-int sigprocmask(int how, const sigset_t *set, sigset_t *oset)
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
-	message m;
-
-	if (set == (sigset_t *) NULL) {
-		m.m2_i1 = SIG_INQUIRE;
-		m.m2_l1 = 0;
-	} else {
-		m.m2_i1 = how;
-		m.m2_l1 = (long) *set;
-	}
-
-	if (ksyscall(PM_PROC_NR, __NR_sigprocmask, &m) < 0)
-		return(-1);
-
-	if (oset != (sigset_t *) NULL)
-		*oset = (sigset_t) (m.m2_l1);
-
-	return(m.m_type);
+	return INLINE_SYSCALL(sigprocmask, 3, how, set, oldset);
 }

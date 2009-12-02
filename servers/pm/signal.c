@@ -747,7 +747,9 @@ void vm_notify_sig_wrapper(endpoint_t ep)
   }
 }
 
-#define p_set	m1_p1
+#define p_set		m1_p1
+#define how_value	m1_i1
+#define p_oldset	m1_p2
 
 int sys_sigpending(void)
 {
@@ -762,6 +764,88 @@ int sys_sigpending(void)
 
 	if (err != 0)
 		return -EFAULT;
+
+	return 0;
+}
+
+int sys_sigprocmask(void)
+{
+	/* Note that the library interface passes the actual mask in sigmask_set,
+	 * not a pointer to the mask, in order to save a copy.  Similarly,
+	 * the old mask is placed in the return message which the library
+	 * interface copies (if requested) to the user specified address.
+	 *
+	 * KILL and STOP can't be masked.
+	 */
+	int i;
+	int err;
+	sigset_t set;
+
+	/* If `set' is null then ignore `how' and store the sigmask into `oldset' */
+	if (!m_in.p_set) {
+		if (m_in.p_oldset) {
+			err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigmask,
+					  mp->mp_endpoint, (vir_bytes)m_in.p_oldset,
+					  sizeof(sigset_t));
+
+			if (err != 0)
+				return -EFAULT;
+
+		} else {
+			return -EFAULT;
+		}
+
+		return 0;
+	}
+
+	/* if `oldset' non-null then make a copy */
+	if (m_in.p_oldset) {
+		err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigmask,
+				   mp->mp_endpoint, (vir_bytes)m_in.p_oldset,
+				   sizeof(sigset_t));
+
+		if (err != 0)
+			return -EFAULT;
+	}
+
+	/* Get the new `set'. */
+	err = sys_datacopy(mp->mp_endpoint, (vir_bytes)m_in.p_set,
+			   SELF, (vir_bytes)&set,
+			   sizeof(sigset_t));
+
+	if (err != 0)
+		return -EFAULT;
+
+	switch (m_in.how_value) {
+	case SIG_BLOCK:
+		sigdelset((sigset_t *)&set, SIGKILL);
+		sigdelset((sigset_t *)&set, SIGSTOP);
+
+		for (i = 1; i < _NSIG; i++) {
+			if (sigismember((sigset_t *)&set, i))
+				sigaddset(&mp->mp_sigmask, i);
+		}
+		break;
+
+	case SIG_UNBLOCK:
+		for (i = 1; i < _NSIG; i++) {
+			if (sigismember((sigset_t *)&set, i))
+				sigdelset(&mp->mp_sigmask, i);
+		}
+		check_pending(mp);
+		break;
+
+	case SIG_SETMASK:
+		sigdelset((sigset_t *) &set, SIGKILL);
+		sigdelset((sigset_t *) &set, SIGSTOP);
+		mp->mp_sigmask = (sigset_t)set;
+		check_pending(mp);
+		break;
+
+	default:
+		return -EINVAL;
+		break;
+	}
 
 	return 0;
 }
