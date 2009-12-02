@@ -7,22 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <asm/sigcontext.h>
 #include <nucleos/signal.h>
+#include <asm/syscall.h>
 
-int __sigreturn(void);
+extern int __sigreturn(void);
 
 int sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 {
-	message m;
-
-	m.m1_i2 = sig;
-
-	/* XXX - yet more type puns because message struct is short of types. */
-	m.m1_p1 = (char *) act;
-	m.m1_p2 = (char *) oact;
-	m.m1_p3 = (char *) __sigreturn;
-
-	return(ksyscall(PM_PROC_NR, __NR_sigaction, &m));
+	return INLINE_SYSCALL(sigaction, 4, sig, act, oact, __sigreturn);
 }

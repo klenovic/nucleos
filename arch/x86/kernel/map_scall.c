@@ -474,7 +474,14 @@ static void msg_setuid(message *msg, struct pt_regs *r)
 	msg->m1_i1 = (uid_t)r->bx;	/* uid */
 }
 
-static void msg_sigaction(message *msg, struct pt_regs *r){}
+static void msg_sigaction(message *msg, struct pt_regs *r)
+{
+	msg->m1_i2 = r->bx;		/* sig */
+	msg->m1_p1 = (void*)r->cx;	/* act */
+	msg->m1_p2 = (void*)r->dx;	/* oact */
+	msg->m1_p3 = (void*)r->si;	/* __sigreturn */
+}
+
 static void msg_signal(message *msg, struct pt_regs *r){}
 static void msg_sigpending(message *msg, struct pt_regs *r){}
 static void msg_sigprocmask(message *msg, struct pt_regs *r){}
