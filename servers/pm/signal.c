@@ -746,3 +746,22 @@ void vm_notify_sig_wrapper(endpoint_t ep)
 	}
   }
 }
+
+#define p_set	m1_p1
+
+int sys_sigpending(void)
+{
+	int err;
+
+	if (!m_in.p_set)
+		return -EFAULT;
+
+	err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigpending,
+			  mp->mp_endpoint, (vir_bytes)m_in.p_set,
+			  sizeof(sigset_t));
+
+	if (err != 0)
+		return -EFAULT;
+
+	return 0;
+}

@@ -103,6 +103,7 @@ int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
 void restart_sigs(struct mproc *rmp);
 void vm_notify_sig_wrapper(endpoint_t ep); 
+int sys_sigpending(void);
 
 /* time.c */
 int do_stime(void);

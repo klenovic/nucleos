@@ -7,14 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/signal.h>
+#include <asm/syscall.h>
 
 int sigpending(sigset_t *set)
 {
-	message m;
-
-	if (ksyscall(PM_PROC_NR, __NR_sigpending, &m) < 0) return(-1);
-	*set = (sigset_t) m.m2_l1;
-	return(m.m_type);
+	return INLINE_SYSCALL(sigpending, 1, set);
 }

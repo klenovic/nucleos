@@ -482,8 +482,16 @@ static void msg_sigaction(message *msg, struct pt_regs *r)
 	msg->m1_p3 = (void*)r->si;	/* __sigreturn */
 }
 
-static void msg_signal(message *msg, struct pt_regs *r){}
-static void msg_sigpending(message *msg, struct pt_regs *r){}
+static void msg_signal(message *msg, struct pt_regs *r)
+{
+	/* n/a: implemented via sigaction */
+}
+
+static void msg_sigpending(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (void*)r->bx;	/* set */
+}
+
 static void msg_sigprocmask(message *msg, struct pt_regs *r){}
 static void msg_sigreturn(message *msg, struct pt_regs *r){}
 static void msg_sigsuspend(message *msg, struct pt_regs *r){}
