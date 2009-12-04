@@ -849,3 +849,29 @@ int sys_sigprocmask(void)
 
 	return 0;
 }
+
+int sys_sigsuspend(void)
+{
+	int err;
+	sigset_t set;
+
+	/* Get the `set' argument */
+	err = sys_datacopy(mp->mp_endpoint, (vir_bytes)m_in.p_set,
+			   SELF, (vir_bytes)&set,
+			   sizeof(sigset_t));
+
+	if (err != 0)
+		return -EFAULT;
+
+	mp->mp_sigmask2 = mp->mp_sigmask;	/* save the old mask */
+	mp->mp_sigmask = (sigset_t) set;
+
+	sigdelset(&mp->mp_sigmask, SIGKILL);
+	sigdelset(&mp->mp_sigmask, SIGSTOP);
+
+	mp->mp_flags |= SIGSUSPENDED;
+
+	check_pending(mp);
+
+	return SUSPEND;
+}

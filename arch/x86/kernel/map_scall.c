@@ -500,7 +500,11 @@ static void msg_sigprocmask(message *msg, struct pt_regs *r)
 }
 
 static void msg_sigreturn(message *msg, struct pt_regs *r){}
-static void msg_sigsuspend(message *msg, struct pt_regs *r){}
+
+static void msg_sigsuspend(message *msg, struct pt_regs *r)
+{
+	msg->m1_p1 = (void*)r->bx;	/* set */
+}
 
 static void msg_sprof(message *msg, struct pt_regs *r)
 {

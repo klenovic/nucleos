@@ -105,6 +105,7 @@ void restart_sigs(struct mproc *rmp);
 void vm_notify_sig_wrapper(endpoint_t ep); 
 int sys_sigpending(void);
 int sys_sigprocmask(void);
+int sys_sigsuspend(void);
 
 /* time.c */
 int do_stime(void);

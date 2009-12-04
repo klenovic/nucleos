@@ -7,14 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/signal.h>
+#include <asm/syscall.h>
 
 int sigsuspend(const sigset_t *set)
 {
-	message m;
-
-	m.m2_l1 = (long) *set;
-
-	return(ksyscall(PM_PROC_NR, __NR_sigsuspend, &m));
+	return INLINE_SYSCALL(sigsuspend, 1, set);
 }
