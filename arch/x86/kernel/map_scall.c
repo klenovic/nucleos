@@ -586,7 +586,14 @@ static void msg_utime(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (void *)r->cx;	/* times pointer */
 }
 
-static void msg_wait(message *msg, struct pt_regs *r){}
+static void msg_wait(message *msg, struct pt_regs *r)
+{
+	/* @nucleos: Should be the `status' address but the legacy way is used
+	 *           for now. The exit status of child is returned in parents
+	 *           reply message.
+	 */
+}
+
 static void msg_waitpid(message *msg, struct pt_regs *r){}
 
 static void msg_write(message *msg, struct pt_regs *r)

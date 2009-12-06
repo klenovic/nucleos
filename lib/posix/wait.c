@@ -10,15 +10,34 @@
 #include <nucleos/lib.h>
 #include <nucleos/wait.h>
 
+#define ASM_SYSCALL_GET_EXITSTATUS(off, argnr)	"mov " #off "(%%esp), %" #argnr "\t\n"
+
 pid_t wait(int *status)
 {
-	message m;
+	int resultvar = 0;
+	int __status = 0;
 
-	if (ksyscall(PM_PROC_NR, __NR_wait, &m) < 0)
-		return(-1);
+	__asm__(ASM_SYSCALL_ALLOC_MESSAGE
+		"mov %2, %%eax\t\n"
+		ASM_SYSCALL_SAVE_CLOBBERED_REGS
+		ASM_SYSCALL_CALL_SYSTEM
+		ASM_SYSCALL_RESTORE_CLOBBERED_REGS
+		ASM_SYSCALL_GET_MSGRC
+		ASM_SYSCALL_GET_EXITSTATUS(8,1)
+		ASM_SYSCALL_DEALLOC_MESSAGE
+		: "=a" (resultvar), "=r"(__status)
+		: "i" (__NNR_wait)
+		: "memory", "cc"
+	);
 
-	if (status != 0)
-		*status = m.m2_i1;
+	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
+		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
+		return -1;
+	}
 
-	return(m.m_type);
+	if (status) {
+		*status = __status;
+	}
+
+	return resultvar;
 }

@@ -188,8 +188,8 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(uname,		sys_uname),
 	SCALL_HANDLER(time,		sys_time),
 	SCALL_HANDLER(times,		scall_times),
+	SCALL_HANDLER(wait,		do_waitpid),
 	SCALL_HANDLER(waitpid,		no_sys),
-	SCALL_HANDLER(wait,		no_sys),
 };
 /* This should not fail with "array size is negative": */
 extern int dummy[sizeof(call_vec) <= NR_syscalls * sizeof(call_vec[0]) ? 1 : -1];
