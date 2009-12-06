@@ -594,7 +594,11 @@ static void msg_wait(message *msg, struct pt_regs *r)
 	 */
 }
 
-static void msg_waitpid(message *msg, struct pt_regs *r){}
+static void msg_waitpid(message *msg, struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* pid */
+	msg->m1_i2 = r->cx;	/* options */
+}
 
 static void msg_write(message *msg, struct pt_regs *r)
 {
@@ -689,7 +693,7 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(umount,		FS),
 	SCALL_TO_SRV(unlink,		FS),
 	SCALL_TO_SRV(utime,		FS),
-	SCALL_TO_SRV(waitpid,		PM),
-	SCALL_TO_SRV(wait,		PM),	/* 80 */
+	SCALL_TO_SRV(wait,		PM),
+	SCALL_TO_SRV(waitpid,		PM),	/* 80 */
 	SCALL_TO_SRV(write,		FS),
 };
