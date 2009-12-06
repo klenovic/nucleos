@@ -345,14 +345,16 @@ ENTRY(system_call)
 	push	%ebp
 
 	/* The map_scall_endpt takes two parameter the (1.) message pointer and (2.) pt_regs */
-	push	SPREG(%ebp)		/* output message pointer (saved on user stack) */
+	mov	SPREG(%ebp), %ebx
+	add	$3*4, %ebx		/* there are 3 clobbered registers saved on stack
+					     thus skip them */
+	push	%ebx			/* output message pointer (saved on user stack) */
 	call	map_scall_endpt		/* create a message from passed values
 					 *   and prepare registers for sys_call
 					 *   and return the endpoint */
 	add	$4, %esp		/* remove message argument from stack */
 
 	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
-	mov	SPREG(%ebp), %ebx	/* user message pointer (saved on user stack) */
 
 	/* @nucleos: kipc_sendrec (if any kipc_*) doesn't not setup %edx register so set zero */
 	xor	%edx, %edx
