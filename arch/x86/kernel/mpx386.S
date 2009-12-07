@@ -349,10 +349,17 @@ ENTRY(system_call)
 	add	$3*4, %ebx		/* there are 3 clobbered registers saved on stack
 					     thus skip them */
 	push	%ebx			/* output message pointer (saved on user stack) */
+	mov	%esp, %ebx		/* address to pointer of output message */
+
+	push	%ebp			/* pt_regs */
+	push	%ebx			/* address of pointer of output message */
 	call	map_scall_endpt		/* create a message from passed values
 					 *   and prepare registers for sys_call
 					 *   and return the endpoint */
-	add	$4, %esp		/* remove message argument from stack */
+	mov	(%esp), %ebx
+	mov	(%ebx), %ebx		/* the final output message pointer */
+
+	add	$12, %esp		/* clean up the stack */
 
 	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
 

@@ -67,9 +67,10 @@ static inline long strnlen_user(const char *s, size_t maxlen)
 	return strnlen(name, len);
 }
 
-endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
+endpoint_t map_scall_endpt(message **msg, struct pt_regs *r)
 {
 	message kmsg;
+	phys_bytes linaddr;
 
 	memset(&kmsg, 0, sizeof(message));
 
@@ -89,10 +90,24 @@ endpoint_t map_scall_endpt(message *msg, struct pt_regs *r)
 		scall_to_srv[r->ax].fill_msg(&kmsg, r);
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
-		     kIPC. It requires to have message in caller's (user's) space. */
+	 *           kIPC. It requires to have message in caller's (user's) space.
+	 *
+	 *           By default the message is placed on stack however it may happen that it
+	 *           must not (see sigreturn) and rather somewhere in static area. For this
+	 *           case the syscall explicitly specifies the message address (takes on register)
+	 *           and set the `m_source' with it.
+	 */
+	if (!kmsg.m_source) {
+		/* Map the message from user space. */
+		linaddr = umap_local(proc_ptr, D, (vir_bytes)*msg, sizeof(message));
+	} else {
+		/* explicitly specified message address */
+		*msg = (message*)kmsg.m_source;
 
-	/* Map the message from user space. */
-	phys_bytes linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
+		/* Map the message from user space. */
+		linaddr = umap_local(proc_ptr, D, (vir_bytes)*msg, sizeof(message));
+		kmsg.m_source = 0;
+	}
 
 	/* copy the filled message into caller (user) space */
 	phys_copy(vir2phys(&kmsg), linaddr, sizeof(message));
