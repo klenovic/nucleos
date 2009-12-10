@@ -342,45 +342,15 @@ ENTRY(system_call)
 	SAVE_PROCESS_CTX(0)
 
 	/* save the pointer to the current process */
-	push	%ebp
-
-	/* The map_scall_endpt takes two parameter the (1.) message pointer and (2.) pt_regs */
-	mov	SPREG(%ebp), %ebx
-	add	$3*4, %ebx		/* there are 3 clobbered registers saved on stack
-					     thus skip them */
-	push	%ebx			/* output message pointer (saved on user stack) */
-	mov	%esp, %ebx		/* address to pointer of output message */
-
 	push	%ebp			/* pt_regs */
-	push	%ebx			/* address of pointer of output message */
 	call	map_scall_endpt		/* create a message from passed values
 					 *   and prepare registers for sys_call
 					 *   and return the endpoint */
-	mov	(%esp), %ebx
-	mov	(%ebx), %ebx		/* the final output message pointer */
 
-	add	$12, %esp		/* clean up the stack */
-
-	mov	$KIPC_SENDREC, %ecx	/* ipc primitive to use */
-
-	/* @nucleos: kipc_sendrec (if any kipc_*) doesn't not setup %edx register so set zero */
-	xor	%edx, %edx
-
-	/* save the obtained infos into process's frame */
-	mov	%eax, AXREG(%ebp)
-	mov	%ebx, BXREG(%ebp)
-	mov	%ecx, CXREG(%ebp)
-	mov	%edx, DXREG(%ebp)
-
-	/*
-	 * pass the syscall arguments from userspace to the handler.
-	 * SAVE_PROCESS_CTX() does not clobber these registers, they are still
-	 * set as the userspace have set them
-	 */
-	push	%edx
-	push	%ebx
-	push	%eax
-	push	%ecx
+	push	DXREG(%ebp)
+	push	BXREG(%ebp)
+	push	AXREG(%ebp)
+	push	CXREG(%ebp)
 
 	/* for stack trace */
 	movl	$0, %ebp

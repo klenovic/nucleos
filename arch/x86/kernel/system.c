@@ -443,5 +443,17 @@ struct proc * arch_finish_schedcheck(void)
 	stk = (char *)tss.sp0;
 	/* set pointer to the process to run on the stack */
 	*((reg_t *)stk) = (reg_t) proc_ptr;
+
+	if (proc_ptr->syscall_0x80) {
+		proc_ptr->p_reg.bx = proc_ptr->clobregs[CLOBB_REG_EBX];
+		proc_ptr->p_reg.cx = proc_ptr->clobregs[CLOBB_REG_ECX];
+		proc_ptr->p_reg.dx = proc_ptr->clobregs[CLOBB_REG_EDX];
+		proc_ptr->p_reg.si = proc_ptr->clobregs[CLOBB_REG_ESI];
+		proc_ptr->p_reg.di = proc_ptr->clobregs[CLOBB_REG_EDI];
+		proc_ptr->p_reg.fp = proc_ptr->clobregs[CLOBB_REG_EBP];
+
+		proc_ptr->syscall_0x80 = 0;
+	}
+
 	return proc_ptr;
 }

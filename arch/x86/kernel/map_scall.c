@@ -67,10 +67,21 @@ static inline long strnlen_user(const char *s, size_t maxlen)
 	return strnlen(name, len);
 }
 
-endpoint_t map_scall_endpt(message **msg, struct pt_regs *r)
+endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
 	phys_bytes linaddr;
+	message *msg = (message*)r->sp;
+
+	proc_ptr->syscall_0x80 = 1;
+
+	/* save all these regs and then retore them on exit (arch_finish_check) */
+	proc_ptr->clobregs[CLOBB_REG_EBX] = r->bx;
+	proc_ptr->clobregs[CLOBB_REG_ECX] = r->cx;
+	proc_ptr->clobregs[CLOBB_REG_EDX] = r->dx;
+	proc_ptr->clobregs[CLOBB_REG_ESI] = r->si;
+	proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
+	proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
 
 	memset(&kmsg, 0, sizeof(message));
 
@@ -97,22 +108,24 @@ endpoint_t map_scall_endpt(message **msg, struct pt_regs *r)
 	 *           case the syscall explicitly specifies the message address (takes on register)
 	 *           and set the `m_source' with it.
 	 */
-	if (!kmsg.m_source) {
-		/* Map the message from user space. */
-		linaddr = umap_local(proc_ptr, D, (vir_bytes)*msg, sizeof(message));
-	} else {
+	if (kmsg.m_source) {
 		/* explicitly specified message address */
-		*msg = (message*)kmsg.m_source;
-
-		/* Map the message from user space. */
-		linaddr = umap_local(proc_ptr, D, (vir_bytes)*msg, sizeof(message));
+		msg = (message*)kmsg.m_source;
 		kmsg.m_source = 0;
 	}
+
+	/* Map the message from user space. */
+	linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
 
 	/* copy the filled message into caller (user) space */
 	phys_copy(vir2phys(&kmsg), linaddr, sizeof(message));
 
-	return scall_to_srv[r->ax].endpt;
+	r->ax = scall_to_srv[r->ax].endpt;
+	r->bx = (unsigned long)msg;
+	r->cx = KIPC_SENDREC;
+	r->dx = 0;
+
+	return r->ax;
 }
 
 static void msg_access(message *msg, struct pt_regs *r)

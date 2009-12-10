@@ -32,12 +32,6 @@
 /* Get return code which was saved in message */
 #define ASM_SYSCALL_GET_MSGRC		"mov 4(%%esp), %%eax\n\t"
 
-/* Always save these registers because after `int 0x80' you can't
- * be sure that you will get them same.
- */
-#define ASM_SYSCALL_SAVE_CLOBBERED_REGS		"push %%ebx; push %%ecx; push %%edx\t\n"
-#define ASM_SYSCALL_RESTORE_CLOBBERED_REGS	"pop %%edx; pop %%ecx; pop %%ebx\t\n"
-
 /* @nucleos: Ignore these notes below. It is just a plan how it should work!
  
 	Nucleos takes system call arguments in registers:
@@ -115,9 +109,7 @@
 		LOADARGS_##nr				\
 		ASM_SYSCALL_ALLOC_MESSAGE		\
 		"movl	%1, %%eax\n\t"			\
-		ASM_SYSCALL_SAVE_CLOBBERED_REGS		\
 		ASM_SYSCALL_CALL_SYSTEM			\
-		ASM_SYSCALL_RESTORE_CLOBBERED_REGS	\
 		ASM_SYSCALL_GET_MSGRC			\
 		ASM_SYSCALL_DEALLOC_MESSAGE		\
 		RESTOREARGS_##nr			\
@@ -135,9 +127,7 @@
 	asm volatile (					\
 		LOADARGS_##nr				\
 		ASM_SYSCALL_ALLOC_MESSAGE		\
-		ASM_SYSCALL_SAVE_CLOBBERED_REGS		\
 		ASM_SYSCALL_CALL_SYSTEM			\
-		ASM_SYSCALL_RESTORE_CLOBBERED_REGS	\
 		ASM_SYSCALL_GET_MSGRC			\
 		ASM_SYSCALL_DEALLOC_MESSAGE		\
 		RESTOREARGS_##nr			\

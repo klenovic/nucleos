@@ -114,6 +114,23 @@ struct proc {
 #ifdef CONFIG_DEBUG_KERNEL_TRACE
 	int p_schedules;
 #endif
+
+	/* @nucleos: All below in this structure is used only for new syscalls
+	 *           and shall be removed one day.
+	 */
+	int syscall_0x80;	/* if set then the call was via `int 0x80' */
+
+#define __NUM_CLOBB_REGS	6	/* number of clobbered registers */
+
+#ifdef CONFIG_X86_32
+#define CLOBB_REG_EBX	0
+#define CLOBB_REG_ECX	1
+#define CLOBB_REG_EDX	2
+#define CLOBB_REG_ESI	3
+#define CLOBB_REG_EDI	4
+#define CLOBB_REG_EBP	5
+#endif
+	long clobregs[__NUM_CLOBB_REGS];
 };
 
 #endif /* __ASSEMBLY__ */
