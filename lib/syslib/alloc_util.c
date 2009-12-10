@@ -58,7 +58,7 @@ void *alloc_contig(size_t len, int flags, phys_bytes *phys)
 	 */
 	if(buf == (vir_bytes) MAP_FAILED) {
 		u32_t align = 0;
-		if(errno != ENXIO) {
+		if(errno != -ENXIO) {
 			return NULL;
 		}
 		if(flags & AC_ALIGN4K)

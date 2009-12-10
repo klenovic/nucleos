@@ -26,14 +26,14 @@
 
 #define ACCESS_CHECK(a) { 			\
 	if((a) & ~(CPF_READ|CPF_WRITE)) {	\
-		errno = EINVAL;			\
+		errno = -EINVAL;		\
 		return -1;			\
 	}					\
    }
 
 #define GID_CHECK(gid) {					\
 	if(!GRANT_VALID(gid) || (gid) < 0 || (gid) >= ngrants) {\
-		errno = EINVAL;					\
+		errno = -EINVAL;				\
 		return -1;					\
 	}							\
    }
@@ -41,7 +41,7 @@
 #define GID_CHECK_USED(gid) {					\
 	GID_CHECK(gid);						\
 	if(!(grants[gid].cp_flags & CPF_USED)) {		\
-		errno = EINVAL;					\
+		errno = -EINVAL;				\
 		return -1;					\
 	}							\
    }
@@ -106,7 +106,7 @@ cpf_new_grantslot(void)
 		assert(g <= ngrants); /* ngrants can't shrink. */
 		if(g == ngrants) {
 			/* ngrants hasn't increased. */
-			errno = ENOSPC;
+			errno = -ENOSPC;
 			return -1;
 		}
 	}
