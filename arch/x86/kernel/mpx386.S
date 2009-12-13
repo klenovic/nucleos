@@ -454,7 +454,11 @@ restart:
 	call	schedcheck
 
 	/* %eax is set by schedcheck() to the process to run */
-	mov	%eax, %esp      /* will assume P_STACKBASE == 0 */
+	push	%eax
+	call	restore_regs_syscall_0x80
+	pop	%eax
+
+	mov	%eax, %esp	/* will assume P_STACKBASE == 0 */
 
 	lldt	P_LDT_SEL(%esp) /* enable process' segment descriptors  */
 	cmpl	$0, P_CR3(%esp)

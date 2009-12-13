@@ -443,8 +443,19 @@ struct proc * arch_finish_schedcheck(void)
 	stk = (char *)tss.sp0;
 	/* set pointer to the process to run on the stack */
 	*((reg_t *)stk) = (reg_t) proc_ptr;
+	return proc_ptr;
+}
 
+void restore_regs_syscall_0x80(struct proc *proc)
+{
 	if (proc_ptr->syscall_0x80) {
+		/* @nucleos: Return the real syscall result not of the KIPC.
+		 *
+		 *           NOTE: This is ignored for now and the result is
+		 *                 got from message.
+		 */
+		proc_ptr->p_reg.retreg = proc_ptr->p_delivermsg.m_type;
+
 		proc_ptr->p_reg.bx = proc_ptr->clobregs[CLOBB_REG_EBX];
 		proc_ptr->p_reg.cx = proc_ptr->clobregs[CLOBB_REG_ECX];
 		proc_ptr->p_reg.dx = proc_ptr->clobregs[CLOBB_REG_EDX];
@@ -454,6 +465,4 @@ struct proc * arch_finish_schedcheck(void)
 
 		proc_ptr->syscall_0x80 = 0;
 	}
-
-	return proc_ptr;
 }
