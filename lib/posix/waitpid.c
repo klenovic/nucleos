@@ -10,23 +10,18 @@
 #include <nucleos/lib.h>
 #include <nucleos/wait.h>
 
-#define ASM_SYSCALL_GET_EXITSTATUS(off, argnr)	"mov " #off "(%%esp), %" #argnr "\t\n"
-
 pid_t waitpid(pid_t pid, int *status, int options)
 {
 	int resultvar = 0;
-	int __status = 0;
+	int __msg[9] = {0, __NNR_waitpid};
 
-	__asm__(ASM_SYSCALL_ALLOC_MESSAGE
-		"mov %2, %%eax\t\n"
-		ASM_SYSCALL_CALL_SYSTEM
-		ASM_SYSCALL_GET_MSGRC
-		ASM_SYSCALL_GET_EXITSTATUS(8,1)
-		ASM_SYSCALL_DEALLOC_MESSAGE
-		: "=a" (resultvar), "=r"(__status)
-		: "i" (__NNR_waitpid), "b"(pid), "c"(options)
+	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
+		: "=a" (resultvar)
+		: "0" (__msg), "b"(pid), "c"(options)
 		: "memory", "cc"
 	);
+
+	resultvar = __msg[1];
 
 	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
 		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
@@ -34,7 +29,7 @@ pid_t waitpid(pid_t pid, int *status, int options)
 	}
 
 	if (status) {
-		*status = __status;
+		*status = __msg[2];
 	}
 
 	return resultvar;

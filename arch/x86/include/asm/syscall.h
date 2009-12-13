@@ -15,22 +15,8 @@
  *           Took from glibc to test how this could work.
  */
 
-/* Alloc 36 bytes (KIPC_MESSAGE_SIZE) on process's stack. It's actually the message which is
- * used by kernel then.
- *
- * @nucleos: This allocation will be removed once the system call stuff is re-designed
- *           in way that it doesn't use the message from user space.
- */
-#define ASM_SYSCALL_ALLOC_MESSAGE	"sub $36, %%esp\t\n"
-
 /* Call the kernel to perform the system call (SYSCALL_VECTOR) */
 #define ASM_SYSCALL_CALL_SYSTEM		"int $0x80\t\n"
-
-/* Cleanup stack from message */
-#define ASM_SYSCALL_DEALLOC_MESSAGE	"add $36, %%esp\t\n"
-
-/* Get return code which was saved in message */
-#define ASM_SYSCALL_GET_MSGRC		"mov 4(%%esp), %%eax\n\t"
 
 /* @nucleos: Ignore these notes below. It is just a plan how it should work!
  
@@ -95,47 +81,25 @@
 })
 
 /* Define a macro which expands inline into the wrapper code for a system
-   call.  This use is for internal calls that do not need to handle errors
-   normally.  It will never touch errno.  This returns just what the kernel
-   gave back.
-
-   The _NCS variant allows non-constant syscall numbers but it is not
-   possible to use more than four parameters.  */
-#define INTERNAL_SYSCALL(name, err, nr, args...)	\
-({							\
-	register unsigned int resultvar;		\
-	EXTRAVAR_##nr					\
-	asm volatile (					\
-		LOADARGS_##nr				\
-		ASM_SYSCALL_ALLOC_MESSAGE		\
-		"movl	%1, %%eax\n\t"			\
-		ASM_SYSCALL_CALL_SYSTEM			\
-		ASM_SYSCALL_GET_MSGRC			\
-		ASM_SYSCALL_DEALLOC_MESSAGE		\
-		RESTOREARGS_##nr			\
-		: "=a" (resultvar)			\
-		: "i" (__NNR_##name) ASMFMT_##nr(args)	\
-		: "memory", "cc"			\
-	);						\
-	(int) resultvar;				\
-})
-
-#define INTERNAL_SYSCALL_NCS(name, err, nr, args...)	\
-({							\
-	register unsigned int resultvar;		\
-	EXTRAVAR_##nr					\
-	asm volatile (					\
-		LOADARGS_##nr				\
-		ASM_SYSCALL_ALLOC_MESSAGE		\
-		ASM_SYSCALL_CALL_SYSTEM			\
-		ASM_SYSCALL_GET_MSGRC			\
-		ASM_SYSCALL_DEALLOC_MESSAGE		\
-		RESTOREARGS_##nr			\
-		: "=a" (resultvar)			\
-		: "0" (name) ASMFMT_##nr(args)		\
-		: "memory", "cc"			\
-	);						\
-	(int) resultvar;				\
+ * call.  This use is for internal calls that do not need to handle errors
+ * normally.  It will never touch errno.  This returns just what the kernel
+ * gave back.
+ */
+#define INTERNAL_SYSCALL(name, err, nr, args...)			\
+({									\
+	register unsigned int resultvar;				\
+	int __msg[9] = {0, __NNR_##name};				\
+	EXTRAVAR_##nr							\
+	__asm__ __volatile__ (						\
+		LOADARGS_##nr						\
+		ASM_SYSCALL_CALL_SYSTEM					\
+		RESTOREARGS_##nr					\
+		: "=a" (resultvar)					\
+		: "0" (__msg) ASMFMT_##nr(args)				\
+		: "memory", "cc"					\
+	);								\
+	resultvar = __msg[1];						\
+	(int) resultvar;						\
 })
 
 #undef INTERNAL_SYSCALL_ERROR_P

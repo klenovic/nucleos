@@ -71,9 +71,25 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
 	phys_bytes linaddr;
-	message *msg = (message*)r->sp;
+	message *msg = (message*)r->ax;
 
-	proc_ptr->syscall_0x80 = 1;
+	memset(&kmsg, 0, sizeof(message));
+
+	/* Map the message from user space. */
+	linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
+
+	/* copy the message from caller (user) space */
+	phys_copy(linaddr, vir2phys(&kmsg), sizeof(message));
+
+	/* `m_type' contains syscall number */
+	proc_ptr->syscall_0x80 = kmsg.m_type;
+
+	/* @nucleos: The syscall numbers used by user (_NR_*) and kernel may be different.
+	 *           E.g. user calls mmap via __NR_mmap but system knows it as VM_MMAP. In
+	 *           this case the m_type can be changed to appropriate number in msg_* function.
+	 *           Thing to change ???
+	 */
+	r->ax = kmsg.m_type;
 
 	/* save all these regs and then retore them on exit (arch_finish_check) */
 	proc_ptr->clobregs[CLOBB_REG_EBX] = r->bx;
@@ -83,39 +99,13 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
 	proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
 
-	memset(&kmsg, 0, sizeof(message));
-
-	/* this code right below totaly kill the kernel!!! */
-	/* kprintf("ax=%d bx=%d cx=%d dx=%d si=%si di=%d\n", r->ax, r->bx, r->cx, r->dx,
-		    r->si, r->di); */
-
-	/* @nucleos: The syscall numbers used by user (_NR_*) and kernel may be different.
-	 *           E.g. user calls mmap via __NR_mmap but system knows it as VM_MMAP. In
-	 *           this case the m_type can be changed to appropriate number in msg_* function.
-	 *           Thing to change ???
-	 */
-	kmsg.m_type = r->ax;
-
 	/* fill the message according to passed arguments */
 	if (scall_to_srv[r->ax].fill_msg)
 		scall_to_srv[r->ax].fill_msg(&kmsg, r);
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
 	 *           kIPC. It requires to have message in caller's (user's) space.
-	 *
-	 *           By default the message is placed on stack however it may happen that it
-	 *           must not (see sigreturn) and rather somewhere in static area. For this
-	 *           case the syscall explicitly specifies the message address (takes on register)
-	 *           and set the `m_source' with it.
 	 */
-	if (kmsg.m_source) {
-		/* explicitly specified message address */
-		msg = (message*)kmsg.m_source;
-		kmsg.m_source = 0;
-	}
-
-	/* Map the message from user space. */
-	linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
 
 	/* copy the filled message into caller (user) space */
 	phys_copy(vir2phys(&kmsg), linaddr, sizeof(message));
