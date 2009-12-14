@@ -14,6 +14,7 @@
 #include <nucleos/types.h>
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
+#include <nucleos/uaccess.h>
 #include <kernel/proc.h>
 #include <kernel/proto.h>
 #include <kernel/glo.h>
@@ -46,23 +47,15 @@ static struct endpt_args scall_to_srv[];
 #define SCALL_TO_SRV(syscall, server) \
 	[ __NNR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
 
-static inline long strnlen_user(const char *s, size_t maxlen)
+static inline long strnlen_user(const char __user *s, size_t maxlen)
 {
 	char name[PATH_MAX];
 	unsigned long len = 0;
-	phys_bytes linaddr;
 
 	/* We must not cross the top of stack during copy */
 	len = ((VM_STACKTOP - (unsigned long)s) < maxlen) ? (VM_STACKTOP - (unsigned long)s) : maxlen;
 
-	/* Map the string from user space.
-	 * @nucleos: Fix this let `fetch_name' takes care.
-	 */
-	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len))) {
-		return -EFAULT;
-	}
-
-	phys_copy(linaddr, vir2phys((vir_bytes)name), len);
+	copy_from_user(name, s, len);
 
 	return strnlen(name, len);
 }
@@ -70,16 +63,12 @@ static inline long strnlen_user(const char *s, size_t maxlen)
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
-	phys_bytes linaddr;
 	message *msg = (message*)r->ax;
 
 	memset(&kmsg, 0, sizeof(message));
 
-	/* Map the message from user space. */
-	linaddr = umap_local(proc_ptr, D, (vir_bytes)msg, sizeof(message));
-
 	/* copy the message from caller (user) space */
-	phys_copy(linaddr, vir2phys(&kmsg), sizeof(message));
+	copy_from_user(&kmsg, msg, sizeof(message));
 
 	/* `m_type' contains syscall number */
 	proc_ptr->syscall_0x80 = kmsg.m_type;
@@ -106,9 +95,8 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
 	 *           kIPC. It requires to have message in caller's (user's) space.
 	 */
-
 	/* copy the filled message into caller (user) space */
-	phys_copy(vir2phys(&kmsg), linaddr, sizeof(message));
+	copy_to_user(msg, &kmsg, sizeof(message));
 
 	r->ax = scall_to_srv[r->ax].endpt;
 	r->bx = (unsigned long)msg;
