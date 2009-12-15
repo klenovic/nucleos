@@ -29,13 +29,9 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 
 int __munmap(void *addr, size_t len)
 {
-	message m;
-
-	m.VMUM_ADDR = addr;
-	m.VMUM_LEN = len;
-
-	return ksyscall(VM_PROC_NR, VM_MUNMAP, &m);
+	return INLINE_SYSCALL(munmap, 2, addr, len);
 }
+
 /* munamp just a weak definition since PM/VM may override it */
 int munmap(void *addr, size_t len) __weak __alias("__munmap");
 

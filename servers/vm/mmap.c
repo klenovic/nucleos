@@ -492,3 +492,46 @@ int scall_mmap(message *m)
 
 	return m->VMM_RETADDR;
 }
+
+int scall_munmap(message *m)
+{
+	int r, n;
+	struct vmproc *vmp;
+	vir_bytes addr, len;
+	struct vir_region *vr;
+
+	if((r = vm_isokendpt(m->m_source, &n)) != 0) {
+		vm_panic("do_mmap: message from strange source", m->m_source);
+	}
+
+	vmp = &vmproc[n];
+
+	if (!(vmp->vm_flags & VMF_HASPT))
+		return -ENXIO;
+
+	if (m->m_type == NNR_VM_MUNMAP) {
+		addr = (vir_bytes) arch_vir2map(vmp, (vir_bytes) m->VMUM_ADDR);
+	} else if(m->m_type == VM_MUNMAP_TEXT) {
+		addr = (vir_bytes) arch_vir2map_text(vmp, (vir_bytes) m->VMUM_ADDR);
+	} else {
+		vm_panic("do_munmap: strange type", NO_NUM);
+	}
+
+	if (!(vr = map_lookup(vmp, addr))) {
+		printf("VM: unmap: virtual address 0x%lx not found in %d\n",
+			m->VMUM_ADDR, vmp->vm_endpoint);
+		return -EFAULT;
+	}
+
+	len = m->VMUM_LEN;
+	len -= len % VM_PAGE_SIZE;
+
+	if (addr != vr->vaddr || len > vr->length || len < VM_PAGE_SIZE) {
+		return -EFAULT;
+	}
+
+	if (map_unmap_region(vmp, vr, len) != 0)
+		vm_panic("do_munmap: map_unmap_region failed", NO_NUM);
+
+	return 0;
+}

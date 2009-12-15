@@ -1021,12 +1021,16 @@
 #	define VMM_OFFSET		m5_i2
 #	define VMM_RETADDR		m5_l1	/* result */
 
+#define NNR_VM_MUNMAP		(VM_RQ_BASE+42)
+#	define VMUM_ADDR		m1_p1
+#	define VMUM_LEN			m1_i1
+
 /* VCTL_PARAMs */
 #define VCTLP_STATS_MEM			1
 #define VCTLP_STATS_EP			2
 
 /* Total. */
-#define VM_NCALLS				42
+#define VM_NCALLS			43
 
 /*===========================================================================*
  *                Messages for IPC server				     *
