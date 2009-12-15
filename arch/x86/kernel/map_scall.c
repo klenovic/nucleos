@@ -387,14 +387,6 @@ static void msg_mmap(message *msg, struct pt_regs *r)
 	msg->VMM_OFFSET = (off_t)parm.offset;
 }
 
-static void msg_munmap(message *msg, struct pt_regs *r)
-{
-	msg->m_type = NNR_VM_MUNMAP;	/* VM syscall number */
-
-	msg->VMUM_ADDR = (vir_bytes)r->bx;
-	msg->VMUM_LEN = (size_t)r->cx;
-}
-
 static void msg_mount(message *msg, struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* special */
@@ -405,6 +397,14 @@ static void msg_mount(message *msg, struct pt_regs *r)
 
 	msg->m1_i3 = r->dx;		/* mountflags */
 	msg->m1_p3 = (char *)r->si;	/* ep */
+}
+
+static void msg_munmap(message *msg, struct pt_regs *r)
+{
+	msg->m_type = NNR_VM_MUNMAP;	/* VM syscall number */
+
+	msg->VMUM_ADDR = (vir_bytes)r->bx;
+	msg->VMUM_LEN = (size_t)r->cx;
 }
 
 static void msg_munmap_text(message *msg, struct pt_regs *r)
