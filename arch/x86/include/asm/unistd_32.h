@@ -168,25 +168,26 @@
 #define __NNR_sigreturn		(59 + __syscall_offset)
 #define __NNR_reboot		(60 + __syscall_offset)
 
+/* The sysuname is not/will be not implemented. Use uname instead. */
 #define __NNR_sysuname		(61 + __syscall_offset)
-#define __NNR_getdents		(62 + __syscall_offset)	/* to FS */
-#define __NNR_llseek		(63 + __syscall_offset)	/* to FS */
-#define __NNR_fstatfs		(64 + __syscall_offset)	/* to FS */
-#define __NNR_select		(65 + __syscall_offset)	/* to FS */
-#define __NNR_fchdir		(66 + __syscall_offset)	/* to FS */
-#define __NNR_fsync		(67 + __syscall_offset)	/* to FS */
-#define __NNR_getpriority	(68 + __syscall_offset)	/* to PM */
-#define __NNR_setpriority	(69 + __syscall_offset)	/* to PM */
-#define __NNR_gettimeofday	(70 + __syscall_offset)	/* to PM */
+#define __NNR_getdents		(62 + __syscall_offset)
+#define __NNR_llseek		(63 + __syscall_offset)
+#define __NNR_fstatfs		(64 + __syscall_offset)
+#define __NNR_select		(65 + __syscall_offset)
+#define __NNR_fchdir		(66 + __syscall_offset)
+#define __NNR_fsync		(67 + __syscall_offset)
+#define __NNR_getpriority	(68 + __syscall_offset)
+#define __NNR_setpriority	(69 + __syscall_offset)
+#define __NNR_gettimeofday	(70 + __syscall_offset)
 
-#define __NNR_seteuid		(71 + __syscall_offset)	/* to PM */
-#define __NNR_setegid		(72 + __syscall_offset)	/* to PM */
-#define __NNR_truncate		(73 + __syscall_offset)	/* to FS */
-#define __NNR_ftruncate		(74 + __syscall_offset)	/* to FS */
-#define __NNR_fchmod		(75 + __syscall_offset)	/* to FS */
-#define __NNR_fchown		(76 + __syscall_offset)	/* to FS */
-#define __NNR_sprof		(77 + __syscall_offset)	/* to PM */
-#define __NNR_cprof		(78 + __syscall_offset)	/* to PM */
+#define __NNR_seteuid		(71 + __syscall_offset)
+#define __NNR_setegid		(72 + __syscall_offset)
+#define __NNR_truncate		(73 + __syscall_offset)
+#define __NNR_ftruncate		(74 + __syscall_offset)
+#define __NNR_fchmod		(75 + __syscall_offset)
+#define __NNR_fchown		(76 + __syscall_offset)
+#define __NNR_sprof		(77 + __syscall_offset)
+#define __NNR_cprof		(78 + __syscall_offset)
 #define __NNR_getegid		(79 + __syscall_offset)
 #define __NNR_getppid		(80 + __syscall_offset)
 

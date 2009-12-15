@@ -1012,7 +1012,7 @@
 #define VCTL_PARAM			m1_i2
 
 /* General calls. */
-#define NNR_VM_MMAP			(VM_RQ_BASE+41)
+#define NNR_VM_MMAP		(VM_RQ_BASE+41)
 #	define VMM_ADDR			m5_l1
 #	define VMM_LEN			m5_l2
 #	define VMM_PROT			m5_c1
