@@ -362,6 +362,8 @@ static void vm_init(void)
 	CALLMAP(VM_MAP_PHYS, do_map_phys, ANYEPM); /* Does its own checking. */
 	CALLMAP(VM_UNMAP_PHYS, do_unmap_phys, ANYEPM);
 
+	CALLMAP(NNR_VM_MMAP, scall_mmap, ANYEPM);
+
 	/* Requests from userland (anyone can call but need an ACL bit). */
 	CALLMAP(VM_REMAP, do_remap, NEEDACL);
 	CALLMAP(VM_GETPHYS, do_get_phys, NEEDACL);

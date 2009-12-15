@@ -440,3 +440,55 @@ int munmap_text(void *addr, size_t len)
 		(vir_bytes) addr);
 	return munmap_lin(laddr, len);
 }
+
+int scall_mmap(message *m)
+{
+	int err, n;
+	struct vmproc *vmp;
+	int mfflags = 0;
+	struct vir_region *vr = NULL;
+
+	if((err = vm_isokendpt(m->m_source, &n)) != 0) {
+		vm_panic("do_mmap: message from strange source", m->m_source);
+	}
+
+	vmp = &vmproc[n];
+
+	if(!(vmp->vm_flags & VMF_HASPT))
+		return -ENXIO;
+
+	if(m->VMM_FD == -1 || (m->VMM_FLAGS & MAP_ANONYMOUS)) {
+		int s;
+		vir_bytes v;
+		u32_t vrflags = VR_ANON | VR_WRITABLE;
+		size_t len = (vir_bytes) m->VMM_LEN;
+
+		if(m->VMM_FD != -1) {
+			return -EINVAL;
+		}
+
+		if(m->VMM_FLAGS & MAP_CONTIG) mfflags |= MF_CONTIG;
+		if(m->VMM_FLAGS & MAP_PREALLOC) mfflags |= MF_PREALLOC;
+		if(m->VMM_FLAGS & MAP_LOWER16M) vrflags |= VR_LOWER16MB;
+		if(m->VMM_FLAGS & MAP_LOWER1M)  vrflags |= VR_LOWER1MB;
+		if(m->VMM_FLAGS & MAP_ALIGN64K) vrflags |= VR_PHYS64K;
+		if(m->VMM_FLAGS & MAP_SHARED) vrflags |= VR_SHARED;
+
+		if(len % VM_PAGE_SIZE)
+			len += VM_PAGE_SIZE - (len % VM_PAGE_SIZE);
+
+		if(!(vr = map_page_region(vmp,
+			arch_vir2map(vmp, vmp->vm_stacktop),
+			VM_DATATOP, len, MAP_NONE, vrflags, mfflags))) {
+			return -ENOMEM;
+		}
+	} else {
+		return -ENOSYS;
+	}
+
+	/* Return mapping, as seen from process. */
+	vm_assert(vr);
+	m->VMM_RETADDR = arch_map2vir(vmp, vr->vaddr);
+
+	return m->VMM_RETADDR;
+}

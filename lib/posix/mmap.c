@@ -15,23 +15,16 @@
 
 void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
-	message m;
-	int r;
+	unsigned long buff[6];
 
-	m.VMM_ADDR = (vir_bytes) addr;
-	m.VMM_LEN = len;
-	m.VMM_PROT = prot;
-	m.VMM_FLAGS = flags;
-	m.VMM_FD = fd;
-	m.VMM_OFFSET = offset;
+	buff[0] = (unsigned long)addr;
+	buff[1] = (unsigned long)len;
+	buff[2] = (unsigned long)prot;
+	buff[3] = (unsigned long)flags;
+	buff[4] = (unsigned long)fd;
+	buff[5] = (unsigned long)offset;
 
-	r = ksyscall(VM_PROC_NR, VM_MMAP, &m);
-
-	if(r != 0) {
-		return MAP_FAILED;
-	}
-
-	return (void *) m.VMM_RETADDR;
+	return (void*)INLINE_SYSCALL(mmap, 1, buff);
 }
 
 int __munmap(void *addr, size_t len)

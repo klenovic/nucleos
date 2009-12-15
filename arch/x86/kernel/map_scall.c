@@ -364,6 +364,29 @@ static void msg_mknod(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
 }
 
+static void msg_mmap(message *msg, struct pt_regs *r)
+{
+	struct mmap_arg_struct{
+		unsigned long addr;
+		unsigned long len;
+		unsigned long prot;
+		unsigned long flags;
+		unsigned long fd;
+		unsigned long offset;
+	} parm;
+
+	copy_from_user(&parm, (void*)r->bx, sizeof(struct mmap_arg_struct));
+
+	msg->m_type = NNR_VM_MMAP;	/* VM syscall number */
+
+	msg->VMM_ADDR = (vir_bytes)parm.addr;
+	msg->VMM_LEN = (size_t)parm.len;
+	msg->VMM_PROT = parm.prot;
+	msg->VMM_FLAGS = parm.flags;
+	msg->VMM_FD = parm.fd;
+	msg->VMM_OFFSET = (off_t)parm.offset;
+}
+
 static void msg_mount(message *msg, struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* special */
@@ -659,6 +682,7 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(mkdir,		FS),	/* 40 */
 
 	SCALL_TO_SRV(mknod,		FS),
+	SCALL_TO_SRV(mmap,		VM),
 	SCALL_TO_SRV(mount,		FS),
 	SCALL_TO_SRV(open,		FS),
 	SCALL_TO_SRV(pause,		PM),
@@ -666,9 +690,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(ptrace,		PM),
 	SCALL_TO_SRV(read,		FS),
 	SCALL_TO_SRV(readlink,		FS),
-	SCALL_TO_SRV(reboot,		PM),
-	SCALL_TO_SRV(rename,		FS),	/* 50 */
+	SCALL_TO_SRV(reboot,		PM),	/* 50 */
 
+	SCALL_TO_SRV(rename,		FS),
 	SCALL_TO_SRV(rmdir,		FS),
 	SCALL_TO_SRV(select,		FS),
 	SCALL_TO_SRV(setegid,		PM),
@@ -677,9 +701,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(setitimer,		PM),
 	SCALL_TO_SRV(setpriority,	PM),
 	SCALL_TO_SRV(setsid,		PM),
-	SCALL_TO_SRV(setuid,		PM),
-	SCALL_TO_SRV(sigaction,		PM),	/* 60 */
+	SCALL_TO_SRV(setuid,		PM),	/* 60 */
 
+	SCALL_TO_SRV(sigaction,		PM),
 	SCALL_TO_SRV(signal,		PM),
 	SCALL_TO_SRV(sigpending,	PM),
 	SCALL_TO_SRV(sigprocmask,	PM),
@@ -688,9 +712,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(sprof,		PM),
 	SCALL_TO_SRV(stat,		FS),
 	SCALL_TO_SRV(stime,		PM),
-	SCALL_TO_SRV(symlink,		FS),
-	SCALL_TO_SRV(sync,		FS),	/* 70 */
+	SCALL_TO_SRV(symlink,		FS),	/* 70 */
 
+	SCALL_TO_SRV(sync,		FS),
 	SCALL_TO_SRV(uname,		PM),
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
@@ -699,7 +723,8 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(umount,		FS),
 	SCALL_TO_SRV(unlink,		FS),
 	SCALL_TO_SRV(utime,		FS),
-	SCALL_TO_SRV(wait,		PM),
-	SCALL_TO_SRV(waitpid,		PM),	/* 80 */
+	SCALL_TO_SRV(wait,		PM),	/* 80 */
+
+	SCALL_TO_SRV(waitpid,		PM),
 	SCALL_TO_SRV(write,		FS),
 };

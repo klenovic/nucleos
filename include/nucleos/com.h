@@ -1011,12 +1011,22 @@
 #define VCTL_WHAT			m1_i1
 #define VCTL_PARAM			m1_i2
 
+/* General calls. */
+#define NNR_VM_MMAP			(VM_RQ_BASE+41)
+#	define VMM_ADDR			m5_l1
+#	define VMM_LEN			m5_l2
+#	define VMM_PROT			m5_c1
+#	define VMM_FLAGS		m5_c2
+#	define VMM_FD			m5_i1
+#	define VMM_OFFSET		m5_i2
+#	define VMM_RETADDR		m5_l1	/* result */
+
 /* VCTL_PARAMs */
 #define VCTLP_STATS_MEM			1
 #define VCTLP_STATS_EP			2
 
 /* Total. */
-#define VM_NCALLS				41
+#define VM_NCALLS				42
 
 /*===========================================================================*
  *                Messages for IPC server				     *

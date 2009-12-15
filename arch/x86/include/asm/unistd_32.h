@@ -189,8 +189,10 @@
 #define __NNR_cprof		(78 + __syscall_offset)	/* to PM */
 #define __NNR_getegid		(79 + __syscall_offset)
 #define __NNR_getppid		(80 + __syscall_offset)
+
 #define __NNR_dup2		(81 + __syscall_offset)
 #define __NNR_uname		(82 + __syscall_offset)
+#define __NNR_mmap		(83 + __syscall_offset)
 
 /* Kernel message numbers. These are used only by u/kernel and
  * never by C library.

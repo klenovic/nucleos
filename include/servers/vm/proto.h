@@ -97,6 +97,7 @@ int do_remap(message *m);
 int do_get_phys(message *m);
 int do_shared_unmap(message *m);
 int do_get_refcount(message *m);
+int scall_mmap(message *m);
 
 /* pagefaults.c */
 void do_pagefaults(void);
