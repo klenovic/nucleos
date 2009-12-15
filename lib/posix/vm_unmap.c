@@ -13,16 +13,12 @@
 #include <nucleos/errno.h>
 #include <stdarg.h>
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
+int vm_unmap(int endpt, void *addr)
 {
-	unsigned long buff[6];
+	message m;
 
-	buff[0] = (unsigned long)addr;
-	buff[1] = (unsigned long)len;
-	buff[2] = (unsigned long)prot;
-	buff[3] = (unsigned long)flags;
-	buff[4] = (unsigned long)fd;
-	buff[5] = (unsigned long)offset;
+	m.VMUN_ENDPT = endpt;
+	m.VMUN_ADDR = (long) addr;
 
-	return (void*)INLINE_SYSCALL(mmap, 1, buff);
+	return ksyscall(VM_PROC_NR, VM_SHM_UNMAP, &m);
 }

@@ -13,16 +13,10 @@
 #include <nucleos/errno.h>
 #include <stdarg.h>
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
+int __munmap(void *addr, size_t len)
 {
-	unsigned long buff[6];
-
-	buff[0] = (unsigned long)addr;
-	buff[1] = (unsigned long)len;
-	buff[2] = (unsigned long)prot;
-	buff[3] = (unsigned long)flags;
-	buff[4] = (unsigned long)fd;
-	buff[5] = (unsigned long)offset;
-
-	return (void*)INLINE_SYSCALL(mmap, 1, buff);
+	return INLINE_SYSCALL(munmap, 2, addr, len);
 }
+
+/* munamp just a weak definition since PM/VM may override it */
+int munmap(void *addr, size_t len) __weak __alias("__munmap");

@@ -13,16 +13,17 @@
 #include <nucleos/errno.h>
 #include <stdarg.h>
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
+unsigned long vm_getphys(int endpt, void *addr)
 {
-	unsigned long buff[6];
+	message m;
+	unsigned long ret;
+	int r;
 
-	buff[0] = (unsigned long)addr;
-	buff[1] = (unsigned long)len;
-	buff[2] = (unsigned long)prot;
-	buff[3] = (unsigned long)flags;
-	buff[4] = (unsigned long)fd;
-	buff[5] = (unsigned long)offset;
+	m.VMPHYS_ENDPT = endpt;
+	m.VMPHYS_ADDR = (long) addr;
 
-	return (void*)INLINE_SYSCALL(mmap, 1, buff);
+	r = ksyscall(VM_PROC_NR, VM_GETPHYS, &m);
+	if (r != 0)
+		return 0;
+	return m.VMPHYS_RETA;
 }
