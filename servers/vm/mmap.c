@@ -511,7 +511,7 @@ int scall_munmap(message *m)
 
 	if (m->m_type == NNR_VM_MUNMAP) {
 		addr = (vir_bytes) arch_vir2map(vmp, (vir_bytes) m->VMUM_ADDR);
-	} else if(m->m_type == VM_MUNMAP_TEXT) {
+	} else if(m->m_type == NNR_VM_MUNMAP_TEXT) {
 		addr = (vir_bytes) arch_vir2map_text(vmp, (vir_bytes) m->VMUM_ADDR);
 	} else {
 		vm_panic("do_munmap: strange type", NO_NUM);

@@ -1025,12 +1025,14 @@
 #	define VMUM_ADDR		m1_p1
 #	define VMUM_LEN			m1_i1
 
+#define NNR_VM_MUNMAP_TEXT	(VM_RQ_BASE+43)
+
 /* VCTL_PARAMs */
 #define VCTLP_STATS_MEM			1
 #define VCTLP_STATS_EP			2
 
 /* Total. */
-#define VM_NCALLS			43
+#define VM_NCALLS			44
 
 /*===========================================================================*
  *                Messages for IPC server				     *

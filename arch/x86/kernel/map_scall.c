@@ -407,6 +407,14 @@ static void msg_mount(message *msg, struct pt_regs *r)
 	msg->m1_p3 = (char *)r->si;	/* ep */
 }
 
+static void msg_munmap_text(message *msg, struct pt_regs *r)
+{
+	msg->m_type = NNR_VM_MUNMAP_TEXT;	/* VM syscall number */
+
+	msg->VMUM_ADDR = (vir_bytes)r->bx;
+	msg->VMUM_LEN = (size_t)r->cx;
+}
+
 static void msg_open(message *msg, struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* pathname */
@@ -693,13 +701,14 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(mmap,		VM),
 	SCALL_TO_SRV(mount,		FS),
 	SCALL_TO_SRV(munmap,		VM),
+	SCALL_TO_SRV(munmap_text,	VM),
 	SCALL_TO_SRV(open,		FS),
 	SCALL_TO_SRV(pause,		PM),
 	SCALL_TO_SRV(pipe,		FS),
 	SCALL_TO_SRV(ptrace,		PM),
-	SCALL_TO_SRV(read,		FS),
-	SCALL_TO_SRV(readlink,		FS),	/* 50 */
+	SCALL_TO_SRV(read,		FS),	/* 50 */
 
+	SCALL_TO_SRV(readlink,		FS),
 	SCALL_TO_SRV(reboot,		PM),
 	SCALL_TO_SRV(rename,		FS),
 	SCALL_TO_SRV(rmdir,		FS),
@@ -708,9 +717,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(seteuid,		PM),
 	SCALL_TO_SRV(setgid,		PM),
 	SCALL_TO_SRV(setitimer,		PM),
-	SCALL_TO_SRV(setpriority,	PM),
-	SCALL_TO_SRV(setsid,		PM),	/* 60 */
+	SCALL_TO_SRV(setpriority,	PM),	/* 60 */
 
+	SCALL_TO_SRV(setsid,		PM),
 	SCALL_TO_SRV(setuid,		PM),
 	SCALL_TO_SRV(sigaction,		PM),
 	SCALL_TO_SRV(signal,		PM),
@@ -719,9 +728,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(sigreturn,		PM),
 	SCALL_TO_SRV(sigsuspend,	PM),
 	SCALL_TO_SRV(sprof,		PM),
-	SCALL_TO_SRV(stat,		FS),
-	SCALL_TO_SRV(stime,		PM),	/* 70 */
+	SCALL_TO_SRV(stat,		FS),	/* 70 */
 
+	SCALL_TO_SRV(stime,		PM),
 	SCALL_TO_SRV(symlink,		FS),
 	SCALL_TO_SRV(sync,		FS),
 	SCALL_TO_SRV(uname,		PM),
@@ -730,9 +739,9 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(truncate,		FS),
 	SCALL_TO_SRV(umask,		FS),
 	SCALL_TO_SRV(umount,		FS),
-	SCALL_TO_SRV(unlink,		FS),
-	SCALL_TO_SRV(utime,		FS),	/* 80 */
+	SCALL_TO_SRV(unlink,		FS),	/* 80 */
 
+	SCALL_TO_SRV(utime,		FS),
 	SCALL_TO_SRV(wait,		PM),
 	SCALL_TO_SRV(waitpid,		PM),
 	SCALL_TO_SRV(write,		FS),
