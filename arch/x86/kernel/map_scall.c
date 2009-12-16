@@ -403,7 +403,7 @@ static void msg_munmap(message *msg, struct pt_regs *r)
 {
 	msg->m_type = NNR_VM_MUNMAP;	/* VM syscall number */
 
-	msg->VMUM_ADDR = (vir_bytes)r->bx;
+	msg->VMUM_ADDR = (void*)r->bx;
 	msg->VMUM_LEN = (size_t)r->cx;
 }
 
@@ -411,7 +411,7 @@ static void msg_munmap_text(message *msg, struct pt_regs *r)
 {
 	msg->m_type = NNR_VM_MUNMAP_TEXT;	/* VM syscall number */
 
-	msg->VMUM_ADDR = (vir_bytes)r->bx;
+	msg->VMUM_ADDR = (void*)r->bx;
 	msg->VMUM_LEN = (size_t)r->cx;
 }
 
