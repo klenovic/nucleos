@@ -85,21 +85,21 @@
  * normally.  It will never touch errno.  This returns just what the kernel
  * gave back.
  */
-#define INTERNAL_SYSCALL(name, err, nr, args...)			\
-({									\
-	register unsigned int resultvar;				\
-	int __msg[9] = {0, __NNR_##name};				\
-	EXTRAVAR_##nr							\
-	__asm__ __volatile__ (						\
-		LOADARGS_##nr						\
-		ASM_SYSCALL_CALL_SYSTEM					\
-		RESTOREARGS_##nr					\
-		: "=a" (resultvar)					\
-		: "0" (__msg) ASMFMT_##nr(args)				\
-		: "memory", "cc"					\
-	);								\
-	resultvar = __msg[1];						\
-	(int) resultvar;						\
+#define INTERNAL_SYSCALL(name, err, nr, args...)	\
+({							\
+	register unsigned int resultvar;		\
+	int __msg[9] = {0, __NNR_##name};		\
+	EXTRAVAR_##nr					\
+	__asm__ __volatile__ (				\
+		LOADARGS_##nr				\
+		ASM_SYSCALL_CALL_SYSTEM			\
+		RESTOREARGS_##nr			\
+		: "=a" (resultvar)			\
+		: "0" (__msg) ASMFMT_##nr(args)		\
+		: "memory", "cc"			\
+	);						\
+	resultvar = __msg[1];				\
+	(int) resultvar;				\
 })
 
 #undef INTERNAL_SYSCALL_ERROR_P
