@@ -13,21 +13,5 @@
 
 pid_t waitpid(pid_t pid, int *status, int options)
 {
-	int resultvar = 0;
-	int __msg[9] = {0, __NNR_waitpid};
-
-	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
-		: "=a" (resultvar)
-		: "0"(__msg), "b"(pid), "c"(status), "d"(options)
-		: "memory", "cc"
-	);
-
-	resultvar = __msg[1];
-
-	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
-		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
-		return -1;
-	}
-
-	return resultvar;
+	return INLINE_SYSCALL(waitpid, 3, pid, status, options);
 }
