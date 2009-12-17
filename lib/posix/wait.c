@@ -7,8 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/lib.h>
+#include <nucleos/unistd.h>
 #include <nucleos/wait.h>
+#include <asm/syscall.h>
 
 pid_t wait(int *status)
 {
