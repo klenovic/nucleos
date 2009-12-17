@@ -343,26 +343,12 @@ ENTRY(system_call)
 
 	/* save the pointer to the current process */
 	push	%ebp			/* pt_regs */
-	call	map_scall_endpt		/* create a message from passed values
-					 *   and prepare registers for sys_call
-					 *   and return the endpoint */
-
-	push	DXREG(%ebp)
-	push	BXREG(%ebp)
-	push	AXREG(%ebp)
-	push	CXREG(%ebp)
 
 	/* for stack trace */
 	movl	$0, %ebp
 
-	call	sys_call
-
-	/* remove sys_call args */
-	add	$4 * 4, %esp
-
-	/* restore the current process pointer and save the return value */
-	pop	%esi
-	mov	%eax, AXREG(%esi)
+	call	map_scall_endpt		/* map inputs and do the system call */
+	add	$4, %esp
 
 	jmp	restart
 
