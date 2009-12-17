@@ -13,21 +13,5 @@
 
 pid_t wait(int *status)
 {
-	int resultvar = 0;
-	int __msg[9] = {0, __NNR_wait};
-
-	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
-		: "=a" (resultvar)
-		: "0"(__msg), "b"(status)
-		: "memory", "cc"
-	);
-
-	resultvar = __msg[1];
-
-	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
-		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
-		return -1;
-	}
-
-	return resultvar;
+	return INLINE_SYSCALL(wait, 1, status);
 }
