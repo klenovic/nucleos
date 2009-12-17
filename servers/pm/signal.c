@@ -875,3 +875,25 @@ int sys_sigsuspend(void)
 
 	return SUSPEND;
 }
+
+#define p_sig_context	m2_p1
+#define v_sig_set	m2_l1
+
+int scall_sigreturn(void)
+{
+	/* A user signal handler is done.  Restore context and check for
+	 * pending unblocked signals.
+	 */
+	int err;
+
+	mp->mp_sigmask = (sigset_t) m_in.v_sig_set;
+
+	sigdelset(&mp->mp_sigmask, SIGKILL);
+	sigdelset(&mp->mp_sigmask, SIGSTOP);
+
+	err = sys_sigreturn(who_e, (struct sigmsg*) m_in.p_sig_context);
+
+	check_pending(mp);
+
+	return err;
+}

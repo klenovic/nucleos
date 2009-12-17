@@ -20,15 +20,27 @@ int sigreturn(register struct sigcontext *scp)
 	 * a message is sent to restart the current process, who knows what will
 	 * be in the place formerly occupied by the message?
 	 */
-	static message m;
+	int resultvar = 0;
+	static int __msg[9];
+
+	__msg[1] = __NNR_sigreturn;
 
 	/* Protect against race conditions by blocking all interrupts. */
 	sigfillset(&set);		/* splhi */
 	sigprocmask(SIG_SETMASK, &set, (sigset_t *) NULL);
 
-	m.m2_l1 = scp->sc_mask;
-	m.m2_i2 = scp->sc_flags;
-	m.m2_p1 = (char *) scp;
+	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
+		: "=a" (resultvar)
+		: "0"(__msg), "b"(scp), "c"(scp->sc_mask), "d"(scp->sc_flags)
+		: "memory", "cc"
+	);
 
-	return(ksyscall(PM_PROC_NR, __NR_sigreturn, &m));	/* normally this doesn't return */
+	resultvar = __msg[1];
+
+	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
+		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
+		return -1;
+	}
+
+	return resultvar;
 }

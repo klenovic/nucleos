@@ -181,7 +181,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(signal,		no_sys),	/* n/a: implemented via sigaction */
 	SCALL_HANDLER(sigpending,	sys_sigpending),
 	SCALL_HANDLER(sigprocmask,	sys_sigprocmask),
-	SCALL_HANDLER(sigreturn,	no_sys),
+	SCALL_HANDLER(sigreturn,	scall_sigreturn),
 	SCALL_HANDLER(sigsuspend,	sys_sigsuspend),
 	SCALL_HANDLER(sprof,		do_sprofile),
 	SCALL_HANDLER(stime,		scall_stime),

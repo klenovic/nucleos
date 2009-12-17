@@ -546,7 +546,12 @@ static void msg_sigprocmask(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (void*)r->dx;	/* oldset */
 }
 
-static void msg_sigreturn(message *msg, struct pt_regs *r){}
+static void msg_sigreturn(message *msg, struct pt_regs *r)
+{
+	msg->m2_p1 = (void*)r->bx;	/* sigcontext */
+	msg->m2_l1 = r->cx;		/* mask */
+	msg->m2_i2 = r->dx;		/* flags */
+}
 
 static void msg_sigsuspend(message *msg, struct pt_regs *r)
 {

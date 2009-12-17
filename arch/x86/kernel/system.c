@@ -448,7 +448,7 @@ struct proc * arch_finish_schedcheck(void)
 
 void restore_regs_syscall_0x80(struct proc *proc)
 {
-	if (proc_ptr->syscall_0x80) {
+	if (proc_ptr->syscall_0x80 && proc_ptr->syscall_0x80 != __NNR_sigreturn) {
 		/* @nucleos: Return the real syscall result not of the KIPC.
 		 *
 		 *           NOTE: This is ignored for now and the result is
