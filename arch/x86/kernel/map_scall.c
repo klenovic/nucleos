@@ -640,10 +640,11 @@ static void msg_utime(message *msg, struct pt_regs *r)
 
 static void msg_wait(message *msg, struct pt_regs *r)
 {
-	/* @nucleos: Should be the `status' address but the legacy way is used
-	 *           for now. The exit status of child is returned in parents
-	 *           reply message.
+	/* @nucleos: The `msg->m1_p1' is not really used but
+	 *           `r->bx' is important. It holds the status
+	 *           address.
 	 */
+	msg->m1_p1 = (void*)r->bx;	/* status */
 }
 
 static void msg_waitpid(message *msg, struct pt_regs *r)

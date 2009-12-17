@@ -17,7 +17,7 @@ pid_t wait(int *status)
 
 	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
 		: "=a" (resultvar)
-		: "0" (__msg)
+		: "0"(__msg), "b"(status)
 		: "memory", "cc"
 	);
 
@@ -26,10 +26,6 @@ pid_t wait(int *status)
 	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
 		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
 		return -1;
-	}
-
-	if (status) {
-		*status = __msg[2];
 	}
 
 	return resultvar;
