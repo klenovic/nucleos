@@ -457,13 +457,26 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		 */
 		proc_ptr->p_reg.retreg = proc_ptr->p_delivermsg.m_type;
 
-		if (proc_ptr->syscall_0x80 == __NNR_wait) {
-			int status = proc_ptr->p_delivermsg.m2_i1;
-			int __user *p_status = (int*)proc_ptr->clobregs[CLOBB_REG_EBX];
+		int wait_waitpid = 0;
+		int __user *p_status = 0;
+		int status = 0;
 
-			if (p_status)
-				copy_to_user(p_status, &status, sizeof(int));
+		switch (proc_ptr->syscall_0x80) {
+		case __NNR_wait:
+			wait_waitpid = 1;
+			status = proc_ptr->p_delivermsg.m2_i1;
+			p_status = (int*)proc_ptr->clobregs[CLOBB_REG_EBX];
+			break;
+
+		case __NNR_waitpid:
+			wait_waitpid = 1;
+			status = proc_ptr->p_delivermsg.m2_i1;
+			p_status = (int*)proc_ptr->clobregs[CLOBB_REG_ECX];
+			break;
 		}
+
+		if (wait_waitpid && p_status)
+			copy_to_user(p_status, &status, sizeof(int));
 
 		proc_ptr->p_reg.bx = proc_ptr->clobregs[CLOBB_REG_EBX];
 		proc_ptr->p_reg.cx = proc_ptr->clobregs[CLOBB_REG_ECX];

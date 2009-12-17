@@ -649,8 +649,13 @@ static void msg_wait(message *msg, struct pt_regs *r)
 
 static void msg_waitpid(message *msg, struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* pid */
-	msg->m1_i2 = r->cx;	/* options */
+	/* @nucleos: The `msg->m1_p1' is not really used but
+	 *           `r->cx' is important. It holds the status
+	 *           address.
+	 */
+	msg->m1_i1 = r->bx;		/* pid */
+	msg->m1_p1 = (void*)r->cx;	/* status */
+	msg->m1_i2 = r->dx;		/* options */
 }
 
 static void msg_write(message *msg, struct pt_regs *r)
