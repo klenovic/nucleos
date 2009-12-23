@@ -103,7 +103,7 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	r->cx = KIPC_SENDREC;
 	r->dx = 0;
 
-	r->ax = sys_call(r->cx, r->ax, (message*)r->bx, r->dx);
+	sys_call(r->cx, r->ax, (message*)r->bx, r->dx);
 
 	return r->ax;
 }
