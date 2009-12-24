@@ -63,7 +63,7 @@ static inline long strnlen_user(const char __user *s, size_t maxlen)
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
-	message *msg = (message*)r->ax;
+	message __user *msg = (message*)r->ax;
 
 	memset(&kmsg, 0, sizeof(message));
 
