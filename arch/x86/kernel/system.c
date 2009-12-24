@@ -449,42 +449,42 @@ struct proc * arch_finish_schedcheck(void)
 
 void restore_regs_syscall_0x80(struct proc *proc)
 {
-	if (proc_ptr->syscall_0x80 && proc_ptr->syscall_0x80 != __NNR_sigreturn) {
+	if (proc->syscall_0x80 && proc->syscall_0x80 != __NNR_sigreturn) {
 		/* @nucleos: Return the real syscall result not of the KIPC.
 		 *
 		 *           NOTE: This is ignored for now and the result is
 		 *                 got from message.
 		 */
-		proc_ptr->p_reg.retreg = proc_ptr->p_delivermsg.m_type;
+		proc->p_reg.retreg = proc->p_delivermsg.m_type;
 
 		int wait_waitpid = 0;
 		int __user *p_status = 0;
 		int status = 0;
 
-		switch (proc_ptr->syscall_0x80) {
+		switch (proc->syscall_0x80) {
 		case __NNR_wait:
 			wait_waitpid = 1;
-			status = proc_ptr->p_delivermsg.m2_i1;
-			p_status = (int*)proc_ptr->clobregs[CLOBB_REG_EBX];
+			status = proc->p_delivermsg.m2_i1;
+			p_status = (int*)proc->clobregs[CLOBB_REG_EBX];
 			break;
 
 		case __NNR_waitpid:
 			wait_waitpid = 1;
-			status = proc_ptr->p_delivermsg.m2_i1;
-			p_status = (int*)proc_ptr->clobregs[CLOBB_REG_ECX];
+			status = proc->p_delivermsg.m2_i1;
+			p_status = (int*)proc->clobregs[CLOBB_REG_ECX];
 			break;
 		}
 
 		if (wait_waitpid && p_status)
 			copy_to_user(p_status, &status, sizeof(int));
 
-		proc_ptr->p_reg.bx = proc_ptr->clobregs[CLOBB_REG_EBX];
-		proc_ptr->p_reg.cx = proc_ptr->clobregs[CLOBB_REG_ECX];
-		proc_ptr->p_reg.dx = proc_ptr->clobregs[CLOBB_REG_EDX];
-		proc_ptr->p_reg.si = proc_ptr->clobregs[CLOBB_REG_ESI];
-		proc_ptr->p_reg.di = proc_ptr->clobregs[CLOBB_REG_EDI];
-		proc_ptr->p_reg.fp = proc_ptr->clobregs[CLOBB_REG_EBP];
+		proc->p_reg.bx = proc->clobregs[CLOBB_REG_EBX];
+		proc->p_reg.cx = proc->clobregs[CLOBB_REG_ECX];
+		proc->p_reg.dx = proc->clobregs[CLOBB_REG_EDX];
+		proc->p_reg.si = proc->clobregs[CLOBB_REG_ESI];
+		proc->p_reg.di = proc->clobregs[CLOBB_REG_EDI];
+		proc->p_reg.fp = proc->clobregs[CLOBB_REG_EBP];
 
-		proc_ptr->syscall_0x80 = 0;
+		proc->syscall_0x80 = 0;
 	}
 }
