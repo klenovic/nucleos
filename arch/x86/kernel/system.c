@@ -450,16 +450,16 @@ struct proc * arch_finish_schedcheck(void)
 void restore_regs_syscall_0x80(struct proc *proc)
 {
 	if (proc->syscall_0x80 && proc->syscall_0x80 != __NNR_sigreturn) {
+		int wait_waitpid = 0;
+		int __user *p_status = 0;
+		int status = 0;
+
 		/* @nucleos: Return the real syscall result not of the KIPC.
 		 *
 		 *           NOTE: This is ignored for now and the result is
 		 *                 got from message.
 		 */
 		proc->p_reg.retreg = proc->p_delivermsg.m_type;
-
-		int wait_waitpid = 0;
-		int __user *p_status = 0;
-		int status = 0;
 
 		switch (proc->syscall_0x80) {
 		case __NNR_wait:
