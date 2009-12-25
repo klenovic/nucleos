@@ -83,6 +83,11 @@ int sys_getppid(void)
 	return mproc[mp->mp_parent].mp_pid;
 }
 
+int sys_geteuid(void)
+{
+	return mp->mp_effuid;
+}
+
 int sys_getuid(void)
 {
 	return mp->mp_realuid;

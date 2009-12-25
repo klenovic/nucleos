@@ -106,6 +106,7 @@
 #define __NNR_mmap		(82 + __syscall_offset)
 #define __NNR_munmap		(83 + __syscall_offset)
 #define __NNR_munmap_text	(84 + __syscall_offset)
+#define __NNR_geteuid		(85 + __syscall_offset)
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 

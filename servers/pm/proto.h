@@ -59,6 +59,7 @@ int sys_getpgrp(void);
 int sys_getpid(void);
 int sys_getppid(void);
 int sys_getuid(void);
+int sys_geteuid(void);
 int sys_setegid(void);
 int sys_seteuid(void);
 int sys_setgid(void);
