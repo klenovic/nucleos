@@ -15,6 +15,9 @@
 #include <nucleos/time.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
+
+struct timeval;
+
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
 #endif
 
