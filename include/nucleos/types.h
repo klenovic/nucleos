@@ -148,7 +148,7 @@ typedef __s64		int64_t;
 #define aligned_be64 __be64 __attribute__((aligned(8)))
 #define aligned_le64 __le64 __attribute__((aligned(8)))
 
-/* @klenovic: don't use these below (will be removed) */
+/* @nucleos: don't use these below (will be removed) */
 typedef u8  u8_t;	/* 8 bit type */
 typedef u16 u16_t;	/* 16 bit type */
 typedef u32 u32_t;	/* 32 bit type */

@@ -10,6 +10,6 @@
 #ifndef __ASM_X86_POSIX_TYPES_64_H
 #define __ASM_X86_POSIX_TYPES_64_H
 
-/* @klenovic: maybe one day ... */
+/* @nucleos: maybe one day ... */
 
 #endif /* __ASM_X86_POSIX_TYPES_64_H */

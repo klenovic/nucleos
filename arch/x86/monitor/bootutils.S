@@ -349,7 +349,7 @@ _sbrk:
 	cmp	%ax, %dx
 	jae	plenty           // No reason to complain
 
-/* @klenovic: `printf' doesn't work from asm. for now thus no
+/* @nucleos: `printf' doesn't work from asm. for now thus no
 	          warnings here
 	mov	$0xbadc0de1,%eax
 1:
@@ -373,7 +373,7 @@ heaperr:
 1:
 	jmp	1b            // Hang on
 	pop	%bx
-/* @klenovic: `printf' doesn't work from asm. for now
+/* @nucleos: `printf' doesn't work from asm. for now
 	mov	$chmem, %ax
 	push	%ax
 	mov	$nomem, %ax

@@ -23,7 +23,7 @@
 
 /* Default FD_SETSIZE is OPEN_MAX. */
 #undef __FD_SETSIZE	// FD_SETSIZE
-#define __FD_SETSIZE	32 /* @klenovic: the value of OPEN_MAX */
+#define __FD_SETSIZE	32 /* @nucleos: the value of OPEN_MAX */
 
 
 #undef __FDSET_LONGS

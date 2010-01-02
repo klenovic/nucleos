@@ -282,7 +282,7 @@ phys_copy:
 	and	$3, %ecx                 // count for alignment
 	sub	%ecx, %eax
 	rep
-	movsb	%es:(%esi), %es:(%edi)   // @klenovic: this long form is important here
+	movsb	%es:(%esi), %es:(%edi)   // @nucleos: this long form is important here
 	                                 //         otherwise the source %ds is used for source
 	mov	%eax, %ecx
 	shr	$2, %ecx                 // count of dwords

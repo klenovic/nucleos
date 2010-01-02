@@ -10,6 +10,6 @@
 #ifndef __ASM_X86_UNISTD_64_H
 #define __ASM_X86_UNISTD_64_H
 
-/* @klenovic: just a dummy for now */
+/* @nucleos: just a dummy for now */
 
 #endif /* __ASM_X86_UNISTD_64_H */

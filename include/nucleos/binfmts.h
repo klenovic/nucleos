@@ -127,7 +127,7 @@ static inline int find_binfmt_handler(struct nucleos_binprm *param, struct vnode
 	return -1;
 }
 
-/* @klenovic: Once it's linked list then implement these methods */
+/* @nucleos: Once it's linked list then implement these methods */
 /**
  * @brief Register new binary format handler
  * @param binfmt  pointer to new binary format handler

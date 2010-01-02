@@ -21,7 +21,7 @@
 #define _POSIX_LINK_MAX      8	/* a file may have 8 links */
 #define _POSIX_MAX_CANON   255	/* size of the canonical input queue */
 #define _POSIX_MAX_INPUT   255	/* you can type 255 chars ahead */
-#define _POSIX_NAME_MAX	    60/* max. file name length; @klenovic: the value of DIRSIZ */
+#define _POSIX_NAME_MAX	    60/* max. file name length; @nucleos: the value of DIRSIZ */
 #define _POSIX_NGROUPS_MAX   0	/* supplementary group IDs are optional */
 #define _POSIX_OPEN_MAX     16	/* a process may have 16 files open */
 #define _POSIX_PATH_MAX    255	/* a pathname may contain 255 chars */
@@ -47,12 +47,12 @@
 #define LINK_MAX      CHAR_MAX	/* # links a file may have (V1 file system ) */
 #else
 #define LINK_MAX      	 32767  /* # links a file may have (V2 or better file system)
-				 * @klenovic: the value of SHORT_MAX */
+				 * @nucleos: the value of SHORT_MAX */
 #endif
 
 #define MAX_CANON          255	/* size of the canonical input queue */
 #define MAX_INPUT          255	/* size of the type-ahead buffer */
-#define NAME_MAX            60  /* # chars in a file name; @klenovic: the value of DIRSIZ */
+#define NAME_MAX            60  /* # chars in a file name; @nucleos: the value of DIRSIZ */
 #define PATH_MAX           255	/* # chars in a path name */
 #define PIPE_BUF          7168	/* # bytes in atomic write to a pipe */
 #define STREAM_MAX          20	/* must be the same as FOPEN_MAX in stdio.h */

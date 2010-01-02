@@ -119,7 +119,7 @@ char *name;
   }
 
   /* Save initial cycle count on stack. */
-/* @klenovic: minix3 impl.
+/* @nucleos: minix3 impl.
   cprof_stk[cprof_stk_top].start_1._[U64_HI] = start._[U64_HI];
   cprof_stk[cprof_stk_top].start_1._[U64_LO] = start._[U64_LO];
 */
@@ -185,7 +185,7 @@ char *name;
 
   /* Again save CPU cycle count on stack. */
 
-/* @klenovic: minix3 impl.
+/* @nucleos: minix3 impl.
     read_tsc(&cprof_stk[cprof_stk_top].start_2._[U64_HI],
 		&cprof_stk[cprof_stk_top].start_2._[U64_LO]);
  */
@@ -206,7 +206,7 @@ char *name;
   if (cprof_locked) return; else cprof_locked = 1;
 
   /* First thing: read CPU cycle count into local variable. */
-/* @klenovic: minix impl.
+/* @nucleos: minix impl.
    read_tsc(&stop._[U64_HI], &stop._[U64_LO]);
  */
   read_tsc(&stop_hi, &stop_lo);
@@ -229,7 +229,7 @@ char *name;
 		sub64(spent, cprof_stk[cprof_stk_top].spent_deeper));
 
   /* Clear spent_deeper for call level we're leaving. */
-/* @klenovic: minix impl.
+/* @nucleos: minix impl.
   cprof_stk[cprof_stk_top].spent_deeper._[U64_LO] = 0;
   cprof_stk[cprof_stk_top].spent_deeper._[U64_HI] = 0;
 */
@@ -249,7 +249,7 @@ char *name;
    */
 
   /* Read CPU cycle count. */
-/* @klenovic: minix impl.
+/* @nucleos: minix impl.
    read_tsc(&stop._[U64_HI], &stop._[U64_LO]);
  */
   read_tsc(&stop_hi, &stop_lo);
@@ -281,7 +281,7 @@ static void cprof_init() {
   for (i=0; i<CPROF_STACK_SIZE; i++) {
 	cprof_stk[i].cpath_len = 0;
 	cprof_stk[i].slot = 0;
-/* @klenovic: minix impl.
+/* @nucleos: minix impl.
 	cprof_stk[i].start_1._[U64_LO] = 0;
 	cprof_stk[i].start_1._[U64_HI] = 0;
 	cprof_stk[i].start_2._[U64_LO] = 0;
@@ -314,7 +314,7 @@ static void clear_tbl()
 	memset(cprof_tbl[i].cpath, '\0', CPROF_CPATH_MAX_LEN);
 	cprof_tbl[i].next = 0;
 	cprof_tbl[i].calls = 0;
-/* @klenovic: minix impl.
+/* @nucleos: minix impl.
 	cprof_tbl[i].cycles._[U64_LO] = 0;
 	cprof_tbl[i].cycles._[U64_HI] = 0;
  */

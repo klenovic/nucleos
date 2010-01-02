@@ -175,7 +175,7 @@ no_ext:
 // Time to switch to a higher level language (not much higher)
 	call	boot
 
-/* @klenovic:
+/* @nucleos:
 	In case of separate I&D it is really important to place into correct
 	section otherwise it is placed into .text section which different 
 	segment.

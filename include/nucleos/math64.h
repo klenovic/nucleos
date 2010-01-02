@@ -81,7 +81,7 @@ static inline u64 div_u64(u64 dividend, u32 divisor)
 {
 	u32 remainder;
 
-	/* @klenovic: do_div modifies dividend in place so safe the it */
+	/* @nucleos: do_div modifies dividend in place so safe the it */
 	return div_u64_rem(dividend, divisor, &remainder);
 }
 #endif
