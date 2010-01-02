@@ -18,23 +18,21 @@
  */
 
 /* This many bits fit in an fd_set word. */
-#undef __NFDBITS	// FDBITSPERWORD
+#undef __NFDBITS
 #define __NFDBITS	(8 * sizeof(unsigned long))
 
-/* Default FD_SETSIZE is OPEN_MAX. */
-#undef __FD_SETSIZE	// FD_SETSIZE
-#define __FD_SETSIZE	32 /* @nucleos: the value of OPEN_MAX */
-
+#undef __FD_SETSIZE
+#define __FD_SETSIZE	32	/* @nucleos: Default of __FD_SETSIZE is OPEN_MAX. */
 
 #undef __FDSET_LONGS
-#define __FDSET_LONGS   (__FD_SETSIZE/__NFDBITS)
+#define __FDSET_LONGS	(__FD_SETSIZE/__NFDBITS)
 
-#undef __FDELT		//_FD_BITWORD
-#define __FDELT(d)      ((d) / __NFDBITS)
+#undef __FDELT
+#define __FDELT(d)	((d) / __NFDBITS)
 
 /* Bit manipulation macros */
-#undef __FDMASK		// _FD_MASK
-#define __FDMASK(d)     (1UL << ((d) % __NFDBITS))
+#undef __FDMASK
+#define __FDMASK(d)	(1UL << ((d) % __NFDBITS))
 
 typedef struct {
 	unsigned long fds_bits[__FDSET_LONGS];
