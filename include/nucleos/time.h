@@ -12,6 +12,26 @@
 
 #include <nucleos/types.h>
 
+#ifndef _STRUCT_TIMESPEC
+#define _STRUCT_TIMESPEC
+struct timespec
+{
+	__kernel_time_t tv_sec;
+	long tv_nsec;
+};
+#endif
+
+struct timeval
+{
+	long tv_sec;	/*time_t*/
+	long tv_usec;	/*useconds_t*/
+};
+
+struct timezone {
+	int tz_minuteswest;	/* minutes west of Greenwich */
+	int tz_dsttime;		/* type of dst correction */
+};
+
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
 #include <nucleos/select.h>
@@ -45,33 +65,14 @@ void tzset(void);
 int stime(time_t *_top);
 
 extern long timezone;
-
-struct timespec
-{
-	time_t tv_sec;
-	long tv_nsec;
-};
+struct timespec;
 
 int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
-
-#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
-
-/* Open Group Base Specifications Issue 6 (not complete) */
-struct timeval
-{
-	long /*time_t*/ tv_sec;
-	long /*useconds_t*/ tv_usec;
-};
-
-struct timezone {
-	int     tz_minuteswest; /* minutes west of Greenwich */
-	int     tz_dsttime;     /* type of dst correction */
-};
-
-int gettimeofday(struct timeval *__restrict tp, void *__restrict tzp);
+int gettimeofday(struct timeval *tp, void *tzp);
 
 /* Compatibility with other Unix systems */
 int settimeofday(const struct timeval *tp, const void *tzp);
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 /* setitimer/getitimer interface */
 struct itimerval
@@ -80,13 +81,9 @@ struct itimerval
 	struct timeval it_value;
 };
 
-#define ITIMER_REAL 0
-#define ITIMER_VIRTUAL 1	/* Not implemented */
-#define ITIMER_PROF 2		/* Not implemented */
-
-int getitimer(int which, struct itimerval *value);
-int setitimer(int which, const struct itimerval *__restrict value,
-	      struct itimerval *__restrict ovalue);
+#define ITIMER_REAL	0
+#define ITIMER_VIRTUAL	1	/* Not implemented */
+#define ITIMER_PROF	2		/* Not implemented */
 
 #define NFDBITS			__NFDBITS
 
@@ -95,5 +92,11 @@ int setitimer(int which, const struct itimerval *__restrict value,
 #define FD_SET(fd,fdsetp)	__FD_SET(fd,fdsetp)
 #define FD_CLR(fd,fdsetp)	__FD_CLR(fd,fdsetp)
 #define FD_ISSET(fd,fdsetp)	__FD_ISSET(fd,fdsetp)
+
+#if defined(__KERNEL__) || defined(__UKERNEL__)
+int getitimer(int which, struct itimerval *value);
+int setitimer(int which, const struct itimerval *__restrict value,
+	      struct itimerval *__restrict ovalue);
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_TIME_H */
