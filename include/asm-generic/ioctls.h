@@ -22,7 +22,7 @@
  * used in each header file are shown in the comment following.
  */
 #include <asm-generic/ioctls-tty.h>	/* 'T' 't' 'k'		*/
-#include <net/ioctl.h>			/* 'n'			*/
+#include <asm-generic/ioctls-net.h>	/* 'n'			*/
 #include <asm-generic/ioctls-disk.h>	/* 'd'			*/
 #include <asm-generic/ioctls-file.h>	/* 'f'			*/
 #include <asm-generic/ioctls-memory.h>	/* 'm'			*/

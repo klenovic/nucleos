@@ -56,7 +56,7 @@ typedef int ioreq_t;
 #include <net/gen/udp_io.h>
 
 #include <net/gen/arp_io.h>
-#include <net/ioctl.h>
+#include <asm/ioctls.h>
 
 #include "const.h"
 #include "inet_config.h"

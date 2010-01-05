@@ -7,13 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*	net/ioctl.h - Network ioctl() command codes.	Author: Kees J. Bot
- *								23 Nov 2002
- *
- */
-
-#ifndef _NET__IOCTL_H
-#define _NET__IOCTL_H
+#ifndef __ASM_GENERIC_IOCTLS_NET_H
+#define __ASM_GENERIC_IOCTLS_NET_H
 
 #include <nucleos/ioctl.h>
 
@@ -62,4 +57,4 @@
 #define NWIOSPSIPOPT	_IOW('n', 80, struct nwio_psipopt)
 #define NWIOGPSIPOPT	_IOR('n', 81, struct nwio_psipopt)
 
-#endif /* _NET__IOCTL_H */
+#endif /* __ASM_GENERIC_IOCTLS_NET_H */
