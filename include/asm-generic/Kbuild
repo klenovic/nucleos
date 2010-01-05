@@ -12,6 +12,7 @@ header-y += ioctls-cmos.h
 header-y += ioctls-disk.h
 header-y += ioctls-file.h
 header-y += ioctls-memory.h
+header-y += ioctls-net.h
 header-y += ioctls-scsi.h
 header-y += ioctls-sound.h
 header-y += ioctls-svrctl.h
