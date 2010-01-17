@@ -14,8 +14,13 @@
 
 #include <nucleos/types.h>
 
-struct statfs {
-	off_t f_bsize;		/* file system block size */
-};
+/*
+ * We need compat_statfs64 to be packed, because the i386 ABI won't
+ * add padding at the end to bring it to a multiple of 8 bytes, but
+ * the x86_64 ABI will.
+ */
+#define ARCH_PACK_COMPAT_STATFS64 __attribute__((packed,aligned(4)))
+
+#include <asm-generic/statfs.h>
 
 #endif /* __X86_ASM_STATFS_H */

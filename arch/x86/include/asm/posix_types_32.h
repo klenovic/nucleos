@@ -39,6 +39,10 @@ typedef int 		__kernel_ptrdiff_t;
 typedef long long	__kernel_loff_t;
 #endif
 
+typedef struct {
+	int	val[2];
+} __kernel_fsid_t;
+
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
 #undef  __FD_SET
