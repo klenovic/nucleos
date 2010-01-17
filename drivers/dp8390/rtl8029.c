@@ -19,8 +19,8 @@ Created:	April 2000 by Philip Homburg <philip@f-mnx.phicoh.com>
 
 #include <stdlib.h>
 #include <nucleos/types.h>
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include <ibm/pci.h>
 
 #include "assert.h"

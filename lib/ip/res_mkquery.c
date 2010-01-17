@@ -31,9 +31,9 @@
 #include <nucleos/string.h>
 
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/nameser.h>
-#include <net/gen/resolv.h>
+#include <net/in.h>
+#include <net/nameser.h>
+#include <net/resolv.h>
 
 #define bzero(b,l) memset(b,0,l)
 #define bcopy(s,d,l) memcpy(d,s,l)

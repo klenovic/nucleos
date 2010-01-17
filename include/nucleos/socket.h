@@ -16,7 +16,7 @@
 #include <nucleos/types.h>
 
 /* Open Group Base Specifications Issue 6 (not complete) */
-#include <net/gen/socket.h>
+#include <net/socket.h>
 
 #define SOCK_STREAM	1
 #define SOCK_DGRAM	2

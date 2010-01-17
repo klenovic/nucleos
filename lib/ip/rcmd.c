@@ -38,10 +38,10 @@
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
-#include <net/gen/netdb.h>
-#include <net/gen/in.h>
-#include <net/gen/tcp.h>
-#include <net/gen/tcp_io.h>
+#include <net/netdb.h>
+#include <net/in.h>
+#include <net/tcp.h>
+#include <net/tcp_io.h>
 #include <net/hton.h>
 #include <net/netlib.h>
 

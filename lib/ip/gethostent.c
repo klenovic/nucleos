@@ -24,10 +24,10 @@
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <nucleos/string.h>
-#include <net/gen/netdb.h>
-#include <net/gen/in.h>
-#include <net/gen/inet.h>
-#include <net/gen/socket.h>
+#include <net/netdb.h>
+#include <net/in.h>
+#include <net/inet.h>
+#include <net/socket.h>
 
 #define arraysize(a)	(sizeof(a) / sizeof((a)[0]))
 #define arraylimit(a)	((a) + arraysize(a))

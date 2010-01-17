@@ -55,8 +55,8 @@
 #include <nucleos/drivers.h>
 #include <nucleos/keymap.h>
 #include <net/hton.h>
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include <assert.h>
 
 #include <nucleos/syslib.h>

@@ -13,7 +13,7 @@
  */
 
 #include <nucleos/types.h>
-#include <net/gen/oneCsum.h>
+#include <net/oneCsum.h>
 
 u16_t oneC_sum(u16 prev, void *data, size_t size)
 {

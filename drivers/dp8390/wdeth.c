@@ -15,8 +15,8 @@ Created:	March 14, 1994 by Philip Homburg
 
 #include <nucleos/drivers.h>
 
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include "assert.h"
 
 #include "local.h"

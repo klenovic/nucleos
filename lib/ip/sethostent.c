@@ -50,10 +50,10 @@
 #include <resolv.h>
 #else
 #include <nucleos/types.h>
-#include <net/gen/in.h>
-#include <net/gen/nameser.h>
-#include <net/gen/netdb.h>
-#include <net/gen/resolv.h>
+#include <net/in.h>
+#include <net/nameser.h>
+#include <net/netdb.h>
+#include <net/resolv.h>
 #endif
 
 void

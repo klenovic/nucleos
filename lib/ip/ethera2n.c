@@ -18,8 +18,8 @@ Created:	Nov 17, 1992 by Philip Homburg
 #include <nucleos/types.h>
 #include <stdlib.h>
 #include <net/netlib.h>
-#include <net/gen/ether.h>
-#include <net/gen/if_ether.h>
+#include <net/ether.h>
+#include <net/if_ether.h>
 
 struct ether_addr *ether_aton(s)
 const char *s;

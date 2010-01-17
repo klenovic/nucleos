@@ -32,12 +32,12 @@
 #include <nucleos/string.h>
 
 #include <net/hton.h>
-#include <net/gen/nameser.h>
-#include <net/gen/netdb.h>
-#include <net/gen/in.h>
-#include <net/gen/inet.h>
-#include <net/gen/resolv.h>
-#include <net/gen/socket.h>
+#include <net/nameser.h>
+#include <net/netdb.h>
+#include <net/in.h>
+#include <net/inet.h>
+#include <net/resolv.h>
+#include <net/socket.h>
 
 #define	MAXALIASES	35
 #define	MAXADDRS	35

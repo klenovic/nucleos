@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <net/gen/netdb.h>
+#include <net/netdb.h>
 
 static char *any(char *cp, char *match);
 

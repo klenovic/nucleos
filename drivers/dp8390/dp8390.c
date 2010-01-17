@@ -67,8 +67,8 @@
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <net/hton.h>
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include <asm/servers/vm/vm.h>
 #include <servers/vm/vm.h>
 #include "assert.h"

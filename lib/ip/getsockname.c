@@ -23,11 +23,11 @@
 #include <nucleos/socket.h>
 #include <netinet/in.h>
 
-#include <net/gen/in.h>
-#include <net/gen/tcp.h>
-#include <net/gen/tcp_io.h>
-#include <net/gen/udp.h>
-#include <net/gen/udp_io.h>
+#include <net/in.h>
+#include <net/tcp.h>
+#include <net/tcp_io.h>
+#include <net/udp.h>
+#include <net/udp_io.h>
 
 #include <asm/ioctls.h>
 

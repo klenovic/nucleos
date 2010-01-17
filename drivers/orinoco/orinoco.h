@@ -17,8 +17,8 @@
  *	  and Michael Valkering <mjvalker@cs.vu.nl>
  */
 
-#include		<net/gen/ether.h>
-#include		<net/gen/eth_io.h>
+#include		<net/ether.h>
+#include		<net/eth_io.h>
 
 #define 		NR_RX_BUFS 32
 

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 
 /* PCI STUFF */
 #define PCI_BASE_ADDRESS_0		0x10

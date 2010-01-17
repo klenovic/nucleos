@@ -28,11 +28,11 @@
 #include <nucleos/limits.h>
 #include <pwd.h>
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/netdb.h>
-#include <net/gen/inet.h>
-#include <net/gen/socket.h>
-#include <net/gen/nameser.h>
+#include <net/in.h>
+#include <net/netdb.h>
+#include <net/inet.h>
+#include <net/socket.h>
+#include <net/nameser.h>
 
 /* Odd global variable.  Seems to be used by lpd(8). */
 int	__check_rhosts_file = 1;

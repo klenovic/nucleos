@@ -31,7 +31,7 @@
 #include <stdlib.h>
 
 #include <net/hton.h>
-#include <net/gen/netdb.h>
+#include <net/netdb.h>
 
 #define	MAXALIASES	35
 

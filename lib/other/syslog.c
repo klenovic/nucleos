@@ -62,12 +62,12 @@
 #include <nucleos/ioctl.h>
 #include <net/netlib.h>
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/udp.h>
-#include <net/gen/udp_io.h>
-#include <net/gen/netdb.h>
+#include <net/in.h>
+#include <net/udp.h>
+#include <net/udp_io.h>
+#include <net/netdb.h>
 #include <nucleos/errno.h>
-#include <net/gen/inet.h>
+#include <net/inet.h>
 #include <asm/ioctls.h>
 
 static int LogPid = (-1);

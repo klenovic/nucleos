@@ -15,8 +15,8 @@
 #include <nucleos/string.h>
 #include <nucleos/types.h>
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/dhcp.h>
+#include <net/in.h>
+#include <net/dhcp.h>
 
 #define arraysize(a)	(sizeof(a) / sizeof((a)[0]))
 #define arraylimit(a)	((a) + arraysize(a))

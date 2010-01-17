@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
-net/gen/rip.h
+net/rip.h
 
 Definitions for the Routing Information Protocol (RFC-1058).
 

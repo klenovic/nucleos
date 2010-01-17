@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
-net/gen/vjhc.h
+net/vjhc.h
 
 Defines for Van Jacobson TCP/IP Header Compression as defined in RFC-1144
 

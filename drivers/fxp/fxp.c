@@ -65,8 +65,8 @@
 
 #include <stdlib.h>
 #include <net/hton.h>
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include <ibm/pci.h>
 #include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>

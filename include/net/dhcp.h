@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*	net/gen/dhcp.h - DHCP packet format		Author: Kees J. Bot
+/*	net/dhcp.h - DHCP packet format		Author: Kees J. Bot
  *								1 Dec 2000
  */
 

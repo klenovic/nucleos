@@ -28,9 +28,9 @@
 #include <nucleos/types.h>
 #include <stdlib.h>
 
-#include <net/gen/in.h>
-#include <net/gen/nameser.h>
-#include <net/gen/resolv.h>
+#include <net/in.h>
+#include <net/nameser.h>
+#include <net/resolv.h>
 
 static int dn_find(const u_char *exp_dn, const u_char *msg, u_char **dnptrs, u_char **lastdnptr);
 int dn_skipname(const u_char *comp_dn, const u_char *eom);

@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /*
-net/gen/arp_io.h
+net/arp_io.h
 
 Created:	Jan 2001 by Philip Homburg <philip@f-mnx.phicoh.com>
 */

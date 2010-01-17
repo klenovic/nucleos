@@ -21,12 +21,12 @@
 #include <nucleos/time.h>
 #include <nucleos/ioctl.h>
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/tcp.h>
-#include <net/gen/tcp_io.h>
-#include <net/gen/inet.h>
-#include <net/gen/socket.h>
-#include <net/gen/netdb.h>
+#include <net/in.h>
+#include <net/tcp.h>
+#include <net/tcp_io.h>
+#include <net/inet.h>
+#include <net/socket.h>
+#include <net/netdb.h>
 
 /* Default service access file. */
 static const char *path_servacces = _PATH_SERVACCES;

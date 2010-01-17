@@ -27,7 +27,7 @@
  */
 #include <nucleos/stddef.h>
 #include <nucleos/string.h>
-#include <net/gen/netdb.h>
+#include <net/netdb.h>
 
 extern int _serv_stayopen;
 

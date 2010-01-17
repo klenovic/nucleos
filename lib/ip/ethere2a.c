@@ -15,8 +15,8 @@
 #include <nucleos/types.h>
 #include <stdlib.h>
 
-#include <net/gen/ether.h>
-#include <net/gen/if_ether.h>
+#include <net/ether.h>
+#include <net/if_ether.h>
 
 #define ETHERSTRLEN 18			/* max length of "xx:xx:xx:xx:xx:xx" */
 #define ether_addr	ether_addr_t

@@ -30,8 +30,8 @@
 #include <nucleos/errno.h>
 
 #include <net/hton.h>
-#include <net/gen/in.h>
-#include <net/gen/inet.h>
+#include <net/in.h>
+#include <net/inet.h>
 
 /*
  * Ascii internet address interpretation routine.

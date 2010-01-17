@@ -26,8 +26,8 @@
 #include <nucleos/types.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <net/gen/ether.h>
-#include <net/gen/if_ether.h>
+#include <net/ether.h>
+#include <net/if_ether.h>
 
 int
 ether_line(line, eaddr, hostname)

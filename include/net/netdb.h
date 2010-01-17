@@ -45,7 +45,7 @@
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
-#include <net/gen/in.h>
+#include <net/in.h>
 
 #define	_PATH_HEQUIV	"/etc/hosts.equiv"
 #define	_PATH_HOSTS	"/etc/hosts"

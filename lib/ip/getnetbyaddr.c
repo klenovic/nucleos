@@ -39,7 +39,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <net/gen/netdb.h>
+#include <net/netdb.h>
 
 extern int _net_stayopen;
 

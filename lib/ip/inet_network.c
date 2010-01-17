@@ -41,8 +41,8 @@
  */
 #include <nucleos/types.h>
 #include <ctype.h>
-#include <net/gen/in.h>
-#include <net/gen/inet.h>
+#include <net/in.h>
+#include <net/inet.h>
 
 #define INADDR_NONE	((ipaddr_t) -1)
 

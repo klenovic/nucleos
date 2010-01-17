@@ -19,8 +19,8 @@
 */
 
 #include <nucleos/drivers.h>
-#include <net/gen/ether.h>
-#include <net/gen/eth_io.h>
+#include <net/ether.h>
+#include <net/eth_io.h>
 #include "dp.h"
 
 #if (HAVE_BUFFERS == 1)
