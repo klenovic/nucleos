@@ -311,6 +311,13 @@ int do_getprocnr()
   /* This call should be moved to DS. */
   if (mp->mp_effuid != 0)
   {
+	/* For now, allow non-root processes to request their own endpoint. */
+	if (m_in.pid < 0 && m_in.namelen == 0) {
+		mp->mp_reply.PM_ENDPT = who_e;
+		mp->mp_reply.PM_PENDPT = NONE;
+		return 0;
+	}
+
 	printf("PM: unauthorized call of do_getprocnr by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
