@@ -21,6 +21,14 @@
 #define RSS_NR_PCI_ID		32
 #define RSS_NR_PCI_CLASS	 4
 #define RSS_NR_SYSTEM		 2
+#define RSS_NR_CONTROL		 8
+
+/* Labels are copied over separately. */
+struct rss_label
+{
+	char *l_addr;
+	size_t l_len;
+};
 
 /* Arguments needed to start a new driver or server */
 struct rs_start
@@ -43,12 +51,13 @@ struct rs_start
 	int rss_nr_pci_class;
 	struct { u32_t class; u32_t mask; } rss_pci_class[RSS_NR_PCI_CLASS];
 	u32_t rss_system[RSS_NR_SYSTEM];
-	char *rss_label;
-	size_t rss_labellen;
+	struct rss_label rss_label;
 	char *rss_ipc;
 	size_t rss_ipclen;
 #define RSS_VM_CALL_SIZE BITMAP_CHUNKS(VM_NCALLS)
 	bitchunk_t rss_vm[RSS_VM_CALL_SIZE];
+	int rss_nr_control;
+	struct rss_label rss_control[RSS_NR_CONTROL];
 };
 
 int minix_rs_lookup(const char *name, endpoint_t *value);

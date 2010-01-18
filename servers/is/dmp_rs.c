@@ -18,6 +18,7 @@
 #include <nucleos/kernel.h>
 #include "inc.h"
 #include <nucleos/timer.h>
+#include <servers/rs/rs.h>
 #include <kernel/priv.h>
 #include "../rs/manager.h"
 

@@ -26,6 +26,7 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/bitmap.h>
+#include <servers/rs/rs.h>
 
 #include <asm/kernel/types.h>
 #include <nucleos/timer.h>				/* For priv.h */

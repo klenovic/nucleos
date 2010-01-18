@@ -48,7 +48,6 @@ int main(void)
   int result;                 			/* result to return */
   sigset_t sigset;				/* system signal set */
   int s;
-  uid_t euid;
 
   /* Initialize the server, then go to work. */
   init_server();
@@ -83,8 +82,12 @@ int main(void)
               continue;
 
             default: /* heartbeat notification */
-              if (rproc_ptr[who_p] != NULL)	/* mark heartbeat time */ 
+	      if (rproc_ptr[who_p] != NULL) {	/* mark heartbeat time */ 
                 rproc_ptr[who_p]->r_alive_tm = m.NOTIFY_TIMESTAMP;
+	      } else {
+		  printf("Warning, RS got unexpected notify message from %d\n",
+		      m.m_source);
+	      }
           }
       }
 
@@ -101,17 +104,7 @@ int main(void)
 		continue;
 	  }
 
-	  /* Only root can make calls to rs. unless it's RS_LOOKUP. */
-	  euid= getnuid(m.m_source);
-	  if (euid != 0 && call_nr != RS_LOOKUP)
-	  {
-		printf("RS: got unauthorized request %d from endpoint %d\n",
-			call_nr, m.m_source);
-		m.m_type = -EPERM;
-		reply(who_e, &m);
-		continue;
-	  }
-
+          /* Handler functions are responsible for permission checking. */
           switch(call_nr) {
           case RS_UP: 		result = do_up(&m, FALSE, 0); break;
           case RS_UP_COPY:	result = do_up(&m, TRUE, 0); break;
