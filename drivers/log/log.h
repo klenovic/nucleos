@@ -9,7 +9,7 @@
  */
 /* Includes. */
 #include <nucleos/drivers.h>
-#include <nucleos/driver_asyn.h>
+#include <nucleos/driver.h>
 #include <nucleos/type.h>
 #include <nucleos/const.h>
 #include <nucleos/com.h>
@@ -33,7 +33,6 @@ struct logdevice {
 		log_revive_alerted,
 		log_status;	/* proc that is blocking on read */
 	vir_bytes log_user_vir_g, log_user_vir_offset;
-	int log_safe;
 #endif
 	int	log_selected, log_select_proc,
 		log_select_alerted, log_select_ready_ops;

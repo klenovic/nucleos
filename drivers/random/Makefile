@@ -6,7 +6,7 @@ random.elf32-obj-y := main.o random.o sha2.o aes/
 random.elf32-obj-y += aes/built-in.o
 
 LDFLAGS_random.elf32 := -L$(lib-arch) -Llib \
-			-ldriver_asyn -lsys -lnucc \
+			-ldriver -lsys -lnucc \
 			-Tdrivers/driver_32.lds
 
 $(src)/random.elf32: drivers/driver_32.lds

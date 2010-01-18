@@ -64,12 +64,12 @@ static int openct[NR_DEVS];
 
 static char *m_name(void);
 static struct device *m_prepare(int device);
-static int m_transfer(int proc_nr, int opcode, u64_t position,
-		      iovec_t *iov, unsigned nr_req, int safe);
+static int m_transfer(int proc_nr, int opcode,
+			u64_t position, iovec_t *iov, unsigned nr_req);
 static int m_do_open(struct driver *dp, message *m_ptr);
 static int m_do_close(struct driver *dp, message *m_ptr);
 static void m_init(void);
-static int m_ioctl(struct driver *dp, message *m_ptr, int safe);
+static int m_ioctl(struct driver *dp, message *m_ptr);
 static void m_geometry(struct partition *entry);
 
 /* Entry points to this driver. */
@@ -110,9 +110,9 @@ int main(void)
   sa.sa_flags = 0;
   if (sigaction(SIGTERM,&sa,NULL)<0) panic("MEM","sigaction failed", errno);
 
-  m_init();			
-  driver_task(&m_dtab);		
-  return 0;				
+  m_init();
+  driver_task(&m_dtab, DRIVER_STD);
+  return(0);
 }
 
 /*===========================================================================*
@@ -141,13 +141,12 @@ int device;
 /*===========================================================================*
  *				m_transfer				     *
  *===========================================================================*/
-static int m_transfer(proc_nr, opcode, pos64, iov, nr_req, safe)
+static int m_transfer(proc_nr, opcode, pos64, iov, nr_req)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t pos64;			/* offset on device to read or write */
 iovec_t *iov;			/* pointer to read or write request vector */
 unsigned nr_req;		/* length of request vector */
-int safe;			/* safe copies */
 {
 /* Read or write one the driver's minor devices. */
   unsigned count, left, chunk;
@@ -157,11 +156,6 @@ int safe;			/* safe copies */
   int s, r;
   off_t position;
   vir_bytes dev_vaddr;
-
-  if(!safe) {
-	printf("m_transfer: unsafe?\n");
-	return -EPERM;
-  }
 
   /* ZERO_DEV and NULL_DEV are infinite in size. */
   if (m_device != ZERO_DEV && m_device != NULL_DEV && ex64hi(pos64) != 0)
@@ -419,20 +413,14 @@ static void m_init()
 /*===========================================================================*
  *				m_ioctl					     *
  *===========================================================================*/
-static int m_ioctl(dp, m_ptr, safe)
+static int m_ioctl(dp, m_ptr)
 struct driver *dp;			/* pointer to driver structure */
 message *m_ptr;				/* pointer to control message */
-int safe;
 {
 /* I/O controls for the memory driver. Currently there is one I/O control:
  * - MIOCRAMSIZE: to set the size of the RAM disk.
  */
   struct device *dv;
-
-  if(!safe) {
-	printf("m_transfer: unsafe?\n");
-	return -EPERM;
-  }
 
   switch (m_ptr->REQUEST) {
     case MIOCRAMSIZE: {
@@ -494,7 +482,7 @@ int safe;
     }
 
     default:
-  	return(do_diocntl(&m_dtab, m_ptr, safe));
+  	return(do_diocntl(&m_dtab, m_ptr));
   }
   return 0;
 }

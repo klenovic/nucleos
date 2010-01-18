@@ -33,17 +33,17 @@ struct driver {
   char *(*dr_name)(void);
   int (*dr_open)(struct driver *dp, message *m_ptr);
   int (*dr_close)(struct driver *dp, message *m_ptr);
-  int (*dr_ioctl)(struct driver *dp, message *m_ptr, int safe);
+  int (*dr_ioctl)(struct driver *dp, message *m_ptr);
   struct device *(*dr_prepare)(int device);
-  int (*dr_transfer)(int proc_nr, int opcode, u64_t position, iovec_t *iov, unsigned nr_req,
-		     int safe);
+  int (*dr_transfer)(int proc_nr, int opcode, u64_t position,
+					iovec_t *iov, unsigned nr_req);
   void (*dr_cleanup)(void);
   void (*dr_geometry)(struct partition *entry);
   void (*dr_signal)(struct driver *dp, sigset_t *set);
   void (*dr_alarm)(struct driver *dp, message *m_ptr);
   int (*dr_cancel)(struct driver *dp, message *m_ptr);
   int (*dr_select)(struct driver *dp, message *m_ptr);
-  int (*dr_other)(struct driver *dp, message *m_ptr, int safe);
+  int (*dr_other)(struct driver *dp, message *m_ptr);
   int (*dr_hw_int)(struct driver *dp, message *m_ptr);
 };
 
@@ -55,8 +55,11 @@ struct device {
 
 #define NIL_DEV		((struct device *) 0)
 
+#define DRIVER_STD	0	/* Use the standard reply protocol */
+#define DRIVER_ASYN	1	/* Use the new asynchronous protocol */
+
 /* Functions defined by driver.c: */
-void driver_task(struct driver *dr);
+void driver_task(struct driver *dr, int type);
 char *no_name(void);
 int do_nop(struct driver *dp, message *m_ptr);
 struct device *nop_prepare(int device);
@@ -66,8 +69,8 @@ void nop_signal(struct driver *dp, sigset_t *set);
 void nop_alarm(struct driver *dp, message *m_ptr);
 int nop_cancel(struct driver *dp, message *m_ptr);
 int nop_select(struct driver *dp, message *m_ptr);
-int do_diocntl(struct driver *dp, message *m_ptr, int safe);
-int nop_ioctl(struct driver *dp, message *m_ptr, int safe);
+int do_diocntl(struct driver *dp, message *m_ptr);
+int nop_ioctl(struct driver *dp, message *m_ptr);
 int mq_queue(message *m_ptr);
 void init_buffer(void);
 
@@ -89,5 +92,3 @@ extern u8_t *tmp_buf;			/* the DMA buffer */
 extern u8_t tmp_buf[];			/* the DMA buffer */
 #endif
 extern phys_bytes tmp_phys;		/* phys address of DMA buffer */
-
-u32_t system_hz;

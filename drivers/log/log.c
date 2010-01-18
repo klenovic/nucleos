@@ -33,15 +33,15 @@ static int log_device = -1;	 		/* current device */
 
 static char *log_name(void);
 static struct device *log_prepare(int device);
-static int log_transfer(int proc_nr, int opcode, u64_t position, iovec_t *iov,
-		        unsigned nr_req, int safe);
+static int log_transfer(int proc_nr, int opcode, u64_t position,
+			iovec_t *iov, unsigned nr_req);
 static int log_do_open(struct driver *dp, message *m_ptr);
 static int log_cancel(struct driver *dp, message *m_ptr);
 static int log_select(struct driver *dp, message *m_ptr);
 static void log_signal(struct driver *dp, sigset_t *set);
-static int log_other(struct driver *dp, message *m_ptr, int);
+static int log_other(struct driver *dp, message *m_ptr);
 static void log_geometry(struct partition *entry);
-static int subread(struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t, int safe);
+static int subread(struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t);
 
 /* Entry points to this driver. */
 static struct driver log_dtab = {
@@ -80,8 +80,8 @@ int main(void)
  	logdevices[i].log_proc_nr = 0;
  	logdevices[i].log_revive_alerted = 0;
   }
-  driver_task(&log_dtab);
-  return 0;
+  driver_task(&log_dtab, DRIVER_ASYN);
+  return(0);
 }
 
 /*===========================================================================*
@@ -109,11 +109,11 @@ int device;
 }
 
 /*===========================================================================*
- *				subwrite					     *
+ *				subwrite				     *
  *===========================================================================*/
 static int
 subwrite(struct logdevice *log, int count, int proc_nr,
-	vir_bytes user_vir, size_t offset, int safe)
+	vir_bytes user_vir, size_t offset)
 {
 	int d, r;
 	char *buf;
@@ -127,15 +127,9 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 		memcpy(buf, (char *) user_vir, count);
 	}
 	else {
-		if(safe) {
-		   if((r=sys_safecopyfrom(proc_nr, user_vir, offset,
+		if((r=sys_safecopyfrom(proc_nr, user_vir, offset,
 			(vir_bytes)buf, count, D)) != 0)
 			return r;
-		} else {
-		   if((r=sys_vircopy(proc_nr, D,
-			user_vir + offset, SELF,D,(int)buf, count)) != 0)
-			return r;
-		}
 	}
 
 	LOGINC(log->log_write, count);
@@ -154,7 +148,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
         	 */
     		log->log_status = subread(log, log->log_iosize,
     			log->log_proc_nr, log->log_user_vir_g,
-			log->log_user_vir_offset, log->log_safe);
+			log->log_user_vir_offset);
 
 		m.m_type = DEV_REVIVE;
 		m.REP_ENDPT = log->log_proc_nr;
@@ -213,10 +207,10 @@ log_append(char *buf, int count)
 	if(count > LOG_SIZE) skip = count - LOG_SIZE;
 	count -= skip;
 	buf += skip;
-	w = subwrite(&logdevices[0], count, SELF, (vir_bytes) buf,0,0);
+	w = subwrite(&logdevices[0], count, SELF, (vir_bytes) buf,0);
 
 	if(w > 0 && w < count)
-		subwrite(&logdevices[0], count-w, SELF, (vir_bytes) buf+w,0,0);
+		subwrite(&logdevices[0], count-w, SELF, (vir_bytes) buf+w,0);
 	return;
 }
 
@@ -225,7 +219,7 @@ log_append(char *buf, int count)
  *===========================================================================*/
 static int
 subread(struct logdevice *log, int count, int proc_nr,
-	vir_bytes user_vir, size_t offset, int safe)
+	vir_bytes user_vir, size_t offset)
 {
 	char *buf;
 	int r;
@@ -235,11 +229,9 @@ subread(struct logdevice *log, int count, int proc_nr,
         	count = LOG_SIZE - log->log_read;
 
     	buf = log->log_buffer + log->log_read;
-	if(safe) {
-	   if((r=sys_safecopyto(proc_nr, user_vir, offset,
+	if((r=sys_safecopyto(proc_nr, user_vir, offset,
 		(vir_bytes)buf, count, D)) != 0)
 		return r;
-	} 
 
   	LOGINC(log->log_read, count);
         log->log_size -= count;
@@ -250,13 +242,12 @@ subread(struct logdevice *log, int count, int proc_nr,
 /*===========================================================================*
  *				log_transfer				     *
  *===========================================================================*/
-static int log_transfer(proc_nr, opcode, position, iov, nr_req, safe)
+static int log_transfer(proc_nr, opcode, position, iov, nr_req)
 int proc_nr;			/* process doing the request */
 int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 u64_t position;			/* offset on device to read or write */
 iovec_t *iov;			/* pointer to read or write request vector */
 unsigned nr_req;		/* length of request vector */
-int safe;			/* safe copies? */
 {
 /* Read or write one the driver's minor devices. */
   unsigned count;
@@ -301,7 +292,6 @@ int safe;			/* safe copies? */
 	    		log->log_user_vir_g = user_vir;
 	    		log->log_user_vir_offset = 0;
 	    		log->log_revive_alerted = 0;
-			log->log_safe = safe;
 
 			/* Device_caller is a global in drivers library. */
 	    		log->log_source = device_caller;
@@ -311,13 +301,13 @@ int safe;			/* safe copies? */
 #endif
 	    		return(-EDONTREPLY);
 	    	}
-	    	count = subread(log, count, proc_nr, user_vir, vir_offset, safe);
+	    	count = subread(log, count, proc_nr, user_vir, vir_offset);
 	    	if(count < 0) {
 	    		return count;
 	    	}
 	    	accumulated_read += count;
 	    } else {
-	    	count = subwrite(log, count, proc_nr, user_vir, vir_offset, safe);
+	    	count = subwrite(log, count, proc_nr, user_vir, vir_offset);
 	    	if(count < 0)
 	    		return count;
 	    }
@@ -391,10 +381,9 @@ sigset_t *set;
 /*============================================================================*
  *				log_other				      *
  *============================================================================*/
-static int log_other(dp, m_ptr, safe)
+static int log_other(dp, m_ptr)
 struct driver *dp;
 message *m_ptr;
-int safe;
 {
 	int r;
 
