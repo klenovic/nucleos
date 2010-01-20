@@ -67,10 +67,13 @@ struct super_block {
   char s_is_root;
 } superblock;
 
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 extern struct super_block superblock;
 
 #define NIL_SUPER (struct super_block *) 0
 #define IMAP		0	/* operating on the inode bit map */
 #define ZMAP		1	/* operating on the zone bit map */
+
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __SERVERS_MFS_SUPER_H */
