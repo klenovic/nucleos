@@ -3,6 +3,7 @@
 
 header-y += asm-generic/
 header-y += nucleos/
+header-y += servers/
 # n/a header-y += sound/
 # n/a header-y += mtd/
 # n/a header-y += rdma/
