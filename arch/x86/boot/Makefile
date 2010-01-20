@@ -2,13 +2,13 @@
 # Note: Keep a watch of the correct order!
 bin-y := arch/$(SRCARCH)/kernel/kernel
 bin-y += servers/pm/pm
-bin-y += servers/vfs/vfs
+bin-y += servers/fs/vfs/vfs
 bin-y += servers/rs/rs
 bin-y += drivers/memory/memory
 bin-y += drivers/log/log
 bin-y += drivers/tty/tty
 bin-y += servers/ds/ds
-bin-y += servers/mfs/mfs
+bin-y += servers/fs/mfs/mfs
 bin-y += arch/$(SRCARCH)/servers/vm/vm
 bin-y += servers/init/init
 

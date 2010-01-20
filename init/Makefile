@@ -10,7 +10,7 @@ bin-y := $(srctree)/drivers/at_wini \
 	 $(srctree)/drivers/bios_wini \
 	 $(srctree)/drivers/floppy \
 	 $(srctree)/drivers/pci \
-	 $(srctree)/servers/mfs/mfs \
+	 $(srctree)/servers/fs/mfs/mfs \
 	 $(src)/sh \
 	 $(src)/simple/cdprobe \
 	 $(src)/simple/dev2name \

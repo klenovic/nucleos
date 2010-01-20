@@ -7,26 +7,24 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* Header file including all needed system headers. */
+/* This is the master header for fs.  It includes some other files
+ * and defines the principal constants.
+ */
+#define VERBOSE		   0    /* show messages during initialization? */
+
+/* The following are so basic, all the *.c files get them automatically. */
 #include <nucleos/types.h>
+#include <nucleos/const.h>
+#include <nucleos/type.h>
+#include <nucleos/dmap.h>
+
 #include <nucleos/limits.h>
 #include <nucleos/errno.h>
 
-#include <nucleos/unistd.h>
-#include <nucleos/type.h>
-#include <nucleos/const.h>
-#include <nucleos/com.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
-#include <nucleos/keymap.h>
-#include <nucleos/bitmap.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <nucleos/string.h>
-#include <nucleos/signal.h>
-
+#include <servers/mfs/const.h>
+#include <servers/mfs/type.h>
 #include "proto.h"
 #include "glo.h"
-#include <servers/ds/store.h>
-

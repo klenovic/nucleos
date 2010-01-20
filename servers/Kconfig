@@ -21,4 +21,4 @@ config SERVERS_LINKAGE_TYPE
   default "0x20" if SERVERS_LINKAGE_SEPID=y
 
 # VFS server
-source "servers/vfs/Kconfig"
+source "servers/fs/vfs/Kconfig"

@@ -15,9 +15,6 @@ ccflags-y := -D__KERNEL__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
 asflags-y := -include arch/$(SRCARCH)/include/asm/code16gcc.h
 
 ASFLAGS_boothead.o += -D__HDRLEN__=$(HDRLEN)
-CFLAGS_boot.o      += -I$(src)/../../../
-CFLAGS_bootimage.o += -I$(src)/../../../
-CFLAGS_rawfs.o     += -I$(src)/../../../
 
 CPPFLAGS_boot.lds := -D__ORIGIN__=$(BOOT_ORG)
 CPPFLAGS_boot.lds += -C -P

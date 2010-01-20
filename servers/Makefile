@@ -1,6 +1,6 @@
 # Makefile for all system servers.
 #
-obj-y := ds/ inet/ init/ ipc/ is/ mfs/ pm/ rs/ vfs/ vm/ iso9660fs/
+obj-y := ds/ fs/ inet/ init/ ipc/ is/ pm/ rs/ vm/
 
 SERV_PAGE_OFFSET    = 0
 SERV_PAGE_ALIGNMENT = 0

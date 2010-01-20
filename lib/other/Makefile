@@ -12,4 +12,4 @@ libnucc.a-obj-y := _pm_findproc.o adddma.o brk.o cprofile.o deldma.o devctl.o ge
 		   telldir.o termcap.o ttyname.o ttyslot.o v8regerror.o v8regexp.o v8regsub.o writev.o getnuid.o \
 		   getngid.o vm_set_priv.o vm_query_exit.o minix_rs.o umount.o
 
-ccflags-y := -I$(srctree)/servers/ -D__UKERNEL__
+ccflags-y := -D__UKERNEL__

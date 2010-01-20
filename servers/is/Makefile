@@ -1,7 +1,7 @@
 # Makefile for Data Store Server (DS)
 app-y := is.elf32
 is.elf32-type := server
-is.elf32-obj-y := main.o dmp.o dmp_kernel.o dmp_pm.o dmp_fs.o dmp_rs.o dmp_ds.o
+is.elf32-obj-y := main.o dmp.o dmp_kernel.o dmp_pm.o dmp_fs_minix.o dmp_rs.o dmp_ds.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 

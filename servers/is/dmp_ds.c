@@ -17,7 +17,7 @@
  */
 
 #include "inc.h"
-#include "../ds/store.h"
+#include <servers/ds/store.h>
 
 struct data_store store[NR_DS_KEYS];
 

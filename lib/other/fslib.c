@@ -14,10 +14,10 @@
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>		/* for unshort :-( */
-#include "mfs/const.h"		/* depends of -I flag in Makefile */
-#include "mfs/type.h"		/* ditto */
-#include "mfs/inode.h"		/* ditto */
-#include "mfs/super.h"
+#include <servers/mfs/const.h>		/* depends of -I flag in Makefile */
+#include <servers/mfs/type.h>		/* ditto */
+#include <servers/mfs/inode.h>		/* ditto */
+#include <servers/mfs/super.h>
 #include <nucleos/fslib.h>
 
 /* The next routine is copied from fsck.c and mkfs.c...  (Re)define some

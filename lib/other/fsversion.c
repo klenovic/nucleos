@@ -25,9 +25,9 @@
 #include <nucleos/unistd.h>
 #include <stdio.h>
 
-#include "mfs/const.h"
-#include "mfs/type.h"
-#include "mfs/super.h"
+#include <servers/mfs/const.h>
+#include <servers/mfs/type.h>
+#include <servers/mfs/super.h>
 
 static struct super_block super, *sp;
 

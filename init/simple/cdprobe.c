@@ -31,7 +31,7 @@
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
 
-#include "../../servers/mfs/const.h"
+#include <servers/mfs/const.h>
 
 char pvd[CD_SECTOR];
 
