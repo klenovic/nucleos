@@ -7,12 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*
-bintoc.c
 
-Convert a (binary) file to a series of comma separated hex values suitable
-for initializing a character array in C.
-*/
+/*
+ * Convert a (binary) file to a series of comma separated hex values suitable
+ * for initializing a character array in C.
+ */
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -27,9 +26,9 @@ static void fatal(char *fmt, ...);
 static void usage(void);
 
 char *comment = "/*\n"
-                " * Do not edit. This file was generated\n"
-                " * by bintoc utility.\n"
-                " */\n";
+		" * Do not edit. This file was generated\n"
+		" * by bintoc utility.\n"
+		" */\n";
 
 int main(int argc, char *argv[])
 {
