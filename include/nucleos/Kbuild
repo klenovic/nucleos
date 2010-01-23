@@ -126,6 +126,7 @@ header-y += magic.h
 # n/a header-y += nfs_mount.h
 # n/a header-y += nl80211.h
 header-y += param.h
+header-y += partition.h
 # n/a header-y += pci_regs.h
 # n/a header-y += pfkeyv2.h
 # n/a header-y += pg.h
