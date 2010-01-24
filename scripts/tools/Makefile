@@ -1,4 +1,5 @@
-hostprogs-y := bintoc ehdr2ahdr edparams installboot mkfs mkinitrd partition
+hostprogs-y := bintoc ehdr2ahdr edparams installboot mkfs \
+	       mkinitrd partition mkimage
 
 HOST_PPFLAGS += -include scripts/tools/include/nucleos/macros.h
 
@@ -19,6 +20,8 @@ HOST_LDFLAGS_mkfs := -L$(src)/ -lutils
 mkinitrd-obj-y := mkinitrd.o
 
 partition-obj-y := partition.o
+
+mkimage-obj-y := mkimage.o
 
 hostlib-y := libutils.a
 libutils.a-obj-y := elfparse.o rawfs.o

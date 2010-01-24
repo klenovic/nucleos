@@ -13,7 +13,7 @@ bin-y += arch/$(SRCARCH)/servers/vm/vm
 bin-y += servers/init/init
 
 quiet_cmd_create_image = GEN     $@
-      cmd_create_image = scripts/tools/installboot -c -i $@ -l "$(filter $(bin-y),$^)"
+      cmd_create_image = scripts/tools/mkimage $@ $(filter $(bin-y),$^)
 
 define rule_create_image
 	rm -f $@; \
@@ -22,7 +22,7 @@ define rule_create_image
 endef
 
 # create final image from kernel and servers
-$(src)/image: scripts/tools/installboot
+$(src)/image: scripts/tools/installboot scripts/tools/mkimage
 $(src)/image: $(bin-y) FORCE
 	$(call if_changed_rule,create_image)
 
