@@ -33,20 +33,20 @@
 /*===========================================================================*
  *				alloc_bit				     *
  *===========================================================================*/
-bit_t alloc_bit(sp, map, origin)
+u32 alloc_bit(sp, map, origin)
 struct minix3_super_block *sp;		/* the filesystem to allocate from */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
-bit_t origin;			/* number of bit to start searching at */
+u32 origin;			/* number of bit to start searching at */
 {
 /* Allocate a bit from a bit map and return its bit number. */
 
   block_t start_block;		/* first bit block */
-  bit_t map_bits;		/* how many bits are there in the bit map? */
+  u32 map_bits;		/* how many bits are there in the bit map? */
   unsigned bit_blocks;		/* how many blocks are there in the bit map? */
   unsigned block, word, bcount;
   struct buf *bp;
   bitchunk_t *wptr, *wlim, k;
-  bit_t i, b;
+  u32 i, b;
 
   if (sp->s_rd_only)
 	panic(__FILE__,"can't allocate bit on read-only filesys.", NO_NUM);
@@ -85,7 +85,7 @@ bit_t origin;			/* number of bit to start searching at */
 		for (i = 0; (k & (1 << i)) != 0; ++i) {}
 
 		/* Bit number from the start of the bit map. */
-		b = ((bit_t) block * FS_BITS_PER_BLOCK(sp->s_block_size))
+		b = ((u32) block * FS_BITS_PER_BLOCK(sp->s_block_size))
 		    + (wptr - &bp->b_bitmap[0]) * FS_BITCHUNK_BITS
 		    + i;
 
@@ -112,7 +112,7 @@ bit_t origin;			/* number of bit to start searching at */
 void free_bit(sp, map, bit_returned)
 struct minix3_super_block *sp;		/* the filesystem to operate on */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
-bit_t bit_returned;		/* number of bit to insert into the map */
+u32 bit_returned;		/* number of bit to insert into the map */
 {
 /* Return a zone or inode by turning off its bitmap bit. */
 

@@ -4,6 +4,8 @@
 #include <nucleos/dir.h>	/* need struct direct */
 #include <nucleos/dirent.h>
 
+#include "type.h"
+
 struct buf {
 	union {
 		char b__data[_MAX_BLOCK_SIZE];		     /* ordinary user data */

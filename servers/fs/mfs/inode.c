@@ -321,7 +321,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
   register struct inode *rip;
   register struct minix3_super_block *sp;
   int major, minor, inumb;
-  bit_t b;
+  u32 b;
 
   sp = get_super(dev);	/* get pointer to super_block */
   if (sp->s_rd_only) {	/* can't allocate an inode on a read only device. */
@@ -396,7 +396,7 @@ ino_t inumb;			/* number of inode to be freed */
 /* Return an inode to the pool of unallocated inodes. */
 
   register struct minix3_super_block *sp;
-  bit_t b;
+  u32 b;
 
   /* Locate the appropriate super_block. */
   sp = get_super(dev);

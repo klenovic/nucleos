@@ -9,6 +9,10 @@
  */
 #ifndef __SERVERS_MFS_SUPER_H
 #define __SERVERS_MFS_SUPER_H
+
+#include <nucleos/types.h>
+#include <servers/mfs/type.h>
+
 /* Super block table.  The root file system and every mounted file system
  * has an entry here.  The entry holds information about the sizes of the bit
  * maps and inodes.  The s_ninodes field gives the number of inodes available
@@ -61,8 +65,8 @@ struct minix3_super_block {
 	int s_version;		/* file system version, zero means bad magic */
 	int s_ndzones;		/* # direct zones in an inode */
 	int s_nindirs;		/* # indirect zones per indirect block */
-	__kernel_bit_t s_isearch;	/* inodes below this bit number are in use */
-	__kernel_bit_t s_zsearch;	/* all zones below this bit number are in use*/
+	__u32 s_isearch;	/* inodes below this bit number are in use */
+	__u32 s_zsearch;	/* all zones below this bit number are in use*/
 	char s_is_root;
 };
 

@@ -11,6 +11,11 @@
 #define __SERVERS_MFS_TYPE_H
 
 #include <nucleos/types.h>
+#include <servers/mfs/const.h>
+
+typedef __u32 __kernel_zone_t;	/* zone number */
+typedef __u32 __kernel_block_t;	/* block number */
+typedef __u16 __kernel_zone1_t;	/* zone number for V1 file systems */
 
 /* Declaration of the V1 inode as it is on the disk (not in core). */
 typedef struct {		/* V1.x disk inode */
@@ -33,10 +38,14 @@ typedef struct {		/* V2.x disk inode */
 	__s32 d2_atime;		/* when was file data last accessed */
 	__s32 d2_mtime;		/* when was file data last changed */
 	__s32 d2_ctime;		/* when was inode data last changed */
-	zone_t d2_zone[V2_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
+	__kernel_zone_t d2_zone[V2_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
 } d2_inode;
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
+typedef __kernel_zone_t zone_t;		/* zone number */
+typedef __kernel_block_t block_t;	/* block number */
+typedef __kernel_zone1_t zone1_t;	/* zone number for V1 file systems */
+
 struct buf {
 	/* Data portion of the buffer. */
 	union fsdata_u *bp;

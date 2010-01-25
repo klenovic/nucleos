@@ -39,13 +39,13 @@
  * and give silly results.
  */ 
 int bitmapsize(nr_bits, block_size)
-bit_t nr_bits;
+u32 nr_bits;
 int block_size;
 {
   int nr_blocks;
 
   nr_blocks = (int) (nr_bits / FS_BITS_PER_BLOCK(block_size));
-  if (((bit_t) nr_blocks * FS_BITS_PER_BLOCK(block_size)) < nr_bits) ++nr_blocks;
+  if (((u32) nr_blocks * FS_BITS_PER_BLOCK(block_size)) < nr_bits) ++nr_blocks;
   return(nr_blocks);
 }
 

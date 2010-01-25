@@ -234,7 +234,7 @@ zone_t z;			/* try to allocate new zone near this one */
 /* Allocate a new zone on the indicated device and return its number. */
 
   int major, minor;
-  bit_t b, bit;
+  u32 b, bit;
   struct minix3_super_block *sp;
 
   /* Note that the routine alloc_bit() returns 1 for the lowest possible
@@ -250,7 +250,7 @@ zone_t z;			/* try to allocate new zone near this one */
   if (z == sp->s_firstdatazone) {
 	bit = sp->s_zsearch;
   } else {
-	bit = (bit_t) z - (sp->s_firstdatazone - 1);
+	bit = (u32) z - (sp->s_firstdatazone - 1);
   }
   b = alloc_bit(sp, ZMAP, bit);
   if (b == NO_BIT) {
@@ -274,12 +274,12 @@ zone_t numb;				/* zone to be returned */
 /* Return a zone. */
 
   register struct minix3_super_block *sp;
-  bit_t bit;
+  u32 bit;
 
   /* Locate the appropriate minix3_super_block and return bit. */
   sp = get_super(dev);
   if (numb < sp->s_firstdatazone || numb >= sp->s_zones) return;
-  bit = (bit_t) (numb - (sp->s_firstdatazone - 1));
+  bit = (u32) (numb - (sp->s_firstdatazone - 1));
   free_bit(sp, ZMAP, bit);
   if (bit < sp->s_zsearch) sp->s_zsearch = bit;
 }

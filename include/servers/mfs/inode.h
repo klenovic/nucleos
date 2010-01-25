@@ -45,7 +45,7 @@ struct inode {
 	struct minix3_super_block *i_sp;	/* pointer to super block for inode's device */
 	char i_dirt;			/* CLEAN or DIRTY */
 	char i_pipe;			/* set to I_PIPE if pipe */
-	bit_t i_zsearch;		/* where to start search for new zones */
+	u32 i_zsearch;		/* where to start search for new zones */
 
 	char i_mountpoint;		/* true if mounted on */
 

@@ -49,7 +49,7 @@
 #define NO_READ		1		/* prevents get_block from doing disk read */
 #define PREFETCH	2		/* tells get_block not to read or mark dev */
 
-#define NO_BIT		((bit_t) 0)	/* returned by alloc_bit() to signal failure */
+#define NO_BIT		((u32) 0)	/* returned by alloc_bit() to signal failure */
 
 #define LOOK_UP		0	/* tells search_dir to lookup string */
 #define ENTER		1	/* tells search_dir to make dir entry */

@@ -10,6 +10,7 @@
 /* Function prototypes. */
 
 #include <nucleos/timer.h>
+#include <servers/mfs/type.h>
 
 /* Structs used in prototypes must be declared as such first. */
 struct buf;
@@ -133,8 +134,8 @@ int read_write(int rw_flag);
 zone_t rd_indir(struct buf *bp, int index);
 
 /* super.c */
-bit_t alloc_bit(struct minix3_super_block *sp, int map, bit_t origin);
-void free_bit(struct minix3_super_block *sp, int map, bit_t bit_returned);
+u32 alloc_bit(struct minix3_super_block *sp, int map, u32 origin);
+void free_bit(struct minix3_super_block *sp, int map, u32 bit_returned);
 struct minix3_super_block *get_super(dev_t dev);
 int mounted(struct inode *rip);
 int read_super(struct minix3_super_block *sp);

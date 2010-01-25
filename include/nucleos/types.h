@@ -20,11 +20,6 @@
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
-typedef __u32	__kernel_zone_t;	/* zone number */
-typedef __u32	__kernel_block_t;	/* block number */
-typedef __u32	__kernel_bit_t;		/* bit number in a bit map */
-typedef __u16	__kernel_zone1_t;	/* zone number for V1 file systems */
-typedef __u16	__kernel_bitchunk_t;	/* collection of bits in a bitmap */
 typedef __s16	__kernel_dev_t;
 
 /* Open Group Base Specifications Issue 6 (not complete) */
@@ -45,13 +40,9 @@ typedef __kernel_key_t		key_t;
 typedef __kernel_loff_t		loff_t;
 #endif
 
-typedef __kernel_zone_t		zone_t;		/* zone number */
-typedef __kernel_block_t	block_t;	/* block number */
-typedef __kernel_bit_t		bit_t;		/* bit number in a bit map */
-typedef __kernel_zone1_t	zone1_t;	/* zone number for V1 file systems */
-typedef __kernel_bitchunk_t	bitchunk_t;	/* collection of bits in a bitmap */
+typedef __u16	bitchunk_t;	/* collection of bits in a bitmap */
 
-typedef _Bool			bool;
+typedef _Bool	bool;
 
 /* Integer type capable of holding a pointer and the largest integer type. */
 typedef unsigned long	uintptr_t;

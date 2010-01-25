@@ -1,6 +1,8 @@
 #ifndef __SERVERS_ISO9660FS_PROTO_H
 #define __SERVERS_ISO9660FS_PROTO_H
 
+#include "type.h"
+
 /* Function prototypes for iso9660 file system. */
 
 struct dir_record;

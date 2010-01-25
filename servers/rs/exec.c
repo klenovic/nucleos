@@ -317,7 +317,6 @@ int *hdrlenp;
 {
 /* Read the header and extract the text, data, bss and total sizes from it. */
   off_t pos;
-  block_t b;
   struct exec hdr;		/* a.out header is read in here */
 
   /* Read the header and check the magic number.  The standard MINIX header 
