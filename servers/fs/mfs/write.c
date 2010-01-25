@@ -28,7 +28,7 @@
 
 
 static void wr_indir(struct buf *bp, int index, zone_t zone);
-static int empty_indir(struct buf *, struct super_block *);
+static int empty_indir(struct buf *, struct minix3_super_block *);
 
 
 /*===========================================================================*
@@ -200,7 +200,7 @@ zone_t zone;			/* zone to write */
 {
 /* Given a pointer to an indirect block, write one entry. */
 
-  struct super_block *sp;
+  struct minix3_super_block *sp;
 
   if(bp == NIL_BUF)
 	panic(__FILE__, "wr_indir() on NIL_BUF", NO_NUM);
@@ -219,7 +219,7 @@ zone_t zone;			/* zone to write */
  *===========================================================================*/
 static int empty_indir(bp, sb)
 struct buf *bp;			/* pointer to indirect block */
-struct super_block *sb;		/* superblock of device block resides on */
+struct minix3_super_block *sb;		/* superblock of device block resides on */
 {
 /* Return nonzero if the indirect block pointed to by bp contains
  * only NO_ZONE entries.
@@ -295,7 +295,7 @@ off_t position;			/* file pointer */
   zone_t z;
   zone_t zone_size;
   int scale, r;
-  struct super_block *sp;
+  struct minix3_super_block *sp;
 
   /* Is another block available in the current zone? */
   if ( (b = read_map(rip, position)) == NO_BLOCK) {

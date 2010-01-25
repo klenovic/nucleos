@@ -42,7 +42,7 @@ struct inode {
 	int i_count;			/* # times inode used; 0 means slot is free */
 	int i_ndzones;		/* # direct zones (Vx_NR_DZONES) */
 	int i_nindirs;		/* # indirect zones per indirect block */
-	struct super_block *i_sp;	/* pointer to super block for inode's device */
+	struct minix3_super_block *i_sp;	/* pointer to super block for inode's device */
 	char i_dirt;			/* CLEAN or DIRTY */
 	char i_pipe;			/* set to I_PIPE if pipe */
 	bit_t i_zsearch;		/* where to start search for new zones */

@@ -21,7 +21,7 @@
 #include <servers/ds/ds.h>
 #include <nucleos/vfsif.h>
 
-struct super_block superblock;
+struct minix3_super_block superblock;
 
 /*===========================================================================*
  *				fs_readsuper_s				     *
@@ -35,7 +35,7 @@ int fs_readsuper_s()
  * so that the VFS knows that it has to find the vnode on which this FS_PROC_NR 
  * process' partition is mounted on.
  */
-  struct super_block *xp;
+  struct minix3_super_block *xp;
   struct inode *root_ip;
   cp_grant_id_t label_gid;
   size_t label_len;
@@ -142,7 +142,7 @@ int fs_readsuper_o()
  * so that the VFS knows that it has to find the vnode on which this FS_PROC_NR 
  * process' partition is mounted on.
  */
-  struct super_block *xp;
+  struct minix3_super_block *xp;
   struct inode *root_ip;
   int r = 0;
   phys_bytes ph;
@@ -288,7 +288,7 @@ printf("MFS(%d) get_inode by fs_mountpoint() failed\n", SELF_E);
 int fs_unmount()
 {
 /* Unmount a file system by device number. */
-  struct super_block *sp1;
+  struct minix3_super_block *sp1;
   int count;
   register struct inode *rip;
 

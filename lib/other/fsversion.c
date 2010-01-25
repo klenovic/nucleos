@@ -29,7 +29,7 @@
 #include <servers/mfs/type.h>
 #include <servers/mfs/super.h>
 
-static struct super_block super, *sp;
+static struct minix3_super_block super, *sp;
 
 int fsversion(dev, prog)
 char *dev, *prog;

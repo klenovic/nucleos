@@ -718,7 +718,7 @@ int index;			/* index into *bp */
  * V1 (IBM and 68000), and V2 (IBM and 68000).
  */
 
-  struct super_block *sp;
+  struct minix3_super_block *sp;
   zone_t zone;			/* V2 zones are longs (shorts in V1) */
 
   if(bp == NIL_BUF)

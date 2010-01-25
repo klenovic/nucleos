@@ -15,7 +15,7 @@
 struct buf;
 struct filp;		
 struct inode;
-struct super_block;
+struct minix3_super_block;
 
 
 int fs_putnode(void);
@@ -133,11 +133,11 @@ int read_write(int rw_flag);
 zone_t rd_indir(struct buf *bp, int index);
 
 /* super.c */
-bit_t alloc_bit(struct super_block *sp, int map, bit_t origin);
-void free_bit(struct super_block *sp, int map, bit_t bit_returned);
-struct super_block *get_super(dev_t dev);
+bit_t alloc_bit(struct minix3_super_block *sp, int map, bit_t origin);
+void free_bit(struct minix3_super_block *sp, int map, bit_t bit_returned);
+struct minix3_super_block *get_super(dev_t dev);
 int mounted(struct inode *rip);
-int read_super(struct super_block *sp);
+int read_super(struct minix3_super_block *sp);
 int get_block_size(dev_t dev);
 
 /* utility.c */

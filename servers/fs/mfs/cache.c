@@ -235,7 +235,7 @@ zone_t z;			/* try to allocate new zone near this one */
 
   int major, minor;
   bit_t b, bit;
-  struct super_block *sp;
+  struct minix3_super_block *sp;
 
   /* Note that the routine alloc_bit() returns 1 for the lowest possible
    * zone, which corresponds to sp->s_firstdatazone.  To convert a value
@@ -273,10 +273,10 @@ zone_t numb;				/* zone to be returned */
 {
 /* Return a zone. */
 
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   bit_t bit;
 
-  /* Locate the appropriate super_block and return bit. */
+  /* Locate the appropriate minix3_super_block and return bit. */
   sp = get_super(dev);
   if (numb < sp->s_firstdatazone || numb >= sp->s_zones) return;
   bit = (bit_t) (numb - (sp->s_firstdatazone - 1));

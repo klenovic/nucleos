@@ -319,7 +319,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
 /* Allocate a free inode on 'dev', and return a pointer to it. */
 
   register struct inode *rip;
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   int major, minor, inumb;
   bit_t b;
 
@@ -395,7 +395,7 @@ ino_t inumb;			/* number of inode to be freed */
 {
 /* Return an inode to the pool of unallocated inodes. */
 
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   bit_t b;
 
   /* Locate the appropriate super_block. */
@@ -420,7 +420,7 @@ register struct inode *rip;	/* pointer to inode to be read/written */
  */
 
   time_t cur_time;
-  struct super_block *sp;
+  struct minix3_super_block *sp;
 
   sp = rip->i_sp;		/* get pointer to super block. */
   if (sp->s_rd_only) return;	/* no updates for read-only file systems */
@@ -442,7 +442,7 @@ int rw_flag;			/* READING or WRITING */
 /* An entry in the inode table is to be copied to or from the disk. */
 
   register struct buf *bp;
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   d1_inode *dip;
   d2_inode *dip2;
   block_t b, offset;

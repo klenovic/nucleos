@@ -54,7 +54,7 @@ static int block_size;
 #include <nucleos/dir.h>
 #endif
 
-static struct super_block super; /* Superblock of file system */
+static struct minix3_super_block super; /* Superblock of file system */
 #define SUPER_V1 SUPER_MAGIC          /* V1 magic has a weird name. */
 
 static struct inode curfil;      /* Inode of file under examination */

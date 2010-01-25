@@ -118,7 +118,7 @@ int forbidden(register struct inode *rip, mode_t access_desired)
  */
 
   register struct inode *old_rip = rip;
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   register mode_t bits, perm_bits;
   int r, shift, type;
 
@@ -189,7 +189,7 @@ struct inode *ip;		/* ptr to inode whose file sys is to be cked */
  * read only.  If so, return -EROFS, else return OK.
  */
 
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
 
   sp = ip->i_sp;
   return(sp->s_rd_only ? -EROFS : 0);

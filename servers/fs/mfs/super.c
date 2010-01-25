@@ -34,7 +34,7 @@
  *				alloc_bit				     *
  *===========================================================================*/
 bit_t alloc_bit(sp, map, origin)
-struct super_block *sp;		/* the filesystem to allocate from */
+struct minix3_super_block *sp;		/* the filesystem to allocate from */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
 bit_t origin;			/* number of bit to start searching at */
 {
@@ -110,7 +110,7 @@ bit_t origin;			/* number of bit to start searching at */
  *				free_bit				     *
  *===========================================================================*/
 void free_bit(sp, map, bit_returned)
-struct super_block *sp;		/* the filesystem to operate on */
+struct minix3_super_block *sp;		/* the filesystem to operate on */
 int map;			/* IMAP (inode map) or ZMAP (zone map) */
 bit_t bit_returned;		/* number of bit to insert into the map */
 {
@@ -154,7 +154,7 @@ bit_t bit_returned;		/* number of bit to insert into the map */
 /*===========================================================================*
  *				get_super				     *
  *===========================================================================*/
-struct super_block *get_super(dev)
+struct minix3_super_block *get_super(dev)
 dev_t dev;			/* device number whose super_block is sought */
 {
   if (dev == NO_DEV)
@@ -215,7 +215,7 @@ register struct inode *rip;
  *				read_super				     *
  *===========================================================================*/
 int read_super(sp)
-register struct super_block *sp; /* pointer to a superblock */
+register struct minix3_super_block *sp; /* pointer to a superblock */
 {
 /* Read a superblock. */
   dev_t dev;

@@ -768,7 +768,7 @@ char string[NAME_MAX];		/* component name to look for */
  */
 
   register struct inode *rip, *dirp;
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   int r, inumb;
   dev_t mnt_dev;
   ino_t numb;
@@ -864,7 +864,7 @@ char string[NAME_MAX];		/* component name to look for */
  */
 
   register struct inode *rip, *dirp;
-  register struct super_block *sp;
+  register struct minix3_super_block *sp;
   int r, inumb;
   dev_t mnt_dev;
   ino_t numb;
@@ -1103,7 +1103,7 @@ int flag;			 /* LOOK_UP, ENTER, DELETE or IS_EMPTY */
   off_t pos;
   unsigned new_slots, old_slots;
   block_t b;
-  struct super_block *sp;
+  struct minix3_super_block *sp;
   int extended = 0;
 
   /* If 'ldir_ptr' is not a pointer to a dir inode, error. */
@@ -1253,7 +1253,7 @@ int flag;			 /* LOOK_UP, ENTER, DELETE or IS_EMPTY */
   off_t pos;
   unsigned new_slots, old_slots;
   block_t b;
-  struct super_block *sp;
+  struct minix3_super_block *sp;
   int extended = 0;
 
   /* If 'ldir_ptr' is not a pointer to a dir inode, error. */
