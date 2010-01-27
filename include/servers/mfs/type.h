@@ -38,7 +38,7 @@ typedef struct {		/* V2.x disk inode */
 	__s32 d2_atime;		/* when was file data last accessed */
 	__s32 d2_mtime;		/* when was file data last changed */
 	__s32 d2_ctime;		/* when was inode data last changed */
-	__kernel_zone_t d2_zone[V2_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
+	__u32 d2_zone[V2_NR_TZONES];	/* block nums for direct, ind, and dbl ind */
 } d2_inode;
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
