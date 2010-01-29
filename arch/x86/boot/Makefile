@@ -8,7 +8,7 @@ bin-y += drivers/memory/memory
 bin-y += drivers/log/log
 bin-y += drivers/tty/tty
 bin-y += servers/ds/ds
-bin-y += servers/fs/mfs/mfs
+bin-y += servers/fs/minixfs/minixfs
 bin-y += arch/$(SRCARCH)/servers/vm/vm
 bin-y += servers/init/init
 

@@ -1,1 +1,1 @@
-obj-y := iso9660/ mfs/ vfs/
+obj-y := iso9660fs/ minixfs/ vfs/
