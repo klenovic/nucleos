@@ -14,9 +14,10 @@
 
 #include <nucleos/timer.h>
 #include <nucleos/safecopies.h>
+#include <nucleos/a.out.h>
+#include <nucleos/kipc.h>
 #include <asm/kernel/types.h>
 #include <asm/kernel/proto.h>
-#include <nucleos/a.out.h>
 
 #ifdef __KERNEL__
 
@@ -32,6 +33,7 @@ void reset_timer(struct timer *tp);
 void ser_dump_proc(void);
 
 /* main.c */
+void main(void);
 void prepare_shutdown(int how);
 void nucleos_shutdown(struct timer *tp);
 
@@ -114,6 +116,7 @@ void stop_profile_clock(void);
 #endif
 
 /* functions defined in architecture-dependent files. */
+void prot_init(void);
 phys_bytes phys_copy(phys_bytes source, phys_bytes dest, phys_bytes count);
 void phys_copy_fault(void);
 void phys_copy_fault_in_kernel(void);

@@ -17,7 +17,7 @@
 read_tsc:
 	push %edx
 	push %eax
-  rdtsc       // it places the TSC in EDX:EAX
+	rdtsc		// it places the TSC in EDX:EAX
 	push %ebp
 	mov 16(%esp), %ebp
 	mov %edx, (%ebp)

@@ -10,14 +10,13 @@
 #ifndef __KERNEL_GLO_H
 #define __KERNEL_GLO_H
 
-#include <nucleos/sysutil.h>
-
 #ifdef __KERNEL__
 
-#include <asm/bootparam.h>
-#include <asm/kernel/types.h>
+#include <nucleos/sysutil.h>
 #include <kernel/const.h>
 #include <kernel/debug.h>
+#include <asm/bootparam.h>
+#include <asm/kernel/types.h>
 
 /* Variables relating to shutting down MINIX. */
 extern char kernel_exception;		/* TRUE after system exceptions */
@@ -65,6 +64,12 @@ extern int verboseflags;
 
 #ifdef CONFIG_X86_LOCAL_APIC
 extern int config_no_apic; /* optionaly turn off apic */
+#endif
+
+#ifdef CONFIG_IDLE_TSC
+extern u64_t idle_tsc;
+extern u64_t idle_stop;
+extern int idle_active;
 #endif
 
 /* VM */

@@ -14,19 +14,20 @@
  * and defines the principal constants.
  */
 /* The following are so basic, all the *.c files get them automatically. */
-#include <nucleos/types.h>		/* general system types */
-#include <nucleos/const.h>	/* MINIX specific constants */
-#include <nucleos/type.h>		/* MINIX specific types, e.g. message */
-#include <nucleos/kipc.h>		/* MINIX run-time system */
-#include <nucleos/timer.h>		/* watchdog timer management */
-#include <nucleos/errno.h>		/* return codes and error numbers */
+#include <nucleos/types.h>	/* general system types */
+#include <nucleos/const.h>	/* Nucleos specific constants */
+#include <nucleos/type.h>	/* Nucleos specific types, e.g. message */
+#include <nucleos/kipc.h>	/* Nucleos run-time system */
+#include <nucleos/timer.h>	/* watchdog timer management */
+#include <nucleos/errno.h>	/* return codes and error numbers */
 
 /* Important kernel header files. */
-#include <kernel/const.h>		/* constants, MUST be second */
-#include <kernel/types.h>		/* type definitions, MUST be third */
-#include <kernel/proto.h>		/* function prototypes */
-#include <kernel/glo.h>			/* global variables */
-#include <nucleos/kipc.h>		/* IPC constants */
-#include <kernel/profile.h>		/* system profiling */
+#include <kernel/const.h>	/* constants */
+#include <kernel/types.h>	/* type definitions */
+#include <kernel/proto.h>	/* function prototypes */
+#include <kernel/glo.h>		/* global variables */
+#include <kernel/profile.h>	/* system profiling */
+#include <nucleos/kipc.h>	/* IPC constants */
+#include <nucleos/sysutil.h>	/* utility library functions */
 
 #endif /* __KERNEL_KERNEL_H */

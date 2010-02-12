@@ -1,12 +1,3 @@
-/*
- *  Copyright (C) 2009  Ladislav Klenovic <klenovic@nucleonsoft.com>
- *
- *  This file is part of Nucleos kernel.
- *
- *  Nucleos kernel is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 2 of the License.
- */
 /* 
  * profile.c - library functions for call profiling
  *
@@ -18,23 +9,16 @@
  * Changes:
  *   14 Aug, 2006   Created (Rogier Meurs)
  */
-
-#include <nucleos/lib.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <nucleos/string.h>
 #include <nucleos/profile.h>
-#include <nucleos/syslib.h>
+#include <nucleos/sysutil.h>
 #include <nucleos/u64.h>
-
-#define U64_LO 0
-#define U64_HI 1
 
 static char cpath[CPROF_CPATH_MAX_LEN];	/* current call path string */
 static int cpath_len;				/* current call path len */
 static struct cprof_tbl_s *cprof_slot;		/* slot of current function */
-
 static struct stack_s {			/* stack entry */
 		int cpath_len;			/* call path len */
 		struct cprof_tbl_s *slot;	/* table slot */
@@ -59,6 +43,7 @@ static void cprof_init(void);
 static void reset(void);
 static void clear_tbl(void);
 
+
 void procentry (name)
 char *name;
 {
@@ -67,15 +52,13 @@ char *name;
   unsigned long hi, lo;
   struct cprof_tbl_s *last;
   char c;
-  u32_t start_hi,start_lo;
   u64_t start;
 
   /* Procentry is not reentrant. */
   if (cprof_locked) return; else cprof_locked = 1;
 
   /* Read CPU cycle count into local variable. */
-  read_tsc(&start_hi, &start_lo);
-  start = make64(start_lo, start_hi);
+  read_tsc_64(&start);
 
   /* Run init code once after system boot. */
   if (init == 0) {
@@ -119,10 +102,6 @@ char *name;
   }
 
   /* Save initial cycle count on stack. */
-/* @nucleos: minix3 impl.
-  cprof_stk[cprof_stk_top].start_1._[U64_HI] = start._[U64_HI];
-  cprof_stk[cprof_stk_top].start_1._[U64_LO] = start._[U64_LO];
-*/
   cprof_stk[cprof_stk_top].start_1 = start;
 
   /* Check available call path len. */
@@ -184,14 +163,7 @@ char *name;
   cprof_stk[cprof_stk_top].slot = cprof_slot;
 
   /* Again save CPU cycle count on stack. */
-
-/* @nucleos: minix3 impl.
-    read_tsc(&cprof_stk[cprof_stk_top].start_2._[U64_HI],
-		&cprof_stk[cprof_stk_top].start_2._[U64_LO]);
- */
-  read_tsc(&start_hi, &start_lo);
-  cprof_stk[cprof_stk_top].start_2 = make64(start_lo, start_hi);
-
+  read_tsc_64(&cprof_stk[cprof_stk_top].start_2);
   cprof_locked = 0;
 }
 
@@ -199,18 +171,13 @@ char *name;
 void procexit (name)
 char *name;
 {
-  u64_t stop,spent;
-  u32_t stop_hi,stop_lo;
+  u64_t stop, spent;
 
   /* Procexit is not reentrant. */
   if (cprof_locked) return; else cprof_locked = 1;
 
   /* First thing: read CPU cycle count into local variable. */
-/* @nucleos: minix impl.
-   read_tsc(&stop._[U64_HI], &stop._[U64_LO]);
- */
-  read_tsc(&stop_hi, &stop_lo);
-  stop = make64(stop_lo, stop_hi);
+  read_tsc_64(&stop);
 
   /* Only continue if sane. */
   if (control.err) return;
@@ -229,11 +196,7 @@ char *name;
 		sub64(spent, cprof_stk[cprof_stk_top].spent_deeper));
 
   /* Clear spent_deeper for call level we're leaving. */
-/* @nucleos: minix impl.
-  cprof_stk[cprof_stk_top].spent_deeper._[U64_LO] = 0;
-  cprof_stk[cprof_stk_top].spent_deeper._[U64_HI] = 0;
-*/
-  cprof_stk[cprof_stk_top].spent_deeper = 0;
+  cprof_stk[cprof_stk_top].spent_deeper = cvu64(0);
 
   /* Adjust call path string and stack. */
   cpath_len = cprof_stk[cprof_stk_top].cpath_len;
@@ -249,11 +212,7 @@ char *name;
    */
 
   /* Read CPU cycle count. */
-/* @nucleos: minix impl.
-   read_tsc(&stop._[U64_HI], &stop._[U64_LO]);
- */
-  read_tsc(&stop_hi, &stop_lo);
-  stop = make64(stop_lo, stop_hi);
+  read_tsc_64(&stop);
 
   /* Calculate "big" difference. */
   spent = sub64(stop, cprof_stk[cprof_stk_top].start_1);
@@ -281,17 +240,9 @@ static void cprof_init() {
   for (i=0; i<CPROF_STACK_SIZE; i++) {
 	cprof_stk[i].cpath_len = 0;
 	cprof_stk[i].slot = 0;
-/* @nucleos: minix impl.
-	cprof_stk[i].start_1._[U64_LO] = 0;
-	cprof_stk[i].start_1._[U64_HI] = 0;
-	cprof_stk[i].start_2._[U64_LO] = 0;
-	cprof_stk[i].start_2._[U64_HI] = 0;
-	cprof_stk[i].spent_deeper._[U64_LO] = 0;
-	cprof_stk[i].spent_deeper._[U64_HI] = 0;
-*/
-	cprof_stk[i].start_1 = 0;
-	cprof_stk[i].start_2 = 0;
-	cprof_stk[i].spent_deeper = 0;
+	cprof_stk[i].start_1 = cvu64(0);
+	cprof_stk[i].start_2 = cvu64(0);
+	cprof_stk[i].spent_deeper = cvu64(0);
   }
 }
 
@@ -314,10 +265,6 @@ static void clear_tbl()
 	memset(cprof_tbl[i].cpath, '\0', CPROF_CPATH_MAX_LEN);
 	cprof_tbl[i].next = 0;
 	cprof_tbl[i].calls = 0;
-/* @nucleos: minix impl.
-	cprof_tbl[i].cycles._[U64_LO] = 0;
-	cprof_tbl[i].cycles._[U64_HI] = 0;
- */
 	cprof_tbl[i].cycles = 0;
   }
 }

@@ -9,7 +9,6 @@
  */
 #include <nucleos/type.h>
 #include <nucleos/syslib.h>
-#include <nucleos/sysutil.h>
 #include <nucleos/string.h>
 #include <nucleos/portio.h>
 #include <kernel/proto.h>

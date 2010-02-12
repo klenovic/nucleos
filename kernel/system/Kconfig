@@ -27,3 +27,7 @@ config KERNEL_MESSAGES_BUFFER_SIZE
 	default 10000
 	---help---
 	  Size of buffer for kernel messages.
+
+config IDLE_TSC
+	bool "Measure cumulative idle timestamp counter ticks"
+	default n

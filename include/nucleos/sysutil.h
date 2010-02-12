@@ -59,6 +59,7 @@ int getuptime2(clock_t *ticks, time_t *boottime);
 int tickdelay(clock_t ticks);
 int micro_delay_calibrate(void);
 u32_t sys_hz(void);
+u64_t getidle(u64_t *idle_time);
 void util_stacktrace(void);
 void util_nstrcat(char *str, unsigned long n);
 void util_stacktrace_strcat(char *);
@@ -88,5 +89,9 @@ struct util_timingdata {
 };
 
 typedef struct util_timingdata util_timingdata_t;
+
+/* read_tsc() and friends. */
+void read_tsc_64(u64_t *t);
+void read_tsc(u32_t *hi, u32_t *lo);
 
 #endif /* __NUCLEOS_SYSUTIL_H */

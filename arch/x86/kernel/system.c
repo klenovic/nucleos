@@ -13,7 +13,6 @@
 #include <nucleos/string.h>
 #include <nucleos/portio.h>
 #include <nucleos/u64.h>
-#include <nucleos/sysutil.h>
 #include <nucleos/a.out.h>
 #include <nucleos/uaccess.h>
 #include <kernel/proto.h>

@@ -170,6 +170,7 @@ int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_byte
 #define sys_getschedinfo(v1,v2)	sys_getinfo(GET_SCHEDINFO, v1,0, v2,0)
 #define sys_getlocktimings(dst)	sys_getinfo(GET_LOCKTIMING, dst, 0,0,0)
 #define sys_getprivid(nr)	sys_getinfo(GET_PRIVID, 0, 0,0, nr)
+#define sys_getidletsc(dst)	sys_getinfo(GET_IDLETSC, dst, 0,0,0)
 #define sys_getbootparam(dst)	sys_getinfo(GET_BOOTPARAM, dst, 0,0,0)
 
 int sys_getinfo(int request, void *val_ptr, int val_len, void *val_ptr2, int val_len2);
@@ -232,10 +233,5 @@ int pci_del_acl(endpoint_t proc_ep);
 int sys_sprof(int action, int size, int freq, endpoint_t endpt, void *ctl_ptr, void *mem_ptr);
 int sys_cprof(int action, int size, endpoint_t endpt, void *ctl_ptr, void *mem_ptr);
 int sys_profbuf(void *ctl_ptr, void *mem_ptr);
-
-/* read_tsc() and friends. */
-void read_tsc_64(u64_t *t);
-
-void read_tsc(u32_t *hi, u32_t *lo);
 
 #endif /* __NUCLEOS_SYSLIB_H */

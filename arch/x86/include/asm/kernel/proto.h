@@ -156,7 +156,6 @@ void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu);
 void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type);
 void i8259_disable(void);
 
-void prot_init(void);
 void idt_init(void);
 void init_codeseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);
 void init_dataseg(struct segdesc_s *segdp, phys_bytes base, vir_bytes size, int privilege);

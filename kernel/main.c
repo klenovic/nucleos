@@ -29,6 +29,7 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
+#include <nucleos/u64.h>
 #include <kernel/proc.h>
 #include <kernel/debug.h>
 #include <kernel/clock.h>
@@ -211,6 +212,10 @@ void main(void)
 	sprofiling = 0;      /* we're not profiling until instructed to */
 #endif
 	cprof_procs_no = 0;  /* init nr of hash table slots used */
+
+#ifdef CONFIG_IDLE_TSC
+	idle_tsc = cvu64(0);
+#endif
 
 	vm_running = 0;
 	krandom.random_sources = RANDOM_SOURCES;

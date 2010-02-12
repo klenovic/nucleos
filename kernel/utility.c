@@ -12,16 +12,12 @@
  *   kprintf:       (from lib/sysutil/kprintf.c)
  *   kputc:         buffered putc used by kernel kprintf
  */
-
-#include <kernel/kernel.h>
-#include <kernel/proc.h>
-
 #include <nucleos/unistd.h>
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
-
-#include <nucleos/sysutil.h>
 #include <nucleos/com.h>
+#include <kernel/kernel.h>
+#include <kernel/proc.h>
 
 /*===========================================================================*
  *			panic                                        *

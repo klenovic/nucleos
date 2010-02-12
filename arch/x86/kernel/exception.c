@@ -16,7 +16,6 @@
 #include <nucleos/signal.h>
 #include <stdio.h>
 #include <nucleos/string.h>
-#include <nucleos/sysutil.h>
 #include <kernel/proc.h>
 #include <kernel/proto.h>
 #include <kernel/vm.h>

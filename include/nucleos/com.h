@@ -514,7 +514,8 @@
 #   define GET_HZ	  18	/* get HZ value */
 #   define GET_WHOAMI	  19	/* get own name and endpoint */
 #   define GET_RANDOMNESS_BIN 20 /* get one randomness bin */
-#   define GET_BOOTPARAM  21	/* get boot params */
+#   define GET_IDLETSC	  21	/* get cumulative idle time stamp counter */
+#   define GET_BOOTPARAM  22	/* get boot params */
 #define I_ENDPT      m7_i4	/* calling process */
 #define I_VAL_PTR      m7_p1	/* virtual address at caller */ 
 #define I_VAL_LEN      m7_i1	/* max length of value */

@@ -160,6 +160,16 @@ register message *m_ptr;	/* pointer to request message */
 			return -EINVAL;
 		return proc_addr(proc_nr)->p_priv->s_id;
 
+	case GET_IDLETSC:
+#ifdef CONFIG_IDLE_TSC
+		length = sizeof(idle_tsc);
+		src_vir = (vir_bytes) &idle_tsc;
+		break;
+#else
+		kprintf("do_getinfo: kernel not compiled with CONFIG_IDLE_TSC\n");
+		return(-EINVAL);
+#endif
+
 	case GET_BOOTPARAM:
 		length = sizeof(struct boot_param);
 		src_vir = (vir_bytes) &boot_param;
