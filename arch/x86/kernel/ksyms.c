@@ -12,3 +12,4 @@
 
 char fpu_presence;
 char osfxsr_feature;	/* FXSAVE/FXRSTOR instructions support (SSEx) */
+int config_no_apic;	/* optionaly turn off apic */
