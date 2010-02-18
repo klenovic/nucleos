@@ -14,7 +14,7 @@
 
 # ifdef CONFIG_X86_32
 #  include "posix_types_32.h"
-# else  /* @nucleos: maybe one day */
+# else
 #  include "posix_types_64.h"
 # endif
 

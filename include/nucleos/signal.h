@@ -12,6 +12,7 @@
 
 #include <nucleos/types.h>
 #include <asm/signal.h>
+#include <asm/siginfo.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 

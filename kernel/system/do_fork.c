@@ -20,6 +20,7 @@
 #include <kernel/system.h>
 #include <kernel/vm.h>
 #include <nucleos/signal.h>
+#include <nucleos/string.h>
 
 #include <nucleos/endpoint.h>
 
@@ -34,6 +35,7 @@ register message *m_ptr;	/* pointer to request message */
 /* Handle sys_fork().  PR_ENDPT has forked.  The child is PR_SLOT. */
 #ifdef CONFIG_X86_32
   reg_t old_ldt_sel;
+  void *old_fpu_save_area_p;
 #endif
 
   register struct proc *rpc;		/* child process pointer */
@@ -69,11 +71,16 @@ register message *m_ptr;	/* pointer to request message */
   gen = _ENDPOINT_G(rpc->p_endpoint);
 #ifdef CONFIG_X86_32
   old_ldt_sel = rpc->p_seg.p_ldt_sel;	/* backup local descriptors */
+  old_fpu_save_area_p = rpc->p_fpu_state.fpu_save_area_p;
 #endif
   *rpc = *rpp;				/* copy 'proc' struct */
-
 #ifdef CONFIG_X86_32
   rpc->p_seg.p_ldt_sel = old_ldt_sel;	/* restore descriptors */
+  rpc->p_fpu_state.fpu_save_area_p = old_fpu_save_area_p;
+  if(rpp->p_misc_flags & MF_FPU_INITIALIZED)
+	memcpy(rpc->p_fpu_state.fpu_save_area_p,
+	       rpp->p_fpu_state.fpu_save_area_p,
+	       FPU_XFP_SIZE);
 #endif
 
   if(++gen >= _ENDPOINT_MAX_GENERATION)	/* increase generation */

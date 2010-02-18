@@ -17,6 +17,7 @@
 #include <kernel/debug.h>
 #include <asm/bootparam.h>
 #include <asm/kernel/types.h>
+#include <asm/kernel/glo.h>
 
 /* Variables relating to shutting down MINIX. */
 extern char kernel_exception;		/* TRUE after system exceptions */

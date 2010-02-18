@@ -10,6 +10,8 @@
 #ifndef __KERNEL_PROC_H
 #define __KERNEL_PROC_H
 
+#if defined (__KERNEL__) || defined (__UKERNEL__)
+
 #ifndef __ASSEMBLY__
 
 /* Here is the declaration of the process table.  It contains all process
@@ -25,9 +27,10 @@
 #include <kernel/const.h>
 #include <kernel/priv.h>
 
-#if defined (__KERNEL__) || defined (__UKERNEL__)
+
 struct proc {
 	struct stackframe_s p_reg;	/* process' registers saved in stack frame */
+	struct fpu_state_s p_fpu_state; /* process' fpu_regs saved lazily */
 	struct segframe p_seg;		/* segment descriptors */
 	proc_nr_t p_nr;			/* number of this process (for fast access) */
 	struct priv *p_priv;		/* system privileges structure */
@@ -133,8 +136,6 @@ struct proc {
 	long clobregs[__NUM_CLOBB_REGS];
 };
 
-#endif /* __ASSEMBLY__ */
-
 /* Bits for the runtime flags. A process is runnable iff p_rts_flags == 0. */
 #define RTS_SLOT_FREE	0x01	/* process slot is free */
 #define RTS_PROC_STOP	0x02	/* process has been stopped */
@@ -229,17 +230,22 @@ struct proc {
 		if(u) { unlock;	}					\
 	} while(0)
 
+#endif /* __ASSEMBLY__ */
+
 /* Misc flags */
-#define MF_REPLY_PEND	0x001	/* reply to IPC_REQUEST is pending */
-#define MF_VIRT_TIMER	0x002	/* process-virtual timer is running */
-#define MF_PROF_TIMER	0x004	/* process-virtual profile timer is running */
-#define MF_ASYNMSG	0x010	/* Asynchrous message pending */
-#define MF_FULLVM	0x020
-#define MF_DELIVERMSG	0x040	/* Copy message for him before running */
-#define MF_SIG_DELAY	0x080	/* Send signal when no longer sending */
-#define MF_SC_ACTIVE	0x100	/* Syscall tracing: in a system call now */
-#define MF_SC_DEFER	0x200	/* Syscall tracing: deferred system call */
-#define MF_SC_TRACE	0x400	/* Syscall tracing: trigger syscall events */
+#define MF_REPLY_PEND		0x001	/* reply to IPC_REQUEST is pending */
+#define MF_VIRT_TIMER		0x002	/* process-virtual timer is running */
+#define MF_PROF_TIMER		0x004	/* process-virtual profile timer is running */
+#define MF_ASYNMSG		0x010	/* Asynchrous message pending */
+#define MF_FULLVM		0x020
+#define MF_DELIVERMSG		0x040	/* Copy message for him before running */
+#define MF_SIG_DELAY		0x080	/* Send signal when no longer sending */
+#define MF_SC_ACTIVE		0x100	/* Syscall tracing: in a system call now */
+#define MF_SC_DEFER		0x200	/* Syscall tracing: deferred system call */
+#define MF_SC_TRACE		0x400	/* Syscall tracing: trigger syscall events */
+#define MF_USED_FPU		0x800	/* process used fpu during last execution run */
+#define MF_FPU_INITIALIZED	0x1000  /* process already used math, so fpu
+					 * regs are significant (initialized)*/
 
 /* Scheduling priorities for p_priority. Values must start at zero (highest
  * priority) and increment.  Priorities of the processes in the boot image 
@@ -285,6 +291,6 @@ extern struct proc *rdy_head[];		/* ptrs to ready list headers */
 extern struct proc *rdy_tail[];		/* ptrs to ready list tails */
 
 #endif /* __ASSEMBLY__ */
-
 #endif /* !(__KERNEL__ || __UKERNEL__) */
+
 #endif /* __KERNEL_PROC_H */

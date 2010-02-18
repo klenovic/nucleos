@@ -21,12 +21,18 @@
 #include <kernel/debug.h>
 #include <ibm/cmos.h>
 #include <ibm/bios.h>
+#include <asm/cpufeature.h>
+#include <asm/kernel/const.h>
 
 #ifdef CONFIG_X86_LOCAL_APIC
 #include <asm/apic.h>
 #endif
 
-#define CR0_EM	0x0004		/* set to enable trap on any FP instruction */
+#define CR0_EM		0x0004		/* set to enable trap on any FP instruction */
+#define CR0_MP_NE	0x0022		/* set MP and NE flags to handle FPU 
+					   exceptions in native mode. */
+#define CR4_OSFXSR	(1L<<9)		/* set CR4.OSFXSR[bit 9] if FXSR is supported. */
+#define CR4_OSXMMEXCPT	(1L<<10)	/* set OSXMMEXCPT[bit 10] if we provide #XM handler. */
 
 static void ser_debug(int c);
 
@@ -135,6 +141,50 @@ void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)
 
 void arch_init(void)
 {
+	unsigned short cw, sw;
+
+	fninit();
+	sw = fnstsw();
+	fnstcw(&cw);
+
+	if ((sw & 0xff) == 0 && (cw & 0x103f) == 0x3f) {
+		/* We have some sort of FPU, but don't check exact model.
+		 * Set CR0_NE and CR0_MP to handle fpu exceptions
+		 * in native mode. */
+		write_cr0(read_cr0() | CR0_MP_NE);
+		fpu_presence = 1;
+
+		if (cpufeature(_CPUF_I386_FXSR)) {
+			register struct proc *rp;
+			phys_bytes aligned_fp_area;
+			/* Enable FXSR feature usage. */
+			write_cr4(read_cr4() | CR4_OSFXSR | CR4_OSXMMEXCPT);
+			osfxsr_feature = 1;
+
+			for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
+				/* FXSR requires 16-byte alignment of memory
+				 * image, but unfortunately some old tools
+				 * (probably linker)ignores ".balign 16"
+				 * applied to our memory image.
+				 * Thus we have to do manual alignment.
+				 */
+				aligned_fp_area = (phys_bytes) &rp->p_fpu_state.fpu_image;
+				if (aligned_fp_area % FPUALIGN) {
+					aligned_fp_area += FPUALIGN - (aligned_fp_area % FPUALIGN);
+				}
+
+				rp->p_fpu_state.fpu_save_area_p = (void *) aligned_fp_area;
+			}
+		} else {
+			osfxsr_feature = 0;
+		}
+	} else {
+		/* No FPU presents. */
+		fpu_presence = 0;
+		osfxsr_feature = 0;
+		return;
+	}
+
 #ifdef CONFIG_X86_LOCAL_APIC
 	/*
 	 * this is setting kernel segments to cover most of the phys memory. The
@@ -157,12 +207,6 @@ void arch_init(void)
 		BOOT_VERBOSE(kprintf("APIC not present, using legacy PIC\n"));
 	}
 #endif
-
-#if 0
-	/* Set CR0_EM until we get FP context switching */
-	write_cr0(read_cr0() | CR0_EM);
-#endif
-
 }
 
 #define COM1_BASE	0x3F8

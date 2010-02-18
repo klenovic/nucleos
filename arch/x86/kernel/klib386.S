@@ -495,6 +495,31 @@ reload_ds:
 	RELOAD_SEG_REG(%ds)
 	ret
 
+/*===========================================================================*/
+/*                            fpu_routines                                   */
+/*===========================================================================*/
+/* non-waiting FPU initialization */
+.globl fninit
+fninit:
+	fninit
+	ret
+
+/* store status word (non-waiting) */
+.globl fnstsw
+fnstsw:
+	xor	%eax, %eax
+	fnstsw	%ax
+	ret
+
+/* store control word (non-waiting) */
+.globl fnstcw 
+fnstcw:
+	push	%eax
+	mov	8(%esp), %eax
+	fnstcw	(%eax)
+	pop	%eax
+	ret
+
 //===========================================================================
 //                           read_cr0
 //===========================================================================

@@ -7,7 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __ASM_X86_POSIX_TYPES_64_H
-#define __ASM_X86_POSIX_TYPES_64_H
+/* Definition of kernel symbols. */
+/* @nucleos: Temporary until EXPORT_SYMBOL is introduced */
 
-#endif /* __ASM_X86_POSIX_TYPES_64_H */
+char fpu_presence;
+char osfxsr_feature;	/* FXSAVE/FXRSTOR instructions support (SSEx) */

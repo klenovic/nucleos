@@ -223,6 +223,9 @@ void idt_init(void)
 		{ general_protection, PROTECTION_VECTOR, INTR_PRIVILEGE },
 		{ page_fault, PAGE_FAULT_VECTOR, INTR_PRIVILEGE },
 		{ copr_error, COPROC_ERR_VECTOR, INTR_PRIVILEGE },
+		{ alignment_check, ALIGNMENT_CHECK_VECTOR, INTR_PRIVILEGE },
+		{ machine_check, MACHINE_CHECK_VECTOR, INTR_PRIVILEGE },
+		{ simd_exception, SIMD_EXCEPTION_VECTOR, INTR_PRIVILEGE },
 
 		/* internal communication */
 		{ syscall_entry, SYS386_VECTOR, USER_PRIVILEGE },

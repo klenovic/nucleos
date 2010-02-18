@@ -53,6 +53,9 @@ void stack_exception(void);
 void general_protection(void);
 void page_fault(void);
 void copr_error(void);
+void alignment_check(void);
+void machine_check(void);
+void simd_exception(void);
 
 /* Software interrupt handlers, in numerical order. */
 void trp(void);
@@ -115,6 +118,9 @@ void phys_memset(phys_bytes ph, u32_t c, phys_bytes bytes);
 void reload_ds(void);
 void ia32_msr_read(u32_t reg, u32_t * hi, u32_t * lo);
 void ia32_msr_write(u32_t reg, u32_t hi, u32_t lo);
+void fninit(void);
+unsigned short fnstsw(void);
+void fnstcw(unsigned short* cw);
 
 /* protect.c */
 struct tss_s {

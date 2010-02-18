@@ -1,7 +1,7 @@
 # Makefile for all device drivers.
 obj-y := amddev/ at_wini/ audio/ bios_wini/ dpeth/ dp8390/ floppy/ fxp/ \
 	 lance/ log/ memory/ orinoco/ pci/ printer/ random/ readclock/ \
-	 rtl8139/ sb16/ tty/ ti1225/ filter/
+	 rtl8139/ sb16/ tty/ ti1225/ filter/ rtl8169/
 
 #subdir-y-flags := not-sort
 
