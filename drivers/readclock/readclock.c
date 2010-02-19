@@ -101,13 +101,9 @@ int main(int argc, char **argv)
   struct tm time1;
   struct tm time2;
   struct tm tmnow;
-  char date[64];
   time_t now, rtc;
   int i, s;
   unsigned char mach_id, cmos_state;
-#if 0
-  struct sysgetenv sysgetenv;
-#endif
 
   if((s=sys_readbios(MACH_ID_ADDR, &mach_id, sizeof(mach_id))) != 0) {
 	printf("readclock: sys_readbios failed: %d.\n", s);
@@ -155,21 +151,6 @@ int main(int argc, char **argv)
   }
   if (Wflag) wflag = 1;		/* -W implies -w */
 
-#if 0
-  /* The hardware clock may run in a different time zone, likely GMT or
-   * winter time.  Select that time zone.
-   */
-  strcpy(clocktz, "TZ=");
-  sysgetenv.key = "TZ";
-  sysgetenv.keylen = 2+1;
-  sysgetenv.val = clocktz+3;
-  sysgetenv.vallen = sizeof(clocktz)-3;
-  if (svrctl(SYSGETENV, &sysgetenv) == 0) {
-	putenv(clocktz);
-	tzset();
-  }
-#endif
-
   /* Read the CMOS real time clock. */
   for (i = 0; i < 10; i++) {
 	get_time(&time1);
@@ -178,7 +159,10 @@ int main(int argc, char **argv)
 	time1.tm_isdst = -1;	/* Do timezone calculations. */
 	time2 = time1;
 
-	rtc= mktime(&time1);	/* Transform to a time_t. */
+	rtc = mktime(time1.tm_year + 1900, time1.tm_mon + 1,
+		     time1.tm_mday, time1.tm_hour,
+		     time1.tm_min, time1.tm_sec);
+
 	if (rtc != -1) break;
 
 	printf(
@@ -199,15 +183,18 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
-	tmnow = *localtime(&rtc);
-	if (strftime(date, sizeof(date),
-				"%a %b %d %H:%M:%S %Z %Y", &tmnow) != 0) {
-		if (date[8] == '0') date[8]= ' ';
-		printf("%s\n", date);
-	}
+
+	time_to_tm(rtc,0,&tmnow);
+	printf("%04d-%02d-%02d %02d:%02d:%02d\n",
+		tmnow.tm_year + 1900,
+		tmnow.tm_mon + 1,
+		tmnow.tm_mday,
+		tmnow.tm_hour,
+		tmnow.tm_min,
+		tmnow.tm_sec);
   } else {
 	/* Set the CMOS clock to the system time. */
-	tmnow = *localtime(&now);
+	time_to_tm(now, 0, &tmnow);
 	if (nflag) {
 		printf("%04d-%02d-%02d %02d:%02d:%02d\n",
 			tmnow.tm_year + 1900,

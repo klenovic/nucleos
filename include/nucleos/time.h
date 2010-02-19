@@ -48,20 +48,18 @@ struct tm {
 	int tm_isdst;	/* Daylight Saving Time flag */
 };
 
+void time_to_tm(time_t totalsecs, int offset, struct tm *result);
+
 extern char *tzname[];
 
 clock_t clock(void);
 double difftime(time_t _time1, time_t _time0);
-time_t mktime(struct tm *_timeptr);
+
+extern unsigned long mktime(const unsigned int year, const unsigned int mon,
+			    const unsigned int day, const unsigned int hour,
+			    const unsigned int min, const unsigned int sec);
+
 time_t time(__kernel_time_t *_timeptr);
-char *asctime(const struct tm *_timeptr);
-char *ctime(const time_t *_timer);
-struct tm *gmtime(const time_t *_timer);
-struct tm *localtime(const time_t *_timer);
-size_t strftime(char *_s, size_t _max, const char *_fmt, const struct tm *_timep);
-
-void tzset(void);
-
 int stime(time_t *_top);
 
 extern long timezone;

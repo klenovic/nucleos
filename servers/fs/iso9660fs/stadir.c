@@ -50,7 +50,9 @@ cp_grant_id_t gid;		/* grant for the stat buf */
   if (dir->rec_date[6] != 0)
     ltime.tm_hour += dir->rec_date[6] / 4;
 
-  time1 = mktime(&ltime);
+  time1 = mktime(ltime.tm_year, ltime.tm_mon,
+		 ltime.tm_mday, ltime.tm_hour,
+		 ltime.tm_min, ltime.tm_sec);
 
   statbuf.st_atime = time1;
   statbuf.st_mtime = time1;
