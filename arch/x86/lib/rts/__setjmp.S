@@ -29,7 +29,7 @@ __setjmp:
 	jz		1f
 	leal	4(%eax), %edx		// pointer to sigset_t
 	pushl	%edx
-	call	__newsigset		// save mask	
+	call	__newsigset		// save mask
 	addl	$4, %esp
 1:
 	movl	$0, %eax

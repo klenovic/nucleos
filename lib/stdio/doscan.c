@@ -404,41 +404,6 @@ _doscan(register FILE *stream, const char *format, va_list ap)
 				*str = '\0';	
 			}
 			break;
-#ifndef	NOFLOAT
-		case 'e':
-		case 'E':
-		case 'f':
-		case 'g':
-		case 'G':
-			if (!(flags & FL_WIDTHSPEC) || width > NUMLEN)
-				width = NUMLEN;
-
-			if (!width) return done;
-			str = f_collect(ic, stream, width);
-
-			if (str < inp_buf
-			    || (str == inp_buf
-				&& (*str == '-'
-				    || *str == '+'))) return done;
-
-			/*
-			 * Although the length of the number is str-inp_buf+1
-			 * we don't add the 1 since we counted it already
-			 */
-			nrchars += str - inp_buf;
-
-			if (!(flags & FL_NOASSIGN)) {
-				ld_val = strtod(inp_buf, &tmp_string);
-				if (flags & FL_LONGDOUBLE)
-					*va_arg(ap, long double *) = (long double) ld_val;
-				else
-				    if (flags & FL_LONG)
-					*va_arg(ap, double *) = (double) ld_val;
-				else
-					*va_arg(ap, float *) = (float) ld_val;
-			}
-			break;
-#endif
 		}		/* end switch */
 		conv++;
 		if (!(flags & FL_NOASSIGN) && kind != 'n') done++;

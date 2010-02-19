@@ -257,24 +257,6 @@ _doprnt(register const char *fmt, va_list ap, FILE *stream)
 		case 'c':
 			*s++ = va_arg(ap, int);
 			break;
-#ifndef NOFLOAT
-		case 'G':
-		case 'g':
-			if ((flags & FL_PRECSPEC) && (precision == 0))
-				precision = 1;
-		case 'f':
-		case 'E':
-		case 'e':
-			if (!(flags & FL_PRECSPEC)) 
-				precision = 6;
-
-			if (precision >= sizeof(buf))
-				precision = sizeof(buf) - 1;
-
-			flags |= FL_SIGNEDCONV;
-			s = _f_print(&ap, flags, s, c, precision);
-			break;
-#endif	/* NOFLOAT */
 		case 'r':
 			ap = va_arg(ap, va_list);
 			fmt = va_arg(ap, char *);
