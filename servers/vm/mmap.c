@@ -77,7 +77,8 @@ int do_mmap(message *m)
 			len += VM_PAGE_SIZE - (len % VM_PAGE_SIZE);
 
 		if(!(vr = map_page_region(vmp,
-			arch_vir2map(vmp, vmp->vm_stacktop),
+			arch_vir2map(vmp,
+				m->VMM_ADDR ? m->VMM_ADDR : vmp->vm_stacktop),
 			VM_DATATOP, len, MAP_NONE, vrflags, mfflags))) {
 			return -ENOMEM;
 		}
@@ -478,7 +479,7 @@ int scall_mmap(message *m)
 			len += VM_PAGE_SIZE - (len % VM_PAGE_SIZE);
 
 		if(!(vr = map_page_region(vmp,
-			arch_vir2map(vmp, vmp->vm_stacktop),
+			arch_vir2map(vmp, m->VMM_ADDR ? m->VMM_ADDR : vmp->vm_stacktop),
 			VM_DATATOP, len, MAP_NONE, vrflags, mfflags))) {
 			return -ENOMEM;
 		}
