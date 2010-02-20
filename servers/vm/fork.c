@@ -77,7 +77,7 @@ int do_fork(message *msg)
   vmc->vm_regions = NULL;
   vmc->vm_endpoint = NONE;	/* In case someone tries to use it. */
   vmc->vm_pt = origpt;
-  vmc->vm_flags &= ~VMF_HASPT;
+  vmc->vm_flags |= VMF_HASPT;
 
 #if VMSTATS
   vmc->vm_bytecopies = 0;
@@ -92,8 +92,6 @@ int do_fork(message *msg)
 		printf("VM: fork: pt_new failed\n");
 		return -ENOMEM;
 	}
-
-	vmc->vm_flags |= VMF_HASPT;
 
 	SANITYCHECK(SCL_DETAIL);
 
@@ -129,7 +127,6 @@ int do_fork(message *msg)
 	/* Create a copy of the parent's core image for the child. */
 	child_abs = (phys_bytes) child_base << CLICK_SHIFT;
 	parent_abs = (phys_bytes) vmp->vm_arch.vm_seg[D].mem_phys << CLICK_SHIFT;
-	FIXME("VM uses kernel for abscopy");
 	s = sys_abscopy(parent_abs, child_abs, prog_bytes);
 	if (s < 0) vm_panic("do_fork can't copy", s);
 
@@ -141,6 +138,11 @@ int do_fork(message *msg)
 	vmc->vm_arch.vm_seg[D].mem_phys = child_base;
 	vmc->vm_arch.vm_seg[S].mem_phys = vmc->vm_arch.vm_seg[D].mem_phys +
            (vmp->vm_arch.vm_seg[S].mem_vir - vmp->vm_arch.vm_seg[D].mem_vir);
+
+	if(pt_identity(&vmc->vm_pt) != 0) {
+		printf("VM: fork: pt_identity failed\n");
+		return -ENOMEM;
+	}
   }
 
   /* Only inherit these flags. */
@@ -153,7 +155,7 @@ int do_fork(message *msg)
   /* Tell kernel about the (now successful) FORK. */
   if((r=sys_fork(vmp->vm_endpoint, childproc,
 	&vmc->vm_endpoint, vmc->vm_arch.vm_seg,
-	fullvm ? PFF_VMINHIBIT : 0, &msgaddr)) != 0) {
+	PFF_VMINHIBIT, &msgaddr)) != 0) {
         vm_panic("do_fork can't sys_fork", r);
   }
 
@@ -169,10 +171,10 @@ int do_fork(message *msg)
 	handle_memory(vmc, vir, sizeof(message), 1);
 	vir = arch_vir2map(vmp, msgaddr);
 	handle_memory(vmp, vir, sizeof(message), 1);
-
-	if((r=pt_bind(&vmc->vm_pt, vmc)) != 0)
-		vm_panic("fork can't pt_bind", r);
   }
+
+  if((r=pt_bind(&vmc->vm_pt, vmc)) != 0)
+	vm_panic("fork can't pt_bind", r);
 
   /* Inform caller of new child endpoint. */
   msg->VMF_CHILD_ENDPOINT = vmc->vm_endpoint;

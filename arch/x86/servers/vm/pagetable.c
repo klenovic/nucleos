@@ -42,8 +42,8 @@
 #include <asm/servers/vm/memory.h>
 
 /* PDE used to map in kernel, kernel physical address. */
-static int kernel_pde = -1, pagedir_pde = -1;
-static u32_t kern_pde_val = 0, global_bit = 0, pagedir_pde_val;
+static int id_map_high_pde = -1, pagedir_pde = -1;
+static u32_t global_bit = 0, pagedir_pde_val;
 
 static int proc_pde = 0;
 
@@ -627,9 +627,39 @@ int pt_new(pt_t *pt)
 }
 
 /*===========================================================================*
+ *				pt_identity		     		     *
+ *===========================================================================*/
+int pt_identity(pt_t *pt)
+{
+/* Allocate a pagetable that does a 1:1 mapping. */
+	int i;
+
+	/* Allocate page directory. */
+        if(!pt->pt_dir &&
+          !(pt->pt_dir = vm_allocpage(&pt->pt_dir_phys, VMP_PAGEDIR))) {
+		return -ENOMEM;
+	}
+
+	for(i = 0; i < I386_VM_DIR_ENTRIES; i++) {
+		phys_bytes addr;
+		addr = I386_BIG_PAGE_SIZE*i;
+		pt->pt_dir[i] = (addr & I386_VM_ADDR_MASK_4MB) |
+				I386_VM_BIGPAGE|
+				I386_VM_USER|
+				I386_VM_PRESENT|I386_VM_WRITE;
+		pt->pt_pt[i] = NULL;
+	}
+
+	/* Where to start looking for free virtual address space? */
+	pt->pt_virtop = 0;
+
+	return 0;
+}
+
+/*===========================================================================*
  *                              pt_init                                      *
  *===========================================================================*/
-void pt_init(void)
+void pt_init(phys_bytes usedlimit)
 {
 /* By default, the kernel gives us a data segment with pre-allocated
  * memory that then can't grow. We want to be able to allocate memory
@@ -653,6 +683,7 @@ void pt_init(void)
         /* Shorthand. */
         newpt = &vmp->vm_pt;
 
+
         /* Get ourselves spare pages. */
         if(!(sparepages_mem = (vir_bytes) aalloc(I386_PAGE_SIZE*SPAREPAGES)))
 		vm_panic("pt_init: aalloc for spare failed", NO_NUM);
@@ -675,29 +706,18 @@ void pt_init(void)
 	if(global_bit_ok)
 		global_bit = I386_VM_GLOBAL;
 
-	/* Figure out kernel pde slot. */
-	{
-		int pde1, pde2;
-		pde1 = I386_VM_PDE(KERNEL_TEXT);
-		pde2 = I386_VM_PDE(KERNEL_DATA+KERNEL_DATA_LEN);
-		if(pde1 != pde2)
-                	vm_panic("pt_init: kernel too big", NO_NUM); 
+	/* The kernel and boot time processes need an identity mapping.
+	 * We use full PDE's for this without separate page tables.
+	 * Figure out which pde we can start using for other purposes.
+	 */
+	id_map_high_pde = usedlimit / I386_BIG_PAGE_SIZE;
 
-		/* Map in kernel with this single pde value if 4MB pages
-		 * supported.
-		 */
-		kern_pde_val = (KERNEL_TEXT & I386_VM_ADDR_MASK_4MB) |
-				I386_VM_BIGPAGE|
-				I386_VM_USER|
-				I386_VM_PRESENT|I386_VM_WRITE|global_bit;
-		kernel_pde = pde1;
-		vm_assert(kernel_pde >= 0);
-		free_pde = kernel_pde+1;
-	}
+	/* We have to make mappings up till here. */
+	free_pde = id_map_high_pde+1;
 
-	/* First unused pde. */
-	proc_pde = free_pde;
-           
+	printf("map high pde: %d for limit: 0x%lx\n",
+		id_map_high_pde, usedlimit);
+
         /* Initial (current) range of our virtual address space. */
         lo = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);
         hi = CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_phys +
@@ -719,9 +739,6 @@ void pt_init(void)
         if(pt_new(newpt) != 0)
                 vm_panic("pt_init: pt_new failed", NO_NUM); 
 
-	/* Old position mapped in? */
-	pt_check(vmp);
-                
         /* Set up mappings for VM process. */
         for(v = lo; v < hi; v += I386_PAGE_SIZE)  {
                 phys_bytes addr;
@@ -791,7 +808,8 @@ void pt_init(void)
 			kern_mappings[index].flags = flags;
 			kern_mappings[index].lin_addr = offset;
 			kern_mappings[index].flags =
-				I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE;
+				I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE |
+				global_bit;
 			if(flags & VMMF_UNCACHED)
 				kern_mappings[index].flags |=
 					I386_VM_PWT | I386_VM_PCD;
@@ -910,28 +928,22 @@ void pt_free(pt_t *pt)
 int pt_mapkernel(pt_t *pt)
 {
 	int r, i;
-	static int printed = 0;
 
         /* Any i386 page table needs to map in the kernel address space. */
         vm_assert(vmproc[VMP_SYSTEM].vm_flags & VMF_INUSE);
 
 	if(bigpage_ok) {
-		if(kernel_pde >= 0) {
-			pt->pt_dir[kernel_pde] = kern_pde_val;
-		} else
-			vm_panic("VM: pt_mapkernel: no kernel pde", NO_NUM);
+		int pde;
+		for(pde = 0; pde <= id_map_high_pde; pde++) {
+			phys_bytes addr;
+			addr = pde * I386_BIG_PAGE_SIZE;
+			vm_assert((addr & I386_VM_ADDR_MASK) == addr);
+			pt->pt_dir[pde] = addr | I386_VM_PRESENT |
+				I386_VM_BIGPAGE | I386_VM_USER |
+				I386_VM_WRITE | global_bit;
+		}
 	} else {
 		vm_panic("VM: pt_mapkernel: no bigpage", NO_NUM);
-
-        	/* Map in text. flags: don't write, supervisor only */
-        	if((r=pt_writemap(pt, KERNEL_TEXT, KERNEL_TEXT, KERNEL_TEXT_LEN,
-			I386_VM_PRESENT|global_bit, 0)) != 0)
-			return r;
- 
-        	/* Map in data. flags: read-write, supervisor only */
-        	if((r=pt_writemap(pt, KERNEL_DATA, KERNEL_DATA, KERNEL_DATA_LEN,
-			I386_VM_PRESENT|I386_VM_WRITE, 0)) != 0)
-			return r;
 	}
 
 	if(pagedir_pde >= 0) {
@@ -950,21 +962,6 @@ int pt_mapkernel(pt_t *pt)
 	}
 
 	return 0;
-}
-
-/*===========================================================================*
- *                              pt_check                                *
- *===========================================================================*/
-void pt_check(struct vmproc *vmp)
-{
-	phys_bytes hi;
-        hi = CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_phys +
-                vmp->vm_arch.vm_seg[S].mem_len);
-	if(hi > (kernel_pde+1) * I386_BIG_PAGE_SIZE) {
-		printf("VM: %d doesn't fit in kernel range (0x%lx)\n",
-			vmp->vm_endpoint, hi);
-		vm_panic("boot time processes too big", NO_NUM);
-	}
 }
 
 /*===========================================================================*
