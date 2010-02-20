@@ -44,4 +44,4 @@ header-y += types.h
 # n/a header-y += int-l64.h
 header-y += int-ll64.h
 # n/a header-y += resource.h
-# n/a header-y += siginfo.h
+header-y += siginfo.h

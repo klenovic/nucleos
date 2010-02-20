@@ -6,11 +6,13 @@ include include/asm-generic/Kbuild.asm
 # n/a header-y += boot.h
 header-y += bootparam.h
 # n/a header-y += debugreg.h
+header-y += fpu.h
 # n/a header-y += ldt.h
 # n/a header-y += msr-index.h
 # n/a header-y += prctl.h
 # n/a header-y += ptrace-abi.h
 # n/a header-y += sigcontext32.h
+header-y += stackframe.h
 # n/a header-y += ucontext.h
 # n/a header-y += processor-flags.h
  
