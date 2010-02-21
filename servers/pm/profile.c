@@ -23,7 +23,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/signal.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #if defined (CONFIG_DEBUG_SERVERS_STATS_PROFILE) || defined(CONFIG_DEBUG_SERVERS_CALL_PROFILE)

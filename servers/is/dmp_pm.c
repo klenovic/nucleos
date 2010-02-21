@@ -17,9 +17,9 @@
  */
 
 #include "inc.h"
-#include "../pm/mproc.h"
-#include <nucleos/timer.h> 
-#include <nucleos/type.h> 
+#include <servers/pm/mproc.h>
+#include <nucleos/timer.h>
+#include <nucleos/type.h>
 
 struct mproc mproc[NR_PROCS];
 

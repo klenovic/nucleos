@@ -1,7 +1,7 @@
 # Makefile for Reincarnation Server (RS)
 app-y := rs.elf32
 rs.elf32-type := server
-rs.elf32-obj-y := exec.o main.o manager.o
+rs.elf32-obj-y := exec.o main.o manager.o table.o utility.o memory.o
 
 ccflags-$(CONFIG_CPROFILE) += $(CPROFILE)
 
@@ -15,6 +15,6 @@ $(src)/rs.elf32: servers/server_32.lds
 rs_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
 rs_a_hdrlen  := 0x20
 rs_a_cpu     := i386
-rs_stackheap := 32k
+rs_stackheap := 350k
 
 e2a-y := rs.elf32,rs

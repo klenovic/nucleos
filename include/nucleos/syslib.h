@@ -94,7 +94,8 @@ void *alloc_contig(size_t len, int flags, phys_bytes *phys);
 /* Clock functionality: get system times,r (un)schedule an alarm call, or 
  * retrieve/set a process-virtual timer.
  */
-int sys_times(endpoint_t proc_ep, clock_t *user_time, clock_t *sys_time, clock_t *uptime);
+int sys_times(endpoint_t proc_ep, clock_t *user_time,
+	clock_t *sys_time, clock_t *uptime, time_t *boottime);
 int sys_setalarm(clock_t exp_time, int abs_time);
 int sys_vtimer(endpoint_t proc_nr, int which, clock_t *newval, clock_t *oldval);
 
@@ -169,8 +170,9 @@ int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_byte
 #define sys_getmonparams(v,vl)	sys_getinfo(GET_MONPARAMS, v,vl, 0,0)
 #define sys_getschedinfo(v1,v2)	sys_getinfo(GET_SCHEDINFO, v1,0, v2,0)
 #define sys_getlocktimings(dst)	sys_getinfo(GET_LOCKTIMING, dst, 0,0,0)
-#define sys_getprivid(nr)	sys_getinfo(GET_PRIVID, 0, 0,0, nr)
+#define sys_getpriv(dst, nr)   sys_getinfo(GET_PRIV, dst, 0,0, nr)
 #define sys_getidletsc(dst)	sys_getinfo(GET_IDLETSC, dst, 0,0,0)
+#define sys_getaoutheader(dst,nr) sys_getinfo(GET_AOUTHEADER, dst, 0,0,nr)
 #define sys_getbootparam(dst)	sys_getinfo(GET_BOOTPARAM, dst, 0,0,0)
 
 int sys_getinfo(int request, void *val_ptr, int val_len, void *val_ptr2, int val_len2);

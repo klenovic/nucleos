@@ -50,6 +50,7 @@ static char *proc_name(int proc_nr);
 static char *s_traps_str(int flags);
 static char *s_flags_str(int flags);
 static char *p_rts_flags_str(int flags);
+static char *boot_flags_str(int flags);
 
 /* Some global data that is shared among several dumping procedures. 
  * Note that the process table copy has the same name as in the kernel
@@ -201,31 +202,36 @@ void irqtab_dmp()
 }
 
 /*===========================================================================*
+ *			      boot_flags_str				     *
+ *===========================================================================*/
+static char *boot_flags_str(int flags)
+{
+	static char str[10];
+	str[0] = (flags & PROC_FULLVM)        ? 'V' : '-';
+	str[1] = '\0';
+
+	return str;
+}
+
+/*===========================================================================*
  *				image_dmp				     *
  *===========================================================================*/
 void image_dmp()
 {
   int m, i,j,r;
   struct boot_image *ip;
-  static char ipc_to[BITCHUNK_BITS*2];
 	
   if ((r = sys_getimage(image)) != 0) {
       report("IS","warning: couldn't get copy of image table", r);
       return;
   }
   printf("Image table dump showing all processes included in system image.\n");
-  printf("---name-- -nr- -flags- -traps- -sq- ----pc- -stack- -ipc_to[0]--------\n");
+  printf("---name- -nr- ----pc- flags -qs- -queue- -stack-\n");
   for (m=0; m<NR_BOOT_PROCS; m++) { 
       ip = &image[m];
-        for (i=j=0; i < BITCHUNK_BITS; i++, j++) {
-       	    ipc_to[j] = (ip->ipc_to & (1<<i)) ? '1' : '0';
-       	    if (i % 8 == 7) ipc_to[++j] = ' ';
-       	}
-        ipc_to[j] = '\0';
-      printf("%8s %4d   %s   %s  %3d %7lu %7lu   %s\n",
-          ip->proc_name, ip->proc_nr, 
-	       s_flags_str(ip->flags), s_traps_str(ip->trap_mask), 
-	ip->priority, (long)ip->initial_pc, ip->stksize, ipc_to); 
+      printf("%8s %4d %7lu %5s %4d %7d %7lu\n",
+          ip->proc_name, ip->proc_nr, (long)ip->initial_pc,
+          boot_flags_str(ip->flags), ip->quantum, ip->priority, ip->stksize); 
   }
   printf("\n");
 }
@@ -271,19 +277,27 @@ void kenv_dmp()
     printf("\n");
 }
 
+/*===========================================================================*
+ *			      s_flags_str				     *
+ *===========================================================================*/
 static char *s_flags_str(int flags)
 {
 	static char str[10];
-	str[0] = (flags & PREEMPTIBLE) ? 'P' : '-';
-	str[1] = '-';
-	str[2] = (flags & BILLABLE)    ? 'B' : '-';
-	str[3] = (flags & SYS_PROC)    ? 'S' : '-';
-	str[4] = '-';
-	str[5] = '\0';
+	str[0] = (flags & PREEMPTIBLE)        ? 'P' : '-';
+	str[1] = (flags & BILLABLE)           ? 'B' : '-';
+	str[2] = (flags & DYN_PRIV_ID)        ? 'D' : '-';
+	str[3] = (flags & SYS_PROC)           ? 'S' : '-';
+	str[4] = (flags & CHECK_IO_PORT)      ? 'I' : '-';
+	str[5] = (flags & CHECK_IRQ)          ? 'Q' : '-';
+	str[6] = (flags & CHECK_MEM)          ? 'M' : '-';
+	str[7] = '\0';
 
 	return str;
 }
 
+/*===========================================================================*
+ *			      s_traps_str				     *
+ *===========================================================================*/
 static char *s_traps_str(int flags)
 {
 	static char str[10];
@@ -317,7 +331,7 @@ void privileges_dmp()
       return;
   }
 
-  printf("\n--nr-id-name---- -flags- -traps- grants -ipc_to-- -system calls--\n");
+  printf("-nr- -id- -name-- -flags-    traps  grants -ipc_to--  -kernel calls-\n");
 
   PROCLOOP(rp, oldrp)
         r = -1;
@@ -326,7 +340,7 @@ void privileges_dmp()
         if (r == -1 && !isemptyp(rp)) {
 	    sp = &priv[USER_PRIV_ID];
         }
-	printf("(%02u) %-7.7s %s   %s %7d",
+	printf("(%02u) %-7.7s %s    %s %7d",
 	       sp->s_id, rp->p_name,
 	       s_flags_str(sp->s_flags), s_traps_str(sp->s_trap_mask),
 		sp->s_grant_entries);
@@ -343,6 +357,9 @@ void privileges_dmp()
   }
 }
 
+/*===========================================================================*
+ *			       p_rts_flags_str 				     *
+ *===========================================================================*/
 static char *p_rts_flags_str(int flags)
 {
 	static char str[10];

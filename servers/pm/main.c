@@ -38,7 +38,7 @@
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
 #include <env.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #include <kernel/const.h>
@@ -235,8 +235,6 @@ extern int unmap_ok;
  *===========================================================================*/
 static void pm_init()
 {
-	int failed = 0;
-	int f = 0;
 /* Initialize the process manager. 
  * Memory use info is collected from the boot monitor, the kernel, and
  * all processes compiled into the system image. Initially this information
@@ -297,19 +295,28 @@ static void pm_init()
 		/* Set process details found in the image table. */
 		rmp = &mproc[ip->proc_nr];	
   		strncpy(rmp->mp_name, ip->proc_name, PROC_NAME_LEN); 
-#if 0
-		rmp->mp_parent = RS_PROC_NR;
-#endif
 		rmp->mp_nice = get_nice_value(ip->priority);
   		sigemptyset(&rmp->mp_sig2mess);
   		sigemptyset(&rmp->mp_ignore);	
   		sigemptyset(&rmp->mp_sigmask);
   		sigemptyset(&rmp->mp_catch);
 		if (ip->proc_nr == INIT_PROC_NR) {	/* user process */
+  			/* INIT is root, we make it father of itself. This is
+  			 * not really 0, INIT should have no father, i.e.
+  			 * a father with pid NO_PID. But PM currently assumes 
+  			 * that mp_parent always points to a valid slot number.
+  			 */
+  			rmp->mp_parent = INIT_PROC_NR;
   			rmp->mp_procgrp = rmp->mp_pid = INIT_PID;
 			rmp->mp_flags |= IN_USE; 
 		}
 		else {					/* system process */
+  			if(ip->proc_nr == RS_PROC_NR) {
+  				rmp->mp_parent = INIT_PROC_NR;
+  			}
+  			else {
+  				rmp->mp_parent = RS_PROC_NR;
+  			}
   			rmp->mp_pid = get_free_pid();
 			rmp->mp_flags |= IN_USE | PRIV_PROC; 
   			for (sig_ptr = mess_sigs; 
@@ -327,23 +334,10 @@ static void pm_init()
 		mess.PR_ENDPT = rmp->mp_endpoint;
   		if ((s=kipc_send(FS_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"can't sync up with FS", s);
-
-		/* Register proces with ds */
-		s= ds_publish_u32(rmp->mp_name, rmp->mp_endpoint);
-		if (s != 0)
-			failed++;
   	}
   }
 
-  if(failed > 0)
-	printf("PM: failed to register %d/%d boot processes\n",
-		failed, NR_BOOT_PROCS);
-
-  /* Override some details. INIT, PM, FS and RS are somewhat special. */
-  mproc[PM_PROC_NR].mp_pid = PM_PID;		/* PM has magic pid */
-#if 0
-  mproc[RS_PROC_NR].mp_parent = INIT_PROC_NR;	/* INIT is root */
-#endif
+  /* Override some details for PM. */
   sigfillset(&mproc[PM_PROC_NR].mp_ignore); 	/* guard against signals */
 
   /* Tell FS that no more system processes follow and synchronize. */
@@ -355,8 +349,6 @@ static void pm_init()
         uts_val.machine[0] = 'i';
         strcpy(uts_val.machine + 1, itoa(getprocessor()));
 #endif
-
- if(f > 0) printf("PM: failed to register %d processes with DS.\n", f);
 
  system_hz = sys_hz();
 

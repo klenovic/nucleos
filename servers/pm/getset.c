@@ -17,7 +17,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/signal.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 /*===========================================================================*

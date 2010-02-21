@@ -39,7 +39,7 @@
 #include <asm/ioctls.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 extern struct utsname uts_val;

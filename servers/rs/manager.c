@@ -21,17 +21,8 @@
 #include <nucleos/stat.h>
 #include <nucleos/wait.h>
 #include <nucleos/vm.h>
-#include <nucleos/dmap.h>
-#include <servers/ds/ds.h>
-#include <nucleos/endpoint.h>
 #include <nucleos/lib.h>
-
-#include <nucleos/timer.h>				/* For priv.h */
-#include <kernel/priv.h>
-
-/* Allocate variables. */
-struct rproc rproc[NR_SYS_PROCS];		/* system process table */
-struct rproc *rproc_ptr[NR_PROCS];		/* mapping for fast access */
+#include <nucleos/sysutil.h>
 
 /* Prototypes for internal functions that do the hard work. */
 static int caller_is_root(endpoint_t endpoint);
@@ -51,10 +42,9 @@ static void add_forward_ipc(struct rproc *rp, struct priv *privp);
 static void add_backward_ipc(struct rproc *rp, struct priv *privp);
 static void init_privs(struct rproc *rp, struct priv *privp);
 static void init_pci(struct rproc *rp, int endpoint);
+static int set_privs(endpoint, privp, req);
 
 static int shutting_down = FALSE;
-
-extern int rs_verbose;
 
 /*===========================================================================*
  *				caller_is_root				     *
@@ -223,6 +213,7 @@ int flags;					/* extra flags, if any */
   rp->r_uid= 0;
   rp->r_nice= 0;
 
+  rp->r_sys_flags = DSRV_SF;
   rp->r_exec= NULL;
 
   if (do_copy)
@@ -230,6 +221,8 @@ int flags;					/* extra flags, if any */
 	s= read_exec(rp);
 	if (s != 0)
 		return s;
+
+	rp->r_sys_flags |= SF_USE_COPY;
   }
 
   /* Initialize some fields. */
@@ -408,6 +401,7 @@ message *m_ptr;					/* request message pointer */
   else
 	rp->r_ipc_list[0]= '\0';
 
+  rp->r_sys_flags = DSRV_SF;
   rp->r_exec= NULL;
   if (rs_start.rss_flags & RF_COPY) {
 	int exst_cpy;
@@ -421,7 +415,7 @@ message *m_ptr;					/* request message pointer */
                 for(i = 0; i < NR_SYS_PROCS; i++) {
                 	rp2 = &rproc[i];
                         if(strcmp(rp->r_cmd, rp2->r_cmd) == 0 &&
-                           rp2->r_exec != NULL) {
+                           (rp2->r_sys_flags & SF_USE_COPY)) {
                                 /* We have found the same binary that's
                                  * already been copied */
                                  exst_cpy = 1;
@@ -437,7 +431,16 @@ message *m_ptr;					/* request message pointer */
 
 	if (s != 0)
 		return s;
+
+	rp->r_sys_flags |= SF_USE_COPY;
   }
+
+  /* All dynamically created services get the same privilege flags, and
+   * allowed traps. Other privilege settings can be specified at runtime.
+   * The privilege id is dynamically allocated by the kernel.
+   */
+  rp->r_priv.s_flags = DSRV_F;           /* privilege flags */
+  rp->r_priv.s_trap_mask = DSRV_T;       /* allowed traps */
 
   /* Copy granted resources */
   if (rs_start.rss_nr_irq > NR_IRQ)
@@ -464,12 +467,10 @@ message *m_ptr;					/* request message pointer */
 	rp->r_priv.s_io_tab[i].ior_base= rs_start.rss_io[i].base;
 	rp->r_priv.s_io_tab[i].ior_limit=
 		rs_start.rss_io[i].base+rs_start.rss_io[i].len-1;
-#if 0
 	if(rs_verbose)
 	   printf("RS: do_start: I/O [%x..%x]\n",
 		rp->r_priv.s_io_tab[i].ior_base,
 		rp->r_priv.s_io_tab[i].ior_limit);
-#endif
   }
 
   if (rs_start.rss_nr_pci_id > RSS_NR_PCI_ID)
@@ -520,7 +521,7 @@ message *m_ptr;					/* request message pointer */
   rp->r_dev_nr = rs_start.rss_major;
   rp->r_dev_style = STYLE_DEV; 
   rp->r_restarts = -1; 				/* will be incremented */
-  rp->r_set_resources= 1;			/* new style, enforece
+  rp->r_set_resources= 1;			/* new style, enforce
 						 * I/O resources
 						 */
   if (sizeof(rp->r_vm) == sizeof(rs_start.rss_vm) &&
@@ -639,9 +640,10 @@ int do_restart(message *m_ptr)
 	  return(r);
       }
   }
-#if VERBOSE
-  printf("RS: do_restart: '%s' not found\n", label);
-#endif
+  if(rs_verbose) {
+      printf("RS: do_restart: '%s' not found\n", label);
+  }
+  
   return(-ESRCH);
 }
 
@@ -673,16 +675,18 @@ int do_refresh(message *m_ptr)
 
   for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
       if (rp->r_flags & RS_IN_USE && strcmp(rp->r_label, label) == 0) {
-#if VERBOSE
+
+	if (rs_verbose) {
 	  printf("RS: refreshing %s (%d)\n", rp->r_label, rp->r_pid);
-#endif
-	  stop_service(rp,RS_REFRESHING);
-  return 0;
+	}
+	stop_service(rp,RS_REFRESHING);
+  return(0);
 }
   }
-#if VERBOSE
-  printf("RS: do_refresh: '%s' not found\n", label);
-#endif
+	if (rs_verbose) {
+		  printf("RS: do_refresh: '%s' not found\n", label);
+	}
+
   return(-ESRCH);
 }
 
@@ -825,7 +829,7 @@ rp->r_restarts= 0;
 				rp->r_cmd, rp->r_backoff);
 		      rp->r_backoff = 1 << MIN(rp->r_restarts,(BACKOFF_BITS-2));
 		      rp->r_backoff = MIN(rp->r_backoff,MAX_BACKOFF); 
-		      if (rp->r_exec != NULL && rp->r_backoff > 1)
+		      if ((rp->r_sys_flags & SF_USE_COPY) && rp->r_backoff > 1)
 			rp->r_backoff= 1;
 		  }
 		  else {
@@ -904,8 +908,10 @@ message *m_ptr;
 	       * check and, if so request the system service's status.
 	       */
 	      else if (now - rp->r_check_tm > rp->r_period) {
+#if 0
 		if(rs_verbose)
-                  printf("RS: status request sent to %d\n", rp->r_proc_nr_e); 
+                  printf("RS: status request sent to %d\n", rp->r_proc_nr_e);
+#endif
 		  kipc_notify(rp->r_proc_nr_e);		/* request status */
 		  rp->r_check_tm = now;			/* mark time */
               }
@@ -940,8 +946,15 @@ endpoint_t *endpoint;
   message m;
   char * null_env = NULL;
 
-  use_copy= (rp->r_exec != NULL);
-  
+  use_copy= (rp->r_sys_flags & SF_USE_COPY);
+
+  /* See if we are not using a copy but we do need one to start the service. */
+  if(!use_copy && (rp->r_sys_flags & SF_NEED_COPY)) {
+	printf("RS: unable to start service %s without an in-memory copy\n",
+	    rp->r_label);
+	return(-EPERM);
+  }
+
   /* Now fork and branch for parent and child process (and check for error). */
   if (use_copy) {
   if(rs_verbose) printf("RS: fork_nb..\n");
@@ -1053,20 +1066,12 @@ endpoint_t *endpoint;
    * That will also cause the child process to start running.
    * This call should succeed: we tested number in use above.
    */
-  if ((s = sys_privctl(child_proc_nr_e, SYS_PRIV_INIT, privp)) < 0) {
-      report("RS","sys_privctl call failed", s);	/* to let child run */
+  if ((s = set_privs(child_proc_nr_e, privp, SYS_PRIV_SET_SYS)) != 0) {
+      report("RS","set_privs failed", s);
       kill(child_pid, SIGKILL);				/* kill driver */
           rp->r_flags |= RS_EXITING;			/* expect exit */
 	  return(s);					/* return error */
       }
-
-  /* The child is now running. Publish its endpoint in DS. */
-  s= ds_publish_u32(rp->r_label, child_proc_nr_e);
-  if (s != 0)
-	printf("RS: start_service: ds_publish_u32 failed: %d\n", s);
-  else if(rs_verbose)
-	printf("RS: start_service: ds_publish_u32 done: %s -> %d\n", 
-  		rp->r_label, child_proc_nr_e);
 
   /* The purpose of non-blocking forks is to avoid involving VFS in the forking
    * process, because VFS may be blocked on a sendrec() to a MFS that is
@@ -1081,6 +1086,11 @@ endpoint_t *endpoint;
   if (use_copy)
 	setuid(0);
 
+  /* Publish the new system service. */
+  s = publish_service(rp);
+  if (s != 0) {
+	printf("RS: warning: publish_service failed: %d\n", s);
+  }
   if (rp->r_dev_nr > 0) {				/* set driver map */
       if ((s=mapdriver5(rp->r_label, strlen(rp->r_label),
 	      rp->r_dev_nr, rp->r_dev_style, !!use_copy /* force */)) < 0) {
@@ -1277,14 +1287,13 @@ struct rproc *rp;
 			rp->r_script, strerror(errno));
 		exit(1);
 	default:
-		/* Set the privilege structure for the child process to let it
+		/* Set the privilege structure for the child process and let it
 		 * run.
 		 */
 		proc_nr_e = getnprocnr(pid);
-		r= sys_privctl(proc_nr_e, SYS_PRIV_USER, NULL);
-		if (r < 0)
-			printf("RS: run_script: sys_privctl call failed: %d\n", r);
-
+		if ((r= set_privs(proc_nr_e, NULL, SYS_PRIV_SET_USER)) != 0) {
+			printf("RS: run_script: set_privs call failed: %d\n",r);
+		}
 		/* Do not wait for the child */
 		break;
 	}
@@ -1346,7 +1355,9 @@ struct priv *privp;
 	char label[MAX_LABEL_LEN+1], *p;
 	struct rproc *tmp_rp;
 	endpoint_t proc_nr_e;
+	int r;
 	int slot_nr, priv_id;
+	struct priv priv;
 
 	p = rp->r_ipc_list;
 
@@ -1392,14 +1403,14 @@ struct priv *privp;
 			proc_nr_e= tmp_rp->r_proc_nr_e;
 		}
 
-		priv_id= sys_getprivid(proc_nr_e);
-		if (priv_id < 0)
+		if ((r = sys_getpriv(&priv, proc_nr_e)) < 0)
 		{
 			printf(
 		"add_forward_ipc: unable to get priv_id for '%s': %d\n",
-				label, priv_id);
+				label, r);
 			continue;
 		}
+		priv_id= priv.s_id;
 		set_sys_bit(privp->s_ipc_to, priv_id);
 	}
 }
@@ -1447,14 +1458,7 @@ struct priv *privp;
 				continue;
 		}
 
-		priv_id= sys_getprivid(rrp->r_proc_nr_e);
-		if (priv_id < 0)
-		{
-			printf(
-		"add_backward_ipc: unable to get priv_id for '%s': %d\n",
-				label, priv_id);
-			continue;
-		}
+		priv_id= rrp->r_priv.s_id;
 
 		set_sys_bit(privp->s_ipc_to, priv_id);
 	}
@@ -1520,6 +1524,35 @@ struct priv *privp;
 	}
 }
 
+/*===========================================================================*
+ *				set_privs				     *
+ *===========================================================================*/
+static int set_privs(endpoint, privp, req)
+endpoint_t endpoint;
+struct priv *privp;
+int req;
+{
+  int r;
+
+  /* Set the privilege structure. */
+  if ((r = sys_privctl(endpoint, req, privp)) != 0) {
+      return r;
+  }
+
+  /* Synch the privilege structure with the kernel for system services. */
+  if(req == SYS_PRIV_SET_SYS) {
+      if ((r = sys_getpriv(privp, endpoint)) != 0) {
+          return r;
+      }
+  }
+
+  /* Allow the process to run. */
+  if ((r = sys_privctl(endpoint, SYS_PRIV_ALLOW, NULL)) != 0) {
+      return r;
+  }
+
+  return(0);
+}
 
 /*===========================================================================*
  *				init_pci				     *

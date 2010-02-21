@@ -17,11 +17,11 @@
  *    m1_p2:	I_VAL_PTR2	(second, optional pointer)	
  *    m1_i2:	I_VAL_LEN2_E	(second length or process nr)	
  */
-
 #include <nucleos/string.h>
-#include <asm/bootparam.h>
+#include <nucleos/endpoint.h>
 #include <kernel/system.h>
 #include <kernel/vm.h>
+#include <asm/bootparam.h>
 
 #if USE_GETINFO
 
@@ -39,6 +39,7 @@ register message *m_ptr;	/* pointer to request message */
 	int proc_nr, nr_e, nr, r;
 	struct proc *caller;
 	int wipe_rnd_bin = -1;
+	struct exec e_hdr;
 	int len = 0;
 	static struct k_randomness copy;	/* copy to keep counters */
 	int i = 0;
@@ -99,6 +100,15 @@ register message *m_ptr;	/* pointer to request message */
 		src_vir = (vir_bytes) proc_addr(nr);
 		break;
 
+	case GET_PRIV: {
+		nr_e = (m_ptr->I_VAL_LEN2_E == SELF) ?
+		who_e : m_ptr->I_VAL_LEN2_E;
+		if(!isokendpt(nr_e, &nr)) return -EINVAL; /* validate request */
+		length = sizeof(struct priv);
+		src_vir = (vir_bytes) priv_addr(nr_to_id(nr));
+		break;
+	}
+
 	case GET_WHOAMI:
 		/* GET_WHOAMI uses m3 and only uses the message contents for info. */
 		m_ptr->GIWHO_EP = caller->p_endpoint;
@@ -155,11 +165,6 @@ register message *m_ptr;	/* pointer to request message */
 		src_vir = (vir_bytes) irq_actids;
 		break;
 
-	case GET_PRIVID:
-		if (!isokendpt(m_ptr->I_VAL_LEN2_E, &proc_nr)) 
-			return -EINVAL;
-		return proc_addr(proc_nr)->p_priv->s_id;
-
 	case GET_IDLETSC:
 #ifdef CONFIG_IDLE_TSC
 		length = sizeof(idle_tsc);
@@ -174,6 +179,22 @@ register message *m_ptr;	/* pointer to request message */
 		length = sizeof(struct boot_param);
 		src_vir = (vir_bytes) &boot_param;
 		break;
+
+	case GET_AOUTHEADER: {
+		int hdrindex, index = m_ptr->I_VAL_LEN2_E;
+		if(index < 0 || index >= NR_BOOT_PROCS) {
+			return -EINVAL;
+		}
+		if (iskerneln(_ENDPOINT_P(image[index].endpoint))) {
+			hdrindex = 0;
+		} else {
+			hdrindex = 1 + index-NR_TASKS;
+		}
+		arch_get_aout_headers(hdrindex, &e_hdr);
+		length = sizeof(e_hdr);
+		src_vir = (vir_bytes) &e_hdr;
+		break;
+	}
 
 	default:
 		kprintf("do_getinfo: invalid request %d\n", m_ptr->I_REQUEST);

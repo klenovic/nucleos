@@ -33,9 +33,6 @@
 #define _AT(T,X)   ((T)(X))
 #endif
 
-/* Map a process number to a privilege structure id. */
-#define s_nr_to_id(n)	(NR_TASKS + (n) + 1)
-
 /* Translate a pointer to a field in a structure to a pointer to the structure
  * itself. So it translates '&struct_ptr->field' back to 'struct_ptr'.
  */

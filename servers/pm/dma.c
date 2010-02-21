@@ -19,7 +19,7 @@
 #include <nucleos/string.h>
 #include <asm/kernel/const.h>
 
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 
 /*===========================================================================*
  *				do_adddma				     *

@@ -37,7 +37,7 @@
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
 #include <nucleos/ptrace.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #define ESCRIPT	(-2000)	/* Returned by read_header for a #! script. */

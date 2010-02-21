@@ -21,7 +21,7 @@
 #include <nucleos/signal.h>
 #include <nucleos/time.h>
 #include <nucleos/times.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 /*===========================================================================*
@@ -80,7 +80,7 @@ int do_times()
   clock_t user_time, sys_time, uptime;
   int s;
 
-  if ((s=sys_times(who_e, &user_time, &sys_time, &uptime)) != 0)
+  if ((s=sys_times(who_e, &user_time, &sys_time, &uptime, NULL)) != 0)
       panic(__FILE__,"do_times couldn't get times", s);
   rmp->mp_reply.reply_t1 = user_time;		/* user time */
   rmp->mp_reply.reply_t2 = sys_time;		/* system time */
@@ -193,7 +193,7 @@ int scall_times(void)
 	int err;
 	int s;
 
-	if ((s = sys_times(who_e, &user_time, &sys_time, &uptime)) != 0)
+	if ((s = sys_times(who_e, &user_time, &sys_time, &uptime, NULL)) != 0)
 		panic(__FILE__,"do_times couldn't get times", s);
 
 	buf.tms_utime = user_time;		/* user time */

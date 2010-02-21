@@ -26,7 +26,7 @@
 #include <nucleos/time.h>
 #include <nucleos/string.h>
 #include <nucleos/com.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #define US 1000000	/* shortcut for microseconds per second */

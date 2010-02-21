@@ -12,6 +12,9 @@
 
 /* Function prototypes. */
 
+/* Structs used in prototypes must be declared as such first. */
+struct rproc;
+
 /* exec.c */
 int dev_execve(int proc_e, char *exec, size_t exec_len,  char *argv[], char **env);
 
@@ -29,5 +32,14 @@ int do_shutdown(message *m);
 void do_period(message *m);
 void do_exit(message *m);
 int do_getsysinfo(message *m);
+
+/* utility.c */
+int publish_service(struct rproc *rp);
+
+/* memory.c */
+void* rs_startup_sbrk(size_t size);
+void* rs_startup_sbrk_synch(size_t size);
+int rs_startup_segcopy(endpoint_t src_proc, int src_s, int dst_s,
+		       vir_bytes dst_vir, phys_bytes bytes);
 
 #endif /* __RS_PROTO_H */

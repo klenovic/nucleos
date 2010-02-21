@@ -33,7 +33,7 @@
 #include <nucleos/ptrace.h>
 #include <nucleos/resource.h>
 #include <nucleos/signal.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #define LAST_FEW            2	/* last few slots reserved for superuser */
@@ -269,7 +269,7 @@ int dump_core;			/* flag indicating whether to dump core */
   if (rmp->mp_flags & ALARM_ON) set_alarm(rmp, (clock_t) 0);
 
   /* Do accounting: fetch usage times and accumulate at parent. */
-  if((r=sys_times(proc_nr_e, &user_time, &sys_time, NULL)) != 0)
+  if((r=sys_times(proc_nr_e, &user_time, &sys_time, NULL, NULL)) != 0)
   	panic(__FILE__,"exit_proc: sys_times failed", r);
 
   p_mp = &mproc[rmp->mp_parent];			/* process' parent */

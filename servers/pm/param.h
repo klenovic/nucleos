@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_PM_PARAM_H
-#define __SERVERS_PM_PARAM_H
+#ifndef __PM_PARAM_H
+#define __PM_PARAM_H
 
 /* The following names are synonyms for the variables in the input message. */
 #define exec_name	m1_p1
@@ -66,4 +66,4 @@
 #define reply_t4	m4_l4
 #define reply_t5	m4_l5
 
-#endif /*  __SERVERS_PM_PARAM_H */
+#endif /* __PM_PARAM_H */

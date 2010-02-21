@@ -39,7 +39,7 @@
 #include <nucleos/resource.h>
 #include <asm/sigcontext.h>
 #include <nucleos/string.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 static void unpause(struct mproc *rmp);

@@ -26,7 +26,7 @@
 #include <nucleos/fcntl.h>
 #include <nucleos/signal.h>		/* needed only because mproc.h needs it */
 #include <nucleos/mman.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 #include <nucleos/timer.h>

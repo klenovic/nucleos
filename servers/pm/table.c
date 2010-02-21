@@ -13,7 +13,7 @@
 #include "pm.h"
 #include <nucleos/unistd.h>
 #include <nucleos/signal.h>
-#include "mproc.h"
+#include <servers/pm/mproc.h>
 #include "param.h"
 
 /* Global variables. */

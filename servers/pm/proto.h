@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_PM_PROTO_H
-#define __SERVERS_PM_PROTO_H
+#ifndef __PM_PROTO_H
+#define __PM_PROTO_H
 
 /* Function prototypes. */
 struct mproc;
@@ -135,4 +135,4 @@ struct mproc *find_proc(pid_t lpid);
 int pm_isokendpt(int ep, int *proc);
 void tell_fs(struct mproc *rmp, message *m_ptr);
 
-#endif /*  __SERVERS_PM_PROTO_H */
+#endif /* __PM_PROTO_H */

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_PM_GLO_H
-#define __SERVERS_PM_GLO_H
+#ifndef __PM_GLO_H
+#define __PM_GLO_H
 
 /* Global variables. */
 extern struct mproc *mp;	/* ptr to 'mproc' slot of current process */
@@ -32,4 +32,4 @@ extern u32_t system_hz;		/* System clock frequency. */
 extern int abort_flag;
 extern char monitor_code[256];
 		
-#endif /*  __SERVERS_PM_GLO_H */
+#endif /* __PM_GLO_H */

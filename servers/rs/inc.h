@@ -10,12 +10,8 @@
 #ifndef __RS_INC_H
 #define __RS_INC_H
 
-/* Header file for the system service manager server. 
- *
- * Created:
- *    Jul 22, 2005	by Jorrit N. Herder 
- */
-#define VERBOSE		   0	/* display diagnostics */
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
@@ -29,18 +25,20 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/keymap.h>
 #include <nucleos/bitmap.h>
-#include <servers/rs/rs.h>
-
-#include <asm/kernel/types.h>
-#include <nucleos/timer.h>				/* For priv.h */
-#include <kernel/priv.h>
-
-#include <stdlib.h>
-#include <stdio.h>
+#include <nucleos/dmap.h>
+#include <nucleos/endpoint.h>
+#include <nucleos/timer.h>	/* For priv.h */
 #include <nucleos/string.h>
 #include <nucleos/signal.h>
+#include <nucleos/kipc.h>
+#include <servers/rs/const.h>
+#include <servers/rs/type.h>
+#include <servers/rs/rs.h>
+
+#include <kernel/priv.h>
+#include <asm/kernel/types.h>
 
 #include "proto.h"
-#include "manager.h"
+#include "glo.h"
 
 #endif /* __RS_INC_H */

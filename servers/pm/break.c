@@ -11,8 +11,7 @@
 #include "pm.h"
 #include "param.h"
 #include "glo.h"
-#include "mproc.h"
-
+#include <servers/pm/mproc.h>
 #include <nucleos/vm.h>
 
 extern void *__curbrk;
