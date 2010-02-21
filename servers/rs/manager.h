@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __RS_MANAGER_H
+#define __RS_MANAGER_H
+
 /* This table has one slot per system process.  It contains information for
  * servers and driver needed by the reincarnation server to keep track of 
  * each process' status. 
@@ -103,3 +106,4 @@ int exec_pipe[2];
 #define END_RPROC_ADDR	(&rproc[NR_SYS_PROCS])
 #define NIL_RPROC ((struct mproc *) 0)
 
+#endif /* __RS_MANAGER_H */

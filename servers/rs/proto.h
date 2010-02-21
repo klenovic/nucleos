@@ -7,6 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#ifndef __RS_PROTO_H
+#define __RS_PROTO_H
+
 /* Function prototypes. */
 
 /* exec.c */
@@ -27,4 +30,4 @@ void do_period(message *m);
 void do_exit(message *m);
 int do_getsysinfo(message *m);
 
-
+#endif /* __RS_PROTO_H */
