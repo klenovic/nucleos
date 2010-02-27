@@ -19,7 +19,7 @@ bin-y := $(srctree)/drivers/at_wini \
 	 $(src)/simple/service \
 	 $(src)/simple/sysenv
 
-scripts := drivers.conf mtab passwd proto.gen rc
+scripts := modules.conf mtab passwd proto.gen rc
 
 targets += initrd.minixfs initrd
 

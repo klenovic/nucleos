@@ -27,7 +27,7 @@
 
 #define _PATH_BSHELL		"/bin/sh"
 #define _PATH_SERVICE		"/bin/service"
-#define _PATH_DRIVERS_CONF	"/etc/drivers.conf"
+#define _PATH_MODULES_CONF	"/etc/modules.conf"
 #define _PATH_DEV		"/dev/"
 
 #endif /* __NUCLEOS_PATHS_H */

@@ -18,7 +18,7 @@
 #include <nucleos/paths.h>
 
 #define FSPATH "/sbin/"
-#define FSDEFAULT "mfs"
+#define FSDEFAULT "minixfs"
 
 static int rs_down(char *label)
 {
@@ -110,12 +110,12 @@ int mount(char *special, char *name, int mountflags, char *type, char *args)
 	}
 
 	if (strlen(_PATH_SERVICE)+strlen(path)+strlen(label)+
-		strlen(_PATH_DRIVERS_CONF)+strlen(args)+50 >= sizeof(cmd)) {
+		strlen(_PATH_MODULES_CONF)+strlen(args)+50 >= sizeof(cmd)) {
 		errno = E2BIG;
 		return -1;
 	}
 
-	sprintf(cmd, _PATH_SERVICE " %sup %s -label '%s' -config " _PATH_DRIVERS_CONF
+	sprintf(cmd, _PATH_SERVICE " %sup %s -label '%s' -config " _PATH_MODULES_CONF
 		" -args '%s%s' -printep yes", reuse ? "-r ": "", path, label, args[0] ? "-o " : "", args);
 
 	if (!(pipe = popen(cmd, "r"))) {

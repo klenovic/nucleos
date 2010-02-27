@@ -43,9 +43,7 @@ static char *known_requests[] = {
   "down",
   "refresh", 
   "restart",
-  "-unused",
   "shutdown", 
-  "upcopy",	/* fill for RS_UP_COPY */
   "catch for illegal requests"
 };
 #define ILLEGAL_REQUEST  sizeof(known_requests)/sizeof(char *)
@@ -55,7 +53,7 @@ static char *known_requests[] = {
 
 #define RUN_CMD		"run"
 #define RUN_SCRIPT	"/etc/rs.single"	/* Default script for 'run' */
-#define PATH_CONFIG	_PATH_DRIVERS_CONF	/* Default config file */
+#define PATH_CONFIG	_PATH_MODULES_CONF	/* Default config file */
 
 /* Define names for arguments provided to this utility. The first few 
  * arguments are required and have a known index. Thereafter, some optional
@@ -74,7 +72,7 @@ static char *known_requests[] = {
 #define ARG_DEV		"-dev"		/* major device number for drivers */
 #define ARG_PERIOD	"-period"	/* heartbeat period in ticks */
 #define ARG_SCRIPT	"-script"	/* name of the script to restart a
-					 * driver 
+					 * system module
 					 */
 #define ARG_LABELNAME	"-label"	/* custom label name */
 #define ARG_CONFIG	"-config"	/* name of the file with the resource
@@ -82,7 +80,7 @@ static char *known_requests[] = {
 					 */
 #define ARG_PRINTEP	"-printep"	/* print endpoint number after start */
 
-#define DRIVER_LOGIN	"driver"	/* Passwd file entry for drivers */
+#define MODULE_LOGIN	"module"	/* passwd file entry for module */
 
 #define MAX_CLASS_RECURS	100	/* Max nesting level for classes */
 
@@ -200,8 +198,6 @@ static int parse_arguments(int argc, char **argv)
   }
 
   if (req_nr == RS_UP) {
-      req_nr= RS_START;
-
       rs_start.rss_flags= RF_IPC_VALID;
       if (c_flag)
 	rs_start.rss_flags |= RF_COPY;
@@ -213,13 +209,7 @@ static int parse_arguments(int argc, char **argv)
       {
 	/* Set default recovery script for RUN */
         req_script = RUN_SCRIPT;
-	req_nr = RS_START;
       }
-
-#if 0
-      if (req_nr == RS_UP && c_flag)
-	req_nr= RS_UP_COPY;
-#endif	
 
       /* Verify argument count. */ 
       if (argc - 1 < optind+ARG_PATH) {
@@ -284,15 +274,12 @@ static int parse_arguments(int argc, char **argv)
           }
           else if (strcmp(argv[i], ARG_SCRIPT)==0) {
               req_script = argv[i+1];
-	      req_nr = RS_START;
           }
           else if (strcmp(argv[i], ARG_LABELNAME)==0) {
               req_label = argv[i+1];
-	      req_nr = RS_START;
           }
           else if (strcmp(argv[i], ARG_CONFIG)==0) {
               req_config = argv[i+1];
-	      req_nr = RS_START;
           }
           else if (strcmp(argv[i], ARG_PRINTEP)==0) {
               req_printep = 1;
@@ -333,7 +320,7 @@ static void fatal(char *fmt, ...)
 	exit(1);
 }
 
-#define KW_DRIVER	"driver"
+#define KW_MODULE	"module"
 #define KW_UID		"uid"
 #define KW_NICE		"nice"
 #define KW_IRQ		"irq"
@@ -346,7 +333,7 @@ static void fatal(char *fmt, ...)
 #define KW_VM		"vm"
 #define KW_CONTROL	"control"
 
-static void do_driver(config_t *cpe, config_t *config);
+static void do_module(config_t *cpe, config_t *config);
 
 static void do_class(config_t *cpe, config_t *config)
 {
@@ -390,10 +377,10 @@ static void do_class(config_t *cpe, config_t *config)
 					cp1->file, cp1->line);
   }
 
-			/* At this place we expect the word 'driver' */
-			if (strcmp(cp1->word, KW_DRIVER) != 0)
+			/* At this place we expect the word KW_MODULE */
+			if (strcmp(cp1->word, KW_MODULE) != 0)
 				fatal("do_class: exected word '%S' at %s:%d",
-					KW_DRIVER, cp1->file, cp1->line);
+					KW_MODULE, cp1->file, cp1->line);
 
 			cp1= cp1->next;
 			if ((cp1->flags & CFG_STRING) ||
@@ -403,7 +390,7 @@ static void do_class(config_t *cpe, config_t *config)
 					cp1->file, cp1->line);
 			}
 
-			/* At this place we expect the name of the driver */
+			/* At this place we expect the name of the module */
 			if (strcmp(cp1->word, cpe->word) == 0)
 				break;
 		}
@@ -413,7 +400,7 @@ static void do_class(config_t *cpe, config_t *config)
 			"do_class: no entry found for class '%s' at %s:%d",
 				cpe->word, cpe->file, cpe->line);
 		}
-		do_driver(cp1->next, config);
+		do_module(cp1->next, config);
 	}
 
 	class_recurs--;
@@ -895,7 +882,7 @@ static void do_control(config_t *cpe)
 	}
 }
 
-static void do_driver(config_t *cpe, config_t *config)
+static void do_module(config_t *cpe, config_t *config)
 {
 	config_t *cp;
 
@@ -904,13 +891,13 @@ static void do_driver(config_t *cpe, config_t *config)
 	 */
 	if (!(cpe->flags & CFG_SUBLIST))
 	{
-		fatal("do_driver: expected list at %s:%d",
+		fatal("do_module: expected list at %s:%d",
 			cpe->file, cpe->line);
 	}
 	if (cpe->next != NULL)
 	{
 		cpe= cpe->next;
-		fatal("do_driver: expected end of list at %s:%d",
+		fatal("do_module: expected end of list at %s:%d",
 			cpe->file, cpe->line);
 	}
 	cpe= cpe->list;
@@ -920,13 +907,13 @@ static void do_driver(config_t *cpe, config_t *config)
 	{
 		if (!(cp->flags & CFG_SUBLIST))
 		{
-			fatal("do_driver: expected list at %s:%d",
+			fatal("do_module: expected list at %s:%d",
 				cp->file, cp->line);
 		}
 		cpe= cp->list;
 		if ((cpe->flags & CFG_STRING) || (cpe->flags & CFG_SUBLIST))
 		{
-			fatal("do_driver: expected word at %s:%d",
+			fatal("do_module: expected word at %s:%d",
 				cpe->file, cpe->line);
 		}
 
@@ -995,7 +982,7 @@ static void do_config(char *label, char *filename)
 		exit(1);
 	}
 
-	/* Find an entry for our driver */
+	/* Find an entry for our module */
 	for (cp= config; cp; cp= cp->next)
 	{
 		if (!(cp->flags & CFG_SUBLIST))
@@ -1010,10 +997,10 @@ static void do_config(char *label, char *filename)
 				cpe->file, cpe->line);
 		}
 
-		/* At this place we expect the word 'driver' */
-		if (strcmp(cpe->word, KW_DRIVER) != 0)
+		/* At this place we expect the word KW_MODULE */
+		if (strcmp(cpe->word, KW_MODULE) != 0)
 			fatal("do_config: exected word '%S' at %s:%d",
-				KW_DRIVER, cpe->file, cpe->line);
+				KW_MODULE, cpe->file, cpe->line);
 
 		cpe= cpe->next;
 		if ((cpe->flags & CFG_STRING) || (cpe->flags & CFG_SUBLIST))
@@ -1022,19 +1009,20 @@ static void do_config(char *label, char *filename)
 				cpe->file, cpe->line);
 		}
 
-		/* At this place we expect the name of the driver */
+		/* At this place we expect the name of the module. */
 		if (strcmp(cpe->word, label) == 0)
 			break;
 	}
 	if (cp == NULL)
 	{
-		fprintf(stderr, "service: driver '%s' not found in config\n", label);
+		fprintf(stderr, "service: module '%s' not found in config\n",
+			label);
 		exit(1);
 	}
 
 	cpe= cpe->next;
 
-	do_driver(cpe, config);
+	do_module(cpe, config);
 }
 
 /* Main program. 
@@ -1067,26 +1055,10 @@ int main(int argc, char **argv)
    */
   switch(request) {
   case RS_UP:
-  case RS_UP_COPY:
       /* Build space-separated command string to be passed to RS server. */
       strcpy(command, req_path);
       command[strlen(req_path)] = ' ';
          strcpy(command+strlen(req_path)+1, req_args);
-
-      /* Build request message and send the request. */
-      m.RS_CMD_ADDR = command;
-      m.RS_CMD_LEN = strlen(command);
-      m.RS_DEV_MAJOR = req_major;
-      m.RS_PERIOD = req_period;
-      if ((s=ktaskcall(RS_PROC_NR, request, &m)) != 0) 
-          failure(-s);
-      result = m.m_type;
-      break;
-  case RS_START:
-      /* Build space-separated command string to be passed to RS server. */
-      strcpy(command, req_path);
-      command[strlen(req_path)] = ' ';
-      strcpy(command+strlen(req_path)+1, req_args);
 
       rs_start.rss_cmd= command;
       rs_start.rss_cmdlen= strlen(command);
@@ -1105,12 +1077,12 @@ int main(int argc, char **argv)
       else
 	      rs_start.rss_scriptlen= 0;
 
-      pw= getpwnam(DRIVER_LOGIN);
+      pw= getpwnam(MODULE_LOGIN);
       if (pw == NULL)
-	fatal("no passwd file entry for '%s'", DRIVER_LOGIN);
+	fatal("no passwd file entry for '%s'", MODULE_LOGIN);
       rs_start.rss_uid= pw->pw_uid;
 
-      /* The name of the driver */
+      /* The name of the system module. */
       (label= strrchr(req_path, '/')) ? label++ : (label= req_path);
 
       if (req_config) {

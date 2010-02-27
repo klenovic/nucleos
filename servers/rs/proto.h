@@ -22,8 +22,7 @@ int dev_execve(int proc_e, char *exec, size_t exec_len,  char *argv[], char **en
 int main(void);
 
 /* manager.c */
-int do_up(message *m, int do_copy, int flags);
-int do_start(message *m);
+int do_up(message *m);
 int do_down(message *m);
 int do_refresh(message *m);
 int do_restart(message *m);
