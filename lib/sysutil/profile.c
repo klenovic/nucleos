@@ -19,7 +19,7 @@
 static char cpath[CPROF_CPATH_MAX_LEN];	/* current call path string */
 static int cpath_len;				/* current call path len */
 static struct cprof_tbl_s *cprof_slot;		/* slot of current function */
-static struct stack_s {			/* stack entry */
+struct stack_s {			/* stack entry */
 		int cpath_len;			/* call path len */
 		struct cprof_tbl_s *slot;	/* table slot */
 		u64_t start_1;			/* count @ begin of procentry */
