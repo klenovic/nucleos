@@ -39,10 +39,10 @@
 
 struct endpt_args {
 	endpoint_t endpt;
-	void (*fill_msg)(message *msg, struct pt_regs *r);
+	void (*fill_msg)(message *msg, const struct pt_regs *r);
 };
 
-static struct endpt_args scall_to_srv[];
+static struct endpt_args scall_to_srv[NR_syscalls];
 
 #define SCALL_TO_SRV(syscall, server) \
 	[ __NNR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
@@ -80,6 +80,16 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	 */
 	r->ax = kmsg.m_type;
 
+	/* don't cross the range */
+	if (r->ax >= NR_syscalls)
+		goto err_nosys;
+
+	/* fill the message according to passed arguments */
+	if (scall_to_srv[r->ax].fill_msg)
+		scall_to_srv[r->ax].fill_msg(&kmsg, r);
+	else
+		goto err_nosys;
+
 	/* save all these regs and then retore them on exit (arch_finish_check) */
 	proc_ptr->clobregs[CLOBB_REG_EBX] = r->bx;
 	proc_ptr->clobregs[CLOBB_REG_ECX] = r->cx;
@@ -87,10 +97,6 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	proc_ptr->clobregs[CLOBB_REG_ESI] = r->si;
 	proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
 	proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
-
-	/* fill the message according to passed arguments */
-	if (scall_to_srv[r->ax].fill_msg)
-		scall_to_srv[r->ax].fill_msg(&kmsg, r);
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
 	 *           kIPC. It requires to have message in caller's (user's) space.
@@ -106,39 +112,51 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	sys_call(r->cx, r->ax, (message*)r->bx, r->dx);
 
 	return r->ax;
+
+err_nosys:
+	proc_ptr->syscall_0x80 = 0;
+
+	/* @nucleos: this is ignored and the syscall result is got from message */
+	proc_ptr->p_reg.retreg = -ENOSYS;
+
+	/* set errno and copy back to user */
+	kmsg.m_type = -ENOSYS;
+	copy_to_user(msg, &kmsg, sizeof(message));
+
+	return -ENOSYS;
 }
 
-static void msg_access(message *msg, struct pt_regs *r)
+static void msg_access(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m3_i2 = r->cx;		/* mode */
 }
 
-static void msg_alarm(message *msg, struct pt_regs *r)
+static void msg_alarm(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* seconds */
 }
 
-static void msg_brk(message *msg, struct pt_regs *r)
+static void msg_brk(message *msg, const struct pt_regs *r)
 {
 	msg->PMBRK_ADDR = (void*)r->bx;		/* addr */
 }
 
-static void msg_chdir(message *msg, struct pt_regs *r)
+static void msg_chdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_chmod(message *msg, struct pt_regs *r)
+static void msg_chmod(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_chown(message *msg, struct pt_regs *r)
+static void msg_chown(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -146,18 +164,18 @@ static void msg_chown(message *msg, struct pt_regs *r)
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 }
 
-static void msg_chroot(message *msg, struct pt_regs *r)
+static void msg_chroot(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* path */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_close(message *msg, struct pt_regs *r)
+static void msg_close(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;
 }
 
-static void msg_cprof(message *msg, struct pt_regs *r)
+static void msg_cprof(message *msg, const struct pt_regs *r)
 {
 	msg->PROF_ACTION	= r->bx;		/* action */
 	msg->PROF_MEM_SIZE	= r->cx;		/* size */
@@ -165,25 +183,25 @@ static void msg_cprof(message *msg, struct pt_regs *r)
 	msg->PROF_MEM_PTR	= (void *)r->si;	/* mem_ptr */
 }
 
-static void msg_creat(message *msg, struct pt_regs *r)
+static void msg_creat(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_dup(message *msg, struct pt_regs *r)
+static void msg_dup(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* descriptor */
 }
 
-static void msg_dup2(message *msg, struct pt_regs *r)
+static void msg_dup2(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* descriptor */
 	msg->m1_i2 = r->cx;	/* descriptor */
 }
 
-static void msg_exec(message *msg, struct pt_regs *r)
+static void msg_exec(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* filename */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -191,30 +209,30 @@ static void msg_exec(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->dx;		/* frame_size */
 }
 
-static void msg_exit(message *msg, struct pt_regs *r)
+static void msg_exit(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;
 }
 
-static void msg_fchdir(message *msg, struct pt_regs *r)
+static void msg_fchdir(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* descriptor */
 }
 
-static void msg_fchmod(message *msg, struct pt_regs *r)
+static void msg_fchmod(message *msg, const struct pt_regs *r)
 {
-	msg->m3_i1 = r->bx;		/* descriptor */
-	msg->m3_i2 = (mode_t)r->cx;	/* mode */
+	msg->m1_i1 = r->bx;		/* descriptor */
+	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_fchown(message *msg, struct pt_regs *r)
+static void msg_fchown(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_i2 = (uid_t)r->cx;	/* owner */
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 }
 
-static void msg_fcntl(message *msg, struct pt_regs *r)
+static void msg_fcntl(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_i2 = r->cx;		/* cmd */
@@ -222,108 +240,108 @@ static void msg_fcntl(message *msg, struct pt_regs *r)
 	msg->m1_p1 = (void*)r->dx;	/* lock */
 }
 
-static void msg_fork(message *msg, struct pt_regs *r)
+static void msg_fork(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_fstat(message *msg, struct pt_regs *r)
+static void msg_fstat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (void*)r->cx;	/* buffer */
 }
 
-static void msg_fstatfs(message *msg, struct pt_regs *r)
+static void msg_fstatfs(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (void*)r->cx;	/* buffer */
 }
 
-static void msg_fsync(message *msg, struct pt_regs *r)
+static void msg_fsync(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* descriptor */
 }
 
-static void msg_ftruncate(message *msg, struct pt_regs *r)
+static void msg_ftruncate(message *msg, const struct pt_regs *r)
 {
 	msg->m2_i1 = r->bx;		/* descriptor */
 	msg->m2_l1 = (off_t)r->cx;	/* length */
 }
 
-static void msg_getdents(message *msg, struct pt_regs *r)
+static void msg_getdents(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (void*)r->cx;	/* struct. dirent */
 	msg->m1_i2 = (size_t)r->dx;		/* count */
 }
 
-static void msg_getegid(message *msg, struct pt_regs *r)
+static void msg_getegid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_geteuid(message *msg, struct pt_regs *r)
+static void msg_geteuid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_getgid(message *msg, struct pt_regs *r)
+static void msg_getgid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_getitimer(message *msg, struct pt_regs *r)
+static void msg_getitimer(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* which */
 	msg->m1_p2 = (void*)r->cx;	/* value */
 }
 
-static void msg_getpgrp(message *msg, struct pt_regs *r)
+static void msg_getpgrp(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_getpid(message *msg, struct pt_regs *r)
+static void msg_getpid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_getppid(message *msg, struct pt_regs *r)
+static void msg_getppid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_getpriority(message *msg, struct pt_regs *r)
+static void msg_getpriority(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* which */
 	msg->m1_i2 = r->cx;	/* who */
 }
 
-static void msg_gettimeofday(message *msg, struct pt_regs *r)
+static void msg_gettimeofday(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (void*)r->bx;	/* timeval */
 	msg->m2_l1 = r->cx;		/* timezone (expected NULL) */
 }
 
-static void msg_getuid(message *msg, struct pt_regs *r)
+static void msg_getuid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_ioctl(message *msg, struct pt_regs *r)
+static void msg_ioctl(message *msg, const struct pt_regs *r)
 {
 	msg->TTY_LINE = r->bx;		/* descriptor */
 	msg->TTY_REQUEST = r->cx;	/* request */
 	msg->ADDRESS = (char *)r->dx;	/* data */
 }
 
-static void msg_kill(message *msg, struct pt_regs *r)
+static void msg_kill(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (pid_t)r->bx;	/* pid */
 	msg->m1_i2 = r->cx;	/* sig */
 }
 
-static void msg_link(message *msg, struct pt_regs *r)
+static void msg_link(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -332,7 +350,7 @@ static void msg_link(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_llseek(message *msg, struct pt_regs *r)
+static void msg_llseek(message *msg, const struct pt_regs *r)
 {
 	msg->m2_i1 = r->bx;		/* descriptor */
 	msg->m2_l2 = r->cx;		/* offset (high) */
@@ -341,28 +359,28 @@ static void msg_llseek(message *msg, struct pt_regs *r)
 	msg->m2_i2 = r->di;		/* whence */
 }
 
-static void msg_lseek(message *msg, struct pt_regs *r)
+static void msg_lseek(message *msg, const struct pt_regs *r)
 {
 	msg->m2_i1 = r->bx;		/* descriptor */
 	msg->m2_l1 = (off_t)r->cx;	/* offset */
 	msg->m2_i2 = r->dx;		/* whence */
 }
 
-static void msg_lstat(message *msg, struct pt_regs *r)
+static void msg_lstat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m1_p2 = (char*)r->cx;	/* buffer */
 }
 
-static void msg_mkdir(message *msg, struct pt_regs *r)
+static void msg_mkdir(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 }
 
-static void msg_mknod(message *msg, struct pt_regs *r)
+static void msg_mknod(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *) r->bx;		/* pathname */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -371,7 +389,7 @@ static void msg_mknod(message *msg, struct pt_regs *r)
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
 }
 
-static void msg_mmap(message *msg, struct pt_regs *r)
+static void msg_mmap(message *msg, const struct pt_regs *r)
 {
 	struct mmap_arg_struct{
 		unsigned long addr;
@@ -394,7 +412,7 @@ static void msg_mmap(message *msg, struct pt_regs *r)
 	msg->VMM_OFFSET = (off_t)parm.offset;
 }
 
-static void msg_mount(message *msg, struct pt_regs *r)
+static void msg_mount(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* special */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -406,7 +424,7 @@ static void msg_mount(message *msg, struct pt_regs *r)
 	msg->m1_p3 = (char *)r->si;	/* ep */
 }
 
-static void msg_munmap(message *msg, struct pt_regs *r)
+static void msg_munmap(message *msg, const struct pt_regs *r)
 {
 	msg->m_type = NNR_VM_MUNMAP;	/* VM syscall number */
 
@@ -414,7 +432,7 @@ static void msg_munmap(message *msg, struct pt_regs *r)
 	msg->VMUM_LEN = (size_t)r->cx;
 }
 
-static void msg_munmap_text(message *msg, struct pt_regs *r)
+static void msg_munmap_text(message *msg, const struct pt_regs *r)
 {
 	msg->m_type = NNR_VM_MUNMAP_TEXT;	/* VM syscall number */
 
@@ -422,7 +440,7 @@ static void msg_munmap_text(message *msg, struct pt_regs *r)
 	msg->VMUM_LEN = (size_t)r->cx;
 }
 
-static void msg_open(message *msg, struct pt_regs *r)
+static void msg_open(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* pathname */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -430,26 +448,26 @@ static void msg_open(message *msg, struct pt_regs *r)
 	msg->m1_i3 = (mode_t)r->dx;	/* mode */
 }
 
-static void msg_pause(message *msg, struct pt_regs *r)
+static void msg_pause(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_pipe(message *msg, struct pt_regs *r)
+static void msg_pipe(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* pointer to fild */
 }
 
-static void msg_ptrace(message *msg, struct pt_regs *r){}
+static void msg_ptrace(message *msg, const struct pt_regs *r){}
 
-static void msg_read(message *msg, struct pt_regs *r)
+static void msg_read(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (void*)r->cx;	/* buffer */
 	msg->m1_i2 = r->dx;		/* count */
 }
 
-static void msg_readlink(message *msg, struct pt_regs *r)
+static void msg_readlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -457,14 +475,14 @@ static void msg_readlink(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->dx;		/* bufsiz */
 }
 
-static void msg_reboot(message *msg, struct pt_regs *r)
+static void msg_reboot(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* how */
 	msg->m1_p1 = (void*)r->cx;	/* code */
 	msg->m1_i2 = (size_t)r->dx	/* size of code */;
 }
 
-static void msg_rename(message *msg, struct pt_regs *r)
+static void msg_rename(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -472,13 +490,13 @@ static void msg_rename(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_rmdir(message *msg, struct pt_regs *r)
+static void msg_rmdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_select(message *msg, struct pt_regs *r)
+static void msg_select(message *msg, const struct pt_regs *r)
 {
 	msg->SEL_NFDS = r->bx;			/* nfds */
 	msg->SEL_READFDS = (char *) r->cx;	/* readfds */
@@ -487,46 +505,46 @@ static void msg_select(message *msg, struct pt_regs *r)
 	msg->SEL_TIMEOUT = (char *) r->di;	/* timeout */
 }
 
-static void msg_setegid(message *msg, struct pt_regs *r)
+static void msg_setegid(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (gid_t)r->bx;	/* gid */
 }
 
-static void msg_seteuid(message *msg, struct pt_regs *r)
+static void msg_seteuid(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (uid_t)r->bx;	/* euid */
 }
 
-static void msg_setgid(message *msg, struct pt_regs *r)
+static void msg_setgid(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (gid_t)r->bx;	/* gid */
 }
 
-static void msg_setitimer(message *msg, struct pt_regs *r)
+static void msg_setitimer(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* which */
 	msg->m1_p1 = (void*)r->cx;	/* value */
 	msg->m1_p2 = (void*)r->dx;	/* ovalue */
 }
 
-static void msg_setpriority(message *msg, struct pt_regs *r)
+static void msg_setpriority(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;	/* which */
 	msg->m1_i2 = r->cx;	/* who */
 	msg->m1_i3 = r->dx;	/* prio */
 }
 
-static void msg_setsid(message *msg, struct pt_regs *r)
+static void msg_setsid(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_setuid(message *msg, struct pt_regs *r)
+static void msg_setuid(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (uid_t)r->bx;	/* uid */
 }
 
-static void msg_sigaction(message *msg, struct pt_regs *r)
+static void msg_sigaction(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i2 = r->bx;		/* sig */
 	msg->m1_p1 = (void*)r->cx;	/* act */
@@ -534,36 +552,36 @@ static void msg_sigaction(message *msg, struct pt_regs *r)
 	msg->m1_p3 = (void*)r->si;	/* __sigreturn */
 }
 
-static void msg_signal(message *msg, struct pt_regs *r)
+static void msg_signal(message *msg, const struct pt_regs *r)
 {
 	/* n/a: implemented via sigaction */
 }
 
-static void msg_sigpending(message *msg, struct pt_regs *r)
+static void msg_sigpending(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* set */
 }
 
-static void msg_sigprocmask(message *msg, struct pt_regs *r)
+static void msg_sigprocmask(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* how */
 	msg->m1_p1 = (void*)r->cx;	/* set */
 	msg->m1_p2 = (void*)r->dx;	/* oldset */
 }
 
-static void msg_sigreturn(message *msg, struct pt_regs *r)
+static void msg_sigreturn(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (void*)r->bx;	/* sigcontext */
 	msg->m2_l1 = r->cx;		/* mask */
 	msg->m2_i2 = r->dx;		/* flags */
 }
 
-static void msg_sigsuspend(message *msg, struct pt_regs *r)
+static void msg_sigsuspend(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* set */
 }
 
-static void msg_sprof(message *msg, struct pt_regs *r)
+static void msg_sprof(message *msg, const struct pt_regs *r)
 {
 	msg->PROF_ACTION = r->bx;		/* action */
 	msg->PROF_MEM_SIZE = r->cx;		/* size */
@@ -572,19 +590,19 @@ static void msg_sprof(message *msg, struct pt_regs *r)
 	msg->PROF_MEM_PTR = (void*)r->di;	/* mem_ptr */
 }
 
-static void msg_stat(message *msg, struct pt_regs *r)
+static void msg_stat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 }
 
-static void msg_stime(message *msg, struct pt_regs *r)
+static void msg_stime(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (void*)r->bx;	/* time */
 }
 
-static void msg_symlink(message *msg, struct pt_regs *r)
+static void msg_symlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;		/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
@@ -592,58 +610,58 @@ static void msg_symlink(message *msg, struct pt_regs *r)
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
 }
 
-static void msg_sync(message *msg, struct pt_regs *r)
+static void msg_sync(message *msg, const struct pt_regs *r)
 {
 	/* no args */
 }
 
-static void msg_uname(message *msg, struct pt_regs *r)
+static void msg_uname(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* utsname */
 }
 
-static void msg_time(message *msg, struct pt_regs *r)
+static void msg_time(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* time */
 }
 
-static void msg_times(message *msg, struct pt_regs *r)
+static void msg_times(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (void*)r->bx;	/* times */
 }
 
-static void msg_truncate(message *msg, struct pt_regs *r)
+static void msg_truncate(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;		/* path */
 	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 	msg->m2_l1 = (off_t)r->cx;		/* length */
 }
 
-static void msg_umask(message *msg, struct pt_regs *r)
+static void msg_umask(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (mode_t)r->bx;	/* mask */
 }
 
-static void msg_umount(message *msg, struct pt_regs *r)
+static void msg_umount(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* target */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_unlink(message *msg, struct pt_regs *r)
+static void msg_unlink(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
 }
 
-static void msg_utime(message *msg, struct pt_regs *r)
+static void msg_utime(message *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* filename */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
-	msg->m1_p2 = (void *)r->cx;	/* times pointer */
+	msg->m2_p1 = (char *)r->bx;	/* filename */
+	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m2_l1 = r->cx;	/* times pointer */
 }
 
-static void msg_wait(message *msg, struct pt_regs *r)
+static void msg_wait(message *msg, const struct pt_regs *r)
 {
 	/* @nucleos: The `msg->m1_p1' is not really used but
 	 *           `r->bx' is important. It holds the status
@@ -652,7 +670,7 @@ static void msg_wait(message *msg, struct pt_regs *r)
 	msg->m1_p1 = (void*)r->bx;	/* status */
 }
 
-static void msg_waitpid(message *msg, struct pt_regs *r)
+static void msg_waitpid(message *msg, const struct pt_regs *r)
 {
 	/* @nucleos: The `msg->m1_p1' is not really used but
 	 *           `r->cx' is important. It holds the status
@@ -663,7 +681,7 @@ static void msg_waitpid(message *msg, struct pt_regs *r)
 	msg->m1_i2 = r->dx;		/* options */
 }
 
-static void msg_write(message *msg, struct pt_regs *r)
+static void msg_write(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (char *)r->cx;	/* buffer */
