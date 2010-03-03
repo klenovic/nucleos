@@ -10,6 +10,7 @@
 #ifndef __ASM_X86_SIGCONTEXT_H
 #define __ASM_X86_SIGCONTEXT_H
 
+#include <nucleos/types.h>
 #include <asm/stackframe.h>
 #include <asm/fpu.h>
 

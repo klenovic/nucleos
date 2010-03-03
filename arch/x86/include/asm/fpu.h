@@ -1,42 +1,44 @@
 #ifndef __ASM_X86_FPU_H
 #define __ASM_X86_FPU_H
 
+#include <nucleos/types.h>
+
 /* x87 FPU state, MMX Technolodgy.
  * 108 bytes.*/
 struct fpu_regs_s {
-	u16_t fp_control;     /* control */
-	u16_t fp_unused_1;
-	u16_t fp_status;      /* status */
-	u16_t fp_unused_2;
-	u16_t fp_tag;         /* register tags */
-	u16_t fp_unused_3;
-	u32_t fp_eip;         /* eip at failed instruction */
-	u16_t fp_cs;          /* cs at failed instruction */
-	u16_t fp_opcode;      /* opcode of failed instruction */
-	u32_t fp_dp;          /* data address */
-	u16_t fp_ds;          /* data segment */
-	u16_t fp_unused_4;
-	u16_t fp_st_regs[8][5]; /* 8 80-bit FP registers */
+	__u16 fp_control;     /* control */
+	__u16 fp_unused_1;
+	__u16 fp_status;      /* status */
+	__u16 fp_unused_2;
+	__u16 fp_tag;         /* register tags */
+	__u16 fp_unused_3;
+	__u32 fp_eip;         /* eip at failed instruction */
+	__u16 fp_cs;          /* cs at failed instruction */
+	__u16 fp_opcode;      /* opcode of failed instruction */
+	__u32 fp_dp;          /* data address */
+	__u16 fp_ds;          /* data segment */
+	__u16 fp_unused_4;
+	__u16 fp_st_regs[8][5]; /* 8 80-bit FP registers */
 };
 
 /* x87 FPU, MMX Technolodgy and SSE state.
  * 512 bytes (if you need size use FPU_XFP_SIZE). */
 struct xfp_save {
-	u16_t fp_control;       /* control */
-	u16_t fp_status;        /* status */
-	u16_t fp_tag;           /* register tags */
-	u16_t fp_opcode;        /* opcode of failed instruction */
-	u32_t fp_eip;           /* eip at failed instruction */
-	u16_t fp_cs;            /* cs at failed instruction */
-	u16_t fp_unused_1;
-	u32_t fp_dp;            /* data address */
-	u16_t fp_ds;            /* data segment */
-	u16_t fp_unused_2;
-	u32_t fp_mxcsr;         /* MXCSR */
-	u32_t fp_mxcsr_mask;    /* MXCSR_MASK */
-	u16_t fp_st_regs[8][8];   /* 128 bytes for ST/MM regs */
-	u32_t fp_xreg_word[32]; /* space for 8 128-bit XMM registers */
-	u32_t fp_padding[56];
+	__u16 fp_control;       /* control */
+	__u16 fp_status;        /* status */
+	__u16 fp_tag;           /* register tags */
+	__u16 fp_opcode;        /* opcode of failed instruction */
+	__u32 fp_eip;           /* eip at failed instruction */
+	__u16 fp_cs;            /* cs at failed instruction */
+	__u16 fp_unused_1;
+	__u32 fp_dp;            /* data address */
+	__u16 fp_ds;            /* data segment */
+	__u16 fp_unused_2;
+	__u32 fp_mxcsr;         /* MXCSR */
+	__u32 fp_mxcsr_mask;    /* MXCSR_MASK */
+	__u16 fp_st_regs[8][8];   /* 128 bytes for ST/MM regs */
+	__u32 fp_xreg_word[32]; /* space for 8 128-bit XMM registers */
+	__u32 fp_padding[56];
 };
 
 /* Size of xfp_save structure. */

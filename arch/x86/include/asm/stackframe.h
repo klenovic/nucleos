@@ -1,6 +1,8 @@
 #ifndef __ASM_X86_STACKFRAME_H
 #define __ASM_X86_STACKFRAME_H
 
+#include <nucleos/types.h>
+
 typedef unsigned reg_t;		/* machine register */
 typedef reg_t segdesc_t;
 
@@ -13,10 +15,10 @@ typedef reg_t segdesc_t;
  * used for the larger registers to avoid differences in the code.
  */
 struct stackframe_s {
-	u16_t gs;	/* last item pushed by save */
-	u16_t fs;	/*  ^ */
-	u16_t es;	/*  | */
-	u16_t ds;	/*  | */
+	__u16 gs;	/* last item pushed by save */
+	__u16 fs;	/*  ^ */
+	__u16 es;	/*  | */
+	__u16 ds;	/*  | */
 	reg_t di;	/* di through cx are not accessed in C */
 	reg_t si;	/* order is to match pusha/popa */
 	reg_t fp;	/* bp */
