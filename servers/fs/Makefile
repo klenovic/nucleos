@@ -1,1 +1,1 @@
-obj-y := iso9660fs/ minixfs/ vfs/
+obj-y := iso9660fs/ minixfs/ vfs/ pipefs/

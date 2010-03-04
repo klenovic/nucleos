@@ -105,8 +105,7 @@ typedef struct {
 	short m9s1;
 	short m9s2;
 	short m9s3;
-	char m9c1;
-	char m9c2;
+	short m9s4;
 } mess_9;
 
 typedef struct {
@@ -194,8 +193,7 @@ typedef struct {
 #define m9_s1  m_u.m_m9.m9s1
 #define m9_s2  m_u.m_m9.m9s2
 #define m9_s3  m_u.m_m9.m9s3
-#define m9_c1  m_u.m_m9.m9c1
-#define m9_c2  m_u.m_m9.m9c2
+#define m9_s4  m_u.m_m9.m9s4
 
 /*==========================================================================* 
  * Nucleos run-time system (IPC). 					    *

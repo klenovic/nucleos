@@ -46,8 +46,8 @@ int req;			/* either F_SETLK or F_SETLKW */
 
   /* Fetch the flock structure from user space. */
   user_flock = (vir_bytes) m_in.name1;
-  r = sys_datacopy(who_e, (vir_bytes) user_flock,
-	FS_PROC_NR, (vir_bytes) &flock, (phys_bytes) sizeof(flock));
+  r = sys_datacopy(who_e, (vir_bytes) user_flock, FS_PROC_NR,
+		   (vir_bytes) &flock, (phys_bytes) sizeof(flock));
   if (r != 0) return(-EINVAL);
 
   /* Make some error checks. */
@@ -64,11 +64,9 @@ int req;			/* either F_SETLK or F_SETLKW */
 	case SEEK_SET:	first = 0; break;
 	case SEEK_CUR:
 		if (ex64hi(f->filp_pos) != 0)
-		{
-			panic(__FILE__, "lock_op: position in file too high",
-				NO_NUM);
-		}
-		first = ex64lo(f->filp_pos); break;
+		panic(__FILE__, "lock_op: position in file too high", NO_NUM);
+	   first = ex64lo(f->filp_pos);
+	   break;
 	case SEEK_END:	first = f->filp_vno->v_size; break;
 	default:	return(-EINVAL);
   }
@@ -83,10 +81,10 @@ int req;			/* either F_SETLK or F_SETLKW */
   if (last < first) return(-EINVAL);
 
   /* Check if this region conflicts with any existing lock. */
-  empty = (struct file_lock *) 0;
+  empty = NIL_LOCK;
   for (flp = &file_lock[0]; flp < & file_lock[NR_LOCKS]; flp++) {
 	if (flp->lock_type == 0) {
-		if (empty == (struct file_lock *) 0) empty = flp;
+		if (empty == NIL_LOCK) empty = flp;
 		continue;	/* 0 means unused slot */
 	}
 	if (flp->lock_vnode != f->filp_vno) continue;	/* different file */

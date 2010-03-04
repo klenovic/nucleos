@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_INC_H
-#define __SERVERS_ISO9660FS_INC_H
+#ifndef __INC_H
+#define __INC_H
 
 #define VERBOSE		   0	/* display diagnostics */
 
@@ -25,4 +25,4 @@
 #include "glo.h"
 #include "drivers.h"
 
-#endif /* __SERVERS_ISO9660FS_INC_H */
+#endif /* __INC_H */

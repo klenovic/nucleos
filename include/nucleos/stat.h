@@ -31,7 +31,7 @@
 #define S_ISUID		0004000	/* set user id on execution */
 #define S_ISGID		0002000	/* set group id on execution */
 				/* next is reserved for future use */
-#define S_ISVTX		01000		/* save swapped text even after use */
+#define S_ISVTX		0001000	/* save swapped text even after use */
 
 /* POSIX masks for st_mode. */
 #define S_IRWXU		00700	/* owner:  rwx------ */

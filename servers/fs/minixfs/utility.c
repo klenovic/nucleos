@@ -74,19 +74,20 @@ time_t clock_time()
   register int k;
   clock_t uptime;
 
-  if (use_getuptime2)
-  {
+  if (use_getuptime2) {
 	if ( (k=getuptime2(&uptime,&boottime)) != 0)
 		panic(__FILE__,"clock_time: getuptme2 failed", k);
-  }
-  else
-  {
+  } else {
 	if ( (k=getuptime(&uptime)) != 0)
 		panic(__FILE__,"clock_time err", k);
   }
   return( (time_t) (boottime + (uptime/sys_hz())));
 }
 
+
+/*===========================================================================*
+ *				mfs_min					     *
+ *===========================================================================*/
 int mfs_min_f(char *file, int line, int v1, int v2)
 {
 	if(v1 < 0 || v2 < 0) {
@@ -95,13 +96,14 @@ int mfs_min_f(char *file, int line, int v1, int v2)
 		panic(file, "strange string lengths", NO_NUM);
 	}
 	if(v2 >= v1) return v1;
-#if 0
-	printf("mfs:%s:%d: truncated %d to %d\n",
-		file, line, v1, v2);
-#endif
+
 	return v2;
 }
 
+
+/*===========================================================================*
+ *				mfs_nul					     *
+ *===========================================================================*/
 void mfs_nul_f(char *file, int line, char *str, int len, int maxlen)
 {
 	if(len < 1) {
@@ -118,6 +120,10 @@ void mfs_nul_f(char *file, int line, char *str, int len, int maxlen)
 #define MYASSERT(c) if(!(c)) { printf("MFS:%s:%d: sanity check: %s failed\n", \
   file, line, #c); panic("MFS", "sanity check " #c " failed", __LINE__); }
 
+
+/*===========================================================================*
+ *				sanity_check				     *
+ *===========================================================================*/
 void sanitycheck(char *file, int line)
 {
 	MYASSERT(SELF_E > 0);

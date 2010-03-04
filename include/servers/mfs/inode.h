@@ -22,8 +22,8 @@
  * Updates:
  * 2007-01-06: jfdsmit@gmail.com added i_zsearch
  */
-
 #include <nucleos/queue.h>
+#include <servers/mfs/type.h>
 
 struct inode {
 	mode_t i_mode;		/* file type, protection, etc. */
@@ -44,7 +44,6 @@ struct inode {
 	int i_nindirs;		/* # indirect zones per indirect block */
 	struct minix3_super_block *i_sp;	/* pointer to super block for inode's device */
 	char i_dirt;			/* CLEAN or DIRTY */
-	char i_pipe;			/* set to I_PIPE if pipe */
 	u32 i_zsearch;		/* where to start search for new zones */
 
 	char i_mountpoint;		/* true if mounted on */
@@ -70,8 +69,6 @@ extern unsigned int inode_cache_miss;
 #define NIL_INODE	(struct inode *)0	/* indicates absence of inode slot */
 
 /* Field values.  Note that CLEAN and DIRTY are defined in "const.h" */
-#define NO_PIPE		0	/* i_pipe is NO_PIPE if inode is not a pipe */
-#define I_PIPE		1	/* i_pipe is I_PIPE if inode is a pipe */
 #define NO_SEEK		0	/* i_seek = NO_SEEK if last op was not SEEK */
 #define ISEEK		1	/* i_seek = ISEEK if last op was SEEK */
 

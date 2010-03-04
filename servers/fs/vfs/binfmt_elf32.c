@@ -93,15 +93,15 @@ static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 	off_t pos;
 	int err;
 	u64_t new_pos;
-	unsigned int cum_io_incr;
+	unsigned int cum_io;
 	elf32_ehdr_t hdr;
 
 	/* Read from the start of the file */
 	pos = 0;
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(pos), READING,
-			    FS_PROC_NR, (char*)&hdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io_incr);
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos), READING,
+			    FS_PROC_NR, (char*)&hdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io);
 
 	if (err) {
 		app_err("Can't read the file header\n");
@@ -299,13 +299,11 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 	int err;
 	unsigned n, k;
 	u64_t new_pos;
-	unsigned int cum_io_incr;
+	unsigned int cum_io;
 	char buf[1024];
 
 	/* Make sure that the file is big enough */
-	if (vp->v_size < off + seg_bytes) {
-		return -EIO;
-	}
+	if (vp->v_size < off + seg_bytes) return -EIO;
 
 	if (seg != D) {
 		/* We have to use a copy loop until safecopies support segments */
@@ -320,16 +318,16 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 			proc_e, seg, buf, n, off+k);
 #endif
 			/* Issue request */
-			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index,
+			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr,
 					    cvul64(off + k), READING, FS_PROC_NR, buf, n, &new_pos,
-					    &cum_io_incr);
+					    &cum_io);
 
 			if (err) {
 				printf("VFS: read_seg: req_readwrite failed (text)\n");
 				return err;
 			}
 
-			if (cum_io_incr != n) {
+			if (cum_io != n) {
 				app_err("Segment 0x%X has not been read properly!\n", seg);
 				return -EIO;
 			}
@@ -353,15 +351,15 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 #endif
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(off),
-			    READING, proc_e, (char*)addr_off, seg_bytes, &new_pos, &cum_io_incr);
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(off),
+			    READING, proc_e, (char*)addr_off, seg_bytes, &new_pos, &cum_io);
 
 	if (err) {
 		printf("VFS: read_seg: req_readwrite failed (data)\n");
 		return err;
 	}
 
-	if (!err && cum_io_incr != seg_bytes)
+	if (!err && cum_io != seg_bytes)
 		app_err("Segment 0x%X has not been read properly!\n", seg);
 
 	return err;
@@ -545,7 +543,7 @@ int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp)
 	unsigned int cum_io_incr;
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(0), READING,
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(0), READING,
 			    FS_PROC_NR, (char*)&ehdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io_incr);
 
 	if (err)
@@ -588,7 +586,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 	}
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(ehdr->e_phoff), READING,
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(ehdr->e_phoff), READING,
 			    FS_PROC_NR, (char*)*phdrs, phdrs_sz, &new_pos, &cum_io_incr);
 
 	if (err) {
@@ -628,7 +626,7 @@ int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 	}
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(ehdr->e_shoff), READING,
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(ehdr->e_shoff), READING,
 			    FS_PROC_NR, (char*)*shdrs, shdrs_sz, &new_pos, &cum_io_incr);
 
 	if (err) {

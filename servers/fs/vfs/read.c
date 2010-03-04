@@ -17,8 +17,6 @@
  *   do_getdents: read entries from a directory (GETDENTS)
  *   read_write: actually do the work of READ and WRITE
  *
- * Changes for VFS:
- *   Jul 2006 (Balazs Gerofi)
  */
 #include <nucleos/kernel.h>
 #include "fs.h"
@@ -56,7 +54,7 @@ int rw_flag;			/* READING or WRITING */
   register struct vnode *vp;
   off_t bytes_left;
   u64_t position, res_pos, new_pos;
-  unsigned int off, cum_io, cum_io_incr, res_cum_io, num_of_bytes;
+  unsigned int off, cum_io, cum_io_incr, res_cum_io;
   int op, oflags, r, chunk, usr, block_spec, char_spec;
   int regular;
   mode_t mode_word;
@@ -69,45 +67,32 @@ int rw_flag;			/* READING or WRITING */
 	panic(__FILE__,
 	"read_write: special read/write calls by PM no longer supported",
 		NO_NUM);
-  } 
-  else {
+  } else {
       usr = who_e;		/* normal case */
   }
 
   /* If the file descriptor is valid, get the vnode, size and mode. */
-  if (m_in.nbytes < 0)
-  	return(-EINVAL);
-
-  if ((f = get_filp(m_in.fd)) == NIL_FILP) {
-  	return(err_code);
-  }
+  if (m_in.nbytes < 0) return(-EINVAL);
+  if ((f = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
   if (((f->filp_mode) & (rw_flag == READING ? R_BIT : W_BIT)) == 0) {
-#if 0
-	printf("vfs:read_write: returning error\n");
-#endif
       return(f->filp_mode == FILP_CLOSED ? -EIO : -EBADF);
   }
-
   if (m_in.nbytes == 0)
       return(0);	/* so char special files need not check for 0*/
 
   position = f->filp_pos;
   oflags = f->filp_flags;
-
   vp = f->filp_vno;
+  r = 0;
+  cum_io = 0;
 
-  if (vp->v_pipe == I_PIPE)
-  {
-	if (fp->fp_cum_io_partial != 0)
-	{
+  if (vp->v_pipe == I_PIPE) {
+	if (fp->fp_cum_io_partial != 0) {
 		panic(__FILE__, "read_write: fp_cum_io_partial not clear",
 			NO_NUM);
 	}
 	return rw_pipe(rw_flag, usr, m_in.fd, f, m_in.buffer, m_in.nbytes);
   }
-
-  r = 0;
-  cum_io = 0;
 
   op = (rw_flag == READING ? VFS_DEV_READ : VFS_DEV_WRITE);
   mode_word = vp->v_mode & I_TYPE;
@@ -125,8 +110,7 @@ int rw_flag;			/* READING or WRITING */
                   " block device NO_DEV", NO_NUM);
   }
 
-  /* Character special files. */
-  if (char_spec) {
+  if (char_spec) {			/* Character special files. */
 	dev_t dev;
 	int suspend_reopen;
 
@@ -140,50 +124,22 @@ int rw_flag;			/* READING or WRITING */
 		position = add64ul(position, r);
 		r = 0;
 	}
-  } 
-  /* Block special files. */
-  else if (block_spec) {
-
-      /* Issue request */
-      r = req_breadwrite(vp->v_bfs_e, usr, vp->v_sdev, position,
-	m_in.nbytes, m_in.buffer, rw_flag, &res_pos, &res_cum_io);
-
+  } else if (block_spec) {		/* Block special files. */
+	r = req_breadwrite(vp->v_bfs_e, usr, vp->v_sdev, position, m_in.nbytes,
+			   m_in.buffer, rw_flag, &res_pos, &res_cum_io);
       position = res_pos;
       cum_io += res_cum_io;
-  }
-  /* Regular files */
-  else {
+  } else {				/* Regular files */
       if (rw_flag == WRITING && block_spec == 0) {
           /* Check for O_APPEND flag. */
           if (oflags & O_APPEND) position = cvul64(vp->v_size);
       }
 
-
-      /* Fill in request structure */
-      num_of_bytes = m_in.nbytes;
-
-#if 0  /* Don't truncate read request at size. The filesystem process will
-	* do this itself.
-	*/
-      if((rw_flag == READING) &&
-	cmp64ul(add64ul(position, num_of_bytes), vp->v_size) > 0) {
-		/* Position always should fit in an off_t (LONG_MAX). */
-		off_t pos32;
-		assert(cmp64ul(position, LONG_MAX) <= 0);
-		pos32 = cv64ul(position);
-		assert(pos32 >= 0);
-		assert(pos32 <= LONG_MAX);
-		num_of_bytes = vp->v_size - pos32;
-		assert(num_of_bytes >= 0);
-      }
-#endif
-
       /* Issue request */
-      r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, position,
-	rw_flag, usr, m_in.buffer, num_of_bytes, &new_pos, &cum_io_incr);
+	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, position, rw_flag, usr,
+			  m_in.buffer, m_in.nbytes, &new_pos, &cum_io_incr);
 
-      if (r >= 0)
-      {
+	if (r >= 0) {
 	if (ex64hi(new_pos))
 		panic(__FILE__, "read_write: bad new pos", NO_NUM);
 
@@ -195,13 +151,10 @@ int rw_flag;			/* READING or WRITING */
   /* On write, update file size and access time. */
   if (rw_flag == WRITING) {
       if (regular || mode_word == I_DIRECTORY) {
-          if (cmp64ul(position, vp->v_size) > 0)
-	  {
-		if (ex64hi(position) != 0)
-		{
+		if (cmp64ul(position, vp->v_size) > 0) {
+			if (ex64hi(position) != 0) {
 			panic(__FILE__,
-				"read_write: file size too big for v_size",
-				NO_NUM);
+				      "read_write: file size too big ", NO_NUM);
 		}
 		vp->v_size = ex64lo(position);
 	  }
@@ -209,12 +162,8 @@ int rw_flag;			/* READING or WRITING */
   }
 
   f->filp_pos = position;
-
-  if (r == 0) {
-      return cum_io;
-  }
-
-  return r;
+  if (r == 0) return(cum_io);
+  return(r);
 }
 
 
@@ -225,7 +174,7 @@ int do_getdents()
 {
 /* Perform the getdents(fd, buf, size) system call. */
   int r;
-  off_t pos_change;
+  u64_t new_pos;
   cp_grant_id_t gid;
   register struct filp *rfilp;
 
@@ -235,78 +184,55 @@ int do_getdents()
   }
   
   if (!(rfilp->filp_mode & R_BIT))
-	return -EBADF;
+	return(-EBADF);
 
   if ((rfilp->filp_vno->v_mode & I_TYPE) != I_DIRECTORY)
-	return -EBADF;
+	return(-EBADF);
 
-  gid=cpf_grant_magic(rfilp->filp_vno->v_fs_e, who_e, (vir_bytes) m_in.buffer,
-	m_in.nbytes, CPF_WRITE);
-  if (gid < 0) panic(__FILE__, "cpf_grant_magic failed", gid);
-
-  /* Issue request */
   if (ex64hi(rfilp->filp_pos) != 0)
 	panic(__FILE__, "do_getdents: should handle large offsets", NO_NUM);
 	
   r= req_getdents(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr, 
-	ex64lo(rfilp->filp_pos), gid, m_in.nbytes, &pos_change);
-
-  cpf_revoke(gid);
+		   rfilp->filp_pos, m_in.buffer, m_in.nbytes, &new_pos);
 
   if (r > 0)
-	rfilp->filp_pos= add64ul(rfilp->filp_pos, pos_change);
-  return r;
+	rfilp->filp_pos = new_pos;
+  return(r);
 }
 
 
 /*===========================================================================*
  *				rw_pipe					     *
  *===========================================================================*/
-int rw_pipe(rw_flag, usr, fd_nr, f, buf, req_size)
+int rw_pipe(rw_flag, usr_e, fd_nr, f, buf, req_size)
 int rw_flag;			/* READING or WRITING */
-endpoint_t usr;
+endpoint_t usr_e;
 int fd_nr;
 struct filp *f;
 char *buf;
 size_t req_size;
 {
-  int r, oflags, op, partial_pipe;
-  size_t size, cum_io, cum_io_incr;
+  int r, oflags, op, partial_pipe = 0, r2;
+  size_t size, size2, cum_io, cum_io_incr, cum_io_incr2;
   struct vnode *vp;
-  u64_t position, new_pos;
+  u64_t position, new_pos, new_pos2;
 
   oflags = f->filp_flags;
-
   vp = f->filp_vno;
   position = cvu64((rw_flag == READING) ? vp->v_pipe_rd_pos :
 	vp->v_pipe_wr_pos);
-
-#if 0
-  printf("vfs:rw_pipe: filp 0x%x pipe %s, buf 0x%x, size %d\n",
-	f, rw_flag == READING ? "read" : "write", buf, req_size);
-  printf("vfs:rw_pipe: pipe vp 0x%x, dev/num 0x%x/%d size %d, pos 0x%x:%08x\n",
-  	vp, vp->v_dev, vp->v_inode_nr, 
-  	vp->v_size, ex64hi(position), ex64lo(position));
-#endif
-
   /* fp->fp_cum_io_partial is only nonzero when doing partial writes */
   cum_io = fp->fp_cum_io_partial; 
-
   op = (rw_flag == READING ? VFS_DEV_READ : VFS_DEV_WRITE);
 
-  r = Xpipe_check(vp, rw_flag, oflags, req_size, position, 0);
-  if (r <= 0)
-  {
-  	if (r == SUSPEND)
-		pipe_suspend(rw_flag, fd_nr, buf, req_size);
+  r = pipe_check(vp, rw_flag, oflags, req_size, position, 0);
+  if (r <= 0) {
+	if (r == SUSPEND) pipe_suspend(rw_flag, fd_nr, buf, req_size);
   	return(r);
   }
 
   size = r;
-  if (r < req_size)
-	partial_pipe = 1;
-  else 
-  	partial_pipe = 0;
+  if (size < req_size) partial_pipe = 1;
 
   /* Truncate read request at size. */
   if((rw_flag == READING) &&
@@ -318,14 +244,22 @@ size_t req_size;
 	pos32 = cv64ul(position);
 	assert(pos32 >= 0);
 	assert(pos32 <= LONG_MAX);
+	size2 = size;
 	size = vp->v_size - pos32;
   }
-  /* Issue request */
-  r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, position,
-	rw_flag, usr, buf, size, &new_pos, &cum_io_incr);
 
-  if (r >= 0)
-  {
+  if (vp->v_mapfs_e != 0) {
+	r = req_readwrite(vp->v_mapfs_e, vp->v_mapinode_nr, position, rw_flag,
+			  usr_e, buf, size, &new_pos, &cum_io_incr);
+  }
+#if 0
+
+	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, position, rw_flag, usr_e,
+			  buf, size, &new_pos, &cum_io_incr);
+  }
+#endif
+
+  if (r >= 0) {
 	if (ex64hi(new_pos))
 		panic(__FILE__, "read_write: bad new pos", NO_NUM);
 
@@ -337,23 +271,17 @@ size_t req_size;
 
   /* On write, update file size and access time. */
   if (rw_flag == WRITING) {
-	if (cmp64ul(position, vp->v_size) > 0)
-	{
-		if (ex64hi(position) != 0)
-		{
+	if (cmp64ul(position, vp->v_size) > 0) {
+		if (ex64hi(position) != 0) {
 			panic(__FILE__,
 				"read_write: file size too big for v_size",
 				NO_NUM);
 		}
 		vp->v_size = ex64lo(position);
 	}
-  }
-  else {
+  } else {
 	if (cmp64ul(position, vp->v_size) >= 0) {
 		/* Reset pipe pointers */
-#if 0
-		printf("vfs:rw_pipe: resetting pipe size/positions\n");
-#endif
 		vp->v_size = 0;
 		vp->v_pipe_rd_pos= 0;
 		vp->v_pipe_wr_pos= 0;
@@ -380,11 +308,9 @@ size_t req_size;
 		}
 	}
 	fp->fp_cum_io_partial = 0;
-	return cum_io;
+	return(cum_io);
   }
 
-  return r;
+  return(r);
 }
-
-
 

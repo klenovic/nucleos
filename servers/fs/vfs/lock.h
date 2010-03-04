@@ -21,6 +21,8 @@ struct file_lock {
   off_t lock_last;		/* offset of last byte locked */
 };
 
+#define NIL_LOCK (struct file_lock *) 0
+
 extern struct file_lock file_lock[NR_LOCKS];
 
 #endif /* __SERVERS_VFS_LOCK_H */

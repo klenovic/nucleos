@@ -55,6 +55,12 @@ static inline long strnlen_user(const char __user *s, size_t maxlen)
 	/* We must not cross the top of stack during copy */
 	len = ((VM_STACKTOP - (unsigned long)s) < maxlen) ? (VM_STACKTOP - (unsigned long)s) : maxlen;
 
+	/* this may be call very early so just hang on for now
+	 * @nucleos: add kernel oops here
+	 */
+	if (len > PATH_MAX)
+		for(;;);
+
 	copy_from_user(name, s, len);
 
 	return strnlen(name, len);
@@ -290,6 +296,12 @@ static void msg_getgid(message *msg, const struct pt_regs *r)
 	/* no args */
 }
 
+static void msg_getgroups(message *msg, const struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* size */
+	msg->m1_p1 = (gid_t*)r->cx;	/* list[] */
+}
+
 static void msg_getitimer(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* which */
@@ -520,6 +532,12 @@ static void msg_setgid(message *msg, const struct pt_regs *r)
 	msg->m1_i1 = (gid_t)r->bx;	/* gid */
 }
 
+static void msg_setgroups(message *msg, const struct pt_regs *r)
+{
+	msg->m1_i1 = r->bx;	/* size */
+	msg->m1_p1 = (gid_t*)r->cx;	/* *list */
+}
+
 static void msg_setitimer(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* which */
@@ -658,7 +676,7 @@ static void msg_utime(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;	/* filename */
 	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
-	msg->m2_l1 = r->cx;	/* times pointer */
+	msg->m2_l1 = r->cx;		/* times pointer */
 }
 
 static void msg_wait(message *msg, const struct pt_regs *r)
@@ -782,4 +800,6 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(wait,		PM),
 	SCALL_TO_SRV(waitpid,		PM),
 	SCALL_TO_SRV(write,		FS),
+	SCALL_TO_SRV(getgroups,		PM),
+	SCALL_TO_SRV(setgroups,		PM),
 };

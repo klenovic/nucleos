@@ -7,16 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-
 #include "fs.h"
 #include <nucleos/unistd.h>
 #include <servers/mfs/buf.h>
 #include <servers/mfs/inode.h>
 #include <servers/mfs/super.h>
-
 #include <nucleos/vfsif.h>
 
+static in_group(gid_t grp);
 
 /*===========================================================================*
  *				fs_chmod				     *
@@ -67,8 +65,8 @@ printf("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
   /* Not permitted to change the owner of a file on a read-only file sys. */
   r = read_only(rip);
   if (r == 0) {
-	rip->i_uid = fs_m_in.REQ_NEW_UID;
-	rip->i_gid = fs_m_in.REQ_NEW_GID;
+	rip->i_uid = fs_m_in.REQ_UID;
+	rip->i_gid = fs_m_in.REQ_GID;
 	rip->i_mode &= ~(I_SET_UID_BIT | I_SET_GID_BIT);
 	rip->i_update |= CTIME;
 	rip->i_dirt = DIRTY;

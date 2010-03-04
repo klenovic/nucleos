@@ -13,13 +13,10 @@
  * The entry points into this file are
  *   do_chdir:	perform the CHDIR system call
  *   do_chroot:	perform the CHROOT system call
+ *   do_lstat:  perform the LSTAT system call
  *   do_stat:	perform the STAT system call
  *   do_fstat:	perform the FSTAT system call
  *   do_fstatfs: perform the FSTATFS system call
- *   do_lstat:  perform the LSTAT system call
- *
- * Changes for VFS:
- *   Jul 2006 (Balazs Gerofi)
  */
 
 #include "fs.h"
@@ -46,27 +43,10 @@ int do_fchdir()
 {
   /* Change directory on already-opened fd. */
   struct filp *rfilp;
-  int r;
-
-  if(!fp->fp_wd || !fp->fp_rd) {
-	printf("VFS: do_fchdir: %d: no rd/wd\n",
-		fp->fp_endpoint);
-	return -ENOENT;
-  }
 
   /* Is the file descriptor valid? */
-  if ( (rfilp = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
-
-  /* Is it a dir? */
-  if ((rfilp->filp_vno->v_mode & I_TYPE) != I_DIRECTORY)
-      return -ENOTDIR;
-  
-  /* Issue request and handle error */
-  r = forbidden(rfilp->filp_vno, X_BIT, 0 /*!use_realuid*/);
-  if (r != 0) return r;
-  
-  rfilp->filp_vno->v_ref_count++;	/* change_into expects a reference  */
-  
+  if ((rfilp = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
+  dup_vnode(rfilp->filp_vno);	/* Change into expects a reference. */
   return change_into(&fp->fp_wd, rfilp->filp_vno);
 }
 
@@ -82,23 +62,11 @@ int do_chdir()
   int r;
   register struct fproc *rfp;
 
-  if(!fp->fp_wd || !fp->fp_rd) {
-	printf("VFS: do_chdir: %d: no rd/wd\n",
-		fp->fp_endpoint);
-	return -ENOENT;
-  }
-
   if (who_e == PM_PROC_NR) {
 	int slot;
-	if(isokendpt(m_in.endpt1, &slot) != 0)
-		return -EINVAL;
+	if(isokendpt(m_in.endpt1, &slot) != 0) return(-EINVAL);
 	rfp = &fproc[slot];
 
-	if(!rfp->fp_wd || !rfp->fp_rd) {
-		printf("VFS: do_chdir: %d: no other rd/wd\n", fp->fp_endpoint);
-		return -ENOENT;
-	}
-        
         put_vnode(fp->fp_rd);
         dup_vnode(fp->fp_rd = rfp->fp_rd);
         put_vnode(fp->fp_wd);
@@ -118,9 +86,9 @@ int do_chdir()
   }
 
   /* Perform the chdir(name) system call. */
-  r = change(&fp->fp_wd, m_in.name, m_in.name_length);
-  return(r);
+  return change(&fp->fp_wd, m_in.name, m_in.name_length);
 }
+
 
 /*===========================================================================*
  *				do_chroot				     *
@@ -129,18 +97,8 @@ int do_chroot()
 {
 /* Perform the chroot(name) system call. */
 
-  register int r;
-
   if (!super_user) return(-EPERM);	/* only su may chroot() */
-
-  if(!fp->fp_wd || !fp->fp_rd) {
-	printf("VFS: do_chroot: %d: no rd/wd\n",
-		fp->fp_endpoint);
-	return -ENOENT;
-  }
-  
-  r = change(&fp->fp_rd, m_in.name, m_in.name_length);
-  return(r);
+  return change(&fp->fp_rd, m_in.name, m_in.name_length);
 }
 
 
@@ -156,25 +114,9 @@ int len;			/* length of the directory name string */
   struct vnode *vp;
   int r;
 
+  /* Try to open the directory */
   if (fetch_name(name_ptr, len) != 0) return(err_code);
-  
-  /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0) return r;
-
-  /* Is it a dir? */
-  if ((vp->v_mode & I_TYPE) != I_DIRECTORY)
-  {
-      put_vnode(vp);
-      return -ENOTDIR;
-  }
-
-  /* Access check */
-  r = forbidden(vp, X_BIT, 0 /*!use_realuid*/);
-  if (r != 0) {
-        put_vnode(vp);
-	return r;
-  }
-
+  if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   return change_into(iip, vp);
 }
 
@@ -186,7 +128,21 @@ static int change_into(iip, vp)
 struct vnode **iip;		/* pointer to the inode pointer for the dir */
 struct vnode *vp;		/* this is what the inode has to become */
 {
-  /* Everything is OK.  Make the change. */
+  int r;
+
+  /* It must be a directory and also be searchable */
+  if ((vp->v_mode & I_TYPE) != I_DIRECTORY)
+  	r = -ENOTDIR;
+  else
+	r = forbidden(vp, X_BIT);	/* Check if dir is searchable*/
+
+  /* If error, return vnode */
+  if (r != 0) {
+  	put_vnode(vp);
+  	return(r);
+  }
+
+  /* Everything is 0.  Make the change. */
   put_vnode(*iip);		/* release the old directory */
   *iip = vp;			/* acquire the new one */
 
@@ -204,13 +160,9 @@ int do_stat()
   struct vnode *vp;
 
   if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
-  
-  /* Request lookup */
-  if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0)
-	return r;
-
-  /* Issue request */
+  if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
+
   put_vnode(vp);
   return r;
 }
@@ -225,23 +177,18 @@ int do_fstat()
   int pipe_pos = 0;
 
   /* Is the file descriptor valid? */
-  if ( (rfilp = get_filp(m_in.fd)) == NIL_FILP) {
-	  return(err_code);
-  }
+  if ((rfilp = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
   
   /* If we read from a pipe, send position too */
-  pipe_pos= 0;
   if (rfilp->filp_vno->v_pipe == I_PIPE) {
 	if (rfilp->filp_mode & R_BIT) 
-		if (ex64hi(rfilp->filp_pos) != 0)
-		{
+		if (ex64hi(rfilp->filp_pos) != 0) {
 			panic(__FILE__, "do_fstat: bad position in pipe",
 				NO_NUM);
 		}
 		pipe_pos = ex64lo(rfilp->filp_pos);
   }
 
-  /* Issue request */
   return req_stat(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr,
 	who_e, m_in.buffer, pipe_pos);
 }
@@ -254,12 +201,11 @@ int do_fstat()
 int do_fstatfs()
 {
   /* Perform the fstatfs(fd, buf) system call. */
-  register struct filp *rfilp;
+  struct filp *rfilp;
 
   /* Is the file descriptor valid? */
   if ( (rfilp = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
 
-  /* Issue request */
   return req_fstatfs(rfilp->filp_vno->v_fs_e, who_e, m_in.buffer);
 }
 
@@ -273,15 +219,9 @@ int do_lstat()
   int r;
 
   if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
-  
-  /* Request lookup */
-  if ((r = lookup_vp(PATH_RET_SYMLINK, 0 /*!use_realuid*/, &vp)) != 0)
-	return r;
-
-  /* Issue request */
+  if ((vp = eat_path(PATH_RET_SYMLINK)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
 
   put_vnode(vp);
-
-  return r;
+  return(r);
 }

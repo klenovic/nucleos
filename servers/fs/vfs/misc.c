@@ -56,6 +56,7 @@ unsigned long calls_stats[NR_syscalls];
 #endif
 
 static void free_proc(struct fproc *freed, int flags);
+static void unmount_all(void);
 /*
 static int dumpcore(int proc_e, struct mem_map *seg_ptr);
 static int write_bytes(struct inode *rip, off_t off, char *buf, size_t bytes);
@@ -76,14 +77,11 @@ int do_getsysinfo()
   size_t len;
   int s;
 
-  if (!super_user)
-  {
-	printf("FS_PROC_NR: unauthorized call of do_getsysinfo by proc %d\n", who_e);
-	return(-EPERM);	/* only su may call do_getsysinfo. This call may leak
-			 * information (and is not stable enough to be part 
-			 * of the API/ABI).
+  /* Only su may call do_getsysinfo. This call may leak information (and is not
+   * stable enough to be part of the API/ABI). 
 			 */
-  }
+
+  if (!super_user) return(-EPERM);
 
   switch(m_in.info_what) {
   case SI_PROC_ADDR:
@@ -110,9 +108,8 @@ int do_getsysinfo()
   }
 
   dst_addr = (vir_bytes) m_in.info_where;
-  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
-  	return(s);
-  return 0;
+  if (0 != (s = sys_datacopy(SELF, src_addr, who_e, dst_addr, len))) return(s);
+  return(0);
 
 }
 
@@ -200,10 +197,7 @@ int do_fcntl()
   struct filp *dummy;
 
   /* Is the file descriptor valid? */
-  if ((f = get_filp(m_in.fd)) == NIL_FILP) {
-/*printf("VFSfcntl: invalid filedesc %d\n", m_in.fd);	 */
-	  return(err_code);
-  }
+  if ((f = get_filp(m_in.fd)) == NIL_FILP) return(err_code);
   
   switch (m_in.request) {
      case F_DUPFD:
@@ -246,26 +240,21 @@ int do_fcntl()
 
      case F_FREESP:
      {
-	/* Free a section of a file. Preparation is done here,
-	 * actual freeing in freesp_inode().
+	/* Free a section of a file. Preparation is done here, actual freeing
+	 * in freesp_inode().
 	 */
 	off_t start, end;
 	struct flock flock_arg;
 	signed long offset;
 
 	/* Check if it's a regular file. */
-	if((f->filp_vno->v_mode & I_TYPE) != I_REGULAR) {
-		return -EINVAL;
-	}
-
-	if (!(f->filp_mode & W_BIT))
-		return -EBADF;
+	if((f->filp_vno->v_mode & I_TYPE) != I_REGULAR) return(-EINVAL);
+	if (!(f->filp_mode & W_BIT)) return(-EBADF);
 
 	/* Copy flock data from userspace. */
-	if((r = sys_datacopy(who_e, (vir_bytes) m_in.name1, 
-	  SELF, (vir_bytes) &flock_arg,
-	  (phys_bytes) sizeof(flock_arg))) != 0)
-		return r;
+	if((r = sys_datacopy(who_e, (vir_bytes) m_in.name1, SELF, 
+	     (vir_bytes) &flock_arg, (phys_bytes) sizeof(flock_arg))) != 0)
+		return(r);
 
 	/* Convert starting offset to signed. */
 	offset = (signed long) flock_arg.l_start;
@@ -275,33 +264,28 @@ int do_fcntl()
 		case SEEK_SET: start = 0; if(offset < 0) return -EINVAL; break;
 		case SEEK_CUR:
 			if (ex64hi(f->filp_pos) != 0)
-			{
-				panic(__FILE__,
-					"do_fcntl: position in file too high",
+			panic(__FILE__, "do_fcntl: position in file too high",
 					NO_NUM);
-			}
-			start = ex64lo(f->filp_pos); break;
+		
+	      start = ex64lo(f->filp_pos);
+	      break;
 		case SEEK_END: start = f->filp_vno->v_size; break;
 		default: return -EINVAL;
 	}
 
 	/* Check for overflow or underflow. */
-	if(offset > 0 && start + offset < start) { return -EINVAL; }
-	if(offset < 0 && start + offset > start) { return -EINVAL; }
+	if(offset > 0 && start + offset < start) return -EINVAL;
+	if(offset < 0 && start + offset > start) return -EINVAL; 
 	start += offset;
 	if(flock_arg.l_len > 0) {
 		end = start + flock_arg.l_len;
-		if(end <= start) {
-			return -EINVAL;
-		}
-	} 
-        else {
+		if(end <= start) return -EINVAL;
+	} else {
                 end = 0;
 	}
   
-        /* Issue request */
-        return req_ftrunc(f->filp_vno->v_fs_e, f->filp_vno->v_inode_nr, 
-		start, end);
+        return req_ftrunc(f->filp_vno->v_fs_e, f->filp_vno->v_inode_nr, start,
+        		  end);
      }
 
      default:
@@ -316,13 +300,11 @@ int do_fcntl()
 int do_sync()
 {
   struct vmnt *vmp;
-  for (vmp = &vmnt[1]; vmp < &vmnt[NR_MNTS]; ++vmp) {
-	  if (vmp->m_dev != NO_DEV) {
-		  /* Send sync request */ 
+  for (vmp = &vmnt[1]; vmp < &vmnt[NR_MNTS]; ++vmp) 
+	  if (vmp->m_dev != NO_DEV) 
                   req_sync(vmp->m_fs_e);
-	  }
-  }
-  return 0;
+
+  return(0);
 }
 
 /*===========================================================================*
@@ -337,27 +319,23 @@ int do_fsync()
   return 0;
 }
 
-void unmount_all(void)
+/*===========================================================================*
+ *				unmount_all				     *
+ *===========================================================================*/
+static void unmount_all(void)
 {
-	int i;
-	int found = 0, worked = 0, remain = 0;
   /* Unmount all filesystems.  File systems are mounted on other file systems,
    * so you have to pull off the loose bits repeatedly to get it all undone.
    */
+
+  int i;
   for (i= 0; i < NR_MNTS; i++) {
   	struct vmnt *vmp;
+
 	/* Unmount at least one. */
-	worked = remain = 0;
 	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++) {
-		if (vmp->m_dev != NO_DEV) {
-			found++;
-  			SANITYCHECK;
-			if(unmount(vmp->m_dev) == 0)
-				worked++;
-			else
-				remain++;
-  			SANITYCHECK;
-		}
+		if (vmp->m_dev != NO_DEV) 
+			unmount(vmp->m_dev); 
 	}
   }
 }
@@ -578,6 +556,29 @@ int rgid;
 
   tfp->fp_effgid =  egid;
   tfp->fp_realgid = rgid;
+}
+
+
+/*===========================================================================*
+ *				pm_setgroups				     *
+ *===========================================================================*/
+void pm_setgroups(proc_e, ngroups, groups)
+int proc_e;
+int ngroups;
+gid_t *groups;
+{
+  struct fproc *rfp;
+  int slot, i;
+
+  okendpt(proc_e, &slot);
+  rfp = &fproc[slot];
+  if (ngroups * sizeof(gid_t) > sizeof(rfp->fp_sgroups))
+  	panic(__FILE__, "VFS: pm_setgroups: too much data to copy\n", NO_NUM);
+  if(sys_datacopy(who_e, (vir_bytes) groups, SELF, (vir_bytes) rfp->fp_sgroups,
+  		   ngroups * sizeof(gid_t)) == 0) {
+	rfp->fp_ngroups = ngroups;
+  } else
+  	panic(__FILE__, "VFS: pm_setgroups: datacopy failed\n", NO_NUM);
 }
 
 

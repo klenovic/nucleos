@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_DRIVERS_H
-#define __SERVERS_ISO9660FS_DRIVERS_H
+#ifndef __DRIVERS_H
+#define __DRIVERS_H
 
 #include <nucleos//dmap.h>
 
@@ -12,4 +12,4 @@ struct driver_endpoints {
 
 extern struct driver_endpoints driver_endpoints[];
 
-#endif /* __SERVERS_ISO9660FS_DRIVERS_H */
+#endif /* __DRIVERS_H */

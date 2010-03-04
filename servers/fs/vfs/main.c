@@ -475,7 +475,7 @@ static void init_root(void)
 	struct dmap *dp;
 	char *label;
 	message m;
-	struct node_details resX;
+  struct node_details res;
 
 	/* Open the root device. */
 	root_dev = DEV_IMGRD;
@@ -508,9 +508,9 @@ static void init_root(void)
 	vmp = &vmnt[0];
  
 	/* We'll need a vnode for the root inode, check whether there is one */
-	if ((root_node = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
+  if ((root_node = get_free_vnode()) == NIL_VNODE) 
 		panic(__FILE__,"Cannot get free vnode", r);
-	}
+
 	
 	/* Get driver process' endpoint */
 	dp = &dmap[(root_dev >> MAJOR) & BYTE];
@@ -526,23 +526,23 @@ static void init_root(void)
 	}
 
 	/* Issue request */
-	r = req_readsuper(ROOT_FS_E, label, root_dev, 0 /*!readonly*/, 1 /*isroot*/, &resX);
-
+	r = req_readsuper(ROOT_FS_E, label, root_dev, 0 /*!readonly*/,
+	1 /*isroot*/, &res);
 	if (r != 0) {
 		panic(__FILE__,"Cannot read superblock from root", r);
 	}
 	
 	/* Fill in root node's fields */
-	root_node->v_fs_e = resX.fs_e;
-	root_node->v_inode_nr = resX.inode_nr;
-	root_node->v_mode = resX.fmode;
-	root_node->v_size = resX.fsize;
+  root_node->v_fs_e = res.fs_e;
+  root_node->v_inode_nr = res.inode_nr;
+  root_node->v_mode = res.fmode;
+  root_node->v_size = res.fsize;
 	root_node->v_sdev = NO_DEV;
 	root_node->v_fs_count = 1;
 	root_node->v_ref_count = 1;
 
 	/* Fill in max file size and blocksize for the vmnt */
-	vmp->m_fs_e = resX.fs_e;
+  vmp->m_fs_e = res.fs_e;
 	vmp->m_dev = root_dev;
 	vmp->m_flags = 0;
 	
@@ -623,6 +623,13 @@ static void service_pm(void)
 	pm_fork(m_in.PM_PPROC, m_in.PM_PROC, m_in.PM_CPID);
 
 	m_out.m_type = (call_nr == PM_FORK) ? PM_FORK_REPLY : PM_FORK_NB_REPLY;
+	m_out.PM_PROC = m_in.PM_PROC;
+
+	break;
+  case PM_SETGROUPS:
+	pm_setgroups(m_in.PM_PROC, m_in.PM_GROUP_NO, m_in.PM_GROUP_ADDR);
+
+	m_out.m_type = PM_SETGROUPS_REPLY;
 	m_out.PM_PROC = m_in.PM_PROC;
 
 	break;

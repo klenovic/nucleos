@@ -16,10 +16,10 @@
  * systems have tables that are also indexed by process, with the contents
  * of corresponding slots referring to the same process in all three.
  */
-
 #include <nucleos/timer.h>
 #include <nucleos/signal.h>
 #include <nucleos/com.h>
+#include <nucleos/limits.h>
 
 /* Needs to be included here, for 'ps' etc */
 #include "const.h"
@@ -44,6 +44,10 @@ struct mproc {
 	gid_t mp_realgid;	/* process' real gid */
 	gid_t mp_effgid;	/* process' effective gid */
 
+	/* Supplemental groups. */
+	int mp_ngroups;			/* number of supplemental groups */
+	gid_t mp_sgroups[NGROUPS_MAX];	/* process' supplemental groups */
+
 	/* Signal handling information. */
 	sigset_t mp_ignore;			/* 1 means ignore the signal, 0 means don't */
 	sigset_t mp_catch;			/* 1 means catch the signal, 0 means don't */
@@ -51,8 +55,8 @@ struct mproc {
 	sigset_t mp_sigmask;			/* signals to be blocked */
 	sigset_t mp_sigmask2;			/* saved copy of mp_sigmask */
 	sigset_t mp_sigpending;			/* pending signals to be handled */
-	sigset_t mp_sigtrace;                /* signals to hand to tracer first */
-	struct sigaction mp_sigact[_NSIG]; /* as in sigaction(2) */
+	sigset_t mp_sigtrace;			/* signals to hand to tracer first */
+	struct sigaction mp_sigact[_NSIG];	/* as in sigaction(2) */
 	vir_bytes mp_sigreturn;			/* address of C library __sigreturn function */
 
 	struct timer mp_timer;			/* watchdog timer for alarm(2), setitimer(2) */

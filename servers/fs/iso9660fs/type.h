@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_TYPE_H
-#define __SERVERS_ISO9660FS_TYPE_H
+#ifndef __TYPE_H
+#define __TYPE_H
 
 #include <nucleos/types.h>
 
@@ -9,4 +9,4 @@ typedef __u32 __kernel_block_t;	/* block number of its (minor) device */
 typedef __kernel_block_t block_t;	/* block number of its (minor) device */
 #endif
 
-#endif /* __SERVERS_ISO9660FS_TYPE_H */
+#endif /* __TYPE_H */

@@ -7,6 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#include <nucleos/vfsif.h>
+
 extern off_t rdahedpos;		/* position to read ahead */
 extern struct inode *rdahed_inode;	/* pointer to inode to read ahead */
 
@@ -24,6 +26,7 @@ extern int (*fs_call_vec[])(void); /* fs call table */
 extern message fs_m_in;
 extern message fs_m_out;
 extern int FS_STATE;
+extern vfs_ucred_t credentials;
 
 extern uid_t caller_uid;
 extern gid_t caller_gid;

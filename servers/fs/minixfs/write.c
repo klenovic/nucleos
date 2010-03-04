@@ -12,12 +12,11 @@
  * insofar as this is not contained in read_write().
  *
  * The entry points into this file are
- *   do_write:     call read_write to perform the WRITE system call
+ *   write_map:    write a new zone into an inode
  *   clear_zone:   erase a zone in the middle of a file
  *   new_block:    acquire a new block
+ *   zero_block:   overwrite a block with zeroes
  *
- * Updates:
- * 2007-06-01:	jfdsmit@gmail.com added i_zsearch optimalization
  */
 
 #include "fs.h"
@@ -228,15 +227,16 @@ struct minix3_super_block *sb;		/* superblock of device block resides on */
 	if(sb->s_version == V1) {
 		for(i = 0; i < V1_INDIRECTS; i++)
 			if(bp->b_v1_ind[i] != NO_ZONE)
-				return 0;
+			return(0);
 	} else {
 		for(i = 0; i < V2_INDIRECTS(sb->s_block_size); i++)
 			if(bp->b_v2_ind[i] != NO_ZONE)
-				return 0;
+			return(0);
 	}
 
-	return 1;
+  return(1);
 }
+
 
 /*===========================================================================*
  *				clear_zone				     *

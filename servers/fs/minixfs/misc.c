@@ -11,7 +11,6 @@
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <nucleos/vfsif.h>
-
 #include <servers/mfs/buf.h>
 #include <servers/mfs/inode.h>
 
@@ -26,17 +25,17 @@ int fs_sync()
  * blocks must be flushed last, since rw_inode() leaves its results in
  * the block cache.
  */
-  register struct inode *rip;
-  register struct buf *bp;
+  struct inode *rip;
+  struct buf *bp;
 
   /* Write all the dirty inodes to the disk. */
-  for (rip = &inode[0]; rip < &inode[NR_INODES]; rip++)
-	if (rip->i_count > 0 && rip->i_dirt == DIRTY) rw_inode(rip, WRITING);
+  for(rip = &inode[0]; rip < &inode[NR_INODES]; rip++)
+	  if(rip->i_count > 0 && rip->i_dirt == DIRTY) rw_inode(rip, WRITING);
 
   /* Write all the dirty blocks to the disk, one drive at a time. */
-  for (bp = &buf[0]; bp < &buf[NR_BUFS]; bp++)
-	if (bp->b_dev != NO_DEV && bp->b_dirt == DIRTY) 
-            flushall(bp->b_dev);
+  for(bp = &buf[0]; bp < &buf[NR_BUFS]; bp++)
+	  if(bp->b_dev != NO_DEV && bp->b_dirt == DIRTY) 
+		  flushall(bp->b_dev);
 
   return 0;		/* sync() can't fail */
 }
@@ -52,15 +51,12 @@ int fs_flush()
  */
   dev_t dev;
 
-  dev= fs_m_in.REQ_DEV;
-  if (dev == fs_dev)
-  {
-	return -EBUSY;
-  }
+  dev = fs_m_in.REQ_DEV;
+  if(dev == fs_dev) return(-EBUSY);
+ 
   flushall(dev);
   invalidate(dev);
-
-  return 0;
+  
+  return(0);
 }
-
 

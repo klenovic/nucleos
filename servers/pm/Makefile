@@ -3,7 +3,7 @@ app-y := pm.elf32
 pm.elf32-type := server
 pm.elf32-obj-y := alarm.o break.o dma.o exec.o forkexit.o getset.o main.o \
 	          misc.o profile.o signal.o table.o time.o timers.o \
-	          trace.o utility.o version.o 
+	          trace.o utility.o version.o pm-syms.o
 
 # files to be removed upon make clean
 clean-files := ../../include/nucleos/compile.h

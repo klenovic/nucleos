@@ -20,114 +20,59 @@
  *   free_inode:   mark an inode as available for a new file
  *   update_times: update atime, ctime, and mtime
  *   rw_inode:	   read a disk block and extract an inode, or corresp. write
- *   old_icopy:	   copy to/from in-core inode struct and disk inode (V1.x)
- *   new_icopy:	   copy to/from in-core inode struct and disk inode (V2.x)
  *   dup_inode:	   indicate that someone else is using an inode table entry
+ *   find_inode:   retrieve pointer to inode in inode cache
  *
- * Updates:
- * 2007-06-01:	jfdsmit@gmail.com added i_zsearch initialization
  */
 
 #include "fs.h"
 #include <servers/mfs/buf.h>
 #include <servers/mfs/inode.h>
 #include <servers/mfs/super.h>
-
 #include <nucleos/vfsif.h>
 
-struct inode inode[NR_INODES];
-
-/* list of unused/free inodes */
-struct unused_inodes_t unused_inodes;
-
-/* inode hashtable */
-struct inodelist hash_inodes[INODE_HASH_SIZE];
-
-unsigned int inode_cache_hit;
-unsigned int inode_cache_miss;
-
-static void old_icopy(struct inode *rip, d1_inode *dip, int direction, int norm);
-static void new_icopy(struct inode *rip, d2_inode *dip, int direction, int norm);
+static int addhash_inode(struct inode *node); 
+static void new_icopy(struct inode *rip, d2_inode *dip,
+		 int direction, int norm);
+static void old_icopy(struct inode *rip, d1_inode *dip,
+						int direction, int norm);
+static int unhash_inode(struct inode *node);
 
 /*===========================================================================*
  *				fs_putnode				     *
  *===========================================================================*/
 int fs_putnode()
 {
-/* Find the inode specified by the request message and decrease its counter.
- */
+/* Find the inode specified by the request message and decrease its counter.*/
+
   struct inode *rip;
   int count;
   
-  /* Sanity check for the direct index */
-  if (fs_m_in.REQ_INODE_INDEX >= 0 && 
-          fs_m_in.REQ_INODE_INDEX < NR_INODES &&
-          inode[fs_m_in.REQ_INODE_INDEX].i_num == fs_m_in.REQ_INODE_NR) {
-      rip = &inode[fs_m_in.REQ_INODE_INDEX];
-      if(!rip) {
-	panic(__FILE__, "null rip", NO_NUM);
-      }
-  }
-  /* Otherwise find it */
-  else { 
-      if(!(rip = find_inode(fs_dev, fs_m_in.REQ_INODE_NR))) {
-      	printf("FSput_inode: inode #%d dev: %d not found, req_nr: %d\n", 
-       	     fs_m_in.REQ_INODE_NR, fs_dev, req_nr);
-      }
+  rip = find_inode(fs_dev, fs_m_in.REQ_INODE_NR);
+
+  if(!rip) {
+	  printf("%s:%d put_inode: inode #%d dev: %d not found\n", __FILE__,
+		 __LINE__, fs_m_in.REQ_INODE_NR, fs_dev);
+	  panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
 
-  if (!rip)
-  {
+  count = fs_m_in.REQ_COUNT;
+  if (count <= 0) {
+	printf("%s:%d put_inode: bad value for count: %d\n", __FILE__,
+	       __LINE__, count);
+	panic(__FILE__, "fs_putnode failed", NO_NUM);
+  } else if(count > rip->i_count) {
+	printf("%s:%d put_inode: count too high: %d > %d\n", __FILE__,
+	       __LINE__, count, rip->i_count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
 
-  count= fs_m_in.REQ_COUNT;
-  if (count <= 0)
-  {
-	printf("put_inode: bad value for count: %d\n", count);
-	panic(__FILE__, "fs_putnode failed", NO_NUM);
-	return -EINVAL;
-  }
-  if (count > rip->i_count)
-  {
-	printf("put_inode: count too high: %d > %d\n", count, rip->i_count);
-	panic(__FILE__, "fs_putnode failed", NO_NUM);
-	return -EINVAL;
-  }
-
+  /* Decrease reference counter, but keep one reference; it will be consumed by
+   * put_inode(). */ 
   rip->i_count -= count - 1;
   put_inode(rip);
 
-  return 0;
-}
-
-
-/*===========================================================================*
- *				fs_getnode				     *
- *===========================================================================*/
-int fs_getnode()
-{
-/* Increase the inode's counter specified in the request message
- */
-  struct inode *rip;
-  /* Get the inode */
-  rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR);
-
-  if (!rip) {
-      printf("FS_PROC_NR: inode #%d couldn't be found\n", fs_m_in.REQ_INODE_NR);
-      return -EINVAL;
-  }
-
-  /* Transfer back the inode's details */
-  fs_m_out.m_source = rip->i_dev;
-  fs_m_out.RES_INODE_NR = rip->i_num;
-  fs_m_out.RES_MODE = rip->i_mode;
-  fs_m_out.RES_FILE_SIZE = rip->i_size;
-  fs_m_out.RES_DEV = (dev_t) rip->i_zone[0];
-  fs_m_out.RES_UID = rip->i_uid;
-  fs_m_out.RES_GID = rip->i_gid;
-
-  return 0;
+  return(0);
 }
 
 
@@ -166,8 +111,9 @@ static int addhash_inode(struct inode *node)
   
   /* insert into hash table */
   LIST_INSERT_HEAD(&hash_inodes[hashi], node, i_hash);
-  return 0;
+  return(0);
 }
+
 
 /*===========================================================================*
  *				unhash_inode      			     *
@@ -176,8 +122,9 @@ static int unhash_inode(struct inode *node)
 {
   /* remove from hash table */
   LIST_REMOVE(node, i_hash);
-  return 0;
+  return(0);
 }
+
 
 /*===========================================================================*
  *				get_inode				     *
@@ -203,7 +150,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
               TAILQ_REMOVE(&unused_inodes, rip, i_unused);
 	  }
           ++rip->i_count;
-          return rip;
+          return(rip);
       }
   }
 
@@ -212,7 +159,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
   /* Inode is not on the hash, get a free one */
   if (TAILQ_EMPTY(&unused_inodes)) {
       err_code = -ENFILE;
-      return NIL_INODE;
+      return(NIL_INODE);
   }
   rip = TAILQ_FIRST(&unused_inodes);
 
@@ -230,10 +177,6 @@ int numb;			/* inode number (ANSI: may not be unshort) */
   if (dev != NO_DEV) rw_inode(rip, READING);	/* get inode from disk */
   rip->i_update = 0;		/* all the times are initially up-to-date */
   rip->i_zsearch = NO_ZONE;	/* no zones searched for yet */
-  if ((rip->i_mode & I_TYPE) == I_NAMED_PIPE)
-	rip->i_pipe = I_PIPE;
-  else
-	rip->i_pipe = NO_PIPE;
   rip->i_mountpoint= FALSE;
 
   /* Add to hash */
@@ -241,6 +184,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
   
   return(rip);
 }
+
 
 /*===========================================================================*
  *				find_inode        			     *
@@ -259,11 +203,11 @@ int numb;			/* inode number (ANSI: may not be unshort) */
   /* Search inode in the hash table */
   LIST_FOREACH(rip, &hash_inodes[hashi], i_hash) {
       if (rip->i_count > 0 && rip->i_num == numb && rip->i_dev == dev) {
-          return rip;
+          return(rip);
       }
   }
   
-  return NIL_INODE;
+  return(NIL_INODE);
 }
 
 
@@ -291,9 +235,7 @@ register struct inode *rip;	/* pointer to inode to be released */
 		rip->i_dirt = DIRTY;
 		free_inode(rip->i_dev, rip->i_num);
 	} 
-        else {
-		if (rip->i_pipe == I_PIPE) truncate_inode(rip, 0);
-	}
+
         rip->i_mountpoint = FALSE;
 	if (rip->i_dirt == DIRTY) rw_inode(rip, WRITING);
 
@@ -302,8 +244,7 @@ register struct inode *rip;	/* pointer to inode to be released */
 		unhash_inode(rip);
 		rip->i_num = 0;
 		TAILQ_INSERT_HEAD(&unused_inodes, rip, i_unused);
-	}
-	else {
+	} else {
 		/* unused, put at the back of the LRU (cache it) */
 		TAILQ_INSERT_TAIL(&unused_inodes, rip, i_unused);
 	}
@@ -367,6 +308,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
   return(rip);
 }
 
+
 /*===========================================================================*
  *				wipe_inode				     *
  *===========================================================================*/
@@ -405,6 +347,7 @@ ino_t inumb;			/* number of inode to be freed */
   free_bit(sp, IMAP, b);
   if (b < sp->s_isearch) sp->s_isearch = b;
 }
+
 
 /*===========================================================================*
  *				update_times				     *
@@ -475,6 +418,7 @@ int rw_flag;			/* READING or WRITING */
   rip->i_dirt = CLEAN;
 }
 
+
 /*===========================================================================*
  *				old_icopy				     *
  *===========================================================================*/
@@ -483,7 +427,6 @@ register struct inode *rip;	/* pointer to the in-core inode struct */
 register d1_inode *dip;		/* pointer to the d1_inode inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
-
 {
 /* The V1.x IBM disk, the V1.x 68000 disk, and the V2 disk (same for IBM and
  * 68000) all have different inode layouts.  When an inode is read or written
@@ -521,6 +464,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
   }
 }
 
+
 /*===========================================================================*
  *				new_icopy				     *
  *===========================================================================*/
@@ -529,7 +473,6 @@ register struct inode *rip;	/* pointer to the in-core inode struct */
 register d2_inode *dip;	/* pointer to the d2_inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
-
 {
 /* Same as old_icopy, but to/from V2 disk layout. */
 
@@ -564,6 +507,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
   }
 }
 
+
 /*===========================================================================*
  *				dup_inode				     *
  *===========================================================================*/
@@ -576,3 +520,4 @@ struct inode *ip;		/* The inode to be duplicated. */
 
   ip->i_count++;
 }
+

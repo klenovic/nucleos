@@ -22,9 +22,6 @@
  *   revive:	  mark a suspended process as able to run again
  *   unsuspend_by_endpt: revive all processes blocking on a given process
  *   do_unpause:  a signal has been sent to a process; see if it suspended
- *
- * Changes for VFS:
- *   Jul 2006 (Balazs Gerofi)
  */
 
 #include "fs.h"
@@ -61,10 +58,7 @@ int do_pipe()
   struct node_details res;
 
   /* See if a free vnode is available */
-  if ( (vp = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
-      printf("VFS: no vnode available!\n");
-      return err_code;
-  }
+  if ( (vp = get_free_vnode()) == NIL_VNODE) return(err_code);
 
   /* Acquire two file descriptors. */
   rfp = fp;
@@ -82,11 +76,10 @@ int do_pipe()
   FD_SET(fil_des[1], &rfp->fp_filp_inuse);
   fil_ptr1->filp_count = 1;
 
-  /* Send request */
-  r = req_newnode(ROOT_FS_E, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE,
+  /* Create a named pipe inode on PipeFS */
+  r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE,
 	(dev_t)0, &res);
 
-  /* Handle error */
   if (r != 0) {
       rfp->fp_filp[fil_des[0]] = NIL_FILP;
       FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
@@ -94,29 +87,24 @@ int do_pipe()
       rfp->fp_filp[fil_des[1]] = NIL_FILP;
       FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
       fil_ptr1->filp_count = 0;
-      return r;
+	return(r);
   }
 
   /* Fill in vnode */
   vp->v_fs_e = res.fs_e;
+  vp->v_mapfs_e = res.fs_e;
   vp->v_inode_nr = res.inode_nr; 
+  vp->v_mapinode_nr = res.inode_nr; 
   vp->v_mode = res.fmode;
-  vp->v_index = res.inode_index;
   vp->v_pipe = I_PIPE;
   vp->v_pipe_rd_pos= 0;
   vp->v_pipe_wr_pos= 0;
   vp->v_fs_count = 1;
+  vp->v_mapfs_count = 1;
   vp->v_ref_count = 1;
   vp->v_size = 0;
-
-  if ( (vmp = find_vmnt(vp->v_fs_e)) == NIL_VMNT) {
-      printf("VFS: vmnt not found by pipe() ==>> USING ROOT VMNT\n");
-      vp->v_vmnt = &vmnt[0];
-  }
-  else {
-      vp->v_vmnt = vmp; 
-      vp->v_dev = vmp->m_dev;
-  }
+  vp->v_vmnt = NIL_VMNT; 
+  vp->v_dev = NO_DEV;
 
   /* Fill in filp objects */
   fil_ptr0->filp_vno = vp;
@@ -130,98 +118,37 @@ int do_pipe()
 
   return 0;
 }
+
+
 /*===========================================================================*
- *                              sys_pipe                                      *
+ *				map_vnode				     *
  *===========================================================================*/
-int sys_pipe(void)
+int map_vnode(vp)
+struct vnode *vp;
 {
-	/* Perform the pipe(fil_des) system call. */
-	register struct fproc *rfp;
-	int r;
-	struct filp *fil_ptr0, *fil_ptr1;
-	int fil_des[2];		/* reply goes here */
-	struct vnode *vp;
-	struct vmnt *vmp;
-	struct node_details res;
+  int r;
+  struct node_details res;
 
-	/* See if a free vnode is available */
-	if ( (vp = get_free_vnode(__FILE__, __LINE__)) == NIL_VNODE) {
-		printf("VFS: no vnode available!\n");
-		return err_code;
-	}
+  if(vp->v_mapfs_e != 0) return(0);	/* Already mapped; nothing to do. */
 
-	/* Acquire two file descriptors. */
-	rfp = fp;
+  /* Create a temporary mapping of this inode to PipeFS. Read and write
+   * operations on data will be handled by PipeFS. The rest by the 'original'
+   * FS that holds the inode. */
+  if ((r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE,
+		       vp->v_dev, &res)) == 0) {
+	vp->v_mapfs_e = res.fs_e;
+	vp->v_mapinode_nr = res.inode_nr; 
+	vp->v_mapfs_count = 1;
+  }
 
-	if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0)
-		return(r);
-
-	rfp->fp_filp[fil_des[0]] = fil_ptr0;
-	FD_SET(fil_des[0], &rfp->fp_filp_inuse);
-	fil_ptr0->filp_count = 1;
-
-	if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
-		rfp->fp_filp[fil_des[0]] = NIL_FILP;
-		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-		fil_ptr0->filp_count = 0;
-
-		return(r);
-	}
-
-	rfp->fp_filp[fil_des[1]] = fil_ptr1;
-	FD_SET(fil_des[1], &rfp->fp_filp_inuse);
-	fil_ptr1->filp_count = 1;
-
-	/* Send request */
-	r = req_newnode(ROOT_FS_E, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE, (dev_t)0, &res);
-
-	/* Handle error */
-	if (r != 0) {
-		rfp->fp_filp[fil_des[0]] = NIL_FILP;
-		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-		fil_ptr0->filp_count = 0;
-		rfp->fp_filp[fil_des[1]] = NIL_FILP;
-		FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
-		fil_ptr1->filp_count = 0;
-		return r;
-	}
-
-	/* Fill in vnode */
-	vp->v_fs_e = res.fs_e;
-	vp->v_inode_nr = res.inode_nr;
-	vp->v_mode = res.fmode;
-	vp->v_index = res.inode_index;
-	vp->v_pipe = I_PIPE;
-	vp->v_pipe_rd_pos= 0;
-	vp->v_pipe_wr_pos= 0;
-	vp->v_fs_count = 1;
-	vp->v_ref_count = 1;
-	vp->v_size = 0;
-
-	if ( (vmp = find_vmnt(vp->v_fs_e)) == NIL_VMNT) {
-		printf("VFS: vmnt not found by pipe() ==>> USING ROOT VMNT\n");
-		vp->v_vmnt = &vmnt[0];
-	} else {
-		vp->v_vmnt = vmp;
-		vp->v_dev = vmp->m_dev;
-	}
-
-	/* Fill in filp objects */
-	fil_ptr0->filp_vno = vp;
-	dup_vnode(vp);
-	fil_ptr1->filp_vno = vp;
-	fil_ptr0->filp_flags = O_RDONLY;
-	fil_ptr1->filp_flags = O_WRONLY;
-
-	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
-
-	return (r < 0) ? -EFAULT : 0;
+  return(r);
 }
+
 
 /*===========================================================================*
  *				pipe_check				     *
  *===========================================================================*/
-int Xpipe_check(vp, rw_flag, oflags, bytes, position, notouch)
+int pipe_check(vp, rw_flag, oflags, bytes, position, notouch)
 register struct vnode *vp;	/* the inode of the pipe */
 int rw_flag;			/* READING or WRITING */
 int oflags;			/* flags set by open or fcntl */
@@ -235,6 +162,7 @@ int notouch;			/* check only */
  * pipe and no one is reading from it, give a broken pipe error.
  */
   off_t pos;
+  int r = 0;
 
   if (ex64hi(position) != 0)
 	panic(__FILE__, "pipe_check: position too large in pipe", NO_NUM);
@@ -244,36 +172,34 @@ int notouch;			/* check only */
   if (rw_flag == READING) {
 	if (pos >= vp->v_size) {
 		/* Process is reading from an empty pipe. */
-		int r = 0;
 		if (find_filp(vp, W_BIT) != NIL_FILP) {
 			/* Writer exists */
-			if (oflags & O_NONBLOCK) {
+			if (oflags & O_NONBLOCK) 
 				r = -EAGAIN;
-			} else {
+			else 
 				r = SUSPEND;
-			}
+			
 			/* If need be, activate sleeping writers. */
 			if (susp_count > 0)
 				release(vp, __NNR_write, susp_count);
 		}
 		return(r);
 	}
-
-	return bytes;
+	return(bytes);
   }
 
   /* Process is writing to a pipe. */
   if (find_filp(vp, R_BIT) == NIL_FILP) {
-	/* Tell kernel to generate a SIGPIPE signal. */
-	if (!notouch) {
-		sys_kill(fp->fp_endpoint, SIGPIPE);
-	}
+	/* Process is writing, but there is no reader. Tell kernel to generate
+	 * a SIGPIPE signal. */
+	if (!notouch) sys_kill(fp->fp_endpoint, SIGPIPE);
+
 	return(-EPIPE);
   }
 
+  /* Calculate how many bytes can be written. */
   if (pos + bytes > PIPE_BUF) {
-	if (oflags & O_NONBLOCK)
-	{
+	if (oflags & O_NONBLOCK) {
 		if (bytes <= PIPE_BUF) {
 			/* Write has to be atomic */
 			return(-EAGAIN);
@@ -307,7 +233,7 @@ int notouch;			/* check only */
 		}
 	}
 
-	/* Pipe is full, or we need an atomic write */
+	/* Pipe is full */
 	return(SUSPEND);
   }
 
@@ -316,8 +242,9 @@ int notouch;			/* check only */
 	release(vp, __NNR_read, susp_count);
 
   /* Requested amount fits */
-  return bytes;
+  return(bytes);
 }
+
 
 /*===========================================================================*
  *				suspend					     *
@@ -361,6 +288,10 @@ void suspend(int why)
   }
 }
 
+
+/*===========================================================================*
+ *				wait_for				     *
+ *===========================================================================*/
 void wait_for(endpoint_t who)
 {
 	if(who == NONE || who == ANY)
@@ -439,10 +370,6 @@ int count;			/* max number of processes to release */
   register struct fproc *rp;
   struct filp *f;
 
-#if 0
-  printf("vfs:release: vp 0x%x, call %d, count %d\n", vp, call_nr, count);
-#endif
-
   /* Trying to perform the call also includes SELECTing on it with that
    * operation.
    */
@@ -465,8 +392,7 @@ int count;			/* max number of processes to release */
   /* Search the proc table. */
   for (rp = &fproc[0]; rp < &fproc[NR_PROCS] && count > 0; rp++) {
 	if (rp->fp_pid != PID_FREE && fp_is_blocked(rp) &&
-			rp->fp_revived == NOT_REVIVING &&
-			(rp->fp_fd & BYTE) == call_nr &&
+	    rp->fp_revived == NOT_REVIVING && (rp->fp_fd & BYTE) == call_nr &&
 			rp->fp_filp[rp->fp_fd>>8]->filp_vno == vp) {
 		revive(rp->fp_endpoint, 0);
 		susp_count--;	/* keep track of who is suspended */
@@ -492,12 +418,10 @@ int returned;			/* if hanging on task, how many bytes read */
   int fd_nr, proc_nr;
   struct filp *fil_ptr;
 
-  if(isokendpt(proc_nr_e, &proc_nr) != 0)
-	return;
+  if(isokendpt(proc_nr_e, &proc_nr) != 0) return;
 
   rfp = &fproc[proc_nr];
-  if (!fp_is_blocked(rfp) || rfp->fp_revived == REVIVING)
-	  return;
+  if (!fp_is_blocked(rfp) || rfp->fp_revived == REVIVING) return;
 
   /* The 'reviving' flag only applies to pipes.  Processes waiting for TTY get
    * a message right away.  The revival process is different for TTY and pipes.
@@ -509,18 +433,14 @@ int returned;			/* if hanging on task, how many bytes read */
 	/* Revive a process suspended on a pipe or lock. */
 	rfp->fp_revived = REVIVING;
 	reviving++;		/* process was waiting on pipe or lock */
-  }
-  else if (blocked_on == FP_BLOCKED_ON_DOPEN)
-  {
+  } else if (blocked_on == FP_BLOCKED_ON_DOPEN) {
 	rfp->fp_blocked_on = FP_BLOCKED_ON_NONE;
 	fd_nr= rfp->fp_fd>>8;
-	if (returned < 0)
-	{
+	if (returned < 0) {
 		fil_ptr= rfp->fp_filp[fd_nr];
 		rfp->fp_filp[fd_nr] = NIL_FILP;
 		FD_CLR(fd_nr, &rfp->fp_filp_inuse);
-		if (fil_ptr->filp_count != 1)
-		{
+		if (fil_ptr->filp_count != 1) {
 			panic(__FILE__, "revive: bad count in filp",
 				fil_ptr->filp_count);
 		}
@@ -528,29 +448,26 @@ int returned;			/* if hanging on task, how many bytes read */
 		put_vnode(fil_ptr->filp_vno);     
 		fil_ptr->filp_vno = NIL_VNODE;
 		reply(proc_nr_e, returned);
-	}
-	else
+	} else
 		reply(proc_nr_e, fd_nr);
-  }
-  else {
+  } else {
 	rfp->fp_blocked_on = FP_BLOCKED_ON_NONE;
-	if (blocked_on == FP_BLOCKED_ON_POPEN)
+	if (blocked_on == FP_BLOCKED_ON_POPEN) {
 		/* process blocked in open or create */
 		reply(proc_nr_e, rfp->fp_fd>>8);
-	else if (blocked_on == FP_BLOCKED_ON_SELECT) {
+	} else if (blocked_on == FP_BLOCKED_ON_SELECT) {
 		reply(proc_nr_e, returned);
-	}
-	else {
+	} else {
 		/* Revive a process suspended on TTY or other device. 
 		 * Pretend it wants only what there is.
 		 */
 		rfp->fp_nbytes = returned; 
-		/* If a grant has been issued by FS_PROC_NR for this I/O, revoke
+		/* If a grant has been issued by FS for this I/O, revoke
 		 * it again now that I/O is done.
 		 */
 		if(GRANT_VALID(rfp->fp_grant)) {
 			if(cpf_revoke(rfp->fp_grant)) {
-				panic(__FILE__,"FS_PROC_NR: revoke failed for grant",
+				panic(__FILE__,"FS: revoke failed for grant",
 					rfp->fp_grant);
 			} 
 			rfp->fp_grant = GRANT_INVALID;
@@ -584,12 +501,10 @@ int proc_nr_e;
   }
 
   rfp = &fproc[proc_nr_p];
-  if (!fp_is_blocked(rfp))
-	return;
+  if (!fp_is_blocked(rfp)) return;
   blocked_on = rfp->fp_blocked_on;
 
-  if (rfp->fp_revived == REVIVING)
-  {
+  if (rfp->fp_revived == REVIVING) {
 	rfp->fp_revived = NOT_REVIVING;
 	reviving--;
 	wasreviving = 1;
@@ -615,8 +530,7 @@ int proc_nr_e;
 		return;	
 
 	case FP_BLOCKED_ON_OTHER:		/* process trying to do device I/O (e.g. tty)*/
-		if (rfp->fp_flags & SUSP_REOPEN)
-		{
+		if (rfp->fp_flags & SUSP_REOPEN) {
 			/* Process is suspended while waiting for a reopen.
 			 * Just reply -EINTR.
 			 */
@@ -648,7 +562,7 @@ int proc_nr_e;
 		if(status == -EAGAIN) status = -EINTR;
 		if(GRANT_VALID(rfp->fp_grant)) {
 			if(cpf_revoke(rfp->fp_grant)) {
-				panic(__FILE__,"FS_PROC_NR: revoke failed for grant (cancel)",
+				panic(__FILE__,"FS: revoke failed for grant (cancel)",
 					rfp->fp_grant);
 			} 
 			rfp->fp_grant = GRANT_INVALID;
@@ -678,7 +592,7 @@ int select_request_pipe(struct filp *f, int *ops, int block)
 	int orig_ops, r = 0, err, canwrite;
 	orig_ops = *ops;
 	if ((*ops & (SEL_RD|SEL_ERR))) {
-		if ((err = Xpipe_check(f->filp_vno, READING, 0,
+		if ((err = pipe_check(f->filp_vno, READING, 0,
 			1, f->filp_pos, 1)) != SUSPEND)
 			r |= SEL_RD;
 		if (err < 0 && err != SUSPEND)
@@ -690,8 +604,9 @@ int select_request_pipe(struct filp *f, int *ops, int block)
 			r &= ~SEL_ERR;
                 }
 	}
+
 	if ((*ops & (SEL_WR|SEL_ERR))) {
-		if ((err = Xpipe_check(f->filp_vno, WRITING, 0,
+		if ((err = pipe_check(f->filp_vno, WRITING, 0,
 			1, f->filp_pos, 1)) != SUSPEND)
 			r |= SEL_WR;
 		if (err < 0 && err != SUSPEND)
@@ -711,8 +626,9 @@ int select_request_pipe(struct filp *f, int *ops, int block)
 		f->filp_pipe_select_ops |= orig_ops;
 	}
 
-	return SEL_OK;
+	return(SEL_OK);
 }
+
 
 /*===========================================================================*
  *				select_match_pipe			     *
@@ -752,3 +668,86 @@ int check_pipe(void)
 	return 1;
 }
 #endif
+
+/*===========================================================================*
+ *                              sys_pipe                                      *
+ *===========================================================================*/
+int sys_pipe(void)
+{
+	/* Perform the pipe(fil_des) system call. */
+	register struct fproc *rfp;
+	int r;
+	struct filp *fil_ptr0, *fil_ptr1;
+	int fil_des[2];		/* reply goes here */
+	struct vnode *vp;
+	struct vmnt *vmp;
+	struct node_details res;
+
+	/* See if a free vnode is available */
+	if ( (vp = get_free_vnode()) == NIL_VNODE) {
+		printf("VFS: no vnode available!\n");
+		return err_code;
+	}
+
+	/* Acquire two file descriptors. */
+	rfp = fp;
+
+	if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0)
+		return(r);
+
+	rfp->fp_filp[fil_des[0]] = fil_ptr0;
+	FD_SET(fil_des[0], &rfp->fp_filp_inuse);
+	fil_ptr0->filp_count = 1;
+
+	if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
+
+		return(r);
+	}
+
+	rfp->fp_filp[fil_des[1]] = fil_ptr1;
+	FD_SET(fil_des[1], &rfp->fp_filp_inuse);
+	fil_ptr1->filp_count = 1;
+
+	/* Create a named pipe inode on PipeFS */
+	r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE, (dev_t)0, &res);
+
+	if (r != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
+		rfp->fp_filp[fil_des[1]] = NIL_FILP;
+		FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
+		fil_ptr1->filp_count = 0;
+		return(r);
+	}
+
+	/* Fill in vnode */
+	vp->v_fs_e = res.fs_e;
+	vp->v_mapfs_e = res.fs_e;
+	vp->v_inode_nr = res.inode_nr;
+	vp->v_mapinode_nr = res.inode_nr; 
+	vp->v_mode = res.fmode;
+	vp->v_pipe = I_PIPE;
+	vp->v_pipe_rd_pos= 0;
+	vp->v_pipe_wr_pos= 0;
+	vp->v_fs_count = 1;
+	vp->v_mapfs_count = 1;
+	vp->v_ref_count = 1;
+	vp->v_size = 0;
+	vp->v_vmnt = NIL_VMNT; 
+	vp->v_dev = NO_DEV;
+
+	/* Fill in filp objects */
+	fil_ptr0->filp_vno = vp;
+	dup_vnode(vp);
+	fil_ptr1->filp_vno = vp;
+	fil_ptr0->filp_flags = O_RDONLY;
+	fil_ptr1->filp_flags = O_WRONLY;
+
+	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
+
+	return (r < 0) ? -EFAULT : 0;
+}

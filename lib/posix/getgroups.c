@@ -7,17 +7,10 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* getgroups.c						POSIX 4.2.3
- *	int getgroups(gidsetsize, grouplist);
- *
- *	This call relates to suplementary group ids, which are not
- *	supported in MINIX.
- */
-#include <nucleos/lib.h>
 #include <nucleos/unistd.h>
-#include <nucleos/time.h>
+#include <asm/syscall.h>
 
 int getgroups(int gidsetsize, gid_t grouplist[])
 {
-  return(0);
+	return INLINE_SYSCALL(getgroups, 2, gidsetsize, grouplist);
 }

@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_BUF_H
-#define __SERVERS_ISO9660FS_BUF_H
+#ifndef __BUF_H
+#define __BUF_H
 
 #include <nucleos/dir.h>	/* need struct direct */
 #include <nucleos/dirent.h>
@@ -29,4 +29,4 @@ extern struct buf buf[];
 #define INODE_BLOCK		0	/* inode block */
 #define DIRECTORY_BLOCK		1	/* directory block */
 
-#endif /* __SERVERS_ISO9660FS_BUF_H */
+#endif /* __BUF_H */

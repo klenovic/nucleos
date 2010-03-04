@@ -82,7 +82,7 @@ static int aout_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 	pos = 0;
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(pos), READING, 
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos), READING, 
 			  FS_PROC_NR, (char*)&hdr, sizeof(struct exec), &new_pos, &cum_io_incr);
 
 	if (err) {
@@ -190,7 +190,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 	int err;
 	unsigned n, k;
 	u64_t new_pos;
-	unsigned int cum_io_incr;
+	unsigned int cum_io;
 	char buf[1024];
 
 	/* Make sure that the file is big enough */
@@ -213,16 +213,16 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 #endif
 
 			/* Issue request */
-			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index,
+			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr,
 					  cvul64(off+k), READING, FS_PROC_NR, buf, n, &new_pos,
-					  &cum_io_incr);
+					  &cum_io);
 
 			if (err) {
 				printf("VFS: read_seg: req_readwrite failed (text)\n");
 				return err;
 			}
 
-			if (cum_io_incr != n) {
+			if (cum_io != n) {
 				printf("read_seg segment has not been read properly by exec()\n");
 				return -EIO;
 			}
@@ -240,21 +240,17 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 		return 0;
 	}
 
-#if 0
-	printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
-	proc_e, seg, 0, seg_bytes, off);
-#endif
 
 	/* Issue request */
-	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(off),
-			    READING, proc_e, 0, seg_bytes, &new_pos, &cum_io_incr);
+	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(off),
+			    READING, proc_e, 0, seg_bytes, &new_pos, &cum_io);
 
 	if (err) {
 		printf("VFS: read_seg: req_readwrite failed (data)\n");
 		return err;
 	}
 
-	if (!err && cum_io_incr != seg_bytes)
+	if (!err && cum_io != seg_bytes)
 		printf("VFSread_seg segment has not been read properly by exec() \n");
 
 	return err;

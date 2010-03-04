@@ -27,10 +27,8 @@ int fs_utime()
   register int r;
   
   /* Temporarily open the file. */
-  if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-printf("MFS(%d) get_inode by fs_utime() failed\n", SELF_E);
+  if( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE)
         return(-EINVAL);
-  }
 
   /* Only the owner of a file or the super_user can change its time. */
   r = 0;
@@ -45,11 +43,5 @@ printf("MFS(%d) get_inode by fs_utime() failed\n", SELF_E);
 
   put_inode(rip);
   return(r);
-}
-
-int fs_stime()
-{
-  boottime = fs_m_in.REQ_BOOTTIME;
-  return 0;
 }
 

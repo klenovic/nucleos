@@ -3,7 +3,7 @@ app-y := iso9660fs.elf32
 iso9660fs.elf32-type := server
 iso9660fs.elf32-obj-y += main.o table.o mount.o super.o inode.o device.o \
 			 utility.o misc.o path.o read.o stadir.o cache.o \
-			 protect.o
+			 isofs-syms.o
 
 NR_BUFS = 100
 

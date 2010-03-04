@@ -9,10 +9,7 @@
 static int stat_dir_record(struct dir_record *dir, int pipe_pos,
 					 int who_e, cp_grant_id_t gid);
 
-/* This function returns all the info about a particular inode. It's missing
- * the recording date because of a bug in the standard functions stdtime.
- * Once the bug is fixed the function can be called inside this function to
- * return the date. */
+
 /*===========================================================================*
  *				stat_dir_record				     *
  *===========================================================================*/
@@ -22,6 +19,10 @@ int pipe_pos;   		/* position in a pipe, supplied by fstat() */
 int who_e;			/* Caller endpoint */
 cp_grant_id_t gid;		/* grant for the stat buf */
 {
+/* This function returns all the info about a particular inode. It's missing
+ * the recording date because of a bug in the standard functions stdtime.
+ * Once the bug is fixed the function can be called inside this function to
+ * return the date. */
 
 /* Common code for stat and fstat system calls. */
   struct stat statbuf;
@@ -48,7 +49,7 @@ cp_grant_id_t gid;		/* grant for the stat buf */
   ltime.tm_isdst = 0;
 
   if (dir->rec_date[6] != 0)
-    ltime.tm_hour += dir->rec_date[6] / 4;
+	ltime.tm_hour += dir->rec_date[6] / 4;
 
   time1 = mktime(ltime.tm_year, ltime.tm_mon,
 		 ltime.tm_mday, ltime.tm_hour,
@@ -60,13 +61,12 @@ cp_grant_id_t gid;		/* grant for the stat buf */
 
   /* Copy the struct to user space. */
   r = sys_safecopyto(who_e, gid, 0, (vir_bytes) &statbuf,
-  		(phys_bytes) sizeof(statbuf), D);
+		     (phys_bytes) sizeof(statbuf), D);
   
   return(r);
 }
 
-/* This function is a wrapper to the function above. It is called with the
- * request. */
+
 /*===========================================================================*
  *                             fs_stat					     *
  *===========================================================================*/
@@ -77,13 +77,13 @@ int fs_stat()
   r = -EINVAL;
 
   if ((dir = get_dir_record(fs_m_in.REQ_INODE_NR)) != NULL) {
-    r = stat_dir_record(dir, 0, fs_m_in.m_source, fs_m_in.REQ_GRANT);
-    release_dir_record(dir);
-  } else
-    printf("I9660FS(%d) fs_stat() failed\n", SELF_E);
+	r = stat_dir_record(dir, 0, fs_m_in.m_source, fs_m_in.REQ_GRANT);
+	release_dir_record(dir);
+  } 
 
-  return r;
+  return(r);
 }
+
 
 /*===========================================================================*
  *				fs_fstatfs				     *
@@ -97,7 +97,7 @@ int fs_fstatfs()
   
   /* Copy the struct to user space. */
   r = sys_safecopyto(fs_m_in.m_source, fs_m_in.REQ_GRANT, 0,
-	(vir_bytes) &st, (phys_bytes) sizeof(st), D);
+		     (vir_bytes) &st, (phys_bytes) sizeof(st), D);
   
   return(r);
 }

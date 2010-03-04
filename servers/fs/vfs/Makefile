@@ -9,7 +9,7 @@ $(appname).elf32-type := $(apptype)
 $(appname).elf32-obj-y := main.o open.o read.o write.o pipe.o dmap.o path.o device.o \
 			  mount.o link.o exec.o filedes.o stadir.o protect.o time.o \
 			  lock.o misc.o utility.o select.o timers.o table.o vnode.o \
-			  vmnt.o request.o mmap.o fscall.o
+			  vmnt.o request.o mmap.o fscall.o vfs-syms.o
 
 $(appname).elf32-obj-$(CONFIG_VFS_ELF32_BINFMT) += binfmt_elf32.o
 $(appname).elf32-obj-$(CONFIG_VFS_AOUT_BINFMT) += binfmt_aout.o

@@ -107,6 +107,8 @@
 #define __NNR_munmap		(83 + __syscall_offset)
 #define __NNR_munmap_text	(84 + __syscall_offset)
 #define __NNR_geteuid		(85 + __syscall_offset)
+#define __NNR_getgroups		(86 + __syscall_offset)
+#define __NNR_setgroups		(87 + __syscall_offset)
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -332,6 +334,9 @@ gid_t getegid(void);
 uid_t geteuid(void);
 gid_t getgid(void);
 int getgroups(int _gidsetsize, gid_t _grouplist[]);
+int setgroups(size_t ngroups, const gid_t *gidset);
+int initgroups(const char *name, gid_t basegid);
+
 char *getlogin(void);
 pid_t getpgrp(void);
 pid_t getpid(void);
@@ -418,8 +423,6 @@ gid_t getngid(endpoint_t proc_nr);
 
 /* For compatibility with other Unix systems */
 size_t getpagesize(void);
-int setgroups(int ngroups, const gid_t *gidset);
-int initgroups(const char *name, gid_t basegid);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 

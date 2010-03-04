@@ -52,7 +52,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
  * complete stack image, including pointers, args, environ, etc.  The stack
  * is copied to a buffer inside FS_PROC_NR, and then to the new core image.
  */
-	int r, round, proc_s;
+	int r, r1, round, proc_s;
 	vir_bytes vsp;
 	struct fproc *rfp;
 	struct vnode *vp;
@@ -104,32 +104,22 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 	/* round = 0 (first attempt), or 1 (interpreted script) */
 	for (round = 0; round < 2; round++) {
-#if 0
-		printf("vfs:pm_exec: round %d, name '%s'\n", round, user_fullpath);
-#endif
 		/* Save the name of the program */
 		(cp = strrchr(user_fullpath, '/')) ? cp++ : (cp= user_fullpath);
 
 		strncpy(bfmt_param.ex.progname, cp, PROC_NAME_LEN-1);
 		bfmt_param.ex.progname[PROC_NAME_LEN-1] = '\0';
 
-		/* Request lookup */
-		if ((r = lookup_vp(0 /*flags*/, 0 /*!use_realuid*/, &vp)) != 0)
-			return r;
+		/* Open executable */
+		if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
 
-		if ((vp->v_mode & I_TYPE) != I_REGULAR) {
-			put_vnode(vp);
-			return -ENOEXEC;
-		}
-
-		/* Check access. */
-		if ((r = forbidden(vp, X_BIT, 0 /*!use_realuid*/)) != 0) {
-			put_vnode(vp);
-			return r;
-		}
-
-		/* Get ctime */
-		r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR, (char *)&sb, 0);
+		if ((vp->v_mode & I_TYPE) != I_REGULAR)
+			r = -ENOEXEC;
+		else if ((r1 = forbidden(vp, X_BIT)) != 0)
+			r = r1;
+		else
+			r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR,
+				     (char *) &sb, 0);
 
 		if (r != 0) {
 			put_vnode(vp);
@@ -137,10 +127,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		}
 
 		bfmt_param.ex.st_ctime = sb.st_ctime;
-#if 0
-		printf("vfs:pm_exec: round %d, mode 0%o, uid %d, gid %d\n",
-		round, vp->v_mode, vp->v_uid, vp->v_gid);
-#endif
+
 		if (round == 0) {
 			/* Deal with setuid/setgid executables */
 			if (vp->v_mode & I_SET_UID_BIT)
@@ -186,7 +173,6 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 		if (r != 0) {
 			printf("pm_exec: patch stack\n");
-			printf("return at %s, %d\n", __FILE__, __LINE__);
 			return r;
 		}
 	}
@@ -264,7 +250,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 	pos = 0;	/* Read from the start of the file */
 
 	/* Issue request */
-	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, vp->v_index, cvul64(pos),
+	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos),
 			  READING, FS_PROC_NR, buf, _MAX_BLOCK_SIZE, &new_pos, &cum_io_incr);
 
 	if (r != 0) return r;

@@ -23,5 +23,6 @@
 #define EXEC_PAGESIZE	4096
 
 #define MAXHOSTNAMELEN	256	/* max. lenght of hostname */
+#define NGROUPS		8	/* max number of supplementary groups */
 
 #endif /* __ASM_X86_PARAM_H */

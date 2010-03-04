@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_SUPER_H
-#define __SERVERS_ISO9660FS_SUPER_H
+#ifndef __SUPER_H
+#define __SUPER_H
 
 /* This file contains the definitions of a ISO9660 structures */
 #include "inode.h"
@@ -52,4 +52,4 @@ struct iso9660_vd_pri {
 
 extern struct iso9660_vd_pri v_pri;
 
-#endif /* __SERVERS_ISO9660FS_SUPER_H */
+#endif /* __SUPER_H */

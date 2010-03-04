@@ -13,12 +13,11 @@
  *      
  *  get_vnode - increase counter and get details of an inode
  *  get_free_vnode - get a pointer to a free vnode obj
- *  find_vnode - find a vnode according to the FS_PROC_NR endpoint and the inode num.  
+ *  find_vnode - find a vnode according to the FS endpoint and the inode num.  
  *  dup_vnode - duplicate vnode (i.e. increase counter)
  *  put_vnode - drop vnode (i.e. decrease counter)  
- *  
- *  Jul 2006 (Balazs Gerofi)
  */
+
 #include "fs.h"
 #include "vnode.h"
 #include "vmnt.h"
@@ -46,44 +45,42 @@
 /*===========================================================================*
  *				get_free_vnode				     *
  *===========================================================================*/
-struct vnode *get_free_vnode(file, line)
-char *file;
-int line;
+struct vnode *get_free_vnode()
 {
-/* Find a free vnode slot in the vnode table */    
+/* Find a free vnode slot in the vnode table (it's not actually allocated) */
   struct vnode *vp;
 
-  for (vp = &vnode[0]; vp < &vnode[NR_VNODES]; ++vp)
-	if (vp->v_ref_count == 0)
-	{
+  for (vp = &vnode[0]; vp < &vnode[NR_VNODES]; ++vp) {
+	if (vp->v_ref_count == 0) {
 		vp->v_pipe= NO_PIPE;
 		vp->v_uid= -1;
 		vp->v_gid= -1;
-		vp->v_sdev= -1;
-		vp->v_file= file;
-		vp->v_line= line;
-		return vp;
+		vp->v_sdev = NO_DEV;
+		vp->v_mapfs_e = 0;
+		vp->v_mapinode_nr = 0;
+		return(vp);
 	}
-
+	}
   
   err_code = -ENFILE;
-  return NIL_VNODE;
+  return(NIL_VNODE);
 }
+
 
 /*===========================================================================*
  *				find_vnode				     *
  *===========================================================================*/
 struct vnode *find_vnode(int fs_e, int numb)
 {
-/* Find a specified (FS_PROC_NR endpoint and inode number) vnode in the
+/* Find a specified (FS endpoint and inode number) vnode in the
  * vnode table */
   struct vnode *vp;
 
   for (vp = &vnode[0]; vp < &vnode[NR_VNODES]; ++vp)
-      if (vp->v_ref_count > 0 && vp->v_inode_nr == numb
-              && vp->v_fs_e == fs_e) return vp;
+	if (vp->v_ref_count > 0 && vp->v_inode_nr == numb && vp->v_fs_e == fs_e)
+		return(vp);
   
-  return NIL_VNODE;
+  return(NIL_VNODE);
 }
 
 
@@ -106,12 +103,16 @@ void dup_vnode(struct vnode *vp)
 void put_vnode(struct vnode *vp)
 {
 /* Decrease vnode's usage counter and decrease inode's usage counter in the 
- * corresponding FS_PROC_NR process.
+ * corresponding FS process. Decreasing the fs_count each time we decrease the
+ * ref count would lead to poor performance. Instead, only decrease fs_count
+ * when the ref count hits zero. However, this could lead to fs_count to wrap.
+ * To prevent this, we drop the counter to 1 when the counter hits 256.
+ * We maintain fs_count as a sanity check to make sure VFS and the FS are in
+ * sync.
  */
   ASSERTVP(vp);
 
-  if (vp->v_ref_count > 1)
-  {
+  if (vp->v_ref_count > 1) {
 	/* Decrease counter */
 	vp->v_ref_count--;
 	if (vp->v_fs_count > 256)
@@ -119,26 +120,34 @@ void put_vnode(struct vnode *vp)
 	return;
   }
 
-  if (vp->v_ref_count <= 0)
-  {
+  /* A vnode that's not in use can't be put. */
+  if (vp->v_ref_count <= 0) {
 	printf("put_vnode: bad v_ref_count %d\n", vp->v_ref_count);
 	panic(__FILE__, "put_vnode failed", NO_NUM);
   }
-  if (vp->v_fs_count <= 0)
-  {
+
+  /* fs_count should indicate that the file is in use. */
+  if (vp->v_fs_count <= 0) {
 	printf("put_vnode: bad v_fs_count %d\n", vp->v_fs_count);
 	panic(__FILE__, "put_vnode failed", NO_NUM);
   }
 
-  /* Send request */
-  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count) != 0)
-      printf("VFSput_vnode Warning: inode doesn't exist\n"); 
+  /* Tell FS we don't need this inode to be open anymore. */
+  req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count); 
+
+  /* This inode could've been mapped. If so, tell PFS to close it as well. */
+  if(vp->v_mapfs_e != 0  && vp->v_mapinode_nr != vp->v_inode_nr &&
+     vp->v_mapfs_e != vp->v_fs_e) {
+	req_putnode(vp->v_mapfs_e, vp->v_mapinode_nr, vp->v_mapfs_count); 
+  }
 
   vp->v_fs_count= 0;
   vp->v_ref_count= 0;
   vp->v_pipe = NO_PIPE;
   vp->v_sdev = NO_DEV;
-  vp->v_index = 0;
+  vp->v_mapfs_e = 0;
+  vp->v_mapinode_nr = 0;
+  vp->v_mapfs_count = 0;
 }
 
 
@@ -147,34 +156,16 @@ void put_vnode(struct vnode *vp)
  *===========================================================================*/
 void vnode_clean_refs(struct vnode *vp)
 {
-/* Tell the underlying FS_PROC_NR to drop all reference but one. */
-  if (vp == NIL_VNODE) {
-        return;
-  }
+/* Tell the underlying FS to drop all reference but one. */
 
-  if (vp->v_fs_count <= 1)
-	return;	/* Nothing to do */
-  if (req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count-1) != 0)
-	printf("vnode_clean_refs: req_putnode failed\n"); 
+  if (vp == NIL_VNODE) return;
+  if (vp->v_fs_count <= 1) return;	/* Nothing to do */
+
+  /* Drop all references except one */
+  req_putnode(vp->v_fs_e, vp->v_inode_nr, vp->v_fs_count - 1);
   vp->v_fs_count= 1;
 }
 
-
-#if 0
-/*===========================================================================*
- *				mark_vn					     *
- *===========================================================================*/
-void mark_vn(vp, file, line)
-struct vnode *vp;
-char *file;
-int line;
-{
-	if (!vp)
-		return;
-	vp->v_file= file;
-	vp->v_line= line;
-}
-#endif
 
 #define REFVP(v) { vp = (v); CHECKVN(v); vp->v_ref_check++; }
 

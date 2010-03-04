@@ -17,6 +17,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/signal.h>
+#include <nucleos/limits.h>
 #include <servers/pm/mproc.h>
 #include "param.h"
 
@@ -25,9 +26,6 @@
  *===========================================================================*/
 int do_get()
 {
-/* Handle GETUID, GETGID, GETPID, GETPGRP.
- */
-
   register struct mproc *rmp = mp;
   int r, proc;
 
@@ -53,10 +51,11 @@ int do_get()
 
 	default:
 		r = -EINVAL;
-		break;	
+		break;
   }
   return(r);
 }
+
 
 int sys_getegid(void)
 {
@@ -258,6 +257,82 @@ int sys_setuid(void)
 	m.PM_PROC = rmp->mp_endpoint;
 	m.PM_EID = rmp->mp_effuid;
 	m.PM_RID = rmp->mp_realuid;
+
+	/* Send the request to FS */
+	tell_fs(rmp, &m);
+
+	/* Do not reply until FS has processed the request */
+	return SUSPEND;
+}
+
+int sys_getgroups(void)
+{
+	register struct mproc *rmp = mp;
+	int r, i;
+	int ngroups;
+
+	message m;
+
+	ngroups = m_in.grp_no;
+
+	if (ngroups > NGROUPS_MAX || ngroups < 0)
+		return(-EINVAL);
+
+	if (ngroups == 0) {
+		r = rmp->mp_ngroups;
+		return(r);
+	}
+
+	if (ngroups < rmp->mp_ngroups)
+		/* Asking for less groups than available */
+		return(-EINVAL);
+
+	r = sys_datacopy(SELF, (vir_bytes) rmp->mp_sgroups, who_e,
+			(vir_bytes) m_in.groupsp, ngroups * sizeof(gid_t));
+
+	if (r != 0)
+		return(r);
+
+	r = rmp->mp_ngroups;
+
+	return(r);
+}
+
+int sys_setgroups(void)
+{
+	register struct mproc *rmp = mp;
+	message m;
+	int ngroups;
+	int i;
+	int r;
+
+	if (rmp->mp_effuid != SUPER_USER)
+		return(-EPERM);
+
+	ngroups = m_in.grp_no;
+
+	if (ngroups > NGROUPS_MAX || ngroups < 0)
+		return(-EINVAL);
+
+	if (m_in.groupsp == NULL)
+		return(-EFAULT);
+
+	r = sys_datacopy(who_e, (vir_bytes) m_in.groupsp, SELF,
+			 (vir_bytes) rmp->mp_sgroups,
+			 ngroups * sizeof(gid_t));
+
+	if (r != 0)
+		return(r);
+
+	for (i = ngroups; i < NGROUPS_MAX; i++)
+		rmp->mp_sgroups[i] = 0;
+
+	rmp->mp_ngroups = ngroups;
+
+	m.m_type = PM_SETGROUPS;
+	m.PM_PROC = rmp->mp_endpoint;
+	m.PM_GROUP_NO = rmp->mp_ngroups;
+	m.PM_GROUP_ADDR = rmp->mp_sgroups;
 
 	/* Send the request to FS */
 	tell_fs(rmp, &m);

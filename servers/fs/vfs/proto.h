@@ -60,7 +60,7 @@ struct filp *find_filp(struct vnode *vp, mode_t bits);
 int get_fd(int start, mode_t bits, int *k, struct filp **fpt);
 struct filp *get_filp(int fild);
 struct filp *get_filp2(struct fproc *rfp, int fild);
-int inval_filp(struct filp *);
+int invalidate(struct filp *);
 
 /* fscall.c */
 void nested_fs_call(message *m);
@@ -72,7 +72,7 @@ int sys_rmdir(void);
 int do_rename(void);
 int do_truncate(void);
 int do_ftruncate(void);
-int truncate_vn(struct vnode *vp, off_t newsize);
+int truncate_vnode(struct vnode *vp, off_t newsize);
 
 /* lock.c */
 int lock_op(struct filp *f, int req);
@@ -90,6 +90,7 @@ int do_fcntl(void);
 void pm_fork(int pproc, int cproc, int cpid);
 void pm_setgid(int proc_e, int egid, int rgid);
 void pm_setuid(int proc_e, int euid, int ruid);
+void pm_setgroups(int proc_e, int ngroups, gid_t *addr);
 int do_sync(void);
 int do_fsync(void);
 void pm_reboot(void);
@@ -126,16 +127,16 @@ int do_vm_open(void);
 int do_vm_close(void);
 
 /* path.c */
-int lookup_rel_vp(struct vnode *start_node, int flags, int use_realuid, struct vnode **vpp);
-int lookup_vp(int flags, int use_realuid, struct vnode **vpp);
-int lookup_lastdir_rel(struct vnode *start_node, int use_realuid, struct vnode **vpp);
-int lookup_lastdir(int use_realuid, struct vnode **vpp);
+struct vnode *advance(struct vnode *dirp, int flags);
+struct vnode *eat_path(int flags);
+struct vnode *last_dir(void);
 
 /* pipe.c */
 int do_pipe(void);
+int map_vnode(struct vnode *vp);
 int sys_pipe(void);
 void unpause(int proc_nr_e);
-int Xpipe_check(struct vnode *vp, int rw_flag, int oflags, int bytes, u64_t position, int notouch);
+int pipe_check(struct vnode *vp, int rw_flag, int oflags, int bytes, u64_t position, int notouch);
 void release(struct vnode *vp, int call_nr, int count);
 void revive(int proc_nr, int bytes);
 void suspend(int task);
@@ -157,7 +158,7 @@ int do_fchmod(void);
 int do_chown(void);
 int do_fchown(void);
 int do_umask(void);
-int forbidden(struct vnode *vp, mode_t access_desired, int use_realuid);
+int forbidden(struct vnode *vp, mode_t access_desired);
 int read_only(struct vnode *vp);
 
 /* read.c */
@@ -178,12 +179,14 @@ int req_create(int fs_e, ino_t inode_nr, int omode, int uid, int gid, char *path
 int req_flush(endpoint_t fs_e, dev_t dev);
 int req_fstatfs(int fs_e, int who_e, char *buf);
 int req_ftrunc(endpoint_t fs_e, ino_t inode_nr, off_t start, off_t end);
-int req_getdents(endpoint_t fs_e, ino_t inode_nr, off_t pos, cp_grant_id_t gid, size_t size,
-		 off_t *pos_change);
+int req_getdents(endpoint_t fs_e, ino_t inode_nr, u64_t pos,
+		 char *buf, size_t size, u64_t *new_pos);
 int req_inhibread(endpoint_t fs_e, ino_t inode_nr);
 int req_link(endpoint_t fs_e, ino_t link_parent, char *lastc, ino_t linked_file);
-int req_lookup(endpoint_t fs_e, size_t path_off, ino_t dir_ino, ino_t root_ino, uid_t uid,
-	       gid_t gid, int flags, lookup_res_t *res);
+int req_lookup(endpoint_t fs_e, ino_t dir_ino, ino_t root_ino,
+	       uid_t uid, gid_t gid, int flags,
+	       lookup_res_t *res);
+
 int req_mkdir(endpoint_t fs_e, ino_t inode_nr, char *lastc, uid_t uid, gid_t gid,
 	      mode_t dmode);
 int req_mknod(endpoint_t fs_e, ino_t inode_nr, char *lastc, uid_t uid, gid_t gid,
@@ -192,10 +195,10 @@ int req_mountpoint(endpoint_t fs_e, ino_t inode_nr);
 int req_newnode(endpoint_t fs_e, uid_t uid, gid_t gid, mode_t dmode,
 		dev_t dev, struct node_details *res);
 int req_putnode(int fs_e, ino_t inode_nr, int count);
-int req_rdlink(endpoint_t fs_e, ino_t inode_nr, endpoint_t who_e, vir_bytes buf, size_t len);
+int req_rdlink(endpoint_t fs_e, ino_t inode_nr, endpoint_t who_e, char *buf, size_t len);
 int req_readsuper(endpoint_t fs_e, char *driver_name, dev_t dev, int readonly, int isroot,
 		  struct node_details *res_nodep);
-int req_readwrite(endpoint_t fs_e, ino_t inode_nr, int inode_index, u64_t pos, int rw_flag,
+int req_readwrite(endpoint_t fs_e, ino_t inode_nr, u64_t pos, int rw_flag,
 		  endpoint_t user_e, char *user_addr, unsigned int num_of_bytes, u64_t *new_posp,
 		  unsigned int *cum_iop); 
 int req_rename(endpoint_t fs_e, ino_t old_dir, char *old_name, ino_t new_dir, char *new_name);
@@ -240,7 +243,7 @@ struct vmnt *get_free_vmnt(short *index);
 struct vmnt *find_vmnt(int fs_e);
 
 /* vnode.c */
-struct vnode *get_free_vnode(char *file, int line);
+struct vnode *get_free_vnode(void);
 struct vnode *find_vnode(int fs_e, int numb);
 void dup_vnode(struct vnode *vp);
 void put_vnode(struct vnode *vp);

@@ -1,5 +1,5 @@
-#ifndef __SERVERS_ISO9660FS_INODE_H
-#define __SERVERS_ISO9660FS_INODE_H
+#ifndef __INODE_H
+#define __INODE_H
 
 #include "const.h"
 
@@ -73,4 +73,4 @@ extern struct ext_attr_rec ext_attr_recs[];
 /* #define ASSIGN_ID 1 */
 /* #define NOT_ASSIGN_ID 0 */
 
-#endif /* __SERVERS_ISO9660FS_INODE_H */
+#endif /* __INODE_H */

@@ -112,7 +112,9 @@ int main()
 	case PM_FORK_NB_REPLY:
 	case PM_UNPAUSE_REPLY:
 	case PM_REBOOT_REPLY:
-		if (who_e == FS_PROC_NR) {
+	case PM_SETGROUPS_REPLY:
+		if (who_e == FS_PROC_NR)
+		{
 			handle_fs_reply();
 			result= SUSPEND;		/* don't reply */
 		} else
@@ -450,6 +452,7 @@ static void handle_fs_reply()
   switch (call_nr) {
   case PM_SETUID_REPLY:
   case PM_SETGID_REPLY:
+  case PM_SETGROUPS_REPLY:
 	/* Wake up the original caller */
 	setreply(rmp-mproc, 0);
 

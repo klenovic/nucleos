@@ -10,6 +10,7 @@ bin-y += drivers/tty/tty
 bin-y += servers/ds/ds
 bin-y += servers/fs/minixfs/minixfs
 bin-y += arch/$(SRCARCH)/servers/vm/vm
+bin-y += servers/fs/pipefs/pipefs
 bin-y += servers/init/init
 
 quiet_cmd_create_image = GEN     $@
