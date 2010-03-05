@@ -8,6 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include "fs.h"
+#include <stdlib.h>
 #include <nucleos/stat.h>
 #include <nucleos/kernel.h>
 #include <nucleos/unistd.h>
@@ -18,13 +19,12 @@
 #include <nucleos/binfmts.h>
 #include <nucleos/vfsif.h>
 #include <nucleos/elf.h>
-
-#include <stdlib.h>
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
 #include <nucleos/dirent.h>
-
 #include <servers/vfs/fproc.h>
+#include <asm/page.h>
+
 #include "param.h"
 #include "vnode.h"
 #include "vmnt.h"
@@ -244,8 +244,9 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 		addr_off = sh->sh_addr;
 
 		if (param->load_text && sh->sh_type == SHT_PROGBITS) {
-			if ((sh->sh_flags & SHF_ALLOC) && (sh->sh_flags & SHF_EXECINSTR))  {
-				/* text sections ("x" flag) */
+			if ((sh->sh_flags & SHF_ALLOC) &&
+			    ((sh->sh_flags & SHF_EXECINSTR) || (~sh->sh_flags & SHF_WRITE)))  {
+				/* .text and read-only sections */
 				err = elf32_read_seg(param->vp, sh->sh_offset, addr_off, param->proc_e,
 						     (exec.sep_id) ? T : D , sh->sh_size);
 				if (err) {
@@ -255,7 +256,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 #ifdef CONFIG_DEBUG_VFS_ELF32
 				app_dbg("text sections loaded\n");
 #endif
-			} else if ((sh->sh_flags & SHF_ALLOC) && (~sh->sh_flags & SHF_EXECINSTR)) {
+			} else if ((sh->sh_flags & SHF_ALLOC) && (sh->sh_flags & SHF_WRITE)) {
 				/* data sections */
 				err = elf32_read_seg(param->vp, sh->sh_offset, addr_off,
 						     param->proc_e, D, sh->sh_size);
@@ -461,16 +462,17 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 		elf32_shdr_t* sh = &shdrs[i];
 
 		if (sh->sh_type == SHT_PROGBITS) {
-			/* segments with "x" flag */
-			if ((sh->sh_flags & SHF_ALLOC) && (sh->sh_flags & SHF_EXECINSTR))  {
+			/* .text and read-only segments */
+			if ((sh->sh_flags & SHF_ALLOC) &&
+			    ((sh->sh_flags & SHF_EXECINSTR) || (~sh->sh_flags & SHF_WRITE))) {
 				if (sh->sh_addr < tlow)
 					tlow = sh->sh_addr;
 
 				if (sh->sh_addr + sh->sh_size > thigh)
 					thigh = sh->sh_addr + sh->sh_size;
 
-			} else if ((sh->sh_flags & SHF_ALLOC) && (~sh->sh_flags & SHF_EXECINSTR)) {
-				/* sections .data and .rodata */
+			} else if ((sh->sh_flags & SHF_ALLOC) && (sh->sh_flags & SHF_WRITE)) {
+				/* sections .data */
 				if (sh->sh_addr < dlow)
 					dlow = sh->sh_addr;
 
@@ -499,6 +501,7 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 	 */
 #define INSEGMENT(a)	(a >= ph->p_vaddr && a < (ph->p_vaddr + ph->p_memsz))
 #define PADDR(a)	(ph->p_paddr + a - ph->p_vaddr)
+#define ELF_PAGEALIGN(a) (((a) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 	for (i = 0; i < ehdr->e_phnum; i++) {
 		elf32_phdr_t* ph = &phdrs[i];
@@ -507,18 +510,21 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 			exec->text_pstart = PADDR (tlow);
 			exec->text_vstart = tlow;
 			exec->text_size = thigh - tlow;
+			exec->text_size = ELF_PAGEALIGN(exec->text_size);
 		}
 
 		if (INSEGMENT (dlow)) {
 			exec->data_pstart = PADDR (dlow);
 			exec->data_vstart = dlow;
-			exec->data_size   = dhigh - dlow;
+			exec->data_size = dhigh - dlow;
+			exec->data_size = ELF_PAGEALIGN(exec->data_size);
 		}
 
 		if (INSEGMENT (blow)) {
 			exec->bss_pstart = PADDR (blow);
 			exec->bss_vstart = blow;
-			exec->bss_size   = bhigh - blow;
+			exec->bss_size = bhigh - blow;
+			exec->bss_size = ELF_PAGEALIGN(exec->bss_size);
 		}
 	}
 
