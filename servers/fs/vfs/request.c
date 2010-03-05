@@ -424,16 +424,16 @@ lookup_res_t *res;
 	    res->uid= m.RES_UID;
 	    res->gid= m.RES_GID;
             break;
-        case EENTERMOUNT:
+        case -EENTERMOUNT:
             res->inode_nr = m.RES_INODE_NR;
             res->char_processed = m.RES_OFFSET;
 	  res->symloop = m.RES_SYMLOOP;
 	    break;
-        case ELEAVEMOUNT:
+        case -ELEAVEMOUNT:
             res->char_processed = m.RES_OFFSET;
 	  res->symloop = m.RES_SYMLOOP;
 	    break;
-        case ESYMLINK:
+        case -ESYMLINK:
             res->char_processed = m.RES_OFFSET;
 	  res->symloop = m.RES_SYMLOOP;
             break;
@@ -1068,8 +1068,8 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
       if (reqm->m_type <= 0)
           break; /* Reply */
 
-      if (reqm->m_type == EENTERMOUNT || reqm->m_type == ELEAVEMOUNT ||
-        reqm->m_type == ESYMLINK) {
+      if (reqm->m_type == -EENTERMOUNT || reqm->m_type == -ELEAVEMOUNT ||
+        reqm->m_type == -ESYMLINK) {
 
           reqm->m_type = -reqm->m_type;
 
@@ -1086,7 +1086,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
       	break;
       }
       /* Dead driver */
-      if (r == EDEADSRCDST || r == EDSTDIED || r == ESRCDIED) {
+      if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           old_driver_e = NONE;
           /* Find old driver by endpoint */
           for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp) {

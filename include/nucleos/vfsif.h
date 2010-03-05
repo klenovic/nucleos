@@ -76,9 +76,9 @@
 					 * opposed to a REQ_UID). */
 
 /* VFS/FS error messages */
-#define EENTERMOUNT              (-301)
-#define ELEAVEMOUNT              (-302)
-#define ESYMLINK                 (-303)
+#define EENTERMOUNT	301
+#define ELEAVEMOUNT	302
+#define ESYMLINK	303
 
 /* VFS/FS types */
 

@@ -144,7 +144,7 @@ int fs_unlink()
   /* If error, return inode. */
   if(r != 0) {
 	  /* Mount point? */
-  	if (r == EENTERMOUNT || r == ELEAVEMOUNT) {
+  	if (r == -EENTERMOUNT || r == -ELEAVEMOUNT) {
   	  	put_inode(rip);
   		r = -EBUSY;
   	}
@@ -320,10 +320,10 @@ int fs_rename()
   old_ip = advance(old_dirp, old_name, IGN_PERM);
   r = err_code;
 
-  if (r == EENTERMOUNT || r == ELEAVEMOUNT) {
+  if (r == -EENTERMOUNT || r == -ELEAVEMOUNT) {
 	put_inode(old_ip);
-	if (r == EENTERMOUNT) r = -EXDEV;	/* should this fail at all? */
-	else if (r == ELEAVEMOUNT) r = -EINVAL;	/* rename on dot-dot */
+	if (r == -EENTERMOUNT) r = -EXDEV;	/* should this fail at all? */
+	else if (r == -ELEAVEMOUNT) r = -EINVAL;	/* rename on dot-dot */
   }
 
   /* Get new dir inode */ 
@@ -332,8 +332,8 @@ int fs_rename()
   new_ip = advance(new_dirp, new_name, IGN_PERM); /* not required to exist */
 
   /* However, if the check failed because the file does exist, don't continue.
-   * Note that ELEAVEMOUNT is covered by the dot-dot check later. */
-  if(err_code == EENTERMOUNT) {
+   * Note that -ELEAVEMOUNT is covered by the dot-dot check later. */
+  if(err_code == -EENTERMOUNT) {
 	put_inode(new_ip);
 	r = -EBUSY;
   }
@@ -362,7 +362,7 @@ int fs_rename()
 				put_inode(new_superdirp);
 				break;	
 			}
-			if(err_code == ELEAVEMOUNT) {
+			if(err_code == -ELEAVEMOUNT) {
 				/* imitate that we are back at the root,
 				 * cross device checked already on VFS */
 				put_inode(next_new_superdirp);

@@ -222,12 +222,12 @@ node_details_t *node;
   /* Issue the request */
   r = req_lookup(fs_e, dir_ino, root_ino, uid, gid, flags, &res);
 
-  if (r != 0 && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
+  if (r != 0 && r != -EENTERMOUNT && r != -ELEAVEMOUNT && r != -ESYMLINK)
 	return(r); /* i.e., an error occured */
 
   /* While the response is related to mount control set the 
    * new requests respectively */
-  while (r == EENTERMOUNT || r == ELEAVEMOUNT || r == ESYMLINK) {
+  while (r == -EENTERMOUNT || r == -ELEAVEMOUNT || r == -ESYMLINK) {
 	/* Update user_fullpath to reflect what's left to be parsed. */
 	path_off= res.char_processed;
 	path_left_len = strlen(&user_fullpath[path_off]);
@@ -240,9 +240,9 @@ node_details_t *node;
 		return(-ELOOP);
 
 	/* Symlink encountered with absolute path */
-	if (r == ESYMLINK) {
+	if (r == -ESYMLINK) {
 		dir_vp = fp->fp_rd;
-	} else if (r == EENTERMOUNT) {
+	} else if (r == -EENTERMOUNT) {
 		/* Entering a new partition */
 		dir_vp = 0;
 		/* Start node is now the mounted partition's root node */
@@ -296,7 +296,7 @@ node_details_t *node;
 
 	r = req_lookup(fs_e, dir_ino, root_ino, uid, gid, flags, &res);
 
-	if (r != 0 && r != EENTERMOUNT && r != ELEAVEMOUNT && r != ESYMLINK)
+	if (r != 0 && r != -EENTERMOUNT && r != -ELEAVEMOUNT && r != -ESYMLINK)
 		return(r);
   }
 

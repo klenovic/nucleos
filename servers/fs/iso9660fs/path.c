@@ -51,14 +51,14 @@ int fs_lookup() {
   offset = 0;
   r = parse_path(dir_ino, root_ino, flags, &dir, &offset);
 
-  if (r == ELEAVEMOUNT) {
+  if (r == -ELEAVEMOUNT) {
 	/* Report offset and the error */
 	fs_m_out.RES_OFFSET = offset;
 	fs_m_out.RES_SYMLOOP = 0;
 	return(r);
   }
 
-  if (r != 0 && r != EENTERMOUNT) return(r);
+  if (r != 0 && r != -EENTERMOUNT) return(r);
 
   fs_m_out.RES_INODE_NR     = ID_DIR_RECORD(dir);
   fs_m_out.RES_MODE         = dir->d_mode;
@@ -68,7 +68,7 @@ int fs_lookup() {
   fs_m_out.RES_GID          = SYS_GID;		/* operator */
 
 
-  if (r == EENTERMOUNT) { 
+  if (r == -EENTERMOUNT) { 
   	fs_m_out.RES_OFFSET = offset;
 	release_dir_record(dir);
   }
@@ -213,9 +213,9 @@ size_t *offsetp;
       *res_inop= start_dir;
       *offsetp += cp-user_path;
 
-      /* Return EENTERMOUNT if we are at a mount point */
+      /* Return -EENTERMOUNT if we are at a mount point */
       if (start_dir->d_mountpoint)
-       	return EENTERMOUNT;
+       	return -EENTERMOUNT;
 
       return 0;
     }
@@ -238,7 +238,7 @@ size_t *offsetp;
   
     /* Special code for '..'. A process is not allowed to leave a chrooted
      * environment. A lookup of '..' at the root of a mounted filesystem
-     * has to return ELEAVEMOUNT.
+     * has to return -ELEAVEMOUNT.
      */
     if (strcmp(string, "..") == 0) {
 
@@ -255,14 +255,14 @@ size_t *offsetp;
 	release_dir_record(start_dir);
 	*res_inop = NULL;
 	*offsetp += cp-user_path;
-	return ELEAVEMOUNT;
+	return -ELEAVEMOUNT;
       }
     } else {
       /* Only check for a mount point if we are not looking for '..'. */
       if (start_dir->d_mountpoint) {
 	*res_inop= start_dir;
 	*offsetp += cp-user_path;
-	return EENTERMOUNT;
+	return -EENTERMOUNT;
       }
     }
  
