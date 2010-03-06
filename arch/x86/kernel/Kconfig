@@ -26,11 +26,12 @@ config KERNEL_LINKAGE_TYPE
 	default "0x00" if KERNEL_LINKAGE_COMID=y
 	default "0x20" if KERNEL_LINKAGE_SEPID=y
 
-config KERNEL_STACK_SIZE
-	int "Kernel stack size (in bytes)"
-	default 1024
+config KERNEL_BOOTSTACK_SIZE
+	int "Kernel stack size used for booting"
+	default 4096
 	---help---
-	  Specify the kernel stack size (in bytes).
+	  Specify the kernel stack size while booting. The kernel
+	  switches to proper stack after the first trap to kernel.
 
 # common kernel configs
 source "kernel/Kconfig"

@@ -667,7 +667,7 @@ level0_call:
  * stack after the first trap to kernel
  */
 k_stack:
-	.space CONFIG_KERNEL_STACK_SIZE
+	.space CONFIG_KERNEL_BOOTSTACK_SIZE
 /* Top of kernel stack */
 .globl k_boot_stktop
 k_boot_stktop:
