@@ -111,21 +111,21 @@ char *t_stack[TOT_STACK_SPACE / sizeof(char *)];
 
 struct boot_image image[] = {
 	/* process nr, pc, flags, qs,  queue, stack,   name */
-	{IDLE,       NULL,     0,  0,      0, IDL_S, "idle"  },
-	{CLOCK,clock_task,     0,  8, TASK_Q, TSK_S, "clock" },
-	{SYSTEM, sys_task,     0,  8, TASK_Q, TSK_S, "system"},
-	{HARDWARE,      0,     0,  8, TASK_Q, HRD_S, "kernel"},
-	{PM_PROC_NR,    0,     0, 32,      4, 0,     "pm"    },
-	{FS_PROC_NR,    0,     0, 32,      5, 0,     "vfs"   },
-	{RS_PROC_NR,    0,     0,  4,      4, 0,     "rs"    },
-	{MEM_PROC_NR,   0, BVM_F,  4,      3, 0,     "memory"},
-	{LOG_PROC_NR,   0, BVM_F,  4,      2, 0,     "log"   },
-	{TTY_PROC_NR,   0, BVM_F,  4,      1, 0,     "tty"   },
-	{DS_PROC_NR,    0, BVM_F,  4,      4, 0,     "ds"    },
-	{MFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "mfs"   },
-	{VM_PROC_NR,    0,     0, 32,      2, 0,     "vm"    },
-	{PFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "pfs"   },
-	{INIT_PROC_NR,  0, BVM_F,  8, USER_Q, 0,     "init"  },
+	{IDLE,       NULL,     0,  0,      0, IDL_S, "idle"    },
+	{CLOCK,clock_task,     0,  8, TASK_Q, TSK_S, "clock"   },
+	{SYSTEM, sys_task,     0,  8, TASK_Q, TSK_S, "system"  },
+	{HARDWARE,      0,     0,  8, TASK_Q, HRD_S, "kernel"  },
+	{PM_PROC_NR,    0,     0, 32,      4, 0,     "pm"      },
+	{FS_PROC_NR,    0,     0, 32,      5, 0,     "vfs"     },
+	{RS_PROC_NR,    0,     0,  4,      4, 0,     "rs"      },
+	{MEM_PROC_NR,   0, BVM_F,  4,      3, 0,     "memory"  },
+	{LOG_PROC_NR,   0, BVM_F,  4,      2, 0,     "log"     },
+	{TTY_PROC_NR,   0, BVM_F,  4,      1, 0,     "tty"     },
+	{DS_PROC_NR,    0, BVM_F,  4,      4, 0,     "ds"      },
+	{MFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "minixfs" },
+	{VM_PROC_NR,    0,     0, 32,      2, 0,     "vm"      },
+	{PFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "pipefs"  },
+	{INIT_PROC_NR,  0, BVM_F,  8, USER_Q, 0,     "init"    },
 };
 
 /* Verify the size of the system image table at compile time. Also verify that 
