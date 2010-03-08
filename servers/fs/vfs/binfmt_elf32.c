@@ -31,6 +31,7 @@
 
 /** @brief Default stack size */
 #define STACKSIZE	CONFIG_VFS_ELF32_STACKSIZE
+#define ELF_PAGEALIGN(a) (((a) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 typedef Elf32_Ehdr elf32_ehdr_t;
 typedef Elf32_Phdr elf32_phdr_t;
@@ -427,7 +428,9 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 		for (i = 0; i < ehdr->e_phnum; i++) {
 			elf32_phdr_t* ph = &phdrs[i];
 
-			// Assume that a segment without write permissions is .text
+			/* Assume that a segment without write
+			 * permissions is .text and read-only sections
+			 */
 			if ((ph->p_flags & PF_W) == 0) {
 				exec->text_pstart = ph->p_paddr;
 				exec->text_vstart = ph->p_paddr;
@@ -454,7 +457,10 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 	 * real .text, .data, and .bss segments by inspecting the section
 	 * type and flags.
 	 */
-	unsigned int tlow = ~0UL, thigh = 0;
+	/* @nucleos: The current kernel expects to start the .text section
+	 *           from 0, thing to change.
+	 */
+	unsigned int tlow = 0, thigh = 0;
 	unsigned int dlow = ~0UL, dhigh = 0;
 	unsigned int blow = ~0UL, bhigh = 0;
 
@@ -465,6 +471,9 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 			/* .text and read-only segments */
 			if ((sh->sh_flags & SHF_ALLOC) &&
 			    ((sh->sh_flags & SHF_EXECINSTR) || (~sh->sh_flags & SHF_WRITE))) {
+				/* @nucleos: This check is useless for now since
+				 *           it was set to 0.
+				 */
 				if (sh->sh_addr < tlow)
 					tlow = sh->sh_addr;
 
@@ -501,7 +510,6 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 	 */
 #define INSEGMENT(a)	(a >= ph->p_vaddr && a < (ph->p_vaddr + ph->p_memsz))
 #define PADDR(a)	(ph->p_paddr + a - ph->p_vaddr)
-#define ELF_PAGEALIGN(a) (((a) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 	for (i = 0; i < ehdr->e_phnum; i++) {
 		elf32_phdr_t* ph = &phdrs[i];
