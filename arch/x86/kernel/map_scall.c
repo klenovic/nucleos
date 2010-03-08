@@ -50,10 +50,10 @@ static struct endpt_args scall_to_srv[NR_syscalls];
 static inline long strnlen_user(const char __user *s, size_t maxlen)
 {
 	char name[PATH_MAX];
-	unsigned long len = 0;
+	unsigned long len = (VM_STACKTOP - (unsigned long)s);
 
 	/* We must not cross the top of stack during copy */
-	len = ((VM_STACKTOP - (unsigned long)s) < maxlen) ? (VM_STACKTOP - (unsigned long)s) : maxlen;
+	len = (len < maxlen) ? len : maxlen;
 
 	/* Just hang on for now
 	 * @nucleos: add kernel oops here
