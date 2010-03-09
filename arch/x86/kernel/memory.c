@@ -185,7 +185,7 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 		CREATEPDE(dstproc, dstptr, dstlinaddr, chunk, bytes, dstpde, dsttype);
 
 		/* Copy pages. */
-		PHYS_COPY_CATCH(srcptr, dstptr, chunk, addr);
+		addr = PHYS_COPY_CATCH(srcptr, dstptr, chunk);
 
 		DONEPDE(srcpde);
 		DONEPDE(dstpde);
@@ -652,8 +652,8 @@ int delivermsg(struct proc *rp)
 
 	vm_set_cr3(rp);
 
-	PHYS_COPY_CATCH(vir2phys(&rp->p_delivermsg),
-		rp->p_delivermsg_lin, sizeof(message), addr);
+	addr = PHYS_COPY_CATCH(vir2phys(&rp->p_delivermsg),
+		rp->p_delivermsg_lin, sizeof(message));
 
 	if(addr) {
 		vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(message), 1,
