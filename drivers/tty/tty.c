@@ -109,6 +109,7 @@ unsigned long rs_irq_set = 0;
 
 struct kmessages kmess;
 
+static void got_signal(void);
 static void tty_timed_out(timer_t *tp);
 static void expire_timers(void);
 static void settimer(tty_t *tty_ptr, int enable);
@@ -224,8 +225,8 @@ int main(void)
 				expire_timers();
 				break;
 			case PM_PROC_NR:
-				/* switch to primary console */
-				cons_stop();
+				/* signal */
+				got_signal();
 				break;
 			case SYSTEM:
 				/* system signal */
@@ -335,6 +336,24 @@ int main(void)
   }
 
   return 0;
+}
+
+/*===========================================================================*
+ *				got_signal				     *
+ *===========================================================================*/
+static void got_signal()
+{
+/* PM notified us that we have received a signal. If it is a SIGTERM, assume
+ * that the system is shutting down.
+ */
+  sigset_t set;
+
+  if (getsigset(&set) != 0) return;
+
+  if (!sigismember(&set, SIGTERM)) return;
+
+  /* switch to primary console */
+  cons_stop();
 }
 
 /*===========================================================================*
