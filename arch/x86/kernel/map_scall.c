@@ -63,7 +63,8 @@ static inline long strnlen_user(const char __user *s, size_t maxlen)
 
 	copy_from_user(name, s, len);
 
-	return strnlen(name, len);
+	/* Return the length of string _including_ the NULL character */
+	return strnlen(name, len) + 1;
 }
 
 endpoint_t map_scall_endpt(struct pt_regs *r)
@@ -135,7 +136,7 @@ err_nosys:
 static void msg_access(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m3_i2 = r->cx;		/* mode */
 }
 
@@ -152,20 +153,20 @@ static void msg_brk(message *msg, const struct pt_regs *r)
 static void msg_chdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 }
 
 static void msg_chmod(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
 static void msg_chown(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_i2 = (uid_t)r->cx;	/* owner */
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 }
@@ -173,7 +174,7 @@ static void msg_chown(message *msg, const struct pt_regs *r)
 static void msg_chroot(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* path */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 }
 
 static void msg_close(message *msg, const struct pt_regs *r)
@@ -192,7 +193,7 @@ static void msg_cprof(message *msg, const struct pt_regs *r)
 static void msg_creat(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 }
 
@@ -210,7 +211,7 @@ static void msg_dup2(message *msg, const struct pt_regs *r)
 static void msg_exec(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* filename */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (char*)r->cx;	/* frame */
 	msg->m1_i2 = r->dx;		/* frame_size */
 }
@@ -356,10 +357,10 @@ static void msg_kill(message *msg, const struct pt_regs *r)
 static void msg_link(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
 	msg->m1_p2 = (char*)r->cx;	/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
 }
 
 static void msg_llseek(message *msg, const struct pt_regs *r)
@@ -381,21 +382,21 @@ static void msg_lseek(message *msg, const struct pt_regs *r)
 static void msg_lstat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (char*)r->cx;	/* buffer */
 }
 
 static void msg_mkdir(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 }
 
 static void msg_mknod(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *) r->bx;		/* pathname */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_i2 = (mode_t)r->cx;		/* mode */
 	msg->m1_i3 = (dev_t)r->dx;		/* device */
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
@@ -427,10 +428,10 @@ static void msg_mmap(message *msg, const struct pt_regs *r)
 static void msg_mount(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* special */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
 	msg->m1_p2 = (char *)r->cx;	/* name */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
 
 	msg->m1_i3 = r->dx;		/* mountflags */
 	msg->m1_p3 = (char *)r->si;	/* ep */
@@ -455,7 +456,7 @@ static void msg_munmap_text(message *msg, const struct pt_regs *r)
 static void msg_open(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* pathname */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_i2 = r->cx;		/* flags */
 	msg->m1_i3 = (mode_t)r->dx;	/* mode */
 }
@@ -482,7 +483,7 @@ static void msg_read(message *msg, const struct pt_regs *r)
 static void msg_readlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 	msg->m1_i2 = r->dx;		/* bufsiz */
 }
@@ -497,15 +498,15 @@ static void msg_reboot(message *msg, const struct pt_regs *r)
 static void msg_rename(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (void *)r->cx;	/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
 }
 
 static void msg_rmdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 }
 
 static void msg_select(message *msg, const struct pt_regs *r)
@@ -611,7 +612,7 @@ static void msg_sprof(message *msg, const struct pt_regs *r)
 static void msg_stat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 }
 
@@ -623,9 +624,9 @@ static void msg_stime(message *msg, const struct pt_regs *r)
 static void msg_symlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;		/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m1_p2 = (char *)r->cx;		/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX) + 1;
+	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
 }
 
 static void msg_sync(message *msg, const struct pt_regs *r)
@@ -651,7 +652,7 @@ static void msg_times(message *msg, const struct pt_regs *r)
 static void msg_truncate(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;		/* path */
-	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m2_l1 = (off_t)r->cx;		/* length */
 }
 
@@ -663,19 +664,19 @@ static void msg_umask(message *msg, const struct pt_regs *r)
 static void msg_umount(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* target */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 }
 
 static void msg_unlink(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 }
 
 static void msg_utime(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;	/* filename */
-	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX) + 1;
+	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX);
 	msg->m2_l1 = r->cx;		/* times pointer */
 }
 
