@@ -17,16 +17,18 @@
 #include <nucleos/type.h>
 #include <kernel/proto.h>
 #include <kernel/glo.h>
+#include <kernel/vm.h>
 
-/*
+/**
  * Copy data to user space from kernel space.
  * Returns number of bytes that could not be copied. On success, this will be zero.
  */
-static inline int copy_to_user(void __user *to, const void *from, unsigned long n)
+static inline unsigned long copy_to_user(void __user *to, const void *from, unsigned long n)
 {
 	phys_bytes linaddr;
-	int rem;
+	phys_bytes pfaddr;
 
+	/* @nucleos: Do better address checking! */
 	if (!to || !from)
 		return -EINVAL;
 
@@ -34,20 +36,30 @@ static inline int copy_to_user(void __user *to, const void *from, unsigned long 
 		return -EFAULT;
 	}
 
-	rem = phys_copy(vir2phys(from), linaddr, n);
+	/* We must use this version of phys_copy (wrapper) because a pagefault
+	 * exception may occur during copy and we want to handle it.
+	 */
+	pfaddr = PHYS_COPY_CATCH(vir2phys(from), linaddr, n);
 
-	return rem;
+	if (!pfaddr)
+		return 0;
+
+	if (pfaddr < linaddr || n < (pfaddr - linaddr))
+		return n;
+
+	return (n - (pfaddr - linaddr));
 }
 
-/*
+/**
  * Copy data from user space to kernel space.
  * Returns number of bytes that could not be copied. On success, this will be zero.
  */
-static inline int copy_from_user(void *to, const void __user *from, unsigned long n)
+static inline unsigned long copy_from_user(void *to, const void __user *from, unsigned long n)
 {
 	phys_bytes linaddr;
-	int rem;
+	phys_bytes pfaddr;
 
+	/* @nucleos: Do better address checking! */
 	if (!to || !from)
 		return -EINVAL;
 
@@ -55,9 +67,18 @@ static inline int copy_from_user(void *to, const void __user *from, unsigned lon
 		return -EFAULT;
 	}
 
-	rem = phys_copy(linaddr, vir2phys(to), n);
+	/* We must use this version of phys_copy (wrapper) because a pagefault
+	 * exception may occur during copy and we want to handle it.
+	 */
+	pfaddr = PHYS_COPY_CATCH(linaddr, vir2phys(to), n);
 
-	return rem;
+	if (!pfaddr)
+		return 0;
+
+	if (pfaddr < linaddr || n < (pfaddr - linaddr))
+		return n;
+
+	return (n - (pfaddr - linaddr));
 }
 
 #endif /*__ASM_X86_KERNEL_UACCESS_32_H */
