@@ -135,6 +135,14 @@ message *m_ptr;			/* pointer to request message */
 	proc_stacktrace(caller);
   }
 
+	/* Mark the process that it will return from sigreturn and we
+	 * must save its return value.
+	 * @nucleos: Necessary workaround because sigreturn
+	 *           (which also calls the sigprocmask) override
+	 *           the return value saved in %eax register.
+	 */
+	rp->ret_from_sig = 1;
+
   return 0;
 }
 

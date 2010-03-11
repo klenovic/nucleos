@@ -122,16 +122,24 @@ struct proc {
 	 *           and shall be removed one day.
 	 */
 	int syscall_0x80;	/* if set then the call was via `int 0x80' */
-
-#define __NUM_CLOBB_REGS	6	/* number of clobbered registers */
+	int ret_from_sig;	/* Mark if will return from sigreturn
+				 * @nucleos: Temporary workaround when the process
+				 *           returns from signal. It is necessary
+				 *           to save its return value otherwise the
+				 *           sigreturn (which also calls sigprocmask)
+				 *           overrides the return value saved in %eax
+				 *           register.
+				 */
+#define __NUM_CLOBB_REGS	7	/* number of clobbered registers */
 
 #ifdef CONFIG_X86_32
-#define CLOBB_REG_EBX	0
-#define CLOBB_REG_ECX	1
-#define CLOBB_REG_EDX	2
-#define CLOBB_REG_ESI	3
-#define CLOBB_REG_EDI	4
-#define CLOBB_REG_EBP	5
+#define CLOBB_REG_EAX	0
+#define CLOBB_REG_EBX	1
+#define CLOBB_REG_ECX	2
+#define CLOBB_REG_EDX	3
+#define CLOBB_REG_ESI	4
+#define CLOBB_REG_EDI	5
+#define CLOBB_REG_EBP	6
 #endif
 	long clobregs[__NUM_CLOBB_REGS];
 };

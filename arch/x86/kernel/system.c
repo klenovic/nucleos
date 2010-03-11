@@ -497,12 +497,20 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		int __user *p_status = 0;
 		int status = 0;
 
-		/* @nucleos: Return the real syscall result not of the KIPC.
-		 *
-		 *           NOTE: This is ignored for now and the result is
-		 *                 got from message.
-		 */
 		proc->p_reg.retreg = proc->p_delivermsg.m_type;
+
+		/* When the process returns from signal we must save its value
+		 * otherwise the sigreturn (which also calls sigprocmask) overrides
+		 * the return value saved in %eax register.
+		 */
+		if (proc->ret_from_sig == 1) {
+			proc->clobregs[CLOBB_REG_EAX] = proc->p_reg.retreg;
+			/* Set to 2 so the first value is not overwritten
+			 * by functions called from sigreturn. Only the
+			 * next signal could change it.
+			 */
+			proc->ret_from_sig = 2;
+		}
 
 		switch (proc->syscall_0x80) {
 		case __NNR_wait:
@@ -529,5 +537,11 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		proc->p_reg.fp = proc->clobregs[CLOBB_REG_EBP];
 
 		proc->syscall_0x80 = 0;
+	}
+
+	if (proc->syscall_0x80 == __NNR_sigreturn) {
+		/* Get the saved return value */
+		proc->p_reg.retreg = proc->clobregs[CLOBB_REG_EAX];
+		proc->ret_from_sig = 0;
 	}
 }
