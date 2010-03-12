@@ -379,7 +379,8 @@ int do_munmap(message *m)
         }
  
 	len = m->VMUM_LEN;
-	len -= len % VM_PAGE_SIZE;
+	if (len % VM_PAGE_SIZE)
+		len += VM_PAGE_SIZE - (len % VM_PAGE_SIZE);
 
         if(addr != vr->vaddr || len > vr->length || len < VM_PAGE_SIZE) {
                 return -EFAULT;
@@ -525,7 +526,8 @@ int scall_munmap(message *m)
 	}
 
 	len = m->VMUM_LEN;
-	len -= len % VM_PAGE_SIZE;
+	if (len % VM_PAGE_SIZE)
+		len += VM_PAGE_SIZE - (len % VM_PAGE_SIZE);
 
 	if (addr != vr->vaddr || len > vr->length || len < VM_PAGE_SIZE) {
 		return -EFAULT;
