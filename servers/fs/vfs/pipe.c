@@ -670,9 +670,9 @@ int check_pipe(void)
 #endif
 
 /*===========================================================================*
- *                              sys_pipe                                      *
+ *                              scall_pipe                                      *
  *===========================================================================*/
-int sys_pipe(void)
+int scall_pipe(void)
 {
 	/* Perform the pipe(fil_des) system call. */
 	register struct fproc *rfp;

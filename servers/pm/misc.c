@@ -665,7 +665,7 @@ struct pciinfo *pciinfo;
  * has been offset by 20 (i.e. it returns 40..1 instead of -20..19)
  * to stay compatible.
  */
-int sys_getpriority(void)
+int scall_getpriority(void)
 {
 	int arg_which, arg_who;
 	int retval = -ESRCH;
@@ -701,7 +701,7 @@ int sys_getpriority(void)
 	return retval;
 }
 
-int sys_setpriority(void)
+int scall_setpriority(void)
 {
 	int r, which, who, niceval;
 	int error = -EINVAL;
@@ -756,7 +756,7 @@ out:
 
 #define p_utsbuf	m1_p1
 
-int sys_uname(void)
+int scall_uname(void)
 {
 	int err;
 

@@ -68,9 +68,9 @@ int do_utime()
 #define utime_ptimes	m2_l1	/* times pointer */
 
 /*===========================================================================*
- *				sys_utime				     *
+ *				scall_utime				     *
  *===========================================================================*/
-int sys_utime(void)
+int scall_utime(void)
 {
 	/* Perform the utime(name, timep) system call. */
 	register int len;

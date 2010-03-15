@@ -751,7 +751,7 @@ void vm_notify_sig_wrapper(endpoint_t ep)
 #define how_value	m1_i1
 #define p_oldset	m1_p2
 
-int sys_sigpending(void)
+int scall_sigpending(void)
 {
 	int err;
 
@@ -768,7 +768,7 @@ int sys_sigpending(void)
 	return 0;
 }
 
-int sys_sigprocmask(void)
+int scall_sigprocmask(void)
 {
 	/* Note that the library interface passes the actual mask in sigmask_set,
 	 * not a pointer to the mask, in order to save a copy.  Similarly,
@@ -850,7 +850,7 @@ int sys_sigprocmask(void)
 	return 0;
 }
 
-int sys_sigsuspend(void)
+int scall_sigsuspend(void)
 {
 	int err;
 	sigset_t set;

@@ -82,9 +82,9 @@ int do_open()
 }
 
 /*===========================================================================*
- *				sys_open				     *
+ *				scall_open				     *
  *===========================================================================*/
-int sys_open()
+int scall_open()
 {
 	/* Perform the open(name, flags,...) system call. */
 	int r;
@@ -513,9 +513,9 @@ int do_llseek()
 }
 
 /*===========================================================================*
- *				sys_lseek				     *
+ *				scall_lseek				     *
  *===========================================================================*/
-int sys_lseek()
+int scall_lseek()
 {
 	/* Perform the lseek(ls_fd, offset, whence) system call. */
 	register struct filp *rfilp;
@@ -572,9 +572,9 @@ int sys_lseek()
 }
 
 /*===========================================================================*
- *				sys_llseek				     *
+ *				scall_llseek				     *
  *===========================================================================*/
-int sys_llseek(void)
+int scall_llseek(void)
 {
 	/* Perform the llseek(fd, offset, whence) system call. */
 	register struct filp *rfilp;

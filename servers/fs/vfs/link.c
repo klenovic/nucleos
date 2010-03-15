@@ -128,7 +128,7 @@ int do_unlink()
   put_vnode(vldirp);
   return(r);
 }
-int sys_rmdir(void) __alias("do_unlink");
+int scall_rmdir(void) __alias("do_unlink");
 
 /*===========================================================================*
  *				do_rename				     *
@@ -284,7 +284,7 @@ int do_slink()
   return(r);
   }
 
-int sys_symlink(void) __alias("do_slink");
+int scall_symlink(void) __alias("do_slink");
 /*===========================================================================*
  *                             do_rdlink                                    *
  *===========================================================================*/

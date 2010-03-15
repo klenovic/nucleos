@@ -57,37 +57,37 @@ int do_get()
 }
 
 
-int sys_getegid(void)
+int scall_getegid(void)
 {
 	return mp->mp_effgid;
 }
 
-int sys_getgid(void)
+int scall_getgid(void)
 {
 	return mp->mp_realgid;
 }
 
-int sys_getpgrp(void)
+int scall_getpgrp(void)
 {
 	return mp->mp_procgrp;
 }
 
-int sys_getpid(void)
+int scall_getpid(void)
 {
 	return  mproc[who_p].mp_pid;
 }
 
-int sys_getppid(void)
+int scall_getppid(void)
 {
 	return mproc[mp->mp_parent].mp_pid;
 }
 
-int sys_geteuid(void)
+int scall_geteuid(void)
 {
 	return mp->mp_effuid;
 }
 
-int sys_getuid(void)
+int scall_getuid(void)
 {
 	return mp->mp_realuid;
 }
@@ -155,7 +155,7 @@ int do_set()
   return(SUSPEND);
 }
 
-int sys_setegid(void)
+int scall_setegid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
@@ -177,7 +177,7 @@ int sys_setegid(void)
 	return SUSPEND;
 }
 
-int sys_seteuid(void)
+int scall_seteuid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
@@ -199,7 +199,7 @@ int sys_seteuid(void)
 	return SUSPEND;
 }
 
-int sys_setgid(void)
+int scall_setgid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
@@ -222,7 +222,7 @@ int sys_setgid(void)
 	return SUSPEND;
 }
 
-int sys_setsid(void)
+int scall_setsid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
@@ -242,7 +242,7 @@ int sys_setsid(void)
 	return SUSPEND;
 }
 
-int sys_setuid(void)
+int scall_setuid(void)
 {
 	register struct mproc *rmp = mp;
 	message m;
@@ -265,7 +265,7 @@ int sys_setuid(void)
 	return SUSPEND;
 }
 
-int sys_getgroups(void)
+int scall_getgroups(void)
 {
 	register struct mproc *rmp = mp;
 	int r, i;
@@ -298,7 +298,7 @@ int sys_getgroups(void)
 	return(r);
 }
 
-int sys_setgroups(void)
+int scall_setgroups(void)
 {
 	register struct mproc *rmp = mp;
 	message m;

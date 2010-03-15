@@ -386,7 +386,7 @@ struct timer *tp;
 /*===========================================================================*
  *                             sys_getitimer                                 *
  *===========================================================================*/
-int sys_getitimer(void)
+int scall_getitimer(void)
 {
 	struct itimerval ovalue;	/* old interval timers */
 	int r = 0;
@@ -423,7 +423,7 @@ int sys_getitimer(void)
 	return r;
 }
 
-int sys_setitimer(void)
+int scall_setitimer(void)
 {
 	struct itimerval ovalue, value;	/* old and new interval timers */
 	int r;

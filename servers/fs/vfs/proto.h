@@ -68,7 +68,7 @@ void nested_fs_call(message *m);
 /* link.c */
 int do_link(void);
 int do_unlink(void);
-int sys_rmdir(void);
+int scall_rmdir(void);
 int do_rename(void);
 int do_truncate(void);
 int do_ftruncate(void);
@@ -114,15 +114,15 @@ void close_filp(struct filp *fp);
 void close_reply(void);
 int do_creat(void);
 int do_lseek(void);
-int sys_lseek(void);
+int scall_lseek(void);
 int do_llseek(void);
-int sys_llseek(void);
+int scall_llseek(void);
 int do_mknod(void);
 int do_mkdir(void);
 int do_open(void);
-int sys_open(void);
+int scall_open(void);
 int do_slink(void);
-int sys_symlink(void);
+int scall_symlink(void);
 int do_vm_open(void);
 int do_vm_close(void);
 
@@ -134,7 +134,7 @@ struct vnode *last_dir(void);
 /* pipe.c */
 int do_pipe(void);
 int map_vnode(struct vnode *vp);
-int sys_pipe(void);
+int scall_pipe(void);
 void unpause(int proc_nr_e);
 int pipe_check(struct vnode *vp, int rw_flag, int oflags, int bytes, u64_t position, int notouch);
 void release(struct vnode *vp, int call_nr, int count);
@@ -224,7 +224,7 @@ int do_lstat(void);
 
 /* time.c */
 int do_utime(void);
-int sys_utime(void);
+int scall_utime(void);
 
 /* utility.c */
 time_t clock_time(void);

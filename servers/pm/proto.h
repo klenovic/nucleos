@@ -23,11 +23,11 @@ int do_alarm(void);
 int do_itimer(void);
 void set_alarm(struct mproc *rmp, clock_t ticks);
 void check_vtimer(int proc_nr, int sig);
-int sys_getitimer(void);
-int sys_setitimer(void);
+int scall_getitimer(void);
+int scall_setitimer(void);
 
 /* break.c */
-long sys_brk(void);
+long scall_brk(void);
 int do_brk(void);
 
 /* dma.c */
@@ -53,20 +53,20 @@ int wait_test(struct mproc *rmp, struct mproc *child);
 /* getset.c */
 int do_get(void);
 int do_set(void);
-int sys_getegid(void);
-int sys_getgid(void);
-int sys_getpgrp(void);
-int sys_getpid(void);
-int sys_getppid(void);
-int sys_getuid(void);
-int sys_geteuid(void);
-int sys_setegid(void);
-int sys_seteuid(void);
-int sys_setgid(void);
-int sys_setsid(void);
-int sys_setuid(void);
-int sys_getgroups(void);
-int sys_setgroups(void);
+int scall_getegid(void);
+int scall_getgid(void);
+int scall_getpgrp(void);
+int scall_getpid(void);
+int scall_getppid(void);
+int scall_getuid(void);
+int scall_geteuid(void);
+int scall_setegid(void);
+int scall_seteuid(void);
+int scall_setgid(void);
+int scall_setsid(void);
+int scall_setuid(void);
+int scall_getgroups(void);
+int scall_setgroups(void);
 
 /* main.c */
 int main(void);
@@ -84,9 +84,9 @@ int do_svrctl(void);
 int do_allocmem(void);
 int do_freemem(void);
 int do_getsetpriority(void);
-int sys_getpriority(void);
-int sys_setpriority(void);
-int sys_uname(void);
+int scall_getpriority(void);
+int scall_setpriority(void);
+int scall_uname(void);
 
 /* profile.c */
 int do_sprofile(void);
@@ -106,18 +106,18 @@ int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
 void restart_sigs(struct mproc *rmp);
 void vm_notify_sig_wrapper(endpoint_t ep); 
-int sys_sigpending(void);
-int sys_sigprocmask(void);
-int sys_sigsuspend(void);
+int scall_sigpending(void);
+int scall_sigprocmask(void);
+int scall_sigsuspend(void);
 int scall_sigreturn(void);
 
 /* time.c */
 int do_stime(void);
 int do_time(void);
 int do_times(void);
-int sys_gettimeofday(void);
+int scall_gettimeofday(void);
 int scall_stime(void);
-int sys_time(void);
+int scall_time(void);
 int scall_times(void);
 
 /* timers.c */

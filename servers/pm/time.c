@@ -93,7 +93,7 @@ int do_times()
 
 #define ptimeval	m2_p1
 
-int sys_gettimeofday(void)
+int scall_gettimeofday(void)
 {
 	/* Perform the time(tp) system call. This returns the time in seconds since
 	 * 1.1.1970.  Nucleos is an astrophysically naive system that assumes the earth
@@ -153,7 +153,7 @@ int scall_stime(void)
 
 #define p_time		m1_p1
 
-int sys_time(void)
+int scall_time(void)
 {
 	/* Perform the time(tp) system call. This returns the time in seconds since 
 	 * 1.1.1970.  MINIX is an astrophysically naive system that assumes the earth 
