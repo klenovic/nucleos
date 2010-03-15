@@ -2,6 +2,9 @@
 menu "Servers"
 
 source "servers/Kconfig"
+source "servers/fs/vfs/Kconfig"
+# Note: vm's arch Kconfig includes generic Kconfig if any
+source "arch/x86/servers/vm/Kconfig"
 
 # Hacking/debugging (generic + arch if any)
 source "arch/x86/servers/Kconfig.debug"

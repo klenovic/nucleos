@@ -1,9 +1,13 @@
-# Common for all servers
+# Common for all servers i.e. may apply on all servers
+ 
 config DEBUG_SERVERS
 	bool "Servers debugging"
 	default y
 	---help---
-	  Say Y if you want to debug servers.
+	  Say Y if you want to debug servers. These options may
+	  apply on all servers. Servers may have their own debug
+	  options independent from these here (see debug options
+	  for particular server).
 
 config DEBUG_SERVERS_SYSCALL_STATS
 	bool "Enable the counting of system calls in PM and FS"

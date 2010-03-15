@@ -1,0 +1,12 @@
+config DEBUG_VM
+	bool "VM debugging"
+	default n
+	---help---
+	  Say Y if you want to debug VM server.
+
+config DEBUG_VM_VERBOSE_LEVEL
+	int "Verbose level"
+	default 0
+	depends on DEBUG_VM
+	---help---
+	  Level of how noisy we are supposed to be.

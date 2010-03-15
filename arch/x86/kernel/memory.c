@@ -888,8 +888,10 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 		vmassert(caller->p_vmrequest.vmresult != VMSUSPEND);
 		RTS_LOCK_UNSET(caller, RTS_VMREQUEST);
 		if(caller->p_vmrequest.vmresult != 0) {
+#ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 			printf("virtual_copy: returning VM error %d\n",
 				caller->p_vmrequest.vmresult);
+#endif
 	  		NOREC_RETURN(virtualcopy, caller->p_vmrequest.vmresult);
 		}
 	}

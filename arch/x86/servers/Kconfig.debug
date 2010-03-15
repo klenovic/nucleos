@@ -1,7 +1,11 @@
 # Generic/common + arch. specific debug (if any) configs for servers
-
+# Note: Don't include Kconfig.debug files of particular servers. Each
+#       server must include its Kconfig.debug itself into Kconfig.
 menu "Servers hacking/debugging"
 
+# Generic debug options
 source "servers/Kconfig.debug"
+
+# Arch debug options
 
 endmenu

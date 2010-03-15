@@ -1,0 +1,9 @@
+menu "VM server"
+
+# arch-independent part
+source "servers/vm/Kconfig"
+
+# VM hacking and debugging
+source "arch/x86/servers/vm/Kconfig.debug"
+
+endmenu
