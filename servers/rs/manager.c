@@ -954,6 +954,12 @@ endpoint_t *endpoint;
       init_pci(rp, child_proc_nr_e);
   }
 
+  /* Publish the new system service. */
+  s = publish_service(rp);
+  if (s != 0) {
+	printf("RS: warning: publish_service failed: %d\n", s);
+  }
+
   /* The purpose of non-blocking forks is to avoid involving VFS in the forking
    * process, because VFS may be blocked on a sendrec() to a MFS that is
    * waiting for a endpoint update for a dead driver. We have just published
@@ -967,11 +973,6 @@ endpoint_t *endpoint;
   if (use_copy)
 	setuid(0);
 
-  /* Publish the new system service. */
-  s = publish_service(rp);
-  if (s != 0) {
-	printf("RS: warning: publish_service failed: %d\n", s);
-  }
   if (rp->r_dev_nr > 0) {				/* set driver map */
       if ((s=mapdriver5(rp->r_label, strlen(rp->r_label),
 	      rp->r_dev_nr, rp->r_dev_style, !!use_copy /* force */)) < 0) {
