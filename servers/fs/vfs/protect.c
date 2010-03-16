@@ -42,11 +42,11 @@ int do_chmod()
   int r;
   mode_t new_mode;
     
-  if (call_nr == __NR_chmod || call_nr == __NNR_chmod) {
+  if (call_nr == __NNR_chmod) {
   	/* Temporarily open the file */
       if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
 	if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
-  } else {	/* call_nr == __NR_fchmod || call_nr == __NNR_fchmod */
+  } else {	/* call_nr == __NNR_fchmod */
 	/* File is already opened; get a pointer to vnode from filp. */
 	if (!(flp = get_filp(m_in.fd))) return(err_code);
       vp= flp->filp_vno;
@@ -94,11 +94,11 @@ int do_chown()
   gid_t gid;
   mode_t new_mode;
   
-  if (call_nr == __NR_chown || call_nr == __NNR_chown) {
+  if (call_nr == __NNR_chown) {
 	/* Temporarily open the file. */
       if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
       if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
-  } else {	/* call_nr == __NR_fchown || __NNR_fchown */
+  } else {	/* __NNR_fchown */
   	/* File is already opened; get a pointer to the vnode from filp. */
       if (!(flp = get_filp(m_in.fd))) return(err_code);
       vp= flp->filp_vno;
@@ -193,8 +193,8 @@ int forbidden(struct vnode *vp, mode_t access_desired)
 
   /* Isolate the relevant rwx bits from the mode. */
   bits = vp->v_mode;
-  uid = (call_nr == __NR_access || call_nr == __NNR_access ? fp->fp_realuid : fp->fp_effuid);
-  gid = (call_nr == __NR_access || call_nr == __NNR_access ? fp->fp_realgid : fp->fp_effgid);
+  uid = (call_nr == __NNR_access ? fp->fp_realuid : fp->fp_effuid);
+  gid = (call_nr == __NNR_access ? fp->fp_realgid : fp->fp_effgid);
 
   if (uid == SU_UID) {
 	/* Grant read and write permission.  Grant search permission for

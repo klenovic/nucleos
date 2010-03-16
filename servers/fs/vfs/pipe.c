@@ -373,10 +373,9 @@ int count;			/* max number of processes to release */
   /* Trying to perform the call also includes SELECTing on it with that
    * operation.
    */
-  if (call_nr == __NR_read || call_nr == __NR_write ||
-      call_nr == __NNR_read || call_nr == __NNR_write) {
+  if (call_nr == __NNR_read || call_nr == __NNR_write) {
   	  int op;
-  	  if (call_nr == __NR_read || call_nr == __NNR_read)
+  	  if (call_nr == __NNR_read)
   	  	op = SEL_RD;
   	  else
   	  	op = SEL_WR;
@@ -549,7 +548,7 @@ int proc_nr_e;
 		mess.IO_GRANT = (char *) rfp->fp_grant;
 
 		/* Tell kernel R or W. Mode is from current call, not open. */
-		mess.COUNT = ((rfp->fp_fd & BYTE) == __NR_read || (rfp->fp_fd & BYTE) == __NNR_read) ? R_BIT : W_BIT;
+		mess.COUNT = ((rfp->fp_fd & BYTE) == __NNR_read) ? R_BIT : W_BIT;
 		mess.m_type = CANCEL;
 		fp = rfp;	/* hack - ctty_io uses fp */
 		(*dmap[(dev >> MAJOR) & BYTE].dmap_io)(rfp->fp_task, &mess);
