@@ -47,6 +47,9 @@ static struct endpt_args scall_to_srv[NR_syscalls];
 #define SCALL_TO_SRV(syscall, server) \
 	[ __NNR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
 
+#define SCALL_TO_ANY(syscall, server) \
+	[ __NNR_ ## syscall ] = { server, msg_ ## syscall }
+
 static inline long strnlen_user(const char __user *s, size_t maxlen)
 {
 	char name[PATH_MAX];
@@ -393,6 +396,16 @@ static int msg_getpriority(message *msg, const struct pt_regs *r)
 	msg->m1_i1 = r->bx;	/* which */
 	msg->m1_i2 = r->cx;	/* who */
 
+	return 0;
+}
+
+static int msg_getsysinfo(message *msg, const struct pt_regs *r)
+{
+	return 0;
+}
+
+static int msg_getsysinfo_up(message *msg, const struct pt_regs *r)
+{
 	return 0;
 }
 
@@ -769,6 +782,11 @@ static int msg_stime(message *msg, const struct pt_regs *r)
 	return 0;
 }
 
+static int msg_svrctl(message *msg, const struct pt_regs *r)
+{
+	return 0;
+}
+
 static int msg_symlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;		/* oldpath */
@@ -911,70 +929,73 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(getegid,		PM),
 	SCALL_TO_SRV(geteuid,		PM),
 	SCALL_TO_SRV(getgid,		PM),
+	SCALL_TO_SRV(getgroups,		PM),
 	SCALL_TO_SRV(getitimer,		PM),
-	SCALL_TO_SRV(getpgrp,		PM),
-	SCALL_TO_SRV(getpid,		PM),	/* 30 */
+	SCALL_TO_SRV(getpgrp,		PM),	/* 30 */
 
+	SCALL_TO_SRV(getpid,		PM),
 	SCALL_TO_SRV(getppid,		PM),
 	SCALL_TO_SRV(getpriority,	PM),
+	SCALL_TO_ANY(getsysinfo,	ENDPT_ANY),
+	SCALL_TO_ANY(getsysinfo_up,	ENDPT_ANY),
 	SCALL_TO_SRV(gettimeofday,	PM),
 	SCALL_TO_SRV(getuid,		PM),
 	SCALL_TO_SRV(ioctl,		FS),
 	SCALL_TO_SRV(kill,		PM),
-	SCALL_TO_SRV(link,		FS),
+	SCALL_TO_SRV(link,		FS),	/* 40 */
+
 	SCALL_TO_SRV(llseek,		FS),
 	SCALL_TO_SRV(lseek,		FS),
-	SCALL_TO_SRV(lstat,		FS),	/* 40 */
-
+	SCALL_TO_SRV(lstat,		FS),
 	SCALL_TO_SRV(mkdir,		FS),
 	SCALL_TO_SRV(mknod,		FS),
 	SCALL_TO_SRV(mmap,		VM),
 	SCALL_TO_SRV(mount,		FS),
 	SCALL_TO_SRV(munmap,		VM),
 	SCALL_TO_SRV(munmap_text,	VM),
-	SCALL_TO_SRV(open,		FS),
+	SCALL_TO_SRV(open,		FS),	/* 50 */
+
 	SCALL_TO_SRV(pause,		PM),
 	SCALL_TO_SRV(pipe,		FS),
-	SCALL_TO_SRV(ptrace,		PM),	/* 50 */
-
+	SCALL_TO_SRV(ptrace,		PM),
 	SCALL_TO_SRV(read,		FS),
 	SCALL_TO_SRV(readlink,		FS),
 	SCALL_TO_SRV(reboot,		PM),
 	SCALL_TO_SRV(rename,		FS),
 	SCALL_TO_SRV(rmdir,		FS),
 	SCALL_TO_SRV(select,		FS),
-	SCALL_TO_SRV(setegid,		PM),
+	SCALL_TO_SRV(setegid,		PM),	/* 60 */
+
 	SCALL_TO_SRV(seteuid,		PM),
 	SCALL_TO_SRV(setgid,		PM),
-	SCALL_TO_SRV(setitimer,		PM),	/* 60 */
-
+	SCALL_TO_SRV(setgroups,		PM),
+	SCALL_TO_SRV(setitimer,		PM),
 	SCALL_TO_SRV(setpriority,	PM),
 	SCALL_TO_SRV(setsid,		PM),
 	SCALL_TO_SRV(setuid,		PM),
 	SCALL_TO_SRV(sigaction,		PM),
 	SCALL_TO_SRV(signal,		PM),
-	SCALL_TO_SRV(sigpending,	PM),
+	SCALL_TO_SRV(sigpending,	PM),	/* 70 */
+
 	SCALL_TO_SRV(sigprocmask,	PM),
 	SCALL_TO_SRV(sigreturn,		PM),
 	SCALL_TO_SRV(sigsuspend,	PM),
-	SCALL_TO_SRV(sprof,		PM),	/* 70 */
-
+	SCALL_TO_SRV(sprof,		PM),
 	SCALL_TO_SRV(stat,		FS),
 	SCALL_TO_SRV(stime,		PM),
+	SCALL_TO_ANY(svrctl,		ENDPT_ANY),
 	SCALL_TO_SRV(symlink,		FS),
 	SCALL_TO_SRV(sync,		FS),
-	SCALL_TO_SRV(uname,		PM),
+	SCALL_TO_SRV(uname,		PM),	/* 80 */
+
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
 	SCALL_TO_SRV(truncate,		FS),
 	SCALL_TO_SRV(umask,		FS),
-	SCALL_TO_SRV(umount,		FS),	/* 80 */
-
+	SCALL_TO_SRV(umount,		FS),
 	SCALL_TO_SRV(unlink,		FS),
 	SCALL_TO_SRV(utime,		FS),
 	SCALL_TO_SRV(wait,		PM),
 	SCALL_TO_SRV(waitpid,		PM),
-	SCALL_TO_SRV(write,		FS),
-	SCALL_TO_SRV(getgroups,		PM),
-	SCALL_TO_SRV(setgroups,		PM),
+	SCALL_TO_SRV(write,		FS),	/* 90 */
 };
