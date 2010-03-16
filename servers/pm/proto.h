@@ -51,8 +51,6 @@ int do_waitpid(void);
 int wait_test(struct mproc *rmp, struct mproc *child);
 
 /* getset.c */
-int do_get(void);
-int do_set(void);
 int scall_getegid(void);
 int scall_getgid(void);
 int scall_getpgrp(void);
