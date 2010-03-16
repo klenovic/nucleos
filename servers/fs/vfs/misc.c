@@ -108,7 +108,7 @@ int do_getsysinfo()
   }
 
   dst_addr = (vir_bytes) m_in.info_where;
-  if (0 != (s = sys_datacopy(SELF, src_addr, who_e, dst_addr, len))) return(s);
+  if (0 != (s = sys_datacopy(ENDPT_SELF, src_addr, who_e, dst_addr, len))) return(s);
   return(0);
 
 }
@@ -252,7 +252,7 @@ int do_fcntl()
 	if (!(f->filp_mode & W_BIT)) return(-EBADF);
 
 	/* Copy flock data from userspace. */
-	if((r = sys_datacopy(who_e, (vir_bytes) m_in.name1, SELF, 
+	if((r = sys_datacopy(who_e, (vir_bytes) m_in.name1, ENDPT_SELF, 
 	     (vir_bytes) &flock_arg, (phys_bytes) sizeof(flock_arg))) != 0)
 		return(r);
 
@@ -357,9 +357,9 @@ void pm_reboot()
    * will tell us about it).
    */
   for (i = 0; i < NR_PROCS; i++)
-	if((m_in.endpt1 = fproc[i].fp_endpoint) != NONE) {
+	if((m_in.endpt1 = fproc[i].fp_endpoint) != ENDPT_NONE) {
 		/* No FP_EXITING, just free the resources, otherwise
-		 * consistency check for fp_endpoint (set to NONE) will
+		 * consistency check for fp_endpoint (set to ENDPT_NONE) will
 		 * fail if process wants to do something in the (short)
 		 * future.
 		 */
@@ -455,7 +455,7 @@ static void free_proc(struct fproc *exiter, int flags)
 
   fp = exiter;		/* get_filp() needs 'fp' */
 
-  if(fp->fp_endpoint == NONE) {
+  if(fp->fp_endpoint == ENDPT_NONE) {
 	panic(__FILE__, "free_proc: already free", NO_NUM);
   }
 
@@ -492,7 +492,7 @@ static void free_proc(struct fproc *exiter, int flags)
   }
 
   /* Invalidate endpoint number for error and sanity checks. */
-  fp->fp_endpoint = NONE;
+  fp->fp_endpoint = ENDPT_NONE;
 
   /* If a session leader exits and it has a controlling tty, then revoke 
    * access to its controlling tty from all other processes using it.
@@ -574,7 +574,7 @@ gid_t *groups;
   rfp = &fproc[slot];
   if (ngroups * sizeof(gid_t) > sizeof(rfp->fp_sgroups))
   	panic(__FILE__, "VFS: pm_setgroups: too much data to copy\n", NO_NUM);
-  if(sys_datacopy(who_e, (vir_bytes) groups, SELF, (vir_bytes) rfp->fp_sgroups,
+  if(sys_datacopy(who_e, (vir_bytes) groups, ENDPT_SELF, (vir_bytes) rfp->fp_sgroups,
   		   ngroups * sizeof(gid_t)) == 0) {
 	rfp->fp_ngroups = ngroups;
   } else
@@ -655,7 +655,7 @@ int do_svrctl()
 		(phys_bytes) sizeof(fdu))) != 0) 
 	    return(r);
 	major = (fdu.dev >> MAJOR) & BYTE;
-	r=map_driver(major, NONE, 0, 0);
+	r=map_driver(major, ENDPT_NONE, 0, 0);
 	return(r);
   }
   default:

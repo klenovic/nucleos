@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 		printf("rtl8169: ds_retrieve_u32 failed for 'inet': %d\n", r);
 #endif
 	while (TRUE) {
-		if ((r = kipc_receive(ANY, &m)) != 0)
+		if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
 			panic("rtl8169", "kipc_receive failed", r);
 
 		if (is_notify(m.m_type)) {
@@ -1252,7 +1252,7 @@ void transmittest(re_t *rep)
 		do {
 			message m;
 			int r;
-			if ((r = kipc_receive(ANY, &m)) != 0)
+			if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
 				panic("rtl8169", "kipc_receive failed", r);
 		} while(m.m_source != HARDWARE);
 		assert(!(rep->re_flags & REF_SEND_AVAIL));
@@ -1665,7 +1665,7 @@ message *mp;
 
 	stats = rep->re_stat;
 
-	r = sys_datacopy(SELF, (vir_bytes) &stats, mp->DL_PROC,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes) &stats, mp->DL_PROC,
 		(vir_bytes) mp->DL_ADDR, sizeof(stats));
 	if (r != 0)
 		panic(__FILE__, "rl_getstat: sys_datacopy failed", r);

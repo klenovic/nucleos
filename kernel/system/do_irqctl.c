@@ -53,7 +53,7 @@ register message *m_ptr;	/* pointer to request message */
   case IRQ_ENABLE:           
   case IRQ_DISABLE: 
       if (irq_hook_id >= NR_IRQ_HOOKS || irq_hook_id < 0 ||
-          irq_hooks[irq_hook_id].proc_nr_e == NONE) return(-EINVAL);
+          irq_hooks[irq_hook_id].proc_nr_e == ENDPT_NONE) return(-EINVAL);
       if (irq_hooks[irq_hook_id].proc_nr_e != m_ptr->m_source) return(-EPERM);
       if (m_ptr->IRQ_REQUEST == IRQ_ENABLE) {
           enable_irq(&irq_hooks[irq_hook_id]);	
@@ -96,7 +96,7 @@ register message *m_ptr;	/* pointer to request message */
       /* Find a free IRQ hook for this mapping. */
       hook_ptr = NULL;
       for (irq_hook_id=0; irq_hook_id<NR_IRQ_HOOKS; irq_hook_id++) {
-          if (irq_hooks[irq_hook_id].proc_nr_e == NONE) {	
+          if (irq_hooks[irq_hook_id].proc_nr_e == ENDPT_NONE) {	
               hook_ptr = &irq_hooks[irq_hook_id];	/* free hook */
               break;
           }
@@ -121,7 +121,7 @@ register message *m_ptr;	/* pointer to request message */
 
   case IRQ_RMPOLICY:
       if (irq_hook_id < 0 || irq_hook_id >= NR_IRQ_HOOKS ||
-               irq_hooks[irq_hook_id].proc_nr_e == NONE) {
+               irq_hooks[irq_hook_id].proc_nr_e == ENDPT_NONE) {
            return(-EINVAL);
       } else if (m_ptr->m_source != irq_hooks[irq_hook_id].proc_nr_e) {
            return(-EPERM);

@@ -123,7 +123,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 		count = LOG_SIZE - log->log_write;
 	buf = log->log_buffer + log->log_write;
 
-	if(proc_nr == SELF) {
+	if(proc_nr == ENDPT_SELF) {
 		memcpy(buf, (char *) user_vir, count);
 	}
 	else {
@@ -207,10 +207,10 @@ log_append(char *buf, int count)
 	if(count > LOG_SIZE) skip = count - LOG_SIZE;
 	count -= skip;
 	buf += skip;
-	w = subwrite(&logdevices[0], count, SELF, (vir_bytes) buf,0);
+	w = subwrite(&logdevices[0], count, ENDPT_SELF, (vir_bytes) buf,0);
 
 	if(w > 0 && w < count)
-		subwrite(&logdevices[0], count-w, SELF, (vir_bytes) buf+w,0);
+		subwrite(&logdevices[0], count-w, ENDPT_SELF, (vir_bytes) buf+w,0);
 	return;
 }
 

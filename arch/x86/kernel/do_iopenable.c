@@ -31,7 +31,7 @@ register message *m_ptr;	/* pointer to request message */
   int proc_nr;
 
 #if 1 /* ENABLE_USERPRIV && ENABLE_USERIOPL */
-  if (m_ptr->IO_ENDPT == SELF) {
+  if (m_ptr->IO_ENDPT == ENDPT_SELF) {
 	proc_nr = who_p;
   } else if(!isokendpt(m_ptr->IO_ENDPT, &proc_nr))
 	return(-EINVAL);

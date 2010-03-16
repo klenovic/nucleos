@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		/* Wait for request. */
-		if(kipc_receive(ANY, &m_in) != 0) {
+		if(kipc_receive(ENDPT_ANY, &m_in) != 0) {
 			panic(__FILE__, "kipc_receive failed", NO_NUM);
 		}
 

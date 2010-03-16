@@ -185,7 +185,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   driver_e = driver_endpoints[(dev >> MAJOR) & BYTE].driver_e;
   
   /* See if driver is roughly valid. */
-  if (driver_e == NONE) {
+  if (driver_e == ENDPT_NONE) {
       printf("MFS(%d) block_dev_io: no driver for dev %x\n", SELF_E, dev);
       return(-EDSTDIED);
   }
@@ -231,7 +231,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   if (r != 0) {
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           printf("MFS(%d) dead driver %d\n", SELF_E, driver_e);
-          driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = NONE;
+          driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = ENDPT_NONE;
           return r;
           /*dmap_unmap_by_endpt(task_nr);    <- in the VFS proc...  */
       }

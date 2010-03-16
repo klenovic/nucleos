@@ -127,7 +127,7 @@ int do_select(void)
   /* Did the process set a timeout value? If so, retrieve it. */
   if (m_in.SEL_TIMEOUT != NULL) {
   	do_timeout = 1;
-	r = sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_TIMEOUT,	SELF, D,
+	r = sys_vircopy(who_e, D, (vir_bytes) m_in.SEL_TIMEOUT,	ENDPT_SELF, D,
 			(vir_bytes) &timeout, sizeof(timeout));
 	if (r != 0) return(r);
   }
@@ -400,8 +400,8 @@ static int copy_fdsets(struct selectentry *se, int nfds, int direction)
 	fd_setsize = (nfds + __NFDBITS - 1)/8;
 
   /* Set source and destination endpoints */
-  src_e = (direction == FROM_PROC) ? se->req_endpt : SELF;
-  dst_e = (direction == FROM_PROC) ? SELF : se->req_endpt;
+  src_e = (direction == FROM_PROC) ? se->req_endpt : ENDPT_SELF;
+  dst_e = (direction == FROM_PROC) ? ENDPT_SELF : se->req_endpt;
 
   /* read set */
   src_fds = (direction == FROM_PROC) ? se->vir_readfds : &se->ready_readfds;

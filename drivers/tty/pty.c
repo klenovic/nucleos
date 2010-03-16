@@ -256,7 +256,7 @@ int try;
  	  }
 	} else {
 	  if ((s = sys_vircopy(tp->tty_outproc, D, (vir_bytes) tp->tty_out_vir_g,
-		SELF, D, (vir_bytes) pp->ohead, (phys_bytes) count)) != 0) {
+		ENDPT_SELF, D, (vir_bytes) pp->ohead, (phys_bytes) count)) != 0) {
 		break;
 	}
 	}
@@ -344,7 +344,7 @@ pty_t *pp;
  	  }
 	  pp->rdvir_offset += count;
 	} else {
-	if ((s = sys_vircopy(SELF, D, (vir_bytes)pp->otail,
+	if ((s = sys_vircopy(ENDPT_SELF, D, (vir_bytes)pp->otail,
 		(vir_bytes) pp->rdproc, D, (vir_bytes) pp->rdvir_g, (phys_bytes) count)) != 0) {
 		printf("pty tty: copy failed (error %d)\n",  s);
 		break;
@@ -427,7 +427,7 @@ int try;
 	  pp->wrvir_offset++;
 	} else {
   	  if ((s = sys_vircopy(pp->wrproc, D, (vir_bytes) pp->wrvir_g,
-		SELF, D, (vir_bytes) &c, (phys_bytes) 1)) != 0) {
+		ENDPT_SELF, D, (vir_bytes) &c, (phys_bytes) 1)) != 0) {
 		printf("pty: copy failed (error %d)\n", s);
 		break;
 	}

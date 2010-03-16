@@ -91,7 +91,7 @@ int exec_newmem()
 
 	/* copy parameters from process (sent by VFS) */
 	r = sys_datacopy(who_e, (vir_bytes)ptr,
-		SELF, (vir_bytes)&args, sizeof(args));
+		ENDPT_SELF, (vir_bytes)&args, sizeof(args));
 
 	if (r != 0)
 		panic(__FILE__, "exec_newmem: sys_datacopy failed", r);

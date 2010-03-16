@@ -187,7 +187,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   driver_e = driver_endpoints[(dev >> MAJOR) & BYTE].driver_e;
   
   /* See if driver is roughly valid. */
-  if (driver_e == NONE) return(-EDSTDIED);
+  if (driver_e == ENDPT_NONE) return(-EDSTDIED);
   
   /* The io vector copying relies on this I/O being for FS itself. */
   if(proc_e != SELF_E) {
@@ -230,7 +230,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   if (r != 0) {
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
           printf("ISOFS(%d) dead driver %d\n", SELF_E, driver_e);
-          driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = NONE;
+          driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = ENDPT_NONE;
           return(r);
       }
       else if (r == -ELOCKED) {

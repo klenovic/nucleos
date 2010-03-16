@@ -394,7 +394,7 @@ long bit_map;			/* notification event set or flags */
   {
 	/* No destination argument */
   }
-  else if (src_dst_e == ANY)
+  else if (src_dst_e == ENDPT_ANY)
   {
 	if (call_nr != KIPC_RECEIVE)
 	{
@@ -546,7 +546,7 @@ int src_dst;					/* src or dst process */
   processes[0] = cp;
 #endif
 
-  while (src_dst != ANY) { 			/* check while process nr */
+  while (src_dst != ENDPT_ANY) { 			/* check while process nr */
       int src_dst_e;
       xp = proc_addr(src_dst);			/* follow chain of processes */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
@@ -558,7 +558,7 @@ int src_dst;					/* src or dst process */
        * has not, the cycle cannot be closed and we are done.
        */
       if (RTS_ISSET(xp, RTS_RECEIVING)) {	/* xp has dependency */
-	  if(xp->p_getfrom_e == ANY) src_dst = ANY;
+	  if(xp->p_getfrom_e == ENDPT_ANY) src_dst = ENDPT_ANY;
 	  else okendpt(xp->p_getfrom_e, &src_dst);
       } else if (RTS_ISSET(xp, RTS_SENDING)) {	/* xp has dependency */
 	  okendpt(xp->p_sendto_e, &src_dst);
@@ -696,7 +696,7 @@ int flags;
   caller_ptr->p_delivermsg_lin = linaddr;
   caller_ptr->p_delivermsg_vir = (vir_bytes) m_ptr;
 
-  if(src_e == ANY) src_p = ANY;
+  if(src_e == ENDPT_ANY) src_p = ENDPT_ANY;
   else
   {
 	okendpt(src_e, &src_p);
@@ -726,18 +726,18 @@ int flags;
             if (src_id >= NR_SYS_PROCS) break;		/* out of range */
             src_proc_nr = id_to_nr(src_id);		/* get source proc */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-	    if(src_proc_nr == NONE) {
-		kprintf("mini_receive: sending notify from NONE\n");
+	    if(src_proc_nr == ENDPT_NONE) {
+		kprintf("mini_receive: sending notify from ENDPT_NONE\n");
 	    }
 #endif
-            if (src_e!=ANY && src_p != src_proc_nr) continue;/* source not ok */
+            if (src_e!=ENDPT_ANY && src_p != src_proc_nr) continue;/* source not ok */
             *chunk &= ~(1 << i);			/* no longer pending */
 
             /* Found a suitable source, deliver the notification message. */
 	    BuildNotifyMessage(&m, src_proc_nr, caller_ptr);	/* assemble message */
 	    hisep = proc_addr(src_proc_nr)->p_endpoint;
 	    vmassert(!(caller_ptr->p_misc_flags & MF_DELIVERMSG));	
-	    vmassert(src_e == ANY || hisep == src_e);
+	    vmassert(src_e == ENDPT_ANY || hisep == src_e);
 	    if((r=QueueMess(hisep, vir2phys(&m), caller_ptr)) != 0)  {
 		minix_panic("mini_receive: local QueueMess failed", NO_NUM);
 	    }
@@ -748,7 +748,7 @@ int flags;
     /* Check caller queue. Use pointer pointers to keep code simple. */
     xpp = &caller_ptr->p_caller_q;
     while (*xpp != NIL_PROC) {
-        if (src_e == ANY || src_p == proc_nr(*xpp)) {
+        if (src_e == ENDPT_ANY || src_p == proc_nr(*xpp)) {
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	    if (RTS_ISSET(*xpp, RTS_SLOT_FREE) || RTS_ISSET(*xpp, RTS_NO_ENDPOINT))
 	    {
@@ -775,7 +775,7 @@ int flags;
     if (caller_ptr->p_misc_flags & MF_ASYNMSG)
     {
 
-	if (src_e != ANY)
+	if (src_e != ENDPT_ANY)
 		r= try_one(proc_addr(src_p), caller_ptr, NULL);
 	else
 		r= try_async(caller_ptr);
@@ -1076,7 +1076,7 @@ struct proc *caller_ptr;
 	/* Try all privilege structures */
 	for (privp = BEG_PRIV_ADDR; privp < END_PRIV_ADDR; ++privp) 
 	{
-		if (privp->s_proc_nr == NONE)
+		if (privp->s_proc_nr == ENDPT_NONE)
 			continue;
 
 		src_ptr= proc_addr(privp->s_proc_nr);

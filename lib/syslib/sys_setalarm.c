@@ -17,7 +17,7 @@ clock_t exp_time;	/* expiration time for the alarm */
 int abs_time;		/* use absolute or relative expiration time */
 {
 /* Ask the SYSTEM schedule a synchronous alarm for the caller. The process
- * number can be SELF if the caller doesn't know its process number.
+ * number can be ENDPT_SELF if the caller doesn't know its process number.
  */
     message m;
     m.ALRM_EXP_TIME = exp_time;		/* the expiration time */

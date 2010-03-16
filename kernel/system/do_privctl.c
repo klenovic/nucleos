@@ -50,7 +50,7 @@ message *m_ptr;			/* pointer to request message */
    */
   caller_ptr = proc_addr(who_p);
   if (! (priv(caller_ptr)->s_flags & SYS_PROC)) return(-EPERM); 
-  if(m_ptr->CTL_ENDPT == SELF) proc_nr = who_p;
+  if(m_ptr->CTL_ENDPT == ENDPT_SELF) proc_nr = who_p;
   else if(!isokendpt(m_ptr->CTL_ENDPT, &proc_nr)) return(-EINVAL);
   rp = proc_addr(proc_nr);
 
@@ -60,7 +60,7 @@ message *m_ptr;			/* pointer to request message */
 	/* Allow process to run. Make sure its privilege structure has already
 	 * been set.
 	 */
-	if (!RTS_ISSET(rp, RTS_NO_PRIV) || priv(rp)->s_proc_nr == NONE) {
+	if (!RTS_ISSET(rp, RTS_NO_PRIV) || priv(rp)->s_proc_nr == ENDPT_NONE) {
 		return(-EPERM);
 	}
 	RTS_LOCK_UNSET(rp, RTS_NO_PRIV);

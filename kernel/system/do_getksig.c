@@ -30,7 +30,7 @@ message *m_ptr;			/* pointer to request message */
 {
 /* PM is ready to accept signals and repeatedly does a kernel call to get 
  * one. Find a process with pending signals. If no signals are available, 
- * return NONE in the process number field.
+ * return ENDPT_NONE in the process number field.
  * It is not sufficient to ready the process when PM is informed, because 
  * PM can block waiting for FS_PROC_NR to do a core dump.
  */
@@ -49,7 +49,7 @@ message *m_ptr;			/* pointer to request message */
   }
 
   /* No process with pending signals was found. */
-  m_ptr->SIG_ENDPT = NONE; 
+  m_ptr->SIG_ENDPT = ENDPT_NONE; 
   return(0);
 }
 #endif /* USE_GETKSIG */

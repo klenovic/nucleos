@@ -230,7 +230,7 @@ unsigned nr_req;		/* length of request vector */
 			if (count + chunk > nbytes) chunk = nbytes - count;
 			assert(chunk <= rem_buf_size);
 
-			if(proc_nr != SELF) {
+			if(proc_nr != ENDPT_SELF) {
 			   	r=sys_safecopyfrom(proc_nr,
 					(cp_grant_id_t) iop->iov_addr,
 		       			0, (vir_bytes) (bios_buf_v+count),
@@ -296,7 +296,7 @@ unsigned nr_req;		/* length of request vector */
 			if (count + chunk > nbytes) chunk = nbytes - count;
 			assert(chunk <= rem_buf_size);
 
-			if(proc_nr != SELF) {
+			if(proc_nr != ENDPT_SELF) {
 			   	r=sys_safecopyto(proc_nr, iop->iov_addr, 
 				       	0, (vir_bytes) (bios_buf_v+count),
 				       	chunk, D);

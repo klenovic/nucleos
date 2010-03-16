@@ -397,7 +397,7 @@ message *m_ptr;
 
   dst_proc = m_ptr->m_source;
   dst_addr = (vir_bytes) m_ptr->m1_p1;
-  if ((s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len)) != 0) {
+  if ((s=sys_datacopy(ENDPT_SELF, src_addr, dst_proc, dst_addr, len)) != 0) {
 	printf("DS: copy failed: %d\n", s);
         return(s);
   }

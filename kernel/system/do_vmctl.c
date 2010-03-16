@@ -31,7 +31,7 @@ register message *m_ptr;	/* pointer to request message */
   struct proc *p, *rp, *target;
   int err;
 
-  if(ep == SELF) { ep = m_ptr->m_source; }
+  if(ep == ENDPT_SELF) { ep = m_ptr->m_source; }
 
   if(!isokendpt(ep, &proc_nr)) {
 	kprintf("do_vmctl: unexpected endpoint %d from VM\n", ep);

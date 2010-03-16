@@ -85,16 +85,16 @@ int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
     int failed = 0;
     endpoint_t ke;
     *proc = _ENDPOINT_P(endpoint);
-    if(endpoint == NONE) {
-        printf("vfs:%s: endpoint is NONE\n", file, line, endpoint);
+    if(endpoint == ENDPT_NONE) {
+        printf("vfs:%s: endpoint is ENDPT_NONE\n", file, line, endpoint);
         failed = 1;
     } else if(*proc < 0 || *proc >= NR_PROCS) {
         printf("vfs:%s:%d: proc (%d) from endpoint (%d) out of range\n",
                 file, line, *proc, endpoint);
         failed = 1;
     } else if((ke=fproc[*proc].fp_endpoint) != endpoint) {
-	if(ke == NONE) {
-        	printf("vfs:%s:%d: endpoint (%d) points to NONE slot (%d)\n",
+	if(ke == ENDPT_NONE) {
+        	printf("vfs:%s:%d: endpoint (%d) points to ENDPT_NONE slot (%d)\n",
                 	file, line, endpoint, *proc);
 		assert(fproc[*proc].fp_pid == PID_FREE);
 	} else {

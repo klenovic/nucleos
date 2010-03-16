@@ -271,7 +271,7 @@ message *m;
 		  r= sys_safecopyto(m->IO_ENDPT, (vir_bytes) m->ADDRESS, 0, 
 			(vir_bytes) &kbdp->buf[kbdp->offset], n, D);
 		} else {
-		r= sys_vircopy(SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
+		r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
 			m->IO_ENDPT, D, (vir_bytes) m->ADDRESS, n);
 		}
 		if (r == 0)
@@ -306,7 +306,7 @@ message *m;
 			} else {
 			  r= sys_vircopy(m->IO_ENDPT, D,
 				(vir_bytes) m->ADDRESS+i,
-				SELF, D, (vir_bytes)&c, 1);
+				ENDPT_SELF, D, (vir_bytes)&c, 1);
 			}
 			if (r != 0)
 				break;
@@ -350,7 +350,7 @@ message *m;
 				sizeof(leds), D);
 			} else {
 			r= sys_vircopy(m->IO_ENDPT, D, (vir_bytes) m->ADDRESS,
-				SELF, D, (vir_bytes)&leds, sizeof(leds));
+				ENDPT_SELF, D, (vir_bytes)&leds, sizeof(leds));
 			}
 			if (r != 0)
 				break;
@@ -390,7 +390,7 @@ message *m;
 				sizeof(bell), D);
 			} else {
 			r= sys_vircopy(m->IO_ENDPT, D, (vir_bytes) m->ADDRESS,
-				SELF, D, (vir_bytes)&bell, sizeof(bell));
+				ENDPT_SELF, D, (vir_bytes)&bell, sizeof(bell));
 			}
 			if (r != 0)
 				break;
@@ -440,7 +440,7 @@ message *m;
 		  r= sys_safecopyto(kbdp->req_proc, kbdp->req_addr_g, 0,
 			(vir_bytes)&kbdp->buf[kbdp->offset], n, D);
 		} else {
-		r= sys_vircopy(SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
+		r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&kbdp->buf[kbdp->offset], 
 			kbdp->req_proc, D, kbdp->req_addr_g, n);
 		}
 		if (r == 0)
@@ -1013,9 +1013,9 @@ void kb_init_once(void)
 
       /* Clear the function key observers array. Also see func_key(). */
       for (i=0; i<12; i++) {
-          fkey_obs[i].proc_nr = NONE;	/* F1-F12 observers */
+          fkey_obs[i].proc_nr = ENDPT_NONE;	/* F1-F12 observers */
           fkey_obs[i].events = 0;	/* F1-F12 observers */
-          sfkey_obs[i].proc_nr = NONE;	/* Shift F1-F12 observers */
+          sfkey_obs[i].proc_nr = ENDPT_NONE;	/* Shift F1-F12 observers */
           sfkey_obs[i].events = 0;	/* Shift F1-F12 observers */
       }
 
@@ -1071,7 +1071,7 @@ int safe;
   	0, (vir_bytes) keymap, (vir_bytes) sizeof(keymap), D);
   } else {
   result = sys_vircopy(m->IO_ENDPT, D, (vir_bytes) m->ADDRESS,
-  	SELF, D, (vir_bytes) keymap, 
+  	ENDPT_SELF, D, (vir_bytes) keymap, 
   	(vir_bytes) sizeof(keymap));
   }
   return(result);
@@ -1099,7 +1099,7 @@ message *m_ptr;			/* pointer to the request message */
 	 * can recover after a crash by overtaking its existing mappings.
 	 * In future, a better solution will be implemented.
 	 */
-              if (fkey_obs[i].proc_nr == NONE) { 
+              if (fkey_obs[i].proc_nr == ENDPT_NONE) { 
 #endif
     	          fkey_obs[i].proc_nr = m_ptr->m_source;
     	          fkey_obs[i].events = 0;
@@ -1115,7 +1115,7 @@ message *m_ptr;			/* pointer to the request message */
       for (i=0; i < 12; i++) {		/* check Shift+F1-F12 keys */
           if (bit_isset(m_ptr->FKEY_SFKEYS, i+1) ) {
 #if DEAD_CODE
-              if (sfkey_obs[i].proc_nr == NONE) { 
+              if (sfkey_obs[i].proc_nr == ENDPT_NONE) { 
 #endif
     	          sfkey_obs[i].proc_nr = m_ptr->m_source;
     	          sfkey_obs[i].events = 0;
@@ -1134,7 +1134,7 @@ message *m_ptr;			/* pointer to the request message */
       for (i=0; i < 12; i++) {		/* check F1-F12 keys */
           if (bit_isset(m_ptr->FKEY_FKEYS, i+1) ) {
               if (fkey_obs[i].proc_nr == m_ptr->m_source) { 
-    	          fkey_obs[i].proc_nr = NONE;
+    	          fkey_obs[i].proc_nr = ENDPT_NONE;
     	          fkey_obs[i].events = 0;
     	          bit_unset(m_ptr->FKEY_FKEYS, i+1);
     	      } else {
@@ -1145,7 +1145,7 @@ message *m_ptr;			/* pointer to the request message */
       for (i=0; i < 12; i++) {		/* check Shift+F1-F12 keys */
           if (bit_isset(m_ptr->FKEY_SFKEYS, i+1) ) {
               if (sfkey_obs[i].proc_nr == m_ptr->m_source) { 
-    	          sfkey_obs[i].proc_nr = NONE;
+    	          sfkey_obs[i].proc_nr = ENDPT_NONE;
     	          sfkey_obs[i].events = 0;
     	          bit_unset(m_ptr->FKEY_SFKEYS, i+1);
     	      } else {
@@ -1187,7 +1187,7 @@ int scode;			/* scan code for a function key */
 /* This procedure traps function keys for debugging purposes. Observers of 
  * function keys are kept in a global array. If a subject (a key) is pressed
  * the observer is notified of the event. Initialization of the arrays is done
- * in kb_init, where NONE is set to indicate there is no interest in the key.
+ * in kb_init, where ENDPT_NONE is set to indicate there is no interest in the key.
  * Returns FALSE on a key release or if the key is not observable.
  */
   message m;
@@ -1218,7 +1218,7 @@ int scode;			/* scan code for a function key */
   }
 
   /* See if an observer is registered and send it a message. */
-  if (proc_nr != NONE) { 
+  if (proc_nr != ENDPT_NONE) { 
       kipc_notify(proc_nr);
   }
   return(TRUE);
@@ -1238,7 +1238,7 @@ static void show_key_mappings()
     for (i=0; i<12; i++) {
 
       printf(" %sF%d: ", i+1<10? " ":"", i+1);
-      if (fkey_obs[i].proc_nr != NONE) {
+      if (fkey_obs[i].proc_nr != ENDPT_NONE) {
           if ((s = sys_getproc(&proc, fkey_obs[i].proc_nr))!=0)
               printf("%-14.14s", "<unknown>");
           else
@@ -1248,7 +1248,7 @@ static void show_key_mappings()
       }
 
       printf("    %sShift-F%d: ", i+1<10? " ":"", i+1);
-      if (sfkey_obs[i].proc_nr != NONE) {
+      if (sfkey_obs[i].proc_nr != ENDPT_NONE) {
           if ((s = sys_getproc(&proc, sfkey_obs[i].proc_nr))!=0)
               printf("%-14.14s", "<unknown>");
           else

@@ -48,7 +48,7 @@
 
 #define WILLRECEIVE(target, source_ep) \
 	((RTS_ISSET(target, RTS_RECEIVING) && !RTS_ISSET(target, RTS_SENDING)) && \
-		(target->p_getfrom_e == ANY || target->p_getfrom_e == source_ep))
+		(target->p_getfrom_e == ENDPT_ANY || target->p_getfrom_e == source_ep))
 
 #endif /* __ASSEMBLY__ */
 #endif /* __KERNEL__ */

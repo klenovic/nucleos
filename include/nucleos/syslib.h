@@ -127,7 +127,7 @@ int sys_vircopy(endpoint_t src_proc, int src_s, vir_bytes src_v, endpoint_t dst_
 		int dst_seg, vir_bytes dst_vir, phys_bytes bytes);
 
 #define sys_abscopy(src_phys, dst_phys, bytes) \
-	sys_physcopy(NONE, PHYS_SEG, src_phys, NONE, PHYS_SEG, dst_phys, bytes)
+	sys_physcopy(ENDPT_NONE, PHYS_SEG, src_phys, ENDPT_NONE, PHYS_SEG, dst_phys, bytes)
 
 int sys_physcopy(endpoint_t src_proc, int src_seg, vir_bytes src_vir, endpoint_t dst_proc,
 		 int dst_seg, vir_bytes dst_vir, phys_bytes bytes);

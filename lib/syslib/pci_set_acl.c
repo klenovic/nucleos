@@ -28,7 +28,7 @@ struct rs_pci *rs_pci;
 	message m;
 	u32_t u32;
 
-	if (pci_procnr == ANY)
+	if (pci_procnr == ENDPT_ANY)
 	{
 		r= ds_retrieve_u32("pci", &u32);
 		if (r != 0)

@@ -68,7 +68,7 @@
 #include <asm/ioctls.h>
 
 static ether_card_t ec_table[EC_PORT_NR_MAX];
-static int eth_tasknr= ANY;
+static int eth_tasknr= ENDPT_ANY;
 static u16_t eth_ign_proto;
 
 /* Configuration */
@@ -153,7 +153,7 @@ unsigned long vir2phys( unsigned long x )
    int r;
    unsigned long value;
 
-   if ( (r=sys_umap( SELF, VM_D, x, 4, &value )) != 0 ) {
+   if ( (r=sys_umap( ENDPT_SELF, VM_D, x, 4, &value )) != 0 ) {
       printf("lance: umap of 0x%lx failed\n",x );
       panic( "lance", "sys_umap failed", r );
    }
@@ -314,7 +314,7 @@ void main( int argc, char **argv )
             sys_irqenable(&ec->ec_hook);
       }
 
-      if ((r= kipc_receive(ANY, &m)) != 0)
+      if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
          panic( "lance", "receive failed", r);
 
       for (i=0;i<EC_PORT_NR_MAX;++i)

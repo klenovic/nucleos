@@ -120,7 +120,7 @@ int scall_pipe(void)
 	fil_ptr0->filp_flags = O_RDONLY;
 	fil_ptr1->filp_flags = O_WRONLY;
 
-	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
+	r = sys_vircopy(ENDPT_SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
 
 	return (r < 0) ? -EFAULT : 0;
 }
@@ -299,8 +299,8 @@ void suspend(int why)
  *===========================================================================*/
 void wait_for(endpoint_t who)
 {
-	if(who == NONE || who == ANY)
-		panic(__FILE__,"suspend on NONE or ANY",NO_NUM);
+	if(who == ENDPT_NONE || who == ENDPT_ANY)
+		panic(__FILE__,"suspend on ENDPT_NONE or ENDPT_ANY",NO_NUM);
 	suspend(FP_BLOCKED_ON_OTHER);
 	fp->fp_task = who;
 }

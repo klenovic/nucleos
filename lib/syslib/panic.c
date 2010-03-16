@@ -29,13 +29,13 @@ int num;			/* number to go with format string */
  * value of a defined constant.
  */
   message m;
-  endpoint_t me = NONE;
+  endpoint_t me = ENDPT_NONE;
   char name[20];
   void (*suicide)(void);
   if(panicing) return;
   panicing= 1;
 
-  if(sys_whoami(&me, name, sizeof(name)) == 0 && me != NONE)
+  if(sys_whoami(&me, name, sizeof(name)) == 0 && me != ENDPT_NONE)
 	printf("%s(%d): ", name, me);
   else
 	printf("(sys_whoami failed): ");

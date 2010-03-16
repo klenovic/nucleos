@@ -61,7 +61,7 @@ int max_len;				/* maximum length of value */
   /* Get copy of boot monitor parameters. */
   m.m_type = SYS_GETINFO;
   m.I_REQUEST = GET_MONPARAMS;
-  m.I_ENDPT = SELF;
+  m.I_ENDPT = ENDPT_SELF;
   m.I_VAL_LEN = sizeof(mon_params);
   m.I_VAL_PTR = mon_params;
   if ((s=ktaskcall(SYSTASK, SYS_GETINFO, &m)) != 0) {

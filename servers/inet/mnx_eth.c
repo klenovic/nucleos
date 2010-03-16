@@ -123,7 +123,7 @@ void osdep_eth_init()
 			printf("eth%d: unable to find task %s: %d\n",
 				i, ecp->ec_task, r);
 #endif
-			tasknr= ANY;
+			tasknr= ENDPT_ANY;
 		}
 
  		eth_port->etp_osdep.etp_port= ecp->ec_port;
@@ -137,7 +137,7 @@ void osdep_eth_init()
 		mess.DL_PROC= this_proc;
 		mess.DL_MODE= DL_NOMODE;
 
-		if (tasknr == ANY)
+		if (tasknr == ENDPT_ANY)
 			r= -ENXIO;
 		else
 		{
@@ -181,7 +181,7 @@ void osdep_eth_init()
 			continue;
 
  		eth_port->etp_osdep.etp_port= ecp->ec_port;
-		eth_port->etp_osdep.etp_task= ANY;
+		eth_port->etp_osdep.etp_task= ENDPT_ANY;
 		ev_init(&eth_port->etp_osdep.etp_recvev);
 
 		rport= eth_port->etp_osdep.etp_port;

@@ -38,7 +38,7 @@ message *m_ptr;			/* pointer to request message */
 
   /* Determine what process exited. User processes are handled here. */
   if (PM_PROC_NR == who_p) {
-      if (m_ptr->PR_ENDPT != SELF) { 		/* PM tries to exit self */
+      if (m_ptr->PR_ENDPT != ENDPT_SELF) { 		/* PM tries to exit self */
           if(!isokendpt(m_ptr->PR_ENDPT, &exit_e)) /* get exiting process */
 	     return -EINVAL;
           clear_proc(proc_addr(exit_e));	/* exit a user process */
@@ -70,7 +70,7 @@ register struct proc *rc;		/* slot of process to clean up */
       int proc;
       if (rc->p_endpoint == irq_hooks[i].proc_nr_e) {
         rm_irq_handler(&irq_hooks[i]);	/* remove interrupt handler */
-        irq_hooks[i].proc_nr_e = NONE;	/* mark hook as free */
+        irq_hooks[i].proc_nr_e = ENDPT_NONE;	/* mark hook as free */
       } 
   }
 
@@ -92,7 +92,7 @@ register struct proc *rc;		/* slot of process to clean up */
    * this point. All important fields are reinitialized when the 
    * slots are assigned to another, new process. 
    */
-  if (priv(rc)->s_flags & SYS_PROC) priv(rc)->s_proc_nr = NONE;
+  if (priv(rc)->s_flags & SYS_PROC) priv(rc)->s_proc_nr = ENDPT_NONE;
 
 #if 0
   /* Clean up virtual memory */

@@ -114,7 +114,7 @@ int main(void)
 	}
 	SANITYCHECK(SCL_DETAIL);
 
-  	if ((r=kipc_receive(ANY, &msg)) != 0)
+  	if ((r=kipc_receive(ENDPT_ANY, &msg)) != 0)
 		vm_panic("receive() error", r);
 
 	SANITYCHECK(SCL_DETAIL);

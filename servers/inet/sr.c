@@ -138,7 +138,7 @@ mq_t *m;
 		}
 #if 0
 		else
-			sr_repl_queue(ANY, 0, 0);
+			sr_repl_queue(ENDPT_ANY, 0, 0);
 #endif
 	}
 
@@ -1186,7 +1186,7 @@ int size;
 		size= (vir_bytes)acc->acc_length;
 
 		s_cp_req[i].v_from= proc;
-		s_cp_req[i].v_to= SELF;
+		s_cp_req[i].v_to= ENDPT_SELF;
 		s_cp_req[i].v_gid= gid;
 		s_cp_req[i].v_offset= offset;
 		s_cp_req[i].v_addr= (vir_bytes) ptr2acc_data(acc);
@@ -1247,7 +1247,7 @@ vir_bytes offset;
 
 		if (size)
 		{
-			s_cp_req[i].v_from= SELF;
+			s_cp_req[i].v_from= ENDPT_SELF;
 			s_cp_req[i].v_to= proc;
 			s_cp_req[i].v_gid= gid;
 			s_cp_req[i].v_offset= offset;

@@ -74,8 +74,8 @@ register message *m_ptr;	/* pointer to request message */
    */
   for (i=_SRC_; i<=_DST_; i++) {
 	int p;
-      /* Check if process number was given implictly with SELF and is valid. */
-      if (vir_addr[i].proc_nr_e == SELF)
+      /* Check if process number was given implictly with ENDPT_SELF and is valid. */
+      if (vir_addr[i].proc_nr_e == ENDPT_SELF)
 	vir_addr[i].proc_nr_e = m_ptr->m_source;
       if (vir_addr[i].segment != PHYS_SEG) {
 	if(! isokendpt(vir_addr[i].proc_nr_e, &p)) {

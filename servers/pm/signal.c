@@ -126,7 +126,7 @@ int ksig_pending()
  *
  * The kernel has notified the PM about pending signals. Request pending
  * signals until all signals are handled. If there are no more signals,
- * NONE is returned in the process number field.
+ * ENDPT_NONE is returned in the process number field.
  */ 
  endpoint_t proc_nr_e;
  sigset_t sig_map;
@@ -136,7 +136,7 @@ int ksig_pending()
    /* get an arbitrary pending signal */
    if((r=sys_getksig(&proc_nr_e, &sig_map)) != 0)
   	panic(__FILE__,"sys_getksig failed", r);
-   if (NONE == proc_nr_e) {		/* stop if no more pending signals */
+   if (ENDPT_NONE == proc_nr_e) {		/* stop if no more pending signals */
  	break;
    } else {
  	int proc_nr_p;
@@ -660,7 +660,7 @@ int scall_sigpending(void)
 	if (!m_in.p_set)
 		return -EFAULT;
 
-	err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigpending,
+	err = sys_datacopy(ENDPT_SELF, (vir_bytes)&mp->mp_sigpending,
 			  mp->mp_endpoint, (vir_bytes)m_in.p_set,
 			  sizeof(sigset_t));
 
@@ -686,7 +686,7 @@ int scall_sigprocmask(void)
 	/* If `set' is null then ignore `how' and store the sigmask into `oldset' */
 	if (!m_in.p_set) {
 		if (m_in.p_oldset) {
-			err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigmask,
+			err = sys_datacopy(ENDPT_SELF, (vir_bytes)&mp->mp_sigmask,
 					  mp->mp_endpoint, (vir_bytes)m_in.p_oldset,
 					  sizeof(sigset_t));
 
@@ -702,7 +702,7 @@ int scall_sigprocmask(void)
 
 	/* if `oldset' non-null then make a copy */
 	if (m_in.p_oldset) {
-		err = sys_datacopy(SELF, (vir_bytes)&mp->mp_sigmask,
+		err = sys_datacopy(ENDPT_SELF, (vir_bytes)&mp->mp_sigmask,
 				   mp->mp_endpoint, (vir_bytes)m_in.p_oldset,
 				   sizeof(sigset_t));
 
@@ -712,7 +712,7 @@ int scall_sigprocmask(void)
 
 	/* Get the new `set'. */
 	err = sys_datacopy(mp->mp_endpoint, (vir_bytes)m_in.p_set,
-			   SELF, (vir_bytes)&set,
+			   ENDPT_SELF, (vir_bytes)&set,
 			   sizeof(sigset_t));
 
 	if (err != 0)
@@ -759,7 +759,7 @@ int scall_sigsuspend(void)
 
 	/* Get the `set' argument */
 	err = sys_datacopy(mp->mp_endpoint, (vir_bytes)m_in.p_set,
-			   SELF, (vir_bytes)&set,
+			   ENDPT_SELF, (vir_bytes)&set,
 			   sizeof(sigset_t));
 
 	if (err != 0)

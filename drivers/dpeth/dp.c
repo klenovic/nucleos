@@ -621,7 +621,7 @@ int main(int argc, char **argv)
 	kipc_notify(tasknr);
 
   while (TRUE) {
-	if ((rc = kipc_receive(ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
+	if ((rc = kipc_receive(ENDPT_ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
 
 	DEBUG(printf("eth: got message %d, ", m.m_type));
 

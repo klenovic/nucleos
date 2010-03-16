@@ -75,7 +75,7 @@ int do_fork(message *msg)
   *vmc = *vmp;
   vmc->vm_slot = childproc;
   vmc->vm_regions = NULL;
-  vmc->vm_endpoint = NONE;	/* In case someone tries to use it. */
+  vmc->vm_endpoint = ENDPT_NONE;	/* In case someone tries to use it. */
   vmc->vm_pt = origpt;
   vmc->vm_flags |= VMF_HASPT;
 

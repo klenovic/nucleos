@@ -212,7 +212,7 @@ static void el1_send(dpeth_t * dep, int from_int, int pktsize)
 
 	/* Loads packet */
 	outw_el1(dep, EL1_XMITPTR, (EL1_BFRSIZ - pktsize));
-	outsb(dep->de_data_port, SELF, txbuff->buffer, pktsize);
+	outsb(dep->de_data_port, ENDPT_SELF, txbuff->buffer, pktsize);
 	/* Starts transmitter */
 	outw_el1(dep, EL1_XMITPTR, (EL1_BFRSIZ - pktsize));
 	outb_el1(dep, EL1_CSR, ECSR_RIDE | ECSR_XMIT);	/* There it goes... */
@@ -313,7 +313,7 @@ static void el1_interrupt(dpeth_t * dep)
 		/* Got a good packet. Read it from buffer */
 		outb_el1(dep, EL1_CSR, ECSR_RIDE | ECSR_SYS);
 		outw_el1(dep, EL1_XMITPTR, 0);
-		insb(dep->de_data_port, SELF, rxptr->buffer, pktsize);
+		insb(dep->de_data_port, ENDPT_SELF, rxptr->buffer, pktsize);
 		rxptr->next = NULL;
 		rxptr->size = pktsize;
 		dep->de_stat.ets_packetR += 1;

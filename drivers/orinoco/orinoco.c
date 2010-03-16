@@ -139,7 +139,7 @@ static tmra_ut or_watchdog;
 #define 	IRQ_BAP 1
 #define		ETH_HLEN		14
 
-static int or_nr_task = ANY;
+static int or_nr_task = ENDPT_ANY;
 static t_or or_table[OR_PORT_NR];
 
 struct ethhdr {
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
 		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
-		if ((r = kipc_receive (ANY, &m)) != 0)
+		if ((r = kipc_receive (ENDPT_ANY, &m)) != 0)
 			panic(__FILE__, "orinoco: receive failed", NO_NUM);
 
 		if (is_notify(m.m_type)) {
@@ -765,7 +765,7 @@ static void map_hw_buffer(t_or *orp) {
 	abuf = buf + o;
 
 #if 0
-	r = sys_vm_map(SELF, 1, (vir_bytes)abuf, 
+	r = sys_vm_map(ENDPT_SELF, 1, (vir_bytes)abuf, 
 			1 * I386_PAGE_SIZE, (phys_bytes)orp->or_base_port);
 #else
 	r = -ENOSYS;
@@ -1406,7 +1406,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 				n = count - i;
 			cps = sys_vircopy(or_client, D, 
 				((vir_bytes) mp->DL_ADDR) + iov_offset,
-				SELF, D, (vir_bytes) orp->or_iovec,
+				ENDPT_SELF, D, (vir_bytes) orp->or_iovec,
 				n * sizeof(orp->or_iovec[0]));
 			if (cps != 0) printf("sys_vircopy failed: %d\n", cps);
 
@@ -1416,7 +1416,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 					printf("invalid packet size\n");
 				}
 				cps = sys_vircopy(or_client, D, iovp->iov_addr,
-					SELF, D, (vir_bytes) databuf + o, s);
+					ENDPT_SELF, D, (vir_bytes) databuf + o, s);
 				if (cps != 0) 
 					printf("sys_vircopy failed: %d\n",cps);
 
@@ -1433,7 +1433,7 @@ static void or_writev (message * mp, int from_int, int vectored) {
 			printf("invalid packet size %d\n", size);
 
 		cps = sys_vircopy(or_client, D, (vir_bytes)mp->DL_ADDR, 
-			SELF, D, (vir_bytes) databuf, size);
+			ENDPT_SELF, D, (vir_bytes) databuf, size);
 		if (cps != 0) printf("sys_abscopy failed: %d\n", cps);
 	}
 
@@ -2024,7 +2024,7 @@ static void or_readv (message * mp, int from_int, int vectored) {
 			
 			cps = sys_vircopy(or_client, D, 
 					(vir_bytes) mp->DL_ADDR + iov_offset,
-					SELF, D, (vir_bytes) orp->or_iovec, 
+					ENDPT_SELF, D, (vir_bytes) orp->or_iovec, 
 					n * sizeof(orp->or_iovec[0]));
 			if (cps != 0) printf("sys_vircopy failed: %d (%d)\n", 
 							cps, __LINE__);
@@ -2036,7 +2036,7 @@ static void or_readv (message * mp, int from_int, int vectored) {
 					s = length - size;
 				}
 
-				cps = sys_vircopy(SELF, D, 
+				cps = sys_vircopy(ENDPT_SELF, D, 
 						(vir_bytes) databuf + o,
 						or_client, D, 
 						iovp->iov_addr, s);
@@ -2344,7 +2344,7 @@ static void or_getstat (message * mp) {
 
 	stats = orp->or_stat;
 
-	r = sys_datacopy(SELF, (vir_bytes)&stats, mp->DL_PROC,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes)&stats, mp->DL_PROC,
 			(vir_bytes) mp->DL_ADDR, sizeof(stats));
 	if(r != 0) {
 		panic(__FILE__, "or_getstat: send failed:", r);	

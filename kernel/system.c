@@ -97,7 +97,7 @@ void sys_task()
       if(!restarting) {
         int r;
 	/* Get work. Block and wait until a request message arrives. */
-	if((r=kipc_receive(ANY, &m)) != 0)
+	if((r=kipc_receive(ENDPT_ANY, &m)) != 0)
 		minix_panic("receive() failed", r);
       } 
 
@@ -163,7 +163,7 @@ static void initialize(void)
 
   /* Initialize IRQ handler hooks. Mark all hooks available. */
   for (i=0; i<NR_IRQ_HOOKS; i++) {
-      irq_hooks[i].proc_nr_e = NONE;
+      irq_hooks[i].proc_nr_e = ENDPT_NONE;
   }
 
   /* Initialize all alarm timers for all processes. */
@@ -259,14 +259,14 @@ int priv_id;				/* privilege id */
 
   if(priv_id == NULL_PRIV_ID) {             /* allocate slot dynamically */
       for (sp = BEG_DYN_PRIV_ADDR; sp < END_DYN_PRIV_ADDR; ++sp) 
-          if (sp->s_proc_nr == NONE) break;	
+          if (sp->s_proc_nr == ENDPT_NONE) break;	
       if (sp >= END_DYN_PRIV_ADDR) return(-ENOSPC);
   }
   else {                                    /* allocate slot from id */
       if(!is_static_priv_id(priv_id)) {
           return -EINVAL;                    /* invalid static priv id */
       }
-      if(priv[priv_id].s_proc_nr != NONE) {
+      if(priv[priv_id].s_proc_nr != ENDPT_NONE) {
           return -EBUSY;                     /* slot already in use */
       }
       sp = &priv[priv_id];
@@ -293,7 +293,7 @@ void set_sendto_bit(struct proc *rp, int id)
   /* Disallow the process from sending to a process privilege structure with no
    * associated process, and disallow the process from sending to itself.
    */
-  if (id_to_nr(id) == NONE || priv_id(rp) == id) {
+  if (id_to_nr(id) == ENDPT_NONE || priv_id(rp) == id) {
 	unset_sys_bit(priv(rp)->s_ipc_to, id);
 	return;
   }
@@ -443,7 +443,7 @@ vir_bytes bytes;                /* size */
          *
          * Then convert that process to a slot number.
          */
-        if(verify_grant(rp->p_endpoint, ANY, grant, bytes, 0, 0,
+        if(verify_grant(rp->p_endpoint, ENDPT_ANY, grant, bytes, 0, 0,
                 &offset, &granter) != 0) {
 		kprintf("SYSTEM: umap_grant: verify_grant failed\n");
                 return 0;
@@ -577,7 +577,7 @@ static struct proc *vmrestart_check(message *m)
 	switch(type) {
 		case VMSTYPE_KERNELCALL:
 			memcpy(m, &restarting->p_vmrequest.saved.reqmsg, sizeof(*m));
-			restarting->p_vmrequest.saved.reqmsg.m_source = NONE;
+			restarting->p_vmrequest.saved.reqmsg.m_source = ENDPT_NONE;
 			vmassert(m->m_source == restarting->p_endpoint);
 			/* Original caller could've disappeared in the meantime. */
 		        if(!isokendpt(m->m_source, &who_p)) {

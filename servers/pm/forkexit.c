@@ -678,10 +678,10 @@ register struct mproc *rmp;	/* tells which process is exiting */
 
 void _exit(int code)
 {
-	sys_exit(SELF);
+	sys_exit(ENDPT_SELF);
 }
 
 void __exit(int code)
 {
-	sys_exit(SELF);
+	sys_exit(ENDPT_SELF);
 }

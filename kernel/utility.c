@@ -88,7 +88,7 @@ int c;					/* character to append */
   } else {
       int p, outprocs[] = OUTPUT_PROCS_ARRAY;
       if(!(minix_panicing || do_serial_debug)) {
-	      for(p = 0; outprocs[p] != NONE; p++) {
+	      for(p = 0; outprocs[p] != ENDPT_NONE; p++) {
 		 if(isokprocn(outprocs[p]) && !isemptyn(outprocs[p])) {
        	    send_sig(outprocs[p], SIGKMESS);
 		 }

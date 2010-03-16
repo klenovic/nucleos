@@ -109,7 +109,7 @@ int main(void)
 			if(endpt == FS_PROC_NR) {
 				endpt = suspended_ep(m_in.m_source, m_in.REP_IO_GRANT);
 
-				if(endpt == NONE) {
+				if(endpt == ENDPT_NONE) {
 					printf("FS: proc with "
 					       "grant %d from %d not found (revive)\n",
 					m_in.REP_IO_GRANT, m_in.m_source);
@@ -323,7 +323,7 @@ static void get_work(void)
 	for(;;) {
 		int r;
 		/* Normal case.  No one to revive. */
-		if ((r=kipc_receive(ANY, &m_in)) != 0)
+		if ((r=kipc_receive(ENDPT_ANY, &m_in)) != 0)
 			panic(__FILE__,"fs receive error", r);
 
 		who_e = m_in.m_source;
@@ -336,14 +336,14 @@ static void get_work(void)
     if(who_p >= (int)(sizeof(fproc) / sizeof(struct fproc)))
 			panic(__FILE__,"receive process out of range", who_p);
 
-		if(who_p >= 0 && fproc[who_p].fp_endpoint == NONE) {
+		if(who_p >= 0 && fproc[who_p].fp_endpoint == ENDPT_NONE) {
 			printf("FS: ignoring request from %d, endpointless slot %d (%d)\n",
 			m_in.m_source, who_p, m_in.m_type);
 			continue;
 		}
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint != who_e) {
-	if(fproc[who_p].fp_endpoint == NONE) { 
+	if(fproc[who_p].fp_endpoint == ENDPT_NONE) { 
 		printf("slot unknown even\n");
 	}
     	printf("FS: receive endpoint inconsistent (source %d, who_p %d, stored ep %d, who_e %d).\n",
@@ -393,19 +393,19 @@ static void fs_init(void)
 	message mess;
 
 	/* Clear endpoint field */
-	last_login_fs_e = NONE;
-	mount_m_in.m1_p3 = (char *) NONE;
+	last_login_fs_e = ENDPT_NONE;
+	mount_m_in.m1_p3 = (char *) ENDPT_NONE;
 
 	/* Initialize the process table with help of the process manager messages. 
 	 * Expect one message for each system process with its slot number and pid. 
-	 * When no more processes follow, the magic process number NONE is sent. 
+	 * When no more processes follow, the magic process number ENDPT_NONE is sent. 
 	 * Then, stop and synchronize with the PM.
 	 */
 	do {
 		if ((s=kipc_receive(PM_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"FS couldn't receive from PM", s);
 
-		if (NONE == mess.PR_ENDPT)
+		if (ENDPT_NONE == mess.PR_ENDPT)
 			break;
 
 		rfp = &fproc[mess.PR_SLOT];
@@ -420,7 +420,7 @@ static void fs_init(void)
 	rfp->fp_blocked_on = FP_BLOCKED_ON_NONE;
 		rfp->fp_revived = NOT_REVIVING;
 	 
-	} while (TRUE);			/* continue until process NONE */
+	} while (TRUE);			/* continue until process ENDPT_NONE */
 
 	mess.m_type = 0;			/* tell PM that we succeeded */
 	s = kipc_send(PM_PROC_NR, &mess);		/* kipc_send synchronization message */
@@ -457,7 +457,7 @@ static void fs_init(void)
 
 			rfp->fp_wd = root_vp;
 		} else {
-			rfp->fp_endpoint = NONE;
+			rfp->fp_endpoint = ENDPT_NONE;
 		}
 	}
 
@@ -499,7 +499,7 @@ static void init_root(void)
 		}
 	}
 
-	last_login_fs_e = NONE;
+	last_login_fs_e = ENDPT_NONE;
 	
 	/* Initialize vmnt table */
 	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp)
@@ -515,7 +515,7 @@ static void init_root(void)
 	/* Get driver process' endpoint */
 	dp = &dmap[(root_dev >> MAJOR) & BYTE];
 
-	if (dp->dmap_driver == NONE) {
+	if (dp->dmap_driver == ENDPT_NONE) {
 		panic(__FILE__,"No driver for root device", r);
 	}
 

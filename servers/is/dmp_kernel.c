@@ -186,7 +186,7 @@ void irqtab_dmp()
   for (i=0; i<NR_IRQ_HOOKS; i++) {
   	e = &irq_hooks[i];
   	printf("%3d", i);
-  	if (e->proc_nr_e==NONE) {
+  	if (e->proc_nr_e==ENDPT_NONE) {
   	    printf("    <unused>\n");
   	    continue;
   	}
@@ -477,8 +477,8 @@ static char *proc_name(proc_nr)
 int proc_nr;
 {
   struct proc *p;
-  if (proc_nr == ANY) return "ANY";
-  if (proc_nr == NONE) return "NONE";	/* bogus */
+  if (proc_nr == ENDPT_ANY) return "ANY";
+  if (proc_nr == ENDPT_NONE) return "NONE";	/* bogus */
   if (proc_nr < -NR_TASKS || proc_nr >= NR_PROCS) return "BOGUS";
   p = cproc_addr(proc_nr);
   if (isemptyp(p)) return "EMPTY";	/* bogus */

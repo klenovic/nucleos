@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 
 	while (TRUE)
 	{
-		if ((r= kipc_receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
 			panic("FXP","receive failed", r);
 
 		if (is_notify(m.m_type)) {
@@ -847,7 +847,7 @@ fxp_t *fp;
 	fxp_do_conf(fp);
 
 	/* Set pointer to statistical counters */
-	r= sys_umap(SELF, VM_D, (vir_bytes)&fp->fxp_stat, sizeof(fp->fxp_stat),
+	r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)&fp->fxp_stat, sizeof(fp->fxp_stat),
 		(phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
@@ -915,7 +915,7 @@ fxp_t *fp;
 	tmpbufp= (union tmpbuf *)buf;
 
 	fp->fxp_rx_buf= (struct rfd *)&tmpbufp[1];
-	r= sys_umap(SELF, VM_D, (vir_bytes)fp->fxp_rx_buf, rx_totbufsize,
+	r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)fp->fxp_rx_buf, rx_totbufsize,
 		&fp->fxp_rx_busaddr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
@@ -931,7 +931,7 @@ fxp_t *fp;
 		rfdp->rfd_command= 0;
 		if (i != fp->fxp_rx_nbuf-1)
 		{
-			r= sys_umap(SELF, VM_D, (vir_bytes)&rfdp[1],
+			r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)&rfdp[1],
 				sizeof(rfdp[1]), (phys_bytes*)&rfdp->rfd_linkaddr);
 			if (r != 0)
 				panic("FXP","sys_umap failed", r);
@@ -949,7 +949,7 @@ fxp_t *fp;
 	fp->fxp_rx_head= 0;
 
 	fp->fxp_tx_buf= (struct tx *)((char *)fp->fxp_rx_buf+rx_totbufsize);
-	r= sys_umap(SELF, VM_D, (vir_bytes)fp->fxp_tx_buf,
+	r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)fp->fxp_tx_buf,
 		(phys_bytes)tx_totbufsize, (phys_bytes*)&fp->fxp_tx_busaddr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
@@ -960,7 +960,7 @@ fxp_t *fp;
 		txp->tx_command= TXC_EL | CBL_NOP;	/* Just in case */
 		if (i != fp->fxp_tx_nbuf-1)
 		{
-			r= sys_umap(SELF, VM_D, (vir_bytes)&txp[1],
+			r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)&txp[1],
 				sizeof(txp[1]),
 				(phys_bytes*)&txp->tx_linkaddr);
 			if (r != 0)
@@ -1048,7 +1048,7 @@ fxp_t *fp;
 	tmpbufp->ias.ias_linkaddr= 0;
 	memcpy(tmpbufp->ias.ias_ethaddr, fp->fxp_address.ea_addr,
 		sizeof(tmpbufp->ias.ias_ethaddr));
-	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->ias,
+	r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)&tmpbufp->ias,
 		(phys_bytes)sizeof(tmpbufp->ias), (phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
@@ -1186,7 +1186,7 @@ int vectored;
 			if (i+n > count)
 				n= count-i;
 			r= sys_vircopy(fxp_client, D, iov_src, 
-				SELF, D, (vir_bytes)fp->fxp_iovec,
+				ENDPT_SELF, D, (vir_bytes)fp->fxp_iovec,
 				n * sizeof(fp->fxp_iovec[0]));
 			if (r != 0)
 				panic("FXP","fxp_writev: sys_vircopy failed", r);
@@ -1201,7 +1201,7 @@ int vectored;
 				}
 
 				r= sys_vircopy(fxp_client, D, iovp->iov_addr, 
-					SELF, D, (vir_bytes)(txp->tx_buf+o),
+					ENDPT_SELF, D, (vir_bytes)(txp->tx_buf+o),
 					s);
 				if (r != 0)
 				{
@@ -1222,7 +1222,7 @@ int vectored;
 			panic("FXP","fxp_writev: invalid packet size", size);
 
 		r= sys_vircopy(fxp_client, D, (vir_bytes)mp->DL_ADDR, 
-			SELF, D, (vir_bytes)txp->tx_buf, size);
+			ENDPT_SELF, D, (vir_bytes)txp->tx_buf, size);
 		if (r != 0)
 			panic("FXP","fxp_writev: sys_vircopy failed", r);
 	}
@@ -1487,7 +1487,7 @@ int vectored;
 			if (i+n > count)
 				n= count-i;
 			r= sys_vircopy(fxp_client, D, iov_src, 
-				SELF, D, (vir_bytes)fp->fxp_iovec,
+				ENDPT_SELF, D, (vir_bytes)fp->fxp_iovec,
 				n * sizeof(fp->fxp_iovec[0]));
 			if (r != 0)
 				panic("FXP","fxp_readv: sys_vircopy failed", r);
@@ -1501,7 +1501,7 @@ int vectored;
 					s= packlen-size;
 				}
 
-				r= sys_vircopy(SELF, D,
+				r= sys_vircopy(ENDPT_SELF, D,
 					(vir_bytes)(rfdp->rfd_buf+o),
 					fxp_client, D, iovp->iov_addr, s);
 				if (r != 0)
@@ -1784,7 +1784,7 @@ fxp_t *fp;
 	memcpy(tmpbufp->cc.cc_bytes, fp->fxp_conf_bytes,
 		sizeof(tmpbufp->cc.cc_bytes));
 
-	r= sys_umap(SELF, VM_D, (vir_bytes)&tmpbufp->cc,
+	r= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)&tmpbufp->cc,
 		(phys_bytes)sizeof(tmpbufp->cc), (phys_bytes*)&bus_addr);
 	if (r != 0)
 		panic("FXP","sys_umap failed", r);
@@ -1985,7 +1985,7 @@ message *mp;
 	stats.ets_CDheartbeat= 0;
 	stats.ets_OWC= fp->fxp_stat.sc_tx_latecol;
 
-	r= sys_vircopy(SELF, D, (vir_bytes)&stats,
+	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&stats,
 		mp->DL_PROC, D, (vir_bytes) mp->DL_ADDR, sizeof(stats));
 	if (r != 0)
 		panic(__FILE__,"fxp_getstat: sys_vircopy failed", r);

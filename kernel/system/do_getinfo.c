@@ -90,7 +90,7 @@ register message *m_ptr;	/* pointer to request message */
 		break;
 
 	case GET_PROC:
-		nr_e = (m_ptr->I_VAL_LEN2_E == SELF) ?
+		nr_e = (m_ptr->I_VAL_LEN2_E == ENDPT_SELF) ?
 		who_e : m_ptr->I_VAL_LEN2_E;
 
 		if(!isokendpt(nr_e, &nr))
@@ -101,7 +101,7 @@ register message *m_ptr;	/* pointer to request message */
 		break;
 
 	case GET_PRIV: {
-		nr_e = (m_ptr->I_VAL_LEN2_E == SELF) ?
+		nr_e = (m_ptr->I_VAL_LEN2_E == ENDPT_SELF) ?
 		who_e : m_ptr->I_VAL_LEN2_E;
 		if(!isokendpt(nr_e, &nr)) return -EINVAL; /* validate request */
 		length = sizeof(struct priv);

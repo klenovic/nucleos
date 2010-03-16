@@ -339,7 +339,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 		return NULL;
 	}
 
-	if((r=sys_vmctl(SELF, VMCTL_FLUSHTLB, 0)) != 0) {
+	if((r=sys_vmctl(ENDPT_SELF, VMCTL_FLUSHTLB, 0)) != 0) {
 		vm_panic("VMCTL_FLUSHTLB failed", r);
 	}
 
@@ -376,7 +376,7 @@ void vm_pagelock(void *vir, int lockflag)
 		vm_panic("vm_lockpage: pt_writemap failed\n", NO_NUM);
 	}
 
-	if((r=sys_vmctl(SELF, VMCTL_FLUSHTLB, 0)) != 0) {
+	if((r=sys_vmctl(ENDPT_SELF, VMCTL_FLUSHTLB, 0)) != 0) {
 		vm_panic("VMCTL_FLUSHTLB failed", r);
 	}
 
@@ -687,7 +687,7 @@ void pt_init(phys_bytes usedlimit)
         /* Get ourselves spare pages. */
         if(!(sparepages_mem = (vir_bytes) aalloc(I386_PAGE_SIZE*SPAREPAGES)))
 		vm_panic("pt_init: aalloc for spare failed", NO_NUM);
-        if((r=sys_umap(SELF, VM_D, (vir_bytes) sparepages_mem,
+        if((r=sys_umap(ENDPT_SELF, VM_D, (vir_bytes) sparepages_mem,
                 I386_PAGE_SIZE*SPAREPAGES, &sparepages_ph)) != 0)
                 vm_panic("pt_init: sys_umap failed", r);
 
@@ -832,7 +832,7 @@ void pt_init(phys_bytes usedlimit)
 
 	/* Tell kernel about free pde's. */
 	while(free_pde*I386_BIG_PAGE_SIZE < VM_PROCSTART) {
-		if((r=sys_vmctl(SELF, VMCTL_I386_FREEPDE, free_pde++)) != 0) {
+		if((r=sys_vmctl(ENDPT_SELF, VMCTL_I386_FREEPDE, free_pde++)) != 0) {
 			vm_panic("VMCTL_I386_FREEPDE failed", r);
 		}
 	}
@@ -843,7 +843,7 @@ void pt_init(phys_bytes usedlimit)
 	kernlimit = free_pde*I386_BIG_PAGE_SIZE;
 
 	/* Increase kernel segment to address this memory. */
-	if((r=sys_vmctl(SELF, VMCTL_I386_KERNELLIMIT, kernlimit)) != 0) {
+	if((r=sys_vmctl(ENDPT_SELF, VMCTL_I386_KERNELLIMIT, kernlimit)) != 0) {
                 vm_panic("VMCTL_I386_KERNELLIMIT failed", r);
 	}
 
@@ -851,7 +851,7 @@ void pt_init(phys_bytes usedlimit)
 		pagedir_pde*I386_BIG_PAGE_SIZE);
 
 	/* Tell kernel how to get at the page directories. */
-	if((r=sys_vmctl(SELF, VMCTL_I386_PAGEDIRS, kpagedir)) != 0) {
+	if((r=sys_vmctl(ENDPT_SELF, VMCTL_I386_PAGEDIRS, kpagedir)) != 0) {
                 vm_panic("VMCTL_I386_KERNELLIMIT failed", r);
 	}
        

@@ -50,7 +50,7 @@ int scall_utime(void)
 
 	/* get times buffer if not 0 */
 	if (m_in.utime_ptimes != 0) {
-		r = sys_datacopy(who_e, (vir_bytes)m_in.utime_ptimes, SELF, (vir_bytes)&ut, sizeof(struct utimbuf));
+		r = sys_datacopy(who_e, (vir_bytes)m_in.utime_ptimes, ENDPT_SELF, (vir_bytes)&ut, sizeof(struct utimbuf));
 
 		if (r != 0)
 			return r;

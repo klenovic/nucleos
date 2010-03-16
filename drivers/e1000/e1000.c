@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
      */
     while (TRUE)
     {
-	if ((r= kipc_receive(ANY, &m)) != 0)
+	if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
 	{
 	    panic("e1000", "kipc_receive failed", r);
 	}
@@ -285,7 +285,7 @@ e1000_t *e;
     }
     /* Read PCI configuration. */
     e->irq   = pci_attr_r8(devind, PCI_ILR);
-    e->regs  = vm_map_phys(SELF, (void *) pci_attr_r32(devind, PCI_BAR), 
+    e->regs  = vm_map_phys(ENDPT_SELF, (void *) pci_attr_r32(devind, PCI_BAR), 
 			   0x20000);
 			   
     /* Verify mapped registers. */
@@ -297,7 +297,7 @@ e1000_t *e;
     /* Optionally map flash memory. */
     if (pci_attr_r32(devind, PCI_BAR_3))
     {
-	e->flash = vm_map_phys(SELF, (void *) pci_attr_r32(devind, PCI_BAR_2),
+	e->flash = vm_map_phys(ENDPT_SELF, (void *) pci_attr_r32(devind, PCI_BAR_2),
 			       0x10000);
 
 	gfpreg = E1000_READ_FLASH_REG(e, ICH_FLASH_GFPREG);

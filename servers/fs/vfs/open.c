@@ -159,7 +159,7 @@ static int common_open(register int oflags, mode_t omode)
 	  
 	  /* Get the driver endpoint of the block spec device */
 	  dp = &dmap[(vp->v_sdev >> MAJOR) & BYTE];
-	  if (dp->dmap_driver == NONE) {
+	  if (dp->dmap_driver == ENDPT_NONE) {
 				printf("VFS: driver not found for device %d\n",
 		      vp->v_sdev);
 				r = -ENXIO;
@@ -509,7 +509,7 @@ int scall_llseek(void)
 	rfilp->filp_pos = newpos;
 
 	/* Copy the result to user space */
-	if (sys_datacopy(SELF, (vir_bytes)&newpos, who_e, (vir_bytes)m_in.result_addr, sizeof(newpos)))
+	if (sys_datacopy(ENDPT_SELF, (vir_bytes)&newpos, who_e, (vir_bytes)m_in.result_addr, sizeof(newpos)))
 		return -EFAULT;
 
 	return 0;

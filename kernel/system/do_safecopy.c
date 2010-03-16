@@ -122,7 +122,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 
 			/* Verify actual grantee. */
 			if(g.cp_u.cp_indirect.cp_who_to != grantee &&
-				grantee != ANY) {
+				grantee != ENDPT_ANY) {
 				kprintf(
 					"verify_grant: indirect grant verify "
 					"failed: bad grantee\n");
@@ -156,7 +156,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		}
 
 		/* Verify actual grantee. */
-		if(g.cp_u.cp_direct.cp_who_to != grantee && grantee != ANY) {
+		if(g.cp_u.cp_direct.cp_who_to != grantee && grantee != ENDPT_ANY) {
 			kprintf(
 		"verify_grant: direct grant verify failed: bad grantee\n");
 			return -EPERM;
@@ -189,7 +189,7 @@ endpoint_t *e_granter;		/* new granter (magic grants) */
 		}
 
 		/* Verify actual grantee. */
-		if(g.cp_u.cp_magic.cp_who_to != grantee && grantee != ANY) {
+		if(g.cp_u.cp_magic.cp_who_to != grantee && grantee != ENDPT_ANY) {
 			kprintf(
 		"verify_grant: magic grant verify failed: bad grantee\n");
 			return -EPERM;
@@ -345,14 +345,14 @@ register message *m_ptr;	/* pointer to request message */
 	for(i = 0; i < els; i++) {
 		int access;
 		endpoint_t granter;
-		if(vec[i].v_from == SELF) {
+		if(vec[i].v_from == ENDPT_SELF) {
 			access = CPF_WRITE;
 			granter = vec[i].v_to;
-		} else if(vec[i].v_to == SELF) {
+		} else if(vec[i].v_to == ENDPT_SELF) {
 			access = CPF_READ;
 			granter = vec[i].v_from;
 		} else {
-			kprintf("vsafecopy: %d: element %d/%d: no SELF found\n",
+			kprintf("vsafecopy: %d: element %d/%d: no ENDPT_SELF found\n",
 				who_e, i, els);
 			return -EINVAL;
 		}

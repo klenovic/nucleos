@@ -505,7 +505,7 @@ unsigned nr_req;		/* length of request vector */
 		if (iov->iov_size < SECTOR_SIZE + sizeof(fmt_param))
 			return(-EINVAL);
 
-		if(proc_nr != SELF) {
+		if(proc_nr != ENDPT_SELF) {
 		   s=sys_safecopyfrom(proc_nr, iov->iov_addr,
 			SECTOR_SIZE + iov_offset, (vir_bytes) &fmt_param,
 			(phys_bytes) sizeof(fmt_param), D);
@@ -611,7 +611,7 @@ unsigned nr_req;		/* length of request vector */
 
 		if (r == 0 && opcode == DEV_SCATTER_S) {
 			/* Copy the user bytes to the DMA buffer. */
-			if(proc_nr != SELF) {
+			if(proc_nr != ENDPT_SELF) {
 		   	   s=sys_safecopyfrom(proc_nr, *ug, *up,
 				(vir_bytes) floppy_buf,
 			  	 (phys_bytes) SECTOR_SIZE, D);
@@ -636,7 +636,7 @@ unsigned nr_req;		/* length of request vector */
 
 		if (r == 0 && opcode == DEV_GATHER_S) {
 			/* Copy the DMA buffer to user space. */
-			if(proc_nr != SELF) {
+			if(proc_nr != ENDPT_SELF) {
 		   	   s=sys_safecopyto(proc_nr, *ug, *up,
 				(vir_bytes) floppy_buf,
 			  	 (phys_bytes) SECTOR_SIZE, D);
@@ -767,7 +767,7 @@ static void start_motor()
   f_set_timer(&f_tmr_timeout, f_dp->start_ms * system_hz / 1000, f_timeout);
   f_busy = BSY_IO;
   do {
-  	kipc_receive(ANY, &mess); 
+  	kipc_receive(ENDPT_ANY, &mess); 
 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
@@ -859,7 +859,7 @@ static int seek()
  	f_set_timer(&f_tmr_timeout, system_hz/30, f_timeout);
 	f_busy = BSY_IO;
   	do {
-  		kipc_receive(ANY, &mess); 
+  		kipc_receive(ENDPT_ANY, &mess); 
 	
 		if (is_notify(mess.m_type)) {
 			switch (_ENDPOINT_P(mess.m_source)) {
@@ -1141,7 +1141,7 @@ static void f_reset()
    * but be prepared to handle a timeout.
    */
   do {
-  	kipc_receive(ANY, &mess); 
+  	kipc_receive(ENDPT_ANY, &mess); 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
 			case CLOCK:
@@ -1193,7 +1193,7 @@ static int f_intr_wait()
 
   /* We expect an interrupt, but if a timeout, occurs, report an error. */
   do {
-  	kipc_receive(ANY, &mess); 
+  	kipc_receive(ENDPT_ANY, &mess); 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
 			case CLOCK:
@@ -1354,7 +1354,7 @@ int density;
   position = (off_t) f_dp->test << SECTOR_SHIFT;
   iovec1.iov_addr = (vir_bytes) floppy_buf;
   iovec1.iov_size = SECTOR_SIZE;
-  result = f_transfer(SELF, DEV_GATHER_S, cvul64(position), &iovec1, 1);
+  result = f_transfer(ENDPT_SELF, DEV_GATHER_S, cvul64(position), &iovec1, 1);
 
   if (iovec1.iov_size != 0) return(-EIO);
 

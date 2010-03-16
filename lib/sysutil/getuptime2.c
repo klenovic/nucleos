@@ -20,7 +20,7 @@ time_t *boottime;
     int s;
 
     m.m_type = SYS_TIMES;		/* request time information */
-    m.T_ENDPT = NONE;			/* ignore process times */
+    m.T_ENDPT = ENDPT_NONE;			/* ignore process times */
     s = ktaskcall(SYSTASK, SYS_TIMES, &m);
     *ticks = m.T_BOOT_TICKS;
     *boottime = m.T_BOOTTIME;

@@ -31,7 +31,7 @@ register message *m_ptr;	/* pointer to request message */
   dst.segment = D;
   src.offset = m_ptr->RDB_ADDR;
   dst.offset = (vir_bytes) m_ptr->RDB_BUF;
-  src.proc_nr_e = NONE;
+  src.proc_nr_e = ENDPT_NONE;
   dst.proc_nr_e = m_ptr->m_source;      
 
   return virtual_copy_vmcheck(&src, &dst, m_ptr->RDB_SIZE);

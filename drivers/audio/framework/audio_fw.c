@@ -94,7 +94,7 @@ void main(void)
 	   carries it out, and sends a reply. */
 
 	while(1) {
-		kipc_receive(ANY, &mess);
+		kipc_receive(ENDPT_ANY, &mess);
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;
 
@@ -927,7 +927,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 	}
 
 	sub_dev_ptr->DmaPtr = sub_dev_ptr->DmaBuf;
-	i = sys_umap(SELF, D, 
+	i = sys_umap(ENDPT_SELF, D, 
 			(vir_bytes) sub_dev_ptr->DmaBuf, 
 			(phys_bytes) sizeof(sub_dev_ptr->DmaBuf), 
 			&(sub_dev_ptr->DmaPhys));

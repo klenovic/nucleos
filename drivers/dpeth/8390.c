@@ -37,7 +37,7 @@
 
 #if 0
 #define	sys_nic2mem(srcOffs,dstProc,dstOffs,length) \
-	sys_vircopy(SELF,dep->de_memsegm,(vir_bytes)(srcOffs),\
+	sys_vircopy(ENDPT_SELF,dep->de_memsegm,(vir_bytes)(srcOffs),\
 		    (dstProc),D,(vir_bytes)(dstOffs),length)
 #endif
 #if 0
@@ -88,7 +88,7 @@ static void mem_getblock(dpeth_t *dep, u16_t offset, int size, void *dst)
 {
   panic(__FILE__, "mem_getblock: not converted to safecopies", NO_NUM);
 #if 0
-  sys_nic2mem(dep->de_linmem + offset, SELF, dst, size);
+  sys_nic2mem(dep->de_linmem + offset, ENDPT_SELF, dst, size);
   return;
 #endif
 }
@@ -189,7 +189,7 @@ static void pio_getblock(dpeth_t *dep, u16_t offset, int size, void *dst)
   ns_rw_setup(dep, CR_DM_RR, size, offset);
 
 #if PIO16 == 0
-  insb(dep->de_data_port, SELF, dst, size);
+  insb(dep->de_data_port, ENDPT_SELF, dst, size);
 #else
   if (dep->de_16bit == TRUE) {
 	insw(dep->de_data_port, dst, size);

@@ -42,7 +42,7 @@ register message *m_ptr;	/* pointer to request message */
   struct proc *targetpr, *caller;
 
   /* Verify process number. */
-  if (endpt == SELF)
+  if (endpt == ENDPT_SELF)
 	proc_nr = who_p;
   else
 	if (! isokendpt(endpt, &proc_nr))
@@ -70,7 +70,7 @@ register message *m_ptr;	/* pointer to request message */
 	endpoint_t newep;
 	int new_proc_nr;
 
-        if(verify_grant(targetpr->p_endpoint, ANY, offset, count, 0, 0,
+        if(verify_grant(targetpr->p_endpoint, ENDPT_ANY, offset, count, 0, 0,
                 &newoffset, &newep) != 0) {
                 kprintf("SYSTEM: do_umap: verify_grant in %s, grant %d, bytes 0x%lx, failed, caller %s\n", targetpr->p_name, offset, count, caller->p_name);
 		proc_stacktrace(caller);

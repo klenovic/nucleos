@@ -79,7 +79,7 @@ int main(void)
 	{
 		report_exceptions();
 
-		r= kipc_receive(ANY, &m);
+		r= kipc_receive(ENDPT_ANY, &m);
 		if (r != 0)
 			panic(__FILE__, "receive failed", r);
 		if (is_notify(m.m_type)) {

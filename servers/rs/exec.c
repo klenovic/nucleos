@@ -173,7 +173,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	vsp = stack_top;
 	vsp -= frame_len;
 	patch_ptr(frame, vsp);
-	r = sys_datacopy(SELF, (vir_bytes) frame,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes) frame,
 		proc_e, (vir_bytes) vsp, (phys_bytes)frame_len);
 	if (r != 0) {
 		printf("RS: stack_top is 0x%lx; tried to copy to 0x%lx in %d\n",
@@ -436,7 +436,7 @@ phys_bytes seg_bytes;		/* how much is to be transferred? */
   off_t n, o, b_off, seg_off;
 
   if (off+seg_bytes > exec_len) return -ENOEXEC;
-  r= sys_vircopy(SELF, D, (vir_bytes)exec+off, proc_e, seg, 0, seg_bytes);
+  r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)exec+off, proc_e, seg, 0, seg_bytes);
   return r;
 }
 

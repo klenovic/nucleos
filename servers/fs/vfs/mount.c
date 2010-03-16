@@ -125,10 +125,10 @@ static int mount_fs(endpoint_t fs_e)
   }
   
   /* Mount request got after FS login or FS login arrived after a suspended mount */
-  last_login_fs_e = NONE;
+  last_login_fs_e = ENDPT_NONE;
   
   /* Clear endpoint field */
-  mount_m_in.fs_endpt = (char *) NONE;
+  mount_m_in.fs_endpt = (char *) ENDPT_NONE;
 
   /* If 'name' is not for a block special file, return error. */
   if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
@@ -238,7 +238,7 @@ static int mount_fs(endpoint_t fs_e)
 
   /* Get driver process' endpoint */  
   dp = &dmap[(dev >> MAJOR) & BYTE];
-  if (dp->dmap_driver == NONE) {
+  if (dp->dmap_driver == ENDPT_NONE) {
 	  printf("VFS: no driver for dev %x\n", dev);
         return(-EINVAL);
   }
@@ -387,7 +387,7 @@ dev_t dev;
   }
 
   /* Tell FS to unmount */
-  if(vmp->m_fs_e <= 0 || vmp->m_fs_e == NONE)
+  if(vmp->m_fs_e <= 0 || vmp->m_fs_e == ENDPT_NONE)
 	panic(__FILE__, "unmount: strange fs endpoint", vmp->m_fs_e);
 
   if ((r = req_unmount(vmp->m_fs_e)) != 0)              /* Not recoverable. */
@@ -398,7 +398,7 @@ dev_t dev;
   vmp->m_root_node->v_sdev = NO_DEV;
   vmp->m_root_node = NIL_VNODE;
   vmp->m_dev = NO_DEV;
-  vmp->m_fs_e = NONE;
+  vmp->m_fs_e = ENDPT_NONE;
 
   /* Is there a block special file that was handled by that partition? */
   for (vp = &vnode[0]; vp < &vnode[NR_VNODES]; vp++) {
@@ -406,7 +406,7 @@ dev_t dev;
 
           /* Get the driver endpoint of the block spec device */
           dp = &dmap[(dev >> MAJOR) & BYTE];
-          if (dp->dmap_driver == NONE) {
+          if (dp->dmap_driver == ENDPT_NONE) {
 			printf("VFS: driver not found for device %d\n", dev);
               continue;
           }

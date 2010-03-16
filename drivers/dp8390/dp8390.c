@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 
 	while (TRUE)
 	{
-		if ((r= kipc_receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
 			panic("", "dp8390: receive failed", r);
 
 		if (is_notify(m.m_type)) {
@@ -1622,7 +1622,7 @@ vir_bytes count;
 
 		r= sys_vircopy(iovp->iod_proc_nr, D,
 			iovp->iod_iovec[i].iov_addr + offset,
-			SELF, D, vir_hw, bytes);
+			ENDPT_SELF, D, vir_hw, bytes);
 		if (r != 0)
 			panic("DP8390", "dp_user2nic: sys_vircopy failed", r);
 
@@ -1859,7 +1859,7 @@ vir_bytes count;
 		if (odd_byte)
 		{
 			r= sys_vircopy(user_proc, D, vir_user, 
-				SELF, D, (vir_bytes)&two_bytes[1], 1);
+				ENDPT_SELF, D, (vir_bytes)&two_bytes[1], 1);
 			if (r != 0)
 			{
 				panic("DP8390",
@@ -1889,7 +1889,7 @@ vir_bytes count;
 		{
 			assert(bytes == 1);
 			r= sys_vircopy(user_proc, D, vir_user, 
-				SELF, D, (vir_bytes)&two_bytes[0], 1);
+				ENDPT_SELF, D, (vir_bytes)&two_bytes[0], 1);
 			if (r != 0)
 			{
 				panic("DP8390",
@@ -2068,7 +2068,7 @@ vir_bytes count;
 		if (bytes > count)
 			bytes = count;
 
-		r= sys_vircopy(SELF, D, vir_hw,
+		r= sys_vircopy(ENDPT_SELF, D, vir_hw,
 			iovp->iod_proc_nr, D,
 			iovp->iod_iovec[i].iov_addr + offset, bytes);
 		if (r != 0)
@@ -2278,7 +2278,7 @@ vir_bytes count;
 		vir_user= iovp->iod_iovec[i].iov_addr + offset;
 		if (odd_byte)
 		{
-			r= sys_vircopy(SELF, D, (vir_bytes)&two_bytes[1],
+			r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&two_bytes[1],
 				user_proc, D, vir_user,  1);
 			if (r != 0)
 			{
@@ -2308,7 +2308,7 @@ vir_bytes count;
 		{
 			assert(bytes == 1);
 			*(u16_t *)two_bytes= inw(dep->de_data_port);
-			r= sys_vircopy(SELF, D, (vir_bytes)&two_bytes[0],
+			r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&two_bytes[0],
 				user_proc, D, vir_user,  1);
 			if (r != 0)
 			{
@@ -2575,7 +2575,7 @@ dpeth_t *dep;
 	printf("buf at 0x%x, abuf at 0x%x\n", buf, abuf);
 
 #if 0
-	r= sys_vm_map(SELF, 1 /* map */, (vir_bytes)abuf,
+	r= sys_vm_map(ENDPT_SELF, 1 /* map */, (vir_bytes)abuf,
 			dep->de_ramsize, (phys_bytes)dep->de_linmem);
 #else
 	r = -ENOSYS;
@@ -2705,7 +2705,7 @@ void *loc_addr;
 	int r;
 
 	r= sys_vircopy(user_proc, D, user_addr,
-		SELF, D, (vir_bytes)loc_addr, count);
+		ENDPT_SELF, D, (vir_bytes)loc_addr, count);
 	if (r != 0)
 		panic("DP8390", "get_userdata: sys_vircopy failed", r);
 }
@@ -2739,7 +2739,7 @@ void *loc_addr;
 {
 	int r;
 
-	r= sys_vircopy(SELF, D, (vir_bytes)loc_addr, 
+	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)loc_addr, 
 		user_proc, D, user_addr, count);
 	if (r != 0)
 		panic("DP8390", "put_userdata: sys_vircopy failed", r);
@@ -2807,12 +2807,12 @@ void outw(port_t port, u16_t value)
 
 static void insb(port_t port, void *buf, size_t size)
 {
-	do_vir_insb(port, SELF, (vir_bytes)buf, size);
+	do_vir_insb(port, ENDPT_SELF, (vir_bytes)buf, size);
 }
 
 static void insw(port_t port, void *buf, size_t size)
 {
-	do_vir_insw(port, SELF, (vir_bytes)buf, size);
+	do_vir_insw(port, ENDPT_SELF, (vir_bytes)buf, size);
 }
 
 static void do_vir_insb(port_t port, int proc, vir_bytes buf, size_t size)

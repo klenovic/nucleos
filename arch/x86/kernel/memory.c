@@ -638,7 +638,7 @@ int delivermsg(struct proc *rp)
 	NOREC_ENTER(deliver);
 
 	vmassert(rp->p_misc_flags & MF_DELIVERMSG);
-	vmassert(rp->p_delivermsg.m_source != NONE);
+	vmassert(rp->p_delivermsg.m_source != ENDPT_NONE);
 
 	vmassert(rp->p_delivermsg_lin);
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
@@ -663,7 +663,7 @@ int delivermsg(struct proc *rp)
 		r = VMSUSPEND;
 	} else {
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
-		rp->p_delivermsg.m_source = NONE;
+		rp->p_delivermsg.m_source = ENDPT_NONE;
 		rp->p_delivermsg_lin = 0;
 #endif
 		rp->p_misc_flags &= ~MF_DELIVERMSG;

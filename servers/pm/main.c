@@ -189,7 +189,7 @@ send_reply:
 static void get_work()
 {
 	/* Wait for the next message and extract useful information from it. */
-	if (kipc_receive(ANY, &m_in) != 0)
+	if (kipc_receive(ENDPT_ANY, &m_in) != 0)
 		panic(__FILE__,"PM receive error", NO_NUM);
 
 	who_e = m_in.m_source;	/* who sent the message */
@@ -343,7 +343,7 @@ static void pm_init()
   sigfillset(&mproc[PM_PROC_NR].mp_ignore); 	/* guard against signals */
 
   /* Tell FS that no more system processes follow and synchronize. */
-  mess.PR_ENDPT = NONE;
+  mess.PR_ENDPT = ENDPT_NONE;
   if (kipc_sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
 	panic(__FILE__,"can't sync up with FS", NO_NUM);
 

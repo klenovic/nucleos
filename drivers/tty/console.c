@@ -189,7 +189,7 @@ int try;
 	    tp->tty_out_vir_offset += count;
 	} else {
 	   if ((result = sys_vircopy(tp->tty_outproc, D, tp->tty_out_vir_g, 
-			SELF, D, (vir_bytes) buf, (vir_bytes) count)) != 0)
+			ENDPT_SELF, D, (vir_bytes) buf, (vir_bytes) count)) != 0)
 		break;
 	    tp->tty_out_vir_g += count;
 	}
@@ -1002,12 +1002,12 @@ tty_t *tp;
   	if (machine.vdu_ega) vid_size = EGA_SIZE;
   	wrap = ! machine.vdu_ega;
 
-	console_memory = vm_map_phys(SELF, (void *) vid_base, vid_size);
+	console_memory = vm_map_phys(ENDPT_SELF, (void *) vid_base, vid_size);
 
 	if(console_memory == MAP_FAILED) 
   		panic("TTY","Console couldn't map video memory", NO_NUM);
 
-	font_memory = vm_map_phys(SELF, (void *)GA_VIDEO_ADDRESS, GA_FONT_SIZE);
+	font_memory = vm_map_phys(ENDPT_SELF, (void *)GA_VIDEO_ADDRESS, GA_FONT_SIZE);
 
 	if(font_memory == MAP_FAILED) 
   		panic("TTY","Console couldn't map font memory", NO_NUM);
@@ -1146,7 +1146,7 @@ int safe;
 	   if(r != 0)
 	  	   printf("<tty: proc %d, grant %ld>", proc_nr, src);
 	} else {
-	   r = sys_vircopy(proc_nr, D, src+offset, SELF, D, (vir_bytes) &c, 1);
+	   r = sys_vircopy(proc_nr, D, src+offset, ENDPT_SELF, D, (vir_bytes) &c, 1);
 	}
 	offset++;
 	if(r != 0) {
@@ -1176,7 +1176,7 @@ message *m_ptr;			/* pointer to request message */
 
   dst = (vir_bytes) m_ptr->GETKM_PTR;
   r= 0;
-  if (sys_vircopy(SELF, D, (vir_bytes)&kmess, m_ptr->m_source, D,
+  if (sys_vircopy(ENDPT_SELF, D, (vir_bytes)&kmess, m_ptr->m_source, D,
 	dst, sizeof(kmess)) != 0) {
 	r = -EFAULT;
   }

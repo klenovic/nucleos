@@ -126,10 +126,10 @@ int do_willexit(message *msg)
 
 void _exit(int code)
 {
-  sys_exit(SELF);
+  sys_exit(ENDPT_SELF);
 }
 
 void __exit(int code)
 {
-  sys_exit(SELF);
+  sys_exit(ENDPT_SELF);
 }

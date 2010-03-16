@@ -149,8 +149,8 @@ void driver_init(void)
 	memset(driver, 0, sizeof(driver));
 
 	/* Endpoints unknown. */
-	driver[DRIVER_MAIN].endpt = NONE;
-	driver[DRIVER_BACKUP].endpt = NONE;
+	driver[DRIVER_MAIN].endpt = ENDPT_NONE;
+	driver[DRIVER_BACKUP].endpt = ENDPT_NONE;
 
 	/* Get disk driver's and this proc's endpoint. */
 	driver[DRIVER_MAIN].label = MAIN_LABEL;
@@ -401,7 +401,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 			MAIN_MINOR = BACKUP_MINOR;
 		}
 
-		driver[DRIVER_BACKUP].endpt = NONE;
+		driver[DRIVER_BACKUP].endpt = ENDPT_NONE;
 
 		return 0;
 	}
@@ -583,7 +583,7 @@ static int flt_receive(message *mess, int which)
 	int r;
 
 	for (;;) {
-		r = kipc_receive(ANY, mess);
+		r = kipc_receive(ENDPT_ANY, mess);
 		if(r != 0)
 			panic(__FILE__, "kipc_receive returned error", r);
 

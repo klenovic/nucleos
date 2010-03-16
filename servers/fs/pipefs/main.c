@@ -82,7 +82,7 @@ static void init_server(void)
 
   /* Init driver mapping */
   for (i = 0; i < NR_DEVICES; ++i) 
-	driver_endpoints[i].driver_e = NONE;
+	driver_endpoints[i].driver_e = ENDPT_NONE;
 	
   SELF_E = getprocnr();
   buf_pool();
@@ -99,7 +99,7 @@ message *m_in;				/* pointer to message */
   endpoint_t src;
 
   do {
-	if ((r = kipc_receive(ANY, m_in)) != 0) 	/* wait for message */
+	if ((r = kipc_receive(ENDPT_ANY, m_in)) != 0) 	/* wait for message */
 		panic("PFS","receive failed", r);
 	src = fs_m_in.m_source;
 

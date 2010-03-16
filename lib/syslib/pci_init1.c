@@ -17,7 +17,7 @@ pci_init1.c
 #include <servers/ds/ds.h>
 #include <nucleos/pci.h>
 
-int pci_procnr= ANY;
+int pci_procnr= ENDPT_ANY;
 
 /*===========================================================================*
  *				pci_init1				     *

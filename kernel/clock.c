@@ -81,7 +81,7 @@ void clock_task()
   /* Main loop of the clock task.  Get work, process it. Never reply. */
   while(TRUE) {
 	/* Go get a message. */
-	result = kipc_receive(ANY, &m);
+	result = kipc_receive(ENDPT_ANY, &m);
 
 	if(result != 0)
 		minix_panic("kipc_receive() failed", result);

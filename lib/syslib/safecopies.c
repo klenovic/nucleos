@@ -223,7 +223,7 @@ cpf_lookup(cp_grant_id_t g, endpoint_t *granter, endpoint_t *grantee)
 	GID_CHECK_USED(g);
 
 	if(grants[g].cp_flags & CPF_DIRECT) {
-		if(granter) *granter = SELF;
+		if(granter) *granter = ENDPT_SELF;
 		if(grantee) *grantee = grants[g].cp_u.cp_direct.cp_who_to;
 	} else if(grants[g].cp_flags & CPF_MAGIC) {
 		if(granter) *granter = grants[g].cp_u.cp_magic.cp_who_from;

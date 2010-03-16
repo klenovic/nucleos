@@ -88,7 +88,7 @@ void dtab_dmp()
     printf("Major  Driver ept  Flags\n");
     printf("-----  ----------  -----\n");
     for (i=0; i<NR_DEVICES; i++) {
-        if (dmap[i].dmap_driver == NONE) continue;
+        if (dmap[i].dmap_driver == ENDPT_NONE) continue;
         printf("%5d  %10d  %s\n",
 		i, dmap[i].dmap_driver, dmap_flags(dmap[i].dmap_flags));
     }

@@ -154,7 +154,7 @@ int type;		/* Driver type (DRIVER_STD or DRIVER_ASYN) */
 	} else {
 		int s;
 	/* Wait for a request to read or write a disk block. */
-		if ((s=kipc_receive(ANY, &mess)) != 0)
+		if ((s=kipc_receive(ENDPT_ANY, &mess)) != 0)
         		panic((*dp->dr_name)(),"receive() failed", s);
 	}
 

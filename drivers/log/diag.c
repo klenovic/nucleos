@@ -132,7 +132,7 @@ int do_diagnostics(message *m, int safe)
       if(safe) {
         r = sys_safecopyfrom(m->m_source, src, offset, (vir_bytes) &c, 1, D);
       } else {
-        r = sys_datacopy(m->m_source, src+offset, SELF, (vir_bytes) &c, 1);
+        r = sys_datacopy(m->m_source, src+offset, ENDPT_SELF, (vir_bytes) &c, 1);
       }
       if(r != 0) break;
       offset ++;

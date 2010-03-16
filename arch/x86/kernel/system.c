@@ -320,7 +320,7 @@ static void ser_debug(int c)
 static void printslot(struct proc *pp, int level)
 {
 	struct proc *depproc = NULL;
-	int dep = NONE;
+	int dep = ENDPT_NONE;
 #define COL { int i; for(i = 0; i < level; i++) printf("> "); }
 
 	if(level >= NR_PROCS) {
@@ -344,9 +344,9 @@ static void printslot(struct proc *pp, int level)
 		kprintf(" from: ");
 	}
 
-	if(dep != NONE) {
-		if(dep == ANY) {
-			kprintf(" ANY\n");
+	if(dep != ENDPT_NONE) {
+		if(dep == ENDPT_ANY) {
+			kprintf(" ENDPT_ANY\n");
 		} else {
 			int procno;
 			if(!isokendpt(dep, &procno)) {

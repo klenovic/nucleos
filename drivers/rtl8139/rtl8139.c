@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
 
 	while (TRUE)
 	{
-		if ((r= kipc_receive(ANY, &m)) != 0)
+		if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
 			panic("rtl8139","receive failed", r);
 
 		if (is_notify(m.m_type)) {
@@ -1175,7 +1175,7 @@ int vectored;
 
 			cps = sys_vircopy(re_client, D,
 				(vir_bytes) mp->DL_ADDR + iov_offset,
-				SELF, D, (vir_bytes) rep->re_iovec,
+				ENDPT_SELF, D, (vir_bytes) rep->re_iovec,
 				n * sizeof(rep->re_iovec[0]));
 			if (cps != 0)
 				printf(
@@ -1202,7 +1202,7 @@ int vectored;
 					assert(o<RX_BUFSIZE);
 					s1= RX_BUFSIZE-o;
 
-					cps = sys_vircopy(SELF, D,
+					cps = sys_vircopy(ENDPT_SELF, D,
 						(vir_bytes) rep->v_re_rx_buf+o,
 						re_client, D, iovp->iov_addr,
 						s1);
@@ -1210,7 +1210,7 @@ int vectored;
 						printf(
 			"RTL8139: warning, sys_vircopy failed: %d (%d)\n",
 							cps, __LINE__);
-					cps = sys_vircopy(SELF, D,
+					cps = sys_vircopy(ENDPT_SELF, D,
 						(vir_bytes) rep->v_re_rx_buf,
 						re_client, D,
 						iovp->iov_addr+s1, s-s1);
@@ -1221,7 +1221,7 @@ int vectored;
 				}
 				else
 				{
-					cps = sys_vircopy(SELF, D,
+					cps = sys_vircopy(ENDPT_SELF, D,
 						(vir_bytes) rep->v_re_rx_buf+o,
 						re_client, D, iovp->iov_addr,
 						s);
@@ -1616,7 +1616,7 @@ int vectored;
 			if (i+n > count)
 				n= count-i;
 			cps = sys_vircopy(re_client, D, ((vir_bytes) mp->DL_ADDR) + iov_offset,
-				SELF, D, (vir_bytes) rep->re_iovec, 
+				ENDPT_SELF, D, (vir_bytes) rep->re_iovec, 
 				n * sizeof(rep->re_iovec[0]));
 if (cps != 0) printf("RTL8139: warning, sys_vircopy failed: %d\n", cps);
 
@@ -1633,7 +1633,7 @@ if (cps != 0) printf("RTL8139: warning, sys_vircopy failed: %d\n", cps);
 				  panic("rtl8139","umap_local failed\n", NO_NUM);
 
 				cps = sys_vircopy(re_client, D, iovp->iov_addr,
-					SELF, D, (vir_bytes) ret, s);
+					ENDPT_SELF, D, (vir_bytes) ret, s);
 		if (cps != 0) printf("RTL8139: warning, sys_vircopy failed: %d\n", cps);
 				size += s;
 				ret += s;
@@ -1649,7 +1649,7 @@ if (cps != 0) printf("RTL8139: warning, sys_vircopy failed: %d\n", cps);
 			panic("rtl8139","invalid packet size", size);
 		ret = rep->re_tx[tx_head].v_ret_buf;
 		cps = sys_vircopy(re_client, D, (vir_bytes)mp->DL_ADDR, 
-			SELF, D, (vir_bytes) ret, size);
+			ENDPT_SELF, D, (vir_bytes) ret, size);
 	if (cps != 0) printf("RTL8139: warning, sys_abscopy failed: %d\n", cps);
 	}
 
@@ -2304,7 +2304,7 @@ message *mp;
 
 	stats= rep->re_stat;
 
-	r = sys_datacopy(SELF, (vir_bytes) &stats, mp->DL_PROC,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes) &stats, mp->DL_PROC,
 		(vir_bytes) mp->DL_ADDR, sizeof(stats));
 	if (r != 0)
 		panic(__FILE__, "rl_getstat: sys_datacopy failed", r);

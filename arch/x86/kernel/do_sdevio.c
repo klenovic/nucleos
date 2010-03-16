@@ -47,9 +47,9 @@ register message *m_ptr;	/* pointer to request message */
   vir_bytes addr;
   struct proc *destproc;
 
-  /* Allow safe copies and accesses to SELF */
+  /* Allow safe copies and accesses to ENDPT_SELF */
   if ((m_ptr->DIO_REQUEST & _DIO_SAFEMASK) != _DIO_SAFE &&
-	proc_nr_e != SELF)
+	proc_nr_e != ENDPT_SELF)
   {
 	static int first= 1;
 	if (first)
@@ -64,7 +64,7 @@ register message *m_ptr;	/* pointer to request message */
    * A driver may directly provide a pointer to a buffer at the user-process
    * that initiated the device I/O. Kernel processes, of course, are denied.
    */
-  if (proc_nr_e == SELF)
+  if (proc_nr_e == ENDPT_SELF)
 	proc_nr = who_p;
   else
 	if(!isokendpt(proc_nr_e, &proc_nr))

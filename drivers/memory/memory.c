@@ -234,11 +234,11 @@ unsigned nr_req;		/* length of request vector */
 	     */
 	    if(!any_mapped || pagestart_mapped != pagestart) {
 	     if(any_mapped) {
-		if(vm_unmap_phys(SELF, vaddr, I386_PAGE_SIZE) != 0)
+		if(vm_unmap_phys(ENDPT_SELF, vaddr, I386_PAGE_SIZE) != 0)
       			panic("MEM","vm_unmap_phys failed",NO_NUM);
 		any_mapped = 0;
 	     }
-	     vaddr = vm_map_phys(SELF, (void *) pagestart, I386_PAGE_SIZE);
+	     vaddr = vm_map_phys(ENDPT_SELF, (void *) pagestart, I386_PAGE_SIZE);
 	     if(vaddr == MAP_FAILED) 
 		r = -ENOMEM;
 	     else
@@ -368,7 +368,7 @@ static void m_init()
   /* Map in kernel memory for /dev/kmem. */
   m_geom[KMEM_DEV].dv_base = cvul64(kinfo.kmem_base);
   m_geom[KMEM_DEV].dv_size = cvul64(kinfo.kmem_size);
-  if((m_vaddrs[KMEM_DEV] = vm_map_phys(SELF, (void *) kinfo.kmem_base,
+  if((m_vaddrs[KMEM_DEV] = vm_map_phys(ENDPT_SELF, (void *) kinfo.kmem_base,
 	kinfo.kmem_size)) == MAP_FAILED) {
 	printf("MEM: Couldn't map in /dev/kmem.");
   }
@@ -381,7 +381,7 @@ static void m_init()
   /* Map in kernel memory for /dev/imgrd. */
   m_geom[IMGRD_DEV].dv_base = cvul64(0);
   m_geom[IMGRD_DEV].dv_size = cvul64(initrd_size);
-  m_vaddrs[IMGRD_DEV] = (vir_bytes) vm_map_phys(SELF, (void *) initrd_base, initrd_size);
+  m_vaddrs[IMGRD_DEV] = (vir_bytes) vm_map_phys(ENDPT_SELF, (void *) initrd_base, initrd_size);
 
   if((void*)m_vaddrs[IMGRD_DEV] == MAP_FAILED) {
     printf("MEM: Couldn't map initial ramdisk.");

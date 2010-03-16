@@ -43,11 +43,11 @@
  *===========================================================================*/
 
 /* These may not be any valid endpoint (see <nucleos/endpoint.h>). */
-#define ANY		0x7ace	/* used to indicate 'any process' */
-#define NONE 		0x6ace  /* used to indicate 'no process at all' */
-#define SELF		0x8ace 	/* used to indicate 'own process' */
-#define _MAX_MAGIC_PROC (SELF)	/* used by <minix/endpoint.h> 
-				   to determine generation size */
+#define ENDPT_ANY		0x7ace	/* used to indicate 'any process' */
+#define ENDPT_NONE 		0x6ace  /* used to indicate 'no process at all' */
+#define ENDPT_SELF		0x8ace 	/* used to indicate 'own process' */
+#define _MAX_MAGIC_PROC		(ENDPT_SELF)	/* used by <minix/endpoint.h> 
+						   to determine generation size */
 
 /*===========================================================================*
  *            	Process numbers of processes in the system image	     *
@@ -106,12 +106,12 @@
  * Directly sending it to TTY only displays the output. Sending it to the
  * log driver will cause the diagnostics to be buffered and displayed.
  * Messages are sent by src/lib/sysutil/kputc.c to these processes, in
- * the order of this array, which must be terminated by NONE. This is used
+ * the order of this array, which must be terminated by ENDPT_NONE. This is used
  * by drivers and servers that printf().
  * The kernel does this for its own kprintf() in kernel/utility.c, also using
  * this array, but a slightly different mechanism.
  */
-#define OUTPUT_PROCS_ARRAY	{ TTY_PROC_NR, LOG_PROC_NR, NONE }
+#define OUTPUT_PROCS_ARRAY	{ TTY_PROC_NR, LOG_PROC_NR, ENDPT_NONE }
 
 /*===========================================================================*
  *                	   Kernel notification types                         *

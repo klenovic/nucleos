@@ -507,12 +507,12 @@ static void init_params()
 		disable_dma = 1;
 		printf("at_wini%d: no dma\n", w_instance);
 	} else {
-		s= sys_umap(SELF, VM_D, (vir_bytes)dma_buf,
+		s= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)dma_buf,
 			ATA_DMA_BUF_SIZE, &dma_buf_phys);
 		if (s != 0)
 			panic("at_wini", "can't map dma buffer", s);
 
-		s= sys_umap(SELF, VM_D, (vir_bytes)prdt,
+		s= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)prdt,
 			PRDT_BYTES, &prdt_phys);
 		if (s != 0)
 			panic("at_wini", "can't map prd table", s);
@@ -994,7 +994,7 @@ static int w_identify()
 	!(wn->w_status & (STATUS_ERR|STATUS_WF))) {
 
 	/* Device information. */
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, SECTOR_SIZE)) != 0)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, ENDPT_SELF, tmp_buf, SECTOR_SIZE)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 
 #if 0
@@ -1067,7 +1067,7 @@ static int w_identify()
 	wn->state |= ATAPI;
 
 	/* Device information. */
-	if ((s=sys_insw(wn->base_cmd + REG_DATA, SELF, tmp_buf, 512)) != 0)
+	if ((s=sys_insw(wn->base_cmd + REG_DATA, ENDPT_SELF, tmp_buf, 512)) != 0)
 		panic(w_name(),"Call to sys_insw() failed", s);
 
 	size = 0;	/* Size set later. */
@@ -1164,7 +1164,7 @@ static int w_io_test(void)
  	if (w_prepare(w_drive * DEV_PER_DRIVE) == NIL_DEV)
  		panic(w_name(), "Couldn't switch devices", NO_NUM);
 
-	r = w_transfer(SELF, DEV_GATHER_S, cvu64(0), &iov, 1);
+	r = w_transfer(ENDPT_SELF, DEV_GATHER_S, cvu64(0), &iov, 1);
 
 	/* Switch back. */
  	if (w_prepare(save_dev) == NIL_DEV)
@@ -1476,7 +1476,7 @@ unsigned nr_req;		/* length of request vector */
 
 			if (do_copyout)
 			{
-				if(proc_nr != SELF) {
+				if(proc_nr != ENDPT_SELF) {
 				   s= sys_safecopyto(proc_nr, iov->iov_addr,
 					addr_offset,
 					(vir_bytes)dma_buf+dma_buf_offset, n, D);
@@ -1515,7 +1515,7 @@ unsigned nr_req;		/* length of request vector */
 				/* An error, send data to the bit bucket. */
 				if (w_wn->w_status & STATUS_DRQ) {
 					if ((s=sys_insw(wn->base_cmd+REG_DATA,
-						SELF, tmp_buf,
+						ENDPT_SELF, tmp_buf,
 						SECTOR_SIZE)) != 0)
 					{
 						panic(w_name(),
@@ -1535,7 +1535,7 @@ unsigned nr_req;		/* length of request vector */
 
 		/* Copy bytes to or from the device's buffer. */
 		if (opcode == DEV_GATHER_S) {
-		   if(proc_nr != SELF) {
+		   if(proc_nr != ENDPT_SELF) {
 			s=sys_safe_insw(wn->base_cmd + REG_DATA, proc_nr, 
 				(void *) (iov->iov_addr), addr_offset,
 					SECTOR_SIZE);
@@ -1548,7 +1548,7 @@ unsigned nr_req;		/* length of request vector */
 			panic(w_name(),"Call to sys_insw() failed", s);
 		   }
 		} else {
-		   if(proc_nr != SELF) {
+		   if(proc_nr != ENDPT_SELF) {
 			s=sys_safe_outsw(wn->base_cmd + REG_DATA, proc_nr,
 				(void *) (iov->iov_addr), addr_offset,
 				SECTOR_SIZE);
@@ -1739,7 +1739,7 @@ int *do_copyoutp;
 			n= size;
 		if (n == 0 || (n & 1))
 			panic("at_wini", "bad size in iov", iov[i].iov_size);
-		if(proc_nr != SELF) {
+		if(proc_nr != ENDPT_SELF) {
 			r= sys_umap(proc_nr, VM_GRANT, iov[i].iov_addr, n,
 				&user_phys);
 			if (r != 0)
@@ -1835,7 +1835,7 @@ int *do_copyoutp;
 				if (n > iov->iov_size)
 					n= iov->iov_size;
 			
-				if(proc_nr != SELF) {
+				if(proc_nr != ENDPT_SELF) {
 				  r= sys_safecopyfrom(proc_nr, iov->iov_addr,
 					addr_offset, (vir_bytes)dma_buf+offset,
 					n, D);
@@ -2073,8 +2073,8 @@ static void w_intr_wait()
 		while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
 			int rr;
 
-			if((rr=kipc_receive(ANY, &m)) != 0)
-				panic("at_wini", "kipc_receive(ANY) failed", rr);
+			if((rr=kipc_receive(ENDPT_ANY, &m)) != 0)
+				panic("at_wini", "kipc_receive(ENDPT_ANY) failed", rr);
 
 			if (is_notify(m.m_type)) {
 				switch (_ENDPOINT_P(m.m_source)) {
@@ -2263,7 +2263,7 @@ void sense_request(void)
 	if (r != 0) { printf("request sense command failed\n"); return; }
 	if (atapi_intr_wait(0, 0) <= 0) { printf("WARNING: request response failed\n"); }
 
-	if (sys_insw(w_wn->base_cmd + REG_DATA, SELF, (void *) sense, SENSE_PACKETSIZE) != 0)
+	if (sys_insw(w_wn->base_cmd + REG_DATA, ENDPT_SELF, (void *) sense, SENSE_PACKETSIZE) != 0)
 		printf("WARNING: sense reading failed\n");
 
 	printf("sense data:");
@@ -2396,7 +2396,7 @@ unsigned nr_req;		/* length of request vector */
 			if (chunk > count) chunk = count;
 			if (chunk > DMA_BUF_SIZE) chunk = DMA_BUF_SIZE;
 			if ((s=sys_insw(wn->base_cmd + REG_DATA,
-				SELF, tmp_buf, chunk)) != 0)
+				ENDPT_SELF, tmp_buf, chunk)) != 0)
 				panic(w_name(),"Call to sys_insw() failed", s);
 			before -= chunk;
 			count -= chunk;
@@ -2406,7 +2406,7 @@ unsigned nr_req;		/* length of request vector */
 			chunk = nbytes;
 			if (chunk > count) chunk = count;
 			if (chunk > iov->iov_size) chunk = iov->iov_size;
-			if(proc_nr != SELF) {
+			if(proc_nr != ENDPT_SELF) {
 				s=sys_safe_insw(wn->base_cmd + REG_DATA,
 					proc_nr, (void *) iov->iov_addr,
 					addr_offset, chunk);
@@ -2436,7 +2436,7 @@ unsigned nr_req;		/* length of request vector */
 			chunk = count;
 			if (chunk > DMA_BUF_SIZE) chunk = DMA_BUF_SIZE;
 			if ((s=sys_insw(wn->base_cmd + REG_DATA,
-				SELF, tmp_buf, chunk)) != 0)
+				ENDPT_SELF, tmp_buf, chunk)) != 0)
 				panic(w_name(),"Call to sys_insw() failed", s);
 			count -= chunk;
 		}
@@ -2516,7 +2516,7 @@ int do_dma;
   wn->w_status |= STATUS_ADMBSY;		/* Command not at all done yet. */
 
   /* Send the command packet to the device. */
-  if ((s=sys_outsw(wn->base_cmd + REG_DATA, SELF, packet, ATAPI_PACKETSIZE)) != 0)
+  if ((s=sys_outsw(wn->base_cmd + REG_DATA, ENDPT_SELF, packet, ATAPI_PACKETSIZE)) != 0)
 	panic(w_name(),"sys_outsw() failed", s);
 
   return 0;

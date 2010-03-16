@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 		int r;
 		int i;
 
-		if ((r = kipc_receive(ANY, &m)) != 0)
+		if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
 			printf("IPC receive error %d.\n", r);
 		who_e = m.m_source;
 		call_type = m.m_type;

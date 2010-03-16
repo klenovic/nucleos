@@ -188,7 +188,7 @@ int scall_getgroups(void)
 		/* Asking for less groups than available */
 		return(-EINVAL);
 
-	r = sys_datacopy(SELF, (vir_bytes) rmp->mp_sgroups, who_e,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes) rmp->mp_sgroups, who_e,
 			(vir_bytes) m_in.groupsp, ngroups * sizeof(gid_t));
 
 	if (r != 0)
@@ -218,7 +218,7 @@ int scall_setgroups(void)
 	if (m_in.groupsp == NULL)
 		return(-EFAULT);
 
-	r = sys_datacopy(who_e, (vir_bytes) m_in.groupsp, SELF,
+	r = sys_datacopy(who_e, (vir_bytes) m_in.groupsp, ENDPT_SELF,
 			 (vir_bytes) rmp->mp_sgroups,
 			 ngroups * sizeof(gid_t));
 

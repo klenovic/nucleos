@@ -32,7 +32,7 @@ static int check_mem_available(char *new_brksize)
   vir_clicks data_clicks;
 
   /* Get stack pointer and pointers to data/stack segment maps. */
-  if ((s=sys_getproc(&proc, SELF)) != 0) {
+  if ((s=sys_getproc(&proc, ENDPT_SELF)) != 0) {
       return(s);
   }
   sp = proc.p_reg.sp;                    /* stack pointer */
@@ -153,7 +153,7 @@ phys_bytes bytes;               /* how many bytes */
 
   /* We don't override normal behavior when not copying to our data segment. */
   if(dst_seg != D) {
-      s = sys_vircopy(src_proc, src_seg, 0, SELF, dst_seg, dst_vir, bytes);
+      s = sys_vircopy(src_proc, src_seg, 0, ENDPT_SELF, dst_seg, dst_vir, bytes);
       return(s);
   }
 
@@ -161,7 +161,7 @@ phys_bytes bytes;               /* how many bytes */
   if ((s=sys_getproc(&src_p, src_proc)) != 0) {
       return(s);
   }
-  if ((s=sys_getproc(&dst_p, SELF)) != 0) {
+  if ((s=sys_getproc(&dst_p, ENDPT_SELF)) != 0) {
       return(s);
   }
 

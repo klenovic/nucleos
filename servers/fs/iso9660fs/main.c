@@ -90,7 +90,7 @@ static void init_server(void)
 
    /* Init driver mapping */
    for (i = 0; i < NR_DEVICES; ++i) 
-       driver_endpoints[i].driver_e = NONE;
+       driver_endpoints[i].driver_e = ENDPT_NONE;
    /* SELF_E will contain the id of this process */
    SELF_E = getprocnr();
 /*    hash_init(); */			/* Init the table with the ids */
@@ -104,7 +104,7 @@ static void get_work(m_in)
 message *m_in;				/* pointer to message */
 {
   int s;				/* receive status */
-  if (0 != (s = kipc_receive(ANY, m_in))) 	/* wait for message */
+  if (0 != (s = kipc_receive(ENDPT_ANY, m_in))) 	/* wait for message */
     panic("ISOFS","kipc_receive failed", s);
 }
 

@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
 	for (;;)
 	{
-		r= kipc_receive(ANY, &m);
+		r= kipc_receive(ENDPT_ANY, &m);
 		if (r != 0)
 			panic("ti1225", "receive failed", r);
 		printf("ti1225: got message %u from %d\n",
@@ -280,7 +280,7 @@ u32_t base;
 	base &= ~(u32_t)0xF;
 
 #if 0
-	r= sys_vm_map(SELF, 1 /* map */, (vir_bytes)pp->base_ptr,
+	r= sys_vm_map(ENDPT_SELF, 1 /* map */, (vir_bytes)pp->base_ptr,
 		I386_PAGE_SIZE, (phys_bytes)base);
 #else
 	r = -ENOSYS;

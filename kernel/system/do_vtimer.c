@@ -49,7 +49,7 @@ message *m_ptr;			/* pointer to request message */
       return(-EINVAL);
 
   /* The target process must be valid. */
-  proc_nr_e = (m_ptr->VT_ENDPT == SELF) ? m_ptr->m_source : m_ptr->VT_ENDPT;
+  proc_nr_e = (m_ptr->VT_ENDPT == ENDPT_SELF) ? m_ptr->m_source : m_ptr->VT_ENDPT;
   if (!isokendpt(proc_nr_e, &proc_nr)) return(-EINVAL);
   rp = proc_addr(proc_nr);
 

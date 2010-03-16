@@ -76,7 +76,7 @@ int flags;			/* mode bits and flags */
   major = (dev >> MAJOR) & BYTE;
   if (major >= NR_DEVICES) major = 0;
   dp = &dmap[major];
-  if (dp->dmap_driver == NONE) return(-ENXIO);
+  if (dp->dmap_driver == ENDPT_NONE) return(-ENXIO);
   r = (*dp->dmap_opcl)(DEV_OPEN, dev, proc, flags);
   return(r);
 }
@@ -100,7 +100,7 @@ int flags;			/* mode bits and flags */
   major = (dev >> MAJOR) & BYTE;
   if (major >= NR_DEVICES) major = 0;
   dp = &dmap[major];
-  if (dp->dmap_driver == NONE) return(-ENXIO);
+  if (dp->dmap_driver == ENDPT_NONE) return(-ENXIO);
   r = (*dp->dmap_opcl)(DEV_REOPEN, dev, filp_no, flags);
   if (r == 0) panic(__FILE__,"OK on reopen from", dp->dmap_driver);
   if (r == SUSPEND) r= 0;
@@ -118,7 +118,7 @@ int filp_no;
   int r;
 
   /* See if driver is roughly valid. */
-  if (dmap[(dev >> MAJOR)].dmap_driver == NONE) return(-ENXIO);
+  if (dmap[(dev >> MAJOR)].dmap_driver == ENDPT_NONE) return(-ENXIO);
   r= (*dmap[(dev >> MAJOR) & BYTE].dmap_opcl)(DEV_CLOSE, dev, filp_no, 0);
   return(r);
 }
@@ -140,7 +140,7 @@ endpoint_t suspended_ep(endpoint_t driver, cp_grant_id_t g)
             return rfp->fp_endpoint;
         }
 
-    return(NONE);
+    return(ENDPT_NONE);
 }
 
 
@@ -154,7 +154,7 @@ void dev_status(message *m)
 	endpoint_t endpt;
 
 	for(d = 0; d < NR_DEVICES; d++)
-	if (dmap[d].dmap_driver != NONE && dmap[d].dmap_driver == m->m_source)
+	if (dmap[d].dmap_driver != ENDPT_NONE && dmap[d].dmap_driver == m->m_source)
 			break;
 
 	if (d >= NR_DEVICES) return;
@@ -181,7 +181,7 @@ void dev_status(message *m)
 				if(endpt == FS_PROC_NR) {
 					endpt = suspended_ep(m->m_source,
 						st.REP_IO_GRANT);
-					if(endpt == NONE) {
+					if(endpt == ENDPT_NONE) {
 						printf("FS: proc with grant %d"
 						" from %d not found (revive)\n",
 						st.REP_IO_GRANT, st.m_source);
@@ -365,7 +365,7 @@ int suspend_reopen;		/* Just suspend the process */
   orig_op = op;
 
   /* See if driver is roughly valid. */
-  if (dp->dmap_driver == NONE) {
+  if (dp->dmap_driver == ENDPT_NONE) {
 	printf("FS: dev_io: no driver for dev %x\n", dev);
 	return(-ENXIO);
   }
@@ -373,7 +373,7 @@ int suspend_reopen;		/* Just suspend the process */
   if (suspend_reopen) {
 	/* Suspend user. */
 	fp->fp_grant = GRANT_INVALID;
-	fp->fp_ioproc = NONE;
+	fp->fp_ioproc = ENDPT_NONE;
 	wait_for(dp->dmap_driver);
 	fp->fp_flags |= SUSP_REOPEN;
 	return(SUSPEND);
@@ -415,7 +415,7 @@ int suspend_reopen;		/* Just suspend the process */
   /* Call the task. */
   (*dp->dmap_io)(dp->dmap_driver, &dev_mess);
 
-  if(dp->dmap_driver == NONE) {
+  if(dp->dmap_driver == ENDPT_NONE) {
   	/* Driver has vanished. */
 	printf("Driver gone?\n");
 	if(safe) safe_io_cleanup(gid, gids, vec_grants);
@@ -503,7 +503,7 @@ int flags;			/* mode bits and flags */
   dev_mess.IO_ENDPT = proc_e;
   dev_mess.COUNT    = flags;
 
-  if (dp->dmap_driver == NONE) {
+  if (dp->dmap_driver == ENDPT_NONE) {
 	printf("FS: gen_opcl: no driver for dev %x\n", dev);
 	return(-ENXIO);
   }
@@ -699,7 +699,7 @@ message *mess_ptr;		/* pointer to message for task */
 	dp = &dmap[(fp->fp_tty >> MAJOR) & BYTE];
 	mess_ptr->DEVICE = (fp->fp_tty >> MINOR) & BYTE;
 
-  if (dp->dmap_driver == NONE) {
+  if (dp->dmap_driver == ENDPT_NONE) {
 	printf("FS: ctty_io: no driver for dev\n");
 		return(-EIO);
   }
@@ -768,7 +768,7 @@ int flags;			/* mode bits and flags */
   dev_mess.COUNT    = flags;
 
 
-  if (dp->dmap_driver == NONE) {
+  if (dp->dmap_driver == ENDPT_NONE) {
 	printf("VFS clone_opcl: no driver for dev %x\n", dev);
 	return(-ENXIO);
   }

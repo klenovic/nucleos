@@ -87,7 +87,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	}
 
 	bfmt_param.ex.args_bytes = frame_len;
-	r = sys_datacopy(proc_e, (vir_bytes) frame, SELF, (vir_bytes) mbuf,
+	r = sys_datacopy(proc_e, (vir_bytes) frame, ENDPT_SELF, (vir_bytes) mbuf,
 			(phys_bytes)bfmt_param.ex.args_bytes);
 
 	/* can't fetch stack (e.g. bad virtual addr) */
@@ -198,7 +198,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	vsp -= bfmt_param.ex.args_bytes;
 
 	patch_ptr(mbuf, vsp);
-	r = sys_datacopy(SELF, (vir_bytes) mbuf, proc_e, (vir_bytes) vsp,
+	r = sys_datacopy(ENDPT_SELF, (vir_bytes) mbuf, proc_e, (vir_bytes) vsp,
 			(phys_bytes)bfmt_param.ex.args_bytes);
 
 	if (r != 0) {

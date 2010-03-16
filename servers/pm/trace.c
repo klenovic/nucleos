@@ -170,7 +170,7 @@ int do_trace()
   case T_GETRANGE:
   case T_SETRANGE:	/* get/set range of values */
 	r = sys_datacopy(who_e, (vir_bytes) m_in.PMTRACE_ADDR,
-			SELF, (vir_bytes) &pr, (phys_bytes) sizeof(pr));
+			ENDPT_SELF, (vir_bytes) &pr, (phys_bytes) sizeof(pr));
 	if (r != 0) return(r);
 
 	if (pr.pr_space != TS_INS && pr.pr_space != TS_DATA) return(-EINVAL);

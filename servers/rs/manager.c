@@ -125,7 +125,7 @@ size_t dst_len;
   len = MIN(dst_len-1, src_label->l_len);
 
   s = sys_datacopy(src_e, (vir_bytes) src_label->l_addr,
-	SELF, (vir_bytes) dst_label, len);
+	ENDPT_SELF, (vir_bytes) dst_label, len);
   if (s != 0) return s;
 
   dst_label[len] = 0;
@@ -172,7 +172,7 @@ message *m_ptr;					/* request message pointer */
 
   /* Ok, there is space. Get the request structure. */
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
-  	SELF, (vir_bytes) &rs_start, sizeof(rs_start));
+  	ENDPT_SELF, (vir_bytes) &rs_start, sizeof(rs_start));
   if (s != 0) return(s);
 
   /* Obtain command name and parameters. This is a space-separated string
@@ -180,7 +180,7 @@ message *m_ptr;					/* request message pointer */
    */
   if (rs_start.rss_cmdlen > MAX_COMMAND_LEN-1) return(-E2BIG);
   s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_cmd, 
-  	SELF, (vir_bytes) rp->r_cmd, rs_start.rss_cmdlen);
+  	ENDPT_SELF, (vir_bytes) rp->r_cmd, rs_start.rss_cmdlen);
   if (s != 0) return(s);
   rp->r_cmd[rs_start.rss_cmdlen] = '\0';	/* ensure it is terminated */
   if (rp->r_cmd[0] != '/') return(-EINVAL);	/* insist on absolute path */
@@ -283,7 +283,7 @@ message *m_ptr;					/* request message pointer */
   if (rs_start.rss_script != NULL)
   {
 	  s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_script, 
-		SELF, (vir_bytes) rp->r_script, rs_start.rss_scriptlen);
+		ENDPT_SELF, (vir_bytes) rp->r_script, rs_start.rss_scriptlen);
 	  if (s != 0) return(s);
 	  rp->r_script[rs_start.rss_scriptlen] = '\0';
   }
@@ -298,7 +298,7 @@ message *m_ptr;					/* request message pointer */
 		return -EINVAL;
 	}
 	s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_ipc, 
-		SELF, (vir_bytes) rp->r_ipc_list, rs_start.rss_ipclen);
+		ENDPT_SELF, (vir_bytes) rp->r_ipc_list, rs_start.rss_ipclen);
 	if (s != 0) return(s);
 	rp->r_ipc_list[rs_start.rss_ipclen]= '\0';
   }
@@ -462,7 +462,7 @@ int do_down(message *m_ptr)
 	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
-  	SELF, (vir_bytes) label, len);
+  	ENDPT_SELF, (vir_bytes) label, len);
   if (s != 0) return(s);
   label[len]= '\0';
 
@@ -508,7 +508,7 @@ int do_restart(message *m_ptr)
 	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
-  	SELF, (vir_bytes) label, len);
+  	ENDPT_SELF, (vir_bytes) label, len);
   if (s != 0) return(s);
   label[len]= '\0';
 
@@ -558,7 +558,7 @@ int do_refresh(message *m_ptr)
 	return -EINVAL;		/* Too long */
 
   s= sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->RS_CMD_ADDR, 
-  	SELF, (vir_bytes) label, len);
+  	ENDPT_SELF, (vir_bytes) label, len);
   if (s != 0) return(s);
   label[len]= '\0';
 
@@ -1051,7 +1051,7 @@ message *m_ptr;
 
   dst_proc = m_ptr->m_source;
   dst_addr = (vir_bytes) m_ptr->m1_p1;
-  if ((s=sys_datacopy(SELF, src_addr, dst_proc, dst_addr, len)) != 0)
+  if ((s=sys_datacopy(ENDPT_SELF, src_addr, dst_proc, dst_addr, len)) != 0)
   	return(s);
   return 0;
 }
@@ -1581,7 +1581,7 @@ message *m_ptr;
 	}
 
 	if((r=sys_vircopy(m_ptr->m_source, D, (vir_bytes) m_ptr->RS_NAME,
-		SELF, D, (vir_bytes) namebuf, len)) != 0) {
+		ENDPT_SELF, D, (vir_bytes) namebuf, len)) != 0) {
 		printf("RS: name copy failed\n");
 		return r;
 

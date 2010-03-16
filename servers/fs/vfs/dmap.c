@@ -48,19 +48,19 @@ static struct dmap init_dmap[] = {
   DT(0, no_dev,   0,       0,           DMAP_MUTABLE, "")   /* 3 = /dev/c0    */
   DT(1, tty_opcl, gen_io,  TTY_PROC_NR, 0, "")    	 /* 4 = /dev/tty00 */
   DT(1, ctty_opcl,ctty_io, TTY_PROC_NR, 0, "")     	 /* 5 = /dev/tty   */
-  DT(0, no_dev,   0,       NONE,	DMAP_MUTABLE, "")	/* 6 = /dev/lp    */
+  DT(0, no_dev,   0,       ENDPT_NONE,	DMAP_MUTABLE, "")	/* 6 = /dev/lp    */
 
 #ifdef CONFIG_X86_32
   DT(1, no_dev,   0,       0,   	DMAP_MUTABLE, "")   /* 7 = /dev/ip    */
-  DT(0, no_dev,   0,       NONE,        DMAP_MUTABLE, "")   /* 8 = /dev/c1    */
+  DT(0, no_dev,   0,       ENDPT_NONE,        DMAP_MUTABLE, "")   /* 8 = /dev/c1    */
   DT(0, 0,        0,       0,   	DMAP_MUTABLE, "")   /* 9 = not used   */
   DT(0, no_dev,   0,       0,           DMAP_MUTABLE, "")   /*10 = /dev/c2    */
   DT(0, no_dev,   0,       0,   	DMAP_MUTABLE, "")   /*11 = /dev/filter*/
-  DT(0, no_dev,   0,       NONE,     	DMAP_MUTABLE, "")   /*12 = /dev/c3    */
-  DT(0, no_dev,   0,       NONE,	DMAP_MUTABLE, "")   /*13 = /dev/audio */
+  DT(0, no_dev,   0,       ENDPT_NONE,     	DMAP_MUTABLE, "")   /*12 = /dev/c3    */
+  DT(0, no_dev,   0,       ENDPT_NONE,	DMAP_MUTABLE, "")   /*13 = /dev/audio */
   DT(0, 0,   	  0,       0,		DMAP_MUTABLE, "")   /*14 = not used   */
   DT(1, gen_opcl, gen_io,  LOG_PROC_NR, 0, "")  	    /*15 = /dev/klog  */
-  DT(0, no_dev,   0,       NONE,	DMAP_MUTABLE, "")   /*16 = /dev/random*/
+  DT(0, no_dev,   0,       ENDPT_NONE,	DMAP_MUTABLE, "")   /*16 = /dev/random*/
   DT(0, 0,	  0,       0,		DMAP_MUTABLE, "")   /*17 = not used   */
 #endif /* CONFIG_X86_32 */
 };
@@ -120,7 +120,7 @@ int force;
       }
       break;
   case DEV_UNMAP:
-      result = map_driver(dev, NONE, 0, 0);
+      result = map_driver(dev, ENDPT_NONE, 0, 0);
       break;
   default:
       result = -EINVAL;
@@ -159,7 +159,7 @@ int do_mapdriver()
 		return -EINVAL;
 	}
 
-	r= sys_vircopy(who_e, D, label_vir, SELF, D, (vir_bytes)label,
+	r= sys_vircopy(who_e, D, label_vir, ENDPT_SELF, D, (vir_bytes)label,
 		label_len);
 	if (r != 0)
 	{
@@ -213,7 +213,7 @@ int force;
 {
 /* Set a new device driver mapping in the dmap table. Given that correct 
  * arguments are given, this only works if the entry is mutable and the 
- * current driver is not busy.  If the proc_nr is set to NONE, we're supposed
+ * current driver is not busy.  If the proc_nr is set to ENDPT_NONE, we're supposed
  * to unmap it.
  *
  * Normal error codes are returned so that this function can be used from
@@ -230,10 +230,10 @@ int force;
    * if busy or unmutable, as unmap is called when driver has
    * exited.
    */
- if(proc_nr_e == NONE) {
+ if(proc_nr_e == ENDPT_NONE) {
 	dp->dmap_opcl = no_dev;
 	dp->dmap_io = no_dev_io;
-	dp->dmap_driver = NONE;
+	dp->dmap_driver = ENDPT_NONE;
 	dp->dmap_flags = DMAP_MUTABLE;	/* When gone, not busy or reserved. */
 	return 0;
   }
@@ -275,7 +275,7 @@ int force;
 {
 /* Set a new device driver mapping in the dmap table. Given that correct 
  * arguments are given, this only works if the entry is mutable and the 
- * current driver is not busy.  If the proc_nr is set to NONE, we're supposed
+ * current driver is not busy.  If the proc_nr is set to ENDPT_NONE, we're supposed
  * to unmap it.
  *
  * Normal error codes are returned so that this function can be used from
@@ -293,10 +293,10 @@ int force;
    * if busy or unmutable, as unmap is called when driver has
    * exited.
    */
- if(proc_nr_e == NONE) {
+ if(proc_nr_e == ENDPT_NONE) {
 	dp->dmap_opcl = no_dev;
 	dp->dmap_io = no_dev_io;
-	dp->dmap_driver = NONE;
+	dp->dmap_driver = ENDPT_NONE;
 	dp->dmap_flags = DMAP_MUTABLE;	/* When gone, not busy or reserved. */
 	return 0;
   }
@@ -341,7 +341,7 @@ void dmap_unmap_by_endpt(int proc_nr_e)
 	int i, r;
 	for (i=0; i<NR_DEVICES; i++)
 	  if(dmap[i].dmap_driver && dmap[i].dmap_driver == proc_nr_e)
-	    if((r=map_driver(i, NONE, 0, 0)) != 0)
+	    if((r=map_driver(i, ENDPT_NONE, 0, 0)) != 0)
 		printf("FS_PROC_NR: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
 
 	return;
@@ -375,7 +375,7 @@ void build_dmap()
       } else {						/* no default */
           dp->dmap_opcl = no_dev;
           dp->dmap_io = no_dev_io;
-          dp->dmap_driver = NONE;
+          dp->dmap_driver = ENDPT_NONE;
           dp->dmap_flags = DMAP_MUTABLE;
       }
   }
@@ -393,7 +393,7 @@ void build_dmap()
 int dmap_driver_match(endpoint_t proc, int major)
 {
 	if (major < 0 || major >= NR_DEVICES) return(0);
-	if(dmap[major].dmap_driver != NONE && dmap[major].dmap_driver == proc)
+	if(dmap[major].dmap_driver != ENDPT_NONE && dmap[major].dmap_driver == proc)
 		return 1;
 	return 0;
 }
@@ -405,7 +405,7 @@ void dmap_endpt_up(int proc_e)
 {
 	int i;
 	for (i=0; i<NR_DEVICES; i++) {
-		if(dmap[i].dmap_driver != NONE
+		if(dmap[i].dmap_driver != ENDPT_NONE
 			&& dmap[i].dmap_driver == proc_e
 			&& (dmap[i].dmap_flags & DMAP_BABY)) {
 			dmap[i].dmap_flags &= ~DMAP_BABY;

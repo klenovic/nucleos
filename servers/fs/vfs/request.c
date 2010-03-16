@@ -926,7 +926,7 @@ int pos;
 
   if (r == 0 && pos != 0) {
 	sb.st_size -= pos;
-	r= sys_vircopy(SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf, 
+	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf, 
 		sizeof(struct stat));
   }
 
@@ -1035,7 +1035,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
   message origm, m;
   struct vmnt *vmp;
 
-  if(fs_e <= 0 || fs_e == NONE)
+  if(fs_e <= 0 || fs_e == ENDPT_NONE)
 	panic(__FILE__, "talking to bogus endpoint", fs_e);
 
   /* Make a copy of the request so that we can load it back in
@@ -1087,7 +1087,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
       }
       /* Dead driver */
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
-          old_driver_e = NONE;
+          old_driver_e = ENDPT_NONE;
           /* Find old driver by endpoint */
           for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp) {
               if (vmp->m_fs_e == fs_e) {   /* found FS */
@@ -1100,7 +1100,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
           }
          
           /* No FS?? */
-          if (old_driver_e == NONE)
+          if (old_driver_e == ENDPT_NONE)
               panic(__FILE__, "VFSdead_driver: couldn't find FS\n", fs_e);
 
           /* Wait for a new driver. */

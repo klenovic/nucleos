@@ -187,7 +187,7 @@ int main(void)
 	}
 
 	/* Get a request message. */
-	r= kipc_receive(ANY, &tty_mess);
+	r= kipc_receive(ENDPT_ANY, &tty_mess);
 	if (r != 0)
 		panic("TTY", "receive failed with %d", r);
 
@@ -616,7 +616,7 @@ int safe;
 	    r = sys_safecopyto(m_ptr->IO_ENDPT, (vir_bytes) m_ptr->ADDRESS, 0,
 		(vir_bytes) &tp->tty_termios, (vir_bytes) size, D);
 	} else {
-	r = sys_vircopy(SELF, D, (vir_bytes) &tp->tty_termios,
+	r = sys_vircopy(ENDPT_SELF, D, (vir_bytes) &tp->tty_termios,
 		m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS, 
 		(vir_bytes) size);
 	}
@@ -645,7 +645,7 @@ int safe;
 		(vir_bytes) &tp->tty_termios, (vir_bytes) size, D);
 	} else {
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
-		SELF, D, (vir_bytes) &tp->tty_termios, (vir_bytes) size);
+		ENDPT_SELF, D, (vir_bytes) &tp->tty_termios, (vir_bytes) size);
 	}
 	if (r != 0) break;
 	setattr(tp);
@@ -657,7 +657,7 @@ int safe;
 		(vir_bytes) &param.i, (vir_bytes) size, D);
 	} else {
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
-		SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
+		ENDPT_SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
 	}
 	if (r != 0) break;
 	switch (param.i) {
@@ -674,7 +674,7 @@ int safe;
 		(vir_bytes) &param.i, (vir_bytes) size, D);
 	} else {
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
-		SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
+		ENDPT_SELF, D, (vir_bytes) &param.i, (vir_bytes) size);
 	}
 	if (r != 0) break;
 	switch (param.i) {
@@ -703,7 +703,7 @@ int safe;
 	   r = sys_safecopyto(m_ptr->IO_ENDPT, (vir_bytes) m_ptr->ADDRESS, 0,
 		(vir_bytes) &tp->tty_winsize, (vir_bytes) size, D);
 	} else {
-	r = sys_vircopy(SELF, D, (vir_bytes) &tp->tty_winsize,
+	r = sys_vircopy(ENDPT_SELF, D, (vir_bytes) &tp->tty_winsize,
 		m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS, 
 		(vir_bytes) size);
 	}
@@ -715,7 +715,7 @@ int safe;
 		(vir_bytes) &tp->tty_winsize, (vir_bytes) size, D);
 	} else {
 	r = sys_vircopy( m_ptr->IO_ENDPT, D, (vir_bytes) m_ptr->ADDRESS,
-		SELF, D, (vir_bytes) &tp->tty_winsize, (vir_bytes) size);
+		ENDPT_SELF, D, (vir_bytes) &tp->tty_winsize, (vir_bytes) size);
 	}
 	sigchar(tp, SIGWINCH, 0);
 	break;
@@ -967,7 +967,7 @@ register tty_t *tp;		/* pointer to terminal to read from */
 					(vir_bytes) buflen(buf), D);
 				tp->tty_in_vir_offset += buflen(buf);
 			} else {
-			sys_vircopy(SELF, D, (vir_bytes) buf, 
+			sys_vircopy(ENDPT_SELF, D, (vir_bytes) buf, 
 					tp->tty_inproc, D, tp->tty_in_vir_g,
 				(vir_bytes) buflen(buf));
 				tp->tty_in_vir_g += buflen(buf);
@@ -997,7 +997,7 @@ register tty_t *tp;		/* pointer to terminal to read from */
 			(vir_bytes) buf, (vir_bytes) count, D);
 		tp->tty_in_vir_offset += count;
 	} else {
-	sys_vircopy(SELF, D, (vir_bytes) buf, 
+	sys_vircopy(ENDPT_SELF, D, (vir_bytes) buf, 
 			tp->tty_inproc, D, tp->tty_in_vir_g, (vir_bytes) count);
 		tp->tty_in_vir_g += count;
 	}
@@ -1426,7 +1426,7 @@ tty_t *tp;
 		(vir_bytes) sizeof(tp->tty_termios), D);
 	} else {
 	    result = sys_vircopy(tp->tty_ioproc, D, tp->tty_iovir_g,
-			SELF, D, (vir_bytes) &tp->tty_termios,
+			ENDPT_SELF, D, (vir_bytes) &tp->tty_termios,
 			(vir_bytes) sizeof(tp->tty_termios));
 	}
 	setattr(tp);

@@ -141,7 +141,7 @@ void main(void)
   if (sigaction(SIGTERM,&sa,NULL)<0) panic("PRN","sigaction failed", errno);
   
   while (TRUE) {
-	kipc_receive(ANY, &pr_mess);
+	kipc_receive(ENDPT_ANY, &pr_mess);
 
 	if (is_notify(pr_mess.m_type)) {
 		switch (_ENDPOINT_P(pr_mess.m_source)) {
@@ -358,8 +358,8 @@ static void do_initialize()
   initialized = TRUE;
   
   /* Get the base port for first printer.  */
-  if(sys_vircopy(SELF, BIOS_SEG, LPT1_IO_PORT_ADDR, 
-  	SELF, D, (vir_bytes) &port_base, LPT1_IO_PORT_SIZE) != 0) {
+  if(sys_vircopy(ENDPT_SELF, BIOS_SEG, LPT1_IO_PORT_ADDR, 
+  	ENDPT_SELF, D, (vir_bytes) &port_base, LPT1_IO_PORT_SIZE) != 0) {
 	panic(__FILE__, "do_initialize: sys_vircopy failed", NO_NUM);
   }
   if(sys_outb(port_base + 2, INIT_PRINTER) != 0) {
@@ -392,7 +392,7 @@ static void prepare_output()
     s=sys_safecopyfrom(proc_nr, user_vir_g, user_vir_d,
     (vir_bytes) obuf, chunk, D);
   } else {
-    s=sys_datacopy(proc_nr, user_vir_g, SELF, (vir_bytes) obuf, chunk);
+    s=sys_datacopy(proc_nr, user_vir_g, ENDPT_SELF, (vir_bytes) obuf, chunk);
   }
 
   if(s != 0) {

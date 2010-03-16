@@ -118,7 +118,7 @@ int arch_register_local_timer_handler(irq_handler_t handler)
 #endif
 	{
 		/* Using PIC, Initialize the CLOCK's interrupt hook. */
-		pic_timer_hook.proc_nr_e = NONE;
+		pic_timer_hook.proc_nr_e = ENDPT_NONE;
 		pic_timer_hook.irq = CLOCK_IRQ;
 
 		put_irq_handler(&pic_timer_hook, CLOCK_IRQ, handler);

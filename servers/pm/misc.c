@@ -118,7 +118,7 @@ int do_procstat()
   
   /* This call should be removed, or made more general. */
 
-  if (m_in.stat_nr == SELF) {
+  if (m_in.stat_nr == ENDPT_SELF) {
       mp->mp_reply.sig_set = mp->mp_sigpending;
       sigemptyset(&mp->mp_sigpending);
   } 
@@ -194,7 +194,7 @@ int do_getsysinfo()
   }
 
   dst_addr = (vir_bytes) m_in.info_where;
-  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
+  if ((s=sys_datacopy(ENDPT_SELF, src_addr, who_e, dst_addr, len)) != 0)
   	return(s);
   return 0;
 }
@@ -237,7 +237,7 @@ int do_getsysinfo_up()
 	len = m_in.SIU_LEN;
 
   dst_addr = (vir_bytes) m_in.SIU_WHERE;
-  if ((s=sys_datacopy(SELF, src_addr, who_e, dst_addr, len)) != 0)
+  if ((s=sys_datacopy(ENDPT_SELF, src_addr, who_e, dst_addr, len)) != 0)
   	return(s);
   return(real_len);
 }
@@ -258,7 +258,7 @@ int do_getprocnr()
 	/* For now, allow non-root processes to request their own endpoint. */
 	if (m_in.pid < 0 && m_in.namelen == 0) {
 		mp->mp_reply.PM_ENDPT = who_e;
-		mp->mp_reply.PM_PENDPT = NONE;
+		mp->mp_reply.PM_PENDPT = ENDPT_NONE;
 		return 0;
 	}
 
@@ -285,7 +285,7 @@ int do_getprocnr()
   } else if (m_in.namelen > 0) {	/* lookup process by name */
   	key_len = MIN(m_in.namelen, PROC_NAME_LEN);
  	if ((s=sys_datacopy(who_e, (vir_bytes) m_in.PMBRK_ADDR, 
- 			SELF, (vir_bytes) search_key, key_len)) != 0) 
+ 			ENDPT_SELF, (vir_bytes) search_key, key_len)) != 0) 
  		return(s);
  	search_key[key_len] = '\0';	/* terminate for safety */
   	for (rmp = &mproc[0]; rmp < &mproc[NR_PROCS]; rmp++) {
@@ -357,7 +357,7 @@ int do_reboot()
 	if(m_in.reboot_strlen >= sizeof(monitor_code))
 		return -EINVAL;
 	if((r = sys_datacopy(who_e, (vir_bytes) m_in.reboot_code,
-		SELF, (vir_bytes) monitor_code, m_in.reboot_strlen)) != 0)
+		ENDPT_SELF, (vir_bytes) monitor_code, m_in.reboot_strlen)) != 0)
 		return r;
 	monitor_code[m_in.reboot_strlen] = '\0';
   }
@@ -411,7 +411,7 @@ int do_svrctl()
       size_t copy_len;
 
       /* Copy sysgetenv structure to PM. */
-      if (sys_datacopy(who_e, ptr, SELF, (vir_bytes) &sysgetenv, 
+      if (sys_datacopy(who_e, ptr, ENDPT_SELF, (vir_bytes) &sysgetenv, 
               sizeof(sysgetenv)) != 0) return(-EFAULT);  
 
       /* Set a param override? */
@@ -426,11 +426,11 @@ int do_svrctl()
   		return -EINVAL;
   		
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
-            SELF, (vir_bytes) local_param_overrides[local_params].name,
+            ENDPT_SELF, (vir_bytes) local_param_overrides[local_params].name,
                sysgetenv.keylen)) != 0)
                	return s;
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.val,
-            SELF, (vir_bytes) local_param_overrides[local_params].value,
+            ENDPT_SELF, (vir_bytes) local_param_overrides[local_params].value,
               sysgetenv.vallen)) != 0)
                	return s;
             local_param_overrides[local_params].name[sysgetenv.keylen] = '\0';
@@ -450,7 +450,7 @@ int do_svrctl()
           /* Try to get a copy of the requested key. */
           if (sysgetenv.keylen > sizeof(search_key)) return(-EINVAL);
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
-                  SELF, (vir_bytes) search_key, sysgetenv.keylen)) != 0)
+                  ENDPT_SELF, (vir_bytes) search_key, sysgetenv.keylen)) != 0)
               return(s);
 
           /* Make sure key is null-terminated and lookup value.
@@ -474,7 +474,7 @@ int do_svrctl()
 
       /* Value found, make the actual copy (as far as possible). */
       copy_len = MIN(val_len, sysgetenv.vallen); 
-      if ((s=sys_datacopy(SELF, (vir_bytes) val_start, 
+      if ((s=sys_datacopy(ENDPT_SELF, (vir_bytes) val_start, 
               who_e, (vir_bytes) sysgetenv.val, copy_len)) != 0)
           return(s);
 
@@ -651,7 +651,7 @@ int scall_uname(void)
 {
 	int err;
 
-	err = sys_vircopy(SELF, D, (vir_bytes)&uts_val,
+	err = sys_vircopy(ENDPT_SELF, D, (vir_bytes)&uts_val,
 			  mp->mp_endpoint, D, (vir_bytes)m_in.p_utsbuf,
 			  sizeof(struct utsname));
 

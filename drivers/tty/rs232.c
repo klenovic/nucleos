@@ -263,7 +263,7 @@ int try;
 		tp->tty_out_vir_offset, (vir_bytes) rs->ohead, count, D);
 	} else {
 	   sys_vircopy(tp->tty_outproc, D, (vir_bytes) tp->tty_out_vir_g, 
-		SELF, D, (vir_bytes) rs->ohead, (phys_bytes) count);
+		ENDPT_SELF, D, (vir_bytes) rs->ohead, (phys_bytes) count);
 	}
 
 	/* Perform output processing on the output buffer. */

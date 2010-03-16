@@ -218,7 +218,7 @@ static void el3_rx_complete(dpeth_t * dep)
 
   } else {
 	/* Good packet.  Read it from FIFO */
-	insb(dep->de_data_port, SELF, rxptr->buffer, pktsize);
+	insb(dep->de_data_port, ENDPT_SELF, rxptr->buffer, pktsize);
 	rxptr->next = NULL;
 	rxptr->size = pktsize;
 

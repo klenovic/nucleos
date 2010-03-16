@@ -103,7 +103,7 @@ int do_exec_newmem(message *msg)
 	SANITYCHECK(SCL_DETAIL);
 
 	r= sys_datacopy(msg->m_source, (vir_bytes)ptr,
-		SELF, (vir_bytes)&args, sizeof(args));
+		ENDPT_SELF, (vir_bytes)&args, sizeof(args));
 	if (r != 0)
 		vm_panic("exec_newmem: sys_datacopy failed", r);
 

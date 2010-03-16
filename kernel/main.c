@@ -70,7 +70,7 @@ void main(void)
 	}
 
 	for (sp = BEG_PRIV_ADDR, i = 0; sp < END_PRIV_ADDR; ++sp, ++i) {
-		sp->s_proc_nr = NONE;			/* initialize as free */
+		sp->s_proc_nr = ENDPT_NONE;			/* initialize as free */
 		sp->s_id = i;				/* priv structure index */
 		ppriv_addr[i] = sp;			/* priv ptr from number */
 	}

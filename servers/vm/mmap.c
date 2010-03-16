@@ -137,7 +137,7 @@ int do_map_phys(message *m)
 	target = m->VMMP_EP;
 	len = m->VMMP_LEN;
 
-	if(target == SELF)
+	if(target == ENDPT_SELF)
 		target = m->m_source;
 
 	if((r=vm_isokendpt(target, &n)) != 0)
@@ -184,7 +184,7 @@ int do_unmap_phys(message *m)
 	struct vir_region *region;
 
 	target = m->VMUP_EP;
-	if(target == SELF)
+	if(target == ENDPT_SELF)
 		target = m->m_source;
 
 	if((r=vm_isokendpt(target, &n)) != 0)

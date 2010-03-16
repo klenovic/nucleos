@@ -14,10 +14,10 @@
 #include <nucleos/limits.h>
 
 /* The point of the padding in 'generation size' is to 
- * allow for certain bogus endpoint numbers such as NONE, ANY, etc.
+ * allow for certain bogus endpoint numbers such as ENDPT_NONE, ENDPT_ANY, etc.
  *
  * The _MAX_MAGIC_PROC is defined by <nucleos/com.h>. That include
- * file defines some magic process numbers such as ANY and NONE,
+ * file defines some magic process numbers such as ENDPT_ANY and ENDPT_NONE,
  * and must never be a valid endpoint number. Therefore we make sure
  * the generation size is big enough to start the next generation
  * above the highest magic number.

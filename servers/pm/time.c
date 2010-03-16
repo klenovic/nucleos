@@ -45,7 +45,7 @@ int scall_time(void)
 
 	/* if argument is not NULL then make a copy there too */
 	if (m_in.p_time != 0) {
-		err = sys_vircopy(SELF, D, (vir_bytes)&t, mp->mp_endpoint, D, (vir_bytes)m_in.p_time,
+		err = sys_vircopy(ENDPT_SELF, D, (vir_bytes)&t, mp->mp_endpoint, D, (vir_bytes)m_in.p_time,
 				  sizeof(time_t));
 
 		if (err != 0)
@@ -74,7 +74,7 @@ int scall_stime(void)
 	if ((s=getuptime(&uptime)) != 0)
 		panic(__FILE__,"scall_stime couldn't get uptime", s);
 
-	err = sys_vircopy(mp->mp_endpoint, D, (vir_bytes)m_in.pstime, SELF, D, (vir_bytes)&t, sizeof(time_t));
+	err = sys_vircopy(mp->mp_endpoint, D, (vir_bytes)m_in.pstime, ENDPT_SELF, D, (vir_bytes)&t, sizeof(time_t));
 
 	if (err != 0)
 		return -EFAULT;
@@ -108,7 +108,7 @@ int scall_times(void)
 	buf.tms_cutime = rmp->mp_child_utime;	/* child user time */
 	buf.tms_cstime = rmp->mp_child_stime;	/* child system time */
 
-	err = sys_vircopy(SELF, D, (vir_bytes)&buf, mp->mp_endpoint, D, (vir_bytes)m_in.p_timesbuf,
+	err = sys_vircopy(ENDPT_SELF, D, (vir_bytes)&buf, mp->mp_endpoint, D, (vir_bytes)m_in.p_timesbuf,
 			  sizeof(struct tms));
 
 	if (err != 0)
@@ -137,7 +137,7 @@ int scall_gettimeofday(void)
 	tv.tv_sec = (boottime + (uptime/system_hz));
 	tv.tv_usec = (uptime%system_hz)*1000000/system_hz;
 
-	ret = sys_vircopy(SELF, D, (vir_bytes)&tv, mp->mp_endpoint, D, (vir_bytes)m_in.ptimeval,
+	ret = sys_vircopy(ENDPT_SELF, D, (vir_bytes)&tv, mp->mp_endpoint, D, (vir_bytes)m_in.ptimeval,
 			  sizeof(struct timeval));
 
 	return (ret < 0) ? -EFAULT : 0;

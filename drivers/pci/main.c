@@ -53,10 +53,10 @@ int main(void)
 
 	for(;;)
 	{
-		r= kipc_receive(ANY, &m);
+		r= kipc_receive(ENDPT_ANY, &m);
 		if (r < 0)
 		{
-			printf("PCI: receive from ANY failed: %d\n", r);
+			printf("PCI: receive from ENDPT_ANY failed: %d\n", r);
 			break;
 		}
 
@@ -247,7 +247,7 @@ message *mp;
 		if (len > name_len)
 			len= name_len;
 		printf("PCI: pci`do_dev_name: calling do_vircopy\n");
-		r= sys_vircopy(SELF, D, (vir_bytes)name, mp->m_source, D,
+		r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)name, mp->m_source, D,
 			(vir_bytes)name_ptr, len);
 	}
 

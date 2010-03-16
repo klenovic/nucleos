@@ -215,7 +215,7 @@ void main(void)
 		if (!mq)
 			ip_panic(("out of messages"));
 
-		r= kipc_receive (ANY, &mq->mq_mess);
+		r= kipc_receive (ENDPT_ANY, &mq->mq_mess);
 		if (r<0)
 		{
 			ip_panic(("unable to receive: %d", r));
