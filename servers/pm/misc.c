@@ -129,70 +129,6 @@ int do_procstat()
 }
 
 /*===========================================================================*
- *				do_sysuname				     *
- *===========================================================================*/
-int do_sysuname()
-{
-/* Set or get uname strings. */
-
-  int r;
-  size_t n;
-  char *string;
-#if 0 /* for updates */
-  char tmp[sizeof(uts_val.nodename)];
-  static short sizes[] = {
-	0,	/* arch, (0 = read-only) */
-	0,	/* kernel */
-	0,	/* machine */
-	0,	/* sizeof(uts_val.hostname), */
-	sizeof(uts_val.nodename),
-	0,	/* release */
-	0,	/* version */
-	0,	/* sysname */
-  };
-#endif
-
-  if ((unsigned) m_in.sysuname_field >= _UTS_MAX) return(-EINVAL);
-
-  string = uts_tbl[m_in.sysuname_field];
-  if (string == NULL)
-	return -EINVAL;	/* Unsupported field */
-
-  switch (m_in.sysuname_req) {
-  case _UTS_GET:
-	/* Copy an uname string to the user. */
-	n = strlen(string) + 1;
-	if (n > m_in.sysuname_len) n = m_in.sysuname_len;
-	r = sys_vircopy(SELF, D, (phys_bytes) string, 
-		mp->mp_endpoint, D, (phys_bytes) m_in.sysuname_value,
-		(phys_bytes) n);
-	if (r < 0) return(r);
-	break;
-
-#if 0	/* no updates yet */
-  case _UTS_SET:
-	/* Set an uname string, needs root power. */
-	len = sizes[m_in.sysuname_field];
-	if (mp->mp_effuid != 0 || len == 0) return(-EPERM);
-	n = len < m_in.sysuname_len ? len : m_in.sysuname_len;
-	if (n <= 0) return(-EINVAL);
-	r = sys_vircopy(mp->mp_endpoint, D, (phys_bytes) m_in.sysuname_value,
-		SELF, D, (phys_bytes) tmp, (phys_bytes) n);
-	if (r < 0) return(r);
-	tmp[n-1] = 0;
-	strcpy(string, tmp);
-	break;
-#endif
-
-  default:
-	return(-EINVAL);
-  }
-  /* Return the number of bytes moved. */
-  return(n);
-}
-
-
-/*===========================================================================*
  *				do_getsysinfo			       	     *
  *===========================================================================*/
 int do_getsysinfo()
@@ -442,51 +378,6 @@ int do_reboot()
   tell_fs(&mproc[FS_PROC_NR], &m);
 
   return(SUSPEND);			/* don't reply to caller */
-}
-
-/*===========================================================================*
- *				do_getsetpriority			     *
- *===========================================================================*/
-int do_getsetpriority()
-{
-	int r, arg_which, arg_who, arg_pri;
-	struct mproc *rmp;
-
-	arg_which = m_in.m1_i1;
-	arg_who = m_in.m1_i2;
-	arg_pri = m_in.m1_i3;	/* for SETPRIORITY */
-
-	/* Code common to GETPRIORITY and SETPRIORITY. */
-
-	/* Only support PRIO_PROCESS for now. */
-	if (arg_which != PRIO_PROCESS)
-		return(-EINVAL);
-
-	if (arg_who == 0)
-		rmp = mp;
-	else
-		if ((rmp = find_proc(arg_who)) == NIL_MPROC)
-			return(-ESRCH);
-
-	if (mp->mp_effuid != SUPER_USER &&
-	   mp->mp_effuid != rmp->mp_effuid && mp->mp_effuid != rmp->mp_realuid)
-		return -EPERM;
-
-	/* If GET, that's it. */
-	if (call_nr == __NR_getpriority) {
-		return(rmp->mp_nice - PRIO_MIN);
-	}
-
-	/* Only root is allowed to reduce the nice level. */
-	if (rmp->mp_nice > arg_pri && mp->mp_effuid != SUPER_USER)
-		return(-EACCES);
-	
-	/* We're SET, and it's allowed. */
-	if ((r = sys_nice(rmp->mp_endpoint, arg_pri)) != 0)
-		return(r);
-
-	rmp->mp_nice = arg_pri;
-	return(0);
 }
 
 /*===========================================================================*

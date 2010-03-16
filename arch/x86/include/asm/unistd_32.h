@@ -116,87 +116,10 @@
 #include <nucleos/type.h>
 #include <nucleos/signal.h>
 
-#define __NR_exit		1
-#define __NR_fork		2
-#define __NR_read		3
-#define __NR_write		4
-#define __NR_open		5
-#define __NR_close		6
-#define __NR_wait		7
-#define __NR_creat		8
-#define __NR_link		9
-#define __NR_unlink		10
-#define __NR_waitpid		11
-#define __NR_chdir		12
-#define __NR_time		13
-#define __NR_mknod		14
-#define __NR_chmod		15
-#define __NR_chown		16
-#define __NR_brk		17
-#define __NR_stat		18
-#define __NR_lseek		19
-#define __NR_getpid		20
-#define __NR_mount		21
-#define __NR_umount		22
-#define __NR_setuid		23
-#define __NR_getuid		24
-#define __NR_stime		25
-#define __NR_ptrace		26
-#define __NR_alarm		27
-#define __NR_fstat		28
-#define __NR_pause		29
-#define __NR_utime		30
-#define __NR_access		33
-#define __NR_sync		36
-#define __NR_kill		37
-#define __NR_rename		38
-#define __NR_mkdir		39
-#define __NR_rmdir		40
-#define __NR_dup		41
-#define __NR_pipe		42
-#define __NR_times		43
-#define __NR_symlink		45
-#define __NR_setgid		46
-#define __NR_getgid		47
-#define __NR_signal		48
-#define __NR_readlink		49
-#define __NR_lstat		50
-#define __NR_ioctl		54
-#define __NR_fcntl		55
-#define __NR_exec		59
-#define __NR_umask		60
-#define __NR_chroot		61
-#define __NR_setsid		62
-#define __NR_getpgrp		63
-#define __NR_itimer		64
-/* Posix signal handling. */
-#define __NR_sigaction		71
-#define __NR_sigsuspend		72
-#define __NR_sigpending		73
-#define __NR_sigprocmask	74
-#define __NR_sigreturn		75
-#define __NR_reboot		76
-#define __NR_svrctl		77
-#define __NR_sysuname		78
 #define __NR_getsysinfo		79	/* to PM or FS */
-#define __NR_getdents		80	/* to FS */
-#define __NR_llseek		81	/* to FS */
-#define __NR_fstatfs		82	/* to FS */
-#define __NR_select		85	/* to FS */
-#define __NR_fchdir		86	/* to FS */
-#define __NR_fsync		87	/* to FS */
-#define __NR_getpriority	88	/* to PM */
-#define __NR_setpriority	89	/* to PM */
-#define __NR_gettimeofday	90	/* to PM */
-#define __NR_seteuid		91	/* to PM */
-#define __NR_setegid		92	/* to PM */
-#define __NR_truncate		93	/* to FS */
-#define __NR_ftruncate		94	/* to FS */
-#define __NR_fchmod		95	/* to FS */
-#define __NR_fchown		96	/* to FS */
 #define __NR_getsysinfo_up	97	/* to PM or FS */
-#define __NR_sprof		98	/* to PM */
-#define __NR_cprof		99	/* to PM */
+#define __NR_ptrace		26
+#define __NR_svrctl		77
 
 /* Kernel message numbers. These are used only by u/kernel and
  * never by C library.

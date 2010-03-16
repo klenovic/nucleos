@@ -20,7 +20,6 @@ struct memory;
 
 /* alarm.c */
 int do_alarm(void);
-int do_itimer(void);
 void set_alarm(struct mproc *rmp, clock_t ticks);
 void check_vtimer(int proc_nr, int sig);
 int scall_getitimer(void);
@@ -28,7 +27,6 @@ int scall_setitimer(void);
 
 /* break.c */
 long scall_brk(void);
-int do_brk(void);
 
 /* dma.c */
 int do_adddma(void);
@@ -73,7 +71,6 @@ void setreply(int proc_nr, int result);
 /* misc.c */
 int do_reboot(void);
 int do_procstat(void);
-int do_sysuname(void);
 int do_getsysinfo(void);
 int do_getsysinfo_up(void);
 int do_getprocnr(void);
@@ -97,10 +94,6 @@ int do_pause(void);
 int check_sig(pid_t proc_id, int signo);
 void sig_proc(struct mproc *rmp, int signo, int trace);
 int do_sigaction(void);
-int do_sigpending(void);
-int do_sigprocmask(void);
-int do_sigreturn(void);
-int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
 void restart_sigs(struct mproc *rmp);
 void vm_notify_sig_wrapper(endpoint_t ep); 
@@ -110,9 +103,6 @@ int scall_sigsuspend(void);
 int scall_sigreturn(void);
 
 /* time.c */
-int do_stime(void);
-int do_time(void);
-int do_times(void);
 int scall_gettimeofday(void);
 int scall_stime(void);
 int scall_time(void);

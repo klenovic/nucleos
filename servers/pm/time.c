@@ -24,133 +24,6 @@
 #include <servers/pm/mproc.h>
 #include "param.h"
 
-/*===========================================================================*
- *				do_time					     *
- *===========================================================================*/
-int do_time()
-{
-/* Perform the time(tp) system call. This returns the time in seconds since 
- * 1.1.1970.  MINIX is an astrophysically naive system that assumes the earth 
- * rotates at a constant rate and that such things as leap seconds do not 
- * exist.
- */
-  clock_t uptime, boottime;
-  int s;
-
-  if ( (s=getuptime2(&uptime, &boottime)) != 0) 
-  	panic(__FILE__,"do_time couldn't get uptime", s);
-
-  mp->mp_reply.reply_time = (time_t) (boottime + (uptime/system_hz));
-  mp->mp_reply.reply_utime = (uptime%system_hz)*1000000/system_hz;
-  return 0;
-}
-
-/*===========================================================================*
- *				do_stime				     *
- *===========================================================================*/
-int do_stime()
-{
-/* Perform the stime(tp) system call. Retrieve the system's uptime (ticks 
- * since boot) and pass the new time in seconds at system boot to the kernel.
- */
-  clock_t uptime, boottime;
-  int s;
-
-  if (mp->mp_effuid != SUPER_USER) { 
-      return(-EPERM);
-  }
-  if ( (s=getuptime(&uptime)) != 0) 
-      panic(__FILE__,"do_stime couldn't get uptime", s);
-  boottime = (long) m_in.stime - (uptime/system_hz);
-
-  s= sys_stime(boottime);		/* Tell kernel about boottime */
-  if (s != 0)
-	panic(__FILE__, "pm: sys_stime failed", s);
-
-  return 0;
-}
-
-/*===========================================================================*
- *				do_times				     *
- *===========================================================================*/
-int do_times()
-{
-/* Perform the times(buffer) system call. */
-  register struct mproc *rmp = mp;
-  clock_t user_time, sys_time, uptime;
-  int s;
-
-  if ((s=sys_times(who_e, &user_time, &sys_time, &uptime, NULL)) != 0)
-      panic(__FILE__,"do_times couldn't get times", s);
-  rmp->mp_reply.reply_t1 = user_time;		/* user time */
-  rmp->mp_reply.reply_t2 = sys_time;		/* system time */
-  rmp->mp_reply.reply_t3 = rmp->mp_child_utime;	/* child user time */
-  rmp->mp_reply.reply_t4 = rmp->mp_child_stime;	/* child system time */
-  rmp->mp_reply.reply_t5 = uptime;		/* uptime since boot */
-
-  return 0;
-}
-
-#define ptimeval	m2_p1
-
-int scall_gettimeofday(void)
-{
-	/* Perform the time(tp) system call. This returns the time in seconds since
-	 * 1.1.1970.  Nucleos is an astrophysically naive system that assumes the earth
-	 * rotates at a constant rate and that such things as leap seconds do not
-	 * exist.
-	 */
-	clock_t uptime, boottime;
-	struct timeval tv;
-	int ret;
-	int s;
-
-	if ((s = getuptime2(&uptime, &boottime)) != 0)
-		panic(__FILE__,"do_gettimeofday couldn't get uptime", s);
-
-	tv.tv_sec = (boottime + (uptime/system_hz));
-	tv.tv_usec = (uptime%system_hz)*1000000/system_hz;
-
-	ret = sys_vircopy(SELF, D, (vir_bytes)&tv, mp->mp_endpoint, D, (vir_bytes)m_in.ptimeval,
-			  sizeof(struct timeval));
-
-	return (ret < 0) ? -EFAULT : 0;
-}
-
-#define pstime		m2_p1
-
-int scall_stime(void)
-{
-	/* Perform the stime(tp) system call. Retrieve the system's uptime (ticks 
-	 * since boot) and pass the new time in seconds at system boot to the kernel.
-	 */
-	clock_t uptime, boottime;
-	time_t t;
-	int err;
-	int s;
-
-	if (mp->mp_effuid != SUPER_USER) { 
-		return -EPERM;
-	}
-
-	if ((s=getuptime(&uptime)) != 0)
-		panic(__FILE__,"do_stime couldn't get uptime", s);
-
-	err = sys_vircopy(mp->mp_endpoint, D, (vir_bytes)m_in.pstime, SELF, D, (vir_bytes)&t, sizeof(time_t));
-
-	if (err != 0)
-		return -EFAULT;
-
-	boottime = (long)t - (uptime/system_hz);
-
-	s = sys_stime(boottime);		/* Tell kernel about boottime */
-
-	if (s != 0)
-		panic(__FILE__, "pm: sys_stime failed", s);
-
-	return 0;
-}
-
 #define p_time		m1_p1
 
 int scall_time(void)
@@ -182,6 +55,40 @@ int scall_time(void)
 	return t;
 }
 
+#define pstime		m2_p1
+
+int scall_stime(void)
+{
+	/* Perform the stime(tp) system call. Retrieve the system's uptime (ticks 
+	 * since boot) and pass the new time in seconds at system boot to the kernel.
+	 */
+	clock_t uptime, boottime;
+	time_t t;
+	int err;
+	int s;
+
+	if (mp->mp_effuid != SUPER_USER) { 
+		return -EPERM;
+	}
+
+	if ((s=getuptime(&uptime)) != 0)
+		panic(__FILE__,"scall_stime couldn't get uptime", s);
+
+	err = sys_vircopy(mp->mp_endpoint, D, (vir_bytes)m_in.pstime, SELF, D, (vir_bytes)&t, sizeof(time_t));
+
+	if (err != 0)
+		return -EFAULT;
+
+	boottime = (long)t - (uptime/system_hz);
+
+	s = sys_stime(boottime);		/* Tell kernel about boottime */
+
+	if (s != 0)
+		panic(__FILE__, "pm: sys_stime failed", s);
+
+	return 0;
+}
+
 #define p_timesbuf	m1_p1
 
 int scall_times(void)
@@ -194,7 +101,7 @@ int scall_times(void)
 	int s;
 
 	if ((s = sys_times(who_e, &user_time, &sys_time, &uptime, NULL)) != 0)
-		panic(__FILE__,"do_times couldn't get times", s);
+		panic(__FILE__,"scall_times couldn't get times", s);
 
 	buf.tms_utime = user_time;		/* user time */
 	buf.tms_stime = sys_time;		/* system time */
@@ -208,4 +115,30 @@ int scall_times(void)
 		return -EFAULT;
 
 	return uptime;
+}
+
+#define ptimeval	m2_p1
+
+int scall_gettimeofday(void)
+{
+	/* Perform the time(tp) system call. This returns the time in seconds since
+	 * 1.1.1970.  Nucleos is an astrophysically naive system that assumes the earth
+	 * rotates at a constant rate and that such things as leap seconds do not
+	 * exist.
+	 */
+	clock_t uptime, boottime;
+	struct timeval tv;
+	int ret;
+	int s;
+
+	if ((s = getuptime2(&uptime, &boottime)) != 0)
+		panic(__FILE__,"do_gettimeofday couldn't get uptime", s);
+
+	tv.tv_sec = (boottime + (uptime/system_hz));
+	tv.tv_usec = (uptime%system_hz)*1000000/system_hz;
+
+	ret = sys_vircopy(SELF, D, (vir_bytes)&tv, mp->mp_endpoint, D, (vir_bytes)m_in.ptimeval,
+			  sizeof(struct timeval));
+
+	return (ret < 0) ? -EFAULT : 0;
 }

@@ -99,69 +99,6 @@ struct timeval *tv;
   return (tv->tv_sec >= 0 && tv->tv_sec <= MAX_SECS &&
  	  tv->tv_usec >= 0 && tv->tv_usec < US);
 }
- 
-/*===========================================================================*
- *				do_itimer				     *
- *===========================================================================*/
-int do_itimer()
-{
-  struct itimerval ovalue, value;	/* old and new interval timers */
-  int setval, getval;			/* set and/or retrieve the values? */
-  int r;
-
-  /* Make sure 'which' is one of the defined timers. */
-  if (m_in.which_timer < 0 || m_in.which_timer >= NR_ITIMERS)
-  	return(-EINVAL);
-
-  /* Determine whether to set and/or return the given timer value, based on
-   * which of the new_val and old_val parameters are nonzero. At least one of
-   * them must be nonzero.
-   */
-  setval = (m_in.new_val != NULL);
-  getval = (m_in.old_val != NULL);
-
-  if (!setval && !getval) return(-EINVAL);
-
-  /* If we're setting a new value, copy the new timer from user space.
-   * Also, make sure its fields have sane values.
-   */
-  if (setval) {
-  	r = sys_datacopy(who_e, (vir_bytes) m_in.new_val,
-  		PM_PROC_NR, (vir_bytes) &value, (phys_bytes) sizeof(value));
-  	if (r != 0) return(r);
-
-  	if (!is_sane_timeval(&value.it_value) ||
-  	    !is_sane_timeval(&value.it_interval))
-  		return(-EINVAL);
-  }
-
-  switch (m_in.which_timer) {
-  	case ITIMER_REAL :
-  		if (getval) get_realtimer(mp, &ovalue);
-
-  		if (setval) set_realtimer(mp, &value);
-
-  		r = 0;
-  		break;
-
-  	case ITIMER_VIRTUAL :
-  	case ITIMER_PROF :
-  		getset_vtimer(mp, m_in.which_timer,
-  				(setval) ? &value : NULL,
-  				(getval) ? &ovalue : NULL);
-
-  		r = 0;
-  		break;
-  }
-
-  /* If requested, copy the old interval timer to user space. */
-  if (r == 0 && getval) {
-  	r = sys_datacopy(PM_PROC_NR, (vir_bytes) &ovalue,
-  		who_e, (vir_bytes) m_in.old_val, (phys_bytes) sizeof(ovalue));
-  }
-
-  return(r);
-}
 
 /*===========================================================================*
  *				do_alarm				     *
