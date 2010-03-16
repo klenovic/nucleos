@@ -122,7 +122,6 @@
 /* Kernel message numbers. These are used only by u/kernel and
  * never by C library.
  */
-#define KCNR_FS_READY		57
 #define KCNR_EXEC_NEWMEM	100	/* from FS or RS to PM: new memory map for
 					 * exec
 					 */
@@ -142,11 +141,12 @@
 					 * that should not be used for bus-master DMA
 					 * any longer
 					 */
-#define KCNR_DEVCTL		120	/* to FS, map or unmap a device */
-#define KCNR_TASK_REPLY		121	/* to FS: reply code from drivers, not
+#define KCNR_FS_READY		111	/* from FS to VFS */
+#define KCNR_DEVCTL		112	/* to FS, map or unmap a device */
+#define KCNR_TASK_REPLY		113	/* to FS: reply code from drivers, not
 					 * really a standalone call.
 					 */
-#define KCNR_MAPDRIVER		122	/* to FS, map a device */
+#define KCNR_MAPDRIVER		114	/* to FS, map a device */
 
 /* Values used by access().  POSIX Table 2-8. */
 #define F_OK               0	/* test if file exists */
