@@ -260,7 +260,7 @@ off_t newsize;
 /*===========================================================================*
  *                             do_slink					     *
  *===========================================================================*/
-int do_slink()
+int scall_symlink(void)
 {
 /* Perform the symlink(name1, name2) system call. */
   int r, linklen;
@@ -284,11 +284,10 @@ int do_slink()
   return(r);
   }
 
-int scall_symlink(void) __alias("do_slink");
 /*===========================================================================*
- *                             do_rdlink                                    *
+ *                             do_readlink                                    *
  *===========================================================================*/
-int do_rdlink()
+int do_readlink()
 {
 /* Perform the readlink(name, buf, bufsize) system call. */
   int r, copylen;
@@ -310,6 +309,3 @@ int do_rdlink()
   put_vnode(vp);
   return(r);
 }
-
-
-

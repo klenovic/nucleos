@@ -43,82 +43,87 @@
 #include "vmnt.h"
 
 /*===========================================================================*
- *				do_pipe					     *
+ *                              scall_pipe                                      *
  *===========================================================================*/
-int do_pipe()
+int scall_pipe(void)
 {
-/* Perform the pipe(fil_des) system call. */
+	/* Perform the pipe(fil_des) system call. */
+	register struct fproc *rfp;
+	int r;
+	struct filp *fil_ptr0, *fil_ptr1;
+	int fil_des[2];		/* reply goes here */
+	struct vnode *vp;
+	struct vmnt *vmp;
+	struct node_details res;
 
-  register struct fproc *rfp;
-  int r;
-  struct filp *fil_ptr0, *fil_ptr1;
-  int fil_des[2];		/* reply goes here */
-  struct vnode *vp;
-  struct vmnt *vmp;
-  struct node_details res;
+	/* See if a free vnode is available */
+	if ( (vp = get_free_vnode()) == NIL_VNODE) {
+		printf("VFS: no vnode available!\n");
+		return err_code;
+	}
 
-  /* See if a free vnode is available */
-  if ( (vp = get_free_vnode()) == NIL_VNODE) return(err_code);
+	/* Acquire two file descriptors. */
+	rfp = fp;
 
-  /* Acquire two file descriptors. */
-  rfp = fp;
-  if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0) return(r);
-  rfp->fp_filp[fil_des[0]] = fil_ptr0;
-  FD_SET(fil_des[0], &rfp->fp_filp_inuse);
-  fil_ptr0->filp_count = 1;
-  if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
-      rfp->fp_filp[fil_des[0]] = NIL_FILP;
-      FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-      fil_ptr0->filp_count = 0;
-      return(r);
-  }
-  rfp->fp_filp[fil_des[1]] = fil_ptr1;
-  FD_SET(fil_des[1], &rfp->fp_filp_inuse);
-  fil_ptr1->filp_count = 1;
+	if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0)
+		return(r);
 
-  /* Create a named pipe inode on PipeFS */
-  r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE,
-	(dev_t)0, &res);
+	rfp->fp_filp[fil_des[0]] = fil_ptr0;
+	FD_SET(fil_des[0], &rfp->fp_filp_inuse);
+	fil_ptr0->filp_count = 1;
 
-  if (r != 0) {
-      rfp->fp_filp[fil_des[0]] = NIL_FILP;
-      FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-      fil_ptr0->filp_count = 0;
-      rfp->fp_filp[fil_des[1]] = NIL_FILP;
-      FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
-      fil_ptr1->filp_count = 0;
-	return(r);
-  }
+	if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
 
-  /* Fill in vnode */
-  vp->v_fs_e = res.fs_e;
-  vp->v_mapfs_e = res.fs_e;
-  vp->v_inode_nr = res.inode_nr; 
-  vp->v_mapinode_nr = res.inode_nr; 
-  vp->v_mode = res.fmode;
-  vp->v_pipe = I_PIPE;
-  vp->v_pipe_rd_pos= 0;
-  vp->v_pipe_wr_pos= 0;
-  vp->v_fs_count = 1;
-  vp->v_mapfs_count = 1;
-  vp->v_ref_count = 1;
-  vp->v_size = 0;
-  vp->v_vmnt = NIL_VMNT; 
-  vp->v_dev = NO_DEV;
+		return(r);
+	}
 
-  /* Fill in filp objects */
-  fil_ptr0->filp_vno = vp;
-  dup_vnode(vp);
-  fil_ptr1->filp_vno = vp;
-  fil_ptr0->filp_flags = O_RDONLY;
-  fil_ptr1->filp_flags = O_WRONLY;
+	rfp->fp_filp[fil_des[1]] = fil_ptr1;
+	FD_SET(fil_des[1], &rfp->fp_filp_inuse);
+	fil_ptr1->filp_count = 1;
 
-  m_out.reply_i1 = fil_des[0];
-  m_out.reply_i2 = fil_des[1];
+	/* Create a named pipe inode on PipeFS */
+	r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE, (dev_t)0, &res);
 
-  return 0;
+	if (r != 0) {
+		rfp->fp_filp[fil_des[0]] = NIL_FILP;
+		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
+		fil_ptr0->filp_count = 0;
+		rfp->fp_filp[fil_des[1]] = NIL_FILP;
+		FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
+		fil_ptr1->filp_count = 0;
+		return(r);
+	}
+
+	/* Fill in vnode */
+	vp->v_fs_e = res.fs_e;
+	vp->v_mapfs_e = res.fs_e;
+	vp->v_inode_nr = res.inode_nr;
+	vp->v_mapinode_nr = res.inode_nr; 
+	vp->v_mode = res.fmode;
+	vp->v_pipe = I_PIPE;
+	vp->v_pipe_rd_pos= 0;
+	vp->v_pipe_wr_pos= 0;
+	vp->v_fs_count = 1;
+	vp->v_mapfs_count = 1;
+	vp->v_ref_count = 1;
+	vp->v_size = 0;
+	vp->v_vmnt = NIL_VMNT; 
+	vp->v_dev = NO_DEV;
+
+	/* Fill in filp objects */
+	fil_ptr0->filp_vno = vp;
+	dup_vnode(vp);
+	fil_ptr1->filp_vno = vp;
+	fil_ptr0->filp_flags = O_RDONLY;
+	fil_ptr1->filp_flags = O_WRONLY;
+
+	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
+
+	return (r < 0) ? -EFAULT : 0;
 }
-
 
 /*===========================================================================*
  *				map_vnode				     *
@@ -668,85 +673,3 @@ int check_pipe(void)
 }
 #endif
 
-/*===========================================================================*
- *                              scall_pipe                                      *
- *===========================================================================*/
-int scall_pipe(void)
-{
-	/* Perform the pipe(fil_des) system call. */
-	register struct fproc *rfp;
-	int r;
-	struct filp *fil_ptr0, *fil_ptr1;
-	int fil_des[2];		/* reply goes here */
-	struct vnode *vp;
-	struct vmnt *vmp;
-	struct node_details res;
-
-	/* See if a free vnode is available */
-	if ( (vp = get_free_vnode()) == NIL_VNODE) {
-		printf("VFS: no vnode available!\n");
-		return err_code;
-	}
-
-	/* Acquire two file descriptors. */
-	rfp = fp;
-
-	if ( (r = get_fd(0, R_BIT, &fil_des[0], &fil_ptr0)) != 0)
-		return(r);
-
-	rfp->fp_filp[fil_des[0]] = fil_ptr0;
-	FD_SET(fil_des[0], &rfp->fp_filp_inuse);
-	fil_ptr0->filp_count = 1;
-
-	if ( (r = get_fd(0, W_BIT, &fil_des[1], &fil_ptr1)) != 0) {
-		rfp->fp_filp[fil_des[0]] = NIL_FILP;
-		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-		fil_ptr0->filp_count = 0;
-
-		return(r);
-	}
-
-	rfp->fp_filp[fil_des[1]] = fil_ptr1;
-	FD_SET(fil_des[1], &rfp->fp_filp_inuse);
-	fil_ptr1->filp_count = 1;
-
-	/* Create a named pipe inode on PipeFS */
-	r = req_newnode(PFS_PROC_NR, fp->fp_effuid, fp->fp_effgid, I_NAMED_PIPE, (dev_t)0, &res);
-
-	if (r != 0) {
-		rfp->fp_filp[fil_des[0]] = NIL_FILP;
-		FD_CLR(fil_des[0], &rfp->fp_filp_inuse);
-		fil_ptr0->filp_count = 0;
-		rfp->fp_filp[fil_des[1]] = NIL_FILP;
-		FD_CLR(fil_des[1], &rfp->fp_filp_inuse);
-		fil_ptr1->filp_count = 0;
-		return(r);
-	}
-
-	/* Fill in vnode */
-	vp->v_fs_e = res.fs_e;
-	vp->v_mapfs_e = res.fs_e;
-	vp->v_inode_nr = res.inode_nr;
-	vp->v_mapinode_nr = res.inode_nr; 
-	vp->v_mode = res.fmode;
-	vp->v_pipe = I_PIPE;
-	vp->v_pipe_rd_pos= 0;
-	vp->v_pipe_wr_pos= 0;
-	vp->v_fs_count = 1;
-	vp->v_mapfs_count = 1;
-	vp->v_ref_count = 1;
-	vp->v_size = 0;
-	vp->v_vmnt = NIL_VMNT; 
-	vp->v_dev = NO_DEV;
-
-	/* Fill in filp objects */
-	fil_ptr0->filp_vno = vp;
-	dup_vnode(vp);
-	fil_ptr1->filp_vno = vp;
-	fil_ptr0->filp_flags = O_RDONLY;
-	fil_ptr1->filp_flags = O_WRONLY;
-
-	r = sys_vircopy(SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
-
-	return (r < 0) ? -EFAULT : 0;
-}

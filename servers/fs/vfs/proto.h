@@ -102,7 +102,7 @@ int pm_dumpcore(int proc_e, struct mem_map *seg_ptr);
 int do_vm_mmap(void);
 
 /* mount.c */
-int do_fslogin(void);
+int do_fsready(void);
 int do_mount(void);
 int do_umount(void);
 int unmount(dev_t dev);
@@ -113,15 +113,11 @@ int close_fd(struct fproc *rfp, int fd_nr);
 void close_filp(struct filp *fp);
 void close_reply(void);
 int do_creat(void);
-int do_lseek(void);
 int scall_lseek(void);
-int do_llseek(void);
 int scall_llseek(void);
 int do_mknod(void);
 int do_mkdir(void);
-int do_open(void);
 int scall_open(void);
-int do_slink(void);
 int scall_symlink(void);
 int do_vm_open(void);
 int do_vm_close(void);
@@ -132,7 +128,6 @@ struct vnode *eat_path(int flags);
 struct vnode *last_dir(void);
 
 /* pipe.c */
-int do_pipe(void);
 int map_vnode(struct vnode *vp);
 int scall_pipe(void);
 void unpause(int proc_nr_e);
@@ -219,11 +214,10 @@ int do_chroot(void);
 int do_fstat(void);
 int do_stat(void);
 int do_fstatfs(void);
-int do_rdlink(void);
+int do_readlink(void);
 int do_lstat(void);
 
 /* time.c */
-int do_utime(void);
 int scall_utime(void);
 
 /* utility.c */

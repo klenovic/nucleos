@@ -60,28 +60,6 @@ int do_creat()
 }
 
 /*===========================================================================*
- *				do_open					     *
- *===========================================================================*/
-int do_open()
-{
-/* Perform the open(name, flags,...) system call. */
-  int create_mode = 0;		/* is really mode_t but this gives problems */
-  int r;
-
-  /* If O_CREAT is set, open has three parameters, otherwise two. */
-  if (m_in.mode & O_CREAT) {
-	create_mode = m_in.c_mode;	
-	r = fetch_name(m_in.c_name, m_in.name1_length);
-  } else {
-	r = fetch_name(m_in.name, m_in.name_length);
-  }
-
-  if (r != 0) return(err_code); /* name was bad */
-  r = common_open(m_in.mode, create_mode);
-  return(r);
-}
-
-/*===========================================================================*
  *				scall_open				     *
  *===========================================================================*/
 int scall_open()
@@ -415,101 +393,6 @@ int do_mkdir()
   
   put_vnode(vp);
   return(r);
-}
-
-
-
-
-/*===========================================================================*
- *				do_lseek				     *
- *===========================================================================*/
-int do_lseek()
-{
-/* Perform the lseek(ls_fd, offset, whence) system call. */
-  register struct filp *rfilp;
-  int r;
-  long offset;
-  u64_t pos, newpos;
-
-  /* Check to see if the file descriptor is valid. */
-  if ( (rfilp = get_filp(m_in.ls_fd)) == NIL_FILP) return(err_code);
-
-  /* No lseek on pipes. */
-  if (rfilp->filp_vno->v_pipe == I_PIPE) return(-ESPIPE);
-
-  /* The value of 'whence' determines the start position to use. */
-  switch(m_in.whence) {
-      case SEEK_SET: pos = cvu64(0);	break;
-      case SEEK_CUR: pos = rfilp->filp_pos;	break;
-      case SEEK_END: pos = cvul64(rfilp->filp_vno->v_size);	break;
-      default: return(-EINVAL);
-  }
-
-  offset= m_in.offset_lo;
-  if (offset >= 0)
-	newpos= add64ul(pos, offset);
-  else
-	newpos= sub64ul(pos, -offset);
-
-  /* Check for overflow. */
-  if (ex64hi(newpos) != 0)
-	return(-EINVAL);
-
-  if (cmp64(newpos, rfilp->filp_pos) != 0) { /* Inhibit read ahead request */
-      r = req_inhibread(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr);
-      if (r != 0) return(r);
-  }
-
-  rfilp->filp_pos = newpos;
-
-  /* insert the new position into the output message */
-  m_out.reply_l1 = ex64lo(newpos);
-
-  return 0;
-}
-
-
-/*===========================================================================*
- *				do_llseek				     *
- *===========================================================================*/
-int do_llseek()
-{
-/* Perform the llseek(ls_fd, offset, whence) system call. */
-  register struct filp *rfilp;
-  u64_t pos, newpos;
-  int r;
-
-  /* Check to see if the file descriptor is valid. */
-  if ( (rfilp = get_filp(m_in.ls_fd)) == NIL_FILP) return(err_code);
-
-  /* No lseek on pipes. */
-  if (rfilp->filp_vno->v_pipe == I_PIPE) return(-ESPIPE);
-
-  /* The value of 'whence' determines the start position to use. */
-  switch(m_in.whence) {
-      case SEEK_SET: pos = cvu64(0);	break;
-      case SEEK_CUR: pos = rfilp->filp_pos;	break;
-      case SEEK_END: pos = cvul64(rfilp->filp_vno->v_size);	break;
-      default: return(-EINVAL);
-  }
-
-  newpos= add64(pos, make64(m_in.offset_lo, m_in.offset_high));
-
-  /* Check for overflow. */
-  if (((long)m_in.offset_high > 0) && cmp64(newpos, pos) < 0) 
-      return(-EINVAL);
-  if (((long)m_in.offset_high < 0) && cmp64(newpos, pos) > 0) 
-      return(-EINVAL);
-
-  if (cmp64(newpos, rfilp->filp_pos) != 0) { /* Inhibit read ahead request */
-      r = req_inhibread(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr);
-      if (r != 0) return(r);
-  }
-
-  rfilp->filp_pos = newpos;
-  m_out.reply_l1 = ex64lo(newpos);
-  m_out.reply_l2 = ex64hi(newpos);
-  return 0;
 }
 
 /*===========================================================================*

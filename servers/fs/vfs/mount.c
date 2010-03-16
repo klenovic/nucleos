@@ -42,9 +42,9 @@ static dev_t name_to_dev(void);
 static int mount_fs(endpoint_t fs_e);
 
 /*===========================================================================*
- *                              do_fslogin                                   *
+ *                              do_fsready                                   *
  *===========================================================================*/
-int do_fslogin()
+int do_fsready()
 {
   int r;
 

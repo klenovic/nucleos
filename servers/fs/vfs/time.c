@@ -25,46 +25,6 @@
 #include <nucleos/vfsif.h>
 #include "vmnt.h"
 
-/*===========================================================================*
- *				do_utime				     *
- *===========================================================================*/
-int do_utime()
-{
-/* Perform the utime(name, timep) system call. */
-  register int len;
-  int r;
-  time_t actime, modtime;
-  struct vnode *vp;
-  
-  /* Adjust for case of 'timep' being NULL;
-   * utime_strlen then holds the actual size: strlen(name)+1 */
-  len = m_in.utime_length;
-  if (len == 0) len = m_in.utime_strlen;
-
-  /* Temporarily open the file */
-  if (fetch_name(m_in.utime_file, len) != 0) return(err_code);
-  if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
-  
-  /* Only the owner of a file or the super user can change its name. */  
-  r = 0;
-  if (vp->v_uid != fp->fp_effuid && fp->fp_effuid != SU_UID) r = -EPERM;
-  if (m_in.utime_length == 0 && r != 0) r = forbidden(vp, W_BIT);
-  if (read_only(vp) != 0) r = -EROFS; /* Not even su can touch if R/O */ 
-  if (r == 0) {
-	/* Issue request */
-  if (m_in.utime_length == 0) {
-        actime = modtime = clock_time();
-  } else {
-        actime = m_in.utime_actime;
-        modtime = m_in.utime_modtime;
-  }
-	r = req_utime(vp->v_fs_e, vp->v_inode_nr, actime, modtime);
-  }
-  
-  put_vnode(vp);
-  return(r);
-}
-
 #define utime_ptimes	m2_l1	/* times pointer */
 
 /*===========================================================================*
