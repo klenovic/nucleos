@@ -23,11 +23,6 @@
 	[ __NNR_ ## syscall ] = handler
 
 int (*call_vec[])(void) = {
-
-	[KCNR_FS_READY]		= do_fsready,		/* 57 = FS proc login */
-	[__NR_svrctl]		= do_svrctl,		/* 77 = svrctl */
-	[__NR_getsysinfo]	= do_getsysinfo,	/* 79 = getsysinfo */
-
 	/* Nucleos syscalls */
 	SCALL_HANDLER(access,		do_access),
 	SCALL_HANDLER(chdir,		do_chdir),
@@ -47,6 +42,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(fsync,		do_fsync),
 	SCALL_HANDLER(ftruncate,	do_ftruncate),
 	SCALL_HANDLER(getdents,		do_getdents),
+	SCALL_HANDLER(getsysinfo,	do_getsysinfo),
 	SCALL_HANDLER(ioctl,		do_ioctl),
 	SCALL_HANDLER(link,		do_link),
 	SCALL_HANDLER(llseek,		scall_llseek),
@@ -63,6 +59,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(rmdir,		scall_rmdir),
 	SCALL_HANDLER(select,		do_select),
 	SCALL_HANDLER(stat,		do_stat),
+	SCALL_HANDLER(svrctl,		do_svrctl),
 	SCALL_HANDLER(symlink,		scall_symlink),
 	SCALL_HANDLER(sync,		do_sync),
 	SCALL_HANDLER(truncate,		do_truncate),
@@ -71,6 +68,8 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(unlink,		do_unlink),
 	SCALL_HANDLER(utime,		scall_utime),
 	SCALL_HANDLER(write,		do_write),
+
+	[KCNR_FS_READY]		= do_fsready,		/* 57 = FS proc login */
 };
 
 /* This should not fail with "array size is negative": */

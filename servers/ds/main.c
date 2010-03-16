@@ -84,7 +84,7 @@ int main(int argc, char **argv)
       case DS_CHECK:
 	  result = do_check(&m);
 	  break;
-      case __NR_getsysinfo:
+      case __NNR_getsysinfo:
           result = do_getsysinfo(&m);
           break;
       default: 

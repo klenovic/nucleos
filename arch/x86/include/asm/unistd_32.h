@@ -109,17 +109,15 @@
 #define __NNR_geteuid		(85 + __syscall_offset)
 #define __NNR_getgroups		(86 + __syscall_offset)
 #define __NNR_setgroups		(87 + __syscall_offset)
+#define __NNR_getsysinfo	(88 + __syscall_offset)	/* to PM or FS */
+#define __NNR_getsysinfo_up	(89 + __syscall_offset)	/* to PM or FS */
+#define __NNR_svrctl		(90 + __syscall_offset)
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
 #include <nucleos/types.h>
 #include <nucleos/type.h>
 #include <nucleos/signal.h>
-
-#define __NR_getsysinfo		79	/* to PM or FS */
-#define __NR_getsysinfo_up	97	/* to PM or FS */
-#define __NR_ptrace		26
-#define __NR_svrctl		77
 
 /* Kernel message numbers. These are used only by u/kernel and
  * never by C library.

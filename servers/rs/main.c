@@ -119,7 +119,7 @@ int main(void)
        * Handle the request and send a reply to the caller.
        */
       else {
-	  if (call_nr != __NR_getsysinfo && 
+	  if (call_nr != __NNR_getsysinfo && 
 	  	(call_nr < RS_RQ_BASE || call_nr >= RS_RQ_BASE+0x100))
 	  {
 		/* Ignore invalid requests. Do not try to reply. */
@@ -135,7 +135,7 @@ int main(void)
           case RS_REFRESH: 	result = do_refresh(&m); 	break;
           case RS_RESTART: 	result = do_restart(&m); 	break;
           case RS_SHUTDOWN: 	result = do_shutdown(&m); 	break;
-          case __NR_getsysinfo: 	result = do_getsysinfo(&m); 	break;
+          case __NNR_getsysinfo: 	result = do_getsysinfo(&m); 	break;
 	  case RS_LOOKUP:	result = do_lookup(&m);		break;
           default: 
               printf("Warning, RS got unexpected request %d from %d\n",
