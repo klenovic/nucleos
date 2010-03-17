@@ -98,7 +98,6 @@
 		: "0" (__msg) ASMFMT_##nr(args)		\
 		: "memory", "cc"			\
 	);						\
-	resultvar = __msg[1];				\
 	(int) resultvar;				\
 })
 

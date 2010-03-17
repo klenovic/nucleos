@@ -35,8 +35,6 @@ int sigreturn(register struct sigcontext *scp)
 		: "memory", "cc"
 	);
 
-	resultvar = __msg[1];
-
 	if (__builtin_expect(INTERNAL_SYSCALL_ERROR_P(resultvar, ), 0)) {
 		__set_errno (INTERNAL_SYSCALL_ERRNO (resultvar, ));
 		return -1;
