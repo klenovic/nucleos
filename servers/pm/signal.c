@@ -320,7 +320,7 @@ int trace;			/* pass signal to tracer first? */
   if ((rmp->mp_flags & STOPPED) && signo != SIGKILL) {
 	/* If the process is stopped for a debugger, do not deliver any signals
 	 * (except SIGKILL) in order not to confuse the debugger. The signals
-	 * will be delivered using the check_pending() calls in do_trace().
+	 * will be delivered using the check_pending() calls in do_ptrace().
 	 */
 	sigaddset(&rmp->mp_sigpending, signo);
 	return;

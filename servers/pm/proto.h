@@ -113,8 +113,8 @@ void pm_set_timer(timer_t *tp, int delta, tmr_func_t watchdog, int arg);
 void pm_expire_timers(clock_t now);
 void pm_cancel_timer(timer_t *tp);
 
-/* trace.c */
-int do_trace(void);
+/* ptrace.c */
+int do_ptrace(void);
 void stop_proc(struct mproc *rmp, int sig_nr);
 
 /* utility.c */

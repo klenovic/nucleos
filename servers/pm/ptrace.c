@@ -44,9 +44,9 @@
 #include "param.h"
 
 /*===========================================================================*
- *				do_trace  				     *
+ *				do_ptrace  				     *
  *===========================================================================*/
-int do_trace()
+int do_ptrace()
 {
   register struct mproc *child;
   struct ptrace_range pr;

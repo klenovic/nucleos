@@ -62,7 +62,7 @@ int (*call_vec[])(void) = {
 	SCALL_HANDLER(uname,		scall_uname),
 	SCALL_HANDLER(time,		scall_time),
 	SCALL_HANDLER(times,		scall_times),
-	SCALL_HANDLER(ptrace,		do_trace),
+	SCALL_HANDLER(ptrace,		do_ptrace),
 	SCALL_HANDLER(wait,		do_waitpid),
 	SCALL_HANDLER(waitpid,		do_waitpid),
 	SCALL_HANDLER(getgroups,	scall_getgroups),
