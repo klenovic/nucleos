@@ -47,10 +47,10 @@ struct endpt_args {
 static struct endpt_args scall_to_srv[NR_syscalls];
 
 #define SCALL_TO_SRV(syscall, server) \
-	[ __NNR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
+	[ __NR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
 
 #define SCALL_TO_ANY(syscall, server) \
-	[ __NNR_ ## syscall ] = { server, msg_ ## syscall }
+	[ __NR_ ## syscall ] = { server, msg_ ## syscall }
 
 static inline long strnlen_user(const char __user *s, size_t maxlen)
 {

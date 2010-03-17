@@ -23,7 +23,7 @@ int sigreturn(register struct sigcontext *scp)
 	int resultvar = 0;
 	static int __msg[9];
 
-	__msg[1] = __NNR_sigreturn;
+	__msg[1] = __NR_sigreturn;
 
 	/* Protect against race conditions by blocking all interrupts. */
 	sigfillset(&set);		/* splhi */

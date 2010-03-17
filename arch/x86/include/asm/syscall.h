@@ -88,7 +88,7 @@
 #define INTERNAL_SYSCALL(name, err, nr, args...)	\
 ({							\
 	register unsigned int resultvar;		\
-	int __msg[9] = {0, __NNR_##name};		\
+	int __msg[9] = {0, __NR_##name};		\
 	EXTRAVAR_##nr					\
 	__asm__ __volatile__ (				\
 		LOADARGS_##nr				\

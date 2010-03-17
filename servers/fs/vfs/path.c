@@ -214,8 +214,8 @@ node_details_t *node;
       root_ino = 0;
 
   /* Set user and group ids according to the system call */
-  uid = (call_nr == __NNR_access ? fp->fp_realuid : fp->fp_effuid); 
-  gid = (call_nr == __NNR_access ? fp->fp_realgid : fp->fp_effgid); 
+  uid = (call_nr == __NR_access ? fp->fp_realuid : fp->fp_effuid); 
+  gid = (call_nr == __NR_access ? fp->fp_realgid : fp->fp_effgid); 
 
   symloop= 0;	/* Number of symlinks seen so far */
 

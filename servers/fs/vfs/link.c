@@ -120,7 +120,7 @@ int do_unlink()
 	}
   }
 
-  if(call_nr == __NNR_unlink) 
+  if(call_nr == __NR_unlink) 
 	  r = req_unlink(vldirp->v_fs_e, vldirp->v_inode_nr, user_fullpath);
   else 
 	  r = req_rmdir(vldirp->v_fs_e, vldirp->v_inode_nr, user_fullpath);

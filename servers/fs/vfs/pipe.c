@@ -186,7 +186,7 @@ int notouch;			/* check only */
 			
 			/* If need be, activate sleeping writers. */
 			if (susp_count > 0)
-				release(vp, __NNR_write, susp_count);
+				release(vp, __NR_write, susp_count);
 		}
 		return(r);
 	}
@@ -216,7 +216,7 @@ int notouch;			/* check only */
 		if (bytes > 0)  {
 			/* Do a partial write. Need to wakeup reader */
 			if (!notouch)
-				release(vp, __NNR_read, susp_count);
+				release(vp, __NR_read, susp_count);
 			return(bytes);
 		} else {
 			/* Pipe is full */
@@ -233,7 +233,7 @@ int notouch;			/* check only */
 			 * since we'll suspend ourself in read_write()
 			 */
 			if (!notouch)
-				release(vp, __NNR_read, susp_count);
+				release(vp, __NR_read, susp_count);
 			return(bytes);
 		}
 	}
@@ -244,7 +244,7 @@ int notouch;			/* check only */
 
   /* Writing to an empty pipe.  Search for suspended reader. */
   if (pos == 0 && !notouch)
-	release(vp, __NNR_read, susp_count);
+	release(vp, __NR_read, susp_count);
 
   /* Requested amount fits */
   return(bytes);
@@ -328,7 +328,7 @@ size_t size;
   susp_count++;					/* #procs susp'ed on pipe*/
   fp->fp_blocked_on = FP_BLOCKED_ON_PIPE;
   assert(!GRANT_VALID(fp->fp_grant));
-  fp->fp_fd = (fd_nr << 8) | ((rw_flag == READING) ? __NNR_read : __NNR_write);
+  fp->fp_fd = (fd_nr << 8) | ((rw_flag == READING) ? __NR_read : __NR_write);
   fp->fp_buffer = buf;		
   fp->fp_nbytes = size;
 }
@@ -378,9 +378,9 @@ int count;			/* max number of processes to release */
   /* Trying to perform the call also includes SELECTing on it with that
    * operation.
    */
-  if (call_nr == __NNR_read || call_nr == __NNR_write) {
+  if (call_nr == __NR_read || call_nr == __NR_write) {
   	  int op;
-  	  if (call_nr == __NNR_read)
+  	  if (call_nr == __NR_read)
   	  	op = SEL_RD;
   	  else
   	  	op = SEL_WR;
@@ -553,7 +553,7 @@ int proc_nr_e;
 		mess.IO_GRANT = (char *) rfp->fp_grant;
 
 		/* Tell kernel R or W. Mode is from current call, not open. */
-		mess.COUNT = ((rfp->fp_fd & BYTE) == __NNR_read) ? R_BIT : W_BIT;
+		mess.COUNT = ((rfp->fp_fd & BYTE) == __NR_read) ? R_BIT : W_BIT;
 		mess.m_type = CANCEL;
 		fp = rfp;	/* hack - ctty_io uses fp */
 		(*dmap[(dev >> MAJOR) & BYTE].dmap_io)(rfp->fp_task, &mess);

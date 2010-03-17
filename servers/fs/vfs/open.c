@@ -321,8 +321,8 @@ static int pipe_open(register struct vnode *vp, register mode_t bits,
 		return(SUSPEND);
 	}
   } else if (susp_count > 0) {/* revive blocked processes */
-	release(vp, __NNR_open, susp_count);
-	release(vp, __NNR_creat, susp_count);
+	release(vp, __NR_open, susp_count);
+	release(vp, __NR_creat, susp_count);
   }
   return 0;
 }
@@ -596,7 +596,7 @@ struct filp *fp;
 
   /* If the inode being closed is a pipe, release everyone hanging on it. */
   if (vp->v_pipe == I_PIPE) {
-	rw = (fp->filp_mode & R_BIT ? __NNR_write : __NNR_read);
+	rw = (fp->filp_mode & R_BIT ? __NR_write : __NR_read);
 	release(vp, rw, NR_PROCS);
   }
 

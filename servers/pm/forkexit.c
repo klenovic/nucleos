@@ -411,8 +411,8 @@ int do_waitpid()
   int i, pidarg, options, children;
 
   /* Set internal variables, depending on whether this is WAIT or WAITPID. */
-  pidarg  = (call_nr == __NNR_wait ? -1 : m_in.pid);	   /* 1st param of waitpid */
-  options = (call_nr == __NNR_wait ?  0 : m_in.sig_nr);  /* 3rd param of waitpid */
+  pidarg  = (call_nr == __NR_wait ? -1 : m_in.pid);	   /* 1st param of waitpid */
+  options = (call_nr == __NR_wait ?  0 : m_in.sig_nr);  /* 3rd param of waitpid */
   if (pidarg == 0) pidarg = -mp->mp_procgrp;	/* pidarg < 0 ==> proc grp */
 
   /* Is there a child waiting to be collected? At this point, pidarg != 0:

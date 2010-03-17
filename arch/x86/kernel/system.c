@@ -492,7 +492,7 @@ struct proc * arch_finish_schedcheck(void)
 
 void restore_regs_syscall_0x80(struct proc *proc)
 {
-	if (proc->syscall_0x80 && proc->syscall_0x80 != __NNR_sigreturn) {
+	if (proc->syscall_0x80 && proc->syscall_0x80 != __NR_sigreturn) {
 		int wait_waitpid = 0;
 		int __user *p_status = 0;
 		int status = 0;
@@ -513,13 +513,13 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		}
 
 		switch (proc->syscall_0x80) {
-		case __NNR_wait:
+		case __NR_wait:
 			wait_waitpid = 1;
 			status = proc->p_delivermsg.m2_i1;
 			p_status = (int*)proc->clobregs[CLOBB_REG_EBX];
 			break;
 
-		case __NNR_waitpid:
+		case __NR_waitpid:
 			wait_waitpid = 1;
 			status = proc->p_delivermsg.m2_i1;
 			p_status = (int*)proc->clobregs[CLOBB_REG_ECX];
@@ -539,7 +539,7 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		proc->syscall_0x80 = 0;
 	}
 
-	if (proc->syscall_0x80 == __NNR_sigreturn) {
+	if (proc->syscall_0x80 == __NR_sigreturn) {
 		/* Get the saved return value */
 		proc->p_reg.retreg = proc->clobregs[CLOBB_REG_EAX];
 		proc->ret_from_sig = 0;

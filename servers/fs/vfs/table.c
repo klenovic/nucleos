@@ -20,7 +20,7 @@
 #include "vmnt.h"
 
 #define SCALL_HANDLER(syscall, handler) \
-	[ __NNR_ ## syscall ] = handler
+	[ __NR_ ## syscall ] = handler
 
 int (*call_vec[])(void) = {
 	/* Nucleos syscalls */
