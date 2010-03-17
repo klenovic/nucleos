@@ -15,4 +15,10 @@
  */
 #include <asm-generic/int-ll64.h>
 
+#ifndef __ASSEMBLY__
+
+typedef int endpoint_t;	/* process identifier */
+
+#endif /* __ASSEMBLY__ */
+
 #endif /* __ASM_GENERIC_TYPES_H */

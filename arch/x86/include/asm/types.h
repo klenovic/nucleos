@@ -14,7 +14,7 @@
 #ifndef __ASM_X86_TYPES_H
 #define __ASM_X86_TYPES_H
 
-#include <asm-generic/int-ll64.h>
+#include <asm-generic/types.h>
 
 /* possible select() operation types; read, write, errors */
 /* (FS_PROC_NR/driver internal use only) */
