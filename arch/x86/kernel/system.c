@@ -496,6 +496,8 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		int wait_waitpid = 0;
 		int __user *p_status = 0;
 		int status = 0;
+		void __user *p_data = 0;
+		long data = 0;
 
 		proc->p_reg.retreg = proc->p_delivermsg.m_type;
 
@@ -523,6 +525,20 @@ void restore_regs_syscall_0x80(struct proc *proc)
 			wait_waitpid = 1;
 			status = proc->p_delivermsg.m2_i1;
 			p_status = (int*)proc->clobregs[CLOBB_REG_ECX];
+			break;
+
+		case __NR_ptrace:
+			/* @nucleos: The current implementation (in PM) saves
+			 *           the return value into m2_l2 member which
+			 *           was used as the address of user `data'.
+			 *           This `data' is passed via %esi register
+			 *           which is saved (as others GP registers).
+			 */
+			p_data = (void*)proc->clobregs[CLOBB_REG_ESI];
+			data = proc->p_delivermsg.m2_l2;
+
+			if (p_data)
+				copy_to_user(p_data, &data, sizeof(long));
 			break;
 		}
 

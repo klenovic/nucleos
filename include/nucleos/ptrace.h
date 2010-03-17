@@ -59,7 +59,7 @@ struct ptrace_range {
 };
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-long ptrace(int _req, pid_t _pid, long _addr, long _data);
+long ptrace(int request, ...);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_PTRACE_H */

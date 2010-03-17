@@ -10,20 +10,29 @@
 #include <nucleos/lib.h>
 #include <nucleos/unistd.h>
 
-long ptrace(int req, pid_t pid, long addr, long data)
+/* long ptrace(int request, pid_t pid, long *addr, long *data) */
+long ptrace(int request, ...)
 {
-  message m;
+	long int res, ret;
+	va_list ap;
+	pid_t pid;
+	void *addr, *data;
 
-  m.m2_i1 = pid;
-  m.m2_i2 = req;
-  m.PMTRACE_ADDR = addr;
-  m.m2_l2 = data;
-  if (ksyscall(PM_PROC_NR, __NR_ptrace, &m) < 0) return(-1);
+	va_start (ap, request);
+	pid = va_arg (ap, pid_t);
+	addr = va_arg (ap, void *);
+	data = va_arg (ap, void *);
+	va_end (ap);
 
-  /* There was no error, but -1 is a legal return value.  Clear errno if
-   * necessary to distinguish this case.  ksyscall has set errno to nonzero
-   * for the error case.
-   */
-  if (m.m2_l2 == -1) errno = 0;
-  return(m.m2_l2);
+	if (request > 0 && request < 4)
+		data = &ret;
+
+	res = INLINE_SYSCALL (ptrace, 4, request, pid, addr, data);
+
+	if (res >= 0 && request > 0 && request < 4) {
+		__set_errno (0);
+		return ret;
+	}
+
+	return res;
 }

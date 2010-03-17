@@ -307,7 +307,7 @@ loff_t lseek64(int fd, loff_t offset, int whence);
 int mknod(const char *_name, mode_t _mode, dev_t _addr);
 int mknod4(const char *_name, mode_t _mode, dev_t _addr, long _size);
 char *mktemp(char *_template);
-long ptrace(int _req, pid_t _pid, long _addr, long _data);
+long ptrace(int request, ...);
 char *sbrk(int _incr);
 int sync(void);
 int fsync(int fd);
