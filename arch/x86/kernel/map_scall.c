@@ -604,6 +604,12 @@ static int msg_pipe(message *msg, const struct pt_regs *r)
 }
 
 static int msg_ptrace(message *msg, const struct pt_regs *r){
+
+	msg->m2_i1 = r->bx;		/* pid */
+	msg->m2_i2 = r->cx;		/* req */
+	msg->PMTRACE_ADDR = r->dx;	/* addr */
+	msg->m2_l2 = r->si;		/* data */
+
 	return 0;
 }
 
