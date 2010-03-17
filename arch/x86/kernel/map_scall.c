@@ -26,6 +26,8 @@
  *           it's microkernel or monolitic nor who to ask for the service. The C library should
  *           know only the system call number and the kernel shall dispatch the request to the
  *           appropriate server.
+ *           The exceptions are the getsysinfo[_up] and svrctl system calls. They might be replaced
+ *           by /proc/sys in the future.
  *
  *           Maybe it make sense to create separate server<->kernel<->driver (internal)
  *           communication and separate libc<->kernel (external) communication.
@@ -801,6 +803,12 @@ static int msg_stime(message *msg, const struct pt_regs *r)
 
 static int msg_svrctl(message *msg, const struct pt_regs *r)
 {
+	/* In case of this syscall the endpoint is specify by user. */
+	scall_to_srv[r->ax].endpt = r->bx;	/* who */
+
+	msg->m2_i1 = r->cx;		/* request */
+	msg->m2_p1 = (void*)r->dx;	/* argp */
+
 	return 0;
 }
 
