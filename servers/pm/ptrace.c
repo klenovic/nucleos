@@ -92,6 +92,7 @@ int do_ptrace()
 	if (child->mp_tracer != NO_TRACER) return(-EBUSY);
 
 	child->mp_tracer = who_p;
+	child->mp_trace_flags = TO_NOEXEC;
 
 	sig_proc(child, SIGSTOP, TRUE /*trace*/);
 
