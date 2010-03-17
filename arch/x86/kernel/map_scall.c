@@ -108,6 +108,10 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
 	proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
 
+	/* sligh check whether the endpoint is valid */
+	if (scall_to_srv[r->ax].endpt == ENDPT_ANY)
+		goto err_nosys;
+
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
 	 *           kIPC. It requires to have message in caller's (user's) space.
 	 */
@@ -401,11 +405,24 @@ static int msg_getpriority(message *msg, const struct pt_regs *r)
 
 static int msg_getsysinfo(message *msg, const struct pt_regs *r)
 {
+	/* In case of this syscall the endpoint is specify by user. */
+	scall_to_srv[r->ax].endpt = r->bx;	/* who */
+
+	msg->m1_i1 = r->cx;		/* what */
+	msg->m1_p1 = (void*)r->dx;	/* where */
+
 	return 0;
 }
 
 static int msg_getsysinfo_up(message *msg, const struct pt_regs *r)
 {
+	/* In case of this syscall the endpoint is specify by user. */
+	scall_to_srv[r->ax].endpt = r->bx;	/* who */
+
+	msg->SIU_WHAT = r->cx;		/* what */
+	msg->SIU_WHERE = (void*)r->dx;	/* where */
+	msg->SIU_LEN = r->si;		/* size */
+
 	return 0;
 }
 

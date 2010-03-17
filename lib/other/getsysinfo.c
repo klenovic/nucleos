@@ -13,14 +13,7 @@
 
 int getsysinfo(endpoint_t who, int what, void *where)
 {
-	message m;
-	m.m1_i1 = what;
-	m.m1_p1 = where;
-
-	if (ksyscall(who, __NNR_getsysinfo, &m) < 0)
-		return(-1);
-
-	return(0);
+	return INLINE_SYSCALL(getsysinfo, 3, who, what, where);
 }
 
 /* Unprivileged variant of getsysinfo. */
@@ -33,11 +26,5 @@ int getsysinfo(endpoint_t who, int what, void *where)
  */
 ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where)
 {
-	message m;
-	m.SIU_WHAT = what;
-	m.SIU_WHERE = where;
-	m.SIU_LEN = size;
-
-	return ksyscall(who, __NNR_getsysinfo_up, &m);
+	return INLINE_SYSCALL(getsysinfo_up, 4, who, what, where, size);
 }
-
