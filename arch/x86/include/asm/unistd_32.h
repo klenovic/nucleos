@@ -71,7 +71,6 @@
 #define __NR_getpgrp		52
 #define __NR_getitimer		53
 #define __NR_setitimer		54
-/* Posix signal handling. */
 #define __NR_sigaction		55
 #define __NR_sigsuspend		56
 #define __NR_sigpending		57
@@ -148,73 +147,73 @@
 #define KCNR_MAPDRIVER		141	/* to FS, map a device */
 
 /* Values used by access().  POSIX Table 2-8. */
-#define F_OK               0	/* test if file exists */
-#define X_OK               1	/* test if file is executable */
-#define W_OK               2	/* test if file is writable */
-#define R_OK               4	/* test if file is readable */
+#define F_OK	0	/* test if file exists */
+#define X_OK	1	/* test if file is executable */
+#define W_OK	2	/* test if file is writable */
+#define R_OK	4	/* test if file is readable */
 
 /* Values used for whence in lseek(fd, offset, whence).  POSIX Table 2-9. */
-#define SEEK_SET           0	/* offset is absolute  */
-#define SEEK_CUR           1	/* offset is relative to current position */
-#define SEEK_END           2	/* offset is relative to end of file */
+#define SEEK_SET	0	/* offset is absolute  */
+#define SEEK_CUR	1	/* offset is relative to current position */
+#define SEEK_END	2	/* offset is relative to end of file */
 
 /* This value is required by POSIX Table 2-10. */
-#define _POSIX_VERSION 199009L	/* which standard is being conformed to */
+#define _POSIX_VERSION	199009L	/* which standard is being conformed to */
 
 /* These three definitions are required by POSIX Sec. 8.2.1.2. */
-#define STDIN_FILENO       0	/* file descriptor for stdin */
-#define STDOUT_FILENO      1	/* file descriptor for stdout */
-#define STDERR_FILENO      2	/* file descriptor for stderr */
+#define STDIN_FILENO	0	/* file descriptor for stdin */
+#define STDOUT_FILENO	1	/* file descriptor for stdout */
+#define STDERR_FILENO	2	/* file descriptor for stderr */
 
 /* How to exit the system or stop a server process. */
-#define RBT_HALT	   0	/* shutdown and return to monitor */
-#define RBT_REBOOT	   1	/* reboot the system through the monitor */
-#define RBT_PANIC	   2	/* a server panics */
-#define RBT_MONITOR	   3	/* let the monitor do this */
-#define RBT_RESET	   4	/* hard reset the system */
-#define RBT_INVALID	   5	/* first invalid reboot flag */
+#define RBT_HALT	0	/* shutdown and return to monitor */
+#define RBT_REBOOT	1	/* reboot the system through the monitor */
+#define RBT_PANIC	2	/* a server panics */
+#define RBT_MONITOR	3	/* let the monitor do this */
+#define RBT_RESET	4	/* hard reset the system */
+#define RBT_INVALID	5	/* first invalid reboot flag */
 #define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to FS_PROC_NR by PM */
 
 /* What system info to retrieve with sysgetinfo(). */
-#define SI_KINFO	   0	/* get kernel info via PM */
-#define SI_PROC_ADDR	   1	/* address of process table */
-#define SI_PROC_TAB	   2	/* copy of entire process table */
-#define SI_DMAP_TAB	   3	/* get device <-> driver mappings */
-#define SI_MEM_ALLOC	   4	/* get memory allocation data */
-#define SI_DATA_STORE	   5	/* get copy of data store */
-#define SI_LOADINFO	   6	/* get copy of load average structure */
-#define SI_KPROC_TAB	   7	/* copy of kernel process table */
-#define SI_CALL_STATS	   8	/* system call statistics */
-#define SI_PCI_INFO	   9	/* get kernel info via PM */
+#define SI_KINFO	0	/* get kernel info via PM */
+#define SI_PROC_ADDR	1	/* address of process table */
+#define SI_PROC_TAB	2	/* copy of entire process table */
+#define SI_DMAP_TAB	3	/* get device <-> driver mappings */
+#define SI_MEM_ALLOC	4	/* get memory allocation data */
+#define SI_DATA_STORE	5	/* get copy of data store */
+#define SI_LOADINFO	6	/* get copy of load average structure */
+#define SI_KPROC_TAB	7	/* copy of kernel process table */
+#define SI_CALL_STATS	8	/* system call statistics */
+#define SI_PCI_INFO	9	/* get kernel info via PM */
 
 /* NULL must be defined in <nucleos/unistd.h> according to POSIX Sec. 2.7.1. */
-#define NULL    ((void *)0)
+#define NULL	((void *)0)
 
 /* The following relate to configurable system variables. POSIX Table 4-2. */
-#define _SC_ARG_MAX	   1
-#define _SC_CHILD_MAX	   2
-#define _SC_CLOCKS_PER_SEC 3
-#define _SC_CLK_TCK	   3
-#define _SC_NGROUPS_MAX	   4
-#define _SC_OPEN_MAX	   5
-#define _SC_JOB_CONTROL	   6
-#define _SC_SAVED_IDS	   7
-#define _SC_VERSION	   8
-#define _SC_STREAM_MAX	   9
-#define _SC_TZNAME_MAX    10
-#define _SC_PAGESIZE	  11
-#define _SC_PAGE_SIZE	  _SC_PAGESIZE
+#define _SC_ARG_MAX		1
+#define _SC_CHILD_MAX		2
+#define _SC_CLOCKS_PER_SEC	3
+#define _SC_CLK_TCK		3
+#define _SC_NGROUPS_MAX		4
+#define _SC_OPEN_MAX		5
+#define _SC_JOB_CONTROL		6
+#define _SC_SAVED_IDS		7
+#define _SC_VERSION		8
+#define _SC_STREAM_MAX		9
+#define _SC_TZNAME_MAX		10
+#define _SC_PAGESIZE		11
+#define _SC_PAGE_SIZE		_SC_PAGESIZE
 
 /* The following relate to configurable pathname variables. POSIX Table 5-2. */
-#define _PC_LINK_MAX	   1	/* link count */
-#define _PC_MAX_CANON	   2	/* size of the canonical input queue */
-#define _PC_MAX_INPUT	   3	/* type-ahead buffer size */
-#define _PC_NAME_MAX	   4	/* file name size */
-#define _PC_PATH_MAX	   5	/* pathname size */
-#define _PC_PIPE_BUF	   6	/* pipe size */
-#define _PC_NO_TRUNC	   7	/* treatment of long name components */
-#define _PC_VDISABLE	   8	/* tty disable */
-#define _PC_CHOWN_RESTRICTED 9	/* chown restricted or not */
+#define _PC_LINK_MAX		1	/* link count */
+#define _PC_MAX_CANON		2	/* size of the canonical input queue */
+#define _PC_MAX_INPUT		3	/* type-ahead buffer size */
+#define _PC_NAME_MAX		4	/* file name size */
+#define _PC_PATH_MAX		5	/* pathname size */
+#define _PC_PIPE_BUF		6	/* pipe size */
+#define _PC_NO_TRUNC		7	/* treatment of long name components */
+#define _PC_VDISABLE		8	/* tty disable */
+#define _PC_CHOWN_RESTRICTED	9	/* chown restricted or not */
 
 /* POSIX defines several options that may be implemented or not, at the
  * implementer's whim.  This implementer has made the following choices:
