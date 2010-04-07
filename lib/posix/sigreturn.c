@@ -20,10 +20,12 @@ int sigreturn(register struct sigcontext *scp)
 	 * a message is sent to restart the current process, who knows what will
 	 * be in the place formerly occupied by the message?
 	 */
-	int resultvar = 0;
+	register unsigned int resultvar = 0;
 	static int __msg[9];
 
 	__msg[1] = __NR_sigreturn;
+
+	resultvar = (unsigned int)__msg;
 
 	/* Protect against race conditions by blocking all interrupts. */
 	sigfillset(&set);		/* splhi */
@@ -31,7 +33,7 @@ int sigreturn(register struct sigcontext *scp)
 
 	__asm__ __volatile__(ASM_SYSCALL_CALL_SYSTEM
 		: "=a" (resultvar)
-		: "0"(__msg), "b"(scp), "c"(scp->sc_mask), "d"(scp->sc_flags)
+		: "0"(resultvar), "b"(scp), "c"(scp->sc_mask), "d"(scp->sc_flags)
 		: "memory", "cc"
 	);
 
