@@ -52,35 +52,43 @@ static struct endpt_args scall_to_srv[NR_syscalls];
 #define SCALL_TO_ANY(syscall, server) \
 	[ __NR_ ## syscall ] = { server, msg_ ## syscall }
 
+extern int __phys_strnlen(const char *s, size_t maxlen);
+
 static inline long strnlen_user(const char __user *s, size_t maxlen)
 {
-	char name[PATH_MAX];
 	unsigned long len = (VM_STACKTOP - (unsigned long)s);
+	phys_bytes linaddr;
 
 	/* We must not cross the top of stack during copy */
 	len = (len < maxlen) ? len : maxlen;
 
-	/* Just hang on for now
-	 * @nucleos: add kernel oops here
+	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len)))
+		return 0;
+
+	/* might fault */
+	catch_pagefaults++;
+	/* The __phys_strnlen returns the size _including_ the '\0'.
+	 * In case of exception in kernel returns 0.
 	 */
-	if (len > PATH_MAX)
-		for(;;);
+	len = __phys_strnlen((const char __user*)linaddr, len);
+	catch_pagefaults--;
 
-	copy_from_user(name, s, len);
-
-	/* Return the length of string _including_ the NULL character */
-	return strnlen(name, len) + 1;
+	return len;
 }
 
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
 	message __user *msg = (message*)r->ax;
+	int err = 0;
 
 	memset(&kmsg, 0, sizeof(message));
 
 	/* copy the message from caller (user) space */
-	copy_from_user(&kmsg, msg, sizeof(message));
+	if (copy_from_user(&kmsg, msg, sizeof(message))) {
+		err = -EFAULT;
+		goto fail_map;
+	}
 
 	/* `m_type' contains syscall number */
 	proc_ptr->syscall_0x80 = kmsg.m_type;
@@ -93,32 +101,45 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	r->ax = kmsg.m_type;
 
 	/* don't cross the range */
-	if (r->ax >= NR_syscalls)
-		goto err_nosys;
+	if (!r->ax || r->ax >= NR_syscalls) {
+		err = -EFAULT;
+		goto fail_map;
+	}
 
 	/* fill the message according to passed arguments */
-	if (scall_to_srv[r->ax].fill_msg)
-		scall_to_srv[r->ax].fill_msg(&kmsg, r);
-	else
-		goto err_nosys;
+	if (!scall_to_srv[r->ax].fill_msg) {
+		err = -ENOSYS;
+		goto fail_map;
+	}
 
-	/* save all these regs and then retore them on exit (arch_finish_check) */
-	proc_ptr->clobregs[CLOBB_REG_EBX] = r->bx;
-	proc_ptr->clobregs[CLOBB_REG_ECX] = r->cx;
-	proc_ptr->clobregs[CLOBB_REG_EDX] = r->dx;
-	proc_ptr->clobregs[CLOBB_REG_ESI] = r->si;
-	proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
-	proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
+	if ((err = scall_to_srv[r->ax].fill_msg(&kmsg, r)) < 0) {
+		goto fail_map;
+	}
+
+	if (r->ax != __NR_sigreturn) {
+		/* save all these regs and then retore them on kernel exit */
+		proc_ptr->clobregs[CLOBB_REG_EBX] = r->bx;
+		proc_ptr->clobregs[CLOBB_REG_ECX] = r->cx;
+		proc_ptr->clobregs[CLOBB_REG_EDX] = r->dx;
+		proc_ptr->clobregs[CLOBB_REG_ESI] = r->si;
+		proc_ptr->clobregs[CLOBB_REG_EDI] = r->di;
+		proc_ptr->clobregs[CLOBB_REG_EBP] = r->bp;
+	}
 
 	/* sligh check whether the endpoint is valid */
-	if (scall_to_srv[r->ax].endpt == ENDPT_ANY)
-		goto err_nosys;
+	if (scall_to_srv[r->ax].endpt == ENDPT_ANY) {
+		err = -EFAULT;
+		goto fail_map;
+	}
 
 	/* @nucleos: This mapping _must_ change in the future. It is here because of current
 	 *           kIPC. It requires to have message in caller's (user's) space.
 	 */
 	/* copy the filled message into caller (user) space */
-	copy_to_user(msg, &kmsg, sizeof(message));
+	if (copy_to_user(msg, &kmsg, sizeof(message))) {
+		err = -EFAULT;
+		goto fail_map;
+	}
 
 	r->ax = scall_to_srv[r->ax].endpt;
 	r->bx = (unsigned long)msg;
@@ -129,23 +150,21 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 
 	return r->ax;
 
-err_nosys:
+fail_map:
 	proc_ptr->syscall_0x80 = 0;
+	proc_ptr->p_reg.retreg = err;
 
-	/* @nucleos: this is ignored and the syscall result is got from message */
-	proc_ptr->p_reg.retreg = -ENOSYS;
-
-	/* set errno and copy back to user */
-	kmsg.m_type = -ENOSYS;
-	copy_to_user(msg, &kmsg, sizeof(message));
-
-	return -ENOSYS;
+	return err;
 }
 
 static int msg_access(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	msg->m3_i2 = r->cx;		/* mode */
 
 	return 0;
@@ -170,6 +189,9 @@ static int msg_chdir(message *msg, const struct pt_regs *r)
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	return 0;
 }
 
@@ -177,6 +199,10 @@ static int msg_chmod(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -186,6 +212,10 @@ static int msg_chown(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_i2 = (uid_t)r->cx;	/* owner */
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 
@@ -196,6 +226,9 @@ static int msg_chroot(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* path */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m3_i1)
+		return -EFAULT;
 
 	return 0;
 }
@@ -221,6 +254,10 @@ static int msg_creat(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -245,6 +282,10 @@ static int msg_exec(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* filename */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (char*)r->cx;	/* frame */
 	msg->m1_i2 = r->dx;		/* frame_size */
 
@@ -465,8 +506,15 @@ static int msg_link(message *msg, const struct pt_regs *r)
 	msg->m1_p1 = (char*)r->bx;	/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (char*)r->cx;	/* newpath */
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
+
+	if (!msg->m1_i2)
+		return -EFAULT;
+
 
 	return 0;
 }
@@ -495,6 +543,10 @@ static int msg_lstat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (char*)r->cx;	/* buffer */
 
 	return 0;
@@ -504,6 +556,10 @@ static int msg_mkdir(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -513,6 +569,10 @@ static int msg_mknod(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *) r->bx;		/* pathname */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_i2 = (mode_t)r->cx;		/* mode */
 	msg->m1_i3 = (dev_t)r->dx;		/* device */
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
@@ -531,7 +591,8 @@ static int msg_mmap(message *msg, const struct pt_regs *r)
 		unsigned long offset;
 	} parm;
 
-	copy_from_user(&parm, (void*)r->bx, sizeof(struct mmap_arg_struct));
+	if (copy_from_user(&parm, (void*)r->bx, sizeof(struct mmap_arg_struct)))
+		return -EFAULT;
 
 	msg->m_type = NNR_VM_MMAP;	/* VM syscall number */
 
@@ -550,8 +611,14 @@ static int msg_mount(message *msg, const struct pt_regs *r)
 	msg->m1_p1 = (char *)r->bx;	/* special */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (char *)r->cx;	/* name */
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
+
+	if (!msg->m1_i2)
+		return -EFAULT;
 
 	msg->m1_i3 = r->dx;		/* mountflags */
 	msg->m1_p3 = (char *)r->si;	/* ep */
@@ -583,6 +650,10 @@ static int msg_open(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* pathname */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_i2 = r->cx;		/* flags */
 	msg->m1_i3 = (mode_t)r->dx;	/* mode */
 
@@ -626,6 +697,10 @@ static int msg_readlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 	msg->m1_i2 = r->dx;		/* bufsiz */
 
@@ -645,8 +720,15 @@ static int msg_rename(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (void *)r->cx;	/* newpath */
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
+
+	if (!msg->m1_i2)
+		return -EFAULT;
 
 	return 0;
 }
@@ -655,6 +737,9 @@ static int msg_rmdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m3_i1)
+		return -EFAULT;
 
 	return 0;
 }
@@ -795,6 +880,10 @@ static int msg_stat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 
 	return 0;
@@ -822,8 +911,15 @@ static int msg_symlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;		/* oldpath */
 	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m1_i1)
+		return -EFAULT;
+
 	msg->m1_p2 = (char *)r->cx;		/* newpath */
 	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
+
+	if (!msg->m1_i2)
+		return -EFAULT;
 
 	return 0;
 }
@@ -860,6 +956,10 @@ static int msg_truncate(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;		/* path */
 	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m2_i1)
+		return -EFAULT;
+
 	msg->m2_l1 = (off_t)r->cx;		/* length */
 
 	return 0;
@@ -877,6 +977,9 @@ static int msg_umount(message *msg, const struct pt_regs *r)
 	msg->m3_p1 = (char *)r->bx;	/* target */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	return 0;
 }
 
@@ -885,6 +988,9 @@ static int msg_unlink(message *msg, const struct pt_regs *r)
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
 	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
 
+	if (!msg->m3_i1)
+		return -EFAULT;
+
 	return 0;
 }
 
@@ -892,6 +998,10 @@ static int msg_utime(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;	/* filename */
 	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX);
+
+	if (!msg->m2_i2)
+		return -EFAULT;
+
 	msg->m2_l1 = r->cx;		/* times pointer */
 
 	return 0;

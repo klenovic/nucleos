@@ -611,5 +611,50 @@ getcr3val:
 	mov	%eax, thecr3
 	ret
 
+/**
+ * strnlen_user: - Get the size of a string specified by linear address.
+ * @s: The string to measure (linear address).
+ * @n: The maximum valid length
+ *
+ * Get the size of a NUL-terminated string.
+ *
+ * Returns the size of the string _including_ the terminating NUL.
+ * On kernel exception, returns 0.
+ * If the string is too long, returns a value greater than @n.
+ */
+.globl __phys_strnlen
+__phys_strnlen:
+	cld
+	push	%es
+	mov	$FLAT_DS_SELECTOR, %eax
+	mov	%ax, %es
+
+	mov	8(%esp), %ecx	/* get s */
+	mov	8+4(%esp), %edx	/* get maxlen */
+	mov	%ecx, %eax
+	jmp	2f
+1:
+	cmpb	$0, %es:(%eax)	/* compare with '\0' */
+	je	3f		/* '\0'? */
+	inc	%eax		/* next char */
+2:
+	dec	%edx		/* decrement maxlen by 1 (preserve CF flag) */
+	cmp	$-1, %edx	/* compare,  %edx = %edx - $1 */
+	jne	1b		/* is result zero (ZF==1)? */
+3:
+	sub	%ecx, %eax	/* %eax = %eax - %ecx or maxlen */
+
+.globl __phys_strnlen_fault
+__phys_strnlen_fault:		/* kernel can send us here */
+	inc	%eax		/* including '\0' or maxlen+1 */
+	pop	%es
+	ret
+
+.globl __phys_strnlen_fault_in_kernel
+__phys_strnlen_fault_in_kernel:	/* kernel can send us here */
+	xor	%eax, %eax	/* returns 0 in this case */
+	pop	%es
+	ret
+
 .section .data
 idt_zero: .long 0, 0

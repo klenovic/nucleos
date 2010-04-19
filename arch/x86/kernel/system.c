@@ -538,23 +538,32 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		p_status = (int*)proc->clobregs[CLOBB_REG_ECX];
 		break;
 
-	case __NR_ptrace:
-		/* @nucleos: The current implementation (in PM) saves
-		 *           the return value into m2_l2 member which
-		 *           was used as the address of user `data'.
-		 *           This `data' is passed via %esi register
-		 *           which is saved (as others GP registers).
-		 */
-		p_data = (void*)proc->clobregs[CLOBB_REG_ESI];
-		data = proc->p_delivermsg.m2_l2;
+	case __NR_ptrace: {
+		/* request is saved in %ebx register */
+		int req = proc->clobregs[CLOBB_REG_EBX];
 
-		if (p_data)
-			copy_to_user(p_data, &data, sizeof(long));
+		if (req > 0 && req < 4) {
+			/* The T_GETINS, T_GETDATA, T_GETUSER cases. */
+
+			/* @nucleos: The current implementation (in PM) saves
+			 *           the return value into m2_l2 member which
+			 *           was used as the address of user `data'.
+			 *           This `data' is passed via %esi register
+			 *           which is saved (as others GP registers).
+			 */
+			p_data = (void*)proc->clobregs[CLOBB_REG_ESI];
+			data = proc->p_delivermsg.m2_l2;
+
+			if (p_data && copy_to_user(p_data, &data, sizeof(long)))
+				proc->p_reg.retreg = -EFAULT;
+		}
+
 		break;
+		}
 	}
 
-	if (wait_waitpid && p_status)
-		copy_to_user(p_status, &status, sizeof(int));
+	if (wait_waitpid && p_status && copy_to_user(p_status, &status, sizeof(int)))
+		proc->p_reg.retreg = -EFAULT;
 
 	proc->p_reg.bx = proc->clobregs[CLOBB_REG_EBX];
 	proc->p_reg.cx = proc->clobregs[CLOBB_REG_ECX];

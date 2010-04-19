@@ -36,6 +36,8 @@ static inline unsigned long copy_to_user(void __user *to, const void *from, unsi
 		return -EFAULT;
 	}
 
+	vm_set_cr3(proc_ptr);
+
 	/* We must use this version of phys_copy (wrapper) because a pagefault
 	 * exception may occur during copy and we want to handle it.
 	 */
@@ -66,6 +68,8 @@ static inline unsigned long copy_from_user(void *to, const void __user *from, un
 	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)from, n))) {
 		return -EFAULT;
 	}
+
+	vm_set_cr3(proc_ptr);
 
 	/* We must use this version of phys_copy (wrapper) because a pagefault
 	 * exception may occur during copy and we want to handle it.

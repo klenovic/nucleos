@@ -23,6 +23,10 @@
 extern int vm_copy_in_progress, catch_pagefaults;
 extern struct proc *vm_copy_from, *vm_copy_to;
 
+extern unsigned long __phys_strnlen;
+extern unsigned long __phys_strnlen_fault;
+extern unsigned long __phys_strnlen_fault_in_kernel;
+
 void pagefault( struct proc *pr,
 		struct exception_frame * frame,
 		int is_nested)
@@ -32,6 +36,7 @@ void pagefault( struct proc *pr,
 	u32_t pte;
 	int procok = 0, pcok = 0, rangeok = 0;
 	int in_physcopy = 0;
+	int in_phys_strnlen = 0;
 
 	reg_t pagefaultcr2;
 
@@ -51,15 +56,26 @@ void pagefault( struct proc *pr,
 	in_physcopy = (frame->eip > (vir_bytes) phys_copy) &&
 		      (frame->eip < (vir_bytes) phys_copy_fault);
 
+	in_phys_strnlen = (frame->eip > (vir_bytes) __phys_strnlen) &&
+			  (frame->eip < (vir_bytes) __phys_strnlen_fault);
+
 	if((is_nested || iskernelp(pr)) &&
-		catch_pagefaults && in_physcopy) {
+		catch_pagefaults && (in_physcopy || in_phys_strnlen)) {
 #if 0
 		printf("pf caught! addr 0x%lx\n", pagefaultcr2);
 #endif
 		if (is_nested) {
-			frame->eip = (reg_t) phys_copy_fault_in_kernel;
+			if (in_physcopy)
+				frame->eip = (reg_t) phys_copy_fault_in_kernel;
+			else if (in_phys_strnlen)
+				frame->eip = (reg_t) __phys_strnlen_fault_in_kernel;
+
 		} else {
-			pr->p_reg.pc = (reg_t) phys_copy_fault;
+			if (in_physcopy)
+				pr->p_reg.pc = (reg_t) phys_copy_fault;
+			else if (in_phys_strnlen)
+				pr->p_reg.pc = (reg_t) __phys_strnlen_fault;
+
 			pr->p_reg.retreg = pagefaultcr2;
 		}
 
