@@ -41,9 +41,9 @@ int scall_utime(void)
 
 	/* Adjust for case of 'timep' being NULL;
 	 * utime_strlen then holds the actual size: strlen(name)+1 */
-	len = m_in.utime_strlen;
+//	len = m_in.utime_strlen;
 
-	if (fetch_name(m_in.utime_file, len) != 0)
+	if (fetch_name(m_in.utime_file) != 0)
 		return(err_code);
 
 	if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);

@@ -115,7 +115,7 @@ int len;			/* length of the directory name string */
   int r;
 
   /* Try to open the directory */
-  if (fetch_name(name_ptr, len) != 0) return(err_code);
+  if (fetch_name(name_ptr) != 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   return change_into(iip, vp);
 }
@@ -159,7 +159,7 @@ int do_stat()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
+  if (fetch_name(m_in.name1) != 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
 
@@ -218,7 +218,7 @@ int do_lstat()
   struct vnode *vp;
   int r;
 
-  if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
+  if (fetch_name(m_in.name1) != 0) return(err_code);
   if ((vp = eat_path(PATH_RET_SYMLINK)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
 

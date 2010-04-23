@@ -224,7 +224,7 @@ int scall_utime(void);
 time_t clock_time(void);
 unsigned conv2(int norm, int w);
 long conv4(int norm, long x);
-int fetch_name(char *path, int len);
+int fetch_name(char *path);
 int no_sys(void);
 int isokendpt_f(char *f, int l, int e, int *p, int ft);
 void panic(char *who, char *mess, int num);

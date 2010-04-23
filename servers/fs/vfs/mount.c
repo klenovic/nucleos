@@ -131,7 +131,7 @@ static int mount_fs(endpoint_t fs_e)
   mount_m_in.fs_endpt = (char *) ENDPT_NONE;
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
+  if (fetch_name(m_in.name1) != 0) return(err_code);
   if ((dev = name_to_dev()) == NO_DEV) return(err_code);
 
   /* Check whether there is a block special file open which uses the 
@@ -187,7 +187,7 @@ static int mount_fs(endpoint_t fs_e)
 		panic("vfs", "inconsistency remounting old root", NO_NUM);
 
 	/* Now get the inode of the file to be mounted on. */
-	if (fetch_name(m_in.name2, m_in.name2_length)!=0) return(err_code);
+	if (fetch_name(m_in.name2)!=0) return(err_code);
 	if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
 	if (vp->v_ref_count != 1) {
 		put_vnode(vp);
@@ -218,7 +218,7 @@ static int mount_fs(endpoint_t fs_e)
   }
 
   /* Fetch the name of the mountpoint */
-  if (fetch_name(m_in.name2, m_in.name2_length) != 0) return(err_code);
+  if (fetch_name(m_in.name2) != 0) return(err_code);
   isroot= (strcmp(user_fullpath, "/") == 0);
   replace_root= (isroot && allow_newroot);
 
@@ -341,7 +341,7 @@ int do_umount()
   if (!super_user) return(-EPERM);
 
   /* If 'name' is not for a block special file, return error. */
-  if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
+  if (fetch_name(m_in.name) != 0) return(err_code);
   if ( (dev = name_to_dev()) == NO_DEV) return(err_code);
   return unmount(dev);
 }

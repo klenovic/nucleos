@@ -18,53 +18,61 @@
  *   conv2:	  do byte swapping on a 16-bit int
  *   conv4:	  do byte swapping on a 32-bit long
  */
-
 #include "fs.h"
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/unistd.h>
+#include <nucleos/string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "file.h"
 #include <servers/vfs/fproc.h>
+#include <asm/servers/vm/memory.h>
+
+#include "file.h"
 #include "param.h"
 #include "vmnt.h"
 
-/*===========================================================================*
- *				fetch_name				     *
- *===========================================================================*/
-int fetch_name(path, len)
-char *path;			/* pointer to the path in user space */
-int len;			/* path length, including 0 byte */
+/**
+ * Fetch name
+ * @path  pointer to the path in user space
+ */
+int fetch_name(char *path)
 {
-/* Go get path and put it in 'user_fullpath'. Copy it from user space. */
-  register char *rpu, *rpm;
-  int r, count;
+	/* Go get path and put it in 'user_fullpath'. Copy it from user space. */
+	int ret;
+	int len = (VM_STACKTOP - (unsigned long)path);
 
-  if (len > PATH_MAX) {
-	err_code = -ENAMETOOLONG;
-	return(-EGENERIC);
-  }
+	len = (len < PATH_MAX) ? len : PATH_MAX;
+	len = (len <= 0) ? PATH_MAX : len;
 
-  if(len >= sizeof(user_fullpath)) 
-	panic(__FILE__, "fetch_name: len too much for user_fullpath", len);
+	if(len >= sizeof(user_fullpath))
+		panic(__FILE__, "fetch_name: len too much for user_fullpath", len);
 
-  /* Check name length for validity. */
-  if (len <= 0) {
-	err_code = -EINVAL;
-	return(-EGENERIC);
-  }
+	memset(user_fullpath, 0, sizeof(user_fullpath));
 
 	/* String is not contained in the message.  Get it from user space. */
-	r = sys_datacopy(who_e, (vir_bytes) path,
-		FS_PROC_NR, (vir_bytes) user_fullpath, (phys_bytes) len);
+	ret = sys_datacopy(who_e, (vir_bytes)path,
+		FS_PROC_NR, (vir_bytes)user_fullpath, (phys_bytes)len);
 
-  if(user_fullpath[len-1] != '\0') {
-  	err_code = -ENAMETOOLONG;
-  	return(-EGENERIC);
-  }
+	len = strnlen(user_fullpath, len) + 1;
 
-  return(r);
+	if (len > PATH_MAX) {
+		err_code = -ENAMETOOLONG;
+		return err_code;
+	}
+
+	/* Check name length for validity. */
+	if (len <= 0) {
+		err_code = -EINVAL;
+		return err_code;
+	}
+
+	if (user_fullpath[len-1] != '\0') {
+		err_code = -ENAMETOOLONG;
+		return err_code;
+	}
+
+	return ret;
 }
 
 /*===========================================================================*
@@ -133,4 +141,3 @@ time_t clock_time()
 
   return( (time_t) (boottime + (uptime/system_hz)));
 }
-

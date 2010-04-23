@@ -54,7 +54,7 @@ int do_creat()
 /* Perform the creat(name, mode) system call. */
   int r;
 
-  if (fetch_name(m_in.name, m_in.name_length) != 0) return(err_code);
+  if (fetch_name(m_in.name) != 0) return(err_code);
   r = common_open(O_WRONLY | O_CREAT | O_TRUNC, (mode_t) m_in.mode);
   return(r);
 }
@@ -67,7 +67,7 @@ int scall_open()
 	/* Perform the open(name, flags,...) system call. */
 	int r;
 
-	r = fetch_name(m_in.m1_p1, m_in.m1_i1);
+	r = fetch_name(m_in.m1_p1);
 
 	if (r != 0) {
 		return(err_code); /* name was bad */
@@ -344,7 +344,7 @@ int do_mknod()
   bits = (mode_bits & I_TYPE) | (mode_bits & ALL_MODES & fp->fp_umask);
   
   /* Open directory that's going to hold the new node. */
-  if(fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
+  if(fetch_name(m_in.name1) != 0) return(err_code);
   if((vp = last_dir()) == NIL_VNODE) return(err_code);
 
   /* Make sure that the object is a directory */
@@ -373,7 +373,7 @@ int do_mkdir()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1, m_in.name1_length) != 0) return(err_code);
+  if (fetch_name(m_in.name1) != 0) return(err_code);
 
   bits = I_DIRECTORY | (m_in.mode & RWX_MODES & fp->fp_umask);
 
