@@ -44,11 +44,11 @@ int do_link()
   struct vnode *vp, *vp_d;
 
   /* See if 'name1' (file to be linked to) exists. */ 
-  if(fetch_name(m_in.name1) != 0) return(err_code);
+  if(fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
 
   /* Does the final directory of 'name2' exist? */
-  if (fetch_name(m_in.name2) != 0) 
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name2) < 0)
 	r = err_code;
   else if ((vp_d = last_dir()) == NIL_VNODE)
 	r = err_code; 
@@ -88,7 +88,7 @@ int do_unlink()
   int r;
   
   /* Get the last directory in the path. */
-  if (fetch_name(m_in.name) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name) < 0) return(err_code);
   if ((vldirp = last_dir()) == NIL_VNODE) return(err_code);
 
   /* Make sure that the object is a directory */
@@ -142,7 +142,7 @@ int do_rename()
   char old_name[PATH_MAX+1];
   
   /* See if 'name1' (existing file) exists.  Get dir and file inodes. */
-  if (fetch_name(m_in.name1) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
   if ((old_dirp = last_dir()) == NIL_VNODE) return(err_code);
   
   /* If the sticky bit is set, only the owner of the file or a privileged
@@ -170,7 +170,7 @@ int do_rename()
   strcpy(old_name, user_fullpath);
 
   /* See if 'name2' (new name) exists.  Get dir inode */
-  if (fetch_name(m_in.name2) != 0)
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name2) < 0)
 	r = err_code;
   else if ((new_dirp = last_dir()) == NIL_VNODE)
 	r = err_code; 
@@ -209,7 +209,7 @@ int do_truncate()
   int r;
 
   /* Temporarily open file */
-  if (fetch_name(m_in.m2_p1) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.m2_p1) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   
   /* Ask FS to truncate the file */
@@ -256,33 +256,43 @@ off_t newsize;
   return(r);
 }
 
-
 /*===========================================================================*
  *                             do_slink					     *
  *===========================================================================*/
 int scall_symlink(void)
 {
-/* Perform the symlink(name1, name2) system call. */
-  int r, linklen;
-  struct vnode *vp;
-  char string[NAME_MAX];       /* last component of the new dir's path name */
+	/* Perform the symlink(oldpath=name1, newpath=name2) system call. */
+	int r;
+	int oldpath_len;
+	struct vnode *vp;
+	char oldpath[PATH_MAX+1];       /* last component of the new dir's path name */
 
-  if(m_in.name1_length <= 1) return(-ENOENT);
-  if(m_in.name1_length >= SYMLINK_MAX) return(-ENAMETOOLONG);
+	if((oldpath_len = fetch_name(oldpath, PATH_MAX, m_in.name1)) < 0)
+		return(err_code);
 
-  /* Get dir inode of 'name2' */
-  if(fetch_name(m_in.name2) != 0) return(err_code);
-  if ((vp = last_dir()) == NIL_VNODE) return(err_code);
+	if(oldpath_len <= 1)
+		return(-ENOENT);
 
-  if ((r = forbidden(vp, W_BIT|X_BIT)) == 0) {
-	r = req_slink(vp->v_fs_e, vp->v_inode_nr, user_fullpath, who_e,
-		      m_in.name1, m_in.name1_length - 1, fp->fp_effuid,
-		      fp->fp_effgid);
-  }
+	if(oldpath_len >= SYMLINK_MAX)
+		return(-ENAMETOOLONG);
+
+	/* Get dir inode of 'name2' */
+	if(fetch_name(user_fullpath, PATH_MAX, m_in.name2) < 0)
+		return(err_code);
+
+	if ((vp = last_dir()) == NIL_VNODE)
+		return(err_code);
+
+	if ((r = forbidden(vp, W_BIT|X_BIT)) == 0) {
+		r = req_slink(vp->v_fs_e, vp->v_inode_nr, user_fullpath, who_e,
+			      m_in.name1, oldpath_len - 1, fp->fp_effuid,
+			      fp->fp_effgid);
+	}
 
 	put_vnode(vp);
-  return(r);
-  }
+
+	return(r);
+}
 
 /*===========================================================================*
  *                             do_readlink                                    *
@@ -297,7 +307,7 @@ int do_readlink()
   if(copylen < 0) return(-EINVAL);
 
   /* Temporarily open the file containing the symbolic link */
-  if (fetch_name(m_in.name1) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
   if ((vp = eat_path(PATH_RET_SYMLINK)) == NIL_VNODE) return(err_code);
 
   /* Make sure this is a symbolic link */

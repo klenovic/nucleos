@@ -33,7 +33,7 @@
 #include "vnode.h"
 #include "vmnt.h"
 
-static int change(struct vnode **iip, char *name_ptr, int len);
+static int change(struct vnode **iip, char *name_ptr);
 static int change_into(struct vnode **iip, struct vnode *vp);
 
 /*===========================================================================*
@@ -86,7 +86,7 @@ int do_chdir()
   }
 
   /* Perform the chdir(name) system call. */
-  return change(&fp->fp_wd, m_in.name, m_in.name_length);
+  return change(&fp->fp_wd, m_in.name);
 }
 
 
@@ -98,24 +98,23 @@ int do_chroot()
 /* Perform the chroot(name) system call. */
 
   if (!super_user) return(-EPERM);	/* only su may chroot() */
-  return change(&fp->fp_rd, m_in.name, m_in.name_length);
+  return change(&fp->fp_rd, m_in.name);
 }
 
 
 /*===========================================================================*
  *				change					     *
  *===========================================================================*/
-static int change(iip, name_ptr, len)
+static int change(iip, name_ptr)
 struct vnode **iip;		/* pointer to the inode pointer for the dir */
 char *name_ptr;			/* pointer to the directory name to change to */
-int len;			/* length of the directory name string */
 {
 /* Do the actual work for chdir() and chroot(). */
   struct vnode *vp;
   int r;
 
   /* Try to open the directory */
-  if (fetch_name(name_ptr) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, name_ptr) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   return change_into(iip, vp);
 }
@@ -159,7 +158,7 @@ int do_stat()
   int r;
   struct vnode *vp;
 
-  if (fetch_name(m_in.name1) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
 
@@ -218,7 +217,7 @@ int do_lstat()
   struct vnode *vp;
   int r;
 
-  if (fetch_name(m_in.name1) != 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
   if ((vp = eat_path(PATH_RET_SYMLINK)) == NIL_VNODE) return(err_code);
   r= req_stat(vp->v_fs_e, vp->v_inode_nr, who_e, m_in.name2, 0);
 

@@ -72,9 +72,9 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	bfmt_param.proc_e = proc_e;
 
 	/* Get the exec file name. */
-	r = fetch_name(path);
+	r = fetch_name(user_fullpath, PATH_MAX, path);
 
-	if (r != 0) {
+	if (r < 0) {
 		printf("pm_exec: fetch_name failed\n");
 		printf("return at %s, %d\n", __FILE__, __LINE__);
 
@@ -158,9 +158,9 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		app_dbg("Continue processing...\n");
 #endif
 		/* Get fresh copy of the file name. */
-		r = fetch_name(path);
+		r = fetch_name(user_fullpath, PATH_MAX, path);
 
-		if (r != 0) {
+		if (r < 0) {
 			printf("pm_exec: 2nd fetch_name failed\n");
 			put_vnode(vp);
 			return(r); /* strange */

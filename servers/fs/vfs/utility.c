@@ -33,30 +33,34 @@
 #include "vmnt.h"
 
 /**
- * Fetch name
- * @path  pointer to the path in user space
+ * Fetch path name
+ * @buff  output buffer with the path
+ * @size  the max.length of the path
+ * @path  pointer to the path in the user space
+ * @return length of the path _including_ '\0'; negative otherwise
  */
-int fetch_name(char *path)
+int fetch_name(char *buff, const int pathmax, char __user *path)
 {
 	/* Go get path and put it in 'user_fullpath'. Copy it from user space. */
 	int ret;
 	int len = (VM_STACKTOP - (unsigned long)path);
 
-	len = (len < PATH_MAX) ? len : PATH_MAX;
-	len = (len <= 0) ? PATH_MAX : len;
+	if (!buff || !pathmax || pathmax < 0)
+		return -EINVAL;
 
-	if(len >= sizeof(user_fullpath))
-		panic(__FILE__, "fetch_name: len too much for user_fullpath", len);
-
-	memset(user_fullpath, 0, sizeof(user_fullpath));
+	len = (len < pathmax) ? len : pathmax;
+	len = (len <= 0) ? pathmax : len;
 
 	/* String is not contained in the message.  Get it from user space. */
 	ret = sys_datacopy(who_e, (vir_bytes)path,
-		FS_PROC_NR, (vir_bytes)user_fullpath, (phys_bytes)len);
+			   FS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
 
-	len = strnlen(user_fullpath, len) + 1;
+	if (ret)
+		return -EFAULT;
 
-	if (len > PATH_MAX) {
+	len = strnlen(buff, len) + 1;
+
+	if (len > pathmax) {
 		err_code = -ENAMETOOLONG;
 		return err_code;
 	}
@@ -67,12 +71,12 @@ int fetch_name(char *path)
 		return err_code;
 	}
 
-	if (user_fullpath[len-1] != '\0') {
+	if (buff[len-1] != '\0') {
 		err_code = -ENAMETOOLONG;
 		return err_code;
 	}
 
-	return ret;
+	return len;
 }
 
 /*===========================================================================*
