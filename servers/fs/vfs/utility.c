@@ -51,12 +51,15 @@ int fetch_name(char *buff, const int pathmax, char __user *path)
 	len = (len < pathmax) ? len : pathmax;
 	len = (len <= 0) ? pathmax : len;
 
-	/* String is not contained in the message.  Get it from user space. */
+	/* String is not contained in the message. Get it from user space. */
 	ret = sys_datacopy(who_e, (vir_bytes)path,
 			   FS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
 
-	if (ret)
-		return -EFAULT;
+	if (ret) {
+		/* Blindly ignore it for now! */
+		/* err_code = -EFAULT;
+		   return -EFAULT; */
+	}
 
 	len = strnlen(buff, len) + 1;
 
