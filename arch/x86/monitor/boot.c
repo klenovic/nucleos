@@ -143,7 +143,6 @@ void readblock(off_t blk, char *buf, int block_size)
 }
 
 #define istty     (1)
-#define alarm(n)  (0)
 
 char *readline(void)
 /* Read a line including a newline with echoing. */
@@ -1262,8 +1261,6 @@ static u32_t Tbase, Tcount;
 void unschedule(void)
 /* Invalidate a waiting command. */
 {
-  alarm(0);
-
   if (Thandler != nil) {
     free(Thandler);
     Thandler= nil;
@@ -1277,7 +1274,6 @@ void schedule(long msec, char *cmd)
   Thandler= cmd;
   Tbase= milli_time();
   Tcount= msec;
-  alarm(1);
 }
 
 int expired(void)
@@ -1293,8 +1289,6 @@ void delay(char *msec)
 
   if ((count= a2l(msec)) == 0) return;
   base= milli_time();
-
-  alarm(1);
 
   do {
     monitor_pause();
@@ -1357,6 +1351,9 @@ void menu(void)
       case USERFUN:
       case SELECT:
         if (c == e->arg[0]) choice= e->value;
+	break;
+      case NOFUN:
+	break;
       }
     }
   } while (choice == nil);
