@@ -7,20 +7,17 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* This file, mpx386.s, is included by mpx.s when Minix is compiled for 
-   32-bit Intel CPUs. The alternative mpx88.s is compiled for 16-bit CPUs.
-
-   This file is part of the lowest layer of the Nucleos kernel.  (The other part
+/* This file is part of the lowest layer of the Nucleos kernel. (The other part
    is "proc.c".)  The lowest layer does process switching and message handling.
-   Furthermore it contains the assembler startup code for Minix and the 32-bit
-   interrupt handlers.  It cooperates with the code in "start.c" to set up a 
+   Furthermore it contains the assembler startup code for Nucleos and the 32-bit
+   interrupt handlers.  It cooperates with the code in "start.c" to set up a
    good environment for main().
 
-   Every transition to the kernel goes through this file.  Transitions to the 
-   kernel may be nested.  The initial entry may be with a system call (i.e., 
-   send or receive a message), an exception or a hardware interrupt;  kernel 
-   reentries may only be made by hardware interrupts.  The count of reentries 
-   is kept in "k_reenter". It is important for deciding whether to switch to 
+   Every transition to the kernel goes through this file.  Transitions to the
+   kernel may be nested.  The initial entry may be with a system call (i.e.,
+   send or receive a message), an exception or a hardware interrupt;  kernel
+   reentries may only be made by hardware interrupts.  The count of reentries
+   is kept in "k_reenter". It is important for deciding whether to switch to
    the kernel stack and for protecting the message passing code in "proc.c".
 
    For the message passing trap, most of the machine state is saved in the
