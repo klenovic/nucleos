@@ -158,7 +158,7 @@ static u32_t findhole(pt_t *pt, u32_t vmin, u32_t vmax)
  * between page-aligned BYTE offsets vmin and vmax, to fit
  * a page in. Return byte offset.
  */
-	u32_t freefound = 0, curv;
+	u32_t curv;
 	int pde = 0, try_restart;
 	static u32_t lastv = 0;
 
@@ -297,7 +297,6 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 	vm_assert(level <= 2);
 
 	if(level > 1 || !(vmp->vm_flags & VMF_HASPT) || !meminit_done) {
-		int r;
 		void *s;
 		s=vm_getsparepage((u32_t*)phys);
 		level--;
@@ -550,14 +549,13 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 int pt_checkrange(pt_t *pt, vir_bytes v,  size_t bytes,
 	int write)
 {
-	int p, pages, pde;
+	int p, pages;
 
 	vm_assert(!(bytes % I386_PAGE_SIZE));
 
 	pages = bytes / I386_PAGE_SIZE;
 
 	for(p = 0; p < pages; p++) {
-		u32_t entry;
 		int pde = I386_VM_PDE(v);
 		int pte = I386_VM_PTE(v);
 
@@ -636,7 +634,7 @@ int pt_identity(pt_t *pt)
 
 	/* Allocate page directory. */
         if(!pt->pt_dir &&
-          !(pt->pt_dir = vm_allocpage(&pt->pt_dir_phys, VMP_PAGEDIR))) {
+          !(pt->pt_dir = vm_allocpage((phys_bytes*)&pt->pt_dir_phys, VMP_PAGEDIR))) {
 		return -ENOMEM;
 	}
 
@@ -675,7 +673,6 @@ void pt_init(phys_bytes usedlimit)
         u32_t moveup = 0;
 	int global_bit_ok = 0;
 	int free_pde;
-	int p;
 	vir_bytes kernlimit;
 	vir_bytes sparepages_mem;
 	phys_bytes sparepages_ph;
@@ -738,9 +735,6 @@ void pt_init(phys_bytes usedlimit)
 
         /* Set up mappings for VM process. */
         for(v = lo; v < hi; v += I386_PAGE_SIZE)  {
-                phys_bytes addr;
-                u32_t flags; 
-        
                 /* We have to write the new position in the PT,
                  * so we can move our segments.
                  */ 
@@ -748,7 +742,7 @@ void pt_init(phys_bytes usedlimit)
                         I386_VM_PRESENT|I386_VM_WRITE|I386_VM_USER, 0) != 0)
                         vm_panic("pt_init: pt_writemap failed", NO_NUM);
         }
-       
+
         /* Move segments up too. */
         vmp->vm_arch.vm_seg[T].mem_phys += ABS2CLICK(moveup);
         vmp->vm_arch.vm_seg[D].mem_phys += ABS2CLICK(moveup);
@@ -789,7 +783,7 @@ void pt_init(phys_bytes usedlimit)
 	{
 		int kernmap_pde;
 		phys_bytes addr, len;
-		int flags, index;
+		int flags, index = 0;
 		u32_t offset = 0;
 
 		kernmap_pde = free_pde++;
@@ -876,7 +870,7 @@ void pt_init(phys_bytes usedlimit)
  *===========================================================================*/
 int pt_bind(pt_t *pt, struct vmproc *who)
 {
-	int slot, ispt;
+	int slot;
 	u32_t phys;
 
 	/* Basic sanity checks. */
@@ -924,7 +918,7 @@ void pt_free(pt_t *pt)
  *===========================================================================*/
 int pt_mapkernel(pt_t *pt)
 {
-	int r, i;
+	int i;
 
         /* Any i386 page table needs to map in the kernel address space. */
         vm_assert(vmproc[VMP_SYSTEM].vm_flags & VMF_INUSE);
