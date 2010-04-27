@@ -52,30 +52,6 @@ static struct endpt_args scall_to_srv[NR_syscalls];
 #define SCALL_TO_ANY(syscall, server) \
 	[ __NR_ ## syscall ] = { server, msg_ ## syscall }
 
-extern int __phys_strnlen(const char *s, size_t maxlen);
-
-static inline long strnlen_user(const char __user *s, size_t maxlen)
-{
-	unsigned long len = (VM_STACKTOP - (unsigned long)s);
-	phys_bytes linaddr;
-
-	/* We must not cross the top of stack during copy */
-	len = (len < maxlen) ? len : maxlen;
-
-	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len)))
-		return 0;
-
-	/* might fault */
-	catch_pagefaults++;
-	/* The __phys_strnlen returns the size _including_ the '\0'.
-	 * In case of exception in kernel returns 0.
-	 */
-	len = __phys_strnlen((const char __user*)linaddr, len);
-	catch_pagefaults--;
-
-	return len;
-}
-
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
 	message kmsg;
@@ -160,11 +136,6 @@ fail_map:
 static int msg_access(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
-
 	msg->m3_i2 = r->cx;		/* mode */
 
 	return 0;
@@ -179,7 +150,7 @@ static int msg_alarm(message *msg, const struct pt_regs *r)
 
 static int msg_brk(message *msg, const struct pt_regs *r)
 {
-	msg->PMBRK_ADDR = (void*)r->bx;		/* addr */
+	msg->PMBRK_ADDR = (void*)r->bx;	/* addr */
 
 	return 0;
 }
@@ -187,10 +158,6 @@ static int msg_brk(message *msg, const struct pt_regs *r)
 static int msg_chdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
 
 	return 0;
 }
@@ -198,11 +165,6 @@ static int msg_chdir(message *msg, const struct pt_regs *r)
 static int msg_chmod(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
-
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -211,11 +173,6 @@ static int msg_chmod(message *msg, const struct pt_regs *r)
 static int msg_chown(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_i2 = (uid_t)r->cx;	/* owner */
 	msg->m1_i3 = (gid_t)r->dx;	/* group */
 
@@ -225,10 +182,6 @@ static int msg_chown(message *msg, const struct pt_regs *r)
 static int msg_chroot(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* path */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
 
 	return 0;
 }
@@ -253,11 +206,6 @@ static int msg_cprof(message *msg, const struct pt_regs *r)
 static int msg_creat(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
-
 	msg->m3_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -281,11 +229,6 @@ static int msg_dup2(message *msg, const struct pt_regs *r)
 static int msg_exec(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* filename */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (char*)r->cx;	/* frame */
 	msg->m1_i2 = r->dx;		/* frame_size */
 
@@ -375,7 +318,7 @@ static int msg_getdents(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = r->bx;		/* descriptor */
 	msg->m1_p1 = (void*)r->cx;	/* struct. dirent */
-	msg->m1_i2 = (size_t)r->dx;		/* count */
+	msg->m1_i2 = (size_t)r->dx;	/* count */
 
 	return 0;
 }
@@ -403,7 +346,7 @@ static int msg_getgid(message *msg, const struct pt_regs *r)
 
 static int msg_getgroups(message *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* size */
+	msg->m1_i1 = r->bx;		/* size */
 	msg->m1_p1 = (gid_t*)r->cx;	/* list[] */
 
 	return 0;
@@ -496,7 +439,7 @@ static int msg_ioctl(message *msg, const struct pt_regs *r)
 static int msg_kill(message *msg, const struct pt_regs *r)
 {
 	msg->m1_i1 = (pid_t)r->bx;	/* pid */
-	msg->m1_i2 = r->cx;	/* sig */
+	msg->m1_i2 = r->cx;		/* sig */
 
 	return 0;
 }
@@ -504,17 +447,7 @@ static int msg_kill(message *msg, const struct pt_regs *r)
 static int msg_link(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (char*)r->cx;	/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
-
-	if (!msg->m1_i2)
-		return -EFAULT;
-
 
 	return 0;
 }
@@ -542,11 +475,6 @@ static int msg_lseek(message *msg, const struct pt_regs *r)
 static int msg_lstat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (char*)r->cx;	/* buffer */
 
 	return 0;
@@ -555,11 +483,6 @@ static int msg_lstat(message *msg, const struct pt_regs *r)
 static int msg_mkdir(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_i2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
@@ -568,11 +491,6 @@ static int msg_mkdir(message *msg, const struct pt_regs *r)
 static int msg_mknod(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *) r->bx;		/* pathname */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_i2 = (mode_t)r->cx;		/* mode */
 	msg->m1_i3 = (dev_t)r->dx;		/* device */
 	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
@@ -609,17 +527,7 @@ static int msg_mmap(message *msg, const struct pt_regs *r)
 static int msg_mount(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* special */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (char *)r->cx;	/* name */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
-
-	if (!msg->m1_i2)
-		return -EFAULT;
-
 	msg->m1_i3 = r->dx;		/* mountflags */
 	msg->m1_p3 = (char *)r->si;	/* ep */
 
@@ -639,7 +547,6 @@ static int msg_munmap(message *msg, const struct pt_regs *r)
 static int msg_munmap_text(message *msg, const struct pt_regs *r)
 {
 	msg->m_type = NNR_VM_MUNMAP_TEXT;	/* VM syscall number */
-
 	msg->VMUM_ADDR = (void*)r->bx;
 	msg->VMUM_LEN = (size_t)r->cx;
 
@@ -649,11 +556,6 @@ static int msg_munmap_text(message *msg, const struct pt_regs *r)
 static int msg_open(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* pathname */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_i2 = r->cx;		/* flags */
 	msg->m1_i3 = (mode_t)r->dx;	/* mode */
 
@@ -696,11 +598,6 @@ static int msg_read(message *msg, const struct pt_regs *r)
 static int msg_readlink(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 	msg->m1_i2 = r->dx;		/* bufsiz */
 
@@ -719,16 +616,7 @@ static int msg_reboot(message *msg, const struct pt_regs *r)
 static int msg_rename(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (void *)r->cx;	/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
-
-	if (!msg->m1_i2)
-		return -EFAULT;
 
 	return 0;
 }
@@ -736,10 +624,6 @@ static int msg_rename(message *msg, const struct pt_regs *r)
 static int msg_rmdir(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
 
 	return 0;
 }
@@ -778,7 +662,7 @@ static int msg_setgid(message *msg, const struct pt_regs *r)
 
 static int msg_setgroups(message *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* size */
+	msg->m1_i1 = r->bx;		/* size */
 	msg->m1_p1 = (gid_t*)r->cx;	/* *list */
 
 	return 0;
@@ -879,11 +763,6 @@ static int msg_sprof(message *msg, const struct pt_regs *r)
 static int msg_stat(message *msg, const struct pt_regs *r)
 {
 	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
 	msg->m1_p2 = (void *)r->cx;	/* buffer */
 
 	return 0;
@@ -909,17 +788,8 @@ static int msg_svrctl(message *msg, const struct pt_regs *r)
 
 static int msg_symlink(message *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;		/* oldpath */
-	msg->m1_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m1_i1)
-		return -EFAULT;
-
-	msg->m1_p2 = (char *)r->cx;		/* newpath */
-	msg->m1_i2 = strnlen_user((char *)r->cx, PATH_MAX);
-
-	if (!msg->m1_i2)
-		return -EFAULT;
+	msg->m1_p1 = (char *)r->bx;	/* oldpath */
+	msg->m1_p2 = (char *)r->cx;	/* newpath */
 
 	return 0;
 }
@@ -954,13 +824,8 @@ static int msg_times(message *msg, const struct pt_regs *r)
 
 static int msg_truncate(message *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (char *)r->bx;		/* path */
-	msg->m2_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m2_i1)
-		return -EFAULT;
-
-	msg->m2_l1 = (off_t)r->cx;		/* length */
+	msg->m2_p1 = (char *)r->bx;	/* path */
+	msg->m2_l1 = (off_t)r->cx;	/* length */
 
 	return 0;
 }
@@ -975,10 +840,6 @@ static int msg_umask(message *msg, const struct pt_regs *r)
 static int msg_umount(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* target */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
 
 	return 0;
 }
@@ -986,10 +847,6 @@ static int msg_umount(message *msg, const struct pt_regs *r)
 static int msg_unlink(message *msg, const struct pt_regs *r)
 {
 	msg->m3_p1 = (char *)r->bx;	/* pathname */
-	msg->m3_i1 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m3_i1)
-		return -EFAULT;
 
 	return 0;
 }
@@ -997,11 +854,6 @@ static int msg_unlink(message *msg, const struct pt_regs *r)
 static int msg_utime(message *msg, const struct pt_regs *r)
 {
 	msg->m2_p1 = (char *)r->bx;	/* filename */
-	msg->m2_i2 = strnlen_user((char *)r->bx, PATH_MAX);
-
-	if (!msg->m2_i2)
-		return -EFAULT;
-
 	msg->m2_l1 = r->cx;		/* times pointer */
 
 	return 0;

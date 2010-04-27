@@ -614,7 +614,7 @@ getcr3val:
 /**
  * strnlen_user: - Get the size of a string specified by linear address.
  * @s: The string to measure (linear address).
- * @n: The maximum valid length
+ * @maxlen: The maximum valid length
  *
  * Get the size of a NUL-terminated string.
  *

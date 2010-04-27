@@ -18,6 +18,9 @@
 #include <kernel/proto.h>
 #include <kernel/glo.h>
 #include <kernel/vm.h>
+#include <asm/servers/vm/memory.h>
+
+extern int __phys_strnlen(const char *s, size_t maxlen);
 
 /**
  * Copy data to user space from kernel space.
@@ -83,6 +86,38 @@ static inline unsigned long copy_from_user(void *to, const void __user *from, un
 		return n;
 
 	return (n - (pfaddr - linaddr));
+}
+/**
+ * strnlen_user: - Get the size of a string specified by linear address.
+ * @s: The string to measure (linear address).
+ * @maxlen: The maximum valid length
+ *
+ * Get the size of a NUL-terminated string.
+ *
+ * Returns the size of the string _including_ the terminating NUL.
+ * On kernel exception, returns 0.
+ * If the string is too long, returns a value greater than @n.
+ */
+static inline long strnlen_user(const char __user *s, size_t maxlen)
+{
+	unsigned long len = (VM_STACKTOP - (unsigned long)s);
+	phys_bytes linaddr;
+
+	/* We must not cross the top of stack during copy */
+	len = (len < maxlen) ? len : maxlen;
+
+	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len)))
+		return 0;
+
+	/* might fault */
+	catch_pagefaults++;
+	/* The __phys_strnlen returns the size _including_ the '\0'.
+	 * In case of exception in kernel returns 0.
+	 */
+	len = __phys_strnlen((const char __user*)linaddr, len);
+	catch_pagefaults--;
+
+	return len;
 }
 
 #endif /*__ASM_X86_KERNEL_UACCESS_32_H */
