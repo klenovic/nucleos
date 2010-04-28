@@ -99,8 +99,13 @@ void level0(void (*func)(void));
 void monitor(void);
 void reset(void);
 void int86(void);
+
 reg_t read_cr0(void);
 reg_t read_cr2(void);
+reg_t read_cs(void);
+reg_t read_ds(void);
+reg_t read_ss(void);
+
 void write_cr0(unsigned long value);
 unsigned long read_cr4(void);
 void write_cr4(unsigned long value);

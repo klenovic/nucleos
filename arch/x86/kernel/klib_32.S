@@ -585,19 +585,19 @@ write_cr4:
 
 .globl read_ds
 read_ds:
-	mov	$0, %eax
+	xor	%eax, %eax
 	mov	%ds, %eax
 	ret
 
 .globl read_cs
 read_cs:
-	mov	$0, %eax
+	xor	%eax, %eax
 	mov	%cs, %eax
 	ret
 
 .globl read_ss
 read_ss:
-	mov	$0, %eax
+	xor	%eax, %eax
 	mov	%ss, %eax
 	ret
 
