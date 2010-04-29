@@ -87,18 +87,20 @@ static inline unsigned long copy_from_user(void *to, const void __user *from, un
 
 	return (n - (pfaddr - linaddr));
 }
+
 /**
- * strnlen_user: - Get the size of a string specified by linear address.
- * @s: The string to measure (linear address).
- * @maxlen: The maximum valid length
+ * Get the size of a string specified by linear address.
+ * @proc  process address
+ * @s  The string to measure (linear address).
+ * @maxlen  The maximum valid length
  *
  * Get the size of a NUL-terminated string.
  *
- * Returns the size of the string _including_ the terminating NUL.
+ * Returns the size of the string _including_ the terminating NULL.
  * On kernel exception, returns 0.
- * If the string is too long, returns a value greater than @n.
+ * If the string is too long, returns a value greater than @maxlen.
  */
-static inline long strnlen_user(const char __user *s, size_t maxlen)
+static inline long strnlen_user(struct proc *proc, const char __user *s, size_t maxlen)
 {
 	unsigned long len = (VM_STACKTOP - (unsigned long)s);
 	phys_bytes linaddr;
@@ -106,8 +108,10 @@ static inline long strnlen_user(const char __user *s, size_t maxlen)
 	/* We must not cross the top of stack during copy */
 	len = (len < maxlen) ? len : maxlen;
 
-	if (!(linaddr = umap_local(proc_ptr, D, (vir_bytes)s, len)))
+	if (!(linaddr = umap_local(proc, D, (vir_bytes)s, len)))
 		return 0;
+
+	vm_set_cr3(proc);
 
 	/* might fault */
 	catch_pagefaults++;

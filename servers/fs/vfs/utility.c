@@ -45,38 +45,42 @@ int fetch_name(char *buff, const int pathmax, char __user *path)
 	int ret;
 	int len = (VM_STACKTOP - (unsigned long)path);
 
-	if (!buff || !pathmax || pathmax < 0)
+	if (!buff || pathmax <= 0)
 		return -EINVAL;
 
 	len = (len < pathmax) ? len : pathmax;
 	len = (len <= 0) ? pathmax : len;
 
-	/* String is not contained in the message. Get it from user space. */
-	ret = sys_datacopy(who_e, (vir_bytes)path,
-			   FS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
+	/* Get the length of the string.
+	 * The sys_strnlen returns the length _including_ the '\0' character.
+	 * In case of exception the zero is returned.
+	 */
+	len = sys_strnlen(who_e, path, len);
 
-	if (ret) {
-		/* Blindly ignore it for now! */
-		/* err_code = -EFAULT;
-		   return -EFAULT; */
+	/* Check whether an exception occured */
+	if (!len) {
+		err_code = -EFAULT;
+		return -EFAULT;
 	}
 
-	len = strnlen(buff, len) + 1;
+	/* Check name length for validity. */
+	if (len < 0) {
+		err_code = -EINVAL;
+		return err_code;
+	}
 
 	if (len > pathmax) {
 		err_code = -ENAMETOOLONG;
 		return err_code;
 	}
 
-	/* Check name length for validity. */
-	if (len <= 0) {
-		err_code = -EINVAL;
-		return err_code;
-	}
+	/* Copy from user space. */
+	ret = sys_datacopy(who_e, (vir_bytes)path,
+			   FS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
 
-	if (buff[len-1] != '\0') {
-		err_code = -ENAMETOOLONG;
-		return err_code;
+	if (ret) {
+		err_code = -EFAULT;
+		return -EFAULT;
 	}
 
 	return len;

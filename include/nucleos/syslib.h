@@ -142,6 +142,8 @@ int sys_vsafecopy(struct vscp_vec *copyvec, int elements);
 
 int sys_memset(unsigned long pattern, phys_bytes base, phys_bytes bytes);
 
+long sys_strnlen(endpoint_t endpt, char __user* s, int maxlen);
+
 /* Vectored virtual / physical copy calls. */
 #if DEAD_CODE		/* library part not yet implemented */
 int sys_virvcopy(phys_cp_req *vec_ptr,int vec_size,int *nr_ok);

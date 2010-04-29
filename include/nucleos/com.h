@@ -385,7 +385,9 @@
 #  define SYS_VTIMER     (KERNEL_CALL + 45)	/* sys_vtimer() */
 #  define SYS_RUNCTL     (KERNEL_CALL + 46)	/* sys_runctl() */
 
-#define NR_SYS_CALLS	47	/* number of system calls */ 
+#  define SYS_STRNLEN	(KERNEL_CALL + 47)	/* sys_strnlen() */
+
+#define NR_SYS_CALLS	48	/* number of system calls */ 
 
 /* Pseudo call for use in kernel/table.c. */
 #define SYS_ALL_CALLS (NR_SYS_CALLS)
@@ -412,6 +414,11 @@
 #define MEM_CHUNK_SIZE	m4_l2	/* size of mem chunk */
 #define MEM_TOT_SIZE	m4_l3	/* total memory size */
 #define MEM_CHUNK_TAG	m4_l4	/* tag to identify chunk of mem */
+
+/* Field names for SYS_STRNLEN */
+#define STRNLEN_PROC_E	m1_i1	/* endpoint */
+#define STRNLEN_STR	m1_p1	/* string (user) */
+#define STRNLEN_MAXLEN	m1_i2   /* maxlen */
 
 /* Field names for SYS_DEVIO, SYS_VDEVIO, SYS_SDEVIO. */
 #define DIO_REQUEST	m2_i3	/* device in or output */

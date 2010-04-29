@@ -207,6 +207,7 @@ int do_cprofile(message *m_ptr);
 int do_profbuf(message *m_ptr);
 
 int do_mapdma(message *m_ptr);
+long do_strnlen(message *m_ptr);
 #endif /* __KERNEL__ */
 #endif	/* __KERNEL_SYSTEM_H */
 

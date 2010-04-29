@@ -243,6 +243,8 @@ static void initialize(void)
   map(SYS_SDEVIO, do_sdevio);		/* phys_insb, _insw, _outsb, _outsw */
   map(SYS_MAPDMA, do_mapdma);		
 #endif
+
+  map(SYS_STRNLEN, do_strnlen); 	/* strnlen for ukernel */
 }
 
 /*===========================================================================*

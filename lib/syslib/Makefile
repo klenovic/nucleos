@@ -13,6 +13,6 @@ libsys.a-obj-y := alloc_util.o assert.o panic.o pci_attr_r16.o pci_attr_r32.o pc
 		  sys_times.o sys_trace.o sys_umap.o sys_vinb.o sys_vinl.o sys_vinw.o sys_vircopy.o \
 		  sys_vmctl.o sys_voutb.o sys_voutl.o sys_voutw.o sys_vtimer.o ds.o \
 		  vm_allocmem.o vm_brk.o vm_exec_newmem.o vm_exit.o vm_fork.o vm_map_phys.o vm_umap.o \
-		  vm_push_sig.o vm_ctl.o vm_notify_sig.o sys_runctl.o time.o timeconv.o
+		  vm_push_sig.o vm_ctl.o vm_notify_sig.o sys_runctl.o time.o timeconv.o sys_strnlen.o
 
 ccflags-y := -D__UKERNEL__
