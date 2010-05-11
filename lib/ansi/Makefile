@@ -1,6 +1,6 @@
 lib-y := libnucc.a
 libnucc.a-obj-y := abort.o abs.o assert.o atexit.o atof.o atoi.o atol.o bsearch.o calloc.o \
-	       chartab.o clock.o difftime.o div.o errlist.o exit.o ext_comp.o getenv.o \
+	       chartab.o clock.o difftime.o div.o errlist.o exit.o getenv.o \
 	       isalnum.o isalpha.o isascii.o iscntrl.o isdigit.o isgraph.o islower.o \
 	       isprint.o ispunct.o isspace.o isupper.o isxdigit.o labs.o ldiv.o localeconv.o \
 	       malloc.o mblen.o mbstowcs.o mbtowc.o misc.o qsort.o raise.o rand.o setlocale.o \

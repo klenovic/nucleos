@@ -11,7 +11,7 @@ libnucc.a-obj-y := _exit.o access.o alarm.o cfgetispeed.o cfgetospeed.o cfsetisp
 		   sigaction.o sigpending.o sigprocmask.o sigreturn.o sigset.o sigsuspend.o sleep.o stat.o stime.o \
 		   symlink.o sync.o tcdrain.o tcflow.o tcflush.o tcgetattr.o tcsendbreak.o tcsetattr.o time.o \
 		   times.o truncate.o umask.o uname.o unlink.o utime.o wait.o waitpid.o write.o getloadavg.o \
-		   getopt.o gettimeofday.o glob.o nice.o usleep.o munmap.o vm_remap.o munmap_text.o vm_getphys.o \
+		   getopt.o gettimeofday.o nice.o usleep.o munmap.o vm_remap.o munmap_text.o vm_getphys.o \
 		   vm_getrefcount.o vm_remap.o vm_unmap.o
 
 ccflags-y := -D__UKERNEL__
