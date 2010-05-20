@@ -43,7 +43,7 @@
  
 #include <nucleos/types.h>
 #include <nucleos/minlib.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/fcntl.h>
 #include <stdlib.h>
 #include <nucleos/string.h>

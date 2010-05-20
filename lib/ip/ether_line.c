@@ -24,7 +24,7 @@
 */
 
 #include <nucleos/types.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <stdlib.h>
 #include <net/ether.h>
 #include <net/if_ether.h>

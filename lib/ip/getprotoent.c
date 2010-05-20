@@ -25,7 +25,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 

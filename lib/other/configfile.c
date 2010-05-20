@@ -20,7 +20,7 @@
 #include <nucleos/string.h>
 #include <nucleos/time.h>
 #include <nucleos/stat.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #define _c /* not const */
 #include <configfile.h>
 

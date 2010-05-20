@@ -1,10 +1,6 @@
 lib-y := libnucc.a
-libnucc.a-obj-y := abort.o abs.o assert.o atexit.o atof.o atoi.o atol.o bsearch.o calloc.o \
-	       chartab.o clock.o difftime.o div.o errlist.o exit.o getenv.o \
-	       isalnum.o isalpha.o isascii.o iscntrl.o isdigit.o isgraph.o islower.o \
-	       isprint.o ispunct.o isspace.o isupper.o isxdigit.o labs.o ldiv.o localeconv.o \
-	       malloc.o mblen.o mbstowcs.o mbtowc.o misc.o qsort.o raise.o rand.o setlocale.o \
-	       sigmisc.o signal.o strcoll.o strcspn.o strerror.o strpbrk.o strspn.o strstr.o \
-	       strtok.o strtol.o strxfrm.o system.o tolower.o toupper.o wcstombs.o wctomb.o
+libnucc.a-obj-y := abort.o assert.o atexit.o calloc.o clock.o errlist.o \
+		   exit.o getenv.o malloc.o raise.o sigmisc.o signal.o \
+		   strerror.o strtol.o system.o
 
 ccflags-y := -D__UKERNEL__

@@ -42,7 +42,7 @@
 
 #include <nucleos/types.h>
 #include <strings.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 
 int
 strcasecmp(s1, s2)

@@ -48,7 +48,7 @@
 #include <nucleos/types.h>
 #include <stdio.h>
 #include <nucleos/string.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/limits.h>
 #include <stdlib.h>
 #include <regex.h>

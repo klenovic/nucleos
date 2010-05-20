@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* system dependent functions for use inside the whole kernel. */
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/unistd.h>
 #include <nucleos/string.h>
 #include <nucleos/portio.h>

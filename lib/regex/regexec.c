@@ -58,7 +58,7 @@
 #include <stdlib.h>
 #include <nucleos/string.h>
 #include <nucleos/limits.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <regex.h>
 
 #include "utils.h"

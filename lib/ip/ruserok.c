@@ -24,7 +24,7 @@
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/limits.h>
 #include <pwd.h>
 #include <net/hton.h>

@@ -461,7 +461,7 @@ tty_t *tp;			/* which TTY */
   /* See if kernel debugging is enabled; if so, don't initialize this
    * serial line, making tty not look at the irq and returning -ENXIO
    * for all requests on it from userland. (The kernel will use it.)
-   */
+   */strtol(l, (char **) NULL, 10);
   if(env_get_param(SERVARNAME, l, sizeof(l)-1) == 0 && atoi(l) == line) {
      return;
   }

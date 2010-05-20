@@ -26,7 +26,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include <nucleos/types.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/errno.h>
 
 #include <net/hton.h>

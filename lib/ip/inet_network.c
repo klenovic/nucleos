@@ -40,7 +40,7 @@
  * SUCH DAMAGE.
  */
 #include <nucleos/types.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <net/in.h>
 #include <net/inet.h>
 

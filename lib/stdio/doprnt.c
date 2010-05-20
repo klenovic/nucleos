@@ -10,7 +10,7 @@
 /*
  * doprnt.c - print formatted output
  */
-#include	<ctype.h>
+#include	<nucleos/ctype.h>
 #include	<stdio.h>
 #include	<stdarg.h>
 #include	<nucleos/string.h>

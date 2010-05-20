@@ -43,10 +43,6 @@ char *strncat(char *_s1, const char *_s2, __kernel_size_t _n);
 char *strncpy(char *_s1, const char *_s2, __kernel_size_t _n);
 char *strpbrk(const char *_s1, const char *_s2);
 char *strrchr(const char *_s, int _c);
-__kernel_size_t strspn(const char *_s1, const char *_s2);
-char *strstr(const char *_s1, const char *_s2);
-char *strtok(char *_s1, const char *_s2);
-__kernel_size_t strxfrm(char *_s1, const char *_s2, __kernel_size_t _n);
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 char *strdup(const char *_s1);

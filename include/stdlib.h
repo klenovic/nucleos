@@ -34,11 +34,11 @@ typedef unsigned int size_t;	/* type returned by sizeof */
 typedef char wchar_t;		/* type expanded character set */
 #endif
 
+
 /* Function Prototypes. */
 void abort(void);
 int atexit(void (*_func)(void));
 double atof(const char *_nptr);
-int atoi(const char *_nptr);
 long atol(const char *_nptr);
 void *calloc(size_t _nmemb, size_t _size);
 div_t div(int _numer, int _denom);
@@ -48,25 +48,15 @@ char *getenv(const char *_name);
 long labs(long _j);
 ldiv_t ldiv(long _numer, long _denom);
 void *malloc(size_t _size);
-int mblen(const char *_s, size_t _n);
-size_t mbstowcs(wchar_t *_pwcs, const char *_s, size_t _n);
-int mbtowc(wchar_t *_pwc, const char *_s, size_t _n);
 int rand(void);
 void *realloc(void *_ptr, size_t _size);
 void srand(unsigned int _seed);
 double strtod(const char *_nptr, char **_endptr);
 long strtol(const char *_nptr, char **_endptr, int _base);
 int system(const char *_string);
-size_t wcstombs(char *_s, const wchar_t *_pwcs, size_t _n);
-int wctomb(char *_s, wchar_t _wchar);
-void *bsearch(const void *_key, const void *_base, size_t _nmemb, size_t _size,
-	      int (*compar) (const void *, const void *));
-void qsort(void *_base, size_t _nmemb, size_t _size,
-	   int (*compar) (const void *, const void *));
 unsigned long int strtoul(const char *_nptr, char **_endptr, int _base);
 
 /* Open Group Base Specifications Issue 6 */
-int mkstemp(char *_fmt);
 char *initstate(unsigned _seed, char *_state, size_t _size);
 long random(void);
 char *setstate(const char *state);
@@ -76,6 +66,10 @@ int setenv(const char *envname, const char *envval, int overwrite);
 int unsetenv(const char *name);
 
 int getloadavg(double *, int);
+
+static inline int atoi(const char *nptr) {
+	return strtol(nptr, (char **) NULL, 10);
+}
 
 /* According to POSIX, getopt should be in unistd.h. What do we do with
  * this?

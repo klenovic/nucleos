@@ -28,7 +28,7 @@
 #include <nucleos/types.h>
 #include <nucleos/stat.h>
 #include <nucleos/ioctl.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/errno.h>
 #include <nucleos/fcntl.h>
 #include <nucleos/limits.h>

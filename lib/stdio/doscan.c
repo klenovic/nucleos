@@ -12,7 +12,7 @@
  */
 #include	<stdio.h>
 #include	<stdlib.h>
-#include	<ctype.h>
+#include	<nucleos/ctype.h>
 #include	<stdarg.h>
 #include	"loc_incl.h"
 

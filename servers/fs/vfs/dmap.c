@@ -16,7 +16,7 @@
 #include <servers/vfs/fproc.h>
 #include <nucleos/string.h>
 #include <stdlib.h>
-#include <ctype.h>
+#include <nucleos/ctype.h>
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <servers/ds/ds.h>
