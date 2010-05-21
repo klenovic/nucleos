@@ -28,11 +28,6 @@ void __cleanup(void);
 FILE *popen(const char *command, const char *type);
 FILE *fdopen(int fd, const char *mode);
 
-#ifndef	NOFLOAT
-char *_ecvt(long double value, int ndigit, int *decpt, int *sign);
-char *_fcvt(long double value, int ndigit, int *decpt, int *sign);
-#endif	/* NOFLOAT */
-
 #define	FL_LJUST	0x0001		/* left-justify field */
 #define	FL_SIGN		0x0002		/* sign in signed conversions */
 #define	FL_SPACE	0x0004		/* space in signed conversions */

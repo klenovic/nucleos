@@ -256,7 +256,6 @@ int getgroups(int _gidsetsize, gid_t _grouplist[]);
 int setgroups(size_t ngroups, const gid_t *gidset);
 int initgroups(const char *name, gid_t basegid);
 
-char *getlogin(void);
 pid_t getpgrp(void);
 pid_t getpid(void);
 
@@ -277,10 +276,8 @@ pid_t setsid(void);
 int setuid(uid_t _uid);
 int seteuid(uid_t _uid);
 unsigned int sleep(unsigned int _seconds);
-long sysconf(int _name);
 pid_t tcgetpgrp(int _fd);
 int tcsetpgrp(int _fd, pid_t _pgrp_id);
-char *ttyname(int _fd);
 int unlink(const char *_path);
 ssize_t write(int _fd, const void *_buf, size_t _n);
 int truncate(const char *_path, off_t _length);

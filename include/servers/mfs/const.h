@@ -86,7 +86,7 @@
 
 #define ROOT_INODE		1		/* inode number for root directory */
 #define BOOT_BLOCK		((block_t) 0)	/* block number of boot block */
-#define SUPER_BLOCK_BYTES	(1024)		/* bytes offset */
+#define SUPER_BLOCK_BYTES	(1024)		/* bytes offset (in device) */
 #define START_BLOCK		2		/* first block of FS (not counting SB) */
 
 #define DIR_ENTRY_SIZE		usizeof (struct direct)	/* # bytes/dir entry   */

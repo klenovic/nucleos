@@ -44,23 +44,10 @@ char *strncpy(char *_s1, const char *_s2, __kernel_size_t _n);
 char *strpbrk(const char *_s1, const char *_s2);
 char *strrchr(const char *_s, int _c);
 
-/* Open Group Base Specifications Issue 6 (not complete) */
-char *strdup(const char *_s1);
-
-/* For backward compatibility. */
-char *index(const char *_s, int _charwanted);
-char *rindex(const char *_s, int _charwanted);
-void bcopy(const void *_src, void *_dst, __kernel_size_t _length);
-int bcmp(const void *_s1, const void *_s2, __kernel_size_t _length);
-void bzero(void *_dst, __kernel_size_t _length);
-void *memccpy(void *_dst, const void *_src, int _ucharstop, __kernel_size_t _size);
-
 /* Misc. extra functions */
 int strcasecmp(const char *_s1, const char *_s2);
 int strncasecmp(const char *_s1, const char *_s2, __kernel_size_t _len);
 __kernel_size_t strnlen(const char *_s, __kernel_size_t _n);
-__kernel_size_t strlcat(char *_dst, const char *_src, __kernel_size_t _siz);
-__kernel_size_t strlcpy(char *_dst, const char *_src, __kernel_size_t _siz);
 
 #endif /*  defined(__KERNEL__) || defined(__UKERNEL__) */
 

@@ -41,7 +41,7 @@
 */
 
 #include <nucleos/types.h>
-#include <strings.h>
+#include <nucleos/string.h>
 #include <nucleos/ctype.h>
 
 int
