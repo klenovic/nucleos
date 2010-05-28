@@ -44,7 +44,7 @@ void int03(void), breakpoint_exception(void);
 void int04(void), overflow(void);
 void int05(void), bounds_check(void);
 void int06(void), inval_opcode(void);
-void int07(void), copr_not_available(void);
+void int07(void), coproc_not_available(void);
 void double_fault(void);
 void copr_seg_overrun(void);
 void inval_tss(void);
@@ -58,9 +58,8 @@ void machine_check(void);
 void simd_exception(void);
 
 /* Software interrupt handlers, in numerical order. */
-void trp(void);
-void syscall_entry(void);		/* internal comunication */
-extern void system_call(void);	/* nucleos system call (C library) */
+void __kipc_entry(void);	/* internal comunication */
+void __syscall_entry(void);	/* nucleos system call (C library) */
 void level0_call(void);
 
 /* memory.c */
@@ -83,13 +82,13 @@ void idt_reload(void);
 
 /* exception.c */
 struct exception_frame {
-	reg_t   vector;         /* which interrupt vector was triggered */
-	reg_t   errcode;        /* zero if no exception does not push err code */
-	reg_t   eip;
-	reg_t   cs;
-	reg_t   eflags;
-	reg_t   esp;            /* undefined if trap is nested */
-	reg_t   ss;             /* undefined if trap is nested */
+	reg_t vector;         /* which interrupt vector was triggered */
+	reg_t errcode;        /* zero if no exception does not push err code */
+	reg_t eip;
+	reg_t cs;
+	reg_t eflags;
+	reg_t esp;            /* undefined if trap is nested */
+	reg_t ss;             /* undefined if trap is nested */
 };
 
 void exception(struct exception_frame * frame);

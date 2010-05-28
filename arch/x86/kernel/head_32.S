@@ -77,7 +77,7 @@
 .globl overflow
 .globl bounds_check
 .globl inval_opcode
-.globl copr_not_available
+.globl coproc_not_available
 .globl double_fault
 .globl copr_seg_overrun
 .globl inval_tss
@@ -336,11 +336,9 @@ hwint14:			// Interrupt routine for irq 14 (AT winchester)
 hwint15:			// Interrupt routine for irq 15
 	hwint_slave(15)
 
-//===========================================================================
-//                             system_call (0x80)
-//===========================================================================
+/* Kernel interface for user space (interrupt 0x80) */
 	.p2align 4
-ENTRY(system_call)
+ENTRY(__syscall_entry)
 	SAVE_PROCESS_CTX(0)
 
 	/* save the pointer to the current process */
@@ -354,12 +352,9 @@ ENTRY(system_call)
 
 	jmp	restart
 
-/*
- * syscall is only from a process to kernel (legacy call)
- */
+/* Kernel internal communication */
 	.p2align 4
-.globl syscall_entry
-syscall_entry:
+ENTRY(__kipc_entry)
 	SAVE_PROCESS_CTX(0)
 
 	/* save the pointer to the current process */
@@ -378,7 +373,7 @@ syscall_entry:
 	/* for stack trace */
 	movl	$0, %ebp
 
-	call	sys_call
+	call	kipc_call
 
 	/* restore the current process pointer and save the return value */
 	add	$4 * 4, %esp
@@ -484,28 +479,28 @@ restart:
 	EXCEPTION_ERR_CODE(vector)
 
 divide_error:
-	EXCEPTION_NO_ERR_CODE(DIVIDE_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_DIVIDE)
 
 single_step_exception:
-	EXCEPTION_NO_ERR_CODE(DEBUG_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_DEBUG)
 
 nmi:
-	EXCEPTION_NO_ERR_CODE(NMI_VECTOR)
+	EXCEPTION_NO_ERR_CODE(IRQVEC_NMI)
 
 breakpoint_exception:
-	EXCEPTION_NO_ERR_CODE(BREAKPOINT_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_BREAKPOINT)
 
 overflow:
-	EXCEPTION_NO_ERR_CODE(OVERFLOW_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_OVERFLOW)
 
 bounds_check:
-	EXCEPTION_NO_ERR_CODE(BOUNDS_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_BOUNDS)
 
 inval_opcode:
-	EXCEPTION_NO_ERR_CODE(INVAL_OP_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_INVAL_OP)
 
-copr_not_available:
-	TEST_INT_IN_KERNEL(4, copr_not_available_in_kernel)
+coproc_not_available:
+	TEST_INT_IN_KERNEL(4, coproc_not_available_in_kernel)
 	clts
 	cld					/* set direction flag to a known value */
 	SAVE_PROCESS_CTX_NON_LAZY(0)
@@ -528,43 +523,43 @@ copr_return:
 	orw	$MF_USED_FPU, (%ebx)		/* fpu was used during last execution */
 	jmp	restart
 
-copr_not_available_in_kernel:
+coproc_not_available_in_kernel:
 	movl	$NO_NUM, 4(%esp)
 	movl	$0, (%esp)
 	call	minix_panic
 
 double_fault:
-	EXCEPTION_ERR_CODE(DOUBLE_FAULT_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_DOUBLE_FAULT)
 
 copr_seg_overrun:
-	EXCEPTION_NO_ERR_CODE(COPROC_SEG_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_COPROC_SEG)
 
 inval_tss:
-	EXCEPTION_ERR_CODE(INVAL_TSS_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_INVAL_TSS)
 
 segment_not_present:
-	EXCEPTION_ERR_CODE(SEG_NOT_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_SEG_NOT)
 
 stack_exception:
-	EXCEPTION_ERR_CODE(STACK_FAULT_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_STACK_FAULT)
 
 general_protection:
-	EXCEPTION_ERR_CODE(PROTECTION_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_PROTECTION)
 
 page_fault:
-	EXCEPTION_ERR_CODE(PAGE_FAULT_VECTOR)
+	EXCEPTION_ERR_CODE(EXVEC_PAGE_FAULT)
 
 copr_error:
-	EXCEPTION_NO_ERR_CODE(COPROC_ERR_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_COPROC_ERR)
 
 alignment_check:
-	EXCEPTION_NO_ERR_CODE(ALIGNMENT_CHECK_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_ALIGNMENT_CHECK)
 
 machine_check:
-	EXCEPTION_NO_ERR_CODE(MACHINE_CHECK_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_MACHINE_CHECK)
 
 simd_exception:
-	EXCEPTION_NO_ERR_CODE(SIMD_EXCEPTION_VECTOR)
+	EXCEPTION_NO_ERR_CODE(EXVEC_SIMD_EXCEPTION)
 /*===========================================================================*/
 /*                              lazy_fpu                                     */
 /*===========================================================================*/

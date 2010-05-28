@@ -42,7 +42,7 @@ int kprintf(const char *fmt, ...);
 void minix_panic(char *s, int n);
 
 /* proc.c */
-int sys_call(int call_nr, int src_dst, message *m_ptr, long bit_map);
+int kipc_call(int call_nr, int src_dst, message *m_ptr, long bit_map);
 int lock_notify(int src, int dst);
 int mini_notify(struct proc *src, endpoint_t dst);
 int lock_send(int dst, message *m_ptr);

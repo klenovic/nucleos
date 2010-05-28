@@ -418,7 +418,7 @@ level0:
 	/* if not runnig in the kernel yet, trap to kernel */
 0:
 	mov	4(%esp), %eax
-	int	$LEVEL0_VECTOR
+	int	$IRQVEC_LEVEL0
 	ret
 
 //===========================================================================

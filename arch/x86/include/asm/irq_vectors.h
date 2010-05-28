@@ -21,20 +21,31 @@
 /* Magic numbers for interrupt controller. */
 #define END_OF_INT		0x20	/* code used to re-enable after an interrupt */
 
-/* Interrupt vectors defined/reserved by processor. */
-#define DIVIDE_VECTOR		0	/* divide error */
-#define DEBUG_VECTOR		1	/* single step (trace) */
-#define NMI_VECTOR		2	/* non-maskable interrupt */
-#define BREAKPOINT_VECTOR	3	/* software breakpoint */
-#define OVERFLOW_VECTOR		4	/* from INTO */
+/* Interrupt and exception vectors defined/reserved by processor. */
+#define EXVEC_DIVIDE			0	/* divide error */
+#define EXVEC_DEBUG			1	/* single step (trace) */
+#define IRQVEC_NMI			2	/* non-maskable interrupt */
+#define EXVEC_BREAKPOINT		3	/* software breakpoint */
+#define EXVEC_OVERFLOW			4	/* from INTO */
+#define EXVEC_BOUNDS			5	/* bounds check failed */
+#define EXVEC_INVAL_OP			6	/* invalid opcode */
+#define EXVEC_COPROC_NOT_AVAILABLE	7	/* coprocessor not available */
+#define EXVEC_DOUBLE_FAULT		8
+#define EXVEC_COPROC_SEG		9	/* coprocessor segment overrun */
+#define EXVEC_INVAL_TSS			10	/* invalid TSS */
+#define EXVEC_SEG_NOT			11	/* segment not present */
+#define EXVEC_STACK_FAULT		12	/* stack exception */
+#define EXVEC_PROTECTION		13	/* general protection */
+#define EXVEC_PAGE_FAULT		14
+#define EXVEC_COPROC_ERR		16	/* coprocessor error */
+#define EXVEC_ALIGNMENT_CHECK		17
+#define EXVEC_MACHINE_CHECK		18
+#define EXVEC_SIMD_EXCEPTION		19	/* SIMD Floating-Point Exception (#XM) */
 
 /* Fixed system call vector. */
-#define SYSCALL_VECTOR		0x80	/* nucleos i386 system calls use this */
-#define SYS386_VECTOR		0x21	/* legacy minix i386 system calls use this
-					 * @nucleos: Planned to be use for internal
-					 *           kernel<->server<->driver communication.
-					 */
-#define LEVEL0_VECTOR		0x22	/* for execution of a function at level 0 */
+#define IRQVEC_SYSCALL	0x80	/* nucleos i386 system call */
+#define IRQVEC_KIPC	0x21	/* internal kernel<->server<->driver communication. */
+#define IRQVEC_LEVEL0	0x22	/* for execution of a function at level 0 */
 
 /* Suitable irq bases for hardware interrupts.  Reprogram the 8259(s) from
  * the PC BIOS defaults since the BIOS doesn't respect all the processor's

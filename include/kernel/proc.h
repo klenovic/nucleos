@@ -100,7 +100,7 @@ struct proc {
 		char stacktrace[200];
 #endif
 
-		/* If the suspended operation is a sys_call, its details are
+		/* If the suspended operation is a kipc_call, its details are
 		 * stored here.
 		 */
 	} p_vmrequest;

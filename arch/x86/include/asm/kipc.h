@@ -17,7 +17,7 @@
 #include <asm/irq_vectors.h>
 
 /* Internal communication */
-#define ASM_CALL_KIPC_SERVICE	"int $" __stringify(SYS386_VECTOR) "\t\n"
+#define ASM_CALL_KIPC_SERVICE	"int $" __stringify(IRQVEC_KIPC) "\t\n"
 
 static inline int __kipc_notify(endpoint_t dst)
 {

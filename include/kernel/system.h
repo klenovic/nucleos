@@ -13,7 +13,7 @@
  *
  * The system library allows to access system services by doing a kernel call.
  * System calls are transformed into request messages to the SYS task that is 
- * responsible for handling the call. By convention, sys_call() is transformed 
+ * responsible for handling the call. By convention, kipc_call() is transformed 
  * into a message with type SYS_CALL that is handled in a function do_call(). 
  *
  * Changes:

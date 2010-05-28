@@ -173,7 +173,7 @@ struct proc *t;
 	return;
   }
 
-  if(frame->vector == PAGE_FAULT_VECTOR) {
+  if(frame->vector == EXVEC_PAGE_FAULT) {
 	pagefault(saved_proc, frame, is_nested);
 	return;
   }

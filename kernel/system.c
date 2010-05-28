@@ -10,7 +10,7 @@
 /* This task handles the interface between the kernel and user-level servers.
  * System services can be accessed by doing a system call. System calls are 
  * transformed into request messages, which are handled by this task. By 
- * convention, a sys_call() is transformed in a SYS_CALL request message that
+ * convention, a kipc_call() is transformed in a SYS_CALL request message that
  * is handled in a function named do_call(). 
  *
  * A private call vector is used to map all system calls to the functions that

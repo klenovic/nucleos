@@ -207,33 +207,33 @@ void idt_copy_vectors(struct gate_table_s * first)
 void idt_init(void)
 {
 	struct gate_table_s gate_table[] = {
-		{ divide_error, DIVIDE_VECTOR, INTR_PRIVILEGE },
-		{ single_step_exception, DEBUG_VECTOR, INTR_PRIVILEGE },
-		{ nmi, NMI_VECTOR, INTR_PRIVILEGE },
-		{ breakpoint_exception, BREAKPOINT_VECTOR, USER_PRIVILEGE },
-		{ overflow, OVERFLOW_VECTOR, USER_PRIVILEGE },
-		{ bounds_check, BOUNDS_VECTOR, INTR_PRIVILEGE },
-		{ inval_opcode, INVAL_OP_VECTOR, INTR_PRIVILEGE },
-		{ copr_not_available, COPROC_NOT_VECTOR, INTR_PRIVILEGE },
-		{ double_fault, DOUBLE_FAULT_VECTOR, INTR_PRIVILEGE },
-		{ copr_seg_overrun, COPROC_SEG_VECTOR, INTR_PRIVILEGE },
-		{ inval_tss, INVAL_TSS_VECTOR, INTR_PRIVILEGE },
-		{ segment_not_present, SEG_NOT_VECTOR, INTR_PRIVILEGE },
-		{ stack_exception, STACK_FAULT_VECTOR, INTR_PRIVILEGE },
-		{ general_protection, PROTECTION_VECTOR, INTR_PRIVILEGE },
-		{ page_fault, PAGE_FAULT_VECTOR, INTR_PRIVILEGE },
-		{ copr_error, COPROC_ERR_VECTOR, INTR_PRIVILEGE },
-		{ alignment_check, ALIGNMENT_CHECK_VECTOR, INTR_PRIVILEGE },
-		{ machine_check, MACHINE_CHECK_VECTOR, INTR_PRIVILEGE },
-		{ simd_exception, SIMD_EXCEPTION_VECTOR, INTR_PRIVILEGE },
+		{ divide_error, EXVEC_DIVIDE, INTR_PRIVILEGE },
+		{ single_step_exception, EXVEC_DEBUG, INTR_PRIVILEGE },
+		{ nmi, IRQVEC_NMI, INTR_PRIVILEGE },
+		{ breakpoint_exception, EXVEC_BREAKPOINT, USER_PRIVILEGE },
+		{ overflow, EXVEC_OVERFLOW, USER_PRIVILEGE },
+		{ bounds_check, EXVEC_BOUNDS, INTR_PRIVILEGE },
+		{ inval_opcode, EXVEC_INVAL_OP, INTR_PRIVILEGE },
+		{ coproc_not_available, EXVEC_COPROC_NOT_AVAILABLE, INTR_PRIVILEGE },
+		{ double_fault, EXVEC_DOUBLE_FAULT, INTR_PRIVILEGE },
+		{ copr_seg_overrun, EXVEC_COPROC_SEG, INTR_PRIVILEGE },
+		{ inval_tss, EXVEC_INVAL_TSS, INTR_PRIVILEGE },
+		{ segment_not_present, EXVEC_SEG_NOT, INTR_PRIVILEGE },
+		{ stack_exception, EXVEC_STACK_FAULT, INTR_PRIVILEGE },
+		{ general_protection, EXVEC_PROTECTION, INTR_PRIVILEGE },
+		{ page_fault, EXVEC_PAGE_FAULT, INTR_PRIVILEGE },
+		{ copr_error, EXVEC_COPROC_ERR, INTR_PRIVILEGE },
+		{ alignment_check, EXVEC_ALIGNMENT_CHECK, INTR_PRIVILEGE },
+		{ machine_check, EXVEC_MACHINE_CHECK, INTR_PRIVILEGE },
+		{ simd_exception, EXVEC_SIMD_EXCEPTION, INTR_PRIVILEGE },
 
-		/* internal communication */
-		{ syscall_entry, SYS386_VECTOR, USER_PRIVILEGE },
+		/* kernel internal communication */
+		{ __kipc_entry, IRQVEC_KIPC, USER_PRIVILEGE },
 
-		/* nucleos i386 system call */
-		{ system_call, SYSCALL_VECTOR, USER_PRIVILEGE },
+		/* nucleos i386 system call entry */
+		{ __syscall_entry, IRQVEC_SYSCALL, USER_PRIVILEGE },
 
-		{ level0_call, LEVEL0_VECTOR, TASK_PRIVILEGE },
+		{ level0_call, IRQVEC_LEVEL0, TASK_PRIVILEGE },
 		{ NULL, 0, 0}
 	};
 

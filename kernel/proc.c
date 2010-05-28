@@ -8,14 +8,12 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* This file contains essentially all of the process and message handling.
- * Together with "mpx.s" it forms the lowest layer of the MINIX kernel.
- * There is one entry point from the outside:
- *
- *   sys_call: 	      a system call, i.e., the kernel is trapped with an INT
+
+ *   kipc_call: kernel internal communication
  *
  * As well as several entry points used from the interrupt and task level:
  *
- *   lock_send:	      send a message to a process
+ *   lock_send: send a message to a process
  *
  * Changes:
  *   Aug 19, 2005     rewrote scheduling code  (Jorrit N. Herder)
@@ -304,16 +302,16 @@ check_misc_flags:
 }
 
 /*===========================================================================*
- *				sys_call				     * 
+ *				kipc_call				     * 
  *===========================================================================*/
-int sys_call(call_nr, src_dst_e, m_ptr, bit_map)
+int kipc_call(call_nr, src_dst_e, m_ptr, bit_map)
 int call_nr;			/* system call number and flags */
 int src_dst_e;			/* src to receive from or dst to send to */
 message *m_ptr;			/* pointer to message in the caller's space */
 long bit_map;			/* notification event set or flags */
 {
 /* System calls are done by trapping to the kernel with an INT instruction.
- * The trap is caught and sys_call() is called to send or receive a message
+ * The trap is caught and kipc_call() is called to send or receive a message
  * (or both). The caller is always given by 'proc_ptr'.
  */
   register struct proc *caller_ptr = proc_ptr;	/* get pointer to caller */
@@ -324,7 +322,7 @@ long bit_map;			/* notification event set or flags */
 
   /* If this process is subject to system call tracing, handle that first. */
   if (caller_ptr->p_misc_flags & (MF_SC_TRACE | MF_SC_DEFER)) {
-	/* Are we tracing this process, and is it the first sys_call entry? */
+	/* Are we tracing this process, and is it the first kipc_call entry? */
 	if ((caller_ptr->p_misc_flags & (MF_SC_TRACE | MF_SC_DEFER)) ==
 							MF_SC_TRACE) {
 		/* We must notify the tracer before processing the actual
@@ -355,7 +353,7 @@ long bit_map;			/* notification event set or flags */
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   if(caller_ptr->p_misc_flags & MF_DELIVERMSG) {
-	kprintf("sys_call: MF_DELIVERMSG on for %s / %d\n",
+	kprintf("kipc_call: MF_DELIVERMSG on for %s / %d\n",
 		caller_ptr->p_name, caller_ptr->p_endpoint);
 	minix_panic("MF_DELIVERMSG on", NO_NUM);
   }
@@ -399,7 +397,7 @@ long bit_map;			/* notification event set or flags */
 	if (call_nr != KIPC_RECEIVE)
 	{
 #if 0
-		kprintf("sys_call: trap %d by %d with bad endpoint %d\n", 
+		kprintf("kipc_call: trap %d by %d with bad endpoint %d\n", 
 			call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
 		return -EINVAL;
@@ -411,7 +409,7 @@ long bit_map;			/* notification event set or flags */
 	/* Require a valid source and/or destination process. */
 	if(!isokendpt(src_dst_e, &src_dst_p)) {
 #if 0
-		kprintf("sys_call: trap %d by %d with bad endpoint %d\n", 
+		kprintf("kipc_call: trap %d by %d with bad endpoint %d\n", 
 			call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
 		return -EDEADSRCDST;
@@ -426,7 +424,7 @@ long bit_map;			/* notification event set or flags */
 		if (!may_send_to(caller_ptr, src_dst_p)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
 			kprintf(
-			"sys_call: ipc mask denied trap %d from %d to %d\n",
+			"kipc_call: ipc mask denied trap %d from %d to %d\n",
 				call_nr, caller_ptr->p_endpoint, src_dst_e);
 #endif
 			return(-ECALLDENIED);	/* call denied by ipc mask */
@@ -438,7 +436,7 @@ long bit_map;			/* notification event set or flags */
   if (call_nr < 0 || call_nr >= 32)
   {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-      kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
+      kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_p);
 #endif
 	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
@@ -450,7 +448,7 @@ long bit_map;			/* notification event set or flags */
    */
   if (!(priv(caller_ptr)->s_trap_mask & (1 << call_nr))) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-      kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
+      kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_p);
 #endif
 	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
@@ -461,7 +459,7 @@ long bit_map;			/* notification event set or flags */
   if (call_nr != KIPC_SENDREC && call_nr != KIPC_RECEIVE && call_nr != KIPC_SENDA &&
 	iskerneln(src_dst_p)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-      kprintf("sys_call: trap %d not allowed, caller %d, src_dst %d\n", 
+      kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n", 
           call_nr, proc_nr(caller_ptr), src_dst_e);
 #endif
 	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
@@ -921,7 +919,7 @@ size_t size;
 	/* Limit size to something reasonable. An arbitrary choice is 16
 	 * times the number of process table entries.
 	 *
-	 * (this check has been duplicated in sys_call but is left here
+	 * (this check has been duplicated in kipc_call but is left here
 	 * as a sanity check)
 	 */
 	if (size > 16*(NR_TASKS + NR_PROCS))
