@@ -80,10 +80,10 @@ int intr_init(int mine, int auto_eoi)
 	 * can still make BIOS calls without reprogramming the i8259s.
 	 */
 #if IRQ0_VECTOR != BIOS_IRQ0_VEC
-      phys_copy(BIOS_VECTOR(0) * 4L, VECTOR(0) * 4L, 8 * 4L);
+      phys_copy(VECTOR(0) * 4L, BIOS_VECTOR(0) * 4L, 8 * 4L);
 #endif
 #if IRQ8_VECTOR != BIOS_IRQ8_VEC
-      phys_copy(BIOS_VECTOR(8) * 4L, VECTOR(8) * 4L, 8 * 4L);
+      phys_copy(VECTOR(8) * 4L, BIOS_VECTOR(8) * 4L, 8 * 4L);
 #endif
 
   return 0;

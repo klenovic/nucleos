@@ -44,7 +44,7 @@ static inline unsigned long copy_to_user(void __user *to, const void *from, unsi
 	/* We must use this version of phys_copy (wrapper) because a pagefault
 	 * exception may occur during copy and we want to handle it.
 	 */
-	pfaddr = PHYS_COPY_CATCH(vir2phys(from), linaddr, n);
+	pfaddr = PHYS_COPY_CATCH(linaddr, vir2phys(from), n);
 
 	if (!pfaddr)
 		return 0;
@@ -77,7 +77,7 @@ static inline unsigned long copy_from_user(void *to, const void __user *from, un
 	/* We must use this version of phys_copy (wrapper) because a pagefault
 	 * exception may occur during copy and we want to handle it.
 	 */
-	pfaddr = PHYS_COPY_CATCH(linaddr, vir2phys(to), n);
+	pfaddr = PHYS_COPY_CATCH(vir2phys(to), linaddr, n);
 
 	if (!pfaddr)
 		return 0;

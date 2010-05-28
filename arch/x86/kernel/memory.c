@@ -185,7 +185,7 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 		CREATEPDE(dstproc, dstptr, dstlinaddr, chunk, bytes, dstpde, dsttype);
 
 		/* Copy pages. */
-		addr = PHYS_COPY_CATCH(srcptr, dstptr, chunk);
+		addr = PHYS_COPY_CATCH(dstptr, srcptr, chunk);
 
 		DONEPDE(srcpde);
 		DONEPDE(dstpde);
@@ -232,7 +232,7 @@ phys_bytes addr;
 	int r;
 
 	if(!vm_running) {
-		phys_copy(addr, vir2phys(&v), sizeof(v));
+		phys_copy(vir2phys(&v), addr, sizeof(v));
 		return v;
 	}
 
@@ -654,8 +654,8 @@ int delivermsg(struct proc *rp)
 
 	vm_set_cr3(rp);
 
-	addr = PHYS_COPY_CATCH(vir2phys(&rp->p_delivermsg),
-		rp->p_delivermsg_lin, sizeof(message));
+	addr = PHYS_COPY_CATCH(rp->p_delivermsg_lin, vir2phys(&rp->p_delivermsg),
+			       sizeof(message));
 
 	if(addr) {
 		vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(message), 1,
@@ -951,7 +951,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
   }
 
   /* Now copy bytes between physical addresseses. */
-  if(phys_copy(phys_addr[_SRC_], phys_addr[_DST_], (phys_bytes) bytes))
+  if(phys_copy(phys_addr[_DST_], phys_addr[_SRC_], (phys_bytes) bytes))
   	NOREC_RETURN(virtualcopy, -EFAULT);
  
   NOREC_RETURN(virtualcopy, 0);

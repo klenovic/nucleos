@@ -107,7 +107,7 @@ void arch_shutdown(int how)
 		 * the BIOS memory test by setting a soft reset flag.
 		 */
 		u16_t magic = STOP_MEM_CHECK;
-		phys_copy(vir2phys(&magic), SOFT_RESET_FLAG_ADDR, SOFT_RESET_FLAG_SIZE);
+		phys_copy(SOFT_RESET_FLAG_ADDR, vir2phys(&magic), SOFT_RESET_FLAG_SIZE);
 		level0(reset);
 	}
 }
@@ -120,7 +120,7 @@ void arch_get_aout_headers(int i, struct exec *h)
 	/* The bootstrap loader created an array of the a.out headers at
 	 * absolute address 'aout'. Get one element to h.
 	 */
-	phys_copy(aout + i * A_MINHDR, vir2phys(h), (phys_bytes) A_MINHDR);
+	phys_copy(vir2phys(h), aout + i * A_MINHDR, (phys_bytes) A_MINHDR);
 }
 
 void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)
@@ -430,7 +430,7 @@ void cons_setc(int pos, int c)
 	char ch;
 
 	ch= c;
-	phys_copy(vir2phys((vir_bytes)&ch), COLOR_BASE+(20*80+pos)*2, 1);
+	phys_copy(COLOR_BASE+(20*80+pos)*2, vir2phys((vir_bytes)&ch), 1);
 }
 
 void cons_seth(int pos, int n)
@@ -447,7 +447,7 @@ u32_t params_size, params_offset, mon_ds;
 
 int arch_get_params(char *params, int maxsize)
 {
-	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params),
+	phys_copy(vir2phys(params),seg2phys(mon_ds) + params_offset,
 		MIN(maxsize, params_size));
 	params[maxsize-1] = '\0';
 	return 0;
@@ -457,7 +457,7 @@ int arch_set_params(char *params, int size)
 {
 	if(size > params_size)
 		return -E2BIG;
-	phys_copy(vir2phys(params), seg2phys(mon_ds) + params_offset, size);
+	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params), size);
 	return 0;
 }
 

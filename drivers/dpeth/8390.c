@@ -669,7 +669,7 @@ static void dp_pio16_user2nic(dpeth_t *dep, int pageno, int pktsize)
 	if (!phys_user) panic(dep->de_name, UmapErrMsg, NO_NUM);
 
 	if (odd_byte) {
-		phys_copy(phys_user, phys_2bytes + 1, (phys_bytes) 1);
+		phys_copy(phys_2bytes + 1, phys_user, (phys_bytes) 1);
 		out_word(dep->de_data_port, *(u16_t *)two_bytes);
 		pktsize--;
 		bytes--;
@@ -685,7 +685,7 @@ static void dp_pio16_user2nic(dpeth_t *dep, int pageno, int pktsize)
 		phys_user += ecount;
 	}
 	if (bytes) {
-		phys_copy(phys_user, phys_2bytes, (phys_bytes) 1);
+		phys_copy(phys_2bytes, phys_user, (phys_bytes) 1);
 		pktsize--;
 		bytes--;
 		phys_user++;
@@ -741,7 +741,7 @@ static void dp_pio16_nic2user(dpeth_t * dep, int nic_addr, int count)
 			  iovp->iod_iovec[i].iov_addr, bytes);
 	if (!phys_user) panic(dep->de_name, UmapErrMsg, NO_NUM);
 	if (odd_byte) {
-		phys_copy(phys_2bytes + 1, phys_user, (phys_bytes) 1);
+		phys_copy(phys_user, phys_2bytes + 1, (phys_bytes) 1);
 		count--;
 		bytes--;
 		phys_user++;
@@ -757,7 +757,7 @@ static void dp_pio16_nic2user(dpeth_t * dep, int nic_addr, int count)
 	}
 	if (bytes) {
 		*(u16_t *) two_bytes = in_word(dep->de_data_port);
-		phys_copy(phys_2bytes, phys_user, (phys_bytes) 1);
+		phys_copy(phys_user, phys_2bytes, (phys_bytes) 1);
 		count--;
 		bytes--;
 		phys_user++;

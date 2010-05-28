@@ -22,12 +22,12 @@
 		prp->p_delivermsg_lin = umap_local(prp, D, prp->p_delivermsg_vir, sizeof(message)); \
 	}
 
-#define PHYS_COPY_CATCH(src, dst, size)		\
+#define PHYS_COPY_CATCH(dst, src, size)		\
 ({						\
 	extern int catch_pagefaults;		\
 	phys_bytes __pfaddr;			\
 	catch_pagefaults++;			\
-	__pfaddr = phys_copy(src, dst, size);	\
+	__pfaddr = phys_copy(dst, src, size);	\
 	catch_pagefaults--;			\
 	__pfaddr;				\
 })

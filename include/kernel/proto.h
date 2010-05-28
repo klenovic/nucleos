@@ -117,7 +117,7 @@ void stop_profile_clock(void);
 
 /* functions defined in architecture-dependent files. */
 void prot_init(void);
-phys_bytes phys_copy(phys_bytes source, phys_bytes dest, phys_bytes count);
+phys_bytes phys_copy(phys_bytes dest, phys_bytes source, phys_bytes count);
 void phys_copy_fault(void);
 void phys_copy_fault_in_kernel(void);
 

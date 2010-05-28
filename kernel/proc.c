@@ -121,11 +121,9 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 
 #if 0
 	if(INMEMORY(dst)) {
-		PHYS_COPY_CATCH(msg_lin, dst->p_delivermsg_lin,
-			sizeof(message), addr);
+		addr = PHYS_COPY_CATCH(dst->p_delivermsg_lin, msg_lin, sizeof(message));
 		if(!addr) {
-			PHYS_COPY_CATCH(vir2phys(&ep), dst->p_delivermsg_lin,
-				sizeof(ep), addr);
+			addr = PHYS_COPY_CATCH(dst->p_delivermsg_lin, vir2phys(&ep), sizeof(ep));
 			if(!addr) {
 				NOREC_RETURN(queuemess, 0);
 			}
@@ -133,7 +131,7 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 	}
 #endif
 
-	addr = PHYS_COPY_CATCH(msg_lin, vir2phys(&dst->p_delivermsg), sizeof(message));
+	addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(message));
 	if(addr) {
 		NOREC_RETURN(queuemess, -EFAULT);
 	}
@@ -644,8 +642,7 @@ int flags;
 	}
 
 	/* Destination is not waiting.  Block and dequeue caller. */
-	addr = PHYS_COPY_CATCH(linaddr, vir2phys(&caller_ptr->p_sendmsg),
-		sizeof(message));
+	addr = PHYS_COPY_CATCH(vir2phys(&caller_ptr->p_sendmsg), linaddr, sizeof(message));
 
 	if(addr) { return -EFAULT; }
 	RTS_SET(caller_ptr, RTS_SENDING);

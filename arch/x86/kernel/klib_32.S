@@ -254,25 +254,25 @@ phys_outsb:
 //===========================================================================
 //                             phys_copy
 //===========================================================================
-// phys_bytes phys_copy(phys_bytes source, phys_bytes destination,
+// phys_bytes phys_copy(phys_bytes destination, phys_bytes source,
 //                      phys_bytes bytecount);
 // Copy a block of physical memory.
 
 .set PC_ARGS, 4 + 4 + 4 + 4   // 4 + 4 + 4
-//              es edi esi eip   src dst len
+//              es esi edi eip   dst src len
 	.p2align 4
 .globl phys_copy      // copy data from anywhere to anywhere in memory
 phys_copy:
 	cld
-	push	%esi
 	push	%edi
+	push	%esi
 	push	%es
 
 	mov	$FLAT_DS_SELECTOR, %eax
 	mov	%ax, %es
 
-	mov	PC_ARGS(%esp), %esi
-	mov	PC_ARGS+4(%esp), %edi
+	mov	PC_ARGS(%esp), %edi
+	mov	PC_ARGS+4(%esp), %esi
 	mov	PC_ARGS+4+4(%esp), %eax
 
 	cmp	$10, %eax                // avoid align overhead for small counts
@@ -298,15 +298,15 @@ pc_small:
 .globl phys_copy_fault
 phys_copy_fault:				// kernel can send us here
 	pop	%es
-	pop	%edi
 	pop	%esi
+	pop	%edi
 	ret
 
 .globl phys_copy_fault_in_kernel
 phys_copy_fault_in_kernel:                     /* kernel can send us here */
 	pop	%es
-	pop	%edi
 	pop	%esi
+	pop	%edi
 	mov	%cr2, %eax
 	ret
 
