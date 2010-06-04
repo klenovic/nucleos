@@ -214,7 +214,7 @@ void arch_init(void)
 #define COM1_RBR	(COM1_BASE + 0)
 #define COM1_LSR	(COM1_BASE + 5)
 #define      LSR_DR		0x01
-#define      LSR_THRE	0x20
+#define      LSR_THRE		0x20
 
 void ser_putc(char c)
 {
@@ -554,6 +554,7 @@ void restore_regs_syscall_0x80(struct proc *proc)
 			p_data = (void*)proc->clobregs[CLOBB_REG_ESI];
 			data = proc->p_delivermsg.m2_l2;
 
+			/* copy data into user-space */
 			if (p_data && copy_to_user(p_data, &data, sizeof(long)))
 				proc->p_reg.retreg = -EFAULT;
 		}
@@ -562,6 +563,7 @@ void restore_regs_syscall_0x80(struct proc *proc)
 		}
 	}
 
+	/* copy status into user-space */
 	if (wait_waitpid && p_status && copy_to_user(p_status, &status, sizeof(int)))
 		proc->p_reg.retreg = -EFAULT;
 
