@@ -22,7 +22,7 @@ unsigned long vm_getphys(int endpt, void *addr)
 	m.VMPHYS_ENDPT = endpt;
 	m.VMPHYS_ADDR = (long) addr;
 
-	r = ksyscall(VM_PROC_NR, VM_GETPHYS, &m);
+	r = ktaskcall(VM_PROC_NR, VM_GETPHYS, &m);
 	if (r != 0)
 		return 0;
 	return m.VMPHYS_RETA;

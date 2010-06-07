@@ -22,7 +22,7 @@ u8_t vm_getrefcount(int endpt, void *addr)
 	m.VMREFCNT_ENDPT = endpt;
 	m.VMREFCNT_ADDR = (long) addr;
 
-	r = ksyscall(VM_PROC_NR, VM_GETREF, &m);
+	r = ktaskcall(VM_PROC_NR, VM_GETREF, &m);
 	if (r != 0)
 		return (u8_t) -1;
 	return (u8_t) m.VMREFCNT_RETC;

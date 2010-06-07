@@ -20,5 +20,5 @@ int vm_unmap(int endpt, void *addr)
 	m.VMUN_ENDPT = endpt;
 	m.VMUN_ADDR = (long) addr;
 
-	return ksyscall(VM_PROC_NR, VM_SHM_UNMAP, &m);
+	return ktaskcall(VM_PROC_NR, VM_SHM_UNMAP, &m);
 }

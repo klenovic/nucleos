@@ -38,7 +38,7 @@ int semget(key_t key, int nsems, int semflag)
 	m.SEMGET_NR = nsems;
 	m.SEMGET_FLAG = semflag;
 
-	r = ksyscall(ipc_pt, IPC_SEMGET, &m);
+	r = ktaskcall(ipc_pt, IPC_SEMGET, &m);
 	if (r != 0)
 		return r;
 
@@ -68,7 +68,7 @@ int semctl(int semid, int semnum, int cmd, ...)
 		m.SEMCTL_OPT = (long) va_arg(ap, long);
 	va_end(ap); 
 
-	r = ksyscall(ipc_pt, IPC_SEMCTL, &m);
+	r = ktaskcall(ipc_pt, IPC_SEMCTL, &m);
 	if ((r != -1) && (cmd == GETNCNT || cmd == GETZCNT || cmd == GETPID ||
 		cmd == GETVAL || cmd == IPC_INFO || cmd == SEM_INFO ||
 		cmd == SEM_STAT))
@@ -91,5 +91,5 @@ int semop(int semid, struct sembuf *sops, size_t nsops)
 	m.SEMOP_OPS = (long) sops;
 	m.SEMOP_SIZE = nsops;
 
-	return ksyscall(ipc_pt, IPC_SEMOP, &m);
+	return ktaskcall(ipc_pt, IPC_SEMOP, &m);
 }

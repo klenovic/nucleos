@@ -11,7 +11,7 @@ int vm_query_exit(int *endpt)
 	message m;
 	int r;
 
-	r = ksyscall(VM_PROC_NR, VM_QUERY_EXIT, &m);
+	r = ktaskcall(VM_PROC_NR, VM_QUERY_EXIT, &m);
 	if (r != 0)
 		return -1;
 	if (endpt == NULL)

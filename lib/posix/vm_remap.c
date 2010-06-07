@@ -24,7 +24,7 @@ void *vm_remap(int d, int s, void *da, void *sa, size_t size)
 	m.VMRE_SA = (char *) sa;
 	m.VMRE_SIZE = size;
 
-	r = ksyscall(VM_PROC_NR, VM_REMAP, &m);
+	r = ktaskcall(VM_PROC_NR, VM_REMAP, &m);
 	if (r != 0)
 		return MAP_FAILED;
 	return (void *) m.VMRE_RETA;

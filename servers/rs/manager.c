@@ -1063,7 +1063,7 @@ static pid_t fork_nb()
 {
   message m;
 
-  return(ksyscall(PM_PROC_NR, KCNR_FORK_NB, &m));
+  return(ktaskcall(PM_PROC_NR, KCNR_FORK_NB, &m));
 }
 
 /*===========================================================================*

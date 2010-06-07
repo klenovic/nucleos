@@ -66,6 +66,9 @@
    two consecutive of these instruction.  This gives no penalty on
    other processors though.  */
 
+/* Don't use it, will be removed! */
+extern int errno;
+
 /* Define a macro which expands inline into the wrapper code for a system
    call.  */
 #undef INLINE_SYSCALL
@@ -188,28 +191,6 @@
 /* @nucleos: define some usefull stuffs here (see linux source) */
 
 #include <nucleos/kipc.h>
-
-extern int errno;
-static inline int ksyscall(int who, int syscallnr, message *msgptr)
-{
-	int status;
-
-	msgptr->m_type = syscallnr;
-	status = kipc_sendrec(who, msgptr);
-
-	if (status != 0) {
-		/* 'sendrec' itself failed. */
-		/* XXX - strerror doesn't know all the codes */
-		msgptr->m_type = status;
-	}
-
-	if (msgptr->m_type < 0) {
-		errno = -msgptr->m_type;
-		return(-1);
-	}
-
-	return(msgptr->m_type);
-}
 
 static inline int ktaskcall(endpoint_t who, int syscallnr, register message *msgptr)
 {

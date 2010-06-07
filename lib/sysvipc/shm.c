@@ -37,7 +37,7 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 	m.SHMCTL_CMD = cmd;
 	m.SHMCTL_BUF = (long) buf;
 
-	r = ksyscall(ipc_pt, IPC_SHMCTL, &m);
+	r = ktaskcall(ipc_pt, IPC_SHMCTL, &m);
 	if ((cmd == IPC_INFO || cmd == SHM_INFO || cmd == SHM_STAT)
 		&& (r == 0))
 		return m.SHMCTL_RET;
@@ -60,7 +60,7 @@ int shmget(key_t key, size_t size, int shmflg)
 	m.SHMGET_SIZE = size;
 	m.SHMGET_FLAG = shmflg;
 
-	r = ksyscall(ipc_pt, IPC_SHMGET, &m);
+	r = ktaskcall(ipc_pt, IPC_SHMGET, &m);
 	if (r != 0)
 		return r;
 	return m.SHMGET_RETID;
@@ -82,7 +82,7 @@ void *shmat(int shmid, const void *shmaddr, int shmflg)
 	m.SHMAT_ADDR = (long) shmaddr;
 	m.SHMAT_FLAG = shmflg;
 
-	r = ksyscall(ipc_pt, IPC_SHMAT, &m);
+	r = ktaskcall(ipc_pt, IPC_SHMAT, &m);
 	if (r != 0)
 		return (void *) -1;
 	return (void *) m.SHMAT_RETADDR;
@@ -101,5 +101,5 @@ int shmdt(const void *shmaddr)
 
 	m.SHMDT_ADDR = (long) shmaddr;
 
-	return ksyscall(ipc_pt, IPC_SHMDT, &m);
+	return ktaskcall(ipc_pt, IPC_SHMDT, &m);
 }

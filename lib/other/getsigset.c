@@ -20,7 +20,7 @@ int getsigset(sigset_t *sp)
 	message m;
 	m.m2_i1 = ENDPT_SELF;			/* request own signal set */
 
-	if (ksyscall(PM_PROC_NR, KCNR_PROCSTAT, &m) < 0)
+	if (ktaskcall(PM_PROC_NR, KCNR_PROCSTAT, &m) < 0)
 		return(-1);
 
 	*sp = m.m2_l1;
