@@ -136,8 +136,13 @@ register message *m_ptr;	/* pointer to request message */
 		vm_init(p);
 		if(!vm_running)
 			minix_panic("do_vmctl: paging enabling failed", NO_NUM);
-		vmassert(p->p_delivermsg_lin ==
-		  umap_local(p, D, p->p_delivermsg_vir, sizeof(message)));
+
+		if (p->syscall_0x80)
+			vmassert(p->p_delivermsg_lin == vir2phys(&p->p_delivermsg));
+		else
+			vmassert(p->p_delivermsg_lin ==
+				 umap_local(p, D, p->p_delivermsg_vir, sizeof(message)));
+
 		if ((err = arch_enable_paging()) != 0) {
 			unlock;
 			return err;

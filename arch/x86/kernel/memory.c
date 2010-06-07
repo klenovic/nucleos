@@ -649,25 +649,33 @@ int delivermsg(struct proc *rp)
 		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(message)));
 		minix_panic("that's wrong", NO_NUM);
 	}
-
 #endif
 
-	vm_set_cr3(rp);
-
-	addr = PHYS_COPY_CATCH(rp->p_delivermsg_lin, vir2phys(&rp->p_delivermsg),
-			       sizeof(message));
-
-	if(addr) {
-		vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(message), 1,
-			VMSTYPE_DELIVERMSG);
-		r = VMSUSPEND;
-	} else {
+	if (rp->syscall_0x80) {
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 		rp->p_delivermsg.m_source = ENDPT_NONE;
 		rp->p_delivermsg_lin = 0;
 #endif
 		rp->p_misc_flags &= ~MF_DELIVERMSG;
 		r = 0;
+	} else {
+		vm_set_cr3(rp);
+
+		addr = PHYS_COPY_CATCH(rp->p_delivermsg_lin, vir2phys(&rp->p_delivermsg),
+				       sizeof(message));
+
+		if(addr) {
+			vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(message), 1,
+				VMSTYPE_DELIVERMSG);
+			r = VMSUSPEND;
+		} else {
+#ifdef CONFIG_DEBUG_KERNEL_VMASSERT
+			rp->p_delivermsg.m_source = ENDPT_NONE;
+			rp->p_delivermsg_lin = 0;
+#endif
+			rp->p_misc_flags &= ~MF_DELIVERMSG;
+			r = 0;
+		}
 	}
 
 	NOREC_RETURN(deliver, r);

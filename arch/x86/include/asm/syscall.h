@@ -88,15 +88,13 @@
 #define INTERNAL_SYSCALL(name, err, nr, args...)	\
 ({							\
 	register unsigned int resultvar;		\
-	int __msg[9] = {0, __NR_##name};		\
-	resultvar = (unsigned int)__msg;		\
 	EXTRAVAR_##nr					\
 	__asm__ __volatile__ (				\
 		LOADARGS_##nr				\
 		ASM_SYSCALL_CALL_SYSTEM			\
 		RESTOREARGS_##nr			\
-		: "=a" (resultvar)			\
-		: "0" (resultvar) ASMFMT_##nr(args)	\
+		: "=a"(resultvar)			\
+		: "0"(__NR_##name) ASMFMT_##nr(args)	\
 		: "memory", "cc"			\
 	);						\
 	(int) resultvar;				\

@@ -110,32 +110,24 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 {
 	int k;
 	phys_bytes addr;
+
 	NOREC_ENTER(queuemess);
 	/* Queue a message from the src process (in memory) to the dst
 	 * process (using dst process table entry). Do actual copy to
 	 * kernel here; it's an error if the copy fails into kernel.
 	 */
-	vmassert(!(dst->p_misc_flags & MF_DELIVERMSG));	
+	vmassert(!(dst->p_misc_flags & MF_DELIVERMSG));
 	vmassert(dst->p_delivermsg_lin);
 	vmassert(isokendpt(ep, &k));
 
-#if 0
-	if(INMEMORY(dst)) {
-		addr = PHYS_COPY_CATCH(dst->p_delivermsg_lin, msg_lin, sizeof(message));
-		if(!addr) {
-			addr = PHYS_COPY_CATCH(dst->p_delivermsg_lin, vir2phys(&ep), sizeof(ep));
-			if(!addr) {
-				NOREC_RETURN(queuemess, 0);
-			}
+	if (dst->syscall_0x80) {
+		*((message*)&dst->p_delivermsg) = *((message*)phys2vir(msg_lin));
+	} else {
+		addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(message));
+		if(addr) {
+			NOREC_RETURN(queuemess, -EFAULT);
 		}
 	}
-#endif
-
-	addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(message));
-	if(addr) {
-		NOREC_RETURN(queuemess, -EFAULT);
-	}
-
 	dst->p_delivermsg.m_source = ep;
 	dst->p_misc_flags |= MF_DELIVERMSG;
 
@@ -609,8 +601,9 @@ int flags;
   vir_bytes addr;
   int r;
 
-  if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr,
-	sizeof(message)))) {
+  if (caller_ptr->syscall_0x80)
+	linaddr = vir2phys(&caller_ptr->p_sendmsg);
+  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(message)))) {
 	return -EFAULT;
   }
 
@@ -641,10 +634,13 @@ int flags;
 		return(-ELOCKED);
 	}
 
-	/* Destination is not waiting.  Block and dequeue caller. */
-	addr = PHYS_COPY_CATCH(vir2phys(&caller_ptr->p_sendmsg), linaddr, sizeof(message));
+	if (!caller_ptr->syscall_0x80) {
+		/* Destination is not waiting.  Block and dequeue caller. */
+		addr = PHYS_COPY_CATCH(vir2phys(&caller_ptr->p_sendmsg), linaddr, sizeof(message));
 
-	if(addr) { return -EFAULT; }
+		if(addr) { return -EFAULT; }
+	}
+
 	RTS_SET(caller_ptr, RTS_SENDING);
 	caller_ptr->p_sendto_e = dst_e;
 
@@ -682,16 +678,21 @@ int flags;
 
   vmassert(!(caller_ptr->p_misc_flags & MF_DELIVERMSG));
 
-  if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr,
-	sizeof(message)))) {
+  if (caller_ptr->syscall_0x80)
+	linaddr = vir2phys(&caller_ptr->p_delivermsg);
+  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(message)))) {
 	return -EFAULT;
   }
 
   /* This is where we want our message. */
   caller_ptr->p_delivermsg_lin = linaddr;
-  caller_ptr->p_delivermsg_vir = (vir_bytes) m_ptr;
+  if (caller_ptr->syscall_0x80)
+	caller_ptr->p_delivermsg_vir = (vir_bytes)&caller_ptr->p_delivermsg;
+  else
+	caller_ptr->p_delivermsg_vir = (vir_bytes) m_ptr;
 
-  if(src_e == ENDPT_ANY) src_p = ENDPT_ANY;
+  if(src_e == ENDPT_ANY)
+	src_p = ENDPT_ANY;
   else
   {
 	okendpt(src_e, &src_p);

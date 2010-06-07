@@ -54,43 +54,33 @@ static struct endpt_args scall_to_srv[NR_syscalls];
 
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
-	message kmsg;
-	message __user *msg = (message*)r->ax;
+	message *kmsg = &proc_ptr->p_sendmsg;
 	int err = 0;
 
-	memset(&kmsg, 0, sizeof(message));
-
-	/* copy the message from caller (user) space */
-	if (copy_from_user(&kmsg, msg, sizeof(message))) {
-		err = -EFAULT;
-		goto fail_map;
-	}
-
 	/* `m_type' contains syscall number */
-	proc_ptr->syscall_0x80 = kmsg.m_type;
+	proc_ptr->syscall_0x80 = r->ax;
 
 	/* @nucleos: The syscall numbers used by user (_NR_*) and kernel may be different.
 	 *           E.g. user calls mmap via __NR_mmap but system knows it as VM_MMAP. In
 	 *           this case the m_type can be changed to appropriate number in msg_* function.
 	 *           Thing to change ???
 	 */
-	r->ax = kmsg.m_type;
+	kmsg->m_type = r->ax;
 
 	/* don't cross the range */
 	if (!r->ax || r->ax >= NR_syscalls) {
-		err = -EFAULT;
-		goto fail_map;
+		err = -ENOSYS;
+		goto fail_msg;
+	}
+
+	if (!scall_to_srv[r->ax].fill_msg) {
+		err = -ENOSYS;
+		goto fail_msg;
 	}
 
 	/* fill the message according to passed arguments */
-	if (!scall_to_srv[r->ax].fill_msg) {
-		err = -ENOSYS;
-		goto fail_map;
-	}
-
-	if ((err = scall_to_srv[r->ax].fill_msg(&kmsg, r)) < 0) {
-		goto fail_map;
-	}
+	if ((err = scall_to_srv[r->ax].fill_msg(kmsg, r)) < 0)
+		goto fail_msg;
 
 	if (r->ax != __NR_sigreturn) {
 		/* save all these regs and then retore them on kernel exit */
@@ -105,20 +95,11 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 	/* sligh check whether the endpoint is valid */
 	if (scall_to_srv[r->ax].endpt == ENDPT_ANY) {
 		err = -EFAULT;
-		goto fail_map;
-	}
-
-	/* @nucleos: This mapping _must_ change in the future. It is here because of current
-	 *           kIPC. It requires to have message in caller's (user's) space.
-	 */
-	/* copy the filled message into caller (user) space */
-	if (copy_to_user(msg, &kmsg, sizeof(message))) {
-		err = -EFAULT;
-		goto fail_map;
+		goto fail_msg;
 	}
 
 	r->ax = scall_to_srv[r->ax].endpt;
-	r->bx = (unsigned long)msg;
+	r->bx = (unsigned long)kmsg;
 	r->cx = KIPC_SENDREC;
 	r->dx = 0;
 
@@ -126,7 +107,7 @@ endpoint_t map_scall_endpt(struct pt_regs *r)
 
 	return r->ax;
 
-fail_map:
+fail_msg:
 	proc_ptr->syscall_0x80 = 0;
 	proc_ptr->p_reg.retreg = err;
 
