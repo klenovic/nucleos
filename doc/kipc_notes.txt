@@ -1,0 +1,14 @@
+KIPC requirements:
+1) Fastes way to pass information:
+	- From user space to kernel space and back (the message is not passed
+	  further i.e. only user<->kernel).
+	- From user space to user space via kernel space (kernel pass the message
+	  to other server/driver  i.e. user<->kernel<->user). The messageshould
+	  not leave the kernel space and it passed only in between procs' kernel
+	  structures. It's _not_ neccessary to copy the message it into the
+	  user-space.
+	- Architecture specific. On the x86 the registers should be used
+	  (like system call macro see arch/x86/include/syscalls.h).
+2) Clear/generic interface
+	- each architecture will define its own low-layer interface and connects to
+	  to the generic framework.
