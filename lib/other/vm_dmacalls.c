@@ -15,7 +15,7 @@
 
 int vm_adddma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
-  message m;
+  kipc_msg_t m;
 
   m.VMAD_REQ= req_proc_e;
   m.VMAD_EP= proc_e;
@@ -27,7 +27,7 @@ int vm_adddma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_b
 
 int vm_deldma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
-  message m;
+  kipc_msg_t m;
 
   m.VMDD_REQ= proc_e;
   m.VMDD_EP= proc_e;
@@ -40,7 +40,7 @@ int vm_deldma(endpoint_t req_proc_e, endpoint_t proc_e, phys_bytes start, phys_b
 int vm_getdma(endpoint_t req_proc_e, endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
 {
   int r;
-  message m;
+  kipc_msg_t m;
 
   m.VMGD_REQ = req_proc_e;
 

@@ -14,7 +14,7 @@
  *===========================================================================*/
 int sys_nice(endpoint_t proc_ep, int prio)
 {
-  message m;
+  kipc_msg_t m;
 
   m.PR_ENDPT = proc_ep;
   m.PR_PRIORITY = prio;

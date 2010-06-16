@@ -36,8 +36,8 @@ typedef struct osdep_eth_port
 	iovec_s_t etp_rd_iovec[RD_IOVEC];
 	cp_grant_id_t etp_rd_vec_grant;
 	event_t etp_recvev;
-	message etp_sendrepl;
-	message etp_recvrepl;
+	kipc_msg_t etp_sendrepl;
+	kipc_msg_t etp_recvrepl;
 	cp_grant_id_t etp_stat_gid;
 	eth_stat_t *etp_stat_buf;
 } osdep_eth_port_t;

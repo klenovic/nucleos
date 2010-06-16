@@ -33,7 +33,7 @@ static struct query_exit_struct array[NR_PROCS];
 /*===========================================================================*
  *				do_query_exit				     *
  *===========================================================================*/
-int do_query_exit(message *m)
+int do_query_exit(kipc_msg_t *m)
 {
 	int i, nr;
 	endpoint_t ep;
@@ -62,7 +62,7 @@ int do_query_exit(message *m)
 /*===========================================================================*
  *				do_notify_sig				     *
  *===========================================================================*/
-int do_notify_sig(message *m)
+int do_notify_sig(kipc_msg_t *m)
 {
 	int i, avails = 0;
 	endpoint_t ep = m->VM_NOTIFY_SIG_ENDPOINT;

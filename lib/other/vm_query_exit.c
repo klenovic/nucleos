@@ -8,7 +8,7 @@
  */
 int vm_query_exit(int *endpt)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	r = ktaskcall(VM_PROC_NR, VM_QUERY_EXIT, &m);

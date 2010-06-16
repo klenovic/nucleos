@@ -28,10 +28,10 @@ struct memory;
 
 /* alloc.c */
 phys_clicks alloc_mem_f(phys_clicks clicks, u32_t flags);
-int do_adddma(message *msg);
-int do_deldma(message *msg);
-int do_getdma(message *msg);
-int do_allocmem(message *msg);
+int do_adddma(kipc_msg_t *msg);
+int do_deldma(kipc_msg_t *msg);
+int do_getdma(kipc_msg_t *msg);
+int do_allocmem(kipc_msg_t *msg);
 void release_dma(struct vmproc *vmp);
 
 void memstats(int *nodes, int *pages, int *largest);
@@ -55,50 +55,50 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr);
 int reserve_initrd_mem(struct memory *mem_chunks);
 int vm_isokendpt(endpoint_t ep, int *proc);
 int get_stack_ptr(int proc_nr, vir_bytes *sp);
-int do_ctl(message *);
+int do_ctl(kipc_msg_t *);
 
 /* exit.c */
 void clear_proc(struct vmproc *vmp);
-int do_exit(message *msg);
-int do_willexit(message *msg);
+int do_exit(kipc_msg_t *msg);
+int do_willexit(kipc_msg_t *msg);
 void free_proc(struct vmproc *vmp);
 
 /* fork.c */
-int do_fork(message *msg);
+int do_fork(kipc_msg_t *msg);
 
 /* exec.c */
 struct vmproc *find_share(struct vmproc *vmp_ign, ino_t ino, dev_t dev, time_t ctime);
-int do_exec_newmem(message *msg);
+int do_exec_newmem(kipc_msg_t *msg);
 int proc_new(struct vmproc *vmp, phys_bytes start, phys_bytes text, phys_bytes data,
 	     phys_bytes stack, phys_bytes gap, phys_bytes text_here, phys_bytes data_here,
 	     vir_bytes stacktop);
 phys_bytes find_kernel_top(void);
 
 /* break.c */
-int do_brk(message *msg);
+int do_brk(kipc_msg_t *msg);
 int adjust(struct vmproc *rmp, vir_clicks data_clicks, vir_bytes sp);
 int real_brk(struct vmproc *vmp, vir_bytes v);
 
 /* signal.c */
-int do_push_sig(message *msg);
+int do_push_sig(kipc_msg_t *msg);
 
 /* vfs.c */
-int do_vfs_reply(message *msg);
+int do_vfs_reply(kipc_msg_t *msg);
 int vfs_open(struct vmproc *for_who, callback_t callback, cp_grant_id_t filename_gid,
 	     int filename_len, int flags, int mode);
 int vfs_close(struct vmproc *for_who, callback_t callback, int fd);
 
 /* mmap.c */
-int do_mmap(message *msg);
-int do_munmap(message *msg);
-int do_map_phys(message *msg);
-int do_unmap_phys(message *msg);
-int do_remap(message *m);
-int do_get_phys(message *m);
-int do_shared_unmap(message *m);
-int do_get_refcount(message *m);
-int scall_mmap(message *m);
-int scall_munmap(message *m);
+int do_mmap(kipc_msg_t *msg);
+int do_munmap(kipc_msg_t *msg);
+int do_map_phys(kipc_msg_t *msg);
+int do_unmap_phys(kipc_msg_t *msg);
+int do_remap(kipc_msg_t *m);
+int do_get_phys(kipc_msg_t *m);
+int do_shared_unmap(kipc_msg_t *m);
+int do_get_refcount(kipc_msg_t *m);
+int scall_mmap(kipc_msg_t *m);
+int scall_munmap(kipc_msg_t *m);
 
 /* pagefaults.c */
 void do_pagefaults(void);
@@ -182,11 +182,11 @@ vir_bytes arch_vir2map_text(struct vmproc *vmp, vir_bytes addr);
 vir_bytes arch_addrok(struct vmproc *vmp, vir_bytes addr);
 
 /* rs.c */
-int do_rs_set_priv(message *m);
+int do_rs_set_priv(kipc_msg_t *m);
 
 /* queryexit.c */
-int do_query_exit(message *m);
-int do_notify_sig(message *m);
+int do_query_exit(kipc_msg_t *m);
+int do_notify_sig(kipc_msg_t *m);
 void init_query_exit(void);
 
 #endif /* __SERVERS_VM_PROTO_H */

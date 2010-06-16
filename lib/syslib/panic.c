@@ -28,7 +28,7 @@ int num;			/* number to go with format string */
  * inconsistency is detected, e.g., a programming error or illegal 
  * value of a defined constant.
  */
-  message m;
+  kipc_msg_t m;
   endpoint_t me = ENDPT_NONE;
   char name[20];
   void (*suicide)(void);

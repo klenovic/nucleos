@@ -82,7 +82,7 @@ int type;					/* type info */
 
 
 int do_publish(m_ptr)
-message *m_ptr;					/* request message */
+kipc_msg_t *m_ptr;					/* request message */
 {
   struct data_store* dsp;
   char key_name[DS_MAX_KEYLEN];
@@ -167,7 +167,7 @@ message *m_ptr;					/* request message */
  *				do_retrieve				     *
  *===========================================================================*/
 int do_retrieve(m_ptr)
-message *m_ptr;					/* request message */
+kipc_msg_t *m_ptr;					/* request message */
 {
   struct data_store *dsp;
   char key_name[DS_MAX_KEYLEN];
@@ -228,7 +228,7 @@ message *m_ptr;					/* request message */
  *				do_check				     *
  *===========================================================================*/
 int do_check(m_ptr)
-message *m_ptr;					/* request message */
+kipc_msg_t *m_ptr;					/* request message */
 {
 /* This routine goes through all subscriptions for a client,
  * and checks all data items if it has been flagged (i.e.,
@@ -304,7 +304,7 @@ message *m_ptr;					/* request message */
 }
 
 int do_subscribe(m_ptr)
-message *m_ptr;					/* request message */
+kipc_msg_t *m_ptr;					/* request message */
 {
   char regex[DS_MAX_KEYLEN+3];
   int s, type, e, d, n = 0;
@@ -377,7 +377,7 @@ message *m_ptr;					/* request message */
  *				do_getsysinfo				     *
  *===========================================================================*/
 int do_getsysinfo(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   vir_bytes src_addr, dst_addr;
   int dst_proc;

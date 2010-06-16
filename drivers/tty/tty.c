@@ -113,14 +113,14 @@ static void got_signal(void);
 static void tty_timed_out(timer_t *tp);
 static void expire_timers(void);
 static void settimer(tty_t *tty_ptr, int enable);
-static void do_cancel(tty_t *tp, message *m_ptr);
-static void do_ioctl(tty_t *tp, message *m_ptr, int s);
-static void do_open(tty_t *tp, message *m_ptr);
-static void do_close(tty_t *tp, message *m_ptr);
-static void do_read(tty_t *tp, message *m_ptr, int s);
-static void do_write(tty_t *tp, message *m_ptr, int s);
-static void do_select(tty_t *tp, message *m_ptr);
-static void do_status(message *m_ptr);
+static void do_cancel(tty_t *tp, kipc_msg_t *m_ptr);
+static void do_ioctl(tty_t *tp, kipc_msg_t *m_ptr, int s);
+static void do_open(tty_t *tp, kipc_msg_t *m_ptr);
+static void do_close(tty_t *tp, kipc_msg_t *m_ptr);
+static void do_read(tty_t *tp, kipc_msg_t *m_ptr, int s);
+static void do_write(tty_t *tp, kipc_msg_t *m_ptr, int s);
+static void do_select(tty_t *tp, kipc_msg_t *m_ptr);
+static void do_status(kipc_msg_t *m_ptr);
 static void in_transfer(tty_t *tp);
 static int tty_echo(tty_t *tp, int ch);
 static void rawecho(tty_t *tp, int ch);
@@ -162,7 +162,7 @@ int main(void)
 {
 /* Main routine of the terminal task. */
 
-  message tty_mess;		/* buffer for all incoming messages */
+  kipc_msg_t tty_mess;		/* buffer for all incoming messages */
   unsigned line;
   int r, s;
   register tty_t *tp;
@@ -360,7 +360,7 @@ static void got_signal()
  *				do_status				     *
  *===========================================================================*/
 static void do_status(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   register struct tty *tp;
   int event_found;
@@ -448,7 +448,7 @@ message *m_ptr;
  *===========================================================================*/
 static void do_read(tp, m_ptr, safe)
 register tty_t *tp;		/* pointer to tty struct */
-register message *m_ptr;	/* pointer to message sent to the task */
+register kipc_msg_t *m_ptr;	/* pointer to message sent to the task */
 int safe;			/* use safecopies? */
 {
 /* A process wants to read from a terminal. */
@@ -517,7 +517,7 @@ int safe;			/* use safecopies? */
  *===========================================================================*/
 static void do_write(tp, m_ptr, safe)
 register tty_t *tp;
-register message *m_ptr;	/* pointer to message sent to the task */
+register kipc_msg_t *m_ptr;	/* pointer to message sent to the task */
 int safe;
 {
 /* A process wants to write on a terminal. */
@@ -560,7 +560,7 @@ int safe;
  *===========================================================================*/
 static void do_ioctl(tp, m_ptr, safe)
 register tty_t *tp;
-message *m_ptr;			/* pointer to message sent to task */
+kipc_msg_t *m_ptr;			/* pointer to message sent to task */
 int safe;
 {
 /* Perform an IOCTL on this terminal. Posix termios calls are handled
@@ -753,7 +753,7 @@ int safe;
  *===========================================================================*/
 static void do_open(tp, m_ptr)
 register tty_t *tp;
-message *m_ptr;			/* pointer to message sent to task */
+kipc_msg_t *m_ptr;			/* pointer to message sent to task */
 {
 /* A tty line has been opened.  Make it the callers controlling tty if
  * O_NOCTTY is *not* set and it is not the log device.  1 is returned if
@@ -779,7 +779,7 @@ message *m_ptr;			/* pointer to message sent to task */
  *===========================================================================*/
 static void do_close(tp, m_ptr)
 register tty_t *tp;
-message *m_ptr;			/* pointer to message sent to task */
+kipc_msg_t *m_ptr;			/* pointer to message sent to task */
 {
 /* A tty line has been closed.  Clean up the line if it is the last close. */
 
@@ -800,7 +800,7 @@ message *m_ptr;			/* pointer to message sent to task */
  *===========================================================================*/
 static void do_cancel(tp, m_ptr)
 register tty_t *tp;
-message *m_ptr;			/* pointer to message sent to task */
+kipc_msg_t *m_ptr;			/* pointer to message sent to task */
 {
 /* A signal has been sent to a process that is hanging trying to read or write.
  * The pending read or write must be finished off immediately.
@@ -1504,7 +1504,7 @@ int proc_nr;			/* to whom should the reply go? */
 int status;			/* reply code */
 {
 /* Send a reply to a process that wanted to read or write data. */
-  message tty_mess;
+  kipc_msg_t tty_mess;
 
   tty_mess.m_type = code;
   tty_mess.REP_ENDPT = proc_nr;
@@ -1701,7 +1701,7 @@ int try;
  *===========================================================================*/
 static void do_select(tp, m_ptr)
 register tty_t *tp;		/* pointer to tty struct */
-register message *m_ptr;	/* pointer to message sent to the task */
+register kipc_msg_t *m_ptr;	/* pointer to message sent to the task */
 {
 	int ops, ready_ops = 0, watch;
 

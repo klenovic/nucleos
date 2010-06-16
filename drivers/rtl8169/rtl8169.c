@@ -159,8 +159,8 @@ typedef struct re {
 	re_dtcc *v_dtcc_buf;	/* Dump Tally Counter buffer */
 	u32_t dtcc_counter;	/* DTCC update counter */
 	ether_addr_t re_address;
-	message re_rx_mess;
-	message re_tx_mess;
+	kipc_msg_t re_rx_mess;
+	kipc_msg_t re_tx_mess;
 	char re_name[sizeof("rtl8169#n")];
 	iovec_t re_iovec[IOVEC_NR];
 	iovec_s_t re_iovec_s[IOVEC_NR];
@@ -245,7 +245,7 @@ static void my_outl(u16_t port, u32_t value)
 #define rl_outw(port, offset, value)	(my_outw((port) + (offset), (value)))
 #define rl_outl(port, offset, value)	(my_outl((port) + (offset), (value)))
 
-static void rl_init(message *mp);
+static void rl_init(kipc_msg_t *mp);
 static void rl_pci_conf(void);
 static int rl_probe(re_t *rep);
 static void rl_conf_hw(re_t *rep);
@@ -254,16 +254,16 @@ static void rl_init_hw(re_t *rep);
 static void rl_reset_hw(re_t *rep);
 static void rl_confaddr(re_t *rep);
 static void rl_rec_mode(re_t *rep);
-static void rl_readv_s(message *mp, int from_int);
-static void rl_writev_s(message *mp, int from_int);
+static void rl_readv_s(kipc_msg_t *mp, int from_int);
+static void rl_writev_s(kipc_msg_t *mp, int from_int);
 static void rl_check_ints(re_t *rep);
 static void rl_report_link(re_t *rep);
 static void rl_do_reset(re_t *rep);
-static void rl_getstat(message *mp);
-static void rl_getstat_s(message *mp);
-static void rl_getname(message *mp);
+static void rl_getstat(kipc_msg_t *mp);
+static void rl_getstat_s(kipc_msg_t *mp);
+static void rl_getname(kipc_msg_t *mp);
 static void reply(re_t *rep, int err, int may_block);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 static void rtl8169_stop(void);
 static void check_int_events(void);
 static void do_hard_int(void);
@@ -276,7 +276,7 @@ static void rl_watchdog_f(timer_t *tp);
  * The message used in the main loop is made global, so that rl_watchdog_f()
  * can change its message type to fake an interrupt message.
  */
-static message m;
+static kipc_msg_t m;
 static int int_event_check;		/* set to TRUE if events arrived */
 
 static char *progname;
@@ -574,13 +574,13 @@ static void rtl8169_dump(void)
  *				do_init					     *
  *===========================================================================*/
 static void rl_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	static int first_time = 1;
 
 	int port;
 	re_t *rep;
-	message reply_mess;
+	kipc_msg_t reply_mess;
 
 	if (first_time) {
 		first_time = 0;
@@ -1250,7 +1250,7 @@ void transmittest(re_t *rep)
 
 	if(rep->re_tx[tx_head].ret_busy) {
 		do {
-			message m;
+			kipc_msg_t m;
 			int r;
 			if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
 				panic("rtl8169", "kipc_receive failed", r);
@@ -1266,7 +1266,7 @@ void transmittest(re_t *rep)
  *				rl_readv_s				     *
  *===========================================================================*/
 static void rl_readv_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	int i, j, n, s, dl_port, re_client, count, size, index;
@@ -1415,7 +1415,7 @@ suspend:
  *				rl_writev_s				     *
  *===========================================================================*/
 static void rl_writev_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	phys_bytes iov_src;
@@ -1648,7 +1648,7 @@ re_t *rep;
  *				rl_getstat				     *
  *===========================================================================*/
 static void rl_getstat(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, port;
 	eth_stat_t stats;
@@ -1682,7 +1682,7 @@ message *mp;
  *				rl_getstat_s				     *
  *===========================================================================*/
 static void rl_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, port;
 	eth_stat_t stats;
@@ -1717,7 +1717,7 @@ message *mp;
  *				rl_getname				     *
  *===========================================================================*/
 static void rl_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -1738,7 +1738,7 @@ re_t *rep;
 int err;
 int may_block;
 {
-	message reply;
+	kipc_msg_t reply;
 	int status;
 	int r;
 	clock_t now;
@@ -1779,8 +1779,8 @@ int may_block;
  *				mess_reply				     *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
 	if (send(req->m_source, reply_mess) != 0)
 		panic("rtl8169", "unable to mess_reply", NO_NUM);

@@ -85,14 +85,14 @@ static int pty_read(tty_t *tp, int try);
 static int pty_close(tty_t *tp, int try);
 static int pty_icancel(tty_t *tp, int try);
 static int pty_ocancel(tty_t *tp, int try);
-static int pty_select(tty_t *tp, message *m);
+static int pty_select(tty_t *tp, kipc_msg_t *m);
 
 /*===========================================================================*
  *				do_pty					     *
  *===========================================================================*/
 void do_pty(tp, m_ptr)
 tty_t *tp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Perform an open/close/read/write call on a /dev/ptypX device. */
   pty_t *pp = tp->tty_priv;
@@ -546,7 +546,7 @@ tty_t *tp;
 /*===========================================================================*
  *				pty_status				     *
  *===========================================================================*/
-int pty_status(message *m_ptr)
+int pty_status(kipc_msg_t *m_ptr)
 {
 	int i, event_found;
 	pty_t *pp;
@@ -640,7 +640,7 @@ void select_retry_pty(tty_t *tp)
 /*===========================================================================*
  *				pty_select				     *
  *===========================================================================*/
-static int pty_select(tty_t *tp, message *m)
+static int pty_select(tty_t *tp, kipc_msg_t *m)
 {
   	pty_t *pp = tp->tty_priv;
 	int ops, ready_ops = 0, watch;

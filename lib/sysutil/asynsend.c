@@ -27,7 +27,7 @@ static int first_slot= 0, next_slot= 0;
 
 int asynsend3(dst, mp, fl)
 endpoint_t dst;
-message *mp;
+kipc_msg_t *mp;
 int fl;
 {
 	int r, src_ind, dst_ind;

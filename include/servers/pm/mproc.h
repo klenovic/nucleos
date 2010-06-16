@@ -65,7 +65,7 @@ struct mproc {
 	unsigned mp_flags;		/* flag bits */
 	unsigned mp_trace_flags;	/* trace options */
 	vir_bytes mp_procargs;		/* ptr to proc's initial stack arguments */
-	message mp_reply;		/* reply message to be sent to one */
+	kipc_msg_t mp_reply;		/* reply message to be sent to one */
 
 	vir_bytes entry_point;		/* Entry point */
 

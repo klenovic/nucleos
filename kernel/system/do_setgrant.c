@@ -22,7 +22,7 @@
  *				do_setgrant				     *
  *===========================================================================*/
 int do_setgrant(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	struct proc *rp;
 	int r;

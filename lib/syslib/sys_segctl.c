@@ -19,7 +19,7 @@ vir_bytes *off;				/* return offset in segment here */
 phys_bytes phys;			/* physical address to convert */
 vir_bytes size;				/* size of segment */
 {
-    message m;
+    kipc_msg_t m;
     int s;
     m.SEG_PHYS = phys;
     m.SEG_SIZE = size;

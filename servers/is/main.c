@@ -20,8 +20,8 @@
 #include <nucleos/endpoint.h>
 
 /* Allocate space for the global variables. */
-message m_in;		/* the input message itself */
-message m_out;		/* the output message used for reply */
+kipc_msg_t m_in;		/* the input message itself */
+kipc_msg_t m_out;		/* the output message used for reply */
 int who_e;		/* caller's proc number */
 int callnr;		/* system call number */
 

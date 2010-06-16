@@ -11,7 +11,7 @@
 
 int sys_privctl(endpoint_t proc_ep, int request, void *p)
 {
-  message m;
+  kipc_msg_t m;
 
   m.CTL_ENDPT = proc_ep;
   m.CTL_REQUEST = request;
@@ -22,7 +22,7 @@ int sys_privctl(endpoint_t proc_ep, int request, void *p)
 
 int sys_privquery_mem(endpoint_t proc_ep, phys_bytes start, phys_bytes len)
 {
-  message m;
+  kipc_msg_t m;
 
   m.CTL_ENDPT = proc_ep;
   m.CTL_REQUEST = SYS_PRIV_QUERY_MEM;

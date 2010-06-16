@@ -30,7 +30,7 @@ static int generic_handler(irq_hook_t *hook);
  *				do_irqctl				     *
  *===========================================================================*/
 int do_irqctl(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   /* Dismember the request message. */
   int irq_vec;

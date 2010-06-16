@@ -22,7 +22,7 @@ int *sfkeys;				/* bit masks for Shift F1-F12 keys */
  * is already bound to another process. Disabling only succeeds if the key is
  * bound to the current process.   
  */ 
-    message m;
+    kipc_msg_t m;
     int s;
     m.FKEY_REQUEST = request;
     m.FKEY_FKEYS = (fkeys) ? *fkeys : 0;

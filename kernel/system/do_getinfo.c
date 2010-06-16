@@ -29,7 +29,7 @@
  *			        do_getinfo				     *
  *===========================================================================*/
 int do_getinfo(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Request system information to be copied to caller's address space. This
  * call simply copies entire data structures to the caller.

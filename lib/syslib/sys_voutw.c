@@ -17,7 +17,7 @@ int sys_voutw(pvw_pairs, nr_ports)
 pvw_pair_t *pvw_pairs;			/* (port,word-value)-pairs */
 int nr_ports;				/* nr of pairs to be processed */
 {
-    message m_io;
+    kipc_msg_t m_io;
 
     m_io.DIO_REQUEST = _DIO_OUTPUT | _DIO_WORD;
     m_io.DIO_VEC_ADDR = (char *) pvw_pairs;

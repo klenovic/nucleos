@@ -101,7 +101,7 @@ static char SizeErrMsg[] = "illegal packet size";
 static char TypeErrMsg[] = "illegal message type";
 static char DevName[] = "eth#?";
 
-static void do_getname(message *mp);
+static void do_getname(kipc_msg_t *mp);
 
 /*
 **  Name:	void reply(dpeth_t *dep, int err, int m_type)
@@ -109,7 +109,7 @@ static void do_getname(message *mp);
 */
 static void reply(dpeth_t * dep, int err, int m_type)
 {
-  message reply;
+  kipc_msg_t reply;
   int status = FALSE;
 
   if (dep->de_flags & DEF_ACK_SEND) status |= DL_PACK_SEND;
@@ -192,10 +192,10 @@ static void update_conf(dpeth_t * dep, dp_conf_t * dcp)
 }
 
 /*
-**  Name:	void do_dump(message *mp)
+**  Name:	void do_dump(kipc_msg_t *mp)
 **  Function:	Displays statistics on screen (SFx key from console)
 */
-static void do_dump(message *mp)
+static void do_dump(kipc_msg_t *mp)
 {
   dpeth_t *dep;
   int port;
@@ -282,16 +282,16 @@ static void do_first_init(dpeth_t *dep, dp_conf_t *dcp)
 }
 
 /*
-**  Name:	void do_init(message *mp)
+**  Name:	void do_init(kipc_msg_t *mp)
 **  Function:	Checks for hardware presence.
 **  		Provides initialization of hardware and data structures
 */
-static void do_init(message * mp)
+static void do_init(kipc_msg_t * mp)
 {
   int port;
   dpeth_t *dep;
   dp_conf_t *dcp;
-  message reply_mess;
+  kipc_msg_t reply_mess;
 
   port = mp->DL_PORT;
   if (port >= 0 && port < DE_PORT_NR) {
@@ -399,10 +399,10 @@ static int calc_iovec_size(iovec_dat_s_t * iovp)
 }
 
 /*
-**  Name:	void do_vwrite_s(message *mp, int vectored)
+**  Name:	void do_vwrite_s(kipc_msg_t *mp, int vectored)
 **  Function:
 */
-static void do_vwrite_s(message * mp)
+static void do_vwrite_s(kipc_msg_t * mp)
 {
   int port, size;
   dpeth_t *dep;
@@ -440,10 +440,10 @@ static void do_vwrite_s(message * mp)
 }
 
 /*
-**  Name:	void do_vread_s(message *mp, int vectored)
+**  Name:	void do_vread_s(kipc_msg_t *mp, int vectored)
 **  Function:
 */
-static void do_vread_s(message * mp)
+static void do_vread_s(kipc_msg_t * mp)
 {
   int port, size;
   dpeth_t *dep;
@@ -483,10 +483,10 @@ static void do_vread_s(message * mp)
 }
 
 /*
-**  Name:	void do_getstat_s(message *mp)
+**  Name:	void do_getstat_s(kipc_msg_t *mp)
 **  Function:	Reports device statistics.
 */
-static void do_getstat_s(message * mp)
+static void do_getstat_s(kipc_msg_t * mp)
 {
   int port, rc;
   dpeth_t *dep;
@@ -508,7 +508,7 @@ static void do_getstat_s(message * mp)
 }
 
 static void do_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -521,10 +521,10 @@ message *mp;
 }
 
 /*
-**  Name:	void do_stop(message *mp)
+**  Name:	void do_stop(kipc_msg_t *mp)
 **  Function:	Stops network interface.
 */
-static void do_stop(message * mp)
+static void do_stop(kipc_msg_t * mp)
 {
   int port;
   dpeth_t *dep;
@@ -544,14 +544,14 @@ static void do_stop(message * mp)
   return;
 }
 
-static void do_watchdog(void *message)
+static void do_watchdog(void *kipc_msg_t)
 {
 
   DEBUG(printf("\t no reply"));
   return;
 }
 
-static void handle_system_signal(message *m)
+static void handle_system_signal(kipc_msg_t *m)
 {
 	sigset_t set;
 	int port;
@@ -592,7 +592,7 @@ static void handle_hw_intr(void)
 */
 int main(int argc, char **argv)
 {
-  message m;
+  kipc_msg_t m;
   dpeth_t *dep;
   int rc, fkeys, sfkeys, tasknr;
 

@@ -123,6 +123,6 @@ int no_sys(void);
 char *find_param(const char *key);
 struct mproc *find_proc(pid_t lpid);
 int pm_isokendpt(int ep, int *proc);
-void tell_fs(struct mproc *rmp, message *m_ptr);
+void tell_fs(struct mproc *rmp, kipc_msg_t *m_ptr);
 
 #endif /* __PM_PROTO_H */

@@ -11,8 +11,8 @@ int err_code;		/* temporary storage for error number */
 
 int cch[NR_INODES];
 
-message fs_m_in;
-message fs_m_out;
+kipc_msg_t fs_m_in;
+kipc_msg_t fs_m_out;
 
 uid_t caller_uid;
 gid_t caller_gid;

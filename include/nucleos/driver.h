@@ -31,20 +31,20 @@
 /* Info about and entry points into the device dependent code. */
 struct driver {
   char *(*dr_name)(void);
-  int (*dr_open)(struct driver *dp, message *m_ptr);
-  int (*dr_close)(struct driver *dp, message *m_ptr);
-  int (*dr_ioctl)(struct driver *dp, message *m_ptr);
+  int (*dr_open)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_close)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_ioctl)(struct driver *dp, kipc_msg_t *m_ptr);
   struct device *(*dr_prepare)(int device);
   int (*dr_transfer)(int proc_nr, int opcode, u64_t position,
 					iovec_t *iov, unsigned nr_req);
   void (*dr_cleanup)(void);
   void (*dr_geometry)(struct partition *entry);
   void (*dr_signal)(struct driver *dp, sigset_t *set);
-  void (*dr_alarm)(struct driver *dp, message *m_ptr);
-  int (*dr_cancel)(struct driver *dp, message *m_ptr);
-  int (*dr_select)(struct driver *dp, message *m_ptr);
-  int (*dr_other)(struct driver *dp, message *m_ptr);
-  int (*dr_hw_int)(struct driver *dp, message *m_ptr);
+  void (*dr_alarm)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_cancel)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_select)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_other)(struct driver *dp, kipc_msg_t *m_ptr);
+  int (*dr_hw_int)(struct driver *dp, kipc_msg_t *m_ptr);
 };
 
 /* Base and size of a partition in bytes. */
@@ -61,17 +61,17 @@ struct device {
 /* Functions defined by driver.c: */
 void driver_task(struct driver *dr, int type);
 char *no_name(void);
-int do_nop(struct driver *dp, message *m_ptr);
+int do_nop(struct driver *dp, kipc_msg_t *m_ptr);
 struct device *nop_prepare(int device);
 void nop_cleanup(void);
 void nop_task(void);
 void nop_signal(struct driver *dp, sigset_t *set);
-void nop_alarm(struct driver *dp, message *m_ptr);
-int nop_cancel(struct driver *dp, message *m_ptr);
-int nop_select(struct driver *dp, message *m_ptr);
-int do_diocntl(struct driver *dp, message *m_ptr);
-int nop_ioctl(struct driver *dp, message *m_ptr);
-int mq_queue(message *m_ptr);
+void nop_alarm(struct driver *dp, kipc_msg_t *m_ptr);
+int nop_cancel(struct driver *dp, kipc_msg_t *m_ptr);
+int nop_select(struct driver *dp, kipc_msg_t *m_ptr);
+int do_diocntl(struct driver *dp, kipc_msg_t *m_ptr);
+int nop_ioctl(struct driver *dp, kipc_msg_t *m_ptr);
+int mq_queue(kipc_msg_t *m_ptr);
 void init_buffer(void);
 
 /* Parameters for the disk drive. */

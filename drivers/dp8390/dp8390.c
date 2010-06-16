@@ -126,16 +126,16 @@ extern int ___dummy[DE_PORT_NR == sizeof(dp_conf)/sizeof(dp_conf[0]) ? 1 : -1];
 #if ENABLE_PCI
 static void pci_conf(void);
 #endif
-static void do_vwrite(message *mp, int from_int, int vectored);
-static void do_vwrite_s(message *mp, int from_int);
-static void do_vread(message *mp, int vectored);
-static void do_vread_s(message *mp);
-static void do_init(message *mp);
+static void do_vwrite(kipc_msg_t *mp, int from_int, int vectored);
+static void do_vwrite_s(kipc_msg_t *mp, int from_int);
+static void do_vread(kipc_msg_t *mp, int vectored);
+static void do_vread_s(kipc_msg_t *mp);
+static void do_init(kipc_msg_t *mp);
 static void do_int(dpeth_t *dep);
-static void do_getstat(message *mp);
-static void do_getstat_s(message *mp);
-static void do_getname(message *mp);
-static void do_stop(message *mp);
+static void do_getstat(kipc_msg_t *mp);
+static void do_getstat_s(kipc_msg_t *mp);
+static void do_getname(kipc_msg_t *mp);
+static void do_stop(kipc_msg_t *mp);
 static void dp_init(dpeth_t *dep);
 static void dp_confaddr(dpeth_t *dep);
 static void dp_reinit(dpeth_t *dep);
@@ -181,7 +181,7 @@ static void map_hw_buffer(dpeth_t *dep);
 static int calc_iovec_size(iovec_dat_t *iovp);
 static int calc_iovec_size_s(iovec_dat_s_t *iovp);
 static void reply(dpeth_t *dep, int err, int may_block);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 static void get_userdata(int user_proc, vir_bytes user_addr, vir_bytes count, void *loc_addr);
 static void get_userdata_s(int user_proc, cp_grant_id_t grant, vir_bytes offset, vir_bytes count,
 			   void *loc_addr);
@@ -228,7 +228,7 @@ static int handle_hw_intr(void)
  *===========================================================================*/
 int main(int argc, char *argv[])
 {
-	message m;
+	kipc_msg_t m;
 	int i, r, tasknr;
 	dpeth_t *dep;
 	long v;
@@ -372,7 +372,7 @@ void dp8390_dump()
  *===========================================================================*/
 static void dp8390_stop()
 {
-	message mess;
+	kipc_msg_t mess;
 	int i;
 
 	for (i= 0; i<DE_PORT_NR; i++)
@@ -442,7 +442,7 @@ static void pci_conf()
  *				do_vwrite				     *
  *===========================================================================*/
 static void do_vwrite(mp, from_int, vectored)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 int vectored;
 {
@@ -544,7 +544,7 @@ int vectored;
  *				do_vwrite_s				     *
  *===========================================================================*/
 static void do_vwrite_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	int port, count, size;
@@ -634,7 +634,7 @@ int from_int;
  *				do_vread				     *
  *===========================================================================*/
 static void do_vread(mp, vectored)
-message *mp;
+kipc_msg_t *mp;
 int vectored;
 {
 	int port, count;
@@ -704,7 +704,7 @@ int vectored;
  *				do_vread_s				     *
  *===========================================================================*/
 static void do_vread_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int port, count;
 	int size;
@@ -762,11 +762,11 @@ message *mp;
  *				do_init					     *
  *===========================================================================*/
 static void do_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int port;
 	dpeth_t *dep;
-	message reply_mess;
+	kipc_msg_t reply_mess;
 
 #if ENABLE_PCI
 	pci_conf(); /* Configure PCI devices. */
@@ -846,7 +846,7 @@ dpeth_t *dep;
  *				do_getstat				     *
  *===========================================================================*/
 static void do_getstat(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int port, r;
 	dpeth_t *dep;
@@ -891,7 +891,7 @@ message *mp;
  *				do_getstat_s				     *
  *===========================================================================*/
 static void do_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int port, r;
 	dpeth_t *dep;
@@ -936,7 +936,7 @@ message *mp;
  *				do_getname				     *
  *===========================================================================*/
 static void do_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -952,7 +952,7 @@ message *mp;
  *				do_stop					     *
  *===========================================================================*/
 static void do_stop(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int port;
 	dpeth_t *dep;
@@ -2649,7 +2649,7 @@ dpeth_t *dep;
 int err;
 int may_block;
 {
-	message reply;
+	kipc_msg_t reply;
 	int status;
 	int r;
 
@@ -2686,8 +2686,8 @@ int may_block;
  *				mess_reply				     *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
 	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("", "dp8390: unable to mess_reply", NO_NUM);

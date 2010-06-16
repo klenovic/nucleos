@@ -109,7 +109,7 @@ static int mount_fs(endpoint_t fs_e)
   struct fproc *tfp;
   struct dmap *dp;
   dev_t dev;
-  message m;
+  kipc_msg_t m;
   struct vnode *root_node, *vp = NULL, *bspec;
   struct vmnt *vmp;
   char *label;

@@ -32,7 +32,7 @@ static int driver_open(int which)
 	 * unfinished code: we should never be doing a blocking kipc_sendrec() to
 	 * the driver.
 	 */
-	message msg;
+	kipc_msg_t msg;
 	cp_grant_id_t gid;
 	struct partition part;
 	sector_t sectors;
@@ -111,7 +111,7 @@ static int driver_open(int which)
  *===========================================================================*/
 static int driver_close(int which)
 {
-	message msg;
+	kipc_msg_t msg;
 	int r;
 
 	msg.m_type = DEV_CLOSE;
@@ -423,7 +423,7 @@ static void restart_driver(int which, int tell_rs)
 {
 	/* Restart the given driver. Block until the new instance is up.
 	 */
-	message msg;
+	kipc_msg_t msg;
 	endpoint_t endpt;
 	int r, w = 0;
 
@@ -526,7 +526,7 @@ int check_driver(int which)
 /*===========================================================================*
  *				flt_senda				     *
  *===========================================================================*/
-static int flt_senda(message *mess, int which)
+static int flt_senda(kipc_msg_t *mess, int which)
 {
 	/* Send a message to one driver. Can only return 0 at the moment. */
 	int r;
@@ -575,7 +575,7 @@ static int check_senda(int which)
 /*===========================================================================*
  *				flt_receive				     *
  *===========================================================================*/
-static int flt_receive(message *mess, int which)
+static int flt_receive(kipc_msg_t *mess, int which)
 {
 	/* Receive a message from one or either driver, unless a timeout
 	 * occurs. Can only return 0 or RET_REDO.
@@ -662,7 +662,7 @@ static int flt_receive(message *mess, int which)
 /*===========================================================================*
  *				flt_sendrec				     *
  *===========================================================================*/
-static int flt_sendrec(message *mess, int which)
+static int flt_sendrec(kipc_msg_t *mess, int which)
 {
 	int r;
 
@@ -687,14 +687,14 @@ static int flt_sendrec(message *mess, int which)
 /*===========================================================================*
  *				do_sendrec_both				     *
  *===========================================================================*/
-static int do_sendrec_both(message *m1, message *m2)
+static int do_sendrec_both(kipc_msg_t *m1, kipc_msg_t *m2)
 {
 	/* If USEE_MIRROR is set, call flt_sendrec() to both drivers.
 	 * Otherwise, only call flt_sendrec() to the main driver.
 	 * This function will only return either 0 or RET_REDO.
 	 */
 	int r, which = -1;
-	message ma, mb;
+	kipc_msg_t ma, mb;
 
 	/* If the two disks use the same driver, call flt_sendrec() twice
 	 * sequentially. Such a setup is not very useful though.
@@ -753,7 +753,7 @@ static int do_sendrec_both(message *m1, message *m2)
 /*===========================================================================*
  *				do_sendrec_one				     *
  *===========================================================================*/
-static int do_sendrec_one(message *m1, message *m2)
+static int do_sendrec_one(kipc_msg_t *m1, kipc_msg_t *m2)
 {
 	/* Only talk to the main driver. If something goes wrong, it will
 	 * be fixed elsewhere.
@@ -766,7 +766,7 @@ static int do_sendrec_one(message *m1, message *m2)
 /*===========================================================================*
  *				paired_sendrec				     *
  *===========================================================================*/
-static int paired_sendrec(message *m1, message *m2, int both)
+static int paired_sendrec(kipc_msg_t *m1, kipc_msg_t *m2, int both)
 {
 	/* Sendrec with the disk driver. If the disk driver is down, and was
 	 * restarted, redo the request, until the driver works fine, or can't
@@ -913,7 +913,7 @@ static void paired_revoke(cp_grant_id_t *gids, iovec_s_t vectors[2][NR_IOREQS],
 int read_write(u64_t pos, char *bufa, char *bufb, size_t *sizep, int request)
 {
 	iovec_s_t vectors[2][NR_IOREQS];
-	message m1, m2;
+	kipc_msg_t m1, m2;
 	cp_grant_id_t gids[2];
 	size_t sizes[2];
 	int r, both, count;

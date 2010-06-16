@@ -43,8 +43,8 @@ static void fill_call_mask(int *calls, int tot_nr_calls,
 /* Declare some local functions. */
 static void init_server(void);
 static void sig_handler(void);
-static void get_work(message *m);
-static void reply(int whom, message *m_out);
+static void get_work(kipc_msg_t *m);
+static void reply(int whom, kipc_msg_t *m_out);
 
 /* The buffer where the boot image is copied during initialization. */
 static int boot_image_buffer_size;
@@ -67,7 +67,7 @@ int main(void)
  * three major activities: getting new work, processing the work, and
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
-  message m;					/* request message */
+  kipc_msg_t m;					/* request message */
   int call_nr, who_e,who_p;			/* call number and caller */
   int result;                 			/* result to return */
   sigset_t sigset;				/* system signal set */
@@ -632,7 +632,7 @@ static void sig_handler()
  *				get_work                                     *
  *===========================================================================*/
 static void get_work(m_in)
-message *m_in;				/* pointer to message */
+kipc_msg_t *m_in;				/* pointer to message */
 {
     int s;				/* receive status */
 
@@ -645,7 +645,7 @@ message *m_in;				/* pointer to message */
  *===========================================================================*/
 static void reply(who, m_out)
 int who;                           	/* replyee */
-message *m_out;                         /* reply message */
+kipc_msg_t *m_out;                         /* reply message */
 {
     int s;				/* send status */
 

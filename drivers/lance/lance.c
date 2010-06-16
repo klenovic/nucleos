@@ -102,30 +102,30 @@ static struct pcitab
 };
 
 /* General */
-static void do_init(message *mp);
+static void do_init(kipc_msg_t *mp);
 static void ec_init(ether_card_t *ec);
 static void ec_confaddr(ether_card_t *ec);
 static void ec_reinit(ether_card_t *ec);
 static void ec_check_ints(ether_card_t *ec);
 static void conf_hw(ether_card_t *ec);
 static void update_conf(ether_card_t *ec, ec_conf_t *ecp);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 static void do_int(ether_card_t *ec);
 static void reply(ether_card_t *ec, int err, int may_block);
 static void ec_reset(ether_card_t *ec);
 static void ec_send(ether_card_t *ec);
 static void ec_recv(ether_card_t *ec);
-static void do_vwrite_s(message *mp, int from_int);
-static void do_vread_s(message *mp);
+static void do_vwrite_s(kipc_msg_t *mp, int from_int);
+static void do_vread_s(kipc_msg_t *mp);
 static void ec_user2nic(ether_card_t *dep, iovec_dat_t *iovp, vir_bytes offset,
 			int nic_addr, vir_bytes count);
 static void ec_nic2user(ether_card_t *ec, int nic_addr, iovec_dat_t *iovp,
 			vir_bytes offset, vir_bytes count);
 static int calc_iovec_size(iovec_dat_t *iovp);
 static void ec_next_iovec(iovec_dat_t *iovp);
-static void do_getstat_s(message *mp);
-static void do_stop(message *mp);
-static void do_getname(message *mp);
+static void do_getstat_s(kipc_msg_t *mp);
+static void do_stop(kipc_msg_t *mp);
+static void do_getname(kipc_msg_t *mp);
 
 static void lance_dump(void);
 static void lance_stop(void);
@@ -274,7 +274,7 @@ phys_bytes lance_buf_phys;
  *===========================================================================*/
 void main( int argc, char **argv )
 {
-   message m;
+   kipc_msg_t m;
    int i,irq,r;
    u32_t tasknr;
    ether_card_t *ec;
@@ -462,7 +462,7 @@ static void lance_dump()
  *===========================================================================*/
 static void lance_stop()
 {
-   message mess;
+   kipc_msg_t mess;
    int i;
 
    for (i= 0; i<EC_PORT_NR_MAX; i++)
@@ -486,11 +486,11 @@ static void lance_stop()
  *                              do_init                                      *
  *===========================================================================*/
 static void do_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
    int port;
    ether_card_t *ec;
-   message reply_mess;
+   kipc_msg_t reply_mess;
 
    pci_init();
 
@@ -706,7 +706,7 @@ ether_card_t *ec;
 int err;
 int may_block;
 {
-   message reply;
+   kipc_msg_t reply;
    int status,r;
    clock_t now;
 
@@ -743,8 +743,8 @@ int may_block;
  *                              mess_reply                                   *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
    if (kipc_send(req->m_source, reply_mess) != 0)
       panic( "lance", "unable to mess_reply", NO_NUM);
@@ -1053,7 +1053,7 @@ ether_card_t *ec;
  *                              do_vread_s                                   *
  *===========================================================================*/
 static void do_vread_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
    int port, count, size, r;
    ether_card_t *ec;
@@ -1161,7 +1161,7 @@ ether_card_t *ec;
  *                              do_vwrite_s                                  *
  *===========================================================================*/
 static void do_vwrite_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
    int port, count, check, r;
@@ -1365,7 +1365,7 @@ iovec_dat_t *iovp;
  *                              do_getstat_s                                 *
  *===========================================================================*/
 static void do_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
    int r, port;
    ether_card_t *ec;
@@ -1396,7 +1396,7 @@ message *mp;
  *                              do_stop                                      *
  *===========================================================================*/
 static void do_stop(mp)
-message *mp;
+kipc_msg_t *mp;
 {
    int port;
    ether_card_t *ec;
@@ -1585,7 +1585,7 @@ ether_card_t *ec;
  *                              do_getname                                   *
  *===========================================================================*/
 static void do_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
    int r;
 

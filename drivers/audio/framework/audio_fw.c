@@ -57,12 +57,12 @@
 
 static int msg_open(int minor_dev_nr);
 static int msg_close(int minor_dev_nr);
-static int msg_ioctl(message *m_ptr);
-static void msg_write(message *m_ptr);
-static void msg_read(message *m_ptr);
+static int msg_ioctl(kipc_msg_t *m_ptr);
+static void msg_write(kipc_msg_t *m_ptr);
+static void msg_read(kipc_msg_t *m_ptr);
 static void msg_hardware(void);
 static void msg_sig_stop(void);
-static void msg_status(message *m_ptr);
+static void msg_status(kipc_msg_t *m_ptr);
 static int init_driver(void);
 static int open_sub_dev(int sub_dev_nr, int operation);
 static int close_sub_dev(int sub_dev_nr);
@@ -86,7 +86,7 @@ static device_available = 0;/*todo*/
 void main(void) 
 {	
 	int r, caller, proc_nr, chan;
-	message mess, repl_mess;
+	kipc_msg_t mess, repl_mess;
 
 	drv_init();
 
@@ -380,7 +380,7 @@ static int close_sub_dev(int sub_dev_nr) {
 }
 
 
-static int msg_ioctl(message *m_ptr)
+static int msg_ioctl(kipc_msg_t *m_ptr)
 {
 	int status, len, chan;
 	phys_bytes user_phys;
@@ -444,7 +444,7 @@ static int msg_ioctl(message *m_ptr)
 }
 
 
-static void msg_write(message *m_ptr) 
+static void msg_write(kipc_msg_t *m_ptr) 
 {
 	int s, chan; sub_dev_t *sub_dev_ptr;
 	special_file_t* special_file_ptr;
@@ -495,7 +495,7 @@ static void msg_write(message *m_ptr)
 }
 
 
-static void msg_read(message *m_ptr) 
+static void msg_read(kipc_msg_t *m_ptr) 
 {
 	int s, chan; sub_dev_t *sub_dev_ptr;
 	special_file_t* special_file_ptr;
@@ -575,7 +575,7 @@ static void msg_hardware(void) {
 }
 
 
-static void msg_status(message *m_ptr)
+static void msg_status(kipc_msg_t *m_ptr)
 {
 	int i; 
 
@@ -766,7 +766,7 @@ static int get_started(sub_dev_t *sub_dev_ptr) {
 static void data_from_user(sub_dev_t *subdev)
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	if (subdev->DmaLength == subdev->NrOfDmaFragments &&
 			subdev->BufLength == subdev->NrOfExtraBuffers) return;/* no space */
@@ -838,7 +838,7 @@ static void data_from_user(sub_dev_t *subdev)
 static void data_to_user(sub_dev_t *sub_dev_ptr)
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	if (!sub_dev_ptr->RevivePending) return; /* nobody is wating for data */
 	if (sub_dev_ptr->ReadyToRevive) return;/* we already filled user's buffer */
@@ -956,7 +956,7 @@ static int init_buffers(sub_dev_t *sub_dev_ptr)
 
 
 static void reply(int code, int replyee, int process, int status) {
-	message m;
+	kipc_msg_t m;
 
 	m.m_type = code;		/* DEV_REVIVE */
 	m.REP_STATUS = status;	/* result of device operation */
@@ -996,7 +996,7 @@ int pci_func;
 	int r;
 	endpoint_t dev_e;
 	u32_t u32;
-	message m;
+	kipc_msg_t m;
 
 	r= ds_retrieve_u32("amddev", &u32);
 	if (r != 0)

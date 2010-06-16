@@ -12,8 +12,8 @@ extern int rdwt_err;		/* status of last disk i/o request */
 
 extern int (*fs_call_vec[])(void); /* fs call table */
 
-extern message fs_m_in;		/* contains the input message of the request */
-extern message fs_m_out;	/* contains the output message of the 
+extern kipc_msg_t fs_m_in;		/* contains the input message of the request */
+extern kipc_msg_t fs_m_out;	/* contains the output message of the 
 				 * request */
 extern int FS_STATE;
 

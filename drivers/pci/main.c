@@ -21,25 +21,25 @@ static struct acl
 	struct rs_pci acl;
 } acl[NR_DRIVERS];
 
-static void do_init(message *mp);
-static void do_first_dev(message *mp);
-static void do_next_dev(message *mp);
-static void do_find_dev(message *mp);
-static void do_ids(message *mp);
-static void do_dev_name(message *mp);
-static void do_dev_name_s(message *mp);
-static void do_slot_name_s(message *mp);
-static void do_set_acl(message *mp);
-static void do_del_acl(message *mp);
-static void do_reserve(message *mp);
-static void do_attr_r8(message *mp);
-static void do_attr_r16(message *mp);
-static void do_attr_r32(message *mp);
-static void do_attr_w8(message *mp);
-static void do_attr_w16(message *mp);
-static void do_attr_w32(message *mp);
-static void do_rescan_bus(message *mp);
-static void reply(message *mp, int result);
+static void do_init(kipc_msg_t *mp);
+static void do_first_dev(kipc_msg_t *mp);
+static void do_next_dev(kipc_msg_t *mp);
+static void do_find_dev(kipc_msg_t *mp);
+static void do_ids(kipc_msg_t *mp);
+static void do_dev_name(kipc_msg_t *mp);
+static void do_dev_name_s(kipc_msg_t *mp);
+static void do_slot_name_s(kipc_msg_t *mp);
+static void do_set_acl(kipc_msg_t *mp);
+static void do_del_acl(kipc_msg_t *mp);
+static void do_reserve(kipc_msg_t *mp);
+static void do_attr_r8(kipc_msg_t *mp);
+static void do_attr_r16(kipc_msg_t *mp);
+static void do_attr_r32(kipc_msg_t *mp);
+static void do_attr_w8(kipc_msg_t *mp);
+static void do_attr_w16(kipc_msg_t *mp);
+static void do_attr_w32(kipc_msg_t *mp);
+static void do_rescan_bus(kipc_msg_t *mp);
+static void reply(kipc_msg_t *mp, int result);
 static struct rs_pci *find_acl(int endpoint);
 
 extern int debug;
@@ -47,7 +47,7 @@ extern int debug;
 int main(void)
 {
 	int i, r;
-	message m;
+	kipc_msg_t m;
 
 	pci_init();
 
@@ -105,7 +105,7 @@ int main(void)
 }
 
 static void do_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -121,7 +121,7 @@ message *mp;
 }
 
 static void do_first_dev(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int i, r, devind;
 	u16_t vid, did;
@@ -150,7 +150,7 @@ message *mp;
 }
 
 static void do_next_dev(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind;
 	u16_t vid, did;
@@ -176,7 +176,7 @@ message *mp;
 }
 
 static void do_find_dev(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind;
 	u8_t bus, dev, func;
@@ -198,7 +198,7 @@ message *mp;
 }
 
 static void do_ids(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind;
 	u16_t vid, did;
@@ -224,7 +224,7 @@ message *mp;
 }
 
 static void do_dev_name(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, name_len, len;
 	u16_t vid, did;
@@ -261,7 +261,7 @@ message *mp;
 }
 
 static void do_dev_name_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, name_len, len;
 	u16_t vid, did;
@@ -298,7 +298,7 @@ message *mp;
 }
 
 static void do_slot_name_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, name_len, len;
 	cp_grant_id_t gid;
@@ -334,7 +334,7 @@ message *mp;
 }
 
 static void do_set_acl(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int i, r, gid;
 
@@ -377,7 +377,7 @@ message *mp;
 }
 
 static void do_del_acl(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int i, r, proc_nr;
 
@@ -418,7 +418,7 @@ message *mp;
 }
 
 static void do_reserve(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int i, r, devind;
 
@@ -434,7 +434,7 @@ message *mp;
 }
 
 static void do_attr_r8(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u8_t v;
@@ -460,7 +460,7 @@ message *mp;
 }
 
 static void do_attr_r16(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u32_t v;
@@ -480,7 +480,7 @@ message *mp;
 }
 
 static void do_attr_r32(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u32_t v;
@@ -506,7 +506,7 @@ message *mp;
 }
 
 static void do_attr_w8(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u8_t v;
@@ -526,7 +526,7 @@ message *mp;
 }
 
 static void do_attr_w16(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u16_t v;
@@ -546,7 +546,7 @@ message *mp;
 }
 
 static void do_attr_w32(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, devind, port;
 	u32_t v;
@@ -566,7 +566,7 @@ message *mp;
 }
 
 static void do_rescan_bus(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, busnr;
 
@@ -584,11 +584,11 @@ message *mp;
 
 
 static void reply(mp, result)
-message *mp;
+kipc_msg_t *mp;
 int result;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= result;
 	r= kipc_send(mp->m_source, &m);

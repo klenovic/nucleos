@@ -35,13 +35,13 @@
 
 void main(void);
 static int mixer_init(void); 
-static int mixer_open(message *m_ptr);
-static int mixer_close(message *m_ptr);
-static int mixer_ioctl(message *m_ptr);
+static int mixer_open(kipc_msg_t *m_ptr);
+static int mixer_close(kipc_msg_t *m_ptr);
+static int mixer_ioctl(kipc_msg_t *m_ptr);
 static int mixer_get(int reg);
-static int get_set_volume(message *m_ptr, int flag);
-static int get_set_input(message *m_ptr, int flag, int channel);
-static int get_set_output(message *m_ptr, int flag);
+static int get_set_volume(kipc_msg_t *m_ptr, int flag);
+static int get_set_input(kipc_msg_t *m_ptr, int flag, int channel);
+static int get_set_output(kipc_msg_t *m_ptr, int flag);
 
 
 static int mixer_avail = 0;	/* Mixer exists? */
@@ -54,7 +54,7 @@ static int mixer_avail = 0;	/* Mixer exists? */
  *				main
  *===========================================================================*/
 void main() {
-message mess;
+kipc_msg_t mess;
 	int err, caller, proc_nr;
 
 	/* Here is the main loop of the mixer task. It waits for a message, carries
@@ -102,7 +102,7 @@ message mess;
  *				mixer_open				   	
  *=========================================================================*/
 static int mixer_open(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	dprint("mixer_open\n");
 
@@ -117,7 +117,7 @@ message *m_ptr;
  *				mixer_close				   	
  *=========================================================================*/
 static int mixer_close(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	dprint("mixer_close\n");
 
@@ -129,7 +129,7 @@ message *m_ptr;
  *				mixer_ioctl				   	
  *=========================================================================*/
 static int mixer_ioctl(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	int status;
 
@@ -195,7 +195,7 @@ int reg;
  *				get_set_volume				   *
  *=========================================================================*/
 static int get_set_volume(m_ptr, flag)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 {
 	phys_bytes user_phys;
@@ -279,7 +279,7 @@ int flag;	/* 0 = get, 1 = set */
  *				get_set_input				   *
  *=========================================================================*/
 static int get_set_input(m_ptr, flag, channel)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 int channel;    /* 0 = left, 1 = right */
 {
@@ -344,7 +344,7 @@ int channel;    /* 0 = left, 1 = right */
  *				get_set_output				   *
  *=========================================================================*/
 static int get_set_output(m_ptr, flag)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 int flag;	/* 0 = get, 1 = set */
 {
 	phys_bytes user_phys;

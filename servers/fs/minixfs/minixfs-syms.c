@@ -36,8 +36,8 @@ int rdwt_err;	/* status of last disk i/o request */
 
 int cch[NR_INODES];
 
-message fs_m_in;
-message fs_m_out;
+kipc_msg_t fs_m_in;
+kipc_msg_t fs_m_out;
 int FS_STATE;
 vfs_ucred_t credentials;
 

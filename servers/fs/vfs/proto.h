@@ -27,17 +27,17 @@ int dev_close(dev_t dev, int filp_no);
 int dev_io(int op, dev_t dev, int proc, void *buf, u64_t pos, int bytes, int flags,
 	   int suspend_reopen);
 int gen_opcl(int op, dev_t dev, int proc, int flags);
-int gen_io(int task_nr, message *mess_ptr);
-int asyn_io(int task_nr, message *mess_ptr);
+int gen_io(int task_nr, kipc_msg_t *mess_ptr);
+int asyn_io(int task_nr, kipc_msg_t *mess_ptr);
 int no_dev(int op, dev_t dev, int proc, int flags);
-int no_dev_io(int, message *);
+int no_dev_io(int, kipc_msg_t *);
 int tty_opcl(int op, dev_t dev, int proc, int flags);
 int ctty_opcl(int op, dev_t dev, int proc, int flags);
 int clone_opcl(int op, dev_t dev, int proc, int flags);
-int ctty_io(int task_nr, message *mess_ptr);
+int ctty_io(int task_nr, kipc_msg_t *mess_ptr);
 int do_ioctl(void);
 void pm_setsid(int proc_e);
-void dev_status(message *);
+void dev_status(kipc_msg_t *);
 void dev_up(int major);
 endpoint_t suspended_ep(endpoint_t driver, cp_grant_id_t g);
 void reopen_reply(void);
@@ -63,7 +63,7 @@ struct filp *get_filp2(struct fproc *rfp, int fild);
 int invalidate(struct filp *);
 
 /* fscall.c */
-void nested_fs_call(message *m);
+void nested_fs_call(kipc_msg_t *m);
 
 /* link.c */
 int do_link(void);

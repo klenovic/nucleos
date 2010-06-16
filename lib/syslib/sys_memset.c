@@ -12,7 +12,7 @@
 int sys_memset(unsigned long pattern, phys_bytes base, phys_bytes bytes)
 {
 /* Zero a block of data.  */
-  message mess;
+  kipc_msg_t mess;
 
   if (bytes == 0L) return 0;
 

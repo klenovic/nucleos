@@ -39,10 +39,10 @@
 void main(void);
 static int dsp_open(void);
 static int dsp_close(void);
-static int dsp_ioctl(message *m_ptr);
-static void dsp_write(message *m_ptr);
+static int dsp_ioctl(kipc_msg_t *m_ptr);
+static void dsp_write(kipc_msg_t *m_ptr);
 static void dsp_hardware_msg(void);
-static void dsp_status(message *m_ptr);
+static void dsp_status(kipc_msg_t *m_ptr);
 
 static void reply(int code, int replyee, int process, int status);
 static void init_buffer(void);
@@ -92,7 +92,7 @@ static int reviveProcNr;
 void main() 
 {	
 	int r, caller, proc_nr, s;
-	message mess;
+	kipc_msg_t mess;
 
 	dprint("sb16_dsp.c: main()\n");
 
@@ -192,7 +192,7 @@ static int dsp_close()
  *				dsp_ioctl
  *===========================================================================*/
 static int dsp_ioctl(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	int status;
 	phys_bytes user_phys;
@@ -233,10 +233,10 @@ message *m_ptr;
  *				dsp_write
  *===========================================================================*/
 static void dsp_write(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	int s;
-	message mess;
+	kipc_msg_t mess;
 	
 	dprint("sb16_dsp.c: dsp_write()\n");
 
@@ -338,7 +338,7 @@ static void dsp_hardware_msg()
  *				dsp_status				     *
  *===========================================================================*/
 static void dsp_status(m_ptr)
-message *m_ptr;	/* pointer to the newly arrived message */
+kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 {
 	if(revivePending) {
 		m_ptr->m_type = DEV_REVIVE;			/* build message */
@@ -363,7 +363,7 @@ int replyee;
 int process;
 int status;
 {
-	message m;
+	kipc_msg_t m;
 
 	m.m_type = code;		/* TASK_REPLY or REVIVE */
 	m.REP_STATUS = status;	/* result of device operation */

@@ -40,7 +40,7 @@
 /*===========================================================================*
  *				do_mmap			     		     *
  *===========================================================================*/
-int do_mmap(message *m)
+int do_mmap(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -125,7 +125,7 @@ int map_perm_check(endpoint_t caller, endpoint_t target,
 /*===========================================================================*
  *				do_map_phys		     		     *
  *===========================================================================*/
-int do_map_phys(message *m)
+int do_map_phys(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -176,7 +176,7 @@ int do_map_phys(message *m)
 /*===========================================================================*
  *				do_unmap_phys		     		     *
  *===========================================================================*/
-int do_unmap_phys(message *m)
+int do_unmap_phys(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -211,7 +211,7 @@ int do_unmap_phys(message *m)
 /*===========================================================================*
  *				do_remap		     		     *
  *===========================================================================*/
-int do_remap(message *m)
+int do_remap(kipc_msg_t *m)
 {
 	int d, dn, s, sn;
 	vir_bytes da, sa, startv;
@@ -255,7 +255,7 @@ int do_remap(message *m)
 /*===========================================================================*
  *				do_shared_unmap		     		     *
  *===========================================================================*/
-int do_shared_unmap(message *m)
+int do_shared_unmap(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -296,7 +296,7 @@ int do_shared_unmap(message *m)
 /*===========================================================================*
  *				do_get_phys		     		     *
  *===========================================================================*/
-int do_get_phys(message *m)
+int do_get_phys(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -322,7 +322,7 @@ int do_get_phys(message *m)
 /*===========================================================================*
  *				do_get_refcount		     		     *
  *===========================================================================*/
-int do_get_refcount(message *m)
+int do_get_refcount(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;
@@ -348,7 +348,7 @@ int do_get_refcount(message *m)
 /*===========================================================================*
  *                              do_munmap                                    *
  *===========================================================================*/
-int do_munmap(message *m)
+int do_munmap(kipc_msg_t *m)
 {
         int r, n;
         struct vmproc *vmp;
@@ -443,7 +443,7 @@ int munmap_text(void *addr, size_t len)
 	return munmap_lin(laddr, len);
 }
 
-int scall_mmap(message *m)
+int scall_mmap(kipc_msg_t *m)
 {
 	int err, n;
 	struct vmproc *vmp;
@@ -495,7 +495,7 @@ int scall_mmap(message *m)
 	return m->VMM_RETADDR;
 }
 
-int scall_munmap(message *m)
+int scall_munmap(kipc_msg_t *m)
 {
 	int r, n;
 	struct vmproc *vmp;

@@ -12,7 +12,7 @@
 int sys_stime(boottime)
 time_t boottime;		/* New boottime */
 {
-  message m;
+  kipc_msg_t m;
   int r;
 
   m.T_BOOTTIME = boottime;

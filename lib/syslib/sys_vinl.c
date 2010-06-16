@@ -16,7 +16,7 @@ int sys_vinl(pvl_pairs, nr_ports)
 pvl_pair_t *pvl_pairs;			/* (port,long-value)-pairs */
 int nr_ports;				/* nr of pairs to be processed */
 {
-    message m_io;
+    kipc_msg_t m_io;
 
     m_io.DIO_REQUEST = _DIO_INPUT | _DIO_LONG;
     m_io.DIO_VEC_ADDR = (char *) pvl_pairs;

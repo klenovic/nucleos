@@ -20,7 +20,7 @@ Copyright 1995 Philip Homburg
 
 typedef struct mq
 {
-	message mq_mess;
+	kipc_msg_t mq_mess;
 	struct mq *mq_next;
 	int mq_allocated;
 } mq_t;

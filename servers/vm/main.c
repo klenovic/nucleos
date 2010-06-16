@@ -67,7 +67,7 @@ typedef u32_t mask_t;
 /* Table of calls and a macro to test for being in range. */
 struct {
 	mask_t vmc_callers;		/* bitmap of endpoint numbers */
-	int (*vmc_func)(message *);	/* Call handles message. */
+	int (*vmc_func)(kipc_msg_t *);	/* Call handles message. */
 	char *vmc_name;			/* Human-readable string. */
 } vm_calls[VM_NCALLS];
 
@@ -88,7 +88,7 @@ static int vm_acl_ok(endpoint_t caller, int call);
  *===========================================================================*/
 int main(void)
 {
-  message msg;
+  kipc_msg_t msg;
   int result, who_e;
 
 #if SANITYCHECKS

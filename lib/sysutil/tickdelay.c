@@ -23,7 +23,7 @@ long ticks;				/* number of ticks to wait */
  * Note however that a long tick_delay (longer than the remaining time of the
  * previous) alarm will also delay the previous alarm.
  */
-    message m, m_alarm;
+    kipc_msg_t m, m_alarm;
     int s;
 
     if (ticks <= 0) return 0;		/* check for robustness */

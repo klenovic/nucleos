@@ -30,7 +30,7 @@
  *				do_fork					     *
  *===========================================================================*/
 int do_fork(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_fork().  PR_ENDPT has forked.  The child is PR_SLOT. */
 #ifdef CONFIG_X86_32

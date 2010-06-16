@@ -137,7 +137,7 @@ size_t dst_len;
  *				do_up					     *
  *===========================================================================*/
 int do_up(m_ptr)
-message *m_ptr;					/* request message pointer */
+kipc_msg_t *m_ptr;					/* request message pointer */
 {
 /* A request was made to start a new system service. 
  */
@@ -447,7 +447,7 @@ message *m_ptr;					/* request message pointer */
 /*===========================================================================*
  *				do_down					     *
  *===========================================================================*/
-int do_down(message *m_ptr)
+int do_down(kipc_msg_t *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -495,7 +495,7 @@ int do_down(message *m_ptr)
 /*===========================================================================*
  *				do_restart				     *
  *===========================================================================*/
-int do_restart(message *m_ptr)
+int do_restart(kipc_msg_t *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -546,7 +546,7 @@ int do_restart(message *m_ptr)
 /*===========================================================================*
  *				do_refresh				     *
  *===========================================================================*/
-int do_refresh(message *m_ptr)
+int do_refresh(kipc_msg_t *m_ptr)
 {
   register struct rproc *rp;
   size_t len;
@@ -588,7 +588,7 @@ int do_refresh(message *m_ptr)
 /*===========================================================================*
  *				do_shutdown				     *
  *===========================================================================*/
-int do_shutdown(message *m_ptr)
+int do_shutdown(kipc_msg_t *m_ptr)
 {
   /* This call requires special privileges. */
   if (m_ptr != NULL && !caller_is_root(m_ptr->m_source)) return(-EPERM);
@@ -601,7 +601,7 @@ int do_shutdown(message *m_ptr)
 /*===========================================================================*
  *				do_exit					     *
  *===========================================================================*/
-void do_exit(message *m_ptr)
+void do_exit(kipc_msg_t *m_ptr)
 {
   register struct rproc *rp;
   pid_t exit_pid;
@@ -676,7 +676,7 @@ void do_exit(message *m_ptr)
               if ((rp->r_flags & RS_EXITING) || shutting_down) {
 		  /* No reply sent to RS_DOWN yet. */
 		  if(rp->r_flags & RS_LATEREPLY) {
-			message rsm;
+			kipc_msg_t rsm;
 			rsm.m_type = 0;
 			kipc_send(rp->r_caller, &rsm);
 		  }
@@ -745,7 +745,7 @@ rp->r_restarts= 0;
  *				do_period				     *
  *===========================================================================*/
 void do_period(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   register struct rproc *rp;
   clock_t now = m_ptr->NOTIFY_TIMESTAMP;
@@ -835,7 +835,7 @@ endpoint_t *endpoint;
   char *file_only;
   int s, use_copy, slot_nr;
   bitchunk_t *vm_mask;
-  message m;
+  kipc_msg_t m;
   char * null_env = NULL;
 
   use_copy= (rp->r_sys_flags & SF_USE_COPY);
@@ -1030,7 +1030,7 @@ int how;
  *				do_getsysinfo				     *
  *===========================================================================*/
 int do_getsysinfo(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   vir_bytes src_addr, dst_addr;
   int dst_proc;
@@ -1061,7 +1061,7 @@ message *m_ptr;
  *===========================================================================*/
 static pid_t fork_nb()
 {
-  message m;
+  kipc_msg_t m;
 
   return(ktaskcall(PM_PROC_NR, KCNR_FORK_NB, &m));
 }
@@ -1567,7 +1567,7 @@ int endpoint;
  *				do_lookup				     *
  *===========================================================================*/
 int do_lookup(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	static char namebuf[100];
 	int len, r;

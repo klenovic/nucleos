@@ -25,7 +25,7 @@
  *			          do_kill				     *
  *===========================================================================*/
 int do_kill(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_kill(). Cause a signal to be sent to a process. The PM is the
  * central server where all signals are processed and handler policies can

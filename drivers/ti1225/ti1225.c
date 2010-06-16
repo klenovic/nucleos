@@ -71,7 +71,7 @@ static u8_t do_inb(port_t port);
 int main(int argc, char *argv[])
 {
 	int c, r;
-	message m;
+	kipc_msg_t m;
 
 	(progname=strrchr(argv[0],'/')) ? progname++ : (progname=argv[0]);
 

@@ -24,7 +24,7 @@
  *				do_profbuf				     *
  *===========================================================================*/
 int do_profbuf(m_ptr)
-register message *m_ptr;    /* pointer to request message */
+register kipc_msg_t *m_ptr;    /* pointer to request message */
 {
 /* This kernel call is used by profiled system processes when Call
  * Profiling is enabled. It is called on the first execution of procentry.

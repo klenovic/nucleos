@@ -115,7 +115,7 @@ int fd;
 }
 
 void clck_tick (mess)
-message *mess;
+kipc_msg_t *mess;
 {
 	next_timeout= 0;
 	set_timer();

@@ -29,7 +29,7 @@ static struct vir_cp_req vir_cp_req[VCOPY_VEC_SIZE];
  *				do_vcopy					     *
  *===========================================================================*/
 int do_vcopy(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_virvcopy() and sys_physvcopy() that pass a vector with copy
  * requests. Although a single handler function is used, there are two

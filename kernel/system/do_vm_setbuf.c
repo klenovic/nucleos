@@ -23,7 +23,7 @@
  *				do_vm_setbuf				     *
  *===========================================================================*/
 int do_vm_setbuf(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 	vm_base= m_ptr->m4_l1;
 	vm_size= m_ptr->m4_l2;

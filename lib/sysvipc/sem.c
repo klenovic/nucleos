@@ -25,7 +25,7 @@ static int get_ipc_endpt(endpoint_t *pt)
 /* Get semaphore.  */
 int semget(key_t key, int nsems, int semflag)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 	int r;
 
@@ -48,7 +48,7 @@ int semget(key_t key, int nsems, int semflag)
 /* Semaphore control operation.  */
 int semctl(int semid, int semnum, int cmd, ...)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 	va_list ap;
 	int r;
@@ -79,7 +79,7 @@ int semctl(int semid, int semnum, int cmd, ...)
 /* Operate on semaphore.  */
 int semop(int semid, struct sembuf *sops, size_t nsops)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 
 	if (get_ipc_endpt(&ipc_pt) != 0) {

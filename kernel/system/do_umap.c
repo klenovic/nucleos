@@ -27,7 +27,7 @@
  *				do_umap					    *
  *==========================================================================*/
 int do_umap(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Map virtual address to physical, for non-kernel processes. */
   int seg_type = m_ptr->CP_SRC_SPACE & SEGMENT_TYPE;

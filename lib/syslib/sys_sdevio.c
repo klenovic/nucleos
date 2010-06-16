@@ -20,7 +20,7 @@ void *buffer;				/* pointer to buffer */
 int count;				/* number of elements */
 vir_bytes offset;			/* offset from grant */
 {
-    message m_io;
+    kipc_msg_t m_io;
     int result;
 
     m_io.DIO_REQUEST = req;

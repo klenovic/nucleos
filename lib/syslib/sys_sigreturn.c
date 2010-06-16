@@ -16,7 +16,7 @@ int sys_sigreturn(proc_ep, sig_ctxt)
 endpoint_t proc_ep;			/* for which process */
 struct sigmsg *sig_ctxt;		/* POSIX style handling */
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.SIG_ENDPT = proc_ep;

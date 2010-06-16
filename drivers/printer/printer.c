@@ -113,10 +113,10 @@ static int irq_hook_id;	/* id of irq hook at kernel */
 
 extern int errno;		/* error number */
 
-static void do_cancel(message *m_ptr);
+static void do_cancel(kipc_msg_t *m_ptr);
 static void output_done(void);
-static void do_write(message *m_ptr, int safe);
-static void do_status(message *m_ptr);
+static void do_write(kipc_msg_t *m_ptr, int safe);
+static void do_status(kipc_msg_t *m_ptr);
 static void prepare_output(void);
 static void do_initialize(void);
 static void reply(int code,int replyee,int proc,int status);
@@ -130,7 +130,7 @@ static void do_signal(void);
 void main(void)
 {
 /* Main routine of the printer task. */
-  message pr_mess;		/* buffer for all incoming messages */
+  kipc_msg_t pr_mess;		/* buffer for all incoming messages */
   struct sigaction sa;
   int s;
 
@@ -198,7 +198,7 @@ static void do_signal()
  *				do_write				     *
  *===========================================================================*/
 static void do_write(m_ptr, safe)
-register message *m_ptr;	/* pointer to the newly arrived message */
+register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 int safe;			/* use virtual addresses or grant id's? */
 {
 /* The printer is used by sending DEV_WRITE messages to it. Process one. */
@@ -292,7 +292,7 @@ static void output_done()
  *				do_status				     *
  *===========================================================================*/
 static void do_status(m_ptr)
-register message *m_ptr;	/* pointer to the newly arrived message */
+register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 {
   if (revive_pending) {
 	m_ptr->m_type = DEV_REVIVE;		/* build message */
@@ -312,7 +312,7 @@ register message *m_ptr;	/* pointer to the newly arrived message */
  *				do_cancel				     *
  *===========================================================================*/
 static void do_cancel(m_ptr)
-register message *m_ptr;	/* pointer to the newly arrived message */
+register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 {
 /* Cancel a print request that has already started.  Usually this means that
  * the process doing the printing has been killed by a signal.  It is not
@@ -339,7 +339,7 @@ int status;			/* number of  chars printed or error code */
 {
 /* Send a reply telling FS_PROC_NR that printing has started or stopped. */
 
-  message pr_mess;
+  kipc_msg_t pr_mess;
 
   pr_mess.m_type = code;		/* TASK_REPLY or REVIVE */
   pr_mess.REP_STATUS = status;		/* count or -EIO */

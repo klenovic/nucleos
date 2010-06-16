@@ -1029,7 +1029,7 @@ static void do_config(char *label, char *filename)
  */
 int main(int argc, char **argv)
 {
-  message m;
+  kipc_msg_t m;
   int result;
   int request;
   int i, s;

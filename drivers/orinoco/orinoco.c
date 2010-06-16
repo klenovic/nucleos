@@ -199,14 +199,14 @@ struct {
 #define BITRATE_TABLE_SIZE (sizeof(bitrate_table) / sizeof(bitrate_table[0]))
 
 
-static void or_writev(message * mp, int from_int, int vectored);
-static void or_readv(message * mp, int from_int, int vectored);
-static void or_writev_s(message * mp, int from_int);
-static void or_readv_s(message * mp, int from_int);
+static void or_writev(kipc_msg_t * mp, int from_int, int vectored);
+static void or_readv(kipc_msg_t * mp, int from_int, int vectored);
+static void or_writev_s(kipc_msg_t * mp, int from_int);
+static void or_readv_s(kipc_msg_t * mp, int from_int);
 static void reply(t_or * orp, int err, int may_block);
 static int  or_probe(t_or *);
 static void or_ev_info(t_or *);
-static void or_init(message *);
+static void or_init(kipc_msg_t *);
 static void or_pci_conf(void);
 static void or_init_struct(t_or *);
 static void map_hw_buffer(t_or *);
@@ -215,27 +215,27 @@ static void or_check_ints(t_or *);
 static void or_writerids(hermes_t *, t_or *);
 static void or_readrids(hermes_t *, t_or *);
 static void or_rec_mode(t_or *);
-static void mess_reply(message *, message *);
+static void mess_reply(kipc_msg_t *, kipc_msg_t *);
 static u32_t or_get_bar(int devind, t_or * orp);
-static void or_getstat(message * mp);
-static void or_getstat_s(message * mp);
+static void or_getstat(kipc_msg_t * mp);
+static void or_getstat_s(kipc_msg_t * mp);
 static void print_linkstatus(t_or * orp, u16_t status);
 static int  or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf);
 static void orinoco_stop(void);
 static void or_reset(void);
 static void or_watchdog_f(timer_t *tp);
 static void setup_wepkey(t_or *orp, char *wepkey0);
-static void or_getstat(message *m);
+static void or_getstat(kipc_msg_t *m);
 static int  do_hard_int(void);
 static void check_int_events(void);
-static void or_getname(message *m);
+static void or_getname(kipc_msg_t *m);
 static int or_handler(t_or *orp);
-static void or_dump(message *m);
+static void or_dump(kipc_msg_t *m);
 
 /* The message used in the main loop is made global, so that rl_watchdog_f()
  * can change its message type to fake an interrupt message.
  */
-static message m;
+static kipc_msg_t m;
 static int int_event_check;		/* set to TRUE if events arrived */
 
 u32_t system_hz;
@@ -383,7 +383,7 @@ static void check_int_events(void) {
  *                                                                          *
  * Gets the drivers name, orinoco                                           *
  ****************************************************************************/
-static void or_getname(message *mp) {
+static void or_getname(kipc_msg_t *mp) {
 	int r;
 	
 	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
@@ -491,7 +491,7 @@ static void or_reset() {
  * Dump interesting information about the card on F-key pressed.             *
  * Not implemented yet                                                       *
  *****************************************************************************/
-static void or_dump (message *m) {
+static void or_dump (kipc_msg_t *m) {
 	t_or *orp;
 	int i, err;
 	u16_t evstat =0, d;
@@ -521,10 +521,10 @@ static void or_dump (message *m) {
  *                                                                           *
  * The main initialization function, called when a DL_INIT message comes in. *
  *****************************************************************************/
-static void or_init (message * mp) {
+static void or_init (kipc_msg_t * mp) {
 	int port, err, i;
 	t_or *orp;
-	message reply;
+	kipc_msg_t reply;
 	static int first_time = 1;
 	hermes_t *hw;
 	clock_t t0,t1;
@@ -1334,7 +1334,7 @@ static void or_watchdog_f(timer_t *tp) {
  *                mess_reply                                                 *
  *****************************************************************************/
 
-static void mess_reply (message * req, message * reply_mess) {
+static void mess_reply (kipc_msg_t * req, kipc_msg_t * reply_mess) {
 	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic(__FILE__, "orinoco: unable to mess_reply", NO_NUM);
 
@@ -1348,7 +1348,7 @@ static void mess_reply (message * req, message * reply_mess) {
  * of or_writev_s. We left out the comments. For an explanation, see         *
  * or_writev_s                                                               *
 ******************************************************************************/
-static void or_writev (message * mp, int from_int, int vectored) {
+static void or_writev (kipc_msg_t * mp, int from_int, int vectored) {
 	int port, or_client, count, size, err, data_len, data_off, tx_head;
 	int o, j, n, i, s, p, cps ;
 	struct ethhdr *eh;
@@ -1516,7 +1516,7 @@ suspend_write:
  *                                                                           *
  * Write data which is denoted by the message to the card and send it.       *
  *****************************************************************************/
-static void or_writev_s (message * mp, int from_int) {
+static void or_writev_s (kipc_msg_t * mp, int from_int) {
 	int port, or_client, count, size, err, data_len, data_off, tx_head;
 	int o, j, n, i, s, p, cps ;
 	struct ethhdr *eh;
@@ -1716,7 +1716,7 @@ suspend_write_s:
  * or sent                                                                   *
  *****************************************************************************/
 static void reply (t_or * orp, int err, int may_block) {
-	message reply;
+	kipc_msg_t reply;
 	int status = 0, r;
 	clock_t now;
 
@@ -1963,7 +1963,7 @@ static int is_ethersnap(struct header_struct *hdr)  {
  * of or_readv_s. We left out the comments. For an explanation, see          *
  * or_readv_s                                                                *
  *****************************************************************************/
-static void or_readv (message * mp, int from_int, int vectored) {
+static void or_readv (kipc_msg_t * mp, int from_int, int vectored) {
 	int i, j, n, o, s, s1, dl_port, or_client, count, size, err, yep, cps;
 	port_t port;
 	clock_t timebefore;
@@ -2083,9 +2083,9 @@ suspend_readv :
  *                or_readv_s                                                 *
  *                                                                           *
  * Copy the data which is stored in orp->rx_buf[orp->rx_first] in the vector *
- * which was given with the message *mp                                      *
+ * which was given with the kipc_msg_t *mp                                      *
  *****************************************************************************/
-static void or_readv_s (message * mp, int from_int) {
+static void or_readv_s (kipc_msg_t * mp, int from_int) {
 	int i, j, n, o, s, s1, dl_port, or_client, count, size, err, cps;
 	int iov_offset = 0, length, offset;
 	port_t port;
@@ -2328,7 +2328,7 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
  * Return the statistics structure. The statistics aren't updated until now, *
  * so this won't return much interesting yet.                                *
  *****************************************************************************/
-static void or_getstat (message * mp) {
+static void or_getstat (kipc_msg_t * mp) {
 	int r, port;
 	eth_stat_t stats;
 	t_or *orp;
@@ -2368,7 +2368,7 @@ static void or_getstat (message * mp) {
  * Return the statistics structure. The statistics aren't updated until now, *
  * so this won't return much interesting yet.                                *
  *****************************************************************************/
-static void or_getstat_s (message * mp) {
+static void or_getstat_s (kipc_msg_t * mp) {
 	int r, port;
 	eth_stat_t stats;
 	t_or *orp;

@@ -258,7 +258,7 @@ static void pm_init()
   static char mess_sigs[] = { SIGTERM, SIGHUP, SIGABRT, SIGQUIT };
   register struct mproc *rmp;
   register char *sig_ptr;
-  message mess;
+  kipc_msg_t mess;
 
   /* Initialize process table, including timers. */
   for (rmp=&mproc[0]; rmp<&mproc[NR_PROCS]; rmp++) {

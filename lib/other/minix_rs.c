@@ -16,7 +16,7 @@
 int minix_rs_lookup(const char *name, endpoint_t *value)
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	size_t len_key;
 
 	len_key = strlen(name)+1;

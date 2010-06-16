@@ -23,7 +23,7 @@ u16_t *vidp;
 u16_t *didp;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_FIRST_DEV;
 	r= kipc_sendrec(pci_procnr, &m);

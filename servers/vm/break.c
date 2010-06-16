@@ -50,7 +50,7 @@
 /*===========================================================================*
  *				do_brk					     *
  *===========================================================================*/
-int do_brk(message *msg)
+int do_brk(kipc_msg_t *msg)
 {
 /* Perform the brk(addr) system call.
  * The parameter, 'addr' is the new virtual address in D space.

@@ -15,7 +15,7 @@
 
 int vm_unmap(int endpt, void *addr)
 {
-	message m;
+	kipc_msg_t m;
 
 	m.VMUN_ENDPT = endpt;
 	m.VMUN_ADDR = (long) addr;

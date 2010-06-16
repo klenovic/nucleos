@@ -293,7 +293,7 @@ int access;			/* CPF_READ for a copy from granter to grantee, CPF_WRITE
  *				do_safecopy				     *
  *===========================================================================*/
 int do_safecopy(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 	static int access, src_seg, dst_seg;
 
@@ -319,7 +319,7 @@ register message *m_ptr;	/* pointer to request message */
  *				do_vsafecopy				     *
  *===========================================================================*/
 int do_vsafecopy(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 	static struct vscp_vec vec[SCPVEC_NR];
 	static struct vir_addr src, dst;

@@ -18,7 +18,7 @@
  */
 int _pm_findproc(char *proc_name, int *proc_nr)
 {
-  message m;
+  kipc_msg_t m;
 
   m.m1_p1 = proc_name;
   m.m1_i1 = -1;			/* search by name */

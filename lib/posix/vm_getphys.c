@@ -15,7 +15,7 @@
 
 unsigned long vm_getphys(int endpt, void *addr)
 {
-	message m;
+	kipc_msg_t m;
 	unsigned long ret;
 	int r;
 

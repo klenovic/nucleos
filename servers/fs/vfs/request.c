@@ -32,7 +32,7 @@
 #include "param.h"
 
 static int fs_sendrec_f(char *file, int line, endpoint_t fs_e,
-				      message *reqm);
+				      kipc_msg_t *reqm);
 
 #define fs_sendrec(e, m) fs_sendrec_f(__FILE__, __LINE__, (e), (m))
 
@@ -54,7 +54,7 @@ unsigned int *cum_iop;
 {
     int r;
   cp_grant_id_t grant_id;
-    message m;
+    kipc_msg_t m;
 
   grant_id = cpf_grant_magic(fs_e, user_e, (vir_bytes) user_addr, num_of_bytes,
 			(rw_flag == READING ? CPF_WRITE : CPF_READ));
@@ -91,7 +91,7 @@ ino_t inode_nr;
 mode_t rmode;
 mode_t *new_modep;
 {
-    message m;
+    kipc_msg_t m;
     int r;
 
     /* Fill in request message */
@@ -119,7 +119,7 @@ uid_t newuid;
 gid_t newgid;
 mode_t *new_modep;
 {
-    message m;
+    kipc_msg_t m;
     int r;
 
     /* Fill in request message */
@@ -153,7 +153,7 @@ node_details_t *res;
     int r;
     cp_grant_id_t grant_id;
     size_t len;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(path) + 1;
     grant_id= cpf_grant_direct(fs_e, (vir_bytes)path, len, CPF_READ);
@@ -194,7 +194,7 @@ int req_flush(fs_e, dev)
 endpoint_t fs_e; 
 dev_t dev;
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_FLUSH;
@@ -215,7 +215,7 @@ char *buf;
 {
   int r;
   cp_grant_id_t grant_id;
-  message m;
+  kipc_msg_t m;
 
   grant_id = cpf_grant_magic(fs_e, who_e, (vir_bytes) buf, sizeof(struct statfs),
 		CPF_WRITE);
@@ -243,7 +243,7 @@ ino_t inode_nr;
 off_t start;
 off_t end;
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_FTRUNC;
@@ -270,7 +270,7 @@ size_t size;
 u64_t *new_pos;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
   cp_grant_id_t grant_id;
   
   grant_id = cpf_grant_magic(fs_e, who_e, (vir_bytes) buf, size, CPF_WRITE);
@@ -303,7 +303,7 @@ int req_inhibread(fs_e, inode_nr)
 endpoint_t fs_e;
 ino_t inode_nr;
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_INHIBREAD;
@@ -326,7 +326,7 @@ ino_t linked_file;
     int r;
   cp_grant_id_t grant_id;
     size_t len;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
   grant_id = cpf_grant_direct(fs_e, (vir_bytes)lastc, len, CPF_READ);
@@ -363,7 +363,7 @@ lookup_res_t *res;
     int r;
     size_t len;
   cp_grant_id_t grant_id, grant_id2;
-    message m;
+    kipc_msg_t m;
   vfs_ucred_t credentials;
 
     grant_id= cpf_grant_direct(fs_e, (vir_bytes)user_fullpath,
@@ -459,7 +459,7 @@ mode_t dmode;
     int r;
     cp_grant_id_t grant_id;
     size_t len;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
     grant_id= cpf_grant_direct(fs_e, (vir_bytes)lastc, len, CPF_READ);
@@ -498,7 +498,7 @@ dev_t dev;
     int r;
     size_t len;
     cp_grant_id_t grant_id;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
     grant_id= cpf_grant_direct(fs_e, (vir_bytes)lastc, len, CPF_READ);
@@ -531,7 +531,7 @@ endpoint_t fs_e;
 ino_t inode_nr;
 {
     int r;
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
   m.m_type = REQ_MOUNTPOINT;
@@ -554,7 +554,7 @@ dev_t dev;
 struct node_details *res;
 {
     int r;
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_NEWNODE;
@@ -591,7 +591,7 @@ endpoint_t driver_e;
  * driver recovery mechanism here. This function is actually called 
  * during the recovery.
  */
-    message m;
+    kipc_msg_t m;
     int r;
 
     /* Fill in request message */
@@ -620,7 +620,7 @@ int fs_e;
 ino_t inode_nr;
 int count;
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_PUTNODE;
@@ -642,7 +642,7 @@ endpoint_t who_e;
 char *buf;
 size_t len;
 {
-    message m;
+    kipc_msg_t m;
     int r;
   cp_grant_id_t grant_id;
 
@@ -680,7 +680,7 @@ struct node_details *res_nodep;
   int r;
   cp_grant_id_t grant_id;
   size_t len;
-  message m;
+  kipc_msg_t m;
 
   len = strlen(label)+1;
   grant_id = cpf_grant_direct(fs_e, (vir_bytes) label, len, CPF_READ);
@@ -731,7 +731,7 @@ unsigned int *cum_iop;
 {
     int r;
   cp_grant_id_t grant_id;
-    message m;
+    kipc_msg_t m;
 
     if (ex64hi(pos) != 0)
 	panic(__FILE__, "req_readwrite: pos too large", NO_NUM);
@@ -776,7 +776,7 @@ char *new_name;
     int r;
     cp_grant_id_t gid_old, gid_new;
     size_t len_old, len_new;
-    message m;
+    kipc_msg_t m;
 
     len_old= strlen(old_name) + 1;
   gid_old = cpf_grant_direct(fs_e, (vir_bytes) old_name, len_old, CPF_READ);
@@ -818,7 +818,7 @@ char *lastc;
     int r;
   cp_grant_id_t grant_id;
     size_t len;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
   grant_id = cpf_grant_direct(fs_e, (vir_bytes) lastc, len, CPF_READ);
@@ -856,7 +856,7 @@ gid_t gid;
     int r;
     size_t len;
     cp_grant_id_t gid_name, gid_buf;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
   gid_name = cpf_grant_direct(fs_e, (vir_bytes) lastc, len, CPF_READ);
@@ -902,7 +902,7 @@ int pos;
 {
   cp_grant_id_t grant_id;
   int r;
-  message m;
+  kipc_msg_t m;
   struct stat sb;
 
   if (pos != 0)
@@ -940,7 +940,7 @@ int pos;
 int req_sync(fs_e)
 endpoint_t fs_e; 
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_SYNC;
@@ -961,7 +961,7 @@ char *lastc;
   cp_grant_id_t grant_id;
     size_t len;
     int r;
-    message m;
+    kipc_msg_t m;
 
     len= strlen(lastc) + 1;
   grant_id = cpf_grant_direct(fs_e, (vir_bytes) lastc, len, CPF_READ);
@@ -988,7 +988,7 @@ char *lastc;
 int req_unmount(fs_e)
 endpoint_t fs_e; 
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_UNMOUNT;
@@ -1007,7 +1007,7 @@ ino_t inode_nr;
 time_t actime;
 time_t modtime;
 {
-    message m;
+    kipc_msg_t m;
 
     /* Fill in request message */
     m.m_type = REQ_UTIME;
@@ -1025,14 +1025,14 @@ time_t modtime;
 /*===========================================================================*
  *				fs_sendrec				     *
  *===========================================================================*/
-static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, message *reqm)
+static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
 {
 /* This is the low level function that sends requests to FS processes.
  * It also handles driver recovery mechanism and reissuing the
  * request which failed due to a dead driver.
  */
   int r, old_driver_e, new_driver_e;
-  message origm, m;
+  kipc_msg_t origm, m;
   struct vmnt *vmp;
 
   if(fs_e <= 0 || fs_e == ENDPT_NONE)

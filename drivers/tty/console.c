@@ -809,7 +809,7 @@ static void beep()
 /*===========================================================================*
  *				do_video				     *
  *===========================================================================*/
-void do_video(message *m)
+void do_video(kipc_msg_t *m)
 {
 	int r, safe = 0;
 
@@ -1080,7 +1080,7 @@ int c;
  *				do_new_kmess				     *
  *===========================================================================*/
 void do_new_kmess(m)
-message *m;
+kipc_msg_t *m;
 {
 /* Notification for a new kernel message. */
   static struct kmessages kmess;		/* kmessages structure */
@@ -1128,7 +1128,7 @@ message *m;
  *				do_diagnostics				     *
  *===========================================================================*/
 void do_diagnostics(m_ptr, safe)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 int safe;
 {
 /* Print a string for a server. */
@@ -1168,7 +1168,7 @@ int safe;
  *				do_get_kmess				     *
  *===========================================================================*/
 void do_get_kmess(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Provide the log device with debug output */
   vir_bytes dst;
@@ -1188,7 +1188,7 @@ message *m_ptr;			/* pointer to request message */
  *				do_get_kmess_s				     *
  *===========================================================================*/
 void do_get_kmess_s(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Provide the log device with debug output */
   cp_grant_id_t gid;
@@ -1325,7 +1325,7 @@ void select_console(int cons_line)
  *				con_loadfont				     *
  *===========================================================================*/
 int con_loadfont(m)
-message *m;
+kipc_msg_t *m;
 {
   
 /* Load a font into the EGA or VGA adapter. */

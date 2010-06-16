@@ -215,7 +215,7 @@ sigset_t sig_map;
   /* If SIGNDELAY is set, an earlier sys_stop() failed because the process was
    * still sending, and the kernel hereby tells us that the process is now done
    * with that. We can now try to resume what we planned to do in the first
-   * place: set up a signal handler. However, the process's message may have
+   * place: set up a signal handler. However, the process's kipc_msg_t may have
    * been a call to PM, in which case the process may have changed any of its
    * signal settings. The process may also have forked, exited etcetera.
    */
@@ -508,7 +508,7 @@ struct mproc *rmp;		/* which process */
  * First check if the process is hanging on an PM call.  If not, tell FS,
  * so it can check for READs and WRITEs from pipes, ttys and the like.
  */
-  message m;
+  kipc_msg_t m;
   int r, slot;
 
   /* If we're already waiting for a delayed call, don't do anything now. */

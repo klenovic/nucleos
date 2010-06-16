@@ -15,7 +15,7 @@ void *buf;			/* Buffer to store the results */
 size_t size;			/* Amount of data to read */
 {
 /* Read data from BIOS locations */
-  message m;
+  kipc_msg_t m;
 
   m.RDB_SIZE = size;
   m.RDB_ADDR = address;

@@ -21,7 +21,7 @@ int sys_safecopyfrom(endpoint_t src_e,
  * given permission. 
  */
 
-  message copy_mess;
+  kipc_msg_t copy_mess;
 
   copy_mess.SCP_FROM_TO = src_e;
   copy_mess.SCP_INFO = SCP_MAKEINFO(my_seg);
@@ -43,7 +43,7 @@ int sys_safecopyto(endpoint_t dst_e,
  * given permission. 
  */
 
-  message copy_mess;
+  kipc_msg_t copy_mess;
 
   copy_mess.SCP_FROM_TO = dst_e;
   copy_mess.SCP_INFO = SCP_MAKEINFO(my_seg);

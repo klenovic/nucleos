@@ -23,7 +23,7 @@ u16_t *vidp;
 u16_t *didp;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_IDS;
 	m.m1_i1= devind;

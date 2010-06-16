@@ -34,7 +34,7 @@ static pvl_pair_t *pvl = (pvl_pair_t *) vdevio_buf;
  *			        do_vdevio                                    *
  *===========================================================================*/
 int do_vdevio(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Perform a series of device I/O on behalf of a non-kernel process. The 
  * I/O addresses and I/O values are fetched from and returned to some buffer

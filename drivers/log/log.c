@@ -35,11 +35,11 @@ static char *log_name(void);
 static struct device *log_prepare(int device);
 static int log_transfer(int proc_nr, int opcode, u64_t position,
 			iovec_t *iov, unsigned nr_req);
-static int log_do_open(struct driver *dp, message *m_ptr);
-static int log_cancel(struct driver *dp, message *m_ptr);
-static int log_select(struct driver *dp, message *m_ptr);
+static int log_do_open(struct driver *dp, kipc_msg_t *m_ptr);
+static int log_cancel(struct driver *dp, kipc_msg_t *m_ptr);
+static int log_select(struct driver *dp, kipc_msg_t *m_ptr);
 static void log_signal(struct driver *dp, sigset_t *set);
-static int log_other(struct driver *dp, message *m_ptr);
+static int log_other(struct driver *dp, kipc_msg_t *m_ptr);
 static void log_geometry(struct partition *entry);
 static int subread(struct logdevice *log, int count, int proc_nr, vir_bytes user_vir, size_t);
 
@@ -117,7 +117,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 {
 	int d, r;
 	char *buf;
-	message m;
+	kipc_msg_t m;
 
 	if (log->log_write + count > LOG_SIZE)
 		count = LOG_SIZE - log->log_write;
@@ -329,7 +329,7 @@ unsigned nr_req;		/* length of request vector */
  *============================================================================*/
 static int log_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   if (log_prepare(m_ptr->DEVICE) == NIL_DEV) return(-ENXIO);
   return 0;
@@ -353,7 +353,7 @@ struct partition *entry;
  *============================================================================*/
 static int log_cancel(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   int d;
   d = m_ptr->TTY_LINE;
@@ -383,7 +383,7 @@ sigset_t *set;
  *============================================================================*/
 static int log_other(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 	int r;
 
@@ -429,7 +429,7 @@ message *m_ptr;
  *============================================================================*/
 static int log_select(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   int d, ready_ops = 0, ops = 0;
   d = m_ptr->TTY_LINE;

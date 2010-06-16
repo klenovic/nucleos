@@ -23,7 +23,7 @@
 			prp->p_delivermsg_lin = vir2phys(&prp->p_delivermsg);			\
 		else										\
 			prp->p_delivermsg_lin = umap_local(prp, D, prp->p_delivermsg_vir,	\
-							   sizeof(message));			\
+							   sizeof(kipc_msg_t));			\
 	}
 
 #define PHYS_COPY_CATCH(dst, src, size)		\

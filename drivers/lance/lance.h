@@ -86,7 +86,7 @@ typedef struct ether_card
   vir_bytes write_s;
   vir_bytes read_s;
   int client;
-  message sendmsg;
+  kipc_msg_t sendmsg;
 
   /* ######## device info. ####### */
   port_t ec_port;

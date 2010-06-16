@@ -15,7 +15,7 @@
 int sys_enable_iop(proc_nr_e)
 endpoint_t proc_nr_e;			/* number of process to allow I/O */
 {
-    message m_iop;
+    kipc_msg_t m_iop;
     m_iop.IO_ENDPT = proc_nr_e;
     return ktaskcall(SYSTASK, SYS_IOPENABLE, &m_iop);
 }

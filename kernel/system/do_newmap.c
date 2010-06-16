@@ -23,7 +23,7 @@
  *				do_newmap				     *
  *===========================================================================*/
 int do_newmap(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_newmap().  Fetch the memory map. */
   register struct proc *rp;	/* process whose map is to be loaded */

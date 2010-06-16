@@ -17,7 +17,7 @@ int port; 				/* port address to write to */
 unsigned long value;			/* value to write */
 int type;				/* byte, word, long */
 {
-    message m_io;
+    kipc_msg_t m_io;
 
     m_io.DIO_REQUEST = _DIO_OUTPUT | type;
     m_io.DIO_PORT = port;

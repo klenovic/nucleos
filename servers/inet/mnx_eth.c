@@ -37,7 +37,7 @@ static void eth_issue_send(eth_port_t *eth_port);
 static void write_int(eth_port_t *eth_port);
 static void eth_recvev(event_t *ev, ev_arg_t ev_arg);
 static void eth_sendev(event_t *ev, ev_arg_t ev_arg);
-static eth_port_t *find_port(message *m);
+static eth_port_t *find_port(kipc_msg_t *m);
 static void eth_restart(eth_port_t *eth_port, int tasknr);
 static void send_getstat(eth_port_t *eth_port);
 
@@ -47,7 +47,7 @@ void osdep_eth_init()
 	u32_t tasknr;
 	struct eth_conf *ecp;
 	eth_port_t *eth_port, *rep;
-	message mess;
+	kipc_msg_t mess;
 	cp_grant_id_t gid;
 
 	/* First initialize normal ethernet interfaces */
@@ -228,7 +228,7 @@ eth_port_t *eth_port;
 acc_t *pack;
 {
 	eth_port_t *loc_port;
-	message mess1, block_msg;
+	kipc_msg_t mess1, block_msg;
 	u8_t *eth_dst_ptr;
 	int multicast, r;
 	ev_arg_t ev_arg;
@@ -254,7 +254,7 @@ static int notification_count;
 #endif
 
 void eth_rec(m)
-message *m;
+kipc_msg_t *m;
 	{
 	int i, r, m_type, stat;
 	eth_port_t *loc_port, *vlan_port;
@@ -496,7 +496,7 @@ message *m;
 }
 
 void eth_check_drivers(m)
-message *m;
+kipc_msg_t *m;
 {
 	int i, r, tasknr;
 
@@ -560,7 +560,7 @@ u32_t flags;
 {
 	int r;
 	unsigned dl_flags, mask;
-	message mess, repl_mess;
+	kipc_msg_t mess, repl_mess;
 
 	assert(!eth_port->etp_vlan);
 
@@ -621,7 +621,7 @@ eth_port_t *eth_port;
 	int i, r, pack_size;
 	acc_t *pack, *pack_ptr;
 	iovec_s_t *iovec;
-	message m;
+	kipc_msg_t m;
 
 	iovec= eth_port->etp_osdep.etp_wr_iovec;
 	pack= eth_port->etp_wr_pack;
@@ -774,7 +774,7 @@ eth_port_t *eth_port;
 {
 	eth_port_t *loc_port;
 	acc_t *pack, *pack_ptr;
-	message mess1, block_msg;
+	kipc_msg_t mess1, block_msg;
 	iovec_s_t *iovec;
 	ev_arg_t ev_arg;
 	int i, r;
@@ -851,7 +851,7 @@ event_t *ev;
 ev_arg_t ev_arg;
 {
 	eth_port_t *eth_port;
-	message *m_ptr;
+	kipc_msg_t *m_ptr;
 
 	eth_port= ev_arg.ev_ptr;
 	assert(ev == &eth_port->etp_osdep.etp_recvev);
@@ -877,7 +877,7 @@ event_t *ev;
 ev_arg_t ev_arg;
 {
 	eth_port_t *eth_port;
-	message *m_ptr;
+	kipc_msg_t *m_ptr;
 
 	eth_port= ev_arg.ev_ptr;
 	assert(ev == &eth_port->etp_sendev);
@@ -897,7 +897,7 @@ ev_arg_t ev_arg;
 }
 
 static eth_port_t *find_port(m)
-message *m;
+kipc_msg_t *m;
 {
 	eth_port_t *loc_port;
 	int i;
@@ -919,7 +919,7 @@ int tasknr;
 	int i, r;
 	unsigned flags, dl_flags;
 	cp_grant_id_t gid;
-	message mess;
+	kipc_msg_t mess;
 
 	if (eth_port->etp_osdep.etp_state != OEPS_INIT) {
 		printf("eth_restart: restarting eth%d, task %d, port %d\n",
@@ -1017,7 +1017,7 @@ static void send_getstat(eth_port)
 eth_port_t *eth_port;
 	{
 	int r;
-	message mess;
+	kipc_msg_t mess;
 
 	mess.m_type= DL_GETSTAT_S;
 	mess.DL_PORT= eth_port->etp_osdep.etp_port;

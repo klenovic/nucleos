@@ -11,7 +11,7 @@ struct iso9660_vd_pri;
 
 /* main.c */
 int main(void);
-void reply(int who, message *m_out);
+void reply(int who, kipc_msg_t *m_out);
 
 /* cache.c */
 struct buf *get_block(block_t block);

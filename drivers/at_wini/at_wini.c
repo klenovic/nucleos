@@ -356,7 +356,7 @@ static void init_params(void);
 static void init_drive(struct wini *w, int base_cmd, int base_ctl, int base_dma, int irq,
 		       int ack, int hook, int drive);
 static void init_params_pci(int);
-static int w_do_open(struct driver *dp, message *m_ptr);
+static int w_do_open(struct driver *dp, kipc_msg_t *m_ptr);
 static struct device *w_prepare(int dev);
 static int w_identify(void);
 static char *w_name(void);
@@ -371,9 +371,9 @@ static void setup_dma(unsigned *sizep, int proc_nr,
 			int *do_copyoutp);
 static void w_need_reset(void);
 static void ack_irqs(unsigned int);
-static int w_do_close(struct driver *dp, message *m_ptr);
-static int w_other(struct driver *dp, message *m_ptr);
-static int w_hw_int(struct driver *dp, message *m_ptr);
+static int w_do_close(struct driver *dp, kipc_msg_t *m_ptr);
+static int w_other(struct driver *dp, kipc_msg_t *m_ptr);
+static int w_hw_int(struct driver *dp, kipc_msg_t *m_ptr);
 static int com_simple(struct command *cmd);
 static void w_timeout(void);
 static int w_reset(void);
@@ -781,7 +781,7 @@ static void init_params_pci(int skip)
  *===========================================================================*/
 static int w_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Device open: Initialize the controller and read the partition table. */
 
@@ -1947,7 +1947,7 @@ static void w_need_reset()
  *===========================================================================*/
 static int w_do_close(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Device close: Release a device. */
   if (w_prepare(m_ptr->DEVICE) == NIL_DEV)
@@ -2064,7 +2064,7 @@ static void w_intr_wait()
 
 	int r;
 	unsigned long w_status;
-	message m;
+	kipc_msg_t m;
 
 	if (w_wn->irq != NO_IRQ) {
 		/* Wait for an interrupt that sets w_status to "not busy".
@@ -2530,7 +2530,7 @@ int do_dma;
  *===========================================================================*/
 static int w_other(dr, m)
 struct driver *dr;
-message *m;
+kipc_msg_t *m;
 {
 	int r, timeout, prev;
 
@@ -2595,7 +2595,7 @@ message *m;
  *===========================================================================*/
 static int w_hw_int(dr, m)
 struct driver *dr;
-message *m;
+kipc_msg_t *m;
 {
   /* Leftover interrupt(s) received; ack it/them. */
   ack_irqs(m->NOTIFY_ARG);

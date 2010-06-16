@@ -19,7 +19,7 @@ endpoint_t proc_ep;			/* which process has exited */
  * used by system processes to directly exit without passing through the
  * PM. This should be used with care to prevent inconsistent PM tables. 
  */
-  message m;
+  kipc_msg_t m;
 
   m.PR_ENDPT = proc_ep;
   return(ktaskcall(SYSTASK, SYS_EXIT, &m));

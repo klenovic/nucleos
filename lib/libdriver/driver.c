@@ -55,9 +55,9 @@
 u8_t *tmp_buf = NULL;		/* the DMA buffer eventually */
 phys_bytes tmp_phys;		/* phys address of DMA buffer */
 
-static void asyn_reply(message *mess, int proc_nr, int r);
-static int do_rdwt(struct driver *dr, message *mp);
-static int do_vrdwt(struct driver *dr, message *mp);
+static void asyn_reply(kipc_msg_t *mess, int proc_nr, int r);
+static int do_rdwt(struct driver *dr, kipc_msg_t *mp);
+static int do_vrdwt(struct driver *dr, kipc_msg_t *mp);
 
 int device_caller;
 static mq_t *queue_head = NULL;
@@ -66,13 +66,13 @@ static mq_t *queue_head = NULL;
  *				asyn_reply				     *
  *===========================================================================*/
 static void asyn_reply(mess, proc_nr, r)
-message *mess;
+kipc_msg_t *mess;
 int proc_nr;
 int r;
 {
 /* Send a reply using the new asynchronous character device protocol.
  */
-  message reply_mess;
+  kipc_msg_t reply_mess;
 
   switch (mess->m_type) {
   case DEV_OPEN:
@@ -134,7 +134,7 @@ int type;		/* Driver type (DRIVER_STD or DRIVER_ASYN) */
 /* Main program of any device driver task. */
 
   int r, proc_nr;
-  message mess;
+  kipc_msg_t mess;
   sigset_t set;
 
   /* Init MQ library. */
@@ -278,7 +278,7 @@ void init_buffer(void)
  *===========================================================================*/
 static int do_rdwt(dp, mp)
 struct driver *dp;		/* device dependent entry points */
-message *mp;			/* pointer to read or write message */
+kipc_msg_t *mp;			/* pointer to read or write message */
 {
 /* Carry out a single read or write request. */
   iovec_t iovec1;
@@ -312,7 +312,7 @@ message *mp;			/* pointer to read or write message */
  *==========================================================================*/
 static int do_vrdwt(dp, mp)
 struct driver *dp;	/* device dependent entry points */
-message *mp;		/* pointer to read or write message */
+kipc_msg_t *mp;		/* pointer to read or write message */
 {
 /* Carry out an device read or write to/from a vector of user addresses.
  * The "user addresses" are assumed to be safe, i.e. FS transferring to/from
@@ -372,7 +372,7 @@ char *no_name()
  *============================================================================*/
 int do_nop(dp, mp)
 struct driver *dp;
-message *mp;
+kipc_msg_t *mp;
 {
 /* Nothing there, or nothing to do. */
 
@@ -390,7 +390,7 @@ message *mp;
  *============================================================================*/
 int nop_ioctl(dp, mp)
 struct driver *dp;
-message *mp;
+kipc_msg_t *mp;
 {
   return(-ENOTTY);
 }
@@ -410,7 +410,7 @@ sigset_t *set;
  *============================================================================*/
 void nop_alarm(dp, mp)
 struct driver *dp;
-message *mp;
+kipc_msg_t *mp;
 {
 /* Ignore the leftover alarm. */
 }
@@ -435,7 +435,7 @@ void nop_cleanup()
 /*===========================================================================*
  *				nop_cancel				     *
  *===========================================================================*/
-int nop_cancel(struct driver *dr, message *m)
+int nop_cancel(struct driver *dr, kipc_msg_t *m)
 {
 /* Nothing to do for cancel. */
    return 0;
@@ -444,7 +444,7 @@ int nop_cancel(struct driver *dr, message *m)
 /*===========================================================================*
  *				nop_select				     *
  *===========================================================================*/
-int nop_select(struct driver *dr, message *m)
+int nop_select(struct driver *dr, kipc_msg_t *m)
 {
 /* Nothing to do for select. */
    return 0;
@@ -455,7 +455,7 @@ int nop_select(struct driver *dr, message *m)
  *============================================================================*/
 int do_diocntl(dp, mp)
 struct driver *dp;
-message *mp;			/* pointer to ioctl request */
+kipc_msg_t *mp;			/* pointer to ioctl request */
 {
 /* Carry out a partition setting/getting request. */
   struct device *dv;
@@ -495,7 +495,7 @@ message *mp;			/* pointer to ioctl request */
 /*===========================================================================*
  *				mq_queue				     *
  *===========================================================================*/
-int mq_queue(message *m)
+int mq_queue(kipc_msg_t *m)
 {
 	mq_t *mq, *mi;
 

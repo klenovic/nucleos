@@ -177,39 +177,39 @@ int select_retry(struct tty *tp);
 
 /* rs232.c */
 void rs_init(struct tty *tp);
-void rs_interrupt(message *m);
+void rs_interrupt(kipc_msg_t *m);
 
 #ifdef CONFIG_X86_32
 /* console.c */
 void kputc(int c);
 void cons_stop(void);
-void do_new_kmess(message *m);
-void do_diagnostics(message *m, int safe);
-void do_get_kmess(message *m);
-void do_get_kmess_s(message *m);
+void do_new_kmess(kipc_msg_t *m);
+void do_diagnostics(kipc_msg_t *m, int safe);
+void do_get_kmess(kipc_msg_t *m);
+void do_get_kmess_s(kipc_msg_t *m);
 void scr_init(struct tty *tp);
 void toggle_scroll(void);
-int con_loadfont(message *m);
+int con_loadfont(kipc_msg_t *m);
 void select_console(int cons_line);
 void beep_x( unsigned freq, clock_t dur);
-void do_video(message *m);
+void do_video(kipc_msg_t *m);
 
 /* keyboard.c */
 void kb_init(struct tty *tp);
 void kb_init_once(void);
-int kbd_loadmap(message *m, int safe);
-void do_panic_dumps(message *m);
-void do_fkey_ctl(message *m);
-void kbd_interrupt(message *m);
-void do_kbd(message *m);
-void do_kbdaux(message *m);
-int kbd_status(message *m_ptr);
+int kbd_loadmap(kipc_msg_t *m, int safe);
+void do_panic_dumps(kipc_msg_t *m);
+void do_fkey_ctl(kipc_msg_t *m);
+void kbd_interrupt(kipc_msg_t *m);
+void do_kbd(kipc_msg_t *m);
+void do_kbdaux(kipc_msg_t *m);
+int kbd_status(kipc_msg_t *m_ptr);
 
 /* pty.c */
-void do_pty(struct tty *tp, message *m_ptr);
+void do_pty(struct tty *tp, kipc_msg_t *m_ptr);
 void pty_init(struct tty *tp);
 void select_retry_pty(struct tty *tp);
-int pty_status(message *m_ptr);
+int pty_status(kipc_msg_t *m_ptr);
 
 #endif /* CONFIG_X86_32 */
 

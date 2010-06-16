@@ -19,7 +19,7 @@ vir_bytes *msgaddr;
 {
 /* A process has forked.  Tell the kernel. */
 
-  message m;
+  kipc_msg_t m;
   int r;
 
   m.PR_ENDPT = parent;

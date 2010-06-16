@@ -14,7 +14,7 @@ int req;
 endpoint_t proc_ep;
 long addr, *data_p;
 {
-  message m;
+  kipc_msg_t m;
   int r;
 
   m.CTL_ENDPT = proc_ep;

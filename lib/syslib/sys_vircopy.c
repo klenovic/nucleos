@@ -24,7 +24,7 @@ phys_bytes bytes;		/* how many bytes */
  * are offsets within LOCAL_SEG (text, stack, data), REMOTE_SEG, or BIOS_SEG. 
  */
 
-  message copy_mess;
+  kipc_msg_t copy_mess;
 
   if (bytes == 0L) return 0;
   copy_mess.CP_SRC_ENDPT = src_proc;

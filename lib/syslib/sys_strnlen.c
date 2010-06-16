@@ -23,7 +23,7 @@
  */
 long sys_strnlen(endpoint_t endpt, char __user *s, int maxlen)
 {
-	message mess;
+	kipc_msg_t mess;
 
 	mess.STRNLEN_PROC_E = endpt;
 	mess.STRNLEN_STR = s;

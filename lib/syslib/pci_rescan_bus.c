@@ -21,7 +21,7 @@ void pci_rescan_bus(busnr)
 u8_t busnr;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_RESCAN;
 	m.m1_i1= busnr;

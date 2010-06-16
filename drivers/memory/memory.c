@@ -66,10 +66,10 @@ static char *m_name(void);
 static struct device *m_prepare(int device);
 static int m_transfer(int proc_nr, int opcode,
 			u64_t position, iovec_t *iov, unsigned nr_req);
-static int m_do_open(struct driver *dp, message *m_ptr);
-static int m_do_close(struct driver *dp, message *m_ptr);
+static int m_do_open(struct driver *dp, kipc_msg_t *m_ptr);
+static int m_do_close(struct driver *dp, kipc_msg_t *m_ptr);
 static void m_init(void);
-static int m_ioctl(struct driver *dp, message *m_ptr);
+static int m_ioctl(struct driver *dp, kipc_msg_t *m_ptr);
 static void m_geometry(struct partition *entry);
 
 /* Entry points to this driver. */
@@ -302,7 +302,7 @@ unsigned nr_req;		/* length of request vector */
  *===========================================================================*/
 static int m_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   int r;
 
@@ -333,7 +333,7 @@ message *m_ptr;
  *===========================================================================*/
 static int m_do_close(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
   int r;
 
@@ -415,7 +415,7 @@ static void m_init()
  *===========================================================================*/
 static int m_ioctl(dp, m_ptr)
 struct driver *dp;			/* pointer to driver structure */
-message *m_ptr;				/* pointer to control message */
+kipc_msg_t *m_ptr;				/* pointer to control message */
 {
 /* I/O controls for the memory driver. Currently there is one I/O control:
  * - MIOCRAMSIZE: to set the size of the RAM disk.

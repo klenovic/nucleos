@@ -27,7 +27,7 @@
  *				do_privctl				     *
  *===========================================================================*/
 int do_privctl(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_privctl(). Update a process' privileges. If the process is not
  * yet a system process, make sure it gets its own privilege structure.

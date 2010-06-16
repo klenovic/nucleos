@@ -8,7 +8,7 @@
  *===========================================================================*/
 int vm_ctl(int what, int param)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VCTL_WHAT = what;

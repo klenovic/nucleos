@@ -25,7 +25,7 @@ u16_t did;
 
 	int r;
 	cp_grant_id_t gid;
-	message m;
+	kipc_msg_t m;
 
 	gid= cpf_grant_direct(pci_procnr, (vir_bytes)name, sizeof(name),
 		CPF_WRITE);

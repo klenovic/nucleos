@@ -34,7 +34,7 @@ struct cprof_proc_info_s cprof_proc_info[NR_SYS_PROCS];
  *				do_cprofile				     *
  *===========================================================================*/
 int do_cprofile(m_ptr)
-register message *m_ptr;    /* pointer to request message */
+register kipc_msg_t *m_ptr;    /* pointer to request message */
 {
   int proc_nr, i, err = 0, k = 0;
   phys_bytes len;

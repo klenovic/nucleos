@@ -28,7 +28,7 @@
  *				do_times				     *
  *===========================================================================*/
 int do_times(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_times().  Retrieve the accounting information. */
   register struct proc *rp;

@@ -18,7 +18,7 @@ int irq_vec;				/* IRQ vector to control */
 int policy;				/* bit mask for policy flags */
 int *hook_id;				/* ID of IRQ hook at kernel */
 {
-    message m_irq;
+    kipc_msg_t m_irq;
     int s;
     
     m_irq.m_type = SYS_IRQCTL;

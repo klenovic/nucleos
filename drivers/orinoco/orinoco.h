@@ -100,8 +100,8 @@ typedef struct s_or
 	/* 'large' items */
 	irq_hook_t or_hook;
 	eth_stat_t or_stat;
-	message or_rx_mess;
-	message or_tx_mess;
+	kipc_msg_t or_rx_mess;
+	kipc_msg_t or_tx_mess;
 	ether_addr_t or_address;
 	iovec_t or_iovec[IOVEC_NR];
 	iovec_s_t or_iovec_s[IOVEC_NR];

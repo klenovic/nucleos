@@ -12,7 +12,7 @@
 
 int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style, int force)
 {
-  message m;
+  kipc_msg_t m;
   m.m4_l1 = ctl_req;
   m.m4_l2 = proc_nr;
   m.m4_l3 = dev_nr;

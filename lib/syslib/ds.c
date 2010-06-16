@@ -22,7 +22,7 @@ int type;
 int flags;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g;
 	size_t len;
 
@@ -51,7 +51,7 @@ char *ds_name;
 u32_t value;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g;
 	size_t len;
 
@@ -80,7 +80,7 @@ char *ds_name;
 char *value;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g_key, g_str;
 	size_t len_key, len_str;
 
@@ -120,7 +120,7 @@ char *ds_name;
 u32_t *value;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g_key;
 	size_t len_key;
 
@@ -154,7 +154,7 @@ char *value;
 size_t len_str;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g_key, g_str;
 	size_t len_key;
 
@@ -197,7 +197,7 @@ char *value;
 size_t len_str;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g_key, g_str;
 
 	if(len_key < 1 || len_str < 1) return -1002;
@@ -242,7 +242,7 @@ size_t len_key;
 u32_t *value;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	cp_grant_id_t g_key;
 
 	if(len_key < 1) return -1;

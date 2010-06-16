@@ -31,8 +31,8 @@ extern int errno;       /* error number set by system library */
 static void init_server(int argc, char **argv);
 static void exit_server(void);
 static void sig_handler(void);
-static void get_work(message *m_ptr);
-static void reply(int whom, message *m_ptr);
+static void get_work(kipc_msg_t *m_ptr);
+static void reply(int whom, kipc_msg_t *m_ptr);
 
 /*===========================================================================*
  *				main                                         *
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
  * three major activities: getting new work, processing the work, and
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
-  message m;
+  kipc_msg_t m;
   int result;
   sigset_t sigset;
 
@@ -148,7 +148,7 @@ static void exit_server()
  *				get_work                                     *
  *===========================================================================*/
 static void get_work(m_ptr)
-message *m_ptr;				/* message buffer */
+kipc_msg_t *m_ptr;				/* message buffer */
 {
     int status = 0;
     status = kipc_receive(ENDPT_ANY, m_ptr);   /* this blocks until message arrives */
@@ -165,7 +165,7 @@ message *m_ptr;				/* message buffer */
  *===========================================================================*/
 static void reply(who_e, m_ptr)
 int who_e;                           	/* destination */
-message *m_ptr;				/* message buffer */
+kipc_msg_t *m_ptr;				/* message buffer */
 {
     int s;
     s = kipc_send(who_e, m_ptr);    /* send the message */

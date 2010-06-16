@@ -27,7 +27,7 @@
  *				do_exec					     *
  *===========================================================================*/
 int do_exec(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_exec().  A process has done a successful EXEC. Patch it up. */
   register struct proc *rp;

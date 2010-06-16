@@ -41,7 +41,7 @@ int dev_execve(int proc_e, char *exec, size_t exec_len, char **argv,
 	size_t string_off;
 	size_t n;
 	int ov;
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	/* Assumptions: size_t and char *, it's all the same thing. */
@@ -243,7 +243,7 @@ vir_bytes entry_point;
 {
 	int r;
 	struct exec_newmem e;
-	message m;
+	kipc_msg_t m;
 
 	e.text_bytes = text_bytes;
 	e.data_bytes = data_bytes;
@@ -288,7 +288,7 @@ int proc_e;
 int result;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= KCNR_EXEC_RESTART;
 	m.EXC_RS_PROC= proc_e;

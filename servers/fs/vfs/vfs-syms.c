@@ -31,11 +31,11 @@ int last_login_fs_e;	/* endpoint of the FS proc that logged in
 u32_t system_hz;	/* system clock frequency. */
 
 /* The parameters of the call are kept here. */
-message m_in;		/* the input message itself */
-message m_out;		/* the output message used for reply */
+kipc_msg_t m_in;		/* the input message itself */
+kipc_msg_t m_out;		/* the output message used for reply */
 int who_p, who_e;	/* caller's proc number, endpoint */
 int call_nr;		/* system call number */
-message mount_m_in;	/* the input message itself */
+kipc_msg_t mount_m_in;	/* the input message itself */
 
 char user_fullpath[PATH_MAX+1];	/* storage for user path name */
 short cum_path_processed;	/* number of characters processed */

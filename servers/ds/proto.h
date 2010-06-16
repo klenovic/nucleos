@@ -13,9 +13,9 @@
 int main(int argc, char **argv);
 
 /* store.c */
-int do_publish(message *m_ptr);
-int do_retrieve(message *m_ptr);
-int do_subscribe(message *m_ptr);
-int do_check(message *m_ptr);
-int do_getsysinfo(message *m_ptr);
+int do_publish(kipc_msg_t *m_ptr);
+int do_retrieve(kipc_msg_t *m_ptr);
+int do_subscribe(kipc_msg_t *m_ptr);
+int do_check(kipc_msg_t *m_ptr);
+int do_getsysinfo(kipc_msg_t *m_ptr);
 void ds_init(void);

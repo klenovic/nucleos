@@ -17,7 +17,7 @@
 
 void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	m.VMMP_EP = who;
@@ -33,7 +33,7 @@ void *vm_map_phys(endpoint_t who, void *phaddr, size_t len)
 
 int vm_unmap_phys(endpoint_t who, void *vaddr, size_t len)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	m.VMUP_EP = who;

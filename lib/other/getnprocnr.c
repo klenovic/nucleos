@@ -12,7 +12,7 @@
 
 int getnprocnr(pid_t pid)
 {
-  message m;
+  kipc_msg_t m;
 
   m.m1_i1 = pid;		/* pass pid >=0 to search for */
   m.m1_i2 = 0;			/* don't pass name to search for */

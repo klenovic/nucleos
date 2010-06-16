@@ -343,7 +343,7 @@ int do_getepinfo()
  *===========================================================================*/
 int do_reboot()
 {
-  message m;
+  kipc_msg_t m;
   int r;
 
   /* Check permission to abort the system. */

@@ -34,7 +34,7 @@ char *key;				/* which key to look up */
 char *value;				/* where to store value */
 int max_len;				/* maximum length of value */
 {
-  message m;
+  kipc_msg_t m;
   static char mon_params[128*sizeof(char *)];	/* copy parameters here */
   char *key_value;
   int i, s, keylen;

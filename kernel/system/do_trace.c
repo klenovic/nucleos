@@ -26,7 +26,7 @@
  *				do_trace				    *
  *==========================================================================*/
 int do_trace(m_ptr)
-register message *m_ptr;
+register kipc_msg_t *m_ptr;
 {
 /* Handle the debugging commands supported by the ptrace system call
  * The commands are:

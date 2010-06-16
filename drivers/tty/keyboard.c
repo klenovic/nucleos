@@ -154,8 +154,8 @@ static long sticky_alt_mode = 0;
 static long debug_fkeys = 1;
 static timer_t tmr_kbd_wd;
 
-static void handle_req(struct kbd *kbdp, message *m);
-static int handle_status(struct kbd *kbdp, message *m);
+static void handle_req(struct kbd *kbdp, kipc_msg_t *m);
+static int handle_status(struct kbd *kbdp, kipc_msg_t *m);
 static void kbc_cmd0(int cmd);
 static void kbc_cmd1(int cmd, int data);
 static int kbc_read(void);
@@ -181,7 +181,7 @@ int micro_delay(u32_t usecs)
 /*===========================================================================*
  *				do_kbd					     *
  *===========================================================================*/
-void do_kbd(message *m)
+void do_kbd(kipc_msg_t *m)
 {
 	handle_req(&kbd, m);
 }
@@ -190,7 +190,7 @@ void do_kbd(message *m)
 /*===========================================================================*
  *				kbd_status				     *
  *===========================================================================*/
-int kbd_status(message *m)
+int kbd_status(kipc_msg_t *m)
 {
 	int r;
 
@@ -204,7 +204,7 @@ int kbd_status(message *m)
 /*===========================================================================*
  *				do_kbdaux				     *
  *===========================================================================*/
-void do_kbdaux(message *m)
+void do_kbdaux(kipc_msg_t *m)
 {
 	handle_req(&kbdaux, m);
 }
@@ -215,7 +215,7 @@ void do_kbdaux(message *m)
  *===========================================================================*/
 static void handle_req(kbdp, m)
 struct kbd *kbdp;
-message *m;
+kipc_msg_t *m;
 {
 	int i, n, r, ops, watch, safecopy = 0;
 	unsigned char c;
@@ -421,7 +421,7 @@ message *m;
  *===========================================================================*/
 static int handle_status(kbdp, m)
 struct kbd *kbdp;
-message *m;
+kipc_msg_t *m;
 {
 	int n, r;
 
@@ -513,7 +513,7 @@ int scode;
  *				kbd_interrupt				     *
  *===========================================================================*/
 void kbd_interrupt(m_ptr)
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* A keyboard interrupt has occurred.  Process it. */
   int o, isaux;
@@ -1061,7 +1061,7 @@ void kb_init_once(void)
  *				kbd_loadmap				     *
  *===========================================================================*/
 int kbd_loadmap(m, safe)
-message *m;
+kipc_msg_t *m;
 int safe;
 {
 /* Load a new keymap. */
@@ -1081,7 +1081,7 @@ int safe;
  *				do_fkey_ctl				     *
  *===========================================================================*/
 void do_fkey_ctl(m_ptr)
-message *m_ptr;			/* pointer to the request message */
+kipc_msg_t *m_ptr;			/* pointer to the request message */
 {
 /* This procedure allows processes to register a function key to receive
  * notifications if it is pressed. At most one binding per key can exist.
@@ -1190,7 +1190,7 @@ int scode;			/* scan code for a function key */
  * in kb_init, where ENDPT_NONE is set to indicate there is no interest in the key.
  * Returns FALSE on a key release or if the key is not observable.
  */
-  message m;
+  kipc_msg_t m;
   int key;
   int proc_nr;
 

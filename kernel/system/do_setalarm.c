@@ -28,7 +28,7 @@ static void cause_alarm(timer_t *tp);
  *				do_setalarm				     *
  *===========================================================================*/
 int do_setalarm(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* A process requests a synchronous alarm, or wants to cancel its alarm. */
   register struct proc *rp;	/* pointer to requesting process */

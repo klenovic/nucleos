@@ -16,7 +16,7 @@
 int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
 {
   int r;
-  message m;
+  kipc_msg_t m;
 
   r= ktaskcall(PM_PROC_NR, KCNR_GETDMA, &m);
   if (r == 0)

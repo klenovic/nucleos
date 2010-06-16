@@ -24,7 +24,7 @@ int pci_del_acl(proc_ep)
 endpoint_t proc_ep;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 	u32_t u32;
 
 	if (pci_procnr == ENDPT_ANY)

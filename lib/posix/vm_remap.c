@@ -15,7 +15,7 @@
 
 void *vm_remap(int d, int s, void *da, void *sa, size_t size)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	m.VMRE_D = d;

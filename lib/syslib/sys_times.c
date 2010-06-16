@@ -19,7 +19,7 @@ clock_t *uptime;		/* time the system is running */
 time_t *boottime;		/* boot time */
 {
 /* Fetch the accounting info for a proc_ep. */
-  message m;
+  kipc_msg_t m;
   int r;
 
   m.T_ENDPT = proc_ep;

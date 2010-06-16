@@ -19,7 +19,7 @@ endpoint_t endpt;				/* caller endpoint */
 void *ctl_ptr;				/* location of info struct */
 void *mem_ptr;				/* location of allocated memory */
 {
-  message m;
+  kipc_msg_t m;
 
   m.PROF_ACTION         = action;
   m.PROF_MEM_SIZE       = size;

@@ -17,7 +17,7 @@ int port; 				/* port address to read from */
 unsigned long *value;			/* pointer where to store value */
 int type;				/* byte, word, long */
 {
-    message m_io;
+    kipc_msg_t m_io;
     int result;
 
     m_io.DIO_REQUEST = _DIO_INPUT | type;

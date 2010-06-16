@@ -70,7 +70,7 @@ time_t ctime;
 /*===========================================================================*
  *				exec_newmem				     *
  *===========================================================================*/
-int do_exec_newmem(message *msg)
+int do_exec_newmem(kipc_msg_t *msg)
 {
 	int r, proc_e, proc_n;
 	vir_bytes stack_top;

@@ -22,7 +22,7 @@ int devind;
 int port;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_ATTR_R32;
 	m.m2_i1= devind;

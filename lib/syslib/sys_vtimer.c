@@ -18,7 +18,7 @@ int which;			/* timer to retrieve/set */
 clock_t *newval;		/* if non-NULL, set to this new value */
 clock_t *oldval;		/* if non-NULL, old value is stored here */
 {
-  message m;
+  kipc_msg_t m;
   int r;
 
   m.VT_ENDPT = proc;

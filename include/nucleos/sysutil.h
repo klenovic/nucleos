@@ -68,7 +68,7 @@ u32_t micros_to_ticks(u32_t micros);
 void ser_putc(char c);
 void get_randomness(struct k_randomness *, int);
 
-int asynsend3(endpoint_t ep, message *msg, int flags);
+int asynsend3(endpoint_t ep, kipc_msg_t *msg, int flags);
 #define asynsend(ep, msg) asynsend3(ep, msg, 0)
 
 #define ASSERT(c) if(!(c)) { panic(__FILE__, "assert " #c " failed at line", __LINE__); }

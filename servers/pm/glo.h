@@ -20,7 +20,7 @@ extern struct kinfo kinfo;	/* kernel information */
 extern struct utsname uts_val;	/* uname info */
 
 /* The parameters of the call are kept here. */
-extern message m_in;		/* the incoming message itself is kept here. */
+extern kipc_msg_t m_in;		/* the incoming message itself is kept here. */
 extern int who_p, who_e;	/* caller's proc number, endpoint */
 extern int call_nr;		/* system call number */
 

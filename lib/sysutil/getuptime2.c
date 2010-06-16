@@ -16,7 +16,7 @@ int getuptime2(ticks, boottime)
 clock_t *ticks;				/* uptime in ticks */
 time_t *boottime;
 {
-    message m;
+    kipc_msg_t m;
     int s;
 
     m.m_type = SYS_TIMES;		/* request time information */

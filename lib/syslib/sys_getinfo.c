@@ -22,7 +22,7 @@ int len;				/* max length of value to get */
 void *ptr2;				/* second pointer */
 int len2;				/* length or process nr */ 
 {
-    message m;
+    kipc_msg_t m;
 
     m.I_REQUEST = request;
     m.I_ENDPT = ENDPT_SELF;			/* always store values at caller */
@@ -39,7 +39,7 @@ int len2;				/* length or process nr */
  *===========================================================================*/
 int sys_whoami(endpoint_t *who_ep, char *who_name, int len)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 	int lenmin;
 

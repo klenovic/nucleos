@@ -33,7 +33,7 @@ static inline int __kipc_notify(endpoint_t dst)
 	return ret;
 }
 
-static inline int __kipc_receive(endpoint_t src, message *m_ptr)
+static inline int __kipc_receive(endpoint_t src, kipc_msg_t *m_ptr)
 {
 	register int ret = 0;
 
@@ -47,7 +47,7 @@ static inline int __kipc_receive(endpoint_t src, message *m_ptr)
 	return ret;
 }
 
-static inline int __kipc_send(endpoint_t dst, message *m_ptr)
+static inline int __kipc_send(endpoint_t dst, kipc_msg_t *m_ptr)
 {
 	register int ret = 0;
 
@@ -75,7 +75,7 @@ static inline int __kipc_senda(asynmsg_t *table, size_t count)
 	return ret;
 }
 
-static inline int __kipc_sendnb(endpoint_t dst, message *m_ptr)
+static inline int __kipc_sendnb(endpoint_t dst, kipc_msg_t *m_ptr)
 {
 	register int ret = 0;
 
@@ -89,7 +89,7 @@ static inline int __kipc_sendnb(endpoint_t dst, message *m_ptr)
 	return ret;
 }
 
-static inline int __kipc_sendrec(endpoint_t src_dst, message *m_ptr)
+static inline int __kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr)
 {
 	register int ret = 0;
 

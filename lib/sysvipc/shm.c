@@ -24,7 +24,7 @@ static int get_ipc_endpt(endpoint_t *pt)
 /* Shared memory control operation. */
 int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 	int r;
 
@@ -47,7 +47,7 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 /* Get shared memory segment. */
 int shmget(key_t key, size_t size, int shmflg)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 	int r;
 
@@ -69,7 +69,7 @@ int shmget(key_t key, size_t size, int shmflg)
 /* Attach shared memory segment. */
 void *shmat(int shmid, const void *shmaddr, int shmflg)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 	int r;
 
@@ -91,7 +91,7 @@ void *shmat(int shmid, const void *shmaddr, int shmflg)
 /* Deattach shared memory segment. */
 int shmdt(const void *shmaddr)
 {
-	message m;
+	kipc_msg_t m;
 	endpoint_t ipc_pt;
 
 	if (get_ipc_endpt(&ipc_pt) != 0) {

@@ -88,11 +88,11 @@ struct message {
 	struct file_line *files;
 };
 
-static struct message *message__list;
+static struct kipc_msg_t *message__list;
 
-static struct message *message__new(const char *msg, char *option, char *file, int lineno)
+static struct kipc_msg_t *message__new(const char *msg, char *option, char *file, int lineno)
 {
-	struct message *self = malloc(sizeof(*self));
+	struct kipc_msg_t *self = malloc(sizeof(*self));
 
 	if (self == NULL)
 		goto out;
@@ -117,9 +117,9 @@ out_fail:
 	goto out;
 }
 
-static struct message *mesage__find(const char *msg)
+static struct kipc_msg_t *mesage__find(const char *msg)
 {
-	struct message *m = message__list;
+	struct kipc_msg_t *m = message__list;
 
 	while (m != NULL) {
 		if (strcmp(m->msg, msg) == 0)
@@ -130,7 +130,7 @@ static struct message *mesage__find(const char *msg)
 	return m;
 }
 
-static int message__add_file_line(struct message *self, char *file, int lineno)
+static int message__add_file_line(struct kipc_msg_t *self, char *file, int lineno)
 {
 	int rc = -1;
 	struct file_line *fl = file_line__new(file, lineno);
@@ -150,7 +150,7 @@ static int message__add(const char *msg, char *option, char *file, int lineno)
 	int rc = 0;
 	char bf[16384];
 	char *escaped = escape(msg, bf, sizeof(bf));
-	struct message *m = mesage__find(escaped);
+	struct kipc_msg_t *m = mesage__find(escaped);
 
 	if (m != NULL)
 		rc = message__add_file_line(m, file, lineno);
@@ -184,7 +184,7 @@ static void menu_build_message_list(struct menu *menu)
 			menu_build_message_list(child);
 }
 
-static void message__print_file_lineno(struct message *self)
+static void message__print_file_lineno(struct kipc_msg_t *self)
 {
 	struct file_line *fl = self->files;
 
@@ -203,7 +203,7 @@ static void message__print_file_lineno(struct message *self)
 	putchar('\n');
 }
 
-static void message__print_gettext_msgid_msgstr(struct message *self)
+static void message__print_gettext_msgid_msgstr(struct kipc_msg_t *self)
 {
 	message__print_file_lineno(self);
 
@@ -213,7 +213,7 @@ static void message__print_gettext_msgid_msgstr(struct message *self)
 
 static void menu__xgettext(void)
 {
-	struct message *m = message__list;
+	struct kipc_msg_t *m = message__list;
 
 	while (m != NULL) {
 		/* skip empty lines ("") */

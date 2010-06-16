@@ -64,8 +64,8 @@ struct proc {
 
 	endpoint_t p_endpoint;		/* endpoint number, generation-aware */
 
-	message p_sendmsg;		/* Message from this process if SENDING */
-	message p_delivermsg;		/* Message for this process if MF_DELIVERMSG */
+	kipc_msg_t p_sendmsg;		/* Message from this process if SENDING */
+	kipc_msg_t p_delivermsg;		/* Message for this process if MF_DELIVERMSG */
 	vir_bytes p_delivermsg_vir;	/* Virtual addr this proc wants message at */
 	vir_bytes p_delivermsg_lin;	/* Linear addr this proc wants message at */
 
@@ -85,7 +85,7 @@ struct proc {
 		int		type;		/* suspended operation */
 		union {
 			/* VMSTYPE_SYS_MESSAGE */
-			message		reqmsg;	/* suspended request message */
+			kipc_msg_t	reqmsg;	/* suspended request message */
 		} saved;
 
 		/* Parameters of request to VM */

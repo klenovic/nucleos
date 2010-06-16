@@ -23,8 +23,8 @@ extern char dot2[3];   /* meaning to search_dir: no access permission check. */
 
 extern int (*fs_call_vec[])(void); /* fs call table */
 
-extern message fs_m_in;
-extern message fs_m_out;
+extern kipc_msg_t fs_m_in;
+extern kipc_msg_t fs_m_out;
 extern int FS_STATE;
 extern vfs_ucred_t credentials;
 

@@ -31,7 +31,7 @@
  *				do_vtimer				     *
  *===========================================================================*/
 int do_vtimer(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Set and/or retrieve the value of one of a process' virtual timers. */
   struct proc *rrp;		/* pointer to requesting process */

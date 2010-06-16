@@ -17,7 +17,7 @@ vir_bytes initpc;
 {
 /* A process has exec'd.  Tell the kernel. */
 
-  message m;
+  kipc_msg_t m;
 
   m.PR_ENDPT = proc_ep;
   m.PR_STACK_PTR = ptr;

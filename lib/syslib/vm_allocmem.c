@@ -17,7 +17,7 @@
  *===========================================================================*/
 int vm_allocmem(phys_clicks bytes, phys_clicks *retmembase)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VMAM_BYTES = (char *) bytes;

@@ -28,7 +28,7 @@
  *			      do_sigreturn				     *
  *===========================================================================*/
 int do_sigreturn(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* POSIX style signals require sys_sigreturn to put things in order before 
  * the signalled process can resume execution

@@ -29,7 +29,7 @@
  *			      do_sigsend				     *
  *===========================================================================*/
 int do_sigsend(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_sigsend, POSIX-style signal handling. */
 

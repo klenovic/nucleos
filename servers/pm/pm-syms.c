@@ -20,7 +20,7 @@ char monitor_params[128*sizeof(char *)];	/* boot monitor parameters */
 struct kinfo kinfo;				/* kernel information */
 
 /* The parameters of the call are kept here. */
-message m_in;		/* the incoming message itself is kept here. */
+kipc_msg_t m_in;		/* the incoming message itself is kept here. */
 int who_p, who_e;	/* caller's proc number, endpoint */
 int call_nr;		/* system call number */
 sigset_t core_sset;	/* which signals cause core images */

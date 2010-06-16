@@ -73,7 +73,7 @@ void clock_task()
 {
 /* Main program of clock task. If the call is not HARD_INT it is an error.
  */
-  message m;       /* message buffer for both input and output */
+  kipc_msg_t m;       /* message buffer for both input and output */
   int result;      /* result returned by the handler */
 
   init_clock();    /* initialize clock task */

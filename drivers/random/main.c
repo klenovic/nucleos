@@ -34,11 +34,11 @@ static char *r_name(void);
 static struct device *r_prepare(int device);
 static int r_transfer(int proc_nr, int opcode, u64_t position,
 				iovec_t *iov, unsigned nr_req);
-static int r_do_open(struct driver *dp, message *m_ptr);
+static int r_do_open(struct driver *dp, kipc_msg_t *m_ptr);
 static void r_init(void);
-static int r_ioctl(struct driver *dp, message *m_ptr);
+static int r_ioctl(struct driver *dp, kipc_msg_t *m_ptr);
 static void r_geometry(struct partition *entry);
-static void r_random(struct driver *dp, message *m_ptr);
+static void r_random(struct driver *dp, kipc_msg_t *m_ptr);
 static void r_updatebin(int source, struct k_randomness_bin *rb);
 
 /* Entry points to this driver. */
@@ -180,7 +180,7 @@ unsigned nr_req;		/* length of request vector */
  *============================================================================*/
 static int r_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Check device number on open.  
  */
@@ -225,7 +225,7 @@ static void r_init()
  *===========================================================================*/
 static int r_ioctl(dp, m_ptr)
 struct driver *dp;			/* pointer to driver structure */
-message *m_ptr;				/* pointer to control message */
+kipc_msg_t *m_ptr;				/* pointer to control message */
 {
   struct device *dv;
   if ((dv = r_prepare(m_ptr->DEVICE)) == NIL_DEV) return(-ENXIO);
@@ -282,7 +282,7 @@ static void r_updatebin(int source, struct k_randomness_bin *rb)
  *============================================================================*/
 static void r_random(dp, m_ptr)
 struct driver *dp;			/* pointer to driver structure */
-message *m_ptr;				/* pointer to alarm message */
+kipc_msg_t *m_ptr;				/* pointer to alarm message */
 {
   /* Fetch random information from the kernel to update /dev/random. */
   int s;

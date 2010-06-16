@@ -294,7 +294,7 @@ void prepare_shutdown(int how)
 	/* This function prepares to shutdown Nucleos. */
 	static timer_t shutdown_timer;
 	register struct proc *rp;
-	message m;
+	kipc_msg_t m;
 
 	/* Continue after 1 second, to give processes a chance to get scheduled to
 	 * do shutdown work.  Set a watchog timer to call shutdown(). The timer

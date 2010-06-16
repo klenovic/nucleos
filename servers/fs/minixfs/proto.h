@@ -62,7 +62,7 @@ int fs_unlink(void);
 int truncate_inode(struct inode *rip, off_t len);
 
 /* main.c */
-void reply(int who, message *m_out);
+void reply(int who, kipc_msg_t *m_out);
 
 /* misc.c */
 int fs_flush(void);

@@ -28,7 +28,7 @@ char *name;
 	int r;
 	u32_t u32;
 	size_t len;
-	message m;
+	kipc_msg_t m;
 
 	r= ds_retrieve_u32("pci", &u32);
 	if (r != 0)

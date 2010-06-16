@@ -58,7 +58,7 @@ int do_fork()
   static int next_child;
   int i, n = 0, r, s;
   endpoint_t child_ep;
-  message m;
+  kipc_msg_t m;
 
  /* If tables might fill up during FORK, don't even start since recovery half
   * way through is such a nuisance.
@@ -144,7 +144,7 @@ int do_fork_nb()
   static int next_child;
   int i, n = 0, r;
   endpoint_t child_ep;
-  message m;
+  kipc_msg_t m;
 
   /* Only system processes are allowed to use fork_nb */
   if (!(mp->mp_flags & PRIV_PROC))
@@ -247,7 +247,7 @@ int dump_core;			/* flag indicating whether to dump core */
   pid_t procgrp;
   struct mproc *p_mp;
   clock_t user_time, sys_time;
-  message m;
+  kipc_msg_t m;
 
   /* Do not create core files for set uid execution */
   if (dump_core && rmp->mp_realuid != rmp->mp_effuid)

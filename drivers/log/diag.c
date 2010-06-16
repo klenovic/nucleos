@@ -42,7 +42,7 @@ endpoint_t from;				/* who sent this message? */
   if (from == TTY_PROC_NR)
   {
 	cp_grant_id_t gid;
-	message mess;
+	kipc_msg_t mess;
 
 	prev_nextp= &tty_prev_next;
 	gid= cpf_grant_direct(TTY_PROC_NR, (vir_bytes)&kmess, sizeof(kmess),
@@ -109,7 +109,7 @@ endpoint_t from;				/* who sent this message? */
 /*===========================================================================*
  *				do_diagnostics				     *
  *===========================================================================*/
-int do_diagnostics(message *m, int safe)
+int do_diagnostics(kipc_msg_t *m, int safe)
 {
 /* The LOG server handles all diagnostic messages from servers and device 
  * drivers. It forwards the message to the TTY driver to display it to the

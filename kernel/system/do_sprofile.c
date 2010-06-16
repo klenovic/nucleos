@@ -33,7 +33,7 @@ static vir_bytes sprof_info_addr_vir;
  *				do_sprofile				     *
  *===========================================================================*/
 int do_sprofile(m_ptr)
-register message *m_ptr;    /* pointer to request message */
+register kipc_msg_t *m_ptr;    /* pointer to request message */
 {
   int proc_nr, i;
   vir_bytes vir_dst;

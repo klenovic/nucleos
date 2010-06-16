@@ -17,7 +17,7 @@
 
 struct vmproc;
 
-typedef void (*callback_t)(struct vmproc *who, message *m);
+typedef void (*callback_t)(struct vmproc *who, kipc_msg_t *m);
 
 struct vmproc {
 	struct vm_arch	vm_arch; /* architecture-specific data */

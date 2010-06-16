@@ -23,7 +23,7 @@ int port;
 u16_t value;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_ATTR_W16;
 	m.m2_i1= devind;

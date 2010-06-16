@@ -250,7 +250,7 @@ static timer_t f_tmr_timeout;		/* timer for various timeouts */
 static timer_t *f_timers;		/* queue of floppy timers */
 static clock_t f_next_timeout; 	/* the next timeout time */
 static u32_t system_hz;		/* system clock frequency */
-static void f_expire_tmrs(struct driver *dp, message *m_ptr);
+static void f_expire_tmrs(struct driver *dp, kipc_msg_t *m_ptr);
 static void f_set_timer(timer_t *tp, clock_t delta, tmr_func_t watchdog);
 static void stop_motor(timer_t *tp);
 static void f_timeout(timer_t *tp);
@@ -271,7 +271,7 @@ static int recalibrate(void);
 static void f_reset(void);
 static int f_intr_wait(void);
 static int read_id(void);
-static int f_do_open(struct driver *dp, message *m_ptr);
+static int f_do_open(struct driver *dp, kipc_msg_t *m_ptr);
 static void floppy_stop(struct driver *dp, sigset_t *set);
 static int test_read(int density);
 static void f_geometry(struct partition *entry);
@@ -341,7 +341,7 @@ void main()
 /*===========================================================================*
  *				f_expire_tmrs				     *
  *===========================================================================*/
-static void f_expire_tmrs(struct driver *dp, message *m_ptr)
+static void f_expire_tmrs(struct driver *dp, kipc_msg_t *m_ptr)
 {
 /* A synchronous alarm message was received. Check if there are any expired 
  * timers. Possibly reschedule the next alarm.  
@@ -748,7 +748,7 @@ static void start_motor()
  */
 
   int s, motor_bit, running;
-  message mess;
+  kipc_msg_t mess;
 
   motor_bit = 1 << f_drive;		/* bit mask for this drive */
   running = motor_status & motor_bit;	/* nonzero if this motor is running */
@@ -828,7 +828,7 @@ static int seek()
 
   struct floppy *fp = f_fp;
   int r;
-  message mess;
+  kipc_msg_t mess;
   u8_t cmd[3];
 
   /* Are we already on the correct cylinder? */
@@ -1116,7 +1116,7 @@ static void f_reset()
  */
   pvb_pair_t byte_out[2];
   int s,i;
-  message mess;
+  kipc_msg_t mess;
 
   /* Disable interrupts and strobe reset bit low. */
   need_reset = FALSE;
@@ -1189,7 +1189,7 @@ static int f_intr_wait()
 /* Wait for an interrupt, but not forever.  The FDC may have all the time of
  * the world, but we humans do not.
  */
-  message mess;
+  kipc_msg_t mess;
 
   /* We expect an interrupt, but if a timeout, occurs, report an error. */
   do {
@@ -1276,7 +1276,7 @@ static int read_id()
  *===========================================================================*/
 static int f_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;			/* pointer to open message */
+kipc_msg_t *m_ptr;			/* pointer to open message */
 {
 /* Handle an open on a floppy.  Determine diskette type if need be. */
 

@@ -124,7 +124,7 @@ int pm_isokendpt(int endpoint, int *proc)
  *===========================================================================*/
 void tell_fs(rmp, m_ptr)
 struct mproc *rmp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Send a request to VFS, without blocking.
  */

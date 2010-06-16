@@ -656,7 +656,7 @@ static struct dmatab
 /*===========================================================================*
  *				do_adddma				     *
  *===========================================================================*/
-int do_adddma(message *msg)
+int do_adddma(kipc_msg_t *msg)
 {
 	endpoint_t req_proc_e, target_proc_e;
 	int i, proc_n;
@@ -709,7 +709,7 @@ int do_adddma(message *msg)
 /*===========================================================================*
  *				do_deldma				     *
  *===========================================================================*/
-int do_deldma(message *msg)
+int do_deldma(kipc_msg_t *msg)
 {
 	endpoint_t req_proc_e, target_proc_e;
 	int i, j, proc_n;
@@ -769,7 +769,7 @@ int do_deldma(message *msg)
 /*===========================================================================*
  *				do_getdma				     *
  *===========================================================================*/
-int do_getdma(message *msg)
+int do_getdma(kipc_msg_t *msg)
 {
 	endpoint_t target_proc_e;
 	int i, proc_n;
@@ -835,7 +835,7 @@ void release_dma(struct vmproc *vmp)
 /*===========================================================================*
  *				do_allocmem				     *
  *===========================================================================*/
-int do_allocmem(message *m)
+int do_allocmem(kipc_msg_t *m)
 {
 	phys_clicks mem, clicks;
 

@@ -56,7 +56,7 @@ void clear_proc(struct vmproc *vmp)
 /*===========================================================================*
  *				do_exit					     *
  *===========================================================================*/
-int do_exit(message *msg)
+int do_exit(kipc_msg_t *msg)
 {
 	int proc;
 	struct vmproc *vmp;
@@ -107,7 +107,7 @@ SANITYCHECK(SCL_FUNCTIONS);
 /*===========================================================================*
  *				do_willexit				     *
  *===========================================================================*/
-int do_willexit(message *msg)
+int do_willexit(kipc_msg_t *msg)
 {
 	int proc;
 	struct vmproc *vmp;

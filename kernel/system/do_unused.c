@@ -17,7 +17,7 @@
  *			          do_unused				     *
  *===========================================================================*/
 int do_unused(m)
-message *m;				/* pointer to request message */
+kipc_msg_t *m;				/* pointer to request message */
 {
   kprintf("SYSTEM: got unused request %d from %d\n", m->m_type, m->m_source);
   return(-EBADREQUEST);			/* illegal message type */

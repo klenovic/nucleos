@@ -18,7 +18,7 @@
 int vm_exec_newmem(endpoint_t ep, struct exec_newmem *args,
 	int argssize, char **ret_stack_top, int *ret_flags)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VMEN_ENDPOINT = ep;

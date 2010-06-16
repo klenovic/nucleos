@@ -22,7 +22,7 @@
  *				do_stime				     *
  *===========================================================================*/
 int do_stime(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   boottime= m_ptr->T_BOOTTIME;
   return 0;

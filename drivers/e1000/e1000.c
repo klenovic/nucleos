@@ -31,18 +31,18 @@ static u16_t pcitab_e1000[] =
 static char *progname;
 static e1000_t e1000_table[E1000_PORT_NR];
 
-static int  e1000_init(message *mp);
+static int  e1000_init(kipc_msg_t *mp);
 static void e1000_init_pci(void);
 static int  e1000_probe(e1000_t *e);
 static int  e1000_init_hw(e1000_t *e);
 static void e1000_init_addr(e1000_t *e);
 static void e1000_init_buf(e1000_t *e);
 static void e1000_reset_hw(e1000_t *e);
-static void e1000_writev_s(message *mp, int from_int);
-static void e1000_readv_s(message *mp, int from_int);
-static void e1000_getstat_s(message *mp);
-static void e1000_getname(message *mp);
-static void e1000_interrupt(message *mp);
+static void e1000_writev_s(kipc_msg_t *mp, int from_int);
+static void e1000_readv_s(kipc_msg_t *mp, int from_int);
+static void e1000_getstat_s(kipc_msg_t *mp);
+static void e1000_getname(kipc_msg_t *mp);
+static void e1000_interrupt(kipc_msg_t *mp);
 static void e1000_signal(void);
 static int  e1000_link_changed(e1000_t *e);
 static void e1000_report_link(e1000_t *e);
@@ -60,14 +60,14 @@ static u16_t eeprom_ich(void *e, int reg);
 static int eeprom_ich_init(e1000_t *e);
 static int eeprom_ich_cycle(e1000_t *e, u32_t timeout);
 static void reply(e1000_t *e, int err, int may_block);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
 int main(int argc, char *argv[])
 {
-    message m;
+    kipc_msg_t m;
     int i, r;
     u32_t tasknr;
     e1000_t *e;
@@ -147,10 +147,10 @@ int main(int argc, char *argv[])
  *				e1000_init				     *
  *===========================================================================*/
 static int e1000_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
     static int first_time = 1;
-    message reply_mess;
+    kipc_msg_t reply_mess;
     e1000_t *e;
 
     E1000_DEBUG(3, ("e1000: init()\n"));
@@ -557,7 +557,7 @@ e1000_t *e;
  *				e1000_writev_s				     *
  *===========================================================================*/
 static void e1000_writev_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
     e1000_t *e = e1000_port(mp->DL_PORT);
@@ -647,7 +647,7 @@ int from_int;
  *				e1000_readv_s				     *
  *===========================================================================*/
 static void e1000_readv_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
     e1000_t *e = e1000_port(mp->DL_PORT);
@@ -734,7 +734,7 @@ int from_int;
  *				e1000_getstat_s				     *
  *===========================================================================*/
 static void e1000_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
     int r;
     eth_stat_t stats;
@@ -771,7 +771,7 @@ message *mp;
  *				e1000_getname				     *
  *===========================================================================*/
 static void e1000_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
     int r;
 
@@ -793,7 +793,7 @@ message *mp;
  *				e1000_interrupt				     *
  *===========================================================================*/
 static void e1000_interrupt(mp)
-message *mp;
+kipc_msg_t *mp;
 {
     e1000_t *e;
     u32_t cause;
@@ -1202,7 +1202,7 @@ e1000_t *e;
 int err;
 int may_block;
 {
-    message msg;
+    kipc_msg_t msg;
     int r;
 
     /* Only reply to client for read/write request. */
@@ -1252,8 +1252,8 @@ int may_block;
  *				mess_reply				     *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
     if (send(req->m_source, reply_mess) != 0)
     {

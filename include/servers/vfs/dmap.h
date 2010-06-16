@@ -25,7 +25,7 @@
 
 struct dmap {
   int (*dmap_opcl)(int, dev_t, int, int);
-  int (*dmap_io)(int, message *);
+  int (*dmap_io)(int, kipc_msg_t *);
   endpoint_t dmap_driver;
   int dmap_flags;
   char dmap_label[16];

@@ -27,8 +27,8 @@
 /* global variables stack */
 static struct {
   struct fproc *g_fp;			/* pointer to caller process */
-  message g_m_in;			/* request message */
-  message g_m_out;			/* reply message */
+  kipc_msg_t g_m_in;			/* request message */
+  kipc_msg_t g_m_out;			/* reply message */
   int g_who_e;				/* endpoint of caller process */
   int g_who_p;				/* slot number of caller process */
   int g_call_nr;			/* call number */
@@ -45,7 +45,7 @@ extern unsigned long calls_stats[NR_syscalls];
 
 static int push_globals(void);
 static void pop_globals(void);
-static void set_globals(message *m);
+static void set_globals(kipc_msg_t *m);
 
 /*===========================================================================*
  *				push_globals				     *
@@ -107,7 +107,7 @@ static void pop_globals()
  *				set_globals				     *
  *===========================================================================*/
 static void set_globals(m)
-message *m;				/* request message */
+kipc_msg_t *m;				/* request message */
 {
 /* Initialize global variables based on a request message.
  */
@@ -125,7 +125,7 @@ message *m;				/* request message */
  *				nested_fs_call				     *
  *===========================================================================*/
 void nested_fs_call(m)
-message *m;				/* request/reply message pointer */
+kipc_msg_t *m;				/* request/reply message pointer */
 {
 /* Handle a nested call from a file system server.
  */

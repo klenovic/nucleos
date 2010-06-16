@@ -17,7 +17,7 @@
  *===========================================================================*/
 int vm_brk(endpoint_t ep, char *addr)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VMB_ENDPOINT = ep;

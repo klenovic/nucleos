@@ -5,7 +5,7 @@
  *===========================================================================*/
 int sys_runctl(endpoint_t proc_ep, int action, int flags)
 {
-  message m;
+  kipc_msg_t m;
 
   m.RC_ENDPT = proc_ep;
   m.RC_ACTION = action;

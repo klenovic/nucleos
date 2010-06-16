@@ -79,11 +79,11 @@ static struct device *w_prepare(int device);
 static char *w_name(void);
 static int w_transfer(int proc_nr, int opcode, u64_t position,
 				iovec_t *iov, unsigned nr_req);
-static int w_do_open(struct driver *dp, message *m_ptr);
-static int w_do_close(struct driver *dp, message *m_ptr);
+static int w_do_open(struct driver *dp, kipc_msg_t *m_ptr);
+static int w_do_close(struct driver *dp, kipc_msg_t *m_ptr);
 static void w_init(void);
 static void w_geometry(struct partition *entry);
-static int w_other(struct driver *dp, message *m_ptr);
+static int w_other(struct driver *dp, kipc_msg_t *m_ptr);
 
 /* Entry points to this driver. */
 static struct driver w_dtab = {
@@ -341,7 +341,7 @@ unsigned nr_req;		/* length of request vector */
  *============================================================================*/
 static int w_do_open(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Device open: Initialize the controller and read the partition table. */
 
@@ -363,7 +363,7 @@ message *m_ptr;
  *============================================================================*/
 static int w_do_close(dp, m_ptr)
 struct driver *dp;
-message *m_ptr;
+kipc_msg_t *m_ptr;
 {
 /* Device close: Release a device. */
 
@@ -499,7 +499,7 @@ struct partition *entry;
  *============================================================================*/
 static int w_other(dr, m)
 struct driver *dr;
-message *m;
+kipc_msg_t *m;
 {
         int r, timeout, prev;
 

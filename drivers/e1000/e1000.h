@@ -168,8 +168,8 @@ typedef struct e1000
     int tx_buffer_size;		  /**< Size of the transmit buffer. */
 
     int client;                   /**< Process ID being served by e1000. */
-    message rx_message;		  /**< Read message received from client. */
-    message tx_message;		  /**< Write message received from client. */
+    kipc_msg_t rx_message;		  /**< Read message received from client. */
+    kipc_msg_t tx_message;		  /**< Write message received from client. */
     size_t rx_size;		  /**< Size of one packet received. */
 }
 e1000_t;

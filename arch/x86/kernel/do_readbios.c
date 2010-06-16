@@ -23,7 +23,7 @@
  *				do_readbios				     *
  *===========================================================================*/
 int do_readbios(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   struct vir_addr src, dst;     
         

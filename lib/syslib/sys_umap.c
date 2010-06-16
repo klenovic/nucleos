@@ -19,7 +19,7 @@ vir_bytes vir_addr;			/* address in bytes with segment*/
 vir_bytes bytes;			/* number of bytes to be copied */
 phys_bytes *phys_addr;			/* placeholder for result */
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.CP_SRC_ENDPT = proc_ep;

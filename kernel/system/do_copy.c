@@ -30,7 +30,7 @@
  *				do_copy					     *
  *===========================================================================*/
 int do_copy(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Handle sys_vircopy() and sys_physcopy().  Copy data using virtual or
  * physical addressing. Although a single handler function is used, there 

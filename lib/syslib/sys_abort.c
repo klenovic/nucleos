@@ -15,7 +15,7 @@ int sys_abort(int how, ...)
 {
 /* Something awful has happened.  Abandon ship. */
 
-  message m;
+  kipc_msg_t m;
   va_list ap;
 
   va_start(ap, how);

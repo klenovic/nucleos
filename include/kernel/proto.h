@@ -42,10 +42,10 @@ int kprintf(const char *fmt, ...);
 void minix_panic(char *s, int n);
 
 /* proc.c */
-int kipc_call(int call_nr, int src_dst, message *m_ptr, long bit_map);
+int kipc_call(int call_nr, int src_dst, kipc_msg_t *m_ptr, long bit_map);
 int lock_notify(int src, int dst);
 int mini_notify(struct proc *src, endpoint_t dst);
-int lock_send(int dst, message *m_ptr);
+int lock_send(int dst, kipc_msg_t *m_ptr);
 void enqueue(struct proc *rp);
 void dequeue(struct proc *rp);
 void balance_queues(struct timer *tp);
@@ -107,7 +107,7 @@ int verify_grant(endpoint_t, endpoint_t, cp_grant_id_t, vir_bytes, int, vir_byte
 		 endpoint_t *);
 
 /* system/do_sysctl.c */
-int do_sysctl(message *m);
+int do_sysctl(kipc_msg_t *m);
 
 #ifdef CONFIG_DEBUG_KERNEL_STATS_PROFILE
 /* profile.c */
@@ -163,7 +163,7 @@ int arch_get_params(char *parm, int max);
 int arch_set_params(char *parm, int max);
 int arch_pre_exec(struct proc *pr, u32_t, u32_t);
 int arch_umap(struct proc *pr, vir_bytes, vir_bytes, int, phys_bytes *);
-int arch_do_vmctl(message *m_ptr, struct proc *p);
+int arch_do_vmctl(kipc_msg_t *m_ptr, struct proc *p);
 int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t count);
 void proc_stacktrace(struct proc *proc);
 int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *result, u32_t *ptent);

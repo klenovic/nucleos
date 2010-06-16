@@ -16,7 +16,7 @@ int sys_mapdma(vir_addr, bytes)
 vir_bytes vir_addr;			/* address in bytes with segment*/
 vir_bytes bytes;			/* number of bytes to be copied */
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.CP_SRC_ADDR = vir_addr;

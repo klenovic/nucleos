@@ -8,7 +8,7 @@
 #include "drivers.h"
 
 static void init_server(void);
-static void get_work(message *m_in);
+static void get_work(kipc_msg_t *m_in);
 
 /*===========================================================================*
  *				main                                         *
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
   int error, ind;
-  message m;
+  kipc_msg_t m;
 
   /* Initialize the server, then go to work. */
   init_server();	
@@ -93,7 +93,7 @@ static void init_server(void)
  *				get_work				     *
  *===========================================================================*/
 static void get_work(m_in)
-message *m_in;				/* pointer to message */
+kipc_msg_t *m_in;				/* pointer to message */
 {
   int r, srcok = 0;
   endpoint_t src;
@@ -129,7 +129,7 @@ message *m_in;				/* pointer to message */
  *===========================================================================*/
 void reply(who, m_out)
 int who;	
-message *m_out;                       	/* report result */
+kipc_msg_t *m_out;                       	/* report result */
 {
   if (0 != kipc_send(who, m_out))    /* send the message */
 	printf("PFS(%d) was unable to send reply\n", SELF_E);

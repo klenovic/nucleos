@@ -24,7 +24,7 @@
  *				do_vmctl				     *
  *===========================================================================*/
 int do_vmctl(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   int proc_nr, i;
   endpoint_t ep = m_ptr->SVMCTL_WHO;

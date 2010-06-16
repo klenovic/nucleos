@@ -24,7 +24,7 @@ u8_t func;
 int *devindp;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_FIND_DEV;
 	m.m1_i1= bus;

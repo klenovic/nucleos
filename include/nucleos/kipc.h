@@ -108,7 +108,7 @@ typedef struct {
 	short m9s4;
 } mess_9;
 
-typedef struct {
+typedef struct kipc_msg {
 	endpoint_t m_source;	/* who sent the message */
 	int m_type;		/* what kind of message is it */
 	union {
@@ -122,7 +122,7 @@ typedef struct {
 		mess_6 m_m6;
 		mess_9 m_m9;
 	} m_u;
-} message;
+} kipc_msg_t;
 
 /* The following defines provide names for useful members. */
 #define m1_i1  m_u.m_m1.m1i1
@@ -204,7 +204,7 @@ typedef struct asynmsg {
 	unsigned flags;
 	endpoint_t dst;
 	int result;
-	message msg;
+	kipc_msg_t msg;
 } asynmsg_t;
 
 #include <asm/kipc.h>
@@ -217,12 +217,12 @@ static inline int kipc_notify(endpoint_t dst)
 	return __kipc_notify(dst);
 }
 
-static inline int kipc_receive(endpoint_t src, message *m_ptr)
+static inline int kipc_receive(endpoint_t src, kipc_msg_t *m_ptr)
 {
 	return __kipc_receive(src, m_ptr);
 }
 
-static inline int kipc_send(endpoint_t dst, message *m_ptr)
+static inline int kipc_send(endpoint_t dst, kipc_msg_t *m_ptr)
 {
 	return __kipc_send(dst, m_ptr);
 }
@@ -232,12 +232,12 @@ static inline int kipc_senda(asynmsg_t *table, size_t count)
 	return __kipc_senda(table, count);
 }
 
-static inline int kipc_sendnb(endpoint_t dst, message *m_ptr)
+static inline int kipc_sendnb(endpoint_t dst, kipc_msg_t *m_ptr)
 {
 	return __kipc_sendnb(dst, m_ptr);
 }
 
-static inline int kipc_sendrec(endpoint_t src_dst, message *m_ptr)
+static inline int kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr)
 {
 	return __kipc_sendrec(src_dst, m_ptr);
 }

@@ -81,7 +81,7 @@ int map;
 #define pressed(k) ((F1<=(k)&&(k)<=F12 && bit_isset(m->FKEY_FKEYS,((k)-F1+1)))\
   	|| (SF1<=(k) && (k)<=SF12 && bit_isset(m->FKEY_SFKEYS, ((k)-SF1+1)))) 
 int do_fkey_pressed(m)
-message *m;					/* notification message */
+kipc_msg_t *m;					/* notification message */
 {
   int s, h;
 

@@ -51,7 +51,7 @@ static struct sem_struct *sem_find_id(int id)
 /*===========================================================================*
  *				do_semget		     		     *
  *===========================================================================*/
-int do_semget(message *m)
+int do_semget(kipc_msg_t *m)
 {
 	key_t key;
 	int nsems, flag, id;
@@ -100,7 +100,7 @@ int do_semget(message *m)
 
 static void send_message_to_process(endpoint_t who, int ret, int ignore)
 {
-	message m;
+	kipc_msg_t m;
 	int r;
 
 	m.m_type = ret;
@@ -278,7 +278,7 @@ static void update_semaphores(void)
 /*===========================================================================*
  *				do_semctl		     		     *
  *===========================================================================*/
-int do_semctl(message *m)
+int do_semctl(kipc_msg_t *m)
 {
 	int r, i;
 	long opt;
@@ -440,7 +440,7 @@ int do_semctl(message *m)
 /*===========================================================================*
  *				do_semop		     		     *
  *===========================================================================*/
-int do_semop(message *m)
+int do_semop(kipc_msg_t *m)
 {
 	int id, i, j, r;
 	struct sembuf *sops;

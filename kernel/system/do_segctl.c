@@ -25,7 +25,7 @@
  *			        do_segctl				     *
  *===========================================================================*/
 int do_segctl(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 /* Return a segment selector and offset that can be used to reach a physical
  * address, for use by a driver doing memory I/O in the A0000 - DFFFF range.

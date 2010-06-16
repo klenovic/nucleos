@@ -64,7 +64,7 @@ struct optset optset_table[] = {
 };
 
 /* Request message. */
-static message m_in;
+static kipc_msg_t m_in;
 static endpoint_t who_e;			/* m_source */
 static endpoint_t proc_e;			/* IO_ENDPT */
 static cp_grant_id_t grant_id;			/* IO_GRANT */
@@ -243,7 +243,7 @@ static int do_vrdwt(int flag_rw)
 /*===========================================================================*
  *				do_ioctl				     *
  *===========================================================================*/
-static int do_ioctl(message *m)
+static int do_ioctl(kipc_msg_t *m)
 {
 	struct partition sizepart;
 
@@ -388,7 +388,7 @@ static void got_signal(void)
  *===========================================================================*/
 int main(int argc, char *argv[])
 {
-	message m_out;
+	kipc_msg_t m_out;
 	int r;
 
 	r = parse_arguments(argc, argv);

@@ -14,7 +14,7 @@ int main(int argc, char **argv);
 
 /* dmp.c */
 void map_unmap_fkeys(int map);
-int do_fkey_pressed(message *m);
+int do_fkey_pressed(kipc_msg_t *m);
 void mapping_dmp(void);
 void vm_dmp(void);
 

@@ -8,8 +8,8 @@ extern int cch[NR_INODES];
 
 extern int (*fs_call_vec[])(void); /* fs call table */
 
-extern message fs_m_in;
-extern message fs_m_out;
+extern kipc_msg_t fs_m_in;
+extern kipc_msg_t fs_m_out;
 
 extern uid_t caller_uid;
 extern gid_t caller_gid;

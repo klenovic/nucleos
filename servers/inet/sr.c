@@ -79,16 +79,16 @@ static mq_t *repl_queue, *repl_queue_tail;
 static struct vir_cp_req vir_cp_req[CPVEC_NR];
 static struct vscp_vec s_cp_req[CPVEC_NR];
 
-static int sr_open(message *m);
-static void sr_close(message *m);
+static int sr_open(kipc_msg_t *m);
+static void sr_close(kipc_msg_t *m);
 static int sr_rwio(mq_t *m);
 static int sr_rwio_s(mq_t *m);
 static int sr_restart_read(sr_fd_t *fdp);
 static int sr_restart_write(sr_fd_t *fdp);
 static int sr_restart_ioctl(sr_fd_t *fdp);
-static int sr_cancel(message *m);
-static int sr_select(message *m);
-static void sr_status(message *m);
+static int sr_cancel(kipc_msg_t *m);
+static int sr_select(kipc_msg_t *m);
+static void sr_status(kipc_msg_t *m);
 static void sr_reply_(mq_t *m, int reply, int is_revive);
 static sr_fd_t *sr_getchannel(int minor);
 static acc_t *sr_get_userdata(int fd, size_t offset, size_t count, int for_ioctl);
@@ -234,7 +234,7 @@ sr_select_t selectf;
 }
 
 static int sr_open(m)
-message *m;
+kipc_msg_t *m;
 {
 	sr_fd_t *sr_fd;
 
@@ -275,7 +275,7 @@ message *m;
 }
 
 static void sr_close(m)
-message *m;
+kipc_msg_t *m;
 {
 	sr_fd_t *sr_fd;
 
@@ -567,7 +567,7 @@ sr_fd_t *sr_fd;
 }
 
 static int sr_cancel(m)
-message *m;
+kipc_msg_t *m;
 {
 	sr_fd_t *sr_fd;
 	int result;
@@ -608,7 +608,7 @@ message *m;
 }
 
 static int sr_select(m)
-message *m;
+kipc_msg_t *m;
 {
 	sr_fd_t *sr_fd;
 	mq_t **q_head_ptr, **q_tail_ptr;
@@ -642,7 +642,7 @@ message *m;
 }
 
 static void sr_status(m)
-message *m;
+kipc_msg_t *m;
 {
 	int fd, result;
 	unsigned m_ops;
@@ -767,7 +767,7 @@ int status;
 int is_revive;
 {
 	int result, proc, ref,operation;
-	message reply, *mp;
+	kipc_msg_t reply, *mp;
 
 	proc= mq->mq_mess.NDEV_PROC;
 	ref= (int)mq->mq_mess.IO_GRANT;
@@ -1070,7 +1070,7 @@ char *src;
 acc_t **var_acc_ptr;
 int size;
 {
-	static message mess;
+	static kipc_msg_t mess;
 	acc_t *acc;
 	int i;
 
@@ -1120,7 +1120,7 @@ acc_t *acc_ptr;
 int proc;
 char *dest;
 {
-	static message mess;
+	static kipc_msg_t mess;
 	acc_t *acc;
 	int i, size;
 

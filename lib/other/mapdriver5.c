@@ -12,7 +12,7 @@
 
 int mapdriver5(char *label, size_t len, int major, int dev_style, int force)
 {
-  message m;
+  kipc_msg_t m;
   m.m2_p1 = label;
   m.m2_l1 = len;
   m.m2_i1 = major;

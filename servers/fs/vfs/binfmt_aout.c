@@ -268,7 +268,7 @@ static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_s
 			    int proc_e, struct exec_newmem *ex)
 {
 	int err;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type = KCNR_EXEC_NEWMEM;
 	m.EXC_NM_PROC = proc_e;

@@ -21,7 +21,7 @@ void pci_reserve(devind)
 int devind;
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_RESERVE;
 	m.m1_i1= devind;
@@ -41,7 +41,7 @@ int pci_reserve_ok(devind)
 int devind;
 {
         int r;
-        message m;
+        kipc_msg_t m;
 
         m.m1_i1= devind;
 

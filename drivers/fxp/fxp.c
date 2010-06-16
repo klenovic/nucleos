@@ -189,8 +189,8 @@ typedef struct fxp
 	/* 'large' items */
 	irq_hook_t fxp_hook;
 	ether_addr_t fxp_address;
-	message fxp_rx_mess;
-	message fxp_tx_mess;
+	kipc_msg_t fxp_rx_mess;
+	kipc_msg_t fxp_tx_mess;
 	struct sc fxp_stat;
 	u8_t fxp_conf_bytes[CC_BYTES_NR];
 	char fxp_name[sizeof("fxp#n")];
@@ -242,7 +242,7 @@ u32_t system_hz;
 #define fxp_outw(port, offset, value)	(do_outw((port) + (offset), (value)))
 #define fxp_outl(port, offset, value)	(do_outl((port) + (offset), (value)))
 
-static void fxp_init(message *mp);
+static void fxp_init(kipc_msg_t *mp);
 static void fxp_pci_conf(void);
 static int fxp_probe(fxp_t *fp);
 static void fxp_conf_hw(fxp_t *fp);
@@ -251,17 +251,17 @@ static void fxp_init_buf(fxp_t *fp);
 static void fxp_reset_hw(fxp_t *fp);
 static void fxp_confaddr(fxp_t *fp);
 static void fxp_rec_mode(fxp_t *fp);
-static void fxp_writev(message *mp, int from_int, int vectored);
-static void fxp_writev_s(message *mp, int from_int);
-static void fxp_readv(message *mp, int from_int, int vectored);
-static void fxp_readv_s(message *mp, int from_int);
+static void fxp_writev(kipc_msg_t *mp, int from_int, int vectored);
+static void fxp_writev_s(kipc_msg_t *mp, int from_int);
+static void fxp_readv(kipc_msg_t *mp, int from_int, int vectored);
+static void fxp_readv_s(kipc_msg_t *mp, int from_int);
 static void fxp_do_conf(fxp_t *fp);
 static void fxp_cu_ptr_cmd(fxp_t *fp, int cmd, phys_bytes bus_addr, int check_idle);
 static void fxp_ru_ptr_cmd(fxp_t *fp, int cmd, phys_bytes bus_addr, int check_idle);
 static void fxp_restart_ru(fxp_t *fp);
-static void fxp_getstat(message *mp);
-static void fxp_getstat_s(message *mp);
-static void fxp_getname(message *mp);
+static void fxp_getstat(kipc_msg_t *mp);
+static void fxp_getstat_s(kipc_msg_t *mp);
+static void fxp_getname(kipc_msg_t *mp);
 static int fxp_handler(fxp_t *fp);
 static void fxp_check_ints(fxp_t *fp);
 static void fxp_watchdog_f(timer_t *tp);
@@ -269,7 +269,7 @@ static int fxp_link_changed(fxp_t *fp);
 static void fxp_report_link(fxp_t *fp);
 static void fxp_stop(void);
 static void reply(fxp_t *fp, int err, int may_block);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 static u16_t eeprom_read(fxp_t *fp, int reg);
 static void eeprom_addrsize(fxp_t *fp);
 static u16_t mii_read(fxp_t *fp, int reg);
@@ -309,7 +309,7 @@ static void handle_hw_intr(void)
  *===========================================================================*/
 int main(int argc, char *argv[])
 {
-	message m;
+	kipc_msg_t m;
 	int i, r;
 	u32_t tasknr;
 	long v;
@@ -400,13 +400,13 @@ int main(int argc, char *argv[])
  *				fxp_init				     *
  *===========================================================================*/
 static void fxp_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	static int first_time= 1;
 
 	int port;
 	fxp_t *fp;
-	message reply_mess;
+	kipc_msg_t reply_mess;
 
 	if (first_time)
 	{
@@ -1112,7 +1112,7 @@ fxp_t *fp;
  *				fxp_writev				     *
  *===========================================================================*/
 static void fxp_writev(mp, from_int, vectored)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 int vectored;
 {
@@ -1272,7 +1272,7 @@ suspend:
  *				fxp_writev_s				     *
  *===========================================================================*/
 static void fxp_writev_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	cp_grant_id_t iov_grant;
@@ -1418,7 +1418,7 @@ suspend:
  *				fxp_readv				     *
  *===========================================================================*/
 static void fxp_readv(mp, from_int, vectored)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 int vectored;
 {
@@ -1598,7 +1598,7 @@ suspend:
  *				fxp_readv_s				     *
  *===========================================================================*/
 static void fxp_readv_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	int i, j, n, o, r, s, dl_port, fxp_client, count, size,
@@ -1919,7 +1919,7 @@ fxp_t *fp;
  *				fxp_getstat				     *
  *===========================================================================*/
 static void fxp_getstat(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	clock_t t0,t1;
 	int r, dl_port;
@@ -2003,7 +2003,7 @@ message *mp;
  *				fxp_getstat_s				     *
  *===========================================================================*/
 static void fxp_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	clock_t t0,t1;
 	int r, dl_port;
@@ -2087,7 +2087,7 @@ message *mp;
  *				fxp_getname				     *
  *===========================================================================*/
 static void fxp_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -2658,7 +2658,7 @@ fxp_t *fp;
 int err;
 int may_block;
 {
-	message reply;
+	kipc_msg_t reply;
 	int status;
 	int r;
 
@@ -2700,8 +2700,8 @@ int may_block;
  *				mess_reply				     *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
 	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("FXP","fxp: unable to mess_reply", NO_NUM);
@@ -2980,7 +2980,7 @@ int pci_func;
 	int r;
 	endpoint_t dev_e;
 	u32_t u32;
-	message m;
+	kipc_msg_t m;
 
 	r= ds_retrieve_u32("amddev", &u32);
 	if (r != 0)

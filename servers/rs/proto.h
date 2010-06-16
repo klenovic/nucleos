@@ -22,15 +22,15 @@ int dev_execve(int proc_e, char *exec, size_t exec_len,  char *argv[], char **en
 int main(void);
 
 /* manager.c */
-int do_up(message *m);
-int do_down(message *m);
-int do_refresh(message *m);
-int do_restart(message *m);
-int do_lookup(message *m);
-int do_shutdown(message *m);
-void do_period(message *m);
-void do_exit(message *m);
-int do_getsysinfo(message *m);
+int do_up(kipc_msg_t *m);
+int do_down(kipc_msg_t *m);
+int do_refresh(kipc_msg_t *m);
+int do_restart(kipc_msg_t *m);
+int do_lookup(kipc_msg_t *m);
+int do_shutdown(kipc_msg_t *m);
+void do_period(kipc_msg_t *m);
+void do_exit(kipc_msg_t *m);
+int do_getsysinfo(kipc_msg_t *m);
 
 /* utility.c */
 int publish_service(struct rproc *rp);

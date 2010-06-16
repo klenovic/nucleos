@@ -23,7 +23,7 @@
 
 /* Message passing constants. */
 #define MESS_SIZE (sizeof(message))	/* might need usizeof from FS here */
-#define NIL_MESS ((message *) 0)	/* null pointer */
+#define NIL_MESS ((kipc_msg_t *) 0)	/* null pointer */
 
 /* Memory related constants. */
 #define SEGMENT_TYPE  0xFF00	/* bit mask to get segment type */

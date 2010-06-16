@@ -17,7 +17,7 @@
  *===========================================================================*/
 int vm_exit(endpoint_t ep)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VME_ENDPOINT = ep;
@@ -32,7 +32,7 @@ int vm_exit(endpoint_t ep)
  *===========================================================================*/
 int vm_willexit(endpoint_t ep)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VMWE_ENDPOINT = ep;

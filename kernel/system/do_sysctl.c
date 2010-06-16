@@ -22,7 +22,7 @@
  *			        do_sysctl				     *
  *===========================================================================*/
 int do_sysctl(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   vir_bytes len, buf;
   static char mybuf[DIAG_BUFSIZE];

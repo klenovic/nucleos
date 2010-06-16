@@ -12,7 +12,7 @@
 
 int sys_sysctl(int code, char *arg1, int arg2)
 {
-  message m;
+  kipc_msg_t m;
 
   m.SYSCTL_CODE = code;
   m.SYSCTL_ARG1 = arg1;

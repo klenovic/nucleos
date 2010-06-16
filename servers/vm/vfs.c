@@ -54,7 +54,7 @@ static void register_callback(struct vmproc *for_who, callback_t callback,
 int vfs_open(struct vmproc *for_who, callback_t callback,
 	cp_grant_id_t filename_gid, int filename_len, int flags, int mode)
 {
-	static message m;
+	static kipc_msg_t m;
 	int r;
 
 	register_callback(for_who, callback, VM_VFS_REPLY_OPEN);
@@ -78,7 +78,7 @@ int vfs_open(struct vmproc *for_who, callback_t callback,
  *===========================================================================*/
 int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
 {
-	static message m;
+	static kipc_msg_t m;
 	int r;
 
 	register_callback(for_who, callback, VM_VFS_REPLY_CLOSE);
@@ -97,7 +97,7 @@ int vfs_close(struct vmproc *for_who, callback_t callback, int fd)
 /*===========================================================================*
  *				do_vfs_reply			     	*
  *===========================================================================*/
-int do_vfs_reply(message *m)
+int do_vfs_reply(kipc_msg_t *m)
 {
 /* Reply to a request has been received from vfs. Handle it. First verify
  * and look up which process, identified by endpoint, this is about.

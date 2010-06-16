@@ -147,9 +147,9 @@ endpoint_t suspended_ep(endpoint_t driver, cp_grant_id_t g)
 /*===========================================================================*
  *				dev_status				     *
  *===========================================================================*/
-void dev_status(message *m)
+void dev_status(kipc_msg_t *m)
 {
-	message st;
+	kipc_msg_t st;
 	int d, get_more = 1;
 	endpoint_t endpt;
 
@@ -350,7 +350,7 @@ int suspend_reopen;		/* Just suspend the process */
 /* Read or write from a device.  The parameter 'dev' tells which one. */
   struct dmap *dp;
   u32_t pos_lo, pos_high;
-  message dev_mess;
+  kipc_msg_t dev_mess;
   cp_grant_id_t gid = GRANT_INVALID;
   static cp_grant_id_t gids[NR_IOREQS];
   int vec_grants = 0, orig_op, safe;
@@ -493,7 +493,7 @@ int flags;			/* mode bits and flags */
 /* Called from the dmap struct in table.c on opens & closes of special files.*/
   int r;
   struct dmap *dp;
-  message dev_mess;
+  kipc_msg_t dev_mess;
 
   /* Determine task dmap. */
   dp = &dmap[(dev >> MAJOR) & BYTE];
@@ -616,7 +616,7 @@ int do_ioctl()
  *===========================================================================*/
 int gen_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
-message *mess_ptr;		/* pointer to message for task */
+kipc_msg_t *mess_ptr;		/* pointer to message for task */
 {
 /* All file system I/O ultimately comes down to I/O on major/minor device
  * pairs.  These lead to calls on the following routines via the dmap table.
@@ -658,7 +658,7 @@ message *mess_ptr;		/* pointer to message for task */
  *===========================================================================*/
 int asyn_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
-message *mess_ptr;		/* pointer to message for task */
+kipc_msg_t *mess_ptr;		/* pointer to message for task */
 {
 /* All file system I/O ultimately comes down to I/O on major/minor device
  * pairs.  These lead to calls on the following routines via the dmap table.
@@ -682,7 +682,7 @@ message *mess_ptr;		/* pointer to message for task */
  *===========================================================================*/
 int ctty_io(task_nr, mess_ptr)
 int task_nr;			/* not used - for compatibility with dmap_t */
-message *mess_ptr;		/* pointer to message for task */
+kipc_msg_t *mess_ptr;		/* pointer to message for task */
 {
 /* This routine is only called for one device, namely /dev/tty.  Its job
  * is to change the message to use the controlling terminal, instead of the
@@ -731,7 +731,7 @@ int flags;			/* mode bits and flags */
 /*===========================================================================*
  *				no_dev_io				     *
  *===========================================================================*/
-int no_dev_io(int proc, message *m)
+int no_dev_io(int proc, kipc_msg_t *m)
 {
 /* Called when doing i/o on a nonexistent device. */
   printf("VFS: I/O on unmapped device number\n");
@@ -756,7 +756,7 @@ int flags;			/* mode bits and flags */
  */
   struct dmap *dp;
   int r, minor;
-  message dev_mess;
+  kipc_msg_t dev_mess;
 
   /* Determine task dmap. */
   dp = &dmap[(dev >> MAJOR) & BYTE];
@@ -847,7 +847,7 @@ void dev_up(int maj)
   struct vmnt *vmp;
   struct fproc *rfp;
   struct vnode *vp;
-  message m;
+  kipc_msg_t m;
 
   /* Open a device once for every filp that's opened on it,
    * and once for every filesystem mounted from it.
@@ -1067,7 +1067,7 @@ static int first_slot= 0, next_slot= 0;
 
 int asynsend(dst, mp)
 endpoint_t dst;
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, src_ind, dst_ind;
 	unsigned flags;

@@ -27,7 +27,7 @@ extern u32_t *vm_pagedirs;
  *				arch_do_vmctl				     *
  *===========================================================================*/
 int arch_do_vmctl(m_ptr, p)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 struct proc *p;
 {
   switch(m_ptr->SVMCTL_PARAM) {

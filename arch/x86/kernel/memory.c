@@ -643,10 +643,10 @@ int delivermsg(struct proc *rp)
 	vmassert(rp->p_delivermsg_lin);
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 	if(rp->p_delivermsg_lin !=
-		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(message))) {
+		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(kipc_msg_t))) {
 		printf("vir: 0x%lx lin was: 0x%lx umap now: 0x%lx\n",
 		rp->p_delivermsg_vir, rp->p_delivermsg_lin,
-		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(message)));
+		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(kipc_msg_t)));
 		minix_panic("that's wrong", NO_NUM);
 	}
 #endif
@@ -662,10 +662,10 @@ int delivermsg(struct proc *rp)
 		vm_set_cr3(rp);
 
 		addr = PHYS_COPY_CATCH(rp->p_delivermsg_lin, vir2phys(&rp->p_delivermsg),
-				       sizeof(message));
+				       sizeof(kipc_msg_t));
 
 		if(addr) {
-			vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(message), 1,
+			vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(kipc_msg_t), 1,
 				VMSTYPE_DELIVERMSG);
 			r = VMSUSPEND;
 		} else {

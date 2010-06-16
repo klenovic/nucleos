@@ -26,7 +26,7 @@
  *				do_abort				     *
  *===========================================================================*/
 int do_abort(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_abort. MINIX is unable to continue. This can originate e.g.
  * in the PM (normal abort or panic) or TTY (after CTRL-ALT-DEL).

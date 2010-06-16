@@ -496,7 +496,7 @@ int proc_nr_e;
   int proc_nr_p, blocked_on, fild, status = -EINTR;
   struct filp *f;
   dev_t dev;
-  message mess;
+  kipc_msg_t mess;
   int wasreviving = 0;
 
   if(isokendpt(proc_nr_e, &proc_nr_p) != 0) {

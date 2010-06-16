@@ -17,12 +17,12 @@ Copyright 1995 Philip Homburg
 
 /* clock.c */
 
-void clck_tick(message *mess);
+void clck_tick(kipc_msg_t *mess);
 
 /* mnx_eth.c */
 
-void eth_rec(message *m);
-void eth_check_drivers(message *m);
+void eth_rec(kipc_msg_t *m);
+void eth_check_drivers(kipc_msg_t *m);
 
 /* sr.c */
 

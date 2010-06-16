@@ -11,7 +11,7 @@ static void safe_io_cleanup(cp_grant_id_t, cp_grant_id_t *,
 					   int);
 static int gen_opcl(endpoint_t driver_e, int op,
 				   dev_t dev, int proc_e, int flags);
-static int gen_io(int task_nr, message *mess_ptr);
+static int gen_io(int task_nr, kipc_msg_t *mess_ptr);
 
 /*===========================================================================*
  *				fs_new_driver   			     *
@@ -174,7 +174,7 @@ int flags;			/* special flags, like O_NONBLOCK */
 /* Read or write from a device.  The parameter 'dev' tells which one. */
   struct dmap *dp;
   int r, safe;
-  message m;
+  kipc_msg_t m;
   iovec_t *v;
   cp_grant_id_t gid = GRANT_INVALID;
   int vec_grants;
@@ -270,7 +270,7 @@ int proc_e;			/* process to open/close for */
 int flags;			/* mode bits and flags */
 {
 /* Called from the dmap struct in table.c on opens & closes of special files.*/
-  message dev_mess;
+  kipc_msg_t dev_mess;
 
   dev_mess.m_type   = op;
   dev_mess.DEVICE   = (dev >> MINOR) & BYTE;
@@ -289,7 +289,7 @@ int flags;			/* mode bits and flags */
  *===========================================================================*/
 static int gen_io(task_nr, mess_ptr)
 int task_nr;			/* which task to call */
-message *mess_ptr;		/* pointer to message for task */
+kipc_msg_t *mess_ptr;		/* pointer to message for task */
 {
 /* All file system I/O ultimately comes down to I/O on major/minor device
  * pairs.  These lead to calls on the following routines via the dmap table.

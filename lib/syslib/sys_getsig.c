@@ -16,7 +16,7 @@ int sys_getksig(proc_ep, k_sig_map)
 endpoint_t *proc_ep;			/* return process number here */
 sigset_t *k_sig_map;			/* return signal map here */
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     result = ktaskcall(SYSTASK, SYS_GETKSIG, &m);

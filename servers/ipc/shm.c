@@ -35,7 +35,7 @@ static struct shm_struct *shm_find_id(int id)
 /*===========================================================================*
  *				do_shmget		     		     *
  *===========================================================================*/
-int do_shmget(message *m)
+int do_shmget(kipc_msg_t *m)
 {
 	struct shm_struct *shm;
 	long key, size, old_size;
@@ -106,7 +106,7 @@ int do_shmget(message *m)
 /*===========================================================================*
  *				do_shmat		     		     *
  *===========================================================================*/
-int do_shmat(message *m)
+int do_shmat(kipc_msg_t *m)
 {
 	int id, flag;
 	vir_bytes addr;
@@ -182,7 +182,7 @@ void update_refcount_and_destroy(void)
 /*===========================================================================*
  *				do_shmdt		     		     *
  *===========================================================================*/
-int do_shmdt(message *m)
+int do_shmdt(kipc_msg_t *m)
 {
 	struct shm_struct *shm;
 	vir_bytes addr;
@@ -217,7 +217,7 @@ int do_shmdt(message *m)
 /*===========================================================================*
  *				do_shmctl		     		     *
  *===========================================================================*/
-int do_shmctl(message *m)
+int do_shmctl(kipc_msg_t *m)
 {
 	int id = m->SHMCTL_ID;
 	int cmd = m->SHMCTL_CMD;

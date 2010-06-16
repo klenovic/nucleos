@@ -548,7 +548,7 @@ tty_t *tp;			/* which TTY */
  *				rs_interrupt				     *
  *===========================================================================*/
 void rs_interrupt(m)
-message *m;			/* which TTY */
+kipc_msg_t *m;			/* which TTY */
 {
 	unsigned long irq_set;
 	int i;

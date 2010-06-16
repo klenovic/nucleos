@@ -15,7 +15,7 @@
 int sys_int86(reg86p)
 struct reg86u *reg86p;
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.m1_p1= (char *)reg86p;

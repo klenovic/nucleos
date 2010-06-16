@@ -191,8 +191,8 @@ typedef struct re
 	int re_hook_id;			/* IRQ hook id at kernel */
 	eth_stat_t re_stat;
 	ether_addr_t re_address;
-	message re_rx_mess;
-	message re_tx_mess;
+	kipc_msg_t re_rx_mess;
+	kipc_msg_t re_tx_mess;
 	char re_name[sizeof("rtl8139#n")];
 	iovec_t re_iovec[IOVEC_NR];
 	iovec_s_t re_iovec_s[IOVEC_NR];
@@ -269,7 +269,7 @@ static void my_outl(u16 port, u32 value) {
 #define rl_outw(port, offset, value)	(my_outw((port) + (offset), (value)))
 #define rl_outl(port, offset, value)	(my_outl((port) + (offset), (value)))
 
-static void rl_init(message *mp);
+static void rl_init(kipc_msg_t *mp);
 static void rl_pci_conf(void);
 static int rl_probe(re_t *rep);
 static void rl_conf_hw(re_t *rep);
@@ -278,25 +278,25 @@ static void rl_init_hw(re_t *rep);
 static void rl_reset_hw(re_t *rep);
 static void rl_confaddr(re_t *rep);
 static void rl_rec_mode(re_t *rep);
-static void rl_readv(message *mp, int from_int, int vectored);
-static void rl_readv_s(message *mp, int from_int);
-static void rl_writev(message *mp, int from_int, int vectored);
-static void rl_writev_s(message *mp, int from_int);
+static void rl_readv(kipc_msg_t *mp, int from_int, int vectored);
+static void rl_readv_s(kipc_msg_t *mp, int from_int);
+static void rl_writev(kipc_msg_t *mp, int from_int, int vectored);
+static void rl_writev_s(kipc_msg_t *mp, int from_int);
 static void rl_check_ints(re_t *rep);
 static void rl_report_link(re_t *rep);
 static void mii_print_techab(u16 techab);
 static void mii_print_stat_speed(u16 stat, u16 extstat);
 static void rl_clear_rx(re_t *rep);
 static void rl_do_reset(re_t *rep);
-static void rl_getstat(message *mp);
-static void rl_getstat_s(message *mp);
-static void rl_getname(message *mp);
+static void rl_getstat(kipc_msg_t *mp);
+static void rl_getstat_s(kipc_msg_t *mp);
+static void rl_getname(kipc_msg_t *mp);
 static void reply(re_t *rep, int err, int may_block);
-static void mess_reply(message *req, message *reply);
+static void mess_reply(kipc_msg_t *req, kipc_msg_t *reply);
 static void rtl8139_stop(void);
 static void check_int_events(void);
 static int do_hard_int(void);
-static void rtl8139_dump(message *m);
+static void rtl8139_dump(kipc_msg_t *m);
 #if 0
 static void dump_phy(re_t *rep);
 #endif
@@ -307,7 +307,7 @@ static void tell_dev(vir_bytes start, size_t size, int pci_bus, int pci_dev, int
 /* The message used in the main loop is made global, so that rl_watchdog_f()
  * can change its message type to fake an interrupt message.
  */
-static message m;
+static kipc_msg_t m;
 static int int_event_check;		/* set to TRUE if events arrived */
 
 static char *progname;
@@ -469,7 +469,7 @@ static void rtl8139_stop()
  *				rtl8139_dump				     *
  *===========================================================================*/
 static void rtl8139_dump(m)
-message *m;			/* pointer to request message */
+kipc_msg_t *m;			/* pointer to request message */
 {
 	re_t *rep;
 	int i;
@@ -527,13 +527,13 @@ message *m;			/* pointer to request message */
  *				do_init					     *
  *===========================================================================*/
 static void rl_init(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	static int first_time= 1;
 
 	int port;
 	re_t *rep;
-	message reply_mess;
+	kipc_msg_t reply_mess;
 
 	if (first_time)
 	{
@@ -1059,7 +1059,7 @@ re_t *rep;
  *				rl_readv				     *
  *===========================================================================*/
 static void rl_readv(mp, from_int, vectored)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 int vectored;
 {
@@ -1311,7 +1311,7 @@ suspend:
  *				rl_readv_s				     *
  *===========================================================================*/
 static void rl_readv_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	int i, j, n, o, s, s1, dl_port, re_client, count, size;
@@ -1549,7 +1549,7 @@ suspend:
  *				rl_writev				     *
  *===========================================================================*/
 static void rl_writev(mp, from_int, vectored)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 int vectored;
 {
@@ -1696,7 +1696,7 @@ suspend:
  *				rl_writev_s				     *
  *===========================================================================*/
 static void rl_writev_s(mp, from_int)
-message *mp;
+kipc_msg_t *mp;
 int from_int;
 {
 	phys_bytes iov_src;
@@ -2287,7 +2287,7 @@ re_t *rep;
  *				rl_getstat				     *
  *===========================================================================*/
 static void rl_getstat(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, port;
 	eth_stat_t stats;
@@ -2321,7 +2321,7 @@ message *mp;
  *				rl_getstat_s				     *
  *===========================================================================*/
 static void rl_getstat_s(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r, port;
 	eth_stat_t stats;
@@ -2356,7 +2356,7 @@ message *mp;
  *				rl_getname				     *
  *===========================================================================*/
 static void rl_getname(mp)
-message *mp;
+kipc_msg_t *mp;
 {
 	int r;
 
@@ -2377,7 +2377,7 @@ re_t *rep;
 int err;
 int may_block;
 {
-	message reply;
+	kipc_msg_t reply;
 	int status;
 	int r;
 	clock_t now;
@@ -2420,8 +2420,8 @@ int may_block;
  *				mess_reply				     *
  *===========================================================================*/
 static void mess_reply(req, reply_mess)
-message *req;
-message *reply_mess;
+kipc_msg_t *req;
+kipc_msg_t *reply_mess;
 {
 	if (kipc_send(req->m_source, reply_mess) != 0)
 		panic("rtl8139","unable to mess_reply", NO_NUM);
@@ -3099,7 +3099,7 @@ int pci_func;
 	int r;
 	endpoint_t dev_e;
 	u32_t u32;
-	message m;
+	kipc_msg_t m;
 
 	r= ds_retrieve_u32("amddev", &u32);
 	if (r != 0)

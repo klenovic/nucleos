@@ -192,7 +192,7 @@ extern int errno;
 
 #include <nucleos/kipc.h>
 
-static inline int ktaskcall(endpoint_t who, int syscallnr, register message *msgptr)
+static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *msgptr)
 {
 	int status;
 

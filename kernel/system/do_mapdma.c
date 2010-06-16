@@ -21,7 +21,7 @@
  *				do_mapdma				    *
  *==========================================================================*/
 int do_mapdma(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
 	int r;
 	endpoint_t proc_e;
@@ -29,7 +29,7 @@ register message *m_ptr;	/* pointer to request message */
 	vir_bytes base, size;
 	phys_bytes phys_base;
 	struct proc *proc;
-	message m;
+	kipc_msg_t m;
 
 	proc_e = m_ptr->CP_SRC_ENDPT;
 	base= m_ptr->CP_SRC_ADDR;

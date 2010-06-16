@@ -25,7 +25,7 @@
  *				do_memset				     *
  *===========================================================================*/
 int do_memset(m_ptr)
-register message *m_ptr;
+register kipc_msg_t *m_ptr;
 {
 /* Handle sys_memset(). This writes a pattern into the specified memory. */
   unsigned char c = m_ptr->MEM_PATTERN;

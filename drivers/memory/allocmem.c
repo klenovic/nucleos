@@ -14,7 +14,7 @@ int allocmem(size, base)
 phys_bytes size;			/* size of mem chunk requested */
 phys_bytes *base;			/* return base address */
 {
-  message m;
+  kipc_msg_t m;
   m.m4_l1 = size;		
   if (ktaskcall(PM_PROC_NR, KCNR_ALLOCMEM, &m) < 0) return(-1);
   *base = m.m4_l2;

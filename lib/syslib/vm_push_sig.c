@@ -17,7 +17,7 @@
  *===========================================================================*/
 int vm_push_sig(endpoint_t ep, vir_bytes *old_sp)
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.VMPS_ENDPOINT = ep;

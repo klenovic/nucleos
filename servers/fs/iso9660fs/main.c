@@ -12,10 +12,10 @@
 
 /* Declare some local functions. */
 static void init_server(void);
-static void get_work(message *m_in);
+static void get_work(kipc_msg_t *m_in);
 
-message fs_m_in;	/* contains the input message of the request */
-message fs_m_out;	/* contains the output message of the request */
+kipc_msg_t fs_m_in;	/* contains the input message of the request */
+kipc_msg_t fs_m_out;	/* contains the output message of the request */
 
 uid_t caller_uid;
 gid_t caller_gid;
@@ -33,7 +33,7 @@ struct buf buf[NR_BUFS];
  *===========================================================================*/
 int main(void) {
 	int who_e, ind, error;
-	message m;
+	kipc_msg_t m;
 
 	/* Initialize the server, then go to work. */
 	init_server();
@@ -101,7 +101,7 @@ static void init_server(void)
  *				get_work                                     *
  *===========================================================================*/
 static void get_work(m_in)
-message *m_in;				/* pointer to message */
+kipc_msg_t *m_in;				/* pointer to message */
 {
   int s;				/* receive status */
   if (0 != (s = kipc_receive(ENDPT_ANY, m_in))) 	/* wait for message */
@@ -113,7 +113,7 @@ message *m_in;				/* pointer to message */
  *===========================================================================*/
 void reply(who, m_out)
 int who;	
-message *m_out;                       	/* report result */
+kipc_msg_t *m_out;                       	/* report result */
 {
   if (0 != kipc_send(who, m_out))    /* send the message */
     printf("ISOFS(%d) was unable to send reply\n", SELF_E);

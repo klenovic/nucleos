@@ -35,7 +35,7 @@
 /*===========================================================================*
  *				do_fork					     *
  *===========================================================================*/
-int do_fork(message *msg)
+int do_fork(kipc_msg_t *msg)
 {
   int r, proc, s, childproc, fullvm;
   struct vmproc *vmp, *vmc;
@@ -168,9 +168,9 @@ int do_fork(message *msg)
 	 * and its return value needn't be checked.
 	 */
 	vir = arch_vir2map(vmc, msgaddr);
-	handle_memory(vmc, vir, sizeof(message), 1);
+	handle_memory(vmc, vir, sizeof(kipc_msg_t), 1);
 	vir = arch_vir2map(vmp, msgaddr);
-	handle_memory(vmp, vir, sizeof(message), 1);
+	handle_memory(vmp, vir, sizeof(kipc_msg_t), 1);
   }
 
   if((r=pt_bind(&vmc->vm_pt, vmc)) != 0)

@@ -25,7 +25,7 @@ struct rs_pci *rs_pci;
 {
 	int r;
 	cp_grant_id_t gid;
-	message m;
+	kipc_msg_t m;
 	u32_t u32;
 
 	if (pci_procnr == ENDPT_ANY)

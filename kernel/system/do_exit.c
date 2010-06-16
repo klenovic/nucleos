@@ -26,7 +26,7 @@ static void clear_proc(register struct proc *rc);
  *				do_exit					     *
  *===========================================================================*/
 int do_exit(m_ptr)
-message *m_ptr;			/* pointer to request message */
+kipc_msg_t *m_ptr;			/* pointer to request message */
 {
 /* Handle sys_exit. A user process has exited or a system process requests 
  * to exit. Only the PM can request other process slots to be cleared.

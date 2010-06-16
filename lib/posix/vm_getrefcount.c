@@ -15,7 +15,7 @@
 
 u8_t vm_getrefcount(int endpt, void *addr)
 {
-	message m;
+	kipc_msg_t m;
 	u8_t ret;
 	int r;
 

@@ -59,7 +59,7 @@ int scall_getuid(void)
 int scall_setegid(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 
 	if (rmp->mp_realgid != (gid_t) m_in.grp_id && rmp->mp_effuid != SUPER_USER)
 		return -EPERM;
@@ -81,7 +81,7 @@ int scall_setegid(void)
 int scall_seteuid(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 
 	if (rmp->mp_realuid != (uid_t) m_in.usr_id && rmp->mp_effuid != SUPER_USER)
 		return -EPERM;
@@ -103,7 +103,7 @@ int scall_seteuid(void)
 int scall_setgid(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 
 	if (rmp->mp_realgid != (gid_t) m_in.grp_id && rmp->mp_effuid != SUPER_USER)
 		return -EPERM;
@@ -126,7 +126,7 @@ int scall_setgid(void)
 int scall_setsid(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 
 	if (rmp->mp_procgrp == rmp->mp_pid)
 		return -EPERM;
@@ -146,7 +146,7 @@ int scall_setsid(void)
 int scall_setuid(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 
 	if (rmp->mp_realuid != (uid_t) m_in.usr_id && rmp->mp_effuid != SUPER_USER)
 		return -EPERM;
@@ -172,7 +172,7 @@ int scall_getgroups(void)
 	int r, i;
 	int ngroups;
 
-	message m;
+	kipc_msg_t m;
 
 	ngroups = m_in.grp_no;
 
@@ -202,7 +202,7 @@ int scall_getgroups(void)
 int scall_setgroups(void)
 {
 	register struct mproc *rmp = mp;
-	message m;
+	kipc_msg_t m;
 	int ngroups;
 	int i;
 	int r;

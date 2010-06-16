@@ -390,7 +390,7 @@ static void fs_init(void)
 	register struct fproc *rfp;
 	struct vmnt *vmp;
 	struct vnode *root_vp;
-	message mess;
+	kipc_msg_t mess;
 
 	/* Clear endpoint field */
 	last_login_fs_e = ENDPT_NONE;
@@ -474,7 +474,7 @@ static void init_root(void)
 	struct vnode *root_node;
 	struct dmap *dp;
 	char *label;
-	message m;
+	kipc_msg_t m;
   struct node_details res;
 
 	/* Open the root device. */

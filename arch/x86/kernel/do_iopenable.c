@@ -26,7 +26,7 @@
  *			        do_iopenable				     *
  *===========================================================================*/
 int do_iopenable(m_ptr)
-register message *m_ptr;	/* pointer to request message */
+register kipc_msg_t *m_ptr;	/* pointer to request message */
 {
   int proc_nr;
 

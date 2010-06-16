@@ -225,7 +225,7 @@ char *name;
 
 
 static void cprof_init() {
-  message m;
+  kipc_msg_t m;
   int i;
 
   cpath[0] = '\0';

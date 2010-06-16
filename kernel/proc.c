@@ -75,8 +75,8 @@ struct priv *ppriv_addr[NR_SYS_PROCS];   /* direct slot pointers */
  * interrupts to prevent race conditions. 
  */
 static void idle(void);
-static int mini_send(struct proc *caller_ptr, int dst_e, message *m_ptr, int flags);
-static int mini_receive(struct proc *caller_ptr, int src, message *m_ptr, int flags);
+static int mini_send(struct proc *caller_ptr, int dst_e, kipc_msg_t *m_ptr, int flags);
+static int mini_receive(struct proc *caller_ptr, int src, kipc_msg_t *m_ptr, int flags);
 static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size);
 static int deadlock(int function, register struct proc *caller, int src_dst);
 static int try_async(struct proc *caller_ptr);
@@ -121,9 +121,9 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 	vmassert(isokendpt(ep, &k));
 
 	if (dst->syscall_0x80) {
-		*((message*)&dst->p_delivermsg) = *((message*)phys2vir(msg_lin));
+		*((kipc_msg_t*)&dst->p_delivermsg) = *((kipc_msg_t*)phys2vir(msg_lin));
 	} else {
-		addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(message));
+		addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(kipc_msg_t));
 		if(addr) {
 			NOREC_RETURN(queuemess, -EFAULT);
 		}
@@ -297,7 +297,7 @@ check_misc_flags:
 int kipc_call(call_nr, src_dst_e, m_ptr, bit_map)
 int call_nr;			/* system call number and flags */
 int src_dst_e;			/* src to receive from or dst to send to */
-message *m_ptr;			/* pointer to message in the caller's space */
+kipc_msg_t *m_ptr;			/* pointer to message in the caller's space */
 long bit_map;			/* notification event set or flags */
 {
 /* System calls are done by trapping to the kernel with an INT instruction.
@@ -587,7 +587,7 @@ int src_dst;					/* src or dst process */
 static int mini_send(caller_ptr, dst_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* who is trying to send a message? */
 int dst_e;				/* to whom is message being sent? */
-message *m_ptr;				/* pointer to message buffer */
+kipc_msg_t *m_ptr;				/* pointer to message buffer */
 int flags;
 {
 /* Send a message from 'caller_ptr' to 'dst'. If 'dst' is blocked waiting
@@ -603,7 +603,7 @@ int flags;
 
   if (caller_ptr->syscall_0x80)
 	linaddr = vir2phys(&caller_ptr->p_sendmsg);
-  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(message)))) {
+  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(kipc_msg_t)))) {
 	return -EFAULT;
   }
 
@@ -636,7 +636,7 @@ int flags;
 
 	if (!caller_ptr->syscall_0x80) {
 		/* Destination is not waiting.  Block and dequeue caller. */
-		addr = PHYS_COPY_CATCH(vir2phys(&caller_ptr->p_sendmsg), linaddr, sizeof(message));
+		addr = PHYS_COPY_CATCH(vir2phys(&caller_ptr->p_sendmsg), linaddr, sizeof(kipc_msg_t));
 
 		if(addr) { return -EFAULT; }
 	}
@@ -660,7 +660,7 @@ int flags;
 static int mini_receive(caller_ptr, src_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* process trying to get message */
 int src_e;				/* which message source is wanted */
-message *m_ptr;				/* pointer to message buffer */
+kipc_msg_t *m_ptr;				/* pointer to message buffer */
 int flags;
 {
 /* A process or task wants to get a message.  If a message is already queued,
@@ -669,7 +669,7 @@ int flags;
  */
   register struct proc **xpp;
   register struct notification **ntf_q_pp;
-  message m;
+  kipc_msg_t m;
   int bit_nr;
   sys_map_t *map;
   bitchunk_t *chunk;
@@ -680,7 +680,7 @@ int flags;
 
   if (caller_ptr->syscall_0x80)
 	linaddr = vir2phys(&caller_ptr->p_delivermsg);
-  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(message)))) {
+  else if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) m_ptr, sizeof(kipc_msg_t)))) {
 	return -EFAULT;
   }
 
@@ -807,7 +807,7 @@ endpoint_t dst_e;			/* which process to notify */
 {
   register struct proc *dst_ptr;
   int src_id;				/* source id for late delivery */
-  message m;				/* the notification message */
+  kipc_msg_t m;				/* the notification message */
   int r;
   int proc_nr;
   int dst_p;
@@ -884,7 +884,7 @@ size_t size;
 	unsigned flags;
 	struct proc *dst_ptr;
 	struct priv *privp;
-	message *m_ptr;
+	kipc_msg_t *m_ptr;
 	asynmsg_t tabent;
 	vir_bytes table_v = (vir_bytes) table;
 	vir_bytes linaddr;
@@ -1104,7 +1104,7 @@ int *postponed;
 	size_t size;
 	endpoint_t dst_e;
 	asynmsg_t *table_ptr;
-	message *m_ptr;
+	kipc_msg_t *m_ptr;
 	struct priv *privp;
 	asynmsg_t tabent;
 	vir_bytes table_v;
@@ -1512,7 +1512,7 @@ timer_t *tp;					/* watchdog timer pointer */
  *===========================================================================*/
 int lock_send(dst_e, m_ptr)
 int dst_e;			/* to whom is message being sent? */
-message *m_ptr;			/* pointer to message buffer */
+kipc_msg_t *m_ptr;			/* pointer to message buffer */
 {
 /* Safe gateway to mini_send() for tasks. */
   int result;

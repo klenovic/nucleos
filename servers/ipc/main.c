@@ -7,7 +7,7 @@ endpoint_t SELF_E;
 
 struct {
 	int type;
-	int (*func)(message *);
+	int (*func)(kipc_msg_t *);
 	int reply;	/* whether the reply action is passed through */
 } ipc_calls[] = {
 	{ IPC_SHMGET,	do_shmget,	0 },
@@ -25,7 +25,7 @@ int verbose = 0;
 
 int main(int argc, char *argv[])
 {
-	message m;
+	kipc_msg_t m;
 
 	SELF_E = getprocnr();
 

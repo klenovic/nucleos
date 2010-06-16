@@ -15,7 +15,7 @@
 
 int deldma(endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
-  message m;
+  kipc_msg_t m;
 
   m.m2_i1= proc_e;
   m.m2_l1= start;

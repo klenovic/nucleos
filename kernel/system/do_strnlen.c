@@ -34,7 +34,7 @@
  * On kernel exception, returns 0.
  * If the string is too long, returns a value greater than @maxlen.
  */
-long do_strnlen(message *m_ptr)
+long do_strnlen(kipc_msg_t *m_ptr)
 {
 	int proc_nr;
 	struct proc *p;

@@ -61,7 +61,7 @@
  * because the dummy is declared extern. If an illegal call is given, the 
  * array size will be negative and this won't compile. 
  */
-int (*call_vec[NR_SYS_CALLS])(message *m_ptr);
+int (*call_vec[NR_SYS_CALLS])(kipc_msg_t *m_ptr);
 char *callnames[NR_SYS_CALLS];
 
 #define map(call_nr, handler) \
@@ -70,7 +70,7 @@ char *callnames[NR_SYS_CALLS];
     call_vec[(call_nr-KERNEL_CALL)] = (handler)  
 
 static void initialize(void);
-static struct proc *vmrestart_check(message *);
+static struct proc *vmrestart_check(kipc_msg_t *);
 
 /*===========================================================================*
  *				sys_task				     *
@@ -78,7 +78,7 @@ static struct proc *vmrestart_check(message *);
 void sys_task()
 {
 /* Main entry point of sys_task.  Get the message and dispatch on type. */
-  static message m;
+  static kipc_msg_t m;
   register int result;
   register struct proc *caller_ptr;
   int s;
@@ -559,7 +559,7 @@ register struct proc *rc;		/* slot of process to clean up */
 /*===========================================================================*
  *                              vmrestart_check                            *
  *===========================================================================*/
-static struct proc *vmrestart_check(message *m)
+static struct proc *vmrestart_check(kipc_msg_t *m)
 {
 	int type, r;
 	struct proc *restarting;

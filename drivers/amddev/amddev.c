@@ -58,18 +58,18 @@ static u32_t read_reg(int function, int index);
 static void write_reg(int function, int index, u32_t value);
 static void init_domain(int index);
 static void init_map(int index);
-static int do_add_phys(message *m);
-static int do_del_phys(message *m);
-static int do_add4pci(message *m);
+static int do_add_phys(kipc_msg_t *m);
+static int do_del_phys(kipc_msg_t *m);
+static int do_add4pci(kipc_msg_t *m);
 static void add_range(u32_t busaddr, u32_t size);
 static void del_range(u32_t busaddr, u32_t size);
-static int do_pm_notify(message *m);
+static int do_pm_notify(kipc_msg_t *m);
 static void report_exceptions(void);
 
 int main(void)
 {
 	int r;
-	message m;
+	kipc_msg_t m;
 
 	printf("amddev: starting\n");
 
@@ -263,7 +263,7 @@ static void init_map(int index)
 }
 
 #if 0
-static int do_add(message *m)
+static int do_add(kipc_msg_t *m)
 {
 	int r;
 	endpoint_t proc;
@@ -304,7 +304,7 @@ static int do_add(message *m)
 }
 #endif
 
-static int do_add_phys(message *m)
+static int do_add_phys(kipc_msg_t *m)
 {
 	int i, r;
 	phys_bytes start;
@@ -340,7 +340,7 @@ static int do_add_phys(message *m)
 	return -EBUSY;
 }
 
-static int do_del_phys(message *m)
+static int do_del_phys(kipc_msg_t *m)
 {
 	int r;
 	phys_bytes start;
@@ -371,7 +371,7 @@ static int do_del_phys(message *m)
 	return 0;
 }
 
-static int do_add4pci(message *m)
+static int do_add4pci(kipc_msg_t *m)
 {
 	int r, pci_bus, pci_dev, pci_func;
 	endpoint_t proc;
@@ -460,7 +460,7 @@ static void del_range(u32_t busaddr, u32_t size)
 	}
 }
 
-static int do_pm_notify(message *m)
+static int do_pm_notify(kipc_msg_t *m)
 {
 	int r;
 	endpoint_t proc_e;

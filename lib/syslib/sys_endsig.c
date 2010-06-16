@@ -15,7 +15,7 @@
 int sys_endksig(proc_ep)
 endpoint_t proc_ep;				/* process number */
 {
-    message m;
+    kipc_msg_t m;
     int result;
 
     m.SIG_ENDPT = proc_ep;
