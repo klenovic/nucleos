@@ -13,7 +13,6 @@
 /* The following names are synonyms for the variables in the input message. */
 #define exec_name	m1_p1
 #define exec_len	m1_i1
-#define func		m6_f1
 #define grp_id		m1_i1
 #define grp_no		m1_i1
 #define groupsp		m1_p1
@@ -23,7 +22,6 @@
 #define which_timer	m1_i1
 #define new_val		m1_p1
 #define old_val		m1_p2
-#define sig		m6_i1
 #define stack_bytes	m1_i2
 #define stack_ptr	m1_p2
 #define status		m1_i1

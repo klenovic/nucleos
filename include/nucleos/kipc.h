@@ -66,19 +66,6 @@ typedef struct {
 } mess_5;
 
 typedef struct {
-	long m6l1;
-	long m6l2;
-	long m6l3;
-	short m6s1;
-	short m6s2;
-	short m6s3;
-	char m6c1;
-	char m6c2;
-	char *m6p1;
-	char *m6p2;
-} mess_6;
-
-typedef struct {
 	int m7i1;
 	int m7i2;
 	int m7i3;
@@ -119,7 +106,6 @@ typedef struct kipc_msg {
 		mess_5 m_m5;
 		mess_7 m_m7;
 		mess_8 m_m8;
-		mess_6 m_m6;
 		mess_9 m_m9;
 	} m_u;
 } kipc_msg_t;
@@ -159,17 +145,6 @@ typedef struct kipc_msg {
 #define m5_l1  m_u.m_m5.m5l1
 #define m5_l2  m_u.m_m5.m5l2
 #define m5_l3  m_u.m_m5.m5l3
-
-#define m6_l1  m_u.m_m6.m6l1
-#define m6_l2  m_u.m_m6.m6l2
-#define m6_l3  m_u.m_m6.m6l3
-#define m6_s1  m_u.m_m6.m6s1
-#define m6_s2  m_u.m_m6.m6s2
-#define m6_s3  m_u.m_m6.m6s3
-#define m6_c1  m_u.m_m6.m6c1
-#define m6_c2  m_u.m_m6.m6c2
-#define m6_p1  m_u.m_m6.m6p1
-#define m6_p2  m_u.m_m6.m6p2
 
 #define m7_i1  m_u.m_m7.m7i1
 #define m7_i2  m_u.m_m7.m7i2
