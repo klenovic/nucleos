@@ -10,8 +10,6 @@
 #ifndef __ASM_X86_KIPC_DEFS_H
 #define __ASM_X86_KIPC_DEFS_H
 
-/* Note that this header can be included in assembly file */
-
-#define KIPC_MESSAGE_SIZE	36 /* size of `message' structure in bytes */
+/* This header can be included in assembly file */
 
 #endif /* __ASM_X86_KIPC_DEFS_H */
