@@ -17,158 +17,79 @@
 #include <nucleos/type.h>
 #include <nucleos/kipc_defs.h>
 
-/*==========================================================================* 
- * Types relating to messages. 						    *
- *==========================================================================*/ 
-
-typedef struct {
-	__s32 m1i1;
-	__s32 m1i2;
-	__s32 m1i3;
-	__s32 m1p1;
-	__s32 m1p2;
-	__s32 m1p3;
-} mess_1;
-
-typedef struct {
-	__s32 m2i1;
-	__s32 m2i2;
-	__s32 m2i3;
-	__s32 m2l1;
-	__s32 m2l2;
-	__s32 m2p1;
-	__s32 m2s1;
-} mess_2;
-
-typedef struct {
-	__s32 m3i1;
-	__s32 m3i2;
-	__s32 m3p1;
-	__s8 m3ca1[KIPC_FLG_M3_STRLEN];
-} mess_3;
-
-typedef struct {
-	__s32 m4l1;
-	__s32 m4l2;
-	__s32 m4l3;
-	__s32 m4l4;
-	__s32 m4l5;
-} mess_4;
-
-typedef struct {
-	__s32 m5c1;
-	__s32 m5c2;
-	__s32 m5i1;
-	__s32 m5i2;
-	__s32 m5l1;
-	__s32 m5l2;
-	__s32 m5l3;
-} mess_5;
-
-typedef struct {
-	__s32 m7i1;
-	__s32 m7i2;
-	__s32 m7i3;
-	__s32 m7i4;
-	__s32 m7p1;
-	__s32 m7p2;
-} mess_7;
-
-typedef struct {
-	__s32 m8i1;
-	__s32 m8i2;
-	__s32 m8p1;
-	__s32 m8p2;
-	__s32 m8p3;
-	__s32 m8p4;
-} mess_8;
-
-typedef struct {
-	__s32 m9l1;
-	__s32 m9l2;
-	__s32 m9l3;
-	__s32 m9l4;
-	__s32 m9l5;
-	__s32 m9s1;
-	__s32 m9s2;
-	__s32 m9s3;
-	__s32 m9s4;
-} mess_9;
-
 typedef struct kipc_msg {
 	endpoint_t m_source;	/* who sent the message */
 	int m_type;		/* what kind of message is it */
-	union {
-		mess_1 m_m1;
-		mess_2 m_m2;
-		mess_3 m_m3;
-		mess_4 m_m4;
-		mess_5 m_m5;
-		mess_7 m_m7;
-		mess_8 m_m8;
-		mess_9 m_m9;
-	} m_u;
+	__s32 m1;
+	__s32 m2;
+	__s32 m3;
+	__s32 m4;
+	__s32 m5;
+	__s32 m6;
+	__s32 m7;
+	__s32 m8;
+	__s32 m9;
+	__s8 m10[KIPC_FLG_M3_STRLEN];
 } kipc_msg_t;
 
 /* The following defines provide names for useful members. */
-#define m1_i1  m_u.m_m1.m1i1
-#define m1_i2  m_u.m_m1.m1i2
-#define m1_i3  m_u.m_m1.m1i3
-#define m1_p1  m_u.m_m1.m1p1
-#define m1_p2  m_u.m_m1.m1p2
-#define m1_p3  m_u.m_m1.m1p3
+#define m1_i1  m1
+#define m1_i2  m2
+#define m1_i3  m3
+#define m1_p1  m4
+#define m1_p2  m5
+#define m1_p3  m6
 
-#define m2_i1  m_u.m_m2.m2i1
-#define m2_i2  m_u.m_m2.m2i2
-#define m2_i3  m_u.m_m2.m2i3
-#define m2_l1  m_u.m_m2.m2l1
-#define m2_l2  m_u.m_m2.m2l2
-#define m2_p1  m_u.m_m2.m2p1
+#define m2_i1  m1
+#define m2_i2  m2
+#define m2_i3  m3
+#define m2_l1  m4
+#define m2_l2  m5
+#define m2_p1  m6
+#define m2_s1  m7
 
-#define m2_s1  m_u.m_m2.m2s1
+#define m3_i1  m1
+#define m3_i2  m2
+#define m3_p1  m3
+#define m3_ca1 m10
 
-#define m3_i1  m_u.m_m3.m3i1
-#define m3_i2  m_u.m_m3.m3i2
-#define m3_p1  m_u.m_m3.m3p1
-#define m3_ca1 m_u.m_m3.m3ca1
+#define m4_l1  m1
+#define m4_l2  m2
+#define m4_l3  m3
+#define m4_l4  m4
+#define m4_l5  m5
 
-#define m4_l1  m_u.m_m4.m4l1
-#define m4_l2  m_u.m_m4.m4l2
-#define m4_l3  m_u.m_m4.m4l3
-#define m4_l4  m_u.m_m4.m4l4
-#define m4_l5  m_u.m_m4.m4l5
+#define m5_c1  m1
+#define m5_c2  m2
+#define m5_i1  m3
+#define m5_i2  m4
+#define m5_l1  m5
+#define m5_l2  m6
+#define m5_l3  m7
 
-#define m5_c1  m_u.m_m5.m5c1
-#define m5_c2  m_u.m_m5.m5c2
-#define m5_i1  m_u.m_m5.m5i1
-#define m5_i2  m_u.m_m5.m5i2
-#define m5_l1  m_u.m_m5.m5l1
-#define m5_l2  m_u.m_m5.m5l2
-#define m5_l3  m_u.m_m5.m5l3
+#define m7_i1  m1
+#define m7_i2  m2
+#define m7_i3  m3
+#define m7_i4  m4
+#define m7_p1  m5
+#define m7_p2  m6
 
-#define m7_i1  m_u.m_m7.m7i1
-#define m7_i2  m_u.m_m7.m7i2
-#define m7_i3  m_u.m_m7.m7i3
-#define m7_i4  m_u.m_m7.m7i4
-#define m7_p1  m_u.m_m7.m7p1
-#define m7_p2  m_u.m_m7.m7p2
+#define m8_i1  m1
+#define m8_i2  m2
+#define m8_p1  m3
+#define m8_p2  m4
+#define m8_p3  m5
+#define m8_p4  m6
 
-#define m8_i1  m_u.m_m8.m8i1
-#define m8_i2  m_u.m_m8.m8i2
-#define m8_p1  m_u.m_m8.m8p1
-#define m8_p2  m_u.m_m8.m8p2
-#define m8_p3  m_u.m_m8.m8p3
-#define m8_p4  m_u.m_m8.m8p4
-
-#define m9_l1  m_u.m_m9.m9l1
-#define m9_l2  m_u.m_m9.m9l2
-#define m9_l3  m_u.m_m9.m9l3
-#define m9_l4  m_u.m_m9.m9l4
-#define m9_l5  m_u.m_m9.m9l5
-#define m9_s1  m_u.m_m9.m9s1
-#define m9_s2  m_u.m_m9.m9s2
-#define m9_s3  m_u.m_m9.m9s3
-#define m9_s4  m_u.m_m9.m9s4
+#define m9_l1  m1
+#define m9_l2  m2
+#define m9_l3  m3
+#define m9_l4  m4
+#define m9_l5  m5
+#define m9_s1  m6
+#define m9_s2  m7
+#define m9_s3  m8
+#define m9_s4  m9
 
 /*==========================================================================* 
  * Nucleos run-time system (IPC). 					    *
