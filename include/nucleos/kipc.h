@@ -22,77 +22,77 @@
  *==========================================================================*/ 
 
 typedef struct {
-	int m1i1;
-	int m1i2;
-	int m1i3;
-	char *m1p1;
-	char *m1p2;
-	char *m1p3;
+	__s32 m1i1;
+	__s32 m1i2;
+	__s32 m1i3;
+	__s32 m1p1;
+	__s32 m1p2;
+	__s32 m1p3;
 } mess_1;
 
 typedef struct {
-	int m2i1;
-	int m2i2;
-	int m2i3;
-	long m2l1;
-	long m2l2;
-	char *m2p1;
-	short m2s1;
+	__s32 m2i1;
+	__s32 m2i2;
+	__s32 m2i3;
+	__s32 m2l1;
+	__s32 m2l2;
+	__s32 m2p1;
+	__s32 m2s1;
 } mess_2;
 
 typedef struct {
-	int m3i1;
-	int m3i2;
-	char *m3p1;
-	char m3ca1[KIPC_FLG_M3_STRLEN];
+	__s32 m3i1;
+	__s32 m3i2;
+	__s32 m3p1;
+	__s8 m3ca1[KIPC_FLG_M3_STRLEN];
 } mess_3;
 
 typedef struct {
-	long m4l1;
-	long m4l2;
-	long m4l3;
-	long m4l4;
-	long m4l5;
+	__s32 m4l1;
+	__s32 m4l2;
+	__s32 m4l3;
+	__s32 m4l4;
+	__s32 m4l5;
 } mess_4;
 
 typedef struct {
-	short m5c1;
-	short m5c2;
-	int m5i1;
-	int m5i2;
-	long m5l1;
-	long m5l2;
-	long m5l3;
+	__s32 m5c1;
+	__s32 m5c2;
+	__s32 m5i1;
+	__s32 m5i2;
+	__s32 m5l1;
+	__s32 m5l2;
+	__s32 m5l3;
 } mess_5;
 
 typedef struct {
-	int m7i1;
-	int m7i2;
-	int m7i3;
-	int m7i4;
-	char *m7p1;
-	char *m7p2;
+	__s32 m7i1;
+	__s32 m7i2;
+	__s32 m7i3;
+	__s32 m7i4;
+	__s32 m7p1;
+	__s32 m7p2;
 } mess_7;
 
 typedef struct {
-	int m8i1;
-	int m8i2;
-	char *m8p1;
-	char *m8p2;
-	char *m8p3;
-	char *m8p4;
+	__s32 m8i1;
+	__s32 m8i2;
+	__s32 m8p1;
+	__s32 m8p2;
+	__s32 m8p3;
+	__s32 m8p4;
 } mess_8;
 
 typedef struct {
-	long m9l1;
-	long m9l2;
-	long m9l3;
-	long m9l4;
-	long m9l5;
-	short m9s1;
-	short m9s2;
-	short m9s3;
-	short m9s4;
+	__s32 m9l1;
+	__s32 m9l2;
+	__s32 m9l3;
+	__s32 m9l4;
+	__s32 m9l5;
+	__s32 m9s1;
+	__s32 m9s2;
+	__s32 m9s3;
+	__s32 m9s4;
 } mess_9;
 
 typedef struct kipc_msg {
