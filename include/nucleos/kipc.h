@@ -10,12 +10,42 @@
 #ifndef __NUCLEOS_KIPC_H
 #define __NUCLEOS_KIPC_H
 
-/* This header file defines constants for nucleos inter-process communication.
- * These definitions are used in the file proc.c.
- */
+/* System call numbers that are passed when trapping to the kernel. */
+#define KIPC_SEND	1	/* blocking send */
+#define KIPC_RECEIVE	2	/* blocking receive */
+#define KIPC_SENDREC	3	/* KIPC_SEND + KIPC_RECEIVE */
+#define KIPC_NOTIFY	4	/* asynchronous notify */
+#define KIPC_SENDNB	5	/* nonblocking send */
+#define KIPC_SENDA	16	/* asynchronous send */
+
+/*==========================================================================* 
+ * Types relating to messages. 						    *
+ *==========================================================================*/ 
+
+/* message flags */
+#define KIPC_FLG_M3_STRLEN	14	/* string length */
+
+/* Defines for flags field */
+#define AMF_EMPTY	0	/* slot is not inuse */
+#define AMF_VALID	1	/* slot contains message */
+#define AMF_DONE	2	/* Kernel has processed the message. The
+				 * result is stored in 'result'
+				 */
+#define AMF_NOTIFY	4	/* Send a notification when AMF_DONE is set */
+#define AMF_NOREPLY	8	/* Not a reply message for a KIPC_SENDREC */
+
+#if defined(__KERNEL__) || defined(__UKERNEL__)
+#ifndef __ASSEMBLY__
+
 #include <nucleos/types.h>
 #include <nucleos/type.h>
-#include <nucleos/kipc_defs.h>
+
+/* Masks and flags for system calls. */
+#define NON_BLOCKING	0x0080  /* do not block if target not ready */
+
+#define WILLRECEIVE(target, source_ep) \
+	((RTS_ISSET(target, RTS_RECEIVING) && !RTS_ISSET(target, RTS_SENDING)) && \
+		(target->p_getfrom_e == ENDPT_ANY || target->p_getfrom_e == source_ep))
 
 typedef struct kipc_msg {
 	endpoint_t m_source;	/* who sent the message */
@@ -78,5 +108,8 @@ static inline int kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr)
 {
 	return __kipc_sendrec(src_dst, m_ptr);
 }
+
+#endif /* __ASSEMBLY__ */
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_KIPC_H */

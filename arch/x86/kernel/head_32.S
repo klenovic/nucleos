@@ -47,7 +47,7 @@
    and modified by the boot monitor before the kernel starts. */
 #include <nucleos/const.h>
 #include <nucleos/com.h>
-#include <nucleos/kipc_defs.h>
+#include <nucleos/kipc.h>
 #include <nucleos/linkage.h>
 #include <kernel/const.h>
 #include <kernel/proc.h>
