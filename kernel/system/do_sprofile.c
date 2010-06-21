@@ -11,12 +11,12 @@
  *   m_type:    SYS_SPROFILE
  *
  * The parameters for this kernel call are:
- *    m7_i1:    PROF_ACTION       (start/stop profiling)
- *    m7_i2:    PROF_MEM_SIZE     (available memory for data)
- *    m7_i3:    PROF_FREQ         (requested sample frequency)
- *    m7_i4:    PROF_ENDPT        (endpoint of caller)
- *    m7_p1:    PROF_CTL_PTR      (location of info struct)
- *    m7_p2:    PROF_MEM_PTR      (location of memory for data)
+ *    m_data1:    PROF_ACTION       (start/stop profiling)
+ *    m_data2:    PROF_MEM_SIZE     (available memory for data)
+ *    m_data3:    PROF_FREQ         (requested sample frequency)
+ *    m_data4:    PROF_ENDPT        (endpoint of caller)
+ *    m_data5:    PROF_CTL_PTR      (location of info struct)
+ *    m_data6:    PROF_MEM_PTR      (location of memory for data)
  *
  * Changes:
  *   14 Aug, 2006   Created (Rogier Meurs)

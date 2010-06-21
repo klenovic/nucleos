@@ -24,7 +24,7 @@ u8_t busnr;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_RESCAN;
-	m.m1_i1= busnr;
+	m.m_data1= busnr;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)

@@ -50,7 +50,7 @@
 **  |DL_TASK_REPL| port nr | proc nr |rd-count| err|stat| clock   | (21)
 **  +------------+---------+---------+--------+---------+---------+
 **
-**    m_type       m3_i1     m3_i2      m3_ca1
+**    m_type       m_data1     m_data2      m_data10
 **  +------------+---------+---------+---------------+
 **  |DL_CONF_REPL| port nr |last port| ethernet addr | (20)
 **  +------------+---------+---------+---------------+
@@ -348,14 +348,14 @@ static void do_init(kipc_msg_t * mp)
 
 	    default:	break;
 	}
-	*(ether_addr_t *) reply_mess.m3_ca1 = dep->de_address;
+	*(ether_addr_t *) reply_mess.m_data10 = dep->de_address;
 
   } else			/* Port number is out of range */
 	port = -ENXIO;
 
   reply_mess.m_type = DL_CONF_REPLY;
-  reply_mess.m3_i1 = port;
-  reply_mess.m3_i2 = DE_PORT_NR;
+  reply_mess.m_data1 = port;
+  reply_mess.m_data2 = DE_PORT_NR;
   DEBUG(printf("\t reply %d\n", reply_mess.m_type));
   if (kipc_send(mp->m_source, &reply_mess) != 0)	/* Can't send */
 	panic(dep->de_name, SendErrMsg, mp->m_source);

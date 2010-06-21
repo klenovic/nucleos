@@ -649,9 +649,9 @@ void vm_notify_sig_wrapper(endpoint_t ep)
   }
 }
 
-#define p_set		m1_p1
-#define how_value	m1_i1
-#define p_oldset	m1_p2
+#define p_set		m_data4
+#define how_value	m_data1
+#define p_oldset	m_data5
 
 int scall_sigpending(void)
 {
@@ -778,8 +778,8 @@ int scall_sigsuspend(void)
 	return SUSPEND;
 }
 
-#define p_sig_context	m2_p1
-#define v_sig_set	m2_l1
+#define p_sig_context	m_data6
+#define v_sig_set	m_data4
 
 int scall_sigreturn(void)
 {

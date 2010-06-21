@@ -37,10 +37,10 @@ u16_t did;
 	}
 
 	m.m_type= BUSC_PCI_DEV_NAME_S;
-	m.m7_i1= vid;
-	m.m7_i2= did;
-	m.m7_i3= sizeof(name);
-	m.m7_i4= gid;
+	m.m_data1= vid;
+	m.m_data2= did;
+	m.m_data3= sizeof(name);
+	m.m_data4= gid;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	cpf_revoke(gid);

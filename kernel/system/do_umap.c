@@ -11,11 +11,11 @@
  *   m_type:	SYS_UMAP
  *
  * The parameters for this kernel call are:
- *    m5_i1:	CP_SRC_PROC_NR	(process number)	
- *    m5_c1:	CP_SRC_SPACE	(segment where address is: T, D, or S)
- *    m5_l1:	CP_SRC_ADDR	(virtual address)	
- *    m5_l2:	CP_DST_ADDR	(returns physical address)	
- *    m5_l3:	CP_NR_BYTES	(size of datastructure) 	
+ *    m_data3:	CP_SRC_PROC_NR	(process number)	
+ *    m_data1:	CP_SRC_SPACE	(segment where address is: T, D, or S)
+ *    m_data5:	CP_SRC_ADDR	(virtual address)	
+ *    m_data6:	CP_DST_ADDR	(returns physical address)	
+ *    m_data7:	CP_NR_BYTES	(size of datastructure) 	
  */
 
 #include <kernel/system.h>

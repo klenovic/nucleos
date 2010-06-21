@@ -11,10 +11,10 @@
  *   m_type:	SYS_TRACE
  *
  * The parameters for this kernel call are:
- *    m2_i1:	CTL_ENDPT	process that is traced
- *    m2_i2:    CTL_REQUEST	trace request
- *    m2_l1:    CTL_ADDRESS     address at traced process' space
- *    m2_l2:    CTL_DATA        data to be written or returned here
+ *    m_data1:	CTL_ENDPT	process that is traced
+ *    m_data2:    CTL_REQUEST	trace request
+ *    m_data4:    CTL_ADDRESS     address at traced process' space
+ *    m_data5:    CTL_DATA        data to be written or returned here
  */
 
 #include <kernel/system.h>

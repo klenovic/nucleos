@@ -41,7 +41,7 @@ endpoint_t proc_ep;
 
 
 	m.m_type= BUSC_PCI_DEL_ACL;
-	m.m1_i1= proc_ep;
+	m.m_data1= proc_ep;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)

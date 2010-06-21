@@ -20,76 +20,17 @@
 typedef struct kipc_msg {
 	endpoint_t m_source;	/* who sent the message */
 	int m_type;		/* what kind of message is it */
-	__s32 m1;
-	__s32 m2;
-	__s32 m3;
-	__s32 m4;
-	__s32 m5;
-	__s32 m6;
-	__s32 m7;
-	__s32 m8;
-	__s32 m9;
-	__s8 m10[KIPC_FLG_M3_STRLEN];
+	__s32 m_data1;
+	__s32 m_data2;
+	__s32 m_data3;
+	__s32 m_data4;
+	__s32 m_data5;
+	__s32 m_data6;
+	__s32 m_data7;
+	__s32 m_data8;
+	__s32 m_data9;
+	__s8 m_data10[KIPC_FLG_M3_STRLEN];
 } kipc_msg_t;
-
-/* The following defines provide names for useful members. */
-#define m1_i1  m1
-#define m1_i2  m2
-#define m1_i3  m3
-#define m1_p1  m4
-#define m1_p2  m5
-#define m1_p3  m6
-
-#define m2_i1  m1
-#define m2_i2  m2
-#define m2_i3  m3
-#define m2_l1  m4
-#define m2_l2  m5
-#define m2_p1  m6
-#define m2_s1  m7
-
-#define m3_i1  m1
-#define m3_i2  m2
-#define m3_p1  m3
-#define m3_ca1 m10
-
-#define m4_l1  m1
-#define m4_l2  m2
-#define m4_l3  m3
-#define m4_l4  m4
-#define m4_l5  m5
-
-#define m5_c1  m1
-#define m5_c2  m2
-#define m5_i1  m3
-#define m5_i2  m4
-#define m5_l1  m5
-#define m5_l2  m6
-#define m5_l3  m7
-
-#define m7_i1  m1
-#define m7_i2  m2
-#define m7_i3  m3
-#define m7_i4  m4
-#define m7_p1  m5
-#define m7_p2  m6
-
-#define m8_i1  m1
-#define m8_i2  m2
-#define m8_p1  m3
-#define m8_p2  m4
-#define m8_p3  m5
-#define m8_p4  m6
-
-#define m9_l1  m1
-#define m9_l2  m2
-#define m9_l3  m3
-#define m9_l4  m4
-#define m9_l5  m5
-#define m9_s1  m6
-#define m9_s2  m7
-#define m9_s3  m8
-#define m9_s4  m9
 
 /*==========================================================================* 
  * Nucleos run-time system (IPC). 					    *

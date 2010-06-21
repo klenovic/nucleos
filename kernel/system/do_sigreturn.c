@@ -11,8 +11,8 @@
  *   m_type:	SYS_SIGRETURN
  *
  * The parameters for this kernel call are:
- *     m2_i1:	SIG_ENDPT  	# process returning from handler
- *     m2_p1:	SIG_CTXT_PTR 	# pointer to sigcontext structure
+ *     m_data1:	SIG_ENDPT  	# process returning from handler
+ *     m_data6:	SIG_CTXT_PTR 	# pointer to sigcontext structure
  *
  */
 

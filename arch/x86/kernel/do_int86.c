@@ -11,7 +11,7 @@
  *   m_type:	SYS_INT86
  *
  * The parameters for this kernel call are:
- *    m1_p1:	INT86_REG86     
+ *    m_data4:	INT86_REG86     
  */
 
 #include <kernel/system.h>

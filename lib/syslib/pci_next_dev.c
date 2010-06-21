@@ -26,7 +26,7 @@ u16_t *didp;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_NEXT_DEV;
-	m.m1_i1= *devindp;
+	m.m_data1= *devindp;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
@@ -34,9 +34,9 @@ u16_t *didp;
 
 	if (m.m_type == 1)
 	{
-		*devindp= m.m1_i1;
-		*vidp= m.m1_i2;
-		*didp= m.m1_i3;
+		*devindp= m.m_data1;
+		*vidp= m.m_data2;
+		*didp= m.m_data3;
 #if 0
 		printf("pci_next_dev: got device %d, %04x/%04x\n", 
 			*devindp, *vidp, *didp);

@@ -209,7 +209,7 @@ int do_truncate()
   int r;
 
   /* Temporarily open file */
-  if (fetch_name(user_fullpath, PATH_MAX, m_in.m2_p1) < 0) return(err_code);
+  if (fetch_name(user_fullpath, PATH_MAX, m_in.m_data6) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
   
   /* Ask FS to truncate the file */
@@ -232,9 +232,9 @@ int do_ftruncate()
   struct filp *rfilp;
   
   /* File is already opened; get a vnode pointer from filp */
-  if ((rfilp = get_filp(m_in.m2_i1)) == NIL_FILP) return(err_code);
+  if ((rfilp = get_filp(m_in.m_data1)) == NIL_FILP) return(err_code);
   if (!(rfilp->filp_mode & W_BIT)) return(-EBADF);
-  return truncate_vnode(rfilp->filp_vno, m_in.m2_l1);
+  return truncate_vnode(rfilp->filp_vno, m_in.m_data4);
 }
 
 

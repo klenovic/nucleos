@@ -14,10 +14,10 @@
  *   m_type:	SYS_VTIMER
  *
  * The parameters for this kernel call are:
- *    m2_i1:	VT_WHICH		(the timer: VT_VIRTUAL or VT_PROF)
- *    m2_i2:	VT_SET			(whether to set, or just retrieve)
- *    m2_l1:	VT_VALUE		(new/old expiration time, in ticks)
- *    m2_l2:	VT_ENDPT		(process to which the timer belongs)
+ *    m_data1:	VT_WHICH		(the timer: VT_VIRTUAL or VT_PROF)
+ *    m_data2:	VT_SET			(whether to set, or just retrieve)
+ *    m_data4:	VT_VALUE		(new/old expiration time, in ticks)
+ *    m_data5:	VT_ENDPT		(process to which the timer belongs)
  */
 
 #include <kernel/system.h>

@@ -11,8 +11,8 @@
  *   m_type:    SYS_PROFBUF
  *
  * The parameters for this kernel call are:
- *    m7_p1:    PROF_CTL_PTR      (location of control struct)
- *    m7_p2:    PROF_MEM_PTR      (location of profiling table)
+ *    m_data5:    PROF_CTL_PTR      (location of control struct)
+ *    m_data6:    PROF_MEM_PTR      (location of profiling table)
  *
  * Changes:
  *   14 Aug, 2006   Created (Rogier Meurs)

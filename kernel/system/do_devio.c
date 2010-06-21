@@ -11,9 +11,9 @@
  *   m_type:	SYS_DEVIO
  *
  * The parameters for this kernel call are:
- *   m2_i3:	DIO_REQUEST	(request input or output)	
- *   m2_l1:	DIO_PORT	(port to read/ write)	
- *   m2_l2:	DIO_VALUE	(value to write/ return value read)	
+ *   m_data3:	DIO_REQUEST	(request input or output)	
+ *   m_data4:	DIO_PORT	(port to read/ write)	
+ *   m_data5:	DIO_VALUE	(value to write/ return value read)	
  */
 
 #include <kernel/system.h>

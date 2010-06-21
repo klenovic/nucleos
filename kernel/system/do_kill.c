@@ -11,8 +11,8 @@
  *   m_type:	SYS_KILL
  *
  * The parameters for this kernel call are:
- *     m2_i1:	SIG_ENDPT  	# process to signal/ pending		
- *     m2_i2:	SIG_NUMBER	# signal number to send to process
+ *     m_data1:	SIG_ENDPT  	# process to signal/ pending		
+ *     m_data2:	SIG_NUMBER	# signal number to send to process
  */
 
 #include <kernel/system.h>

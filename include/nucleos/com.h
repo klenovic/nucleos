@@ -129,8 +129,8 @@
 #define NOTIFY_FROM(p_nr)	 (NOTIFY_MESSAGE | ((p_nr) + NR_TASKS)) 
 
 /* Shorthands for message parameters passed with notifications. */
-#define NOTIFY_ARG		m2_l1
-#define NOTIFY_TIMESTAMP	m2_l2
+#define NOTIFY_ARG		m_data4
+#define NOTIFY_TIMESTAMP	m_data5
 
 /*===========================================================================*
  *                Messages for BUS controller drivers 			     *
@@ -236,34 +236,34 @@
 #define DEV_SEL_REPL2	(DEV_RS_BASE + 8) /* (opt) second reply to DEV_SELECT */
 
 /* Field names for messages to block and character device drivers. */
-#define DEVICE    	m2_i1	/* major-minor device */
-#define IO_ENDPT	m2_i2	/* which (proc/endpoint) wants I/O? */
-#define COUNT   	m2_i3	/* how many bytes to transfer */
-#define REQUEST 	m2_i3	/* ioctl request code */
-#define POSITION	m2_l1	/* file offset (low 4 bytes) */
-#define HIGHPOS		m2_l2	/* file offset (high 4 bytes) */
-#define ADDRESS 	m2_p1	/* core buffer address */
-#define IO_GRANT 	m2_p1	/* grant id (for DEV_*_S variants) */
+#define DEVICE    	m_data1	/* major-minor device */
+#define IO_ENDPT	m_data2	/* which (proc/endpoint) wants I/O? */
+#define COUNT   	m_data3	/* how many bytes to transfer */
+#define REQUEST 	m_data3	/* ioctl request code */
+#define POSITION	m_data4	/* file offset (low 4 bytes) */
+#define HIGHPOS		m_data5	/* file offset (high 4 bytes) */
+#define ADDRESS 	m_data6	/* core buffer address */
+#define IO_GRANT 	m_data6	/* grant id (for DEV_*_S variants) */
 
 /* Field names for DEV_SELECT messages to device drivers. */
-#define DEV_MINOR	m2_i1	/* minor device */
-#define DEV_SEL_OPS	m2_i2	/* which select operations are requested */
+#define DEV_MINOR	m_data1	/* minor device */
+#define DEV_SEL_OPS	m_data2	/* which select operations are requested */
 
 /* Field names used in reply messages from tasks. */
-#define REP_ENDPT	m2_i1	/* # of proc on whose behalf I/O was done */
-#define REP_STATUS	m2_i2	/* bytes transferred or error number */
-#define REP_IO_GRANT	m2_i3	/* DEV_REVIVE: grant by which I/O was done */
+#define REP_ENDPT	m_data1	/* # of proc on whose behalf I/O was done */
+#define REP_STATUS	m_data2	/* bytes transferred or error number */
+#define REP_IO_GRANT	m_data3	/* DEV_REVIVE: grant by which I/O was done */
 #  define SUSPEND 	 -998 	/* status to suspend caller, reply later */
 
 /* Field names for messages to TTY driver. */
 #define TTY_LINE	DEVICE	/* message parameter: terminal line */
 #define TTY_REQUEST	COUNT	/* message parameter: ioctl request code */
 #define TTY_SPEK	POSITION/* message parameter: ioctl speed, erasing */
-#define TTY_PGRP 	m2_i3	/* message parameter: process group */	
+#define TTY_PGRP 	m_data3	/* message parameter: process group */	
 
 /* Field names for the QIC 02 status reply from tape driver */
-#define TAPE_STAT0	m2_l1
-#define TAPE_STAT1	m2_l2
+#define TAPE_STAT0	m_data4
+#define TAPE_STAT1	m_data5
 
 /*===========================================================================*
  *                  	   Messages for networking layer		     *
@@ -301,15 +301,15 @@
 #define DL_STAT_REPLY	(DL_RS_BASE + 23)
 
 /* Field names for data link layer messages. */
-#define DL_PORT		m2_i1
-#define DL_PROC		m2_i2	/* endpoint */
-#define DL_COUNT	m2_i3
-#define DL_MODE		m2_l1
-#define DL_CLCK		m2_l2
-#define DL_ADDR		m2_p1
-#define DL_STAT		m2_l1
-#define DL_GRANT	m2_l2
-#define DL_NAME		m3_ca1
+#define DL_PORT		m_data1
+#define DL_PROC		m_data2	/* endpoint */
+#define DL_COUNT	m_data3
+#define DL_MODE		m_data4
+#define DL_CLCK		m_data5
+#define DL_ADDR		m_data6
+#define DL_STAT		m_data4
+#define DL_GRANT	m_data5
+#define DL_NAME		m_data10
 
 /* Bits in 'DL_STAT' field of DL replies. */
 #  define DL_PACK_SEND		0x01
@@ -407,21 +407,21 @@
 #define SYS_PARAM_SET_GRANT	1	/* Set address and size of grant table */
 
 /* Field names for SYS_MEMSET, SYS_SEGCTL. */
-#define MEM_PTR		m2_p1	/* base */
-#define MEM_COUNT	m2_l1	/* count */
-#define MEM_PATTERN	m2_l2   /* pattern to write */
-#define MEM_CHUNK_BASE	m4_l1	/* physical base address */
-#define MEM_CHUNK_SIZE	m4_l2	/* size of mem chunk */
-#define MEM_TOT_SIZE	m4_l3	/* total memory size */
-#define MEM_CHUNK_TAG	m4_l4	/* tag to identify chunk of mem */
+#define MEM_PTR		m_data6	/* base */
+#define MEM_COUNT	m_data4	/* count */
+#define MEM_PATTERN	m_data5   /* pattern to write */
+#define MEM_CHUNK_BASE	m_data1	/* physical base address */
+#define MEM_CHUNK_SIZE	m_data2	/* size of mem chunk */
+#define MEM_TOT_SIZE	m_data3	/* total memory size */
+#define MEM_CHUNK_TAG	m_data4	/* tag to identify chunk of mem */
 
 /* Field names for SYS_STRNLEN */
-#define STRNLEN_PROC_E	m1_i1	/* endpoint */
-#define STRNLEN_STR	m1_p1	/* string (user) */
-#define STRNLEN_MAXLEN	m1_i2   /* maxlen */
+#define STRNLEN_PROC_E	m_data1	/* endpoint */
+#define STRNLEN_STR	m_data4	/* string (user) */
+#define STRNLEN_MAXLEN	m_data2   /* maxlen */
 
 /* Field names for SYS_DEVIO, SYS_VDEVIO, SYS_SDEVIO. */
-#define DIO_REQUEST	m2_i3	/* device in or output */
+#define DIO_REQUEST	m_data3	/* device in or output */
 #   define _DIO_INPUT		0x001
 #   define _DIO_OUTPUT		0x002
 #   define _DIO_DIRMASK		0x00f
@@ -439,72 +439,72 @@
 #   define DIO_SAFE_INPUT_WORD      (_DIO_INPUT|_DIO_WORD|_DIO_SAFE)
 #   define DIO_SAFE_OUTPUT_BYTE     (_DIO_OUTPUT|_DIO_BYTE|_DIO_SAFE)
 #   define DIO_SAFE_OUTPUT_WORD     (_DIO_OUTPUT|_DIO_WORD|_DIO_SAFE)
-#define DIO_PORT	m2_l1	/* single port address */
-#define DIO_VALUE	m2_l2	/* single I/O value */
-#define DIO_VEC_ADDR	m2_p1   /* address of buffer or (p,v)-pairs */
-#define DIO_VEC_SIZE	m2_l2   /* number of elements in vector */
-#define DIO_VEC_ENDPT	m2_i2   /* number of process where vector is */
-#define DIO_OFFSET	m2_i1	/* offset from grant */
+#define DIO_PORT	m_data4	/* single port address */
+#define DIO_VALUE	m_data5	/* single I/O value */
+#define DIO_VEC_ADDR	m_data6   /* address of buffer or (p,v)-pairs */
+#define DIO_VEC_SIZE	m_data5   /* number of elements in vector */
+#define DIO_VEC_ENDPT	m_data2   /* number of process where vector is */
+#define DIO_OFFSET	m_data1	/* offset from grant */
 
 /* Field names for SYS_SIGNARLM, SYS_FLAGARLM, SYS_SYNCALRM. */
-#define ALRM_EXP_TIME   m2_l1	/* expire time for the alarm call */
-#define ALRM_ABS_TIME   m2_i2	/* set to 1 to use absolute alarm time */
-#define ALRM_TIME_LEFT  m2_l1	/* how many ticks were remaining */
-#define ALRM_ENDPT      m2_i1	/* which process wants the alarm? */
-#define ALRM_FLAG_PTR	m2_p1   /* virtual address of timeout flag */ 	
+#define ALRM_EXP_TIME   m_data4	/* expire time for the alarm call */
+#define ALRM_ABS_TIME   m_data2	/* set to 1 to use absolute alarm time */
+#define ALRM_TIME_LEFT  m_data4	/* how many ticks were remaining */
+#define ALRM_ENDPT      m_data1	/* which process wants the alarm? */
+#define ALRM_FLAG_PTR	m_data6   /* virtual address of timeout flag */ 	
 
 /* Field names for SYS_IRQCTL. */
-#define IRQ_REQUEST     m5_c1	/* what to do? */
+#define IRQ_REQUEST     m_data1	/* what to do? */
 #  define IRQ_SETPOLICY     1	/* manage a slot of the IRQ table */
 #  define IRQ_RMPOLICY      2	/* remove a slot of the IRQ table */
 #  define IRQ_ENABLE        3	/* enable interrupts */
 #  define IRQ_DISABLE       4	/* disable interrupts */
-#define IRQ_VECTOR	m5_c2   /* irq vector */
-#define IRQ_POLICY	m5_i1   /* options for IRQCTL request */
+#define IRQ_VECTOR	m_data2   /* irq vector */
+#define IRQ_POLICY	m_data3   /* options for IRQCTL request */
 #  define IRQ_REENABLE  0x001	/* reenable IRQ line after interrupt */
 #  define IRQ_BYTE      0x100	/* byte values */      
 #  define IRQ_WORD      0x200	/* word values */
 #  define IRQ_LONG      0x400	/* long values */
-#define IRQ_HOOK_ID	m5_l3   /* id of irq hook at kernel */
+#define IRQ_HOOK_ID	m_data7   /* id of irq hook at kernel */
 
 /* Field names for SYS_SEGCTL. */
-#define SEG_SELECT	m4_l1   /* segment selector returned */ 
-#define SEG_OFFSET	m4_l2	/* offset in segment returned */
-#define SEG_PHYS	m4_l3	/* physical address of segment */
-#define SEG_SIZE	m4_l4	/* segment size */
-#define SEG_INDEX	m4_l5	/* segment index in remote map */
+#define SEG_SELECT	m_data1   /* segment selector returned */ 
+#define SEG_OFFSET	m_data2	/* offset in segment returned */
+#define SEG_PHYS	m_data3	/* physical address of segment */
+#define SEG_SIZE	m_data4	/* segment size */
+#define SEG_INDEX	m_data5	/* segment index in remote map */
 
 /* Field names for SYS_VIDCOPY. */
-#define VID_REQUEST	m4_l1	/* what to do? */
+#define VID_REQUEST	m_data1	/* what to do? */
 #  define VID_VID_COPY	   1	/* request vid_vid_copy() */
 #  define MEM_VID_COPY     2	/* request mem_vid_copy() */
-#define VID_SRC_ADDR	m4_l2	/* virtual address in memory */
-#define VID_SRC_OFFSET	m4_l3	/* offset in video memory */
-#define VID_DST_OFFSET	m4_l4	/* offset in video memory */
-#define VID_CP_COUNT	m4_l5	/* number of words to be copied */
+#define VID_SRC_ADDR	m_data2	/* virtual address in memory */
+#define VID_SRC_OFFSET	m_data3	/* offset in video memory */
+#define VID_DST_OFFSET	m_data4	/* offset in video memory */
+#define VID_CP_COUNT	m_data5	/* number of words to be copied */
 
 /* Field names for SYS_ABORT. */
-#define ABRT_HOW	m1_i1	/* RBT_REBOOT, RBT_HALT, etc. */
-#define ABRT_MON_ENDPT  m1_i2	/* process where monitor params are */
-#define ABRT_MON_LEN	m1_i3	/* length of monitor params */
-#define ABRT_MON_ADDR   m1_p1	/* virtual address of monitor params */
+#define ABRT_HOW	m_data1	/* RBT_REBOOT, RBT_HALT, etc. */
+#define ABRT_MON_ENDPT  m_data2	/* process where monitor params are */
+#define ABRT_MON_LEN	m_data3	/* length of monitor params */
+#define ABRT_MON_ADDR   m_data4	/* virtual address of monitor params */
 
 /* Field names for _UMAP, _VIRCOPY, _PHYSCOPY. */
-#define CP_SRC_SPACE 	m5_c1	/* T or D space (stack is also D) */
-#define CP_SRC_ENDPT	m5_i1	/* process to copy from */
-#define CP_SRC_ADDR	m5_l1	/* address where data come from */
-#define CP_DST_SPACE	m5_c2	/* T or D space (stack is also D) */
-#define CP_DST_ENDPT	m5_i2	/* process to copy to */
-#define CP_DST_ADDR	m5_l2	/* address where data go to */
-#define CP_NR_BYTES	m5_l3	/* number of bytes to copy */
+#define CP_SRC_SPACE 	m_data1	/* T or D space (stack is also D) */
+#define CP_SRC_ENDPT	m_data3	/* process to copy from */
+#define CP_SRC_ADDR	m_data5	/* address where data come from */
+#define CP_DST_SPACE	m_data2	/* T or D space (stack is also D) */
+#define CP_DST_ENDPT	m_data4	/* process to copy to */
+#define CP_DST_ADDR	m_data6	/* address where data go to */
+#define CP_NR_BYTES	m_data7	/* number of bytes to copy */
 
 /* Field names for SYS_VCOPY and SYS_VVIRCOPY. */
-#define VCP_NR_OK	m1_i2	/* number of successfull copies */
-#define VCP_VEC_SIZE	m1_i3	/* size of copy vector */
-#define VCP_VEC_ADDR	m1_p1	/* pointer to copy vector */
+#define VCP_NR_OK	m_data2	/* number of successfull copies */
+#define VCP_VEC_SIZE	m_data3	/* size of copy vector */
+#define VCP_VEC_ADDR	m_data4	/* pointer to copy vector */
 
 /* Field names for SYS_GETINFO. */
-#define I_REQUEST      m7_i3	/* what info to get */
+#define I_REQUEST      m_data3	/* what info to get */
 #   define GET_KINFO	   0	/* get kernel information structure */
 #   define GET_IMAGE	   1	/* get system image table */
 #   define GET_PROCTAB	   2	/* get kernel process table */
@@ -529,145 +529,145 @@
 #   define GET_IDLETSC	  21	/* get cumulative idle time stamp counter */
 #   define GET_AOUTHEADER 22	/* get a.out headers from the boot image */
 #   define GET_BOOTPARAM  23	/* get boot params */
-#define I_ENDPT      m7_i4	/* calling process */
-#define I_VAL_PTR      m7_p1	/* virtual address at caller */ 
-#define I_VAL_LEN      m7_i1	/* max length of value */
-#define I_VAL_PTR2     m7_p2	/* second virtual address */ 
-#define I_VAL_LEN2_E   m7_i2	/* second length, or proc nr */
+#define I_ENDPT      m_data4	/* calling process */
+#define I_VAL_PTR      m_data5	/* virtual address at caller */ 
+#define I_VAL_LEN      m_data1	/* max length of value */
+#define I_VAL_PTR2     m_data6	/* second virtual address */ 
+#define I_VAL_LEN2_E   m_data2	/* second length, or proc nr */
 
 /* GET_WHOAMI fields. */
-#define GIWHO_EP	m3_i1
-#define GIWHO_NAME 	m3_ca1
+#define GIWHO_EP	m_data1
+#define GIWHO_NAME 	m_data10
 
 /* Field names for SYS_TIMES. */
-#define T_ENDPT      m4_l1	/* process to request time info for */
-#define T_USER_TIME    m4_l1	/* user time consumed by process */
-#define T_SYSTEM_TIME  m4_l2	/* system time consumed by process */
-#define T_BOOTTIME	m4_l3	/* Boottime in seconds (also for SYS_STIME) */
-#define T_BOOT_TICKS   m4_l5	/* number of clock ticks since boot time */
+#define T_ENDPT      m_data1	/* process to request time info for */
+#define T_USER_TIME    m_data1	/* user time consumed by process */
+#define T_SYSTEM_TIME  m_data2	/* system time consumed by process */
+#define T_BOOTTIME	m_data3	/* Boottime in seconds (also for SYS_STIME) */
+#define T_BOOT_TICKS   m_data5	/* number of clock ticks since boot time */
 
 /* vm_map */
-#define VM_MAP_ENDPT		m4_l1
-#define VM_MAP_MAPUNMAP		m4_l2
-#define VM_MAP_BASE		m4_l3
-#define VM_MAP_SIZE		m4_l4
-#define VM_MAP_ADDR		m4_l5
+#define VM_MAP_ENDPT		m_data1
+#define VM_MAP_MAPUNMAP		m_data2
+#define VM_MAP_BASE		m_data3
+#define VM_MAP_SIZE		m_data4
+#define VM_MAP_ADDR		m_data5
 
 /* Field names for SYS_TRACE, SYS_PRIVCTL. */
-#define CTL_ENDPT    m2_i1	/* process number of the caller */
-#define CTL_REQUEST    m2_i2	/* server control request */
-#define CTL_ARG_PTR    m2_p1	/* pointer to argument */
-#define CTL_ADDRESS    m2_l1	/* address at traced process' space */
-#define CTL_DATA       m2_l2	/* data field for tracing */
+#define CTL_ENDPT    m_data1	/* process number of the caller */
+#define CTL_REQUEST    m_data2	/* server control request */
+#define CTL_ARG_PTR    m_data6	/* pointer to argument */
+#define CTL_ADDRESS    m_data4	/* address at traced process' space */
+#define CTL_DATA       m_data5	/* data field for tracing */
 
 /* SYS_PRIVCTL with CTL_REQUEST == SYS_PRIV_QUERY_MEM */
-#define CTL_PHYSSTART  m2_l1	/* physical memory start in bytes*/
-#define CTL_PHYSLEN    m2_l2	/* length in bytes */
+#define CTL_PHYSSTART  m_data4	/* physical memory start in bytes*/
+#define CTL_PHYSLEN    m_data5	/* length in bytes */
 
 /* Field names for SYS_SETGRANT */
-#define SG_ADDR		m2_p1	/* address */
-#define SG_SIZE		m2_i2	/* no. of entries */
+#define SG_ADDR		m_data6	/* address */
+#define SG_SIZE		m_data2	/* no. of entries */
 
 /* Field names for SYS_KILL, SYS_SIGCTL */
-#define SIG_REQUEST    m2_l2	/* PM signal control request */
+#define SIG_REQUEST    m_data5	/* PM signal control request */
 #define S_GETSIG 	   0	/* get pending kernel signal */
 #define S_ENDSIG 	   1	/* finish a kernel signal */
 #define S_SENDSIG   	   2	/* POSIX style signal handling */
 #define S_SIGRETURN	   3 	/* return from POSIX handling */
 #define S_KILL		   4 	/* servers kills process with signal */
-#define SIG_ENDPT       m2_i1	/* process number for inform */
-#define SIG_NUMBER     m2_i2	/* signal number to send */
-#define SIG_FLAGS      m2_i3	/* signal flags field */
-#define SIG_MAP        m2_l1	/* used by kernel to pass signal bit map */
-#define SIG_CTXT_PTR   m2_p1	/* pointer to info to restore signal context */
+#define SIG_ENDPT       m_data1	/* process number for inform */
+#define SIG_NUMBER     m_data2	/* signal number to send */
+#define SIG_FLAGS      m_data3	/* signal flags field */
+#define SIG_MAP        m_data4	/* used by kernel to pass signal bit map */
+#define SIG_CTXT_PTR   m_data6	/* pointer to info to restore signal context */
 
 /* Field names for SYS_FORK, _EXEC, _EXIT, _NEWMAP. */
-#define PR_ENDPT       m1_i1	/* indicates a process */
-#define PR_PRIORITY    m1_i2	/* process priority */
-#define PR_SLOT        m1_i2	/* indicates a process slot */
-#define PR_PID	       m1_i3	/* process id at process manager */
-#define PR_STACK_PTR   m1_p1	/* used for stack ptr in sys_exec, sys_getsp */
-#define PR_TRACING     m1_i3	/* flag to indicate tracing is on/ off */
-#define PR_NAME_PTR    m1_p2	/* tells where program name is for dmp */
-#define PR_IP_PTR      m1_p3	/* initial value for ip after exec */
-#define PR_MEM_PTR     m1_p1	/* tells where memory map is for sys_newmap
+#define PR_ENDPT       m_data1	/* indicates a process */
+#define PR_PRIORITY    m_data2	/* process priority */
+#define PR_SLOT        m_data2	/* indicates a process slot */
+#define PR_PID	       m_data3	/* process id at process manager */
+#define PR_STACK_PTR   m_data4	/* used for stack ptr in sys_exec, sys_getsp */
+#define PR_TRACING     m_data3	/* flag to indicate tracing is on/ off */
+#define PR_NAME_PTR    m_data5	/* tells where program name is for dmp */
+#define PR_IP_PTR      m_data6	/* initial value for ip after exec */
+#define PR_MEM_PTR     m_data4	/* tells where memory map is for sys_newmap
 				 * and sys_fork
 				 */
-#define PR_FORK_FLAGS	m1_i3
-#define PR_FORK_MSGADDR m1_p1
+#define PR_FORK_FLAGS	m_data3
+#define PR_FORK_MSGADDR m_data4
 
 /* Field names for SYS_INT86 */
-#define INT86_REG86    m1_p1	/* pointer to registers */
+#define INT86_REG86    m_data4	/* pointer to registers */
 
 /* Flags for PR_FORK_FLAGS. */
 #define PFF_VMINHIBIT	0x01	/* Don't schedule until release by VM. */
 
 /* Field names for SYS_SAFECOPY* */
-#define SCP_FROM_TO	m2_i1	/* from/to whom? */
-#define SCP_INFO	m2_i2	/* byte: DDDDSSSS Dest and Src seg */
-#define SCP_GID		m2_i3	/* grant id */
-#define SCP_OFFSET	m2_l1	/* offset within grant */
-#define	SCP_ADDRESS	m2_p1	/* my own address */
-#define	SCP_BYTES	m2_l2	/* bytes from offset */
+#define SCP_FROM_TO	m_data1	/* from/to whom? */
+#define SCP_INFO	m_data2	/* byte: DDDDSSSS Dest and Src seg */
+#define SCP_GID		m_data3	/* grant id */
+#define SCP_OFFSET	m_data4	/* offset within grant */
+#define	SCP_ADDRESS	m_data6	/* my own address */
+#define	SCP_BYTES	m_data5	/* bytes from offset */
 
 /* Field names for SYS_VSAFECOPY* */
-#define VSCP_VEC_ADDR	m2_p1	/* start of vector */
-#define VSCP_VEC_SIZE	m2_l2	/* elements in vector */
+#define VSCP_VEC_ADDR	m_data6	/* start of vector */
+#define VSCP_VEC_SIZE	m_data5	/* elements in vector */
 
 /* For the SCP_INFO field: encoding and decoding. */
 #define SCP_MAKEINFO(seg)  ((seg) & 0xffff)
 #define SCP_INFO2SEG(info) ((info) & 0xffff)
 
 /* Field names for SELECT (FS_PROC_NR). */
-#define SEL_NFDS       m8_i1
-#define SEL_READFDS    m8_p1
-#define SEL_WRITEFDS   m8_p2
-#define SEL_ERRORFDS   m8_p3
-#define SEL_TIMEOUT    m8_p4
+#define SEL_NFDS       m_data1
+#define SEL_READFDS    m_data3
+#define SEL_WRITEFDS   m_data4
+#define SEL_ERRORFDS   m_data5
+#define SEL_TIMEOUT    m_data6
 
 /* Field names for SYS_SPROF, _CPROF, _PROFBUF. */
-#define PROF_ACTION    m7_i1    /* start/stop/reset/get */
-#define PROF_MEM_SIZE  m7_i2    /* available memory for data */ 
-#define PROF_FREQ      m7_i3    /* sample frequency */
-#define PROF_ENDPT     m7_i4    /* endpoint of caller */
-#define PROF_CTL_PTR   m7_p1    /* location of info struct */
-#define PROF_MEM_PTR   m7_p2    /* location of profiling data */
+#define PROF_ACTION    m_data1    /* start/stop/reset/get */
+#define PROF_MEM_SIZE  m_data2    /* available memory for data */ 
+#define PROF_FREQ      m_data3    /* sample frequency */
+#define PROF_ENDPT     m_data4    /* endpoint of caller */
+#define PROF_CTL_PTR   m_data5    /* location of info struct */
+#define PROF_MEM_PTR   m_data6    /* location of profiling data */
 
 /* Field names for GETSYSINFO_UP (PM). */
-#define SIU_WHAT	m2_i1
-#define SIU_LEN		m2_i2
-#define SIU_WHERE	m2_p1
+#define SIU_WHAT	m_data1
+#define SIU_LEN		m_data2
+#define SIU_WHERE	m_data6
 
 /* Message for SYS_READBIOS */
-#define RDB_SIZE	m2_i1
-#define RDB_ADDR	m2_l1
-#define RDB_BUF		m2_p1
+#define RDB_SIZE	m_data1
+#define RDB_ADDR	m_data4
+#define RDB_BUF		m_data6
 
 /* Field names for SYS_VMCTL. */
-#define SVMCTL_WHO	m1_i1
-#define SVMCTL_PARAM	m1_i2	/* All SYS_VMCTL requests. */
-#define SVMCTL_VALUE	m1_i3
-#define SVMCTL_PF_WHO		m1_i1	/* GET_PAGEFAULT reply: process ep */
-#define SVMCTL_PF_I386_CR2	m1_i2	/* GET_PAGEFAULT reply: CR2 */
-#define SVMCTL_PF_I386_ERR	m1_i3	/* GET_PAGEFAULT reply: error code */
-#define SVMCTL_MRG_ADDR		m1_p1	/* MEMREQ_GET reply: address */
-#define SVMCTL_MRG_LEN		m1_i1	/* MEMREQ_GET reply: length */
-#define SVMCTL_MRG_WRITE	m1_i2	/* MEMREQ_GET reply: writeflag */
-#define SVMCTL_MRG_EP		m1_i3	/* MEMREQ_GET reply: process */
-#define SVMCTL_MRG_REQUESTOR	m1_p2	/* MEMREQ_GET reply: requestor */
-#define SVMCTL_MAP_VIR_ADDR	m1_p1
+#define SVMCTL_WHO	m_data1
+#define SVMCTL_PARAM	m_data2	/* All SYS_VMCTL requests. */
+#define SVMCTL_VALUE	m_data3
+#define SVMCTL_PF_WHO		m_data1	/* GET_PAGEFAULT reply: process ep */
+#define SVMCTL_PF_I386_CR2	m_data2	/* GET_PAGEFAULT reply: CR2 */
+#define SVMCTL_PF_I386_ERR	m_data3	/* GET_PAGEFAULT reply: error code */
+#define SVMCTL_MRG_ADDR		m_data4	/* MEMREQ_GET reply: address */
+#define SVMCTL_MRG_LEN		m_data1	/* MEMREQ_GET reply: length */
+#define SVMCTL_MRG_WRITE	m_data2	/* MEMREQ_GET reply: writeflag */
+#define SVMCTL_MRG_EP		m_data3	/* MEMREQ_GET reply: process */
+#define SVMCTL_MRG_REQUESTOR	m_data5	/* MEMREQ_GET reply: requestor */
+#define SVMCTL_MAP_VIR_ADDR	m_data4
 
 /* Reply message for VMCTL_KERN_PHYSMAP */
-#define SVMCTL_MAP_FLAGS	m2_i1	/* VMMF_* */
-#define SVMCTL_MAP_PHYS_ADDR	m2_l1
-#define SVMCTL_MAP_PHYS_LEN	m2_l2
+#define SVMCTL_MAP_FLAGS	m_data1	/* VMMF_* */
+#define SVMCTL_MAP_PHYS_ADDR	m_data4
+#define SVMCTL_MAP_PHYS_LEN	m_data5
 
 #define VMMF_UNCACHED		(1L << 0)
 
 /* Codes and field names for SYS_SYSCTL. */
-#define SYSCTL_CODE		m1_i1	/* SYSCTL_CODE_* below */
-#define SYSCTL_ARG1		m1_p1
-#define SYSCTL_ARG2		m1_i2
+#define SYSCTL_CODE		m_data1	/* SYSCTL_CODE_* below */
+#define SYSCTL_ARG1		m_data4
+#define SYSCTL_ARG2		m_data2
 #define SYSCTL_CODE_DIAG	1	/* Print diagnostics. */
 #define SYSCTL_CODE_STACKTRACE	2	/* Print process stack. */
 #define DIAG_BUFSIZE	(80*25)
@@ -691,19 +691,19 @@
 #define VMCTL_KERN_MAP_REPLY	28
 
 /* Field names for SYS_VTIMER. */
-#define VT_WHICH	m2_i1	/* which timer to set/retrieve */
+#define VT_WHICH	m_data1	/* which timer to set/retrieve */
 #  define VT_VIRTUAL        1	/* the ITIMER_VIRTUAL timer */
 #  define VT_PROF           2	/* the ITIMER_PROF timer */
-#define VT_SET		m2_i2	/* 1 for setting a timer, 0 retrieval only */
-#define VT_VALUE	m2_l1	/* new/previous value of the timer */
-#define VT_ENDPT	m2_l2	/* process to set/retrieve the timer for */
+#define VT_SET		m_data2	/* 1 for setting a timer, 0 retrieval only */
+#define VT_VALUE	m_data4	/* new/previous value of the timer */
+#define VT_ENDPT	m_data5	/* process to set/retrieve the timer for */
 
 /* Field names for SYS_RUNCTL. */
-#define RC_ENDPT	m1_i1	/* which process to stop or resume */
-#define RC_ACTION	m1_i2	/* set or clear stop flag */
+#define RC_ENDPT	m_data1	/* which process to stop or resume */
+#define RC_ACTION	m_data2	/* set or clear stop flag */
 #  define RC_STOP           0	/* stop the process */
 #  define RC_RESUME         1	/* clear the stop flag */
-#define RC_FLAGS	m1_i3	/* request flags */
+#define RC_FLAGS	m_data3	/* request flags */
 #  define RC_DELAY          1	/* delay stop if process is sending */
 
 /*===========================================================================*
@@ -720,15 +720,15 @@
 
 #define RS_LOOKUP	(RS_RQ_BASE + 8)	/* lookup server name */
 
-#  define RS_CMD_ADDR		m1_p1		/* command string */
-#  define RS_CMD_LEN		m1_i1		/* length of command */
-#  define RS_PERIOD 	        m1_i2		/* heartbeat period */
-#  define RS_DEV_MAJOR          m1_i3           /* major device number */
+#  define RS_CMD_ADDR		m_data4		/* command string */
+#  define RS_CMD_LEN		m_data1		/* length of command */
+#  define RS_PERIOD 	        m_data2		/* heartbeat period */
+#  define RS_DEV_MAJOR          m_data3           /* major device number */
 
-#  define RS_ENDPOINT		m1_i1		/* endpoint number in reply */
+#  define RS_ENDPOINT		m_data1		/* endpoint number in reply */
 
-#  define RS_NAME		m1_p1		/* name */
-#  define RS_NAME_LEN		m1_i1		/* namelen */
+#  define RS_NAME		m_data4		/* name */
+#  define RS_NAME_LEN		m_data1		/* namelen */
 
 /*===========================================================================*
  *                Messages for the Data Store Server			     *
@@ -742,13 +742,13 @@
 #define DS_CHECK	(DS_RQ_BASE + 3)	/* retrieve updated information */
 
 /* DS field names: DS_SUBSCRIBE, DS_PUBLISH, DS_RETRIEVE */
-#  define DS_KEY_GRANT		m2_p1		/* key for the information */
-#  define DS_KEY_LEN		m2_i1		/* length of key incl. '\0' */
-#  define DS_FLAGS		m2_i2		/* flags provided by caller */
+#  define DS_KEY_GRANT		m_data6		/* key for the information */
+#  define DS_KEY_LEN		m_data1		/* length of key incl. '\0' */
+#  define DS_FLAGS		m_data2		/* flags provided by caller */
 
 /* DS_PUBLISH, DS_RETRIEVE */
-#  define DS_VAL		m2_l1		/* data (u32, char *, etc.) */
-#  define DS_VAL_LEN		m2_l2		/* data length */
+#  define DS_VAL		m_data4		/* data (u32, char *, etc.) */
+#  define DS_VAL_LEN		m_data5		/* data length */
 
 /*===========================================================================*
  *                Miscellaneous messages used by TTY			     *
@@ -756,21 +756,21 @@
 
 /* Miscellaneous request types and field names, e.g. used by IS server. */
 #define FKEY_CONTROL 		98  	/* control a function key at the TTY */
-#  define FKEY_REQUEST	     m2_i1	/* request to perform at TTY */
+#  define FKEY_REQUEST	     m_data1	/* request to perform at TTY */
 #  define    FKEY_MAP		10	/* observe function key */
 #  define    FKEY_UNMAP		11	/* stop observing function key */
 #  define    FKEY_EVENTS	12	/* request open key presses */
-#  define FKEY_FKEYS	      m2_l1	/* F1-F12 keys pressed */
-#  define FKEY_SFKEYS	      m2_l2	/* Shift-F1-F12 keys pressed */
+#  define FKEY_FKEYS	      m_data4	/* F1-F12 keys pressed */
+#  define FKEY_SFKEYS	      m_data5	/* Shift-F1-F12 keys pressed */
 #define DIAG_BASE	0xa00
 #define DIAGNOSTICS_OLD 	(DIAG_BASE+1) 	/* output a string without FS in between */
 #define DIAGNOSTICS_S_OLD 	(DIAG_BASE+2) 	/* grant-based version of DIAGNOSTICS */
-#  define DIAG_PRINT_BUF_G    m1_p1
-#  define DIAG_BUF_COUNT      m1_i1
+#  define DIAG_PRINT_BUF_G    m_data4
+#  define DIAG_BUF_COUNT      m_data1
 #define GET_KMESS	(DIAG_BASE+3)	/* get kmess from TTY */
-#  define GETKM_PTR	      m1_p1
+#  define GETKM_PTR	      m_data4
 #define GET_KMESS_S	(DIAG_BASE+4)	/* get kmess from TTY */
-#  define GETKM_GRANT	      m1_i1
+#  define GETKM_GRANT	      m_data1
 #define ASYN_DIAGNOSTICS_OLD (DIAG_BASE+5) 	/* grant-based, replyless DIAGNOSTICS */
 
 #define DIAG_REPL_OLD 	(DIAG_BASE+0x80+0) 	/* reply to DIAGNOSTICS(_S) */
@@ -809,39 +809,39 @@
 #define PM_SETGROUPS_REPLY	(PM_RS_BASE + 31)
 
 /* Standard parameters for all requests and replies, except PM_REBOOT */
-#  define PM_PROC		m1_i1	/* process */
+#  define PM_PROC		m_data1	/* process */
 
 /* Additional parameters for PM_SETUID and PM_SETGID */
-#  define PM_EID		m1_i2	/* effective user/group id */
-#  define PM_RID		m1_i3	/* real user/group id */
+#  define PM_EID		m_data2	/* effective user/group id */
+#  define PM_RID		m_data3	/* real user/group id */
 
 /* Additional parameter for PM_SETGROUPS */
-#define PM_GROUP_NO		m1_i2	/* number of groups */
-#define PM_GROUP_ADDR		m1_p1	/* struct holding group data */
+#define PM_GROUP_NO		m_data2	/* number of groups */
+#define PM_GROUP_ADDR		m_data4	/* struct holding group data */
 
 
 /* Additional parameters for PM_EXEC */
-#  define PM_PATH		m1_p1	/* executable */
-#  define PM_PATH_LEN		m1_i2	/* length of path including
+#  define PM_PATH		m_data4	/* executable */
+#  define PM_PATH_LEN		m_data2	/* length of path including
 					 * terminating nul
 					 */
-#  define PM_FRAME		m1_p2	/* arguments and environment */
-#  define PM_FRAME_LEN		m1_i3	/* size of frame */
+#  define PM_FRAME		m_data5	/* arguments and environment */
+#  define PM_FRAME_LEN		m_data3	/* size of frame */
 
 /* Additional parameters for PM_EXEC_REPLY and PM_CORE_REPLY */
-#  define PM_STATUS		m1_i2	/* OK or failure */
+#  define PM_STATUS		m_data2	/* OK or failure */
 
 /* Additional parameters for PM_FORK and PM_FORK_NB */
-#  define PM_PPROC		m1_i2	/* parent process */
-#  define PM_CPID		m1_i3	/* child pid */
+#  define PM_PPROC		m_data2	/* parent process */
+#  define PM_CPID		m_data3	/* child pid */
 
 /* Parameters for the EXEC_NEWMEM call */
-#define EXC_NM_PROC	m1_i1		/* process that needs new map */
-#define EXC_NM_PTR	m1_p1		/* parameters in struct exec_newmem */
+#define EXC_NM_PROC	m_data1		/* process that needs new map */
+#define EXC_NM_PTR	m_data4		/* parameters in struct exec_newmem */
 /* Results:
  * the status will be in m_type.
- * the top of the stack will be in m1_i1.
- * the following flags will be in m1_i2:
+ * the top of the stack will be in m_data1.
+ * the following flags will be in m_data2:
  */
 #define EXC_NM_RF_LOAD_TEXT	1	/* Load text segment (otherwise the
 					 * text segment is already present)
@@ -853,8 +853,8 @@
 #define EXC_NM_RF_FULLVM	4	
 
 /* Parameters for the EXEC_RESTART call */
-#define EXC_RS_PROC	m1_i1		/* process that needs to be restarted */
-#define EXC_RS_RESULT	m1_i2		/* result of the exec */
+#define EXC_RS_PROC	m_data1		/* process that needs to be restarted */
+#define EXC_RS_RESULT	m_data2		/* result of the exec */
 
 /*===========================================================================*
  *                Messages used from VFS to file servers		     *
@@ -871,25 +871,25 @@
 /* Requests sent by VM to VFS, done on behalf of a user process. */
 #define VM_VFS_BASE	0xB00		
 #define VM_VFS_OPEN	(VM_VFS_BASE+0) /* open() on behalf of user process. */
-#	define VMVO_NAME_GRANT		m2_i1	/* 0-terminated */
-#	define VMVO_NAME_LENGTH		m2_i2	/* name length including 0 */
-#	define VMVO_FLAGS		m2_i3
-#	define VMVO_MODE		m2_l1
-#	define VMVO_ENDPOINT		m2_l2
+#	define VMVO_NAME_GRANT		m_data1	/* 0-terminated */
+#	define VMVO_NAME_LENGTH		m_data2	/* name length including 0 */
+#	define VMVO_FLAGS		m_data3
+#	define VMVO_MODE		m_data4
+#	define VMVO_ENDPOINT		m_data5
 #define VM_VFS_MMAP	(VM_VFS_BASE+1) /* mmap() */
 #define VM_VFS_CLOSE	(VM_VFS_BASE+2) /* close() */
-#	define VMVC_FD			m1_i1
-#	define VMVC_ENDPOINT		m1_i2
+#	define VMVC_FD			m_data1
+#	define VMVC_ENDPOINT		m_data2
 
 /* PM field names */
 /* BRK */
-#define PMBRK_ADDR				m1_p1
+#define PMBRK_ADDR				m_data4
 
 /* TRACE */
-#define PMTRACE_ADDR				m2_l1
+#define PMTRACE_ADDR				m_data4
 
-#define PM_ENDPT				m1_i1
-#define PM_PENDPT				m1_i2
+#define PM_ENDPT				m_data1
+#define PM_PENDPT				m_data2
 
 /*===========================================================================*
  *                Messages for VM server				     *
@@ -898,147 +898,147 @@
 
 /* Calls from PM */
 #define VM_EXIT			(VM_RQ_BASE+0)
-#	define VME_ENDPOINT		m1_i1
+#	define VME_ENDPOINT		m_data1
 #define VM_FORK			(VM_RQ_BASE+1)
-#	define VMF_ENDPOINT		m1_i1
-#	define VMF_SLOTNO		m1_i2
-#	define VMF_CHILD_ENDPOINT	m1_i3	/* result */
+#	define VMF_ENDPOINT		m_data1
+#	define VMF_SLOTNO		m_data2
+#	define VMF_CHILD_ENDPOINT	m_data3	/* result */
 #define VM_BRK			(VM_RQ_BASE+2)
-#	define VMB_ENDPOINT		m1_i1
-#	define VMB_ADDR			m1_p1
-#	define VMB_RETADDR		m1_p2	/* result */
+#	define VMB_ENDPOINT		m_data1
+#	define VMB_ADDR			m_data4
+#	define VMB_RETADDR		m_data5	/* result */
 #define VM_EXEC_NEWMEM		(VM_RQ_BASE+3)
-#	define VMEN_ENDPOINT		m1_i1
-#	define VMEN_ARGSPTR		m1_p1
-#	define VMEN_ARGSSIZE		m1_i2
-#	define VMEN_FLAGS		m1_i3	/* result */
-#	define VMEN_STACK_TOP		m1_p2	/* result */
+#	define VMEN_ENDPOINT		m_data1
+#	define VMEN_ARGSPTR		m_data4
+#	define VMEN_ARGSSIZE		m_data2
+#	define VMEN_FLAGS		m_data3	/* result */
+#	define VMEN_STACK_TOP		m_data5	/* result */
 #define VM_PUSH_SIG		(VM_RQ_BASE+4)
-#	define VMPS_ENDPOINT		m1_i1
-#	define VMPS_OLD_SP		m1_p1	/* result */
+#	define VMPS_ENDPOINT		m_data1
+#	define VMPS_OLD_SP		m_data4	/* result */
 #define VM_WILLEXIT		(VM_RQ_BASE+5)
-#	define VMWE_ENDPOINT		m1_i1
+#	define VMWE_ENDPOINT		m_data1
 
 /* General calls. */
 #define VM_MMAP			(VM_RQ_BASE+10)
-#	define VMM_ADDR			m5_l1
-#	define VMM_LEN			m5_l2
-#	define VMM_PROT			m5_c1
-#	define VMM_FLAGS		m5_c2
-#	define VMM_FD			m5_i1
-#	define VMM_OFFSET		m5_i2
-#	define VMM_RETADDR		m5_l1	/* result */
+#	define VMM_ADDR			m_data5
+#	define VMM_LEN			m_data6
+#	define VMM_PROT			m_data1
+#	define VMM_FLAGS		m_data2
+#	define VMM_FD			m_data3
+#	define VMM_OFFSET		m_data4
+#	define VMM_RETADDR		m_data5	/* result */
 #define VM_UMAP			(VM_RQ_BASE+11)
-#	define VMU_SEG			m1_i1
-#	define VMU_OFFSET		m1_p1
-#	define VMU_LENGTH		m1_p2
-#	define VMU_RETADDR		m1_p3
+#	define VMU_SEG			m_data1
+#	define VMU_OFFSET		m_data4
+#	define VMU_LENGTH		m_data5
+#	define VMU_RETADDR		m_data6
 
 /* to VM: inform VM about a region of memory that is used for
  * bus-master DMA
  */
 #define VM_ADDDMA	(VM_RQ_BASE+12)
-#	define VMAD_REQ			m2_i2
-#	define VMAD_EP			m2_i1
-#	define VMAD_START		m2_l1
-#	define VMAD_SIZE		m2_l2
+#	define VMAD_REQ			m_data2
+#	define VMAD_EP			m_data1
+#	define VMAD_START		m_data4
+#	define VMAD_SIZE		m_data5
 
 /* to VM: inform VM that a region of memory that is no longer
  * used for bus-master DMA
  */
 #define VM_DELDMA       (VM_RQ_BASE+13)
-#	define VMDD_REQ			m2_i2
-#	define VMDD_EP			m2_i1
-#	define VMDD_START		m2_l1
-#	define VMDD_SIZE		m2_l2
+#	define VMDD_REQ			m_data2
+#	define VMDD_EP			m_data1
+#	define VMDD_START		m_data4
+#	define VMDD_SIZE		m_data5
 
 /* to VM: ask VM for a region of memory that should not
  * be used for bus-master DMA any longer
  */
 #define VM_GETDMA       (VM_RQ_BASE+14)
-#	define VMGD_REQ			m2_i2
-#	define VMGD_PROCP		m2_i1
-#	define VMGD_BASEP		m2_l1
-#	define VMGD_SIZEP		m2_l2
+#	define VMGD_REQ			m_data2
+#	define VMGD_PROCP		m_data1
+#	define VMGD_BASEP		m_data4
+#	define VMGD_SIZEP		m_data5
 
 #define VM_MAP_PHYS		(VM_RQ_BASE+15)
-#	define VMMP_EP			m1_i1
-#	define VMMP_PHADDR		m1_p2
-#	define VMMP_LEN			m1_i2
-#	define VMMP_VADDR_REPLY		m1_p3
+#	define VMMP_EP			m_data1
+#	define VMMP_PHADDR		m_data5
+#	define VMMP_LEN			m_data2
+#	define VMMP_VADDR_REPLY		m_data6
 
 #define VM_UNMAP_PHYS		(VM_RQ_BASE+16)
-#	define VMUP_EP			m1_i1
-#	define VMUP_VADDR		m1_p1
+#	define VMUP_EP			m_data1
+#	define VMUP_VADDR		m_data4
 
 #define VM_MUNMAP		(VM_RQ_BASE+17)
-#	define VMUM_ADDR		m1_p1
-#	define VMUM_LEN			m1_i1
+#	define VMUM_ADDR		m_data4
+#	define VMUM_LEN			m_data1
 
 #define VM_ALLOCMEM		(VM_RQ_BASE+18)
-#	define VMAM_BYTES		m1_p1
-#	define VMAM_MEMBASE		m1_i1
+#	define VMAM_BYTES		m_data4
+#	define VMAM_MEMBASE		m_data1
 
 #define VM_MUNMAP_TEXT		(VM_RQ_BASE+19)
 
 /* Calls from VFS. */
-#	define VMV_ENDPOINT		m1_i1	/* for all VM_VFS_REPLY_* */
+#	define VMV_ENDPOINT		m_data1	/* for all VM_VFS_REPLY_* */
 #define VM_VFS_REPLY_OPEN	(VM_RQ_BASE+30)
-#	define VMVRO_FD			m1_i2
+#	define VMVRO_FD			m_data2
 #define VM_VFS_REPLY_MMAP	(VM_RQ_BASE+31)
 #define VM_VFS_REPLY_CLOSE	(VM_RQ_BASE+32)
 
 #define VM_REMAP		(VM_RQ_BASE+33)
-#	define VMRE_D			m1_i1
-#	define VMRE_S			m1_i2
-#	define VMRE_DA			m1_p1
-#	define VMRE_SA			m1_p2
-#	define VMRE_RETA		m1_p3
-#	define VMRE_SIZE		m1_i3
+#	define VMRE_D			m_data1
+#	define VMRE_S			m_data2
+#	define VMRE_DA			m_data4
+#	define VMRE_SA			m_data5
+#	define VMRE_RETA		m_data6
+#	define VMRE_SIZE		m_data3
 
 #define VM_SHM_UNMAP		(VM_RQ_BASE+34)
-#	define VMUN_ENDPT		m2_i1
-#	define VMUN_ADDR		m2_l1
+#	define VMUN_ENDPT		m_data1
+#	define VMUN_ADDR		m_data4
 
 #define VM_GETPHYS		(VM_RQ_BASE+35)
-#	define VMPHYS_ENDPT		m2_i1
-#	define VMPHYS_ADDR		m2_l1
-#	define VMPHYS_RETA		m2_l2
+#	define VMPHYS_ENDPT		m_data1
+#	define VMPHYS_ADDR		m_data4
+#	define VMPHYS_RETA		m_data5
 
 #define VM_GETREF		(VM_RQ_BASE+36)
-#	define VMREFCNT_ENDPT		m2_i1
-#	define VMREFCNT_ADDR		m2_l1
-#	define VMREFCNT_RETC		m2_i2
+#	define VMREFCNT_ENDPT		m_data1
+#	define VMREFCNT_ADDR		m_data4
+#	define VMREFCNT_RETC		m_data2
 
 #define VM_RS_SET_PRIV		(VM_RQ_BASE+37)
-#	define VM_RS_NR			m2_i1
-#	define VM_RS_BUF		m2_l1
+#	define VM_RS_NR			m_data1
+#	define VM_RS_BUF		m_data4
 
 #define VM_QUERY_EXIT		(VM_RQ_BASE+38)
-#	define VM_QUERY_RET_PT	m2_i1
-#	define VM_QUERY_IS_MORE	m2_i2
+#	define VM_QUERY_RET_PT	m_data1
+#	define VM_QUERY_IS_MORE	m_data2
 
 #define VM_NOTIFY_SIG		(VM_RQ_BASE+39)
-#	define VM_NOTIFY_SIG_ENDPOINT	m1_i1
-#	define VM_NOTIFY_SIG_IPC	m1_i2
+#	define VM_NOTIFY_SIG_ENDPOINT	m_data1
+#	define VM_NOTIFY_SIG_IPC	m_data2
 
 #define VM_CTL			(VM_RQ_BASE+40)
-#define VCTL_WHAT			m1_i1
-#define VCTL_PARAM			m1_i2
+#define VCTL_WHAT			m_data1
+#define VCTL_PARAM			m_data2
 
 /* General calls. */
 #define NNR_VM_MMAP		(VM_RQ_BASE+41)
-#	define VMM_ADDR			m5_l1
-#	define VMM_LEN			m5_l2
-#	define VMM_PROT			m5_c1
-#	define VMM_FLAGS		m5_c2
-#	define VMM_FD			m5_i1
-#	define VMM_OFFSET		m5_i2
-#	define VMM_RETADDR		m5_l1	/* result */
+#	define VMM_ADDR			m_data5
+#	define VMM_LEN			m_data6
+#	define VMM_PROT			m_data1
+#	define VMM_FLAGS		m_data2
+#	define VMM_FD			m_data3
+#	define VMM_OFFSET		m_data4
+#	define VMM_RETADDR		m_data5	/* result */
 
 #define NNR_VM_MUNMAP		(VM_RQ_BASE+42)
-#	define VMUM_ADDR		m1_p1
-#	define VMUM_LEN			m1_i1
+#	define VMUM_ADDR		m_data4
+#	define VMUM_LEN			m_data1
 
 #define NNR_VM_MUNMAP_TEXT	(VM_RQ_BASE+43)
 
@@ -1056,38 +1056,38 @@
 
 /* Shared Memory */
 #define IPC_SHMGET	(IPC_BASE+1)
-#	define SHMGET_KEY	m2_l1
-#	define SHMGET_SIZE	m2_l2
-#	define SHMGET_FLAG	m2_i1
-#	define SHMGET_RETID	m2_i2
+#	define SHMGET_KEY	m_data4
+#	define SHMGET_SIZE	m_data5
+#	define SHMGET_FLAG	m_data1
+#	define SHMGET_RETID	m_data2
 #define IPC_SHMAT	(IPC_BASE+2)
-#	define SHMAT_ID		m2_i1
-#	define SHMAT_ADDR	m2_l1
-#	define SHMAT_FLAG	m2_i2
-#	define SHMAT_RETADDR	m2_l2
+#	define SHMAT_ID		m_data1
+#	define SHMAT_ADDR	m_data4
+#	define SHMAT_FLAG	m_data2
+#	define SHMAT_RETADDR	m_data5
 #define IPC_SHMDT	(IPC_BASE+3)
-#	define SHMDT_ADDR	m2_l1
+#	define SHMDT_ADDR	m_data4
 #define IPC_SHMCTL	(IPC_BASE+4)
-#	define SHMCTL_ID	m2_i1
-#	define SHMCTL_CMD	m2_i2
-#	define SHMCTL_BUF	m2_l1
-#	define SHMCTL_RET	m2_i3
+#	define SHMCTL_ID	m_data1
+#	define SHMCTL_CMD	m_data2
+#	define SHMCTL_BUF	m_data4
+#	define SHMCTL_RET	m_data3
 
 /* Semaphore */
 #define IPC_SEMGET	(IPC_BASE+5)
-#	define SEMGET_KEY	m2_l1
-#	define SEMGET_NR	m2_i1
-#	define SEMGET_FLAG	m2_i2
-#	define SEMGET_RETID	m2_i3
+#	define SEMGET_KEY	m_data4
+#	define SEMGET_NR	m_data1
+#	define SEMGET_FLAG	m_data2
+#	define SEMGET_RETID	m_data3
 #define IPC_SEMCTL	(IPC_BASE+6)
-#	define SEMCTL_ID	m2_i1
-#	define SEMCTL_NUM	m2_i2
-#	define SEMCTL_CMD	m2_i3
-#	define SEMCTL_OPT	m2_l1
+#	define SEMCTL_ID	m_data1
+#	define SEMCTL_NUM	m_data2
+#	define SEMCTL_CMD	m_data3
+#	define SEMCTL_OPT	m_data4
 #define IPC_SEMOP	(IPC_BASE+7)
-#	define SEMOP_ID		m2_i1
-#	define SEMOP_OPS	m2_l1
-#	define SEMOP_SIZE	m2_i2
+#	define SEMOP_ID		m_data1
+#	define SEMOP_OPS	m_data4
+#	define SEMOP_SIZE	m_data2
 
 #endif /* __ASSEMBLY__ */
 

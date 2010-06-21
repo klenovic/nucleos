@@ -11,8 +11,8 @@
  *   m_type:	SYS_NICE
  *
  * The parameters for this kernel call are:
- *    m1_i1:	PR_ENDPT   	process number to change priority
- *    m1_i2:	PR_PRIORITY	the new priority
+ *    m_data1:	PR_ENDPT   	process number to change priority
+ *    m_data2:	PR_PRIORITY	the new priority
  */
 
 #include <kernel/system.h>

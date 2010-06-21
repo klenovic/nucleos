@@ -51,7 +51,7 @@ struct rs_pci *rs_pci;
 	}
 
 	m.m_type= BUSC_PCI_SET_ACL;
-	m.m1_i1= gid;
+	m.m_data1= gid;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	cpf_revoke(gid);

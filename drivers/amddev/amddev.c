@@ -272,8 +272,8 @@ static int do_add(kipc_msg_t *m)
 	phys_bytes busaddr;
 
 	proc= m->m_source;
-	start= m->m2_l1;
-	size= m->m2_l2;
+	start= m->m_data4;
+	size= m->m_data5;
 
 #if 0
 	printf("amddev`do_add: got request for 0x%x@0x%x from %d\n",
@@ -310,8 +310,8 @@ static int do_add_phys(kipc_msg_t *m)
 	phys_bytes start;
 	size_t size;
 
-	start= m->m2_l1;
-	size= m->m2_l2;
+	start= m->m_data4;
+	size= m->m_data5;
 
 #if 0
 	printf("amddev`do_add_phys: got request for 0x%x@0x%x\n",
@@ -346,8 +346,8 @@ static int do_del_phys(kipc_msg_t *m)
 	phys_bytes start;
 	size_t size;
 
-	start= m->m2_l1;
-	size= m->m2_l2;
+	start= m->m_data4;
+	size= m->m_data5;
 
 #if 0
 	printf("amddev`do_del_phys: got request for 0x%x@0x%x\n",
@@ -380,11 +380,11 @@ static int do_add4pci(kipc_msg_t *m)
 	phys_bytes busaddr;
 
 	proc= m->m_source;
-	start= m->m2_l1;
-	size= m->m2_l2;
-	pci_bus= m->m1_i1;
-	pci_dev= m->m1_i2;
-	pci_func= m->m1_i3;
+	start= m->m_data4;
+	size= m->m_data5;
+	pci_bus= m->m_data1;
+	pci_dev= m->m_data2;
+	pci_func= m->m_data3;
 
 	printf(
 "amddev`do_add4pci: got request for 0x%x@0x%x from %d for pci dev %u.%u.%u\n",

@@ -563,8 +563,8 @@ int scall_getpriority(void)
 	int niceval;
 	struct mproc *rmp;
 
-	arg_which = m_in.m1_i1;
-	arg_who = m_in.m1_i2;
+	arg_which = m_in.m_data1;
+	arg_who = m_in.m_data2;
 
 	switch (arg_which) {
 	case PRIO_PROCESS: /* Only support PRIO_PROCESS for now. */
@@ -598,9 +598,9 @@ int scall_setpriority(void)
 	int error = -EINVAL;
 	struct mproc *rmp;
 
-	which = m_in.m1_i1;
-	who = m_in.m1_i2;
-	niceval = m_in.m1_i3;
+	which = m_in.m_data1;
+	who = m_in.m_data2;
+	niceval = m_in.m_data3;
 
 	/* @nucleos: Only PRIO_PROCESS is supported */
 	if (which > PRIO_USER || which < PRIO_PROCESS)
@@ -645,7 +645,7 @@ out:
 	return error;
 }
 
-#define p_utsbuf	m1_p1
+#define p_utsbuf	m_data4
 
 int scall_uname(void)
 {

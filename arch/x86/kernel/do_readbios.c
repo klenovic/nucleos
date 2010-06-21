@@ -11,9 +11,9 @@
  *   m_type:	SYS_READBIOS
  *
  * The parameters for this kernel call are:
- *    m2_i1:	RDB_SIZE		number of bytes to copy
- *    m2_l1:	RDB_ADDR		absolute address in BIOS area
- *    m2_p1:	RDB_BUF			buffer address in requesting process
+ *    m_data1:	RDB_SIZE		number of bytes to copy
+ *    m_data4:	RDB_ADDR		absolute address in BIOS area
+ *    m_data6:	RDB_BUF			buffer address in requesting process
  */
 
 #include <kernel/system.h>

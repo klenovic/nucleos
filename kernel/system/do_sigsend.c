@@ -11,9 +11,9 @@
  *   m_type:	SYS_SIGSEND
  *
  * The parameters for this kernel call are:
- *     m2_i1:	SIG_ENDPT  	# process to call signal handler
- *     m2_p1:	SIG_CTXT_PTR 	# pointer to sigcontext structure
- *     m2_i3:	SIG_FLAGS    	# flags for S_SIGRETURN call	
+ *     m_data1:	SIG_ENDPT  	# process to call signal handler
+ *     m_data6:	SIG_CTXT_PTR 	# pointer to sigcontext structure
+ *     m_data3:	SIG_FLAGS    	# flags for S_SIGRETURN call	
  *
  */
 

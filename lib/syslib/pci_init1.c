@@ -37,13 +37,13 @@ char *name;
 
 	m.m_type= BUSC_PCI_INIT;
 	len= strlen(name);
-	if (len+1 <= sizeof(m.m3_ca1))
-		strcpy(m.m3_ca1, name);
+	if (len+1 <= sizeof(m.m_data10))
+		strcpy(m.m_data10, name);
 	else
 	{
-		len= sizeof(m.m3_ca1)-1;
-		memcpy(m.m3_ca1, name, len);
-		m.m3_ca1[len]= '\0';
+		len= sizeof(m.m_data10)-1;
+		memcpy(m.m_data10, name, len);
+		m.m_data10[len]= '\0';
 	}
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)

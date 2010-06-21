@@ -11,9 +11,9 @@
  *   m_type:	SYS_VDEVIO
  *
  * The parameters for this kernel call are:
- *    m2_i3:	DIO_REQUEST	(request input or output)	
- *    m2_p1:	DIO_VEC_ADDR	(pointer to port/ value pairs)	
- *    m2_i2:	DIO_VEC_SIZE	(number of ports to read or write) 
+ *    m_data3:	DIO_REQUEST	(request input or output)	
+ *    m_data6:	DIO_VEC_ADDR	(pointer to port/ value pairs)	
+ *    m_data2:	DIO_VEC_SIZE	(number of ports to read or write) 
  */
 
 #include <kernel/system.h>

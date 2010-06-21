@@ -26,7 +26,7 @@ u16_t *didp;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_IDS;
-	m.m1_i1= devind;
+	m.m_data1= devind;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
@@ -34,8 +34,8 @@ u16_t *didp;
 
 	if (m.m_type != 0)
 		panic("syslib/" __FILE__, "pci_ids: got bad reply from PCI", m.m_type);
-	*vidp= m.m1_i1;
-	*didp= m.m1_i2;
+	*vidp= m.m_data1;
+	*didp= m.m_data2;
 	printf("pci_ids: %04x/%04x\n", *vidp, *didp);
 }
 

@@ -24,7 +24,7 @@
 #include <servers/pm/mproc.h>
 #include "param.h"
 
-#define p_time		m1_p1
+#define p_time		m_data4
 
 int scall_time(void)
 {
@@ -55,7 +55,7 @@ int scall_time(void)
 	return t;
 }
 
-#define pstime		m2_p1
+#define pstime		m_data6
 
 int scall_stime(void)
 {
@@ -89,7 +89,7 @@ int scall_stime(void)
 	return 0;
 }
 
-#define p_timesbuf	m1_p1
+#define p_timesbuf	m_data4
 
 int scall_times(void)
 {
@@ -117,7 +117,7 @@ int scall_times(void)
 	return uptime;
 }
 
-#define ptimeval	m2_p1
+#define ptimeval	m_data6
 
 int scall_gettimeofday(void)
 {

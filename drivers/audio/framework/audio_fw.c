@@ -1011,11 +1011,11 @@ int pci_func;
 	dev_e= u32;
 
 	m.m_type= IOMMU_MAP;
-	m.m2_i1= pci_bus;
-	m.m2_i2= pci_dev;
-	m.m2_i3= pci_func;
-	m.m2_l1= buf;
-	m.m2_l2= size;
+	m.m_data1= pci_bus;
+	m.m_data2= pci_dev;
+	m.m_data3= pci_func;
+	m.m_data4= buf;
+	m.m_data5= size;
 
 	r= kipc_sendrec(dev_e, &m);
 	if (r != 0)

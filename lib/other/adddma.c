@@ -17,9 +17,9 @@ int adddma(endpoint_t proc_e, phys_bytes start, phys_bytes size)
 {
   kipc_msg_t m;
 
-  m.m2_i1= proc_e;
-  m.m2_l1= start;
-  m.m2_l2= size;
+  m.m_data1= proc_e;
+  m.m_data4= start;
+  m.m_data5= size;
 
   return ktaskcall(PM_PROC_NR, KCNR_ADDDMA, &m);
 }

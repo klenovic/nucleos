@@ -11,12 +11,12 @@
  *   m_type:	SYS_SDEVIO
  *
  * The parameters for this kernel call are:
- *    m2_i3:	DIO_REQUEST	(request input or output)
- *    m2_l1:	DIO_PORT	(port to read/ write)
- *    m2_p1:	DIO_VEC_ADDR	(virtual address of buffer, or grant ID)
- *    m2_l2:	DIO_VEC_SIZE	(number of elements)
- *    m2_i2:	DIO_VEC_PROC	(process where buffer is)
- *    m2_i1:	DIO_OFFSET	(offset into the grant)
+ *    m_data3:	DIO_REQUEST	(request input or output)
+ *    m_data4:	DIO_PORT	(port to read/ write)
+ *    m_data6:	DIO_VEC_ADDR	(virtual address of buffer, or grant ID)
+ *    m_data5:	DIO_VEC_SIZE	(number of elements)
+ *    m_data2:	DIO_VEC_PROC	(process where buffer is)
+ *    m_data1:	DIO_OFFSET	(offset into the grant)
  */
 
 #include <kernel/system.h>

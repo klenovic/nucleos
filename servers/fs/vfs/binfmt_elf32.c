@@ -393,9 +393,9 @@ static int elf32_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_
 #ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
 #endif
-	*stack_topp= m.m1_i1;
-	*load_textp= !!(m.m1_i2 & EXC_NM_RF_LOAD_TEXT);
-	*allow_setuidp= !!(m.m1_i2 & EXC_NM_RF_ALLOW_SETUID);
+	*stack_topp= m.m_data1;
+	*load_textp= !!(m.m_data2 & EXC_NM_RF_LOAD_TEXT);
+	*allow_setuidp= !!(m.m_data2 & EXC_NM_RF_ALLOW_SETUID);
 
 #ifdef CONFIG_DEBUG_VFS_ELF32
 	printf("exec_newmem: stack_top = 0x%x\n", *stack_topp);

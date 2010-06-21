@@ -15,9 +15,9 @@ phys_bytes size;			/* size of mem chunk requested */
 phys_bytes *base;			/* return base address */
 {
   kipc_msg_t m;
-  m.m4_l1 = size;		
+  m.m_data1 = size;		
   if (ktaskcall(PM_PROC_NR, KCNR_ALLOCMEM, &m) < 0) return(-1);
-  *base = m.m4_l2;
+  *base = m.m_data2;
   return(0);
 }
 

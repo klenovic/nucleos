@@ -11,11 +11,11 @@
  *   m_type:	SYS_TIMES
  *
  * The parameters for this kernel call are:
- *    m4_l1:	T_ENDPT		(get info for this process)	
- *    m4_l1:	T_USER_TIME		(return values ...)	
- *    m4_l2:	T_SYSTEM_TIME	
- *    m4_l3:	T_BOOTTIME
- *    m4_l5:	T_BOOT_TICKS	
+ *    m_data1:	T_ENDPT		(get info for this process)	
+ *    m_data1:	T_USER_TIME		(return values ...)	
+ *    m_data2:	T_SYSTEM_TIME	
+ *    m_data3:	T_BOOTTIME
+ *    m_data5:	T_BOOT_TICKS	
  */
 
 #include <kernel/system.h>

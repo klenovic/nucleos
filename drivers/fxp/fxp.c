@@ -47,7 +47,7 @@
  * |DL_TASK_REPLY| port nr  | proc nr | rd-count | err|stat| clock   |
  * |-------------+----------+---------+----------+---------+---------|
  *
- *   m_type	   m3_i1     m3_i2       m3_ca1
+ *   m_type	   m_data1     m_data2       m_data10
  * |-------------+---------+-----------+---------------|
  * |DL_CONF_REPLY| port nr | last port | ethernet addr |
  * |-------------+---------+-----------+---------------|
@@ -422,7 +422,7 @@ kipc_msg_t *mp;
 	if (port < 0 || port >= FXP_PORT_NR)
 	{
 		reply_mess.m_type= DL_CONF_REPLY;
-		reply_mess.m3_i1= -ENXIO;
+		reply_mess.m_data1= -ENXIO;
 		mess_reply(mp, &reply_mess);
 		return;
 	}
@@ -435,7 +435,7 @@ kipc_msg_t *mp;
 		{
 			/* Probe failed, or the device is configured off. */
 			reply_mess.m_type= DL_CONF_REPLY;
-			reply_mess.m3_i1= -ENXIO;
+			reply_mess.m_data1= -ENXIO;
 			mess_reply(mp, &reply_mess);
 			return;
 		}
@@ -460,9 +460,9 @@ kipc_msg_t *mp;
 	fxp_rec_mode(fp);
 
 	reply_mess.m_type = DL_CONF_REPLY;
-	reply_mess.m3_i1 = mp->DL_PORT;
-	reply_mess.m3_i2 = FXP_PORT_NR;
-	*(ether_addr_t *) reply_mess.m3_ca1 = fp->fxp_address;
+	reply_mess.m_data1 = mp->DL_PORT;
+	reply_mess.m_data2 = FXP_PORT_NR;
+	*(ether_addr_t *) reply_mess.m_data10 = fp->fxp_address;
 
 	mess_reply(mp, &reply_mess);
 }
@@ -2996,11 +2996,11 @@ int pci_func;
 	dev_e= u32;
 
 	m.m_type= IOMMU_MAP;
-	m.m2_i1= pci_bus;
-	m.m2_i2= pci_dev;
-	m.m2_i3= pci_func;
-	m.m2_l1= buf;
-	m.m2_l2= size;
+	m.m_data1= pci_bus;
+	m.m_data2= pci_dev;
+	m.m_data3= pci_func;
+	m.m_data4= buf;
+	m.m_data5= size;
 
 	r= kipc_sendrec(dev_e, &m);
 	if (r != 0)

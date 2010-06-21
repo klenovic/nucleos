@@ -18,7 +18,7 @@ struct reg86u *reg86p;
     kipc_msg_t m;
     int result;
 
-    m.m1_p1= (char *)reg86p;
+    m.m_data4= (char *)reg86p;
 
     result = ktaskcall(SYSTASK, SYS_INT86, &m);
     return(result);

@@ -11,9 +11,9 @@
  *   m_type:	SYS_PRIVCTL
  *
  * The parameters for this kernel call are:
- *    m2_i1:	CTL_ENDPT 	(process endpoint of target)
- *    m2_i2:	CTL_REQUEST	(privilege control request)
- *    m2_p1:	CTL_ARG_PTR	(pointer to request data)
+ *    m_data1:	CTL_ENDPT 	(process endpoint of target)
+ *    m_data2:	CTL_REQUEST	(privilege control request)
+ *    m_data6:	CTL_ARG_PTR	(pointer to request data)
  */
 
 #include <kernel/system.h>

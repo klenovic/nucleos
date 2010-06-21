@@ -120,7 +120,7 @@ int scall_pipe(void)
 	fil_ptr0->filp_flags = O_RDONLY;
 	fil_ptr1->filp_flags = O_WRONLY;
 
-	r = sys_vircopy(ENDPT_SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m1_p1, sizeof(fil_des));
+	r = sys_vircopy(ENDPT_SELF, D, (vir_bytes)fil_des, who_e, D, (vir_bytes)m_in.m_data4, sizeof(fil_des));
 
 	return (r < 0) ? -EFAULT : 0;
 }

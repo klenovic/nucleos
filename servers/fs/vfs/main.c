@@ -394,7 +394,7 @@ static void fs_init(void)
 
 	/* Clear endpoint field */
 	last_login_fs_e = ENDPT_NONE;
-	mount_m_in.m1_p3 = (char *) ENDPT_NONE;
+	mount_m_in.m_data6 = (char *) ENDPT_NONE;
 
 	/* Initialize the process table with help of the process manager messages. 
 	 * Expect one message for each system process with its slot number and pid. 

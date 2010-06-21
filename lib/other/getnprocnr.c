@@ -14,9 +14,9 @@ int getnprocnr(pid_t pid)
 {
   kipc_msg_t m;
 
-  m.m1_i1 = pid;		/* pass pid >=0 to search for */
-  m.m1_i2 = 0;			/* don't pass name to search for */
+  m.m_data1 = pid;		/* pass pid >=0 to search for */
+  m.m_data2 = 0;			/* don't pass name to search for */
   if (ktaskcall(PM_PROC_NR, KCNR_GETPROCNR, &m) < 0) return(-1);
-  return(m.m1_i1);		/* return search result */
+  return(m.m_data1);		/* return search result */
 }
 

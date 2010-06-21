@@ -11,10 +11,10 @@
  *   m_type:	SYS_EXEC
  *
  * The parameters for this kernel call are:
- *    m1_i1:	PR_ENDPT  		(process that did exec call)
- *    m1_p1:	PR_STACK_PTR		(new stack pointer)
- *    m1_p2:	PR_NAME_PTR		(pointer to program name)
- *    m1_p3:	PR_IP_PTR		(new instruction pointer)
+ *    m_data1:	PR_ENDPT  		(process that did exec call)
+ *    m_data4:	PR_STACK_PTR		(new stack pointer)
+ *    m_data5:	PR_NAME_PTR		(pointer to program name)
+ *    m_data6:	PR_IP_PTR		(new instruction pointer)
  */
 #include <kernel/system.h>
 #include <nucleos/string.h>

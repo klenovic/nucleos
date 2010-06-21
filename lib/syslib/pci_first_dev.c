@@ -31,9 +31,9 @@ u16_t *didp;
 		panic("syslib/" __FILE__, "pci_first_dev: can't talk to PCI", r);
 	if (m.m_type == 1)
 	{
-		*devindp= m.m1_i1;
-		*vidp= m.m1_i2;
-		*didp= m.m1_i3;
+		*devindp= m.m_data1;
+		*vidp= m.m_data2;
+		*didp= m.m_data3;
 #if DEBUG
 		printf("pci_first_dev: got device %d, %04x/%04x\n", 
 			*devindp, *vidp, *didp);

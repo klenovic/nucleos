@@ -50,7 +50,7 @@
  * |DL_TASK_REPL| port nr  | proc nr | rd-count | err|stat| clock   |
  * |------------|----------|---------|----------|---------|---------|
  *
- *   m_type	  m3_i1     m3_i2       m3_ca1
+ *   m_type	  m_data1     m_data2       m_data10
  * |------------|---------|-----------|---------------|
  * |DL_CONF_REPL| port nr | last port | ethernet addr |
  * |------------|---------|-----------|---------------|
@@ -542,7 +542,7 @@ static void or_init (kipc_msg_t * mp) {
 	if (port < 0 || port >= OR_PORT_NR)	{
 		/* illegal port in message */
 		reply.m_type = DL_CONF_REPLY;
-		reply.m3_i1 = -ENXIO;
+		reply.m_data1 = -ENXIO;
 		mess_reply (mp, &reply);
 		return;
 	}
@@ -557,7 +557,7 @@ static void or_init (kipc_msg_t * mp) {
 		or_init_struct (orp);
 		if (orp->or_mode == OR_M_DISABLED) {
 			reply.m_type = DL_CONF_REPLY;
-			reply.m3_i1 = -ENXIO;
+			reply.m_data1 = -ENXIO;
 			mess_reply (mp, &reply);
 			return;
 		}
@@ -587,9 +587,9 @@ static void or_init (kipc_msg_t * mp) {
 
 	/* reply the caller that the configuration succeeded */
 	reply.m_type = DL_CONF_REPLY;
-	reply.m3_i1 = mp->DL_PORT;
-	reply.m3_i2 = OR_PORT_NR;
-	*(ether_addr_t *) reply.m3_ca1 = orp->or_address;
+	reply.m_data1 = mp->DL_PORT;
+	reply.m_data2 = OR_PORT_NR;
+	*(ether_addr_t *) reply.m_data10 = orp->or_address;
 	mess_reply (mp, &reply);
 }
 

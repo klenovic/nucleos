@@ -13,11 +13,11 @@
 int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style, int force)
 {
   kipc_msg_t m;
-  m.m4_l1 = ctl_req;
-  m.m4_l2 = proc_nr;
-  m.m4_l3 = dev_nr;
-  m.m4_l4 = dev_style;
-  m.m4_l5 = force;
+  m.m_data1 = ctl_req;
+  m.m_data2 = proc_nr;
+  m.m_data3 = dev_nr;
+  m.m_data4 = dev_style;
+  m.m_data5 = force;
   if (ktaskcall(FS_PROC_NR, KCNR_DEVCTL, &m) < 0) return(-1);
   return(0);
 }

@@ -11,9 +11,9 @@
  *   m_type:	SYS_MEMSET
  *
  * The parameters for this kernel call are:
- *    m2_p1:	MEM_PTR		(virtual address)	
- *    m2_l1:	MEM_COUNT	(returns physical address)	
- *    m2_l2:	MEM_PATTERN	(pattern byte to be written) 	
+ *    m_data6:	MEM_PTR		(virtual address)	
+ *    m_data4:	MEM_COUNT	(returns physical address)	
+ *    m_data5:	MEM_PATTERN	(pattern byte to be written) 	
  */
 
 #include <kernel/system.h>

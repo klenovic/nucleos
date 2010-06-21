@@ -38,7 +38,7 @@
 
 #include "vnode.h"
 #include "vmnt.h"
-#define result_addr	m2_p1
+#define result_addr	m_data6
 static char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
  
 static int common_open(int oflags, mode_t omode);
@@ -67,13 +67,13 @@ int scall_open()
 	/* Perform the open(name, flags,...) system call. */
 	int r;
 
-	r = fetch_name(user_fullpath, PATH_MAX, m_in.m1_p1);
+	r = fetch_name(user_fullpath, PATH_MAX, m_in.m_data4);
 
 	if (r < 0) {
 		return(err_code); /* name was bad */
 	}
 
-	r = common_open(m_in.m1_i2, m_in.m1_i3);
+	r = common_open(m_in.m_data2, m_in.m_data3);
 
 	return r;
 }

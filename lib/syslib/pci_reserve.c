@@ -24,7 +24,7 @@ int devind;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_RESERVE;
-	m.m1_i1= devind;
+	m.m_data1= devind;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
@@ -43,7 +43,7 @@ int devind;
         int r;
         kipc_msg_t m;
 
-        m.m1_i1= devind;
+        m.m_data1= devind;
 
         return(ktaskcall(pci_procnr, BUSC_PCI_RESERVE, &m));
 }

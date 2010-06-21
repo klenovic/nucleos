@@ -116,15 +116,15 @@ fail_msg:
 
 static int msg_access(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i2 = r->cx;		/* mode */
+	msg->m_data3 = (char*)r->bx;	/* pathname */
+	msg->m_data2 = r->cx;		/* mode */
 
 	return 0;
 }
 
 static int msg_alarm(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* seconds */
+	msg->m_data1 = r->bx;	/* seconds */
 
 	return 0;
 }
@@ -138,38 +138,38 @@ static int msg_brk(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_chdir(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;	/* pathname */
+	msg->m_data3 = (char*)r->bx;	/* pathname */
 
 	return 0;
 }
 
 static int msg_chmod(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i2 = (mode_t)r->cx;	/* mode */
+	msg->m_data3 = (char*)r->bx;	/* pathname */
+	msg->m_data2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
 }
 
 static int msg_chown(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i2 = (uid_t)r->cx;	/* owner */
-	msg->m1_i3 = (gid_t)r->dx;	/* group */
+	msg->m_data4 = (char*)r->bx;	/* name */
+	msg->m_data2 = (uid_t)r->cx;	/* owner */
+	msg->m_data3 = (gid_t)r->dx;	/* group */
 
 	return 0;
 }
 
 static int msg_chroot(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;	/* path */
+	msg->m_data3 = (char*)r->bx;	/* path */
 
 	return 0;
 }
 
 static int msg_close(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;
+	msg->m_data1 = r->bx;
 
 	return 0;
 }
@@ -186,73 +186,73 @@ static int msg_cprof(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_creat(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char*)r->bx;	/* pathname */
-	msg->m3_i2 = (mode_t)r->cx;	/* mode */
+	msg->m_data3 = (char*)r->bx;	/* pathname */
+	msg->m_data2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
 }
 
 static int msg_dup(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* descriptor */
+	msg->m_data1 = r->bx;	/* descriptor */
 
 	return 0;
 }
 
 static int msg_dup2(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* descriptor */
-	msg->m1_i2 = r->cx;	/* descriptor */
+	msg->m_data1 = r->bx;	/* descriptor */
+	msg->m_data2 = r->cx;	/* descriptor */
 
 	return 0;
 }
 
 static int msg_exec(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char*)r->bx;	/* filename */
-	msg->m1_p2 = (char*)r->cx;	/* frame */
-	msg->m1_i2 = r->dx;		/* frame_size */
+	msg->m_data4 = (char*)r->bx;	/* filename */
+	msg->m_data5 = (char*)r->cx;	/* frame */
+	msg->m_data2 = r->dx;		/* frame_size */
 
 	return 0;
 }
 
 static int msg_exit(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;
+	msg->m_data1 = r->bx;
 
 	return 0;
 }
 
 static int msg_fchdir(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* descriptor */
+	msg->m_data1 = r->bx;	/* descriptor */
 
 	return 0;
 }
 
 static int msg_fchmod(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_i2 = (mode_t)r->cx;	/* mode */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
 }
 
 static int msg_fchown(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_i2 = (uid_t)r->cx;	/* owner */
-	msg->m1_i3 = (gid_t)r->dx;	/* group */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data2 = (uid_t)r->cx;	/* owner */
+	msg->m_data3 = (gid_t)r->dx;	/* group */
 
 	return 0;
 }
 
 static int msg_fcntl(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_i2 = r->cx;		/* cmd */
-	msg->m1_i3 = r->dx;		/* flags */
-	msg->m1_p1 = (void*)r->dx;	/* lock */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data2 = r->cx;		/* cmd */
+	msg->m_data3 = r->dx;		/* flags */
+	msg->m_data4 = (void*)r->dx;	/* lock */
 
 	return 0;
 }
@@ -266,40 +266,40 @@ static int msg_fork(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_fstat(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (void*)r->cx;	/* buffer */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (void*)r->cx;	/* buffer */
 
 	return 0;
 }
 
 static int msg_fstatfs(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (void*)r->cx;	/* buffer */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (void*)r->cx;	/* buffer */
 
 	return 0;
 }
 
 static int msg_fsync(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* descriptor */
+	msg->m_data1 = r->bx;	/* descriptor */
 
 	return 0;
 }
 
 static int msg_ftruncate(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_i1 = r->bx;		/* descriptor */
-	msg->m2_l1 = (off_t)r->cx;	/* length */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (off_t)r->cx;	/* length */
 
 	return 0;
 }
 
 static int msg_getdents(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (void*)r->cx;	/* struct. dirent */
-	msg->m1_i2 = (size_t)r->dx;	/* count */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (void*)r->cx;	/* struct. dirent */
+	msg->m_data2 = (size_t)r->dx;	/* count */
 
 	return 0;
 }
@@ -327,16 +327,16 @@ static int msg_getgid(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_getgroups(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* size */
-	msg->m1_p1 = (gid_t*)r->cx;	/* list[] */
+	msg->m_data1 = r->bx;		/* size */
+	msg->m_data4 = (gid_t*)r->cx;	/* list[] */
 
 	return 0;
 }
 
 static int msg_getitimer(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* which */
-	msg->m1_p2 = (void*)r->cx;	/* value */
+	msg->m_data1 = r->bx;		/* which */
+	msg->m_data5 = (void*)r->cx;	/* value */
 
 	return 0;
 }
@@ -364,8 +364,8 @@ static int msg_getppid(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_getpriority(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* which */
-	msg->m1_i2 = r->cx;	/* who */
+	msg->m_data1 = r->bx;	/* which */
+	msg->m_data2 = r->cx;	/* who */
 
 	return 0;
 }
@@ -375,8 +375,8 @@ static int msg_getsysinfo(kipc_msg_t *msg, const struct pt_regs *r)
 	/* In case of this syscall the endpoint is specify by user. */
 	scall_to_srv[r->ax].endpt = r->bx;	/* who */
 
-	msg->m1_i1 = r->cx;		/* what */
-	msg->m1_p1 = (void*)r->dx;	/* where */
+	msg->m_data1 = r->cx;		/* what */
+	msg->m_data4 = (void*)r->dx;	/* where */
 
 	return 0;
 }
@@ -395,8 +395,8 @@ static int msg_getsysinfo_up(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_gettimeofday(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (void*)r->bx;	/* timeval */
-	msg->m2_l1 = r->cx;		/* timezone (expected NULL) */
+	msg->m_data6 = (void*)r->bx;	/* timeval */
+	msg->m_data4 = r->cx;		/* timezone (expected NULL) */
 
 	return 0;
 }
@@ -419,62 +419,62 @@ static int msg_ioctl(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_kill(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (pid_t)r->bx;	/* pid */
-	msg->m1_i2 = r->cx;		/* sig */
+	msg->m_data1 = (pid_t)r->bx;	/* pid */
+	msg->m_data2 = r->cx;		/* sig */
 
 	return 0;
 }
 
 static int msg_link(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char*)r->bx;	/* oldpath */
-	msg->m1_p2 = (char*)r->cx;	/* newpath */
+	msg->m_data4 = (char*)r->bx;	/* oldpath */
+	msg->m_data5 = (char*)r->cx;	/* newpath */
 
 	return 0;
 }
 
 static int msg_llseek(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_i1 = r->bx;		/* descriptor */
-	msg->m2_l2 = r->cx;		/* offset (high) */
-	msg->m2_l1 = r->dx;		/* offset (low) */
-	msg->m2_p1 = (void*)r->si;	/* result (address) */
-	msg->m2_i2 = r->di;		/* whence */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data5 = r->cx;		/* offset (high) */
+	msg->m_data4 = r->dx;		/* offset (low) */
+	msg->m_data6 = (void*)r->si;	/* result (address) */
+	msg->m_data2 = r->di;		/* whence */
 
 	return 0;
 }
 
 static int msg_lseek(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_i1 = r->bx;		/* descriptor */
-	msg->m2_l1 = (off_t)r->cx;	/* offset */
-	msg->m2_i2 = r->dx;		/* whence */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (off_t)r->cx;	/* offset */
+	msg->m_data2 = r->dx;		/* whence */
 
 	return 0;
 }
 
 static int msg_lstat(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char*)r->bx;	/* path */
-	msg->m1_p2 = (char*)r->cx;	/* buffer */
+	msg->m_data4 = (char*)r->bx;	/* path */
+	msg->m_data5 = (char*)r->cx;	/* buffer */
 
 	return 0;
 }
 
 static int msg_mkdir(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char*)r->bx;	/* name */
-	msg->m1_i2 = (mode_t)r->cx;	/* mode */
+	msg->m_data4 = (char*)r->bx;	/* name */
+	msg->m_data2 = (mode_t)r->cx;	/* mode */
 
 	return 0;
 }
 
 static int msg_mknod(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *) r->bx;		/* pathname */
-	msg->m1_i2 = (mode_t)r->cx;		/* mode */
-	msg->m1_i3 = (dev_t)r->dx;		/* device */
-	msg->m1_p2 = (char *) ((int) 0);	/* obsolete size field */
+	msg->m_data4 = (char *) r->bx;		/* pathname */
+	msg->m_data2 = (mode_t)r->cx;		/* mode */
+	msg->m_data3 = (dev_t)r->dx;		/* device */
+	msg->m_data5 = (char *) ((int) 0);	/* obsolete size field */
 
 	return 0;
 }
@@ -507,10 +507,10 @@ static int msg_mmap(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_mount(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* special */
-	msg->m1_p2 = (char *)r->cx;	/* name */
-	msg->m1_i3 = r->dx;		/* mountflags */
-	msg->m1_p3 = (char *)r->si;	/* ep */
+	msg->m_data4 = (char *)r->bx;	/* special */
+	msg->m_data5 = (char *)r->cx;	/* name */
+	msg->m_data3 = r->dx;		/* mountflags */
+	msg->m_data6 = (char *)r->si;	/* ep */
 
 	return 0;
 }
@@ -536,9 +536,9 @@ static int msg_munmap_text(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_open(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* pathname */
-	msg->m1_i2 = r->cx;		/* flags */
-	msg->m1_i3 = (mode_t)r->dx;	/* mode */
+	msg->m_data4 = (char *)r->bx;	/* pathname */
+	msg->m_data2 = r->cx;		/* flags */
+	msg->m_data3 = (mode_t)r->dx;	/* mode */
 
 	return 0;
 }
@@ -552,59 +552,59 @@ static int msg_pause(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_pipe(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* pointer to fild */
+	msg->m_data4 = (void*)r->bx;	/* pointer to fild */
 
 	return 0;
 }
 
 static int msg_ptrace(kipc_msg_t *msg, const struct pt_regs *r){
 
-	msg->m2_i2 = r->bx;		/* req */
-	msg->m2_i1 = r->cx;		/* pid */
+	msg->m_data2 = r->bx;		/* req */
+	msg->m_data1 = r->cx;		/* pid */
 	msg->PMTRACE_ADDR = r->dx;	/* addr */
-	msg->m2_l2 = r->si;		/* data */
+	msg->m_data5 = r->si;		/* data */
 
 	return 0;
 }
 
 static int msg_read(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (void*)r->cx;	/* buffer */
-	msg->m1_i2 = r->dx;		/* count */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (void*)r->cx;	/* buffer */
+	msg->m_data2 = r->dx;		/* count */
 
 	return 0;
 }
 
 static int msg_readlink(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_p2 = (void *)r->cx;	/* buffer */
-	msg->m1_i2 = r->dx;		/* bufsiz */
+	msg->m_data4 = (char *)r->bx;	/* path */
+	msg->m_data5 = (void *)r->cx;	/* buffer */
+	msg->m_data2 = r->dx;		/* bufsiz */
 
 	return 0;
 }
 
 static int msg_reboot(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* how */
-	msg->m1_p1 = (void*)r->cx;	/* code */
-	msg->m1_i2 = (size_t)r->dx	/* size of code */;
+	msg->m_data1 = r->bx;		/* how */
+	msg->m_data4 = (void*)r->cx;	/* code */
+	msg->m_data2 = (size_t)r->dx	/* size of code */;
 
 	return 0;
 }
 
 static int msg_rename(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* oldpath */
-	msg->m1_p2 = (void *)r->cx;	/* newpath */
+	msg->m_data4 = (char *)r->bx;	/* oldpath */
+	msg->m_data5 = (void *)r->cx;	/* newpath */
 
 	return 0;
 }
 
 static int msg_rmdir(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char *)r->bx;	/* pathname */
+	msg->m_data3 = (char *)r->bx;	/* pathname */
 
 	return 0;
 }
@@ -622,47 +622,47 @@ static int msg_select(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_setegid(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (gid_t)r->bx;	/* gid */
+	msg->m_data1 = (gid_t)r->bx;	/* gid */
 
 	return 0;
 }
 
 static int msg_seteuid(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (uid_t)r->bx;	/* euid */
+	msg->m_data1 = (uid_t)r->bx;	/* euid */
 
 	return 0;
 }
 
 static int msg_setgid(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (gid_t)r->bx;	/* gid */
+	msg->m_data1 = (gid_t)r->bx;	/* gid */
 
 	return 0;
 }
 
 static int msg_setgroups(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* size */
-	msg->m1_p1 = (gid_t*)r->cx;	/* *list */
+	msg->m_data1 = r->bx;		/* size */
+	msg->m_data4 = (gid_t*)r->cx;	/* *list */
 
 	return 0;
 }
 
 static int msg_setitimer(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* which */
-	msg->m1_p1 = (void*)r->cx;	/* value */
-	msg->m1_p2 = (void*)r->dx;	/* ovalue */
+	msg->m_data1 = r->bx;		/* which */
+	msg->m_data4 = (void*)r->cx;	/* value */
+	msg->m_data5 = (void*)r->dx;	/* ovalue */
 
 	return 0;
 }
 
 static int msg_setpriority(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;	/* which */
-	msg->m1_i2 = r->cx;	/* who */
-	msg->m1_i3 = r->dx;	/* prio */
+	msg->m_data1 = r->bx;	/* which */
+	msg->m_data2 = r->cx;	/* who */
+	msg->m_data3 = r->dx;	/* prio */
 
 	return 0;
 }
@@ -676,17 +676,17 @@ static int msg_setsid(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_setuid(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (uid_t)r->bx;	/* uid */
+	msg->m_data1 = (uid_t)r->bx;	/* uid */
 
 	return 0;
 }
 
 static int msg_sigaction(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i2 = r->bx;		/* sig */
-	msg->m1_p1 = (void*)r->cx;	/* act */
-	msg->m1_p2 = (void*)r->dx;	/* oact */
-	msg->m1_p3 = (void*)r->si;	/* __sigreturn */
+	msg->m_data2 = r->bx;		/* sig */
+	msg->m_data4 = (void*)r->cx;	/* act */
+	msg->m_data5 = (void*)r->dx;	/* oact */
+	msg->m_data6 = (void*)r->si;	/* __sigreturn */
 
 	return 0;
 }
@@ -700,32 +700,32 @@ static int msg_signal(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_sigpending(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* set */
+	msg->m_data4 = (void*)r->bx;	/* set */
 
 	return 0;
 }
 
 static int msg_sigprocmask(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* how */
-	msg->m1_p1 = (void*)r->cx;	/* set */
-	msg->m1_p2 = (void*)r->dx;	/* oldset */
+	msg->m_data1 = r->bx;		/* how */
+	msg->m_data4 = (void*)r->cx;	/* set */
+	msg->m_data5 = (void*)r->dx;	/* oldset */
 
 	return 0;
 }
 
 static int msg_sigreturn(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (void*)r->bx;	/* sigcontext */
-	msg->m2_l1 = r->cx;		/* mask */
-	msg->m2_i2 = r->dx;		/* flags */
+	msg->m_data6 = (void*)r->bx;	/* sigcontext */
+	msg->m_data4 = r->cx;		/* mask */
+	msg->m_data2 = r->dx;		/* flags */
 
 	return 0;
 }
 
 static int msg_sigsuspend(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* set */
+	msg->m_data4 = (void*)r->bx;	/* set */
 
 	return 0;
 }
@@ -743,15 +743,15 @@ static int msg_sprof(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_stat(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* path */
-	msg->m1_p2 = (void *)r->cx;	/* buffer */
+	msg->m_data4 = (char *)r->bx;	/* path */
+	msg->m_data5 = (void *)r->cx;	/* buffer */
 
 	return 0;
 }
 
 static int msg_stime(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (void*)r->bx;	/* time */
+	msg->m_data6 = (void*)r->bx;	/* time */
 
 	return 0;
 }
@@ -761,16 +761,16 @@ static int msg_svrctl(kipc_msg_t *msg, const struct pt_regs *r)
 	/* In case of this syscall the endpoint is specify by user. */
 	scall_to_srv[r->ax].endpt = r->bx;	/* who */
 
-	msg->m2_i1 = r->cx;		/* request */
-	msg->m2_p1 = (void*)r->dx;	/* argp */
+	msg->m_data1 = r->cx;		/* request */
+	msg->m_data6 = (void*)r->dx;	/* argp */
 
 	return 0;
 }
 
 static int msg_symlink(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (char *)r->bx;	/* oldpath */
-	msg->m1_p2 = (char *)r->cx;	/* newpath */
+	msg->m_data4 = (char *)r->bx;	/* oldpath */
+	msg->m_data5 = (char *)r->cx;	/* newpath */
 
 	return 0;
 }
@@ -784,91 +784,91 @@ static int msg_sync(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_uname(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* utsname */
+	msg->m_data4 = (void*)r->bx;	/* utsname */
 
 	return 0;
 }
 
 static int msg_time(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* time */
+	msg->m_data4 = (void*)r->bx;	/* time */
 
 	return 0;
 }
 
 static int msg_times(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_p1 = (void*)r->bx;	/* times */
+	msg->m_data4 = (void*)r->bx;	/* times */
 
 	return 0;
 }
 
 static int msg_truncate(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (char *)r->bx;	/* path */
-	msg->m2_l1 = (off_t)r->cx;	/* length */
+	msg->m_data6 = (char *)r->bx;	/* path */
+	msg->m_data4 = (off_t)r->cx;	/* length */
 
 	return 0;
 }
 
 static int msg_umask(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = (mode_t)r->bx;	/* mask */
+	msg->m_data1 = (mode_t)r->bx;	/* mask */
 
 	return 0;
 }
 
 static int msg_umount(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char *)r->bx;	/* target */
+	msg->m_data3 = (char *)r->bx;	/* target */
 
 	return 0;
 }
 
 static int msg_unlink(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m3_p1 = (char *)r->bx;	/* pathname */
+	msg->m_data3 = (char *)r->bx;	/* pathname */
 
 	return 0;
 }
 
 static int msg_utime(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m2_p1 = (char *)r->bx;	/* filename */
-	msg->m2_l1 = r->cx;		/* times pointer */
+	msg->m_data6 = (char *)r->bx;	/* filename */
+	msg->m_data4 = r->cx;		/* times pointer */
 
 	return 0;
 }
 
 static int msg_wait(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	/* @nucleos: The `msg->m1_p1' is not really used but
+	/* @nucleos: The `msg->m_data4' is not really used but
 	 *           `r->bx' is important. It holds the status
 	 *           address.
 	 */
-	msg->m1_p1 = (void*)r->bx;	/* status */
+	msg->m_data4 = (void*)r->bx;	/* status */
 
 	return 0;
 }
 
 static int msg_waitpid(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	/* @nucleos: The `msg->m1_p1' is not really used but
+	/* @nucleos: The `msg->m_data4' is not really used but
 	 *           `r->cx' is important. It holds the status
 	 *           address.
 	 */
-	msg->m1_i1 = r->bx;		/* pid */
-	msg->m1_p1 = (void*)r->cx;	/* status */
-	msg->m1_i2 = r->dx;		/* options */
+	msg->m_data1 = r->bx;		/* pid */
+	msg->m_data4 = (void*)r->cx;	/* status */
+	msg->m_data2 = r->dx;		/* options */
 
 	return 0;
 }
 
 static int msg_write(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m1_i1 = r->bx;		/* descriptor */
-	msg->m1_p1 = (char *)r->cx;	/* buffer */
-	msg->m1_i2 = (size_t)r->dx;	/* count */
+	msg->m_data1 = r->bx;		/* descriptor */
+	msg->m_data4 = (char *)r->cx;	/* buffer */
+	msg->m_data2 = (size_t)r->dx;	/* count */
 
 	return 0;
 }

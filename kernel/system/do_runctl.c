@@ -2,9 +2,9 @@
  *   m_type:	SYS_RUNCTL
  *
  * The parameters for this kernel call are:
- *    m1_i1:	RC_ENDPT	process number to control
- *    m1_i2:	RC_ACTION	stop or resume the process
- *    m1_i3:	RC_FLAGS	request flags
+ *    m_data1:	RC_ENDPT	process number to control
+ *    m_data2:	RC_ACTION	stop or resume the process
+ *    m_data3:	RC_FLAGS	request flags
  */
 
 #include <kernel/system.h>

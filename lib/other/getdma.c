@@ -21,9 +21,9 @@ int getdma(endpoint_t *procp, phys_bytes *basep, phys_bytes *sizep)
   r= ktaskcall(PM_PROC_NR, KCNR_GETDMA, &m);
   if (r == 0)
   {
-	*procp= m.m2_i1;
-	*basep= m.m2_l1;
-	*sizep= m.m2_l2;
+	*procp= m.m_data1;
+	*basep= m.m_data4;
+	*sizep= m.m_data5;
   }
   return r;
 }

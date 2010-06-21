@@ -11,9 +11,9 @@
  *   m_type:	SYS_VIRVCOPY, SYS_PHYSVCOPY 
  *
  * The parameters for this kernel call are:
- *    m1_i3:	VCP_VEC_SIZE		size of copy request vector 
- *    m1_p1:	VCP_VEC_ADDR		address of vector at caller 
- *    m1_i2:	VCP_NR_OK		number of successfull copies	
+ *    m_data3:	VCP_VEC_SIZE		size of copy request vector 
+ *    m_data4:	VCP_VEC_ADDR		address of vector at caller 
+ *    m_data2:	VCP_NR_OK		number of successfull copies	
  */
 
 #include <kernel/system.h>

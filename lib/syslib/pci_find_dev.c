@@ -27,9 +27,9 @@ int *devindp;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_FIND_DEV;
-	m.m1_i1= bus;
-	m.m1_i2= dev;
-	m.m1_i3= func;
+	m.m_data1= bus;
+	m.m_data2= dev;
+	m.m_data3= func;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)
@@ -37,7 +37,7 @@ int *devindp;
 
 	if (m.m_type == 1)
 	{
-		*devindp= m.m1_i1;
+		*devindp= m.m_data1;
 		printf("pci_find_dev: got device %d for %d.%d.%d\n",
 			*devindp, bus, dev, func);
 		return 1;

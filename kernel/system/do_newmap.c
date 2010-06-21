@@ -11,8 +11,8 @@
  *   m_type:	SYS_NEWMAP
  *
  * The parameters for this kernel call are:
- *    m1_i1:	PR_ENDPT		(install new map for this process)
- *    m1_p1:	PR_MEM_PTR		(pointer to the new memory map)
+ *    m_data1:	PR_ENDPT		(install new map for this process)
+ *    m_data4:	PR_MEM_PTR		(pointer to the new memory map)
  */
 #include <kernel/system.h>
 #include <nucleos/endpoint.h>

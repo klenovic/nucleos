@@ -26,9 +26,9 @@ u32_t value;
 	kipc_msg_t m;
 
 	m.m_type= BUSC_PCI_ATTR_W32;
-	m.m2_i1= devind;
-	m.m2_i2= port;
-	m.m2_l1= value;
+	m.m_data1= devind;
+	m.m_data2= port;
+	m.m_data4= value;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	if (r != 0)

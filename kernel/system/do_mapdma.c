@@ -11,8 +11,8 @@
  *   m_type:	SYS_MAPDMA
  *
  * The parameters for this kernel call are:
- *    m5_l1:	CP_SRC_ADDR	(virtual address)	
- *    m5_l3:	CP_NR_BYTES	(size of datastructure) 	
+ *    m_data5:	CP_SRC_ADDR	(virtual address)	
+ *    m_data7:	CP_NR_BYTES	(size of datastructure) 	
  */
 
 #include <kernel/system.h>

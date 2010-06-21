@@ -11,7 +11,7 @@
  *   m_type:	SYS_EXIT
  *
  * The parameters for this kernel call are:
- *    m1_i1:	PR_ENDPT		(slot number of exiting process)
+ *    m_data1:	PR_ENDPT		(slot number of exiting process)
  */
 
 #include <kernel/system.h>

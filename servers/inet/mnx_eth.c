@@ -166,7 +166,7 @@ void osdep_eth_init()
 		eth_port->etp_rd_pack= 0;
 		if (r == 0)
 		{
-			eth_port->etp_ethaddr= *(ether_addr_t *)mess.m3_ca1;
+			eth_port->etp_ethaddr= *(ether_addr_t *)mess.m_data10;
 			printf("osdep_eth_init: setting EPF_GOT_ADDR\n");
 			eth_port->etp_flags |= EPF_GOT_ADDR;
 			setup_read (eth_port);
@@ -264,7 +264,7 @@ kipc_msg_t *m;
 	m_type= m->m_type;
 	if (m_type == DL_NAME_REPLY)
 		{
-		drivername= m->m3_ca1;
+		drivername= m->m_data10;
 #if 0
 		printf("eth_rec: got name: %s\n", drivername);
 
@@ -325,7 +325,7 @@ kipc_msg_t *m;
 			return;
 		}
 
-		r= m->m3_i1;
+		r= m->m_data1;
 		if (r == -ENXIO)
 			{
 				printf(
@@ -344,7 +344,7 @@ kipc_msg_t *m;
 		loc_port->etp_osdep.etp_state= OEPS_IDLE;
 		loc_port->etp_flags |= EPF_ENABLED;
 
-		loc_port->etp_ethaddr= *(ether_addr_t *)m->m3_ca1;
+		loc_port->etp_ethaddr= *(ether_addr_t *)m->m_data10;
 		if (!(loc_port->etp_flags & EPF_GOT_ADDR))
 	{
 			loc_port->etp_flags |= EPF_GOT_ADDR;

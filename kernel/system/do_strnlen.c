@@ -11,9 +11,9 @@
  *   m_type:	SYS_STRNLEN
  *
  * The parameters for this kernel call are:
- *     m1_i1: STRNLEN_PROC_E	process endpoint
- *     m1_p1: STRNLEN_STR	string (user)
- *     m1_i2: STRNLEN_MAXLEN	max. length
+ *     m_data1: STRNLEN_PROC_E	process endpoint
+ *     m_data4: STRNLEN_STR	string (user)
+ *     m_data2: STRNLEN_MAXLEN	max. length
  */
 #include <nucleos/type.h>
 #include <nucleos/const.h>

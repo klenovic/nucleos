@@ -14,54 +14,54 @@
 #include <nucleos/limits.h>
 
 /* VFS/FS request fields */
-#define REQ_ACTIME		m9_l2
-#define REQ_COUNT		m9_l2
-#define REQ_DEV			m9_l5
-#define REQ_DEV2		m9_l1
-#define REQ_DIR_INO   		m9_l3
-#define REQ_DRIVER_E		m9_l2
-#define REQ_FLAGS		m9_s3
-#define REQ_GID			m9_s1
-#define REQ_GRANT		m9_l2
-#define REQ_GRANT2		m9_l1 
-#define REQ_GRANT3		m9_l3
-#define REQ_INODE_NR		m9_l1
-#define REQ_MEM_SIZE		m9_l5
-#define REQ_MODE		m9_s3
-#define REQ_MODTIME		m9_l3
-#define REQ_NBYTES		m9_l5
-#define REQ_PATH_LEN		m9_s2
-#define REQ_PATH_SIZE		m9_l5
-#define REQ_REN_GRANT_NEW	m9_l1
-#define REQ_REN_GRANT_OLD	m9_l2
-#define REQ_REN_LEN_NEW		m9_s2
-#define REQ_REN_LEN_OLD		m9_s1
-#define REQ_REN_NEW_DIR		m9_l4
-#define REQ_REN_OLD_DIR		m9_l3
-#define REQ_ROOT_INO		m9_l4
-#define REQ_SEEK_POS_HI		m9_l3
-#define REQ_SEEK_POS_LO		m9_l4
-#define REQ_TRC_END_HI		m9_l4
-#define REQ_TRC_END_LO		m9_l5
-#define REQ_TRC_START_HI	m9_l2
-#define REQ_TRC_START_LO	m9_l3
-#define REQ_UCRED_SIZE		m9_s4 
-#define REQ_UID			m9_s4
+#define REQ_ACTIME		m_data2
+#define REQ_COUNT		m_data2
+#define REQ_DEV			m_data5
+#define REQ_DEV2		m_data1
+#define REQ_DIR_INO   		m_data3
+#define REQ_DRIVER_E		m_data2
+#define REQ_FLAGS		m_data8
+#define REQ_GID			m_data6
+#define REQ_GRANT		m_data2
+#define REQ_GRANT2		m_data1 
+#define REQ_GRANT3		m_data3
+#define REQ_INODE_NR		m_data1
+#define REQ_MEM_SIZE		m_data5
+#define REQ_MODE		m_data8
+#define REQ_MODTIME		m_data3
+#define REQ_NBYTES		m_data5
+#define REQ_PATH_LEN		m_data7
+#define REQ_PATH_SIZE		m_data5
+#define REQ_REN_GRANT_NEW	m_data1
+#define REQ_REN_GRANT_OLD	m_data2
+#define REQ_REN_LEN_NEW		m_data7
+#define REQ_REN_LEN_OLD		m_data6
+#define REQ_REN_NEW_DIR		m_data4
+#define REQ_REN_OLD_DIR		m_data3
+#define REQ_ROOT_INO		m_data4
+#define REQ_SEEK_POS_HI		m_data3
+#define REQ_SEEK_POS_LO		m_data4
+#define REQ_TRC_END_HI		m_data4
+#define REQ_TRC_END_LO		m_data5
+#define REQ_TRC_START_HI	m_data2
+#define REQ_TRC_START_LO	m_data3
+#define REQ_UCRED_SIZE		m_data9 
+#define REQ_UID			m_data9
 
 
 /* VFS/FS reply fields */
-#define RES_DEV			m9_l4
-#define RES_GID			m9_s1
-#define RES_INODE_NR		m9_l1
-#define RES_FILE_SIZE_HI	m9_l2
-#define RES_FILE_SIZE_LO	m9_l3
-#define RES_MODE		m9_s2
-#define RES_NBYTES		m9_l5
-#define RES_OFFSET		m9_s2
-#define RES_SEEK_POS_HI		m9_l3
-#define RES_SEEK_POS_LO		m9_l4
-#define RES_SYMLOOP		m9_s3
-#define RES_UID			m9_s4
+#define RES_DEV			m_data4
+#define RES_GID			m_data6
+#define RES_INODE_NR		m_data1
+#define RES_FILE_SIZE_HI	m_data2
+#define RES_FILE_SIZE_LO	m_data3
+#define RES_MODE		m_data7
+#define RES_NBYTES		m_data5
+#define RES_OFFSET		m_data7
+#define RES_SEEK_POS_HI		m_data3
+#define RES_SEEK_POS_LO		m_data4
+#define RES_SYMLOOP		m_data8
+#define RES_UID			m_data9
 
 /* VFS/FS flags */
 #define REQ_RDONLY		001
@@ -71,8 +71,8 @@
 					 * do not continue with the contents
 					 * of the symlink if it is the last
 					 * component in a path). */
-#define PATH_GET_UCRED		002	/* Request provides a grant ID in m9_l1
-					 * and struct ucred size in m9_s4 (as
+#define PATH_GET_UCRED		002	/* Request provides a grant ID in m_data1
+					 * and struct ucred size in m_data9 (as
 					 * opposed to a REQ_UID). */
 
 /* VFS/FS error messages */

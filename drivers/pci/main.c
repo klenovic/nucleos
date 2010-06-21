@@ -136,9 +136,9 @@ kipc_msg_t *mp;
 	r= pci_first_dev_a(aclp, &devind, &vid, &did);
 	if (r == 1)
 	{
-		mp->m1_i1= devind;
-		mp->m1_i2= vid;
-		mp->m1_i3= did;
+		mp->m_data1= devind;
+		mp->m_data2= vid;
+		mp->m_data3= did;
 	}
 	mp->m_type= r;
 	r= kipc_send(mp->m_source, mp);
@@ -156,15 +156,15 @@ kipc_msg_t *mp;
 	u16_t vid, did;
 	struct rs_pci *aclp;
 
-	devind= mp->m1_i1;
+	devind= mp->m_data1;
 	aclp= find_acl(mp->m_source);
 
 	r= pci_next_dev_a(aclp, &devind, &vid, &did);
 	if (r == 1)
 	{
-		mp->m1_i1= devind;
-		mp->m1_i2= vid;
-		mp->m1_i3= did;
+		mp->m_data1= devind;
+		mp->m_data2= vid;
+		mp->m_data3= did;
 	}
 	mp->m_type= r;
 	r= kipc_send(mp->m_source, mp);
@@ -181,13 +181,13 @@ kipc_msg_t *mp;
 	int r, devind;
 	u8_t bus, dev, func;
 
-	bus= mp->m1_i1;
-	dev= mp->m1_i2;
-	func= mp->m1_i3;
+	bus= mp->m_data1;
+	dev= mp->m_data2;
+	func= mp->m_data3;
 
 	r= pci_find_dev(bus, dev, func, &devind);
 	if (r == 1)
-		mp->m1_i1= devind;
+		mp->m_data1= devind;
 	mp->m_type= r;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
@@ -203,7 +203,7 @@ kipc_msg_t *mp;
 	int r, devind;
 	u16_t vid, did;
 
-	devind= mp->m1_i1;
+	devind= mp->m_data1;
 
 	r= pci_ids_s(devind, &vid, &did);
 	if (r != 0)
@@ -212,8 +212,8 @@ kipc_msg_t *mp;
 			devind, r);
 	}
 
-	mp->m1_i1= vid;
-	mp->m1_i2= did;
+	mp->m_data1= vid;
+	mp->m_data2= did;
 	mp->m_type= r;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
@@ -230,10 +230,10 @@ kipc_msg_t *mp;
 	u16_t vid, did;
 	char *name_ptr, *name;
 
-	vid= mp->m1_i1;
-	did= mp->m1_i2;
-	name_len= mp->m1_i3;
-	name_ptr= mp->m1_p1;
+	vid= mp->m_data1;
+	did= mp->m_data2;
+	name_len= mp->m_data3;
+	name_ptr= mp->m_data4;
 
 	name= pci_dev_name(vid, did);
 	if (name == NULL)
@@ -268,10 +268,10 @@ kipc_msg_t *mp;
 	cp_grant_id_t name_gid;
 	char *name;
 
-	vid= mp->m7_i1;
-	did= mp->m7_i2;
-	name_len= mp->m7_i3;
-	name_gid= mp->m7_i4;
+	vid= mp->m_data1;
+	did= mp->m_data2;
+	name_len= mp->m_data3;
+	name_gid= mp->m_data4;
 
 	name= pci_dev_name(vid, did);
 	if (name == NULL)
@@ -304,9 +304,9 @@ kipc_msg_t *mp;
 	cp_grant_id_t gid;
 	char *name;
 
-	devind= mp->m1_i1;
-	name_len= mp->m1_i2;
-	gid= mp->m1_i3;
+	devind= mp->m_data1;
+	name_len= mp->m_data2;
+	gid= mp->m_data3;
 
 	r= pci_slot_name_s(devind, &name);
 	if (r != 0)
@@ -357,7 +357,7 @@ kipc_msg_t *mp;
 		return;
 	}
 
-	gid= mp->m1_i1;
+	gid= mp->m_data1;
 
 	r= sys_safecopyfrom(mp->m_source, gid, 0, (vir_bytes)&acl[i].acl,
 		sizeof(acl[i].acl), D);
@@ -388,7 +388,7 @@ kipc_msg_t *mp;
 		return;
 	}
 
-	proc_nr= mp->m1_i1;
+	proc_nr= mp->m_data1;
 
 	for (i= 0; i<NR_DRIVERS; i++)
 	{
@@ -422,7 +422,7 @@ kipc_msg_t *mp;
 {
 	int i, r, devind;
 
-	devind= mp->m1_i1;
+	devind= mp->m_data1;
 
 	mp->m_type= pci_reserve2(devind, mp->m_source);
 	r= kipc_send(mp->m_source, mp);
@@ -439,8 +439,8 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u8_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
+	devind= mp->m_data1;
+	port= mp->m_data2;
 
 	r= pci_attr_r8_s(devind, port, &v);
 	if (r != 0)
@@ -449,7 +449,7 @@ kipc_msg_t *mp;
 		"pci:do_attr_r8: pci_attr_r8_s(%d, %d, ...) failed: %d\n",
 			devind, port, r);
 	}
-	mp->m2_l1= v;
+	mp->m_data4= v;
 	mp->m_type= r;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
@@ -465,11 +465,11 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u32_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
+	devind= mp->m_data1;
+	port= mp->m_data2;
 
 	v= pci_attr_r16(devind, port);
-	mp->m2_l1= v;
+	mp->m_data4= v;
 	mp->m_type= 0;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
@@ -485,8 +485,8 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u32_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
+	devind= mp->m_data1;
+	port= mp->m_data2;
 
 	r= pci_attr_r32_s(devind, port, &v);
 	if (r != 0)
@@ -495,7 +495,7 @@ kipc_msg_t *mp;
 		"pci:do_attr_r32: pci_attr_r32_s(%d, %d, ...) failed: %d\n",
 			devind, port, r);
 	}
-	mp->m2_l1= v;
+	mp->m_data4= v;
 	mp->m_type= 0;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)
@@ -511,9 +511,9 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u8_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
-	v= mp->m2_l1;
+	devind= mp->m_data1;
+	port= mp->m_data2;
+	v= mp->m_data4;
 
 	pci_attr_w8(devind, port, v);
 	mp->m_type= 0;
@@ -531,9 +531,9 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u16_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
-	v= mp->m2_l1;
+	devind= mp->m_data1;
+	port= mp->m_data2;
+	v= mp->m_data4;
 
 	pci_attr_w16(devind, port, v);
 	mp->m_type= 0;
@@ -551,9 +551,9 @@ kipc_msg_t *mp;
 	int r, devind, port;
 	u32_t v;
 
-	devind= mp->m2_i1;
-	port= mp->m2_i2;
-	v= mp->m2_l1;
+	devind= mp->m_data1;
+	port= mp->m_data2;
+	v= mp->m_data4;
 
 	pci_attr_w32(devind, port, v);
 	mp->m_type= 0;
@@ -570,7 +570,7 @@ kipc_msg_t *mp;
 {
 	int r, busnr;
 
-	busnr= mp->m2_i1;
+	busnr= mp->m_data1;
 
 	pci_rescan_bus(busnr);
 	mp->m_type= 0;

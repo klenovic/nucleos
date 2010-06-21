@@ -11,11 +11,11 @@
  *   m_type:	SYS_GETINFO
  *
  * The parameters for this kernel call are:
- *    m1_i3:	I_REQUEST	(what info to get)	
- *    m1_p1:	I_VAL_PTR 	(where to put it)	
- *    m1_i1:	I_VAL_LEN 	(maximum length expected, optional)	
- *    m1_p2:	I_VAL_PTR2	(second, optional pointer)	
- *    m1_i2:	I_VAL_LEN2_E	(second length or process nr)	
+ *    m_data3:	I_REQUEST	(what info to get)	
+ *    m_data4:	I_VAL_PTR 	(where to put it)	
+ *    m_data1:	I_VAL_LEN 	(maximum length expected, optional)	
+ *    m_data5:	I_VAL_PTR2	(second, optional pointer)	
+ *    m_data2:	I_VAL_LEN2_E	(second length or process nr)	
  */
 #include <nucleos/string.h>
 #include <nucleos/endpoint.h>

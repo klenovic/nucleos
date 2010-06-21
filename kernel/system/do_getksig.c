@@ -11,8 +11,8 @@
  *   m_type:	SYS_GETKSIG
  *
  * The parameters for this kernel call are:
- *     m2_i1:	SIG_ENDPT  	# process with pending signals
- *     m2_l1:	SIG_MAP		# bit map with pending signals
+ *     m_data1:	SIG_ENDPT  	# process with pending signals
+ *     m_data4:	SIG_MAP		# bit map with pending signals
  */
 
 #include <kernel/system.h>

@@ -11,7 +11,7 @@
  *   m_type:	SYS_IOPENABLE
  *
  * The parameters for this system call are:
- *    m2_i2:	IO_ENDPT	(process to give I/O Protection Level bits)
+ *    m_data2:	IO_ENDPT	(process to give I/O Protection Level bits)
  *
  * Author:
  *    Jorrit N. Herder <jnherder@cs.vu.nl>

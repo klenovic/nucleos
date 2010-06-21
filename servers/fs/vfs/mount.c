@@ -49,7 +49,7 @@ int do_fsready()
   int r;
 
   /* Login before mount request */
-  if ((unsigned long)mount_m_in.m1_p3 != who_e) {
+  if ((unsigned long)mount_m_in.m_data6 != who_e) {
       last_login_fs_e = who_e;
       r = SUSPEND;
   }

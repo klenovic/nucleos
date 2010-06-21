@@ -11,7 +11,7 @@
  *   m_type:	SYS_ENDKSIG
  *
  * The parameters for this kernel call are:
- *     m2_i1:	SIG_ENDPT  	# process for which PM is done
+ *     m_data1:	SIG_ENDPT  	# process for which PM is done
  */
 
 #include <kernel/system.h>

@@ -11,11 +11,11 @@
  *   m_type:	SYS_SEGCTL
  *
  * The parameters for this kernel call are:
- *    m4_l3:	SEG_PHYS	(physical base address)
- *    m4_l4:	SEG_SIZE	(size of segment)
- *    m4_l1:	SEG_SELECT	(return segment selector here)
- *    m4_l2:	SEG_OFFSET	(return offset within segment here)
- *    m4_l5:	SEG_INDEX	(return index into remote memory map here)
+ *    m_data3:	SEG_PHYS	(physical base address)
+ *    m_data4:	SEG_SIZE	(size of segment)
+ *    m_data1:	SEG_SELECT	(return segment selector here)
+ *    m_data2:	SEG_OFFSET	(return offset within segment here)
+ *    m_data5:	SEG_INDEX	(return index into remote memory map here)
  */
 #include <kernel/system.h>
 

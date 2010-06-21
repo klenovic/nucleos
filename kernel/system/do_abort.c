@@ -11,10 +11,10 @@
  *   m_type:	SYS_ABORT
  *
  * The parameters for this kernel call are:
- *    m1_i1:	ABRT_HOW 	(how to abort, possibly fetch monitor params)	
- *    m1_i2:	ABRT_MON_ENDPT 	(proc nr to get monitor params from)	
- *    m1_i3:	ABRT_MON_LEN	(length of monitor params)
- *    m1_p1:	ABRT_MON_ADDR 	(virtual address of params)	
+ *    m_data1:	ABRT_HOW 	(how to abort, possibly fetch monitor params)	
+ *    m_data2:	ABRT_MON_ENDPT 	(proc nr to get monitor params from)	
+ *    m_data3:	ABRT_MON_LEN	(length of monitor params)
+ *    m_data4:	ABRT_MON_ADDR 	(virtual address of params)	
  */
 #include <nucleos/kernel.h>
 #include <nucleos/unistd.h>

@@ -13,11 +13,11 @@
 int mapdriver5(char *label, size_t len, int major, int dev_style, int force)
 {
   kipc_msg_t m;
-  m.m2_p1 = label;
-  m.m2_l1 = len;
-  m.m2_i1 = major;
-  m.m2_i2 = dev_style;
-  m.m2_i3 = force;
+  m.m_data6 = label;
+  m.m_data4 = len;
+  m.m_data1 = major;
+  m.m_data2 = dev_style;
+  m.m_data3 = force;
   if (ktaskcall(FS_PROC_NR, KCNR_MAPDRIVER, &m) < 0) return(-1);
   return(0);
 }

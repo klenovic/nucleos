@@ -25,7 +25,7 @@
 #include <nucleos/vfsif.h>
 #include "vmnt.h"
 
-#define utime_ptimes	m2_l1	/* times pointer */
+#define utime_ptimes	m_data4	/* times pointer */
 
 /*===========================================================================*
  *				scall_utime				     *

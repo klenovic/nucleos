@@ -36,9 +36,9 @@ int devind;
 	}
 
 	m.m_type= BUSC_PCI_SLOT_NAME_S;
-	m.m1_i1= devind;
-	m.m1_i2= sizeof(name);
-	m.m1_i3= gid;
+	m.m_data1= devind;
+	m.m_data2= sizeof(name);
+	m.m_data3= gid;
 
 	r= kipc_sendrec(pci_procnr, &m);
 	cpf_revoke(gid);

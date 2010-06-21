@@ -40,7 +40,7 @@
  * |DL_TASK_REPL| port nr  | proc nr | rd-count | err|stat| clock   |
  * |------------|----------|---------|----------|---------|---------|
  *
- *   m_type       m3_i1     m3_i2       m3_ca1
+ *   m_type       m_data1     m_data2       m_data10
  * |------------+---------+-----------+---------------|
  * |DL_CONF_REPL| port nr | last port | ethernet addr |
  * |------------|---------|-----------|---------------|
@@ -502,7 +502,7 @@ kipc_msg_t *mp;
    if (port < 0 || port >= EC_PORT_NR_MAX)
    {
       reply_mess.m_type= DL_CONF_REPLY;
-      reply_mess.m3_i1= -ENXIO;
+      reply_mess.m_data1= -ENXIO;
       mess_reply(mp, &reply_mess);
       return;
    }
@@ -528,7 +528,7 @@ kipc_msg_t *mp;
       {
          /* Probe failed, or the device is configured off. */
          reply_mess.m_type= DL_CONF_REPLY;
-         reply_mess.m3_i1= -ENXIO;
+         reply_mess.m_data1= -ENXIO;
          mess_reply(mp, &reply_mess);
          return;
       }
@@ -546,9 +546,9 @@ kipc_msg_t *mp;
          ec->mac_address.ea_addr[5] = 0;
       ec_confaddr(ec);
       reply_mess.m_type = DL_CONF_REPLY;
-      reply_mess.m3_i1 = mp->DL_PORT;
-      reply_mess.m3_i2 = EC_PORT_NR_MAX;
-      *(ether_addr_t *) reply_mess.m3_ca1 = ec->mac_address;
+      reply_mess.m_data1 = mp->DL_PORT;
+      reply_mess.m_data2 = EC_PORT_NR_MAX;
+      *(ether_addr_t *) reply_mess.m_data10 = ec->mac_address;
       mess_reply(mp, &reply_mess);
       return;
    }
@@ -569,9 +569,9 @@ kipc_msg_t *mp;
    ec_reinit(ec);
 
    reply_mess.m_type = DL_CONF_REPLY;
-   reply_mess.m3_i1 = mp->DL_PORT;
-   reply_mess.m3_i2 = EC_PORT_NR_MAX;
-   *(ether_addr_t *) reply_mess.m3_ca1 = ec->mac_address;
+   reply_mess.m_data1 = mp->DL_PORT;
+   reply_mess.m_data2 = EC_PORT_NR_MAX;
+   *(ether_addr_t *) reply_mess.m_data10 = ec->mac_address;
 
    mess_reply(mp, &reply_mess);
 }

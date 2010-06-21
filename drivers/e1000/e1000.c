@@ -169,15 +169,15 @@ kipc_msg_t *mp;
     if (!(e->status & E1000_ENABLED) && !(e1000_init_hw(e)))
     {
         reply_mess.m_type = DL_CONF_REPLY;
-        reply_mess.m3_i1  = -ENXIO;
+        reply_mess.m_data1  = -ENXIO;
         mess_reply(mp, &reply_mess);
         return;
     }
     /* Reply back to INET. */
     reply_mess.m_type = DL_CONF_REPLY;
-    reply_mess.m3_i1  = mp->DL_PORT;
-    reply_mess.m3_i2  = E1000_PORT_NR;
-    *(ether_addr_t *) reply_mess.m3_ca1 = e->address;
+    reply_mess.m_data1  = mp->DL_PORT;
+    reply_mess.m_data2  = E1000_PORT_NR;
+    *(ether_addr_t *) reply_mess.m_data10 = e->address;
     mess_reply(mp, &reply_mess);
 }
 

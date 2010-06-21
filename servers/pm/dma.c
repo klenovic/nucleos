@@ -34,9 +34,9 @@ int do_adddma()
 		return -EPERM;
 
 	req_proc_e= m_in.m_source;
-	target_proc_e= m_in.m2_i1;
-	base= m_in.m2_l1;
-	size= m_in.m2_l2;
+	target_proc_e= m_in.m_data1;
+	base= m_in.m_data4;
+	size= m_in.m_data5;
 
 	if((r = vm_adddma(req_proc_e, target_proc_e, base, size)) != 0) {
 		printf("pm:do_adddma: vm_adddma failed (%d)\n", r);
@@ -65,9 +65,9 @@ int do_deldma()
 		return -EPERM;
 
 	req_proc_e= m_in.m_source;
-	target_proc_e= m_in.m2_i1;
-	base= m_in.m2_l1;
-	size= m_in.m2_l2;
+	target_proc_e= m_in.m_data1;
+	base= m_in.m_data4;
+	size= m_in.m_data5;
 
 	return vm_deldma(req_proc_e, target_proc_e, base, size);
 }
@@ -92,9 +92,9 @@ int do_getdma()
 	printf("pm:do_getdma: setting reply to 0x%lx@0x%lx proc %d\n",
 		size, base, proc);
 
-	mp->mp_reply.m2_i1= proc;
-	mp->mp_reply.m2_l1= base;
-	mp->mp_reply.m2_l2= size;
+	mp->mp_reply.m_data1= proc;
+	mp->mp_reply.m_data4= base;
+	mp->mp_reply.m_data5= size;
 
 	return 0;
 }

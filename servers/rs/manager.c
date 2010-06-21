@@ -1040,7 +1040,7 @@ kipc_msg_t *m_ptr;
   /* This call requires special privileges. */
   if (!caller_is_root(m_ptr->m_source)) return(-EPERM);
 
-  switch(m_ptr->m1_i1) {
+  switch(m_ptr->m_data1) {
   case SI_PROC_TAB:
   	src_addr = (vir_bytes) rproc;
   	len = sizeof(struct rproc) * NR_SYS_PROCS;
@@ -1050,7 +1050,7 @@ kipc_msg_t *m_ptr;
   }
 
   dst_proc = m_ptr->m_source;
-  dst_addr = (vir_bytes) m_ptr->m1_p1;
+  dst_addr = (vir_bytes) m_ptr->m_data4;
   if ((s=sys_datacopy(ENDPT_SELF, src_addr, dst_proc, dst_addr, len)) != 0)
   	return(s);
   return 0;
