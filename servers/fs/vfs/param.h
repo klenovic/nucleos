@@ -33,7 +33,6 @@
 #define name2_length  m_data2
 #define nbytes        m_data2
 #define owner	      m_data2
-#define pathname      m_data10
 #define pid	      m_data3
 #define ENDPT	      m_data1
 #define offset_lo     m_data4
