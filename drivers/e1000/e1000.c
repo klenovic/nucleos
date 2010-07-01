@@ -177,7 +177,14 @@ kipc_msg_t *mp;
     reply_mess.m_type = DL_CONF_REPLY;
     reply_mess.m_data1  = mp->DL_PORT;
     reply_mess.m_data2  = E1000_PORT_NR;
-    *(ether_addr_t *) reply_mess.m_data10 = e->address;
+
+    reply_mess.m_data3 = (e->address.ea_addr[0]|
+                         (e->address.ea_addr[1]<<1)|
+                         (e->address.ea_addr[2]<<2)|
+                         (e->address.ea_addr[3]<<3));
+    reply_mess.m_data4 = (e->address.ea_addr[4]|
+                         (e->address.ea_addr[5]<<1));
+
     mess_reply(mp, &reply_mess);
 }
 
@@ -778,9 +785,7 @@ kipc_msg_t *mp;
     E1000_DEBUG(3, ("e1000: getname()\n"));
 
     /* Copy our program name. */
-    strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
-    mp->DL_NAME[ sizeof(mp->DL_NAME) - 1 ] = 0;
-
+    mp->DL_NAME = progname;
     /* Acknowledge the name request. */
     mp->m_type = DL_NAME_REPLY;
     if ((r = send(mp->m_source, mp)) != 0)

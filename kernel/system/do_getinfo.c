@@ -109,14 +109,6 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		break;
 	}
 
-	case GET_WHOAMI:
-		/* GET_WHOAMI uses m3 and only uses the message contents for info. */
-		m_ptr->GIWHO_EP = caller->p_endpoint;
-		len = MIN(sizeof(m_ptr->GIWHO_NAME), sizeof(caller->p_name))-1;
-		strncpy(m_ptr->GIWHO_NAME, caller->p_name, len);
-		m_ptr->GIWHO_NAME[len] = '\0';
-		return 0;
-
 	case GET_MONPARAMS:
 		src_vir = (vir_bytes) params_buffer;
 		length = sizeof(params_buffer);

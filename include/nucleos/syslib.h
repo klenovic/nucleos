@@ -178,7 +178,6 @@ int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_byte
 #define sys_getbootparam(dst)	sys_getinfo(GET_BOOTPARAM, dst, 0,0,0)
 
 int sys_getinfo(int request, void *val_ptr, int val_len, void *val_ptr2, int val_len2);
-int sys_whoami(endpoint_t *ep, char *name, int namelen);
 
 /* Signal control. */
 int sys_kill(endpoint_t proc_ep, int sig);
@@ -214,7 +213,6 @@ int sys_in(int port, unsigned long *value, int type);
 
 /* pci.c */
 void pci_init(void);
-void pci_init1(char *name);
 int pci_first_dev(int *devindp, u16_t *vidp, u16_t *didp);
 int pci_next_dev(int *devindp, u16_t *vidp, u16_t *didp);
 int pci_find_dev(u8 bus, u8 dev, u8 func, int *devindp);

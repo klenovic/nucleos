@@ -3,7 +3,7 @@
 lib-y := libsys.a
 libsys.a-obj-y := alloc_util.o assert.o panic.o pci_attr_r16.o pci_attr_r32.o pci_attr_r8.o \
 		  pci_attr_w16.o pci_attr_w32.o pci_attr_w8.o pci_del_acl.o pci_dev_name.o \
-		  pci_find_dev.o pci_first_dev.o pci_ids.o pci_init.o pci_init1.o pci_next_dev.o \
+		  pci_find_dev.o pci_first_dev.o pci_ids.o pci_init.o pci_next_dev.o \
 		  pci_rescan_bus.o pci_reserve.o pci_set_acl.o pci_slot_name.o safecopies.o \
 		  sys_abort.o sys_cprof.o sys_endsig.o sys_eniop.o sys_exec.o sys_exit.o sys_fork.o \
 		  sys_getinfo.o sys_getsig.o sys_in.o sys_int86.o sys_irqctl.o sys_kill.o sys_memset.o \
@@ -13,6 +13,7 @@ libsys.a-obj-y := alloc_util.o assert.o panic.o pci_attr_r16.o pci_attr_r32.o pc
 		  sys_times.o sys_trace.o sys_umap.o sys_vinb.o sys_vinl.o sys_vinw.o sys_vircopy.o \
 		  sys_vmctl.o sys_voutb.o sys_voutl.o sys_voutw.o sys_vtimer.o ds.o \
 		  vm_allocmem.o vm_brk.o vm_exec_newmem.o vm_exit.o vm_fork.o vm_map_phys.o vm_umap.o \
-		  vm_push_sig.o vm_ctl.o vm_notify_sig.o sys_runctl.o time.o timeconv.o sys_strnlen.o
+		  vm_push_sig.o vm_ctl.o vm_notify_sig.o sys_runctl.o time.o timeconv.o sys_strnlen.o \
+		  sys_strncpy.o
 
 ccflags-y := -D__UKERNEL__

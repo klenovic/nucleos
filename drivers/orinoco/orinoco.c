@@ -50,10 +50,10 @@
  * |DL_TASK_REPL| port nr  | proc nr | rd-count | err|stat| clock   |
  * |------------|----------|---------|----------|---------|---------|
  *
- *   m_type	  m_data1     m_data2       m_data10
- * |------------|---------|-----------|---------------|
- * |DL_CONF_REPL| port nr | last port | ethernet addr |
- * |------------|---------|-----------|---------------|
+ *   m_type	  m_data1     m_data2     m_data3 | m_data4
+ * |------------|---------|-----------|---------------------|
+ * |DL_CONF_REPL| port nr | last port | ethernet addr       |
+ * |------------|---------|-----------|---------------------|
  *
  *   m_type	  DL_PORT    DL_STAT       
  * |------------|---------|-----------|
@@ -385,9 +385,8 @@ static void check_int_events(void) {
  ****************************************************************************/
 static void or_getname(kipc_msg_t *mp) {
 	int r;
-	
-	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
-	mp->DL_NAME[sizeof(mp->DL_NAME) - 1] = '\0';
+
+	mp->DL_NAME = progname;
 	mp->m_type = DL_NAME_REPLY;
 
 	r = kipc_send(mp->m_source, mp);
@@ -589,7 +588,14 @@ static void or_init (kipc_msg_t * mp) {
 	reply.m_type = DL_CONF_REPLY;
 	reply.m_data1 = mp->DL_PORT;
 	reply.m_data2 = OR_PORT_NR;
-	*(ether_addr_t *) reply.m_data10 = orp->or_address;
+
+	reply.m_data3 = (orp->or_address.ea_addr[0]|
+			(orp->or_address.ea_addr[1]<<1)|
+			(orp->or_address.ea_addr[2]<<2)|
+			(orp->or_address.ea_addr[3]<<3));
+	reply.m_data4 = (orp->or_address.ea_addr[4]|
+			(orp->or_address.ea_addr[5]<<1));
+
 	mess_reply (mp, &reply);
 }
 

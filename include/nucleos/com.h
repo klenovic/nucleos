@@ -309,7 +309,7 @@
 #define DL_ADDR		m_data6
 #define DL_STAT		m_data4
 #define DL_GRANT	m_data5
-#define DL_NAME		m_data10
+#define DL_NAME		m_data1
 
 /* Bits in 'DL_STAT' field of DL replies. */
 #  define DL_PACK_SEND		0x01
@@ -524,20 +524,15 @@
 #   define GET_IRQACTIDS  16	/* get the IRQ masks */
 #   define GET_PRIV	  17	/* get privilege structure */
 #   define GET_HZ	  18	/* get HZ value */
-#   define GET_WHOAMI	  19	/* get own name and endpoint */
-#   define GET_RANDOMNESS_BIN 20 /* get one randomness bin */
-#   define GET_IDLETSC	  21	/* get cumulative idle time stamp counter */
-#   define GET_AOUTHEADER 22	/* get a.out headers from the boot image */
-#   define GET_BOOTPARAM  23	/* get boot params */
+#   define GET_RANDOMNESS_BIN 19 /* get one randomness bin */
+#   define GET_IDLETSC	  20	/* get cumulative idle time stamp counter */
+#   define GET_AOUTHEADER 21	/* get a.out headers from the boot image */
+#   define GET_BOOTPARAM  22	/* get boot params */
 #define I_ENDPT      m_data4	/* calling process */
 #define I_VAL_PTR      m_data5	/* virtual address at caller */ 
 #define I_VAL_LEN      m_data1	/* max length of value */
 #define I_VAL_PTR2     m_data6	/* second virtual address */ 
 #define I_VAL_LEN2_E   m_data2	/* second length, or proc nr */
-
-/* GET_WHOAMI fields. */
-#define GIWHO_EP	m_data1
-#define GIWHO_NAME 	m_data10
 
 /* Field names for SYS_TIMES. */
 #define T_ENDPT      m_data1	/* process to request time info for */

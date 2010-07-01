@@ -50,10 +50,10 @@
 **  |DL_TASK_REPL| port nr | proc nr |rd-count| err|stat| clock   | (21)
 **  +------------+---------+---------+--------+---------+---------+
 **
-**    m_type       m_data1     m_data2      m_data10
-**  +------------+---------+---------+---------------+
-**  |DL_CONF_REPL| port nr |last port| ethernet addr | (20)
-**  +------------+---------+---------+---------------+
+**    m_type       m_data1     m_data2   m_data3|m_data4
+**  +------------+---------+---------+--------------------+
+**  |DL_CONF_REPL| port nr |last port| ethernet addr      | (20)
+**  +------------+---------+---------+--------------------+
 **
 **  $Id: dp.c 3043 2007-10-17 10:53:47Z beng $
 **
@@ -348,8 +348,12 @@ static void do_init(kipc_msg_t * mp)
 
 	    default:	break;
 	}
-	*(ether_addr_t *) reply_mess.m_data10 = dep->de_address;
-
+	reply_mess.m_data3 = (dep->de_address.ea_addr[0]|
+			     (dep->de_address.ea_addr[1]<<1)|
+			     (dep->de_address.ea_addr[2]<<2)|
+			     (dep->de_address.ea_addr[3]<<3));
+	reply_mess.m_data4 = (dep->de_address.ea_addr[4]|
+			     (dep->de_address.ea_addr[5]<<1));
   } else			/* Port number is out of range */
 	port = -ENXIO;
 
@@ -512,8 +516,7 @@ kipc_msg_t *mp;
 {
 	int r;
 
-	strncpy(mp->DL_NAME, progname, sizeof(mp->DL_NAME));
-	mp->DL_NAME[sizeof(mp->DL_NAME)-1]= '\0';
+	mp->DL_NAME = progname;
 	mp->m_type= DL_NAME_REPLY;
 	r= kipc_send(mp->m_source, mp);
 	if (r != 0)

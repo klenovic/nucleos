@@ -11,8 +11,8 @@
 #include <nucleos/signal.h>
 #include <nucleos/unistd.h>
 #include <nucleos/sysutil.h>
-
 #include <nucleos/syslib.h>
+#include <kernel/proc.h>
 
 int panicing= 0;
 
@@ -29,22 +29,30 @@ int num;			/* number to go with format string */
  * value of a defined constant.
  */
   kipc_msg_t m;
-  endpoint_t me = ENDPT_NONE;
-  char name[20];
+  struct proc proc;
+  endpoint_t me;
+  char *name=0;
+  char *name_unknown = "unknown";
   void (*suicide)(void);
   if(panicing) return;
   panicing= 1;
 
-  if(sys_whoami(&me, name, sizeof(name)) == 0 && me != ENDPT_NONE)
-	printf("%s(%d): ", name, me);
-  else
-	printf("(sys_whoami failed): ");
+  if(sys_getproc(&proc, ENDPT_SELF) != 0) {
+	name = name_unknown;
+	me = ENDPT_NONE;
+  } else {
+	name = proc.p_name;
+	me = proc.p_endpoint;
+  }
+
+  printf("%s(%d): ", name, me);
+
   printf("syslib:panic.c: stacktrace: ");
   util_stacktrace();
 
   if (NULL != who && NULL != mess) {
       if (num != NO_NUM) {
-          printf("Panic in %s: %s: %d\n", who, mess, num); 
+          printf("Panic in %s: %s: %d\n", who, mess, num);
       } else {
           printf("Panic in %s: %s\n", who, mess); 
       }

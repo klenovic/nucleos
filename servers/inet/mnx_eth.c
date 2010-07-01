@@ -166,7 +166,13 @@ void osdep_eth_init()
 		eth_port->etp_rd_pack= 0;
 		if (r == 0)
 		{
-			eth_port->etp_ethaddr= *(ether_addr_t *)mess.m_data10;
+			eth_port->etp_ethaddr.ea_addr[0] = mess.m_data3 & 0xff;
+			eth_port->etp_ethaddr.ea_addr[1] = (mess.m_data3 >> 1) & 0xff;
+			eth_port->etp_ethaddr.ea_addr[2] = (mess.m_data3 >> 2) & 0xff;
+			eth_port->etp_ethaddr.ea_addr[3] = (mess.m_data3 >> 3) & 0xff;
+			eth_port->etp_ethaddr.ea_addr[4] = mess.m_data4 & 0xff;
+			eth_port->etp_ethaddr.ea_addr[5] = (mess.m_data4 >> 1) & 0xff;
+
 			printf("osdep_eth_init: setting EPF_GOT_ADDR\n");
 			eth_port->etp_flags |= EPF_GOT_ADDR;
 			setup_read (eth_port);
@@ -249,23 +255,25 @@ acc_t *pack;
 	eth_issue_send(eth_port);
 }
 
-#if 0
+#if 1
 static int notification_count;
 #endif
+
+#define MAX_DRV_NAME_LEN	20
 
 void eth_rec(m)
 kipc_msg_t *m;
 	{
 	int i, r, m_type, stat;
 	eth_port_t *loc_port, *vlan_port;
-	char *drivername;
+	char *drivername[MAX_DRV_NAME_LEN];
 	struct eth_conf *ecp;
 
 	m_type= m->m_type;
-	if (m_type == DL_NAME_REPLY)
-		{
-		drivername= m->m_data10;
-#if 0
+	if (m_type == DL_NAME_REPLY) {
+		if (sys_strncpy(this_proc, drivername, m->m_source, m->DL_NAME, MAX_DRV_NAME_LEN))
+			printf("inet: Can't get driver name\n");
+#if 1
 		printf("eth_rec: got name: %s\n", drivername);
 
 		notification_count= 0;
@@ -344,7 +352,13 @@ kipc_msg_t *m;
 		loc_port->etp_osdep.etp_state= OEPS_IDLE;
 		loc_port->etp_flags |= EPF_ENABLED;
 
-		loc_port->etp_ethaddr= *(ether_addr_t *)m->m_data10;
+		loc_port->etp_ethaddr.ea_addr[0] = m->m_data3 & 0xff;
+		loc_port->etp_ethaddr.ea_addr[1] = (m->m_data3 >> 1) & 0xff;
+		loc_port->etp_ethaddr.ea_addr[2] = (m->m_data3 >> 2) & 0xff;
+		loc_port->etp_ethaddr.ea_addr[3] = (m->m_data3 >> 3) & 0xff;
+		loc_port->etp_ethaddr.ea_addr[4] = m->m_data4 & 0xff;
+		loc_port->etp_ethaddr.ea_addr[5] = (m->m_data4 >> 1) & 0xff;
+
 		if (!(loc_port->etp_flags & EPF_GOT_ADDR))
 	{
 			loc_port->etp_flags |= EPF_GOT_ADDR;

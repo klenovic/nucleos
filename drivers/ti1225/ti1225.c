@@ -107,7 +107,7 @@ static void init()
 	int i, r, first, devind, port;
 	u16_t vid, did;
 
-	pci_init1(progname);
+	pci_init();
 
 	first= 1;
 	port= 0;

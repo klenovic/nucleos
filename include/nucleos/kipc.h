@@ -18,13 +18,6 @@
 #define KIPC_SENDNB	5	/* nonblocking send */
 #define KIPC_SENDA	16	/* asynchronous send */
 
-/*==========================================================================* 
- * Types relating to messages. 						    *
- *==========================================================================*/ 
-
-/* message flags */
-#define KIPC_FLG_M3_STRLEN	14	/* string length */
-
 /* Defines for flags field */
 #define AMF_EMPTY	0	/* slot is not inuse */
 #define AMF_VALID	1	/* slot contains message */
@@ -59,7 +52,6 @@ typedef struct kipc_msg {
 	__s32 m_data7;
 	__s32 m_data8;
 	__s32 m_data9;
-	__s8 m_data10[KIPC_FLG_M3_STRLEN];
 } kipc_msg_t;
 
 /*==========================================================================* 

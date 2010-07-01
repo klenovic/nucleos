@@ -8,14 +8,14 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 #include <nucleos/syslib.h>
+#include <asm/servers/vm/memory.h>
 
 /**
  * Get the size of a string specified by linear address.
- * @proc  process address
+ * @endpt  destination process endpoint
  * @s  The string to measure (linear address).
  * @maxlen  The maximum valid length
- *
- * Get the size of a NUL-terminated string.
+ * @return size of a NUL-terminated string.
  *
  * Returns the size of the string _including_ the terminating NULL.
  * On kernel exception, returns 0.
