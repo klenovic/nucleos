@@ -19,28 +19,6 @@
 #define TRACE(code, statement)
 #endif /* CONFIG_DEBUG_KERNEL_TRACE */
 
-
-#define ENTERED		0xBA5E1514
-#define NOTENTERED	0x1415BEE1
-
-#define NOREC_ENTER(varname) 					\
-	static int varname = NOTENTERED;			\
-	int mustunlock = 0; 					\
-	if(!intr_disabled()) { lock; mustunlock = 1; }		\
-	vmassert(varname == ENTERED || varname == NOTENTERED);	\
-	vmassert(magictest == MAGICTEST);			\
-	vmassert(varname != ENTERED);				\
-	varname = ENTERED;
-
-#define NOREC_RETURN(varname, v) do {				\
-	vmassert(intr_disabled());				\
-	vmassert(magictest == MAGICTEST);			\
-	vmassert(varname == ENTERED || varname == NOTENTERED);	\
-	varname = NOTENTERED;					\
-	if(mustunlock)	{ unlock;	} 			\
-	return v;						\
-} while(0)
-
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 #define vmassert(t) { \
 	if (!(t)) { minix_panic("vm: assert " #t " failed in " __FILE__, __LINE__); } }

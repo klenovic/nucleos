@@ -111,7 +111,6 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 	int k;
 	phys_bytes addr;
 
-	NOREC_ENTER(queuemess);
 	/* Queue a message from the src process (in memory) to the dst
 	 * process (using dst process table entry). Do actual copy to
 	 * kernel here; it's an error if the copy fails into kernel.
@@ -125,13 +124,13 @@ static int QueueMess(endpoint_t ep, vir_bytes msg_lin, struct proc *dst)
 	} else {
 		addr = PHYS_COPY_CATCH(vir2phys(&dst->p_delivermsg), msg_lin, sizeof(kipc_msg_t));
 		if(addr) {
-			NOREC_RETURN(queuemess, -EFAULT);
+			return -EFAULT;
 		}
 	}
 	dst->p_delivermsg.m_source = ep;
 	dst->p_misc_flags |= MF_DELIVERMSG;
 
-	NOREC_RETURN(queuemess, 0);
+	return 0;
 }
 
 /*===========================================================================*
@@ -171,7 +170,6 @@ struct proc * schedcheck(void)
 	/* This function is called an instant before proc_ptr is
 	 * to be scheduled again.
 	 */
-  	NOREC_ENTER(schedch);
 	vmassert(intr_disabled());
 
 	/*
@@ -288,7 +286,7 @@ check_misc_flags:
 
 	proc_ptr = arch_finish_schedcheck();
 
-	NOREC_RETURN(schedch, proc_ptr);
+	return proc_ptr;
 }
 
 /*===========================================================================*
@@ -1251,8 +1249,6 @@ register struct proc *rp;	/* this process is now runnable */
   int q;	 				/* scheduling queue to use */
   int front;					/* add to front or back */
 
-  NOREC_ENTER(enqueuefunc);
-
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
   if(!intr_disabled()) { minix_panic("enqueue with interrupts enabled", NO_NUM); }
   if (rp->p_ready) minix_panic("enqueue already ready process", NO_NUM);
@@ -1297,7 +1293,7 @@ register struct proc *rp;	/* this process is now runnable */
   CHECK_RUNQUEUES;
 #endif
 
-  NOREC_RETURN(enqueuefunc, );
+  return;
 }
 
 /*===========================================================================*
@@ -1357,8 +1353,6 @@ register struct proc *rp;	/* this process is no longer runnable */
   register struct proc **xpp;			/* iterate over queue */
   register struct proc *prev_xp;
 
-  NOREC_ENTER(dequeuefunc);
-
 #if DEBUG_STACK_CHECK
   /* Side-effect for kernel: check if the task's stack still is ok? */
   if (iskernelp(rp)) { 				
@@ -1397,7 +1391,7 @@ register struct proc *rp;	/* this process is no longer runnable */
   CHECK_RUNQUEUES;
 #endif
 
-  NOREC_RETURN(dequeuefunc, );
+  return;
 }
 
 /*===========================================================================*

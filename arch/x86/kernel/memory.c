@@ -160,8 +160,6 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 	int procslot;
 	int firstloop = 1;
 
-	NOREC_ENTER(linlincopy);
-
 	vmassert(vm_running);
 	vmassert(nfreepdes >= 3);
 
@@ -196,18 +194,18 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 			if(addr >= srcptr && addr < (srcptr + chunk)) {
 				WIPEPDE(srcpde);
 				WIPEPDE(dstpde);
-				NOREC_RETURN(linlincopy, EFAULT_SRC);
+				return EFAULT_SRC;
 			}
 			if(addr >= dstptr && addr < (dstptr + chunk)) {
 				WIPEPDE(srcpde);
 				WIPEPDE(dstpde);
-				NOREC_RETURN(linlincopy, EFAULT_DST);
+				return EFAULT_DST;
 			}
 
 			minix_panic("lin_lin_copy fault out of range", NO_NUM);
 
 			/* Not reached. */
-			NOREC_RETURN(linlincopy, -EFAULT);
+			return -EFAULT;
 		}
 
 		WIPEPDE(srcpde);
@@ -221,7 +219,7 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 		firstloop = 0;
 	}
 
-	NOREC_RETURN(linlincopy, 0);
+	return 0;
 }
 
 
@@ -475,7 +473,6 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 	u32_t *root, *pt;
 	int pde, pte;
 	u32_t pde_v, pte_v;
-	NOREC_ENTER(vmlookup);
 
 	vmassert(proc);
 	vmassert(physical);
@@ -483,7 +480,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 
 	if(!HASPT(proc)) {
 		*physical = virtual;
-		NOREC_RETURN(vmlookup, 0);
+		return 0;
 	}
 
 	/* Retrieve page directory entry. */
@@ -494,7 +491,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 	pde_v = phys_get32((u32_t) (root + pde));
 
 	if(!(pde_v & I386_VM_PRESENT)) {
-		NOREC_RETURN(vmlookup, -EFAULT);
+		return -EFAULT;
 	}
 
 	/* We don't expect to ever see this. */
@@ -510,7 +507,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 		vmassert(pte >= 0 && pte < I386_VM_PT_ENTRIES);
 		pte_v = phys_get32((u32_t) (pt + pte));
 		if(!(pte_v & I386_VM_PRESENT)) {
-			NOREC_RETURN(vmlookup, -EFAULT);
+			return -EFAULT;
 		}
 
 		if(ptent) *ptent = pte_v;
@@ -520,7 +517,7 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 		*physical += virtual % I386_PAGE_SIZE;
 	}
 
-	NOREC_RETURN(vmlookup, 0);
+	return 0;
 }
 
 /* From virtual address v in process p,
@@ -635,7 +632,6 @@ int delivermsg(struct proc *rp)
 {
 	phys_bytes addr;  
 	int r;
-	NOREC_ENTER(deliver);
 
 	vmassert(rp->p_misc_flags & MF_DELIVERMSG);
 	vmassert(rp->p_delivermsg.m_source != ENDPT_NONE);
@@ -678,7 +674,7 @@ int delivermsg(struct proc *rp)
 		}
 	}
 
-	NOREC_RETURN(deliver, r);
+	return r;
 }
 
 char *flagstr(u32_t e, int dir)
@@ -764,13 +760,12 @@ int vm_phys_memset(phys_bytes ph, u8_t c, phys_bytes bytes)
 {
 	char *v;
 	u32_t p;
-	NOREC_ENTER(physmemset);
 
 	p = c | (c << 8) | (c << 16) | (c << 24);
 
 	if(!vm_running) {
 		phys_memset(ph, p, bytes);
-		NOREC_RETURN(physmemset, 0);
+		return 0;
 	}
 
 	vmassert(nfreepdes >= 3);
@@ -794,7 +789,7 @@ int vm_phys_memset(phys_bytes ph, u8_t c, phys_bytes bytes)
 	}
 
 
-	NOREC_RETURN(physmemset, 0);
+	return 0;
 }
 
 /*===========================================================================*
@@ -814,7 +809,6 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
   int seg_index;
   int i, r;
   struct proc *procs[2];
-  NOREC_ENTER(virtualcopy);
 
   /* Check copy count. */
   if (bytes <= 0) return(-EDOM);
@@ -841,7 +835,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
       case LOCAL_SEG:
       case LOCAL_VM_SEG:
 	  if(!p) {
-		NOREC_RETURN(virtualcopy, -EDEADSRCDST);
+		return -EDEADSRCDST;
 	  }
           seg_index = vir_addr[i]->segment & SEGMENT_INDEX;
 	  if(type == LOCAL_SEG)
@@ -859,7 +853,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
           break;
       case REMOTE_SEG:
 	  if(!p) {
-		NOREC_RETURN(virtualcopy, -EDEADSRCDST);
+		return -EDEADSRCDST;
 	  }
           seg_index = vir_addr[i]->segment & SEGMENT_INDEX;
           phys_addr[i] = umap_remote(p, seg_index, vir_addr[i]->offset, bytes);
@@ -874,13 +868,13 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
           break;
       default:
 	  kprintf("virtual_copy: strange type 0x%x\n", type);
-	  NOREC_RETURN(virtualcopy, -EINVAL);
+	  return -EINVAL;
       }
 
       /* Check if mapping succeeded. */
       if (phys_addr[i] <= 0 && vir_addr[i]->segment != PHYS_SEG)  {
       kprintf("virtual_copy EFAULT\n");
-	  NOREC_RETURN(virtualcopy, -EFAULT);
+	  return -EFAULT;
       }
   }
 
@@ -900,7 +894,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 			printf("virtual_copy: returning VM error %d\n",
 				caller->p_vmrequest.vmresult);
 #endif
-	  		NOREC_RETURN(virtualcopy, caller->p_vmrequest.vmresult);
+	  		return caller->p_vmrequest.vmresult;
 		}
 	}
 
@@ -912,7 +906,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 		if(r != EFAULT_SRC && r != EFAULT_DST)
 			minix_panic("lin_lin_copy failed", r);
 		if(!vmcheck) {
-	  		NOREC_RETURN(virtualcopy, r);
+	  		return r;
 		}
 
 		vmassert(procs[_SRC_] && procs[_DST_]);
@@ -938,10 +932,10 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 		vmassert(proc_ptr->p_endpoint == SYSTEM);
 		vm_suspend(caller, target, lin, bytes, wr, VMSTYPE_KERNELCALL);
 
-	  	NOREC_RETURN(virtualcopy, VMSUSPEND);
+	  	return VMSUSPEND;
 	}
 
-  	NOREC_RETURN(virtualcopy, 0);
+  	return 0;
   }
 
   vmassert(!vm_running);
@@ -960,9 +954,9 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 
   /* Now copy bytes between physical addresseses. */
   if(phys_copy(phys_addr[_DST_], phys_addr[_SRC_], (phys_bytes) bytes))
-  	NOREC_RETURN(virtualcopy, -EFAULT);
+  	return -EFAULT;
  
-  NOREC_RETURN(virtualcopy, 0);
+  return 0;
 }
 
 /*===========================================================================*
