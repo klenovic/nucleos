@@ -194,12 +194,12 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 			if(addr >= srcptr && addr < (srcptr + chunk)) {
 				WIPEPDE(srcpde);
 				WIPEPDE(dstpde);
-				return EFAULT_SRC;
+				return -EFAULT_SRC;
 			}
 			if(addr >= dstptr && addr < (dstptr + chunk)) {
 				WIPEPDE(srcpde);
 				WIPEPDE(dstpde);
-				return EFAULT_DST;
+				return -EFAULT_DST;
 			}
 
 			minix_panic("lin_lin_copy fault out of range", NO_NUM);
@@ -663,7 +663,7 @@ int delivermsg(struct proc *rp)
 		if(addr) {
 			vm_suspend(rp, rp, rp->p_delivermsg_lin, sizeof(kipc_msg_t), 1,
 				VMSTYPE_DELIVERMSG);
-			r = VMSUSPEND;
+			r = -VMSUSPEND;
 		} else {
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 			rp->p_delivermsg.m_source = ENDPT_NONE;
@@ -799,7 +799,7 @@ int virtual_copy_f(src_addr, dst_addr, bytes, vmcheck)
 struct vir_addr *src_addr;	/* source virtual address */
 struct vir_addr *dst_addr;	/* destination virtual address */
 vir_bytes bytes;		/* # of bytes to copy  */
-int vmcheck;			/* if nonzero, can return VMSUSPEND */
+int vmcheck;			/* if nonzero, can return -VMSUSPEND */
 {
 /* Copy bytes from virtual address src_addr to virtual address dst_addr. 
  * Virtual addresses can be in ABS, LOCAL_SEG, REMOTE_SEG, or BIOS_SEG.
@@ -887,7 +887,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 	if(RTS_ISSET(caller, RTS_VMREQUEST)) {
 		struct proc *target;
 		int pn;
-		vmassert(caller->p_vmrequest.vmresult != VMSUSPEND);
+		vmassert(caller->p_vmrequest.vmresult != -VMSUSPEND);
 		RTS_LOCK_UNSET(caller, RTS_VMREQUEST);
 		if(caller->p_vmrequest.vmresult != 0) {
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
@@ -903,7 +903,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 		struct proc *target;
 		int wr;
 		phys_bytes lin;
-		if(r != EFAULT_SRC && r != EFAULT_DST)
+		if(r != -EFAULT_SRC && r != -EFAULT_DST)
 			minix_panic("lin_lin_copy failed", r);
 		if(!vmcheck) {
 	  		return r;
@@ -911,11 +911,11 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 
 		vmassert(procs[_SRC_] && procs[_DST_]);
 
-		if(r == EFAULT_SRC) {
+		if(r == -EFAULT_SRC) {
 			lin = phys_addr[_SRC_];
 			target = procs[_SRC_];
 			wr = 0;
-		} else if(r == EFAULT_DST) {
+		} else if(r == -EFAULT_DST) {
 			lin = phys_addr[_DST_];
 			target = procs[_DST_];
 			wr = 1;
@@ -932,7 +932,7 @@ int vmcheck;			/* if nonzero, can return VMSUSPEND */
 		vmassert(proc_ptr->p_endpoint == SYSTEM);
 		vm_suspend(caller, target, lin, bytes, wr, VMSTYPE_KERNELCALL);
 
-	  	return VMSUSPEND;
+	  	return -VMSUSPEND;
 	}
 
   	return 0;

@@ -77,7 +77,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		m_ptr->SVMCTL_MRG_WRITE = rp->p_vmrequest.writeflag;
 		m_ptr->SVMCTL_MRG_EP = rp->p_vmrequest.who;
 		m_ptr->SVMCTL_MRG_REQUESTOR = (void *) rp->p_endpoint;
-		rp->p_vmrequest.vmresult = VMSUSPEND;
+		rp->p_vmrequest.vmresult = -VMSUSPEND;
 
 		/* Remove from request chain. */
 		vmrequest = vmrequest->p_vmrequest.nextrequestor;
@@ -85,11 +85,11 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		return 0;
 	case VMCTL_MEMREQ_REPLY:
 		vmassert(RTS_ISSET(p, RTS_VMREQUEST));
-		vmassert(p->p_vmrequest.vmresult == VMSUSPEND);
+		vmassert(p->p_vmrequest.vmresult == -VMSUSPEND);
   		okendpt(p->p_vmrequest.who, &proc_nr);
 		target = proc_addr(proc_nr);
 		p->p_vmrequest.vmresult = m_ptr->SVMCTL_VALUE;
-		vmassert(p->p_vmrequest.vmresult != VMSUSPEND);
+		vmassert(p->p_vmrequest.vmresult != -VMSUSPEND);
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 		if(p->p_vmrequest.vmresult != 0)
 			kprintf("SYSTEM: VM replied %d to mem request\n",

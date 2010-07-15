@@ -218,7 +218,7 @@ check_misc_flags:
 		if (proc_ptr->p_misc_flags & MF_DELIVERMSG) {
 			TRACE(VF_SCHEDULING, printf("delivering to %s / %d\n",
 				proc_ptr->p_name, proc_ptr->p_endpoint););
-			if(delivermsg(proc_ptr) == VMSUSPEND) {
+			if(delivermsg(proc_ptr) == -VMSUSPEND) {
 				TRACE(VF_SCHEDULING,
 					printf("suspending %s / %d\n",
 					proc_ptr->p_name,

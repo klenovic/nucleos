@@ -120,7 +120,7 @@ void sys_task()
           result = (*call_vec[call_nr])(&m); /* handle the system call */
       }
 
-      if(result == VMSUSPEND) {
+      if(result == -VMSUSPEND) {
 	/* Special case: message has to be saved for handling
 	 * until VM tells us it's allowed. VM has been notified
 	 * and we must wait for its reply to restart the call.

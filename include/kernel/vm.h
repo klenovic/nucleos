@@ -14,9 +14,9 @@
 #ifdef __KERNEL__
 
 /* Pseudo error codes */
-#define VMSUSPEND       -996
-#define EFAULT_SRC     -995
-#define EFAULT_DST     -994
+#define VMSUSPEND	996
+#define EFAULT_SRC	995
+#define EFAULT_DST	994
 
 #define FIXLINMSG(prp) {									\
 		if (prp->syscall_0x80)								\
