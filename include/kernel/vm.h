@@ -18,12 +18,12 @@
 #define EFAULT_SRC	995
 #define EFAULT_DST	994
 
-#define FIXLINMSG(prp) {									\
-		if (prp->syscall_0x80)								\
-			prp->p_delivermsg_lin = vir2phys(&prp->p_delivermsg);			\
-		else										\
-			prp->p_delivermsg_lin = umap_local(prp, D, prp->p_delivermsg_vir,	\
-							   sizeof(kipc_msg_t));			\
+#define FIXLINMSG(prp) {								\
+	if (prp->syscall_0x80)								\
+		prp->p_delivermsg_lin = vir2phys(&prp->p_delivermsg);			\
+	else										\
+		prp->p_delivermsg_lin = umap_local(prp, D, prp->p_delivermsg_vir,	\
+						   sizeof(kipc_msg_t));			\
 	}
 
 #define PHYS_COPY_CATCH(dst, src, size)		\
