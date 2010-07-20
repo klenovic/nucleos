@@ -75,8 +75,8 @@ struct priv *ppriv_addr[NR_SYS_PROCS];   /* direct slot pointers */
  * interrupts to prevent race conditions. 
  */
 static void idle(void);
-static int mini_send(struct proc *caller_ptr, int dst_e, kipc_msg_t *m_ptr, int flags);
-static int mini_receive(struct proc *caller_ptr, int src, kipc_msg_t *m_ptr, int flags);
+static int mini_send(struct proc *caller_ptr, int dst_e, kipc_msg_t *m_ptr, u32 flags);
+static int mini_receive(struct proc *caller_ptr, int src, kipc_msg_t *m_ptr, u32 flags);
 static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size);
 static int deadlock(int function, register struct proc *caller, int src_dst);
 static int try_async(struct proc *caller_ptr);
@@ -583,7 +583,7 @@ static int mini_send(caller_ptr, dst_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* who is trying to send a message? */
 int dst_e;				/* to whom is message being sent? */
 kipc_msg_t *m_ptr;				/* pointer to message buffer */
-int flags;
+u32 flags;
 {
 /* Send a message from 'caller_ptr' to 'dst'. If 'dst' is blocked waiting
  * for this message, copy the message to it and unblock 'dst'. If 'dst' is
@@ -656,7 +656,7 @@ static int mini_receive(caller_ptr, src_e, m_ptr, flags)
 register struct proc *caller_ptr;	/* process trying to get message */
 int src_e;				/* which message source is wanted */
 kipc_msg_t *m_ptr;				/* pointer to message buffer */
-int flags;
+u32 flags;
 {
 /* A process or task wants to get a message.  If a message is already queued,
  * acquire it and deblock the sender.  If no message from the desired source
