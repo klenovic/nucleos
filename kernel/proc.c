@@ -496,9 +496,6 @@ u32 flags;			/* notification event set or flags */
   case KIPC_NOTIFY:
 	result = mini_notify(caller_ptr, src_dst_e);
 	break;
-  case KIPC_SENDNB:
-        result = mini_send(caller_ptr, src_dst_e, m_ptr, KIPC_FLG_NONBLOCK);
-        break;
   case KIPC_SENDA:
 	result = mini_senda(caller_ptr, (asynmsg_t *)m_ptr, (size_t)src_dst_e);
 	break;

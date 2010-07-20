@@ -15,7 +15,6 @@
 #define KIPC_RECEIVE	2	/* blocking receive */
 #define KIPC_SENDREC	3	/* KIPC_SEND + KIPC_RECEIVE */
 #define KIPC_NOTIFY	4	/* asynchronous notify */
-#define KIPC_SENDNB	5	/* nonblocking send */
 #define KIPC_SENDA	16	/* asynchronous send */
 
 /* Masks and flags for system calls. */
@@ -89,11 +88,6 @@ static inline int kipc_send(endpoint_t dst, kipc_msg_t *m_ptr, u32 flags)
 static inline int kipc_senda(asynmsg_t *table, size_t count)
 {
 	return __kipc_senda(table, count);
-}
-
-static inline int kipc_sendnb(endpoint_t dst, kipc_msg_t *m_ptr)
-{
-	return __kipc_sendnb(dst, m_ptr);
 }
 
 static inline int kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr, u32 flags)

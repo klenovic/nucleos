@@ -436,7 +436,7 @@ kipc_msg_t *m_ptr;
   }
 
   /* Almost done. Send back the reply message to the caller. */
-  status = kipc_sendnb(m_ptr->m_source, m_ptr);
+  status = kipc_send(m_ptr->m_source, m_ptr, KIPC_FLG_NONBLOCK);
   if (status != 0) {
 	printf("tty`do_status: send to %d failed: %d\n",
 		m_ptr->m_source, status);
@@ -1520,7 +1520,7 @@ int status;			/* reply code */
 	panic("TTY","tty_reply sending TTY_REVIVE", NO_NUM);
   }
 
-  status = kipc_sendnb(replyee, &tty_mess);
+  status = kipc_send(replyee, &tty_mess, KIPC_FLG_NONBLOCK);
   if (status != 0)
 	printf("tty`tty_reply: send to %d failed: %d\n", replyee, status);
 }

@@ -75,20 +75,6 @@ static inline int __kipc_senda(asynmsg_t *table, size_t count)
 	return ret;
 }
 
-static inline int __kipc_sendnb(endpoint_t dst, kipc_msg_t *m_ptr)
-{
-	register int ret = 0;
-
-	__asm__ __volatile__ (
-		ASM_CALL_KIPC_SERVICE
-		:"=a"(ret)
-		:"0"(dst), "b"(m_ptr), "c"(KIPC_SENDNB)
-		:"memory", "cc"
-	);
-
-	return ret;
-}
-
 static inline int __kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr, u32 flags)
 {
 	register int ret = 0;

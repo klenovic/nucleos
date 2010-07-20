@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 					printf("IPC: error for %d: %d\n",
 						call_type, result);
 
-				if ((r = kipc_sendnb(who_e, &m)) != 0)
+				if ((r = kipc_send(who_e, &m, KIPC_FLG_NONBLOCK)) != 0)
 					printf("IPC send error %d.\n", r);
 				break;
 			}

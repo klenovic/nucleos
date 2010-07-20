@@ -374,7 +374,7 @@ void reply(int whom, int result)
 	printf("vfs:reply: replying %d for call %d\n", result, call_nr);
 #endif
 	m_out.reply_type = result;
-	s = kipc_sendnb(whom, &m_out);
+	s = kipc_send(whom, &m_out, KIPC_FLG_NONBLOCK);
 
 	if (s != 0)
 		printf("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);

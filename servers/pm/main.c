@@ -171,7 +171,7 @@ send_reply:
 		 */
 		if ((rmp->mp_flags & (REPLY | IN_USE | EXITING)) ==
 		   (REPLY | IN_USE)) {
-			s=kipc_sendnb(rmp->mp_endpoint, &rmp->mp_reply);
+			s=kipc_send(rmp->mp_endpoint, &rmp->mp_reply, KIPC_FLG_NONBLOCK);
 			if (s != 0) {
 				printf("PM can't reply to %d (%s): %d\n",
 					rmp->mp_endpoint, rmp->mp_name, s);
