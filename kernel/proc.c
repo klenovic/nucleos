@@ -292,11 +292,11 @@ check_misc_flags:
 /*===========================================================================*
  *				kipc_call				     * 
  *===========================================================================*/
-int kipc_call(call_nr, src_dst_e, m_ptr, bit_map)
+int kipc_call(call_nr, src_dst_e, m_ptr, flags)
 int call_nr;			/* system call number and flags */
 int src_dst_e;			/* src to receive from or dst to send to */
-kipc_msg_t *m_ptr;			/* pointer to message in the caller's space */
-long bit_map;			/* notification event set or flags */
+kipc_msg_t *m_ptr;		/* pointer to message in the caller's space */
+u32 flags;			/* notification event set or flags */
 {
 /* System calls are done by trapping to the kernel with an INT instruction.
  * The trap is caught and kipc_call() is called to send or receive a message
@@ -483,8 +483,8 @@ long bit_map;			/* notification event set or flags */
 	/* A flag is set so that notifications cannot interrupt KIPC_SENDREC. */
 	caller_ptr->p_misc_flags |= MF_REPLY_PEND;
 	/* fall through */
-  case KIPC_SEND:			
-	result = mini_send(caller_ptr, src_dst_e, m_ptr, 0);
+  case KIPC_SEND:
+	result = mini_send(caller_ptr, src_dst_e, m_ptr, flags);
 	if (call_nr == KIPC_SEND || result != 0)
 		break;				/* done, or KIPC_SEND failed */
 	/* fall through for KIPC_SENDREC */

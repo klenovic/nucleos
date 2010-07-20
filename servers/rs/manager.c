@@ -678,7 +678,7 @@ void do_exit(kipc_msg_t *m_ptr)
 		  if(rp->r_flags & RS_LATEREPLY) {
 			kipc_msg_t rsm;
 			rsm.m_type = 0;
-			kipc_send(rp->r_caller, &rsm);
+			kipc_send(rp->r_caller, &rsm, 0);
 		  }
 
 		  /* Release slot. */

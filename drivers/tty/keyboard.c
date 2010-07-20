@@ -1175,7 +1175,7 @@ kipc_msg_t *m_ptr;			/* pointer to the request message */
 
   /* Almost done, return result to caller. */
   m_ptr->m_type = result;
-  kipc_send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr, 0);
 }
 
 /*===========================================================================*

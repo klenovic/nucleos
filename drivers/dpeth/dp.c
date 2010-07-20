@@ -124,7 +124,7 @@ static void reply(dpeth_t * dep, int err, int m_type)
 
   DEBUG(printf("\t reply %d (%ld)\n", reply.m_type, reply.DL_STAT));
 
-  if ((status = kipc_send(dep->de_client, &reply)) == 0) {
+  if ((status = kipc_send(dep->de_client, &reply, 0)) == 0) {
 	dep->de_read_s = 0;
 	dep->de_flags &= NOT(DEF_ACK_SEND | DEF_ACK_RECV);
 
@@ -361,7 +361,7 @@ static void do_init(kipc_msg_t * mp)
   reply_mess.m_data1 = port;
   reply_mess.m_data2 = DE_PORT_NR;
   DEBUG(printf("\t reply %d\n", reply_mess.m_type));
-  if (kipc_send(mp->m_source, &reply_mess) != 0)	/* Can't send */
+  if (kipc_send(mp->m_source, &reply_mess, 0) != 0)	/* Can't send */
 	panic(dep->de_name, SendErrMsg, mp->m_source);
 
   return;
@@ -518,7 +518,7 @@ kipc_msg_t *mp;
 
 	mp->DL_NAME = progname;
 	mp->m_type= DL_NAME_REPLY;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 		panic("dpeth", "do_getname: send failed: %d\n", r);
 }

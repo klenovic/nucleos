@@ -466,7 +466,7 @@ void arch_do_syscall(struct proc *proc)
 	/* Perform a previously postponed system call. */
 	int call_nr, src_dst_e;
 	kipc_msg_t *m_ptr;
-	long bit_map;
+	u32 bit_map;
 
 	/* Get the system call parameters from their respective registers. */
 	call_nr = proc->p_reg.cx;

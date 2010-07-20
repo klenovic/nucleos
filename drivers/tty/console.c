@@ -1160,7 +1160,7 @@ int safe;
   if(m_ptr->m_type != ASYN_DIAGNOSTICS_OLD) {
 	  m_ptr->m_type = DIAG_REPL_OLD;
 	  m_ptr->REP_STATUS = result;
-	  kipc_send(m_ptr->m_source, m_ptr);
+	  kipc_send(m_ptr->m_source, m_ptr, 0);
   }
 }
 
@@ -1181,7 +1181,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	r = -EFAULT;
   }
   m_ptr->m_type = r;
-  kipc_send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr, 0);
 }
 
 /*===========================================================================*
@@ -1201,7 +1201,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	r = -EFAULT;
   }
   m_ptr->m_type = r;
-  kipc_send(m_ptr->m_source, m_ptr);
+  kipc_send(m_ptr->m_source, m_ptr, 0);
 }
 
 /*===========================================================================*

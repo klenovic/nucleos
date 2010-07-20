@@ -149,7 +149,7 @@ int result;                           	/* report result to replyee */
 {
     int send_status;
     m_out.m_type = result;  		/* build reply message */
-    send_status = kipc_send(who, &m_out);    /* send the message */
+    send_status = kipc_send(who, &m_out, 0);    /* send the message */
     if (send_status != 0)
         panic("IS", "unable to send reply!", send_status);
 }

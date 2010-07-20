@@ -1999,7 +1999,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 		panic(__FILE__, "fxp_getstat: kipc_send failed: %d\n", r);
 }
@@ -2083,7 +2083,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= dl_port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 		panic(__FILE__, "fxp_getstat_s: kipc_send failed: %d\n", r);
 }
@@ -2099,7 +2099,7 @@ kipc_msg_t *mp;
 
 	mp->DL_NAME = progname;
 	mp->m_type= DL_NAME_REPLY;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 		panic("FXP", "fxp_getname: kipc_send failed", r);
 }
@@ -2684,7 +2684,7 @@ int may_block;
 	reply.DL_CLCK = 0;
 #endif
 
-	r= kipc_send(fp->fxp_client, &reply);
+	r= kipc_send(fp->fxp_client, &reply, 0);
 
 	if (r == -ELOCKED && may_block)
 	{
@@ -2708,7 +2708,7 @@ static void mess_reply(req, reply_mess)
 kipc_msg_t *req;
 kipc_msg_t *reply_mess;
 {
-	if (kipc_send(req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess, 0) != 0)
 		panic("FXP","fxp: unable to mess_reply", NO_NUM);
 }
 
@@ -3007,7 +3007,7 @@ int pci_func;
 	m.m_data4= buf;
 	m.m_data5= size;
 
-	r= kipc_sendrec(dev_e, &m);
+	r= kipc_sendrec(dev_e, &m, 0);
 	if (r != 0)
 	{
 		printf("fxp`tell_dev: sendrec to %d failed: %d\n",

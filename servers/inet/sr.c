@@ -655,7 +655,7 @@ kipc_msg_t *m;
 		repl_queue= mq->mq_next;
 
 		mq->mq_mess.m_type= DEV_REVIVE;
-		result= kipc_send(mq->mq_mess.m_source, &mq->mq_mess);
+		result= kipc_send(mq->mq_mess.m_source, &mq->mq_mess, 0);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		mq_free(mq);
@@ -688,14 +688,14 @@ kipc_msg_t *m;
 		m->DEV_MINOR= fd;
 		m->DEV_SEL_OPS= m_ops;
 
-		result= kipc_send(m->m_source, m);
+		result= kipc_send(m->m_source, m, 0);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		return;
 	}
 
 	m->m_type= DEV_NO_STATUS;
-	result= kipc_send(m->m_source, m);
+	result= kipc_send(m->m_source, m, 0);
 	if (result != 0)
 		ip_panic(("unable to send"));
 }
@@ -789,7 +789,7 @@ int is_revive;
 	}
 	else
 	{
-		result= kipc_send(mq->mq_mess.m_source, mp);
+		result= kipc_send(mq->mq_mess.m_source, mp, 0);
 	}
 
 	if (result == -ELOCKED && is_revive)
@@ -1101,7 +1101,7 @@ int size;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *)vir_cp_req;
 
-			if (kipc_sendrec(SYSTASK, &mess) <0)
+			if (kipc_sendrec(SYSTASK, &mess, 0) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{
@@ -1152,7 +1152,7 @@ char *dest;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *) vir_cp_req;
 
-			if (kipc_sendrec(SYSTASK, &mess) <0)
+			if (kipc_sendrec(SYSTASK, &mess, 0) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{
@@ -1325,7 +1325,7 @@ int operation;
 
 	if (m_cancel)
 	{
-		result= kipc_send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess);
+		result= kipc_send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess, 0);
 		if (result != 0)
 			ip_panic(("unable to send: %d", result));
 		mq_free(m_cancel);

@@ -28,7 +28,7 @@ u16_t *didp;
 	m.m_type= BUSC_PCI_NEXT_DEV;
 	m.m_data1= *devindp;
 
-	r= kipc_sendrec(pci_procnr, &m);
+	r= kipc_sendrec(pci_procnr, &m, 0);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_next_dev: can't talk to PCI", r);
 

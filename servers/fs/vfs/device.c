@@ -167,7 +167,7 @@ void dev_status(kipc_msg_t *m)
 	do {
 		int r;
 		st.m_type = DEV_STATUS;
-		if ((r=kipc_sendrec(m->m_source, &st)) != 0) {
+		if ((r=kipc_sendrec(m->m_source, &st, 0)) != 0) {
 			printf("DEV_STATUS failed to %d: %d\n", m->m_source, r);
 			if (r == -EDEADSRCDST) return;
 			if (r == -EDSTDIED) return;
@@ -627,7 +627,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
   if(task_nr == SYSTEM) printf("VFS: sending %d to SYSTEM\n", mess_ptr->m_type);
 
   proc_e = mess_ptr->IO_ENDPT;
-  r = kipc_sendrec(task_nr, mess_ptr);
+  r = kipc_sendrec(task_nr, mess_ptr, 0);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);

@@ -305,7 +305,7 @@ register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
   } else {
 	m_ptr->m_type = DEV_NO_STATUS;
   }
-  kipc_send(m_ptr->m_source, m_ptr);			/* send the message */
+  kipc_send(m_ptr->m_source, m_ptr, 0);			/* send the message */
 }
 
 /*===========================================================================*
@@ -344,7 +344,7 @@ int status;			/* number of  chars printed or error code */
   pr_mess.m_type = code;		/* TASK_REPLY or REVIVE */
   pr_mess.REP_STATUS = status;		/* count or -EIO */
   pr_mess.REP_ENDPT = process;	/* which user does this pertain to */
-  kipc_send(replyee, &pr_mess);		/* send the message */
+  kipc_send(replyee, &pr_mess, 0);		/* send the message */
 }
 
 /*===========================================================================*

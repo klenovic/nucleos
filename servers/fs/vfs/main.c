@@ -423,7 +423,7 @@ static void fs_init(void)
 	} while (TRUE);			/* continue until process ENDPT_NONE */
 
 	mess.m_type = 0;			/* tell PM that we succeeded */
-	s = kipc_send(PM_PROC_NR, &mess);		/* kipc_send synchronization message */
+	s = kipc_send(PM_PROC_NR, &mess, 0);		/* kipc_send synchronization message */
 
 	/* All process table entries have been set. Continue with FS initialization.
 	 * Certain relations must hold for the file system to work at all. Some 
@@ -656,7 +656,7 @@ static void service_pm(void)
 	return;
   }
 
-  r = kipc_send(PM_PROC_NR, &m_out);
+  r = kipc_send(PM_PROC_NR, &m_out, 0);
   if (r != 0)
 	panic(__FILE__, "service_pm: send failed", r);
 }

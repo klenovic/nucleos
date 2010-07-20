@@ -47,14 +47,14 @@ static inline int __kipc_receive(endpoint_t src, kipc_msg_t *m_ptr)
 	return ret;
 }
 
-static inline int __kipc_send(endpoint_t dst, kipc_msg_t *m_ptr)
+static inline int __kipc_send(endpoint_t dst, kipc_msg_t *m_ptr, u32 flags)
 {
 	register int ret = 0;
 
 	__asm__ __volatile__ (
 		ASM_CALL_KIPC_SERVICE
 		:"=a"(ret)
-		:"0"(dst), "b"(m_ptr), "c"(KIPC_SEND)
+		:"0"(dst), "b"(m_ptr), "c"(KIPC_SEND), "d"(flags)
 		:"memory", "cc"
 	);
 
@@ -89,14 +89,14 @@ static inline int __kipc_sendnb(endpoint_t dst, kipc_msg_t *m_ptr)
 	return ret;
 }
 
-static inline int __kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr)
+static inline int __kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr, u32 flags)
 {
 	register int ret = 0;
 
 	__asm__ __volatile__ (
 		ASM_CALL_KIPC_SERVICE
 		:"=a"(ret)
-		:"0"(src_dst), "b"(m_ptr), "c"(KIPC_SENDREC)
+		:"0"(src_dst), "b"(m_ptr), "c"(KIPC_SENDREC), "d"(flags)
 		:"memory", "cc"
 	);
 

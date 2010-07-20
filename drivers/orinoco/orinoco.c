@@ -389,7 +389,7 @@ static void or_getname(kipc_msg_t *mp) {
 	mp->DL_NAME = progname;
 	mp->m_type = DL_NAME_REPLY;
 
-	r = kipc_send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp, 0);
 	if(r != 0) {
 		panic(__FILE__, "or_getname: send failed", r);
 	}
@@ -506,7 +506,7 @@ static void or_dump (kipc_msg_t *m) {
 
 		m->m_type = FKEY_CONTROL;
 		m->FKEY_REQUEST = FKEY_EVENTS;
-		if((kipc_sendrec(TTY_PROC_NR,m)) != 0)
+		if((kipc_sendrec(TTY_PROC_NR, m, 0)) != 0)
 			printf("Contacting the TTY failed\n");
 		
 		if(bit_isset(m->FKEY_SFKEYS, 11)) {
@@ -1341,7 +1341,7 @@ static void or_watchdog_f(timer_t *tp) {
  *****************************************************************************/
 
 static void mess_reply (kipc_msg_t * req, kipc_msg_t * reply_mess) {
-	if (kipc_send(req->m_source, reply_mess) != 0)
+	if (kipc_send(req->m_source, reply_mess, 0) != 0)
 		panic(__FILE__, "orinoco: unable to mess_reply", NO_NUM);
 
 }
@@ -1742,7 +1742,7 @@ static void reply (t_or * orp, int err, int may_block) {
 		panic(__FILE__, "orinoco: getuptime() failed:", r);
 
 	reply.DL_CLCK = now;
-	r = kipc_send(orp->or_client, &reply);
+	r = kipc_send(orp->or_client, &reply, 0);
 
 	if (r == -ELOCKED && may_block) {
 		return;
@@ -2360,7 +2360,7 @@ static void or_getstat (kipc_msg_t * mp) {
 	mp->DL_PORT = port;
 	mp->DL_STAT = 0;
 
-	r = kipc_send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp, 0);
 	if(r != 0)
 		panic(__FILE__, "orinoco: getstat failed:", r);
 
@@ -2401,7 +2401,7 @@ static void or_getstat_s (kipc_msg_t * mp) {
 	mp->DL_PORT = port;
 	mp->DL_STAT = 0;
 
-	r = kipc_send(mp->m_source, mp);
+	r = kipc_send(mp->m_source, mp, 0);
 	if(r != 0)
 		panic(__FILE__, "orinoco: getstat_s failed:", r);
 }

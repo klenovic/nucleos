@@ -41,7 +41,7 @@ static int driver_open(int which)
 	msg.m_type = DEV_OPEN;
 	msg.DEVICE = driver[which].minor;
 	msg.IO_ENDPT = self_ep;
-	r = kipc_sendrec(driver[which].endpt, &msg);
+	r = kipc_sendrec(driver[which].endpt, &msg, 0);
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
@@ -69,7 +69,7 @@ static int driver_open(int which)
 	msg.IO_ENDPT = self_ep;
 	msg.IO_GRANT = (char *) gid;
 
-	r = kipc_sendrec(driver[which].endpt, &msg);
+	r = kipc_sendrec(driver[which].endpt, &msg, 0);
 
 	cpf_revoke(gid);
 
@@ -117,7 +117,7 @@ static int driver_close(int which)
 	msg.m_type = DEV_CLOSE;
 	msg.DEVICE = driver[which].minor;
 	msg.IO_ENDPT = self_ep;
-	r = kipc_sendrec(driver[which].endpt, &msg);
+	r = kipc_sendrec(driver[which].endpt, &msg, 0);
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
@@ -438,7 +438,7 @@ static void restart_driver(int which, int tell_rs)
 			driver[which].label);
 #endif
 
-		r = kipc_sendrec(RS_PROC_NR, &msg);
+		r = kipc_sendrec(RS_PROC_NR, &msg, 0);
 
 		if (r != 0 || msg.m_type != 0)
 			panic(__FILE__, "RS request failed", r);

@@ -93,7 +93,7 @@ kipc_msg_t mess;
 		dprint("%d %d", err, 0);
 		
 		mess.REP_STATUS = err;	/* error code */
-		kipc_send(caller, &mess);	/* send reply to caller */
+		kipc_send(caller, &mess, 0);	/* send reply to caller */
 	}
 }
 

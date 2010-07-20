@@ -197,7 +197,7 @@ static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *
 	int status;
 
 	msgptr->m_type = syscallnr;
-	status = kipc_sendrec(who, msgptr);
+	status = kipc_sendrec(who, msgptr, 0);
 
 	if (status != 0)
 		return(status);

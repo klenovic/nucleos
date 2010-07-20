@@ -58,7 +58,7 @@ endpoint_t from;				/* who sent this message? */
 	/* Ask TTY driver for log output */
 	mess.GETKM_GRANT= gid;
 	mess.m_type = GET_KMESS_S;
-	r= kipc_sendrec(TTY_PROC_NR, &mess);
+	r= kipc_sendrec(TTY_PROC_NR, &mess, 0);
 	cpf_revoke(gid);
 
 	if (r == 0) r= mess.m_type;

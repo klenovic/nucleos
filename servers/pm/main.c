@@ -334,7 +334,7 @@ static void pm_init()
 		mess.PR_SLOT = ip->proc_nr;
 		mess.PR_PID = rmp->mp_pid;
 		mess.PR_ENDPT = rmp->mp_endpoint;
-  		if ((s=kipc_send(FS_PROC_NR, &mess)) != 0)
+  		if ((s=kipc_send(FS_PROC_NR, &mess, 0)) != 0)
 			panic(__FILE__,"can't sync up with FS", s);
   	}
   }
@@ -344,7 +344,7 @@ static void pm_init()
 
   /* Tell FS that no more system processes follow and synchronize. */
   mess.PR_ENDPT = ENDPT_NONE;
-  if (kipc_sendrec(FS_PROC_NR, &mess) != 0 || mess.m_type != 0)
+  if (kipc_sendrec(FS_PROC_NR, &mess, 0) != 0 || mess.m_type != 0)
 	panic(__FILE__,"can't sync up with FS", NO_NUM);
 
 #ifdef CONFIG_X86_32

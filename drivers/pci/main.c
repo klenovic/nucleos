@@ -114,7 +114,7 @@ kipc_msg_t *mp;
 #endif
 
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 		printf("PCI: do_init: unable to send to %d: %d\n",
 			mp->m_source, r);
@@ -141,7 +141,7 @@ kipc_msg_t *mp;
 		mp->m_data3= did;
 	}
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_first_dev: unable to kipc_send to %d: %d\n",
@@ -167,7 +167,7 @@ kipc_msg_t *mp;
 		mp->m_data3= did;
 	}
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_next_dev: unable to kipc_send to %d: %d\n",
@@ -189,7 +189,7 @@ kipc_msg_t *mp;
 	if (r == 1)
 		mp->m_data1= devind;
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_find_dev: unable to kipc_send to %d: %d\n",
@@ -215,7 +215,7 @@ kipc_msg_t *mp;
 	mp->m_data1= vid;
 	mp->m_data2= did;
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_ids: unable to kipc_send to %d: %d\n",
@@ -252,7 +252,7 @@ kipc_msg_t *mp;
 	}
 
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_dev_name: unable to kipc_send to %d: %d\n",
@@ -289,7 +289,7 @@ kipc_msg_t *mp;
 	}
 
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_dev_name: unable to kipc_send to %d: %d\n",
@@ -325,7 +325,7 @@ kipc_msg_t *mp;
 	}
 
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("PCI: do_slot_name: unable to kipc_send to %d: %d\n",
@@ -425,7 +425,7 @@ kipc_msg_t *mp;
 	devind= mp->m_data1;
 
 	mp->m_type= pci_reserve2(devind, mp->m_source);
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_reserve: unable to kipc_send to %d: %d\n",
@@ -451,7 +451,7 @@ kipc_msg_t *mp;
 	}
 	mp->m_data4= v;
 	mp->m_type= r;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_r8: unable to kipc_send to %d: %d\n",
@@ -471,7 +471,7 @@ kipc_msg_t *mp;
 	v= pci_attr_r16(devind, port);
 	mp->m_data4= v;
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_r16: unable to kipc_send to %d: %d\n",
@@ -497,7 +497,7 @@ kipc_msg_t *mp;
 	}
 	mp->m_data4= v;
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_r32: unable to kipc_send to %d: %d\n",
@@ -517,7 +517,7 @@ kipc_msg_t *mp;
 
 	pci_attr_w8(devind, port, v);
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_w8: unable to send to %d: %d\n",
@@ -537,7 +537,7 @@ kipc_msg_t *mp;
 
 	pci_attr_w16(devind, port, v);
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_w16: unable to send to %d: %d\n",
@@ -557,7 +557,7 @@ kipc_msg_t *mp;
 
 	pci_attr_w32(devind, port, v);
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_attr_w32: unable to send to %d: %d\n",
@@ -574,7 +574,7 @@ kipc_msg_t *mp;
 
 	pci_rescan_bus(busnr);
 	mp->m_type= 0;
-	r= kipc_send(mp->m_source, mp);
+	r= kipc_send(mp->m_source, mp, 0);
 	if (r != 0)
 	{
 		printf("do_rescan_bus: unable to send to %d: %d\n",
@@ -591,7 +591,7 @@ int result;
 	kipc_msg_t m;
 
 	m.m_type= result;
-	r= kipc_send(mp->m_source, &m);
+	r= kipc_send(mp->m_source, &m, 0);
 	if (r != 0)
 		printf("reply: unable to send to %d: %d\n", mp->m_source, r);
 }
