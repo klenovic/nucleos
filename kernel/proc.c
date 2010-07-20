@@ -497,7 +497,7 @@ u32 flags;			/* notification event set or flags */
 	result = mini_notify(caller_ptr, src_dst_e);
 	break;
   case KIPC_SENDNB:
-        result = mini_send(caller_ptr, src_dst_e, m_ptr, NON_BLOCKING);
+        result = mini_send(caller_ptr, src_dst_e, m_ptr, KIPC_FLG_NONBLOCK);
         break;
   case KIPC_SENDA:
 	result = mini_senda(caller_ptr, (asynmsg_t *)m_ptr, (size_t)src_dst_e);
@@ -623,7 +623,7 @@ int flags;
 		return r;
 	RTS_UNSET(dst_ptr, RTS_RECEIVING);
   } else {
-	if(flags & NON_BLOCKING) {
+	if(flags & KIPC_FLG_NONBLOCK) {
 		return(-ENOTREADY);
 	}
 
@@ -782,7 +782,7 @@ int flags;
   /* No suitable message is available or the caller couldn't send in KIPC_SENDREC. 
    * Block the process trying to receive, unless the flags tell otherwise.
    */
-  if ( ! (flags & NON_BLOCKING)) {
+  if ( ! (flags & KIPC_FLG_NONBLOCK)) {
       /* Check for a possible deadlock before actually blocking. */
       if (deadlock(KIPC_RECEIVE, caller_ptr, src_p)) {
           return(-ELOCKED);

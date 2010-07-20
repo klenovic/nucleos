@@ -18,6 +18,9 @@
 #define KIPC_SENDNB	5	/* nonblocking send */
 #define KIPC_SENDA	16	/* asynchronous send */
 
+/* Masks and flags for system calls. */
+#define KIPC_FLG_NONBLOCK	1  /* do not block if target not ready */
+
 /* Defines for flags field */
 #define AMF_EMPTY	0	/* slot is not inuse */
 #define AMF_VALID	1	/* slot contains message */
@@ -32,9 +35,6 @@
 
 #include <nucleos/types.h>
 #include <nucleos/type.h>
-
-/* Masks and flags for system calls. */
-#define NON_BLOCKING	0x0080  /* do not block if target not ready */
 
 #define WILLRECEIVE(target, source_ep) \
 	((RTS_ISSET(target, RTS_RECEIVING) && !RTS_ISSET(target, RTS_SENDING)) && \
