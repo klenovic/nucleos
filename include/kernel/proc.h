@@ -22,11 +22,11 @@
  * fields are defined in the assembler include file sconst.h.  When changing
  * struct proc, be sure to change sconst.h to match.
  */
+#include <nucleos/kipc.h>
 #include <nucleos/com.h>
 #include <nucleos/portio.h>
 #include <kernel/const.h>
 #include <kernel/priv.h>
-
 
 struct proc {
 	struct stackframe_s p_reg;	/* process' registers saved in stack frame */
