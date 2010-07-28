@@ -69,9 +69,9 @@ int do_chmod()
 
   /* Now make the change. Clear setgid bit if file is not in caller's grp */
   if (fp->fp_effuid != SU_UID && vp->v_gid != fp->fp_effgid) 
-	  m_in.mode &= ~I_SET_GID_BIT;
+	  m_in.perm_mode &= ~I_SET_GID_BIT;
 
-  if ((r = req_chmod(vp->v_fs_e, vp->v_inode_nr, m_in.mode, &new_mode)) == 0)
+  if ((r = req_chmod(vp->v_fs_e, vp->v_inode_nr, m_in.perm_mode, &new_mode)) == 0)
   	vp->v_mode = new_mode;
 
   put_vnode(vp);
@@ -159,14 +159,14 @@ int do_access()
   struct vnode *vp;
     
   /* First check to see if the mode is correct. */
-  if ( (m_in.mode & ~(R_OK | W_OK | X_OK)) != 0 && m_in.mode != F_OK)
+  if ( (m_in.perm_mode & ~(R_OK | W_OK | X_OK)) != 0 && m_in.perm_mode != F_OK)
 	return(-EINVAL);
 
   /* Temporarily open the file. */
   if (fetch_name(user_fullpath, PATH_MAX, m_in.name) < 0) return(err_code);
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) return(err_code);
 
-  r = forbidden(vp, m_in.mode);
+  r = forbidden(vp, m_in.perm_mode);
   put_vnode(vp);
   return(r);
 }

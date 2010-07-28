@@ -55,7 +55,7 @@ int do_creat()
   int r;
 
   if (fetch_name(user_fullpath, PATH_MAX, m_in.name) < 0) return(err_code);
-  r = common_open(O_WRONLY | O_CREAT | O_TRUNC, (mode_t) m_in.mode);
+  r = common_open(O_WRONLY | O_CREAT | O_TRUNC, (mode_t) m_in.perm_mode);
   return(r);
 }
 
@@ -375,7 +375,7 @@ int do_mkdir()
 
   if (fetch_name(user_fullpath, PATH_MAX, m_in.name1) < 0) return(err_code);
 
-  bits = I_DIRECTORY | (m_in.mode & RWX_MODES & fp->fp_umask);
+  bits = I_DIRECTORY | (m_in.perm_mode & RWX_MODES & fp->fp_umask);
 
   /* Request lookup */
   if((vp = last_dir()) == NIL_VNODE) return(err_code);

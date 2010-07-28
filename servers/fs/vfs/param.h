@@ -21,7 +21,7 @@
 #define ls_fd	      m_data1
 #define mk_mode	      m_data2
 #define mk_z0	      m_data3
-#define mode	      m_data2
+#define perm_mode     m_data2
 #define c_mode        m_data3
 #define c_name        m_data4
 #define name	      m_data3
