@@ -27,7 +27,3 @@ header-y += unistd_32.h
 header-y += unistd_64.h
 # n/a header-y += vm86.h
 # n/a header-y += vsyscall.h
-
-# @nucleos: temporary exported to show how to define
-#           appropriate macros e.g. for glibc
-header-y += syscall.h
