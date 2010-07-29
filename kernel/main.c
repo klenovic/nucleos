@@ -282,7 +282,7 @@ void main(void)
 static void announce(void)
 {
 	/* Display the Nucleos startup banner. */
-	kprintf("\nNucleos %s Copyright (c) 2009, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
+	kprintf("\nNucleos %s Copyright (c) 2010, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
 		UTS_RELEASE);
 }
 
