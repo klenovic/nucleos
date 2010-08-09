@@ -74,6 +74,31 @@ mode_t umask(mode_t _cmask);
 /* Open Group Base Specifications Issue 6 (not complete) */
 int lstat(const char *_path, struct stat *_buf);
 
+#include <nucleos/time.h>
+
+/* @nucleos: This one is for the VFS and various filesystems. Arch may have its
+ *           own definition of `struct stat' (e.g. according to asm-generic/stat.h).
+ *           The `struct stat' is not used in concrete FS but _only_ in VFS as
+ *           the `struct stat' may change or may be different on various platforms
+ *           and we don't want to take care about that in every FS.
+ *           The VFS server takes care about that.
+ */
+struct kstat {
+	u64			ino;
+	dev_t			dev;
+	mode_t			mode;
+	unsigned int		nlink;
+	uid_t			uid;
+	gid_t			gid;
+	dev_t			rdev;
+	loff_t			size;
+	struct timespec		atime;
+	struct timespec		mtime;
+	struct timespec		ctime;
+	unsigned long		blksize;
+	unsigned long long	blocks;
+};
+
 #endif/* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __NUCLEOS_STAT_H */

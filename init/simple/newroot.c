@@ -49,6 +49,6 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "newroot: mount failed: %s\n",strerror(errno));
 		exit(1);
 	}
-	
+
 	return 0;
 }

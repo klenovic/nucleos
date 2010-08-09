@@ -119,7 +119,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 			r = r1;
 		else
 			r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR,
-				     (char *) &sb, 0);
+				     (struct stat*) &sb, 0);
 
 		if (r != 0) {
 			put_vnode(vp);

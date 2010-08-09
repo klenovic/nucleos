@@ -897,7 +897,7 @@ int req_stat(fs_e, inode_nr, who_e, buf, pos)
 int fs_e;
 ino_t inode_nr;
 int who_e;
-char *buf;
+struct stat *buf;
 int pos;
 {
   cp_grant_id_t grant_id;
@@ -926,7 +926,7 @@ int pos;
 
   if (r == 0 && pos != 0) {
 	sb.st_size -= pos;
-	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf, 
+	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf,
 		sizeof(struct stat));
   }
 

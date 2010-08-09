@@ -19,17 +19,24 @@
 
 #ifdef __i386__
 struct stat {
-	dev_t st_dev;		/* major/minor device number */
-	ino_t st_ino;		/* i-node number */
-	mode_t st_mode;		/* file mode, protection bits, etc. */
-	short int st_nlink;	/* # links; TEMPORARY HACK: should be nlink_t*/
-	uid_t st_uid;		/* uid of the file's owner */
-	short int st_gid;	/* gid; TEMPORARY HACK: should be gid_t */
-	dev_t st_rdev;		/* device ID (if special file) */
-	off_t st_size;		/* file size */
-	time_t st_atime;	/* time of last access */
-	time_t st_mtime;	/* time of last data modification */
-	time_t st_ctime;	/* time of last file status change */
+	short		st_dev;		/* major/minor device number */
+	unsigned long	st_ino;		/* i-node number */
+	unsigned short	st_mode;	/* file mode, protection bits, etc. */
+	short		st_nlink;	/* # links; TEMPORARY HACK: should be nlink_t*/
+	short		st_uid;		/* uid of the file's owner */
+	short		st_gid;		/* gid; TEMPORARY HACK: should be gid_t */
+	short		st_rdev;	/* device ID (if special file) */
+	long		st_size;	/* file size */
+	unsigned long	st_blksize;	/* blocksize for file system I/O */
+	unsigned long	st_blocks;	/* number of 512B blocks allocated */
+	unsigned long	st_atime;	/* time of last access */
+	unsigned long	st_atime_nsec;	/* time of last access (nanosec) */
+	unsigned long	st_mtime;	/* time of last data modification */
+	unsigned long	st_mtime_nsec;	/* time of last data modification (nanosec) */
+	unsigned long	st_ctime;	/* time of last file status change */
+	unsigned long	st_ctime_nsec;	/* time of last file status change (nanosec) */
+	unsigned long	__unused4;
+	unsigned long	__unused5;
 };
 #else /* __i386__*/
 

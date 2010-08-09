@@ -11,6 +11,7 @@
 #define __SERVERS_VFS_PROTO_H
 
 /* Function prototypes. */
+#include <nucleos/stat.h>
 #include <nucleos/timer.h>
 #include "request.h"
 
@@ -200,7 +201,7 @@ int req_rename(endpoint_t fs_e, ino_t old_dir, char *old_name, ino_t new_dir, ch
 int req_rmdir(endpoint_t fs_e, ino_t inode_nr, char *lastc);
 int req_slink(endpoint_t fs_e, ino_t inode_nr, char *lastc, endpoint_t who_e, char *path_addr,
 	      int path_length, uid_t uid, gid_t gid);
-int req_stat(int fs_e, ino_t inode_nr, int who_e, char *buf, int pos);
+int req_stat(int fs_e, ino_t inode_nr, int who_e, struct stat *buf, int pos);
 int req_sync(endpoint_t fs_e);
 int req_unlink(endpoint_t fs_e, ino_t inode_nr, char *lastc);
 int req_unmount(endpoint_t fs_e);
