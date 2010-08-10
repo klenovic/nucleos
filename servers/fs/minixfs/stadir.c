@@ -30,7 +30,7 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);
  */
 static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
 {
-	struct stat statbuf;
+	struct kstat ksb;
 	mode_t mo;
 	int r, s;
 
@@ -38,34 +38,34 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
 	if (rip->i_update)
 		update_times(rip);
 
-	/* Fill in the statbuf struct. */
+	/* Fill in the ksb struct. */
 	mo = rip->i_mode & I_TYPE;
 
 	/* true iff special */
 	s = (mo == I_CHAR_SPECIAL || mo == I_BLOCK_SPECIAL);
 
-	memset(&statbuf, 0, sizeof(statbuf));
+	memset(&ksb, 0, sizeof(ksb));
 
-	statbuf.st_dev = rip->i_dev;
-	statbuf.st_ino = rip->i_num;
-	statbuf.st_mode = rip->i_mode;
-	statbuf.st_nlink = rip->i_nlinks;
-	statbuf.st_uid = rip->i_uid;
-	statbuf.st_gid = rip->i_gid;
-	statbuf.st_rdev = (dev_t) (s ? rip->i_zone[0] : NO_DEV);
-	statbuf.st_size = rip->i_size;
-	statbuf.st_atime = rip->i_atime;
-	statbuf.st_mtime = rip->i_mtime;
-	statbuf.st_ctime = rip->i_ctime;
-	statbuf.st_atime_nsec = 0;
-	statbuf.st_mtime_nsec = 0;
-	statbuf.st_ctime_nsec = 0;
+	ksb.dev = rip->i_dev;
+	ksb.ino = rip->i_num;
+	ksb.mode = rip->i_mode;
+	ksb.nlink = rip->i_nlinks;
+	ksb.uid = rip->i_uid;
+	ksb.gid = rip->i_gid;
+	ksb.rdev = (dev_t)(s ? rip->i_zone[0] : NO_DEV);
+	ksb.size = rip->i_size;
+	ksb.atime.tv_sec = rip->i_atime;
+	ksb.mtime.tv_sec = rip->i_mtime;
+	ksb.ctime.tv_sec = rip->i_ctime;
+	ksb.atime.tv_nsec = 0;
+	ksb.mtime.tv_nsec = 0;
+	ksb.ctime.tv_nsec = 0;
 
 	/* @nucleos: NOT correct e.g. see minix_getattr() in linux sources fs/minix/inode.c */
-	statbuf.st_blksize = 1024;
-	statbuf.st_blocks = ((statbuf.st_size + 511) >> 9);
+	ksb.blksize = 1024;
+	ksb.blocks = ((ksb.size + 511) >> 9);
 
-	r = sys_safecopyto(who_e, gid, 0, (vir_bytes)&statbuf, (phys_bytes)sizeof(statbuf), D);
+	r = sys_safecopyto(who_e, gid, 0, (vir_bytes)&ksb, (phys_bytes)sizeof(ksb), D);
 
 	return(r);
 }

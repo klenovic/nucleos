@@ -31,11 +31,9 @@
 #include "vnode.h"
 #include "param.h"
 
-static int fs_sendrec_f(char *file, int line, endpoint_t fs_e,
-				      kipc_msg_t *reqm);
+static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm);
 
 #define fs_sendrec(e, m) fs_sendrec_f(__FILE__, __LINE__, (e), (m))
-
 
 /*===========================================================================*
  *			req_breadwrite					     *
@@ -889,48 +887,34 @@ gid_t gid;
   return(r);
 }
 
-
 /*===========================================================================*
  *				req_stat	       			     *
  *===========================================================================*/
-int req_stat(fs_e, inode_nr, who_e, buf, pos)
-int fs_e;
-ino_t inode_nr;
-int who_e;
-struct stat *buf;
-int pos;
+int req_stat(int fs_e, ino_t inode_nr, int who_e, struct kstat *ksb_buf, int pos)
 {
-  cp_grant_id_t grant_id;
-  int r;
-  kipc_msg_t m;
-  struct stat sb;
+	cp_grant_id_t grant_id;
+	int r;
+	kipc_msg_t m;
 
-  if (pos != 0)
-	  grant_id = cpf_grant_direct(fs_e, (vir_bytes) &sb,
-	  			      sizeof(struct stat), CPF_WRITE);
-  else
-	  grant_id = cpf_grant_magic(fs_e, who_e, (vir_bytes) buf,
-				sizeof(struct stat), CPF_WRITE);
+	if (!ksb_buf)
+		return -EFAULT;
 
-  if (grant_id < 0)
-	panic(__FILE__, "req_stat: cpf_grant_* failed", NO_NUM);
+	grant_id = cpf_grant_direct(fs_e, (vir_bytes)ksb_buf, sizeof(struct kstat),
+				    CPF_WRITE);
 
-  /* Fill in request message */
-  m.m_type = REQ_STAT;
-  m.REQ_INODE_NR = inode_nr;
-  m.REQ_GRANT = grant_id;
+	if (grant_id < 0)
+		panic(__FILE__, "req_stat: cpf_grant_* failed", NO_NUM);
 
-  /* Send/rec request */
-  r= fs_sendrec(fs_e, &m);
-  cpf_revoke(grant_id);
+	/* Fill in request message */
+	m.m_type = REQ_STAT;
+	m.REQ_INODE_NR = inode_nr;
+	m.REQ_GRANT = grant_id;
 
-  if (r == 0 && pos != 0) {
-	sb.st_size -= pos;
-	r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)&sb, who_e, D, (vir_bytes)buf,
-		sizeof(struct stat));
-  }
+	/* Send/rec request */
+	r = fs_sendrec(fs_e, &m);
+	cpf_revoke(grant_id);
 
-  return(r);
+	return(r);
 }
 
 

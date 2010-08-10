@@ -57,7 +57,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	struct fproc *rfp;
 	struct vnode *vp;
 	char *cp;
-	struct stat sb;
+	struct kstat ksb;
 	static char mbuf[ARG_MAX];	/* buffer for stack and zeroes */
 	struct nucleos_binprm bfmt_param;
 	struct nucleos_binfmt *bhandler;
@@ -119,14 +119,14 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 			r = r1;
 		else
 			r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR,
-				     (struct stat*) &sb, 0);
+				     (struct kstat*)&ksb, 0);
 
 		if (r != 0) {
 			put_vnode(vp);
 			return r;
 		}
 
-		bfmt_param.ex.st_ctime = sb.st_ctime;
+		bfmt_param.ex.st_ctime = ksb.ctime.tv_sec;
 
 		if (round == 0) {
 			/* Deal with setuid/setgid executables */

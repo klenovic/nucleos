@@ -13,7 +13,6 @@
 /* Function prototypes. */
 
 struct vmproc;
-struct stat;
 struct mem_map;
 struct memory;
 
