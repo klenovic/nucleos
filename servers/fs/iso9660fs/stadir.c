@@ -40,8 +40,7 @@ static int stat_dir_record(struct dir_record *dir, int pipe_pos, int who_e, cp_g
 	ksb.rdev = NO_DEV;
 	ksb.size = dir->d_file_size;	/* size of the file */
 
-	/* @nucleos: FIX ME! */
-	ksb.blksize = 0;
+	ksb.blksize = 1024;
 	ksb.blocks = ((ksb.size + 511) >> 9);
 
 	ltime.tm_year = dir->rec_date[0];

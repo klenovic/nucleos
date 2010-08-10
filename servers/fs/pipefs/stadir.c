@@ -29,8 +29,8 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
 	ksb.size = rip->i_size;
 	ksb.mode &= ~I_REGULAR;	/* wipe out I_REGULAR bit for pipes */
 
+	ksb.blksize = 1024;
 	/* @nucleos: what it should be for pipes? */
-	ksb.blksize = 0;
 	ksb.blocks = 0;
 
 	ksb.atime.tv_sec = rip->i_atime;
