@@ -180,7 +180,7 @@ unsigned nr_req;		/* length of request vector */
 	    if (opcode == DEV_GATHER_S) return 0;	/* always at EOF */
 	    break;
 
-	/* Virtual copying. For RAM disks, kernel memory and internal FS_PROC_NR. */
+	/* Virtual copying. For RAM disks, kernel memory and internal VFS_PROC_NR. */
 	default:
 	case KMEM_DEV:
 	case RAM_DEV_OLD:

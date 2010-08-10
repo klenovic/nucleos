@@ -33,7 +33,7 @@ typedef unsigned long sigset_t;
 /* Regular signals. */
 #define SIGHUP		1	/* hangup */
 #define SIGINT		2	/* interrupt (DEL) */
-#define SIGQUIT		3	/* quit (ASCII FS_PROC_NR) */
+#define SIGQUIT		3	/* quit (ASCII VFS_PROC_NR) */
 #define SIGILL		4	/* illegal instruction */
 #define SIGTRAP		5	/* trace trap (not reset when caught) */
 #define SIGABRT		6	/* IOT instruction */

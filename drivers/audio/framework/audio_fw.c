@@ -878,7 +878,7 @@ static void data_to_user(sub_dev_t *sub_dev_ptr)
 
 	sub_dev_ptr->ReviveStatus = sub_dev_ptr->FragSize;
 	sub_dev_ptr->ReadyToRevive = TRUE; 
-		/* drv_status will kipc_send REVIVE mess to FS_PROC_NR*/	
+		/* drv_status will kipc_send REVIVE mess to VFS_PROC_NR*/	
 
 	m.m_type = DEV_REVIVE;			/* build message */
 	m.REP_ENDPT = sub_dev_ptr->ReviveProcNr;

@@ -359,7 +359,7 @@ int sig_nr;			/* signal to be sent */
 /* A system process wants to send a signal to a process.  Examples are:
  *  - HARDWARE wanting to cause a SIGSEGV after a CPU exception
  *  - TTY wanting to cause SIGINT upon getting a DEL
- *  - FS_PROC_NR wanting to cause SIGPIPE for a broken pipe 
+ *  - VFS_PROC_NR wanting to cause SIGPIPE for a broken pipe 
  * Signals are handled by sending a message to PM.  This function handles the 
  * signals and makes sure the PM gets them by sending a notification. The 
  * process being signaled is blocked while PM has not finished all signals 

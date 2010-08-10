@@ -25,7 +25,7 @@
 				/* maximum number of entries in an iorequest */
 
 /* Message passing constants. */
-#define MESS_SIZE	(sizeof(message))	/* might need usizeof from FS_PROC_NR here */
+#define MESS_SIZE	(sizeof(message))	/* might need usizeof from VFS_PROC_NR here */
 #define NIL_MESS	((kipc_msg_t *) 0)	/* null pointer */
 
 /* Memory related constants. */

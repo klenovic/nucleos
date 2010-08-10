@@ -19,8 +19,8 @@
  *   do_fork:		perform the FORK system call
  *   do_fork_nb:	special nonblocking version of FORK, for RS
  *   do_exit:		perform the EXIT system call (by calling exit_proc())
- *   exit_proc:		actually do the exiting, and tell FS_PROC_NR about it
- *   exit_restart:	continue exiting a process after FS_PROC_NR has replied
+ *   exit_proc:		actually do the exiting, and tell VFS_PROC_NR about it
+ *   exit_restart:	continue exiting a process after VFS_PROC_NR has replied
  *   do_waitpid:	perform the WAITPID or WAIT system call
  *   wait_test:		check whether a parent is waiting for a child
  */
@@ -295,7 +295,7 @@ int dump_core;			/* flag indicating whether to dump core */
 	printf("PM: INIT died\n");
 	return;
   }
-  if (proc_nr_e == FS_PROC_NR)
+  if (proc_nr_e == VFS_PROC_NR)
   {
 	panic(__FILE__, "exit_proc: FS died", r);
   }
@@ -360,7 +360,7 @@ void exit_restart(rmp, dump_core)
 struct mproc *rmp;		/* pointer to the process being terminated */
 int dump_core;			/* flag indicating whether to dump core */
 {
-/* FS_PROC_NR replied to our exit or coredump request. Perform the second half of the
+/* VFS_PROC_NR replied to our exit or coredump request. Perform the second half of the
  * exit code.
  */
   int r;

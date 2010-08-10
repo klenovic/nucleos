@@ -82,18 +82,17 @@
 #define NR_CTRLRS	CONFIG_NR_CTRLRS
 
 /* User-space processes, that is, device drivers, servers, and INIT. */
-#define PM_PROC_NR	0		/* process manager */
-#define FS_PROC_NR	1		/* file system */
-#define VFS_PROC_NR	FS_PROC_NR	/* FS has been renamed to VFS. */
-#define RS_PROC_NR 	  2  	/* reincarnation server */
-#define MEM_PROC_NR	3		/* memory driver (RAM disk, null, etc.) */
-#define LOG_PROC_NR	4		/* log device driver */
-#define TTY_PROC_NR	5		/* terminal (TTY) driver */
-#define DS_PROC_NR	6		/* data store server */
-#define MFS_PROC_NR	7		/* nucleos root filesystem */
-#define VM_PROC_NR	8		/* memory server */
-#define PFS_PROC_NR       9     /* pipe filesystem */
-#define INIT_PROC_NR	  10   	/* init -- goes multiuser */
+#define PM_PROC_NR	0	/* process manager */
+#define VFS_PROC_NR	1	/* Virtual filesystem */
+#define RS_PROC_NR 	2	/* reincarnation server */
+#define MEM_PROC_NR	3	/* memory driver (RAM disk, null, etc.) */
+#define LOG_PROC_NR	4	/* log device driver */
+#define TTY_PROC_NR	5	/* terminal (TTY) driver */
+#define DS_PROC_NR	6	/* data store server */
+#define MFS_PROC_NR	7	/* nucleos root filesystem */
+#define VM_PROC_NR	8	/* memory server */
+#define PFS_PROC_NR	9	/* pipe filesystem */
+#define INIT_PROC_NR	10	/* init -- goes multiuser */
 
 /* Root system process and root user process. */
 #define ROOT_SYS_PROC_NR  RS_PROC_NR
@@ -613,7 +612,7 @@
 #define SCP_MAKEINFO(seg)  ((seg) & 0xffff)
 #define SCP_INFO2SEG(info) ((info) & 0xffff)
 
-/* Field names for SELECT (FS_PROC_NR). */
+/* Field names for SELECT (VFS_PROC_NR). */
 #define SEL_NFDS       m_data1
 #define SEL_READFDS    m_data3
 #define SEL_WRITEFDS   m_data4

@@ -279,11 +279,11 @@ int *completed;			/* number of bytes copied */
 
   if (rw_flag == READING) {
 	/* Copy a chunk from the block buffer to user space. */
-	r = sys_safecopyto(FS_PROC_NR, gid, buf_off,
+	r = sys_safecopyto(VFS_PROC_NR, gid, buf_off,
 		(vir_bytes) (bp->b_data+off), (phys_bytes) chunk, D);
   } else {
 	/* Copy a chunk from user space to the block buffer. */
-	r = sys_safecopyfrom(FS_PROC_NR, gid, buf_off,
+	r = sys_safecopyfrom(VFS_PROC_NR, gid, buf_off,
 		(vir_bytes) (bp->b_data+off), (phys_bytes) chunk, D);
 	bp->b_dirt = DIRTY;
   }
@@ -611,7 +611,7 @@ int fs_getdents(void)
 		ent_pos= block_pos + ((char *)dp - bp->b_data);
 
 		  if(tmpbuf_off + reclen > GETDENTS_BUFSIZ) {
-			r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
+			r= sys_safecopyto(VFS_PROC_NR, gid, userbuf_off, 
 					     (vir_bytes)getdents_buf,
 					     tmpbuf_off, D);
 			if (r != 0)
@@ -649,7 +649,7 @@ int fs_getdents(void)
   }
 
   if(tmpbuf_off != 0) {
-	r= sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
+	r= sys_safecopyto(VFS_PROC_NR, gid, userbuf_off, 
 		(vir_bytes)getdents_buf, tmpbuf_off, D);
 	if (r != 0)
 		panic(__FILE__, "fs_getdents: sys_safecopyto failed\n", r);

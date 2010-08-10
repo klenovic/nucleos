@@ -34,7 +34,7 @@ enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };
 
 #define CTRLR(n) ((n)==0 ? 3 : (8 + 2*((n)-1)))	/* magic formula */
 
-/* Full device numbers that are special to the boot monitor and FS_PROC_NR. */
+/* Full device numbers that are special to the boot monitor and VFS_PROC_NR. */
 #  define DEV_RAM	      0x0100	/* device number of /dev/ram */
 #  define DEV_IMGRD	      0x0106	/* device number of /dev/imgrd */
 

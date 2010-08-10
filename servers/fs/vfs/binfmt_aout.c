@@ -83,7 +83,7 @@ static int aout_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos), READING, 
-			  FS_PROC_NR, (char*)&hdr, sizeof(struct exec), &new_pos, &cum_io_incr);
+			  VFS_PROC_NR, (char*)&hdr, sizeof(struct exec), &new_pos, &cum_io_incr);
 
 	if (err) {
 		app_err("Can't read the file header\n");
@@ -214,7 +214,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 
 			/* Issue request */
 			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr,
-					  cvul64(off+k), READING, FS_PROC_NR, buf, n, &new_pos,
+					  cvul64(off+k), READING, VFS_PROC_NR, buf, n, &new_pos,
 					  &cum_io);
 
 			if (err) {
@@ -227,7 +227,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 				return -EIO;
 			}
 
-			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
+			err = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
 			if (err) {
 				printf("VFS: read_seg: copy failed (text)\n");

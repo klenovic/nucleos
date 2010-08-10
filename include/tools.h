@@ -77,7 +77,7 @@ typedef struct environment {
 
 /* External variables */
 extern environment *env;	/* Lists the environment */
-extern int fsok;		/* True if the boot device contains an FS_PROC_NR */
+extern int fsok;		/* True if the boot device contains an VFS_PROC_NR */
 extern u32_t lowsec;		/* Offset to the file system on the boot dev */
 
 /* Prototypes */

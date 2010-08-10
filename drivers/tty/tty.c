@@ -36,7 +36,7 @@
  *   DEV_OPEN:       a tty line has been opened
  *   DEV_CLOSE:      a tty line has been closed
  *   DEV_SELECT:     start select notification request
- *   DEV_STATUS:     FS_PROC_NR wants to know status for SELECT or REVIVE
+ *   DEV_STATUS:     VFS_PROC_NR wants to know status for SELECT or REVIVE
  *   CANCEL:         terminate a previous incomplete system call immediately
  *
  *    m_type      TTY_LINE   IO_ENDPT    COUNT   TTY_SPEKS  ADDRESS
@@ -368,7 +368,7 @@ kipc_msg_t *m_ptr;
   int ops;
   
   /* Check for select or revive events on any of the ttys. If we found an, 
-   * event return a single status message for it. The FS_PROC_NR will make another 
+   * event return a single status message for it. The VFS_PROC_NR will make another 
    * call to see if there is more.
    */
   event_found = 0;

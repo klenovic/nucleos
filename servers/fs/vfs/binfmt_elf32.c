@@ -102,7 +102,7 @@ static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos), READING,
-			    FS_PROC_NR, (char*)&hdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io);
+			    VFS_PROC_NR, (char*)&hdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io);
 
 	if (err) {
 		app_err("Can't read the file header\n");
@@ -321,7 +321,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 #endif
 			/* Issue request */
 			err = req_readwrite(vp->v_fs_e, vp->v_inode_nr,
-					    cvul64(off + k), READING, FS_PROC_NR, buf, n, &new_pos,
+					    cvul64(off + k), READING, VFS_PROC_NR, buf, n, &new_pos,
 					    &cum_io);
 
 			if (err) {
@@ -334,7 +334,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 				return -EIO;
 			}
 
-			err = sys_vircopy(FS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
+			err = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
 			if (err) {
 				printf("VFS: read_seg: copy failed (text)\n");
@@ -558,7 +558,7 @@ int elf32_read_ehdr(elf32_ehdr_t *ehdr, struct vnode *vp)
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(0), READING,
-			    FS_PROC_NR, (char*)&ehdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io_incr);
+			    VFS_PROC_NR, (char*)&ehdr, sizeof(elf32_ehdr_t), &new_pos, &cum_io_incr);
 
 	if (err)
 		return -1;
@@ -601,7 +601,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(ehdr->e_phoff), READING,
-			    FS_PROC_NR, (char*)*phdrs, phdrs_sz, &new_pos, &cum_io_incr);
+			    VFS_PROC_NR, (char*)*phdrs, phdrs_sz, &new_pos, &cum_io_incr);
 
 	if (err) {
 		free(phdrs);
@@ -641,7 +641,7 @@ int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(ehdr->e_shoff), READING,
-			    FS_PROC_NR, (char*)*shdrs, shdrs_sz, &new_pos, &cum_io_incr);
+			    VFS_PROC_NR, (char*)*shdrs, shdrs_sz, &new_pos, &cum_io_incr);
 
 	if (err) {
 		free(shdrs);

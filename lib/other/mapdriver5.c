@@ -18,7 +18,7 @@ int mapdriver5(char *label, size_t len, int major, int dev_style, int force)
   m.m_data1 = major;
   m.m_data2 = dev_style;
   m.m_data3 = force;
-  if (ktaskcall(FS_PROC_NR, KCNR_MAPDRIVER, &m) < 0) return(-1);
+  if (ktaskcall(VFS_PROC_NR, KCNR_MAPDRIVER, &m) < 0) return(-1);
   return(0);
 }
 

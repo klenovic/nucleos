@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
   fs_m_in.m_type = KCNR_FS_READY;
 
-  if (kipc_send(FS_PROC_NR, &fs_m_in, 0) != 0) {
+  if (kipc_send(VFS_PROC_NR, &fs_m_in, 0) != 0) {
 	printf("MFS(%d): Error sending login to VFS\n", SELF_E);
 	return(-1);
   }
@@ -131,7 +131,7 @@ kipc_msg_t *m_in;				/* pointer to message */
 		panic("MFS","receive failed", r);
 	src = fs_m_in.m_source;
 
-	if (src != FS_PROC_NR) {
+	if (src != VFS_PROC_NR) {
 		if(src == PM_PROC_NR) {
 			if(is_notify(fs_m_in.m_type))
 				srcok = 1;	/* Normal exit request. */
@@ -139,7 +139,7 @@ kipc_msg_t *m_in;				/* pointer to message */
 				printf("MFS: unexpected message from PM\n");
 		} else
 			printf("MFS: unexpected source %d\n", src);
-	} else if(src == FS_PROC_NR) {
+	} else if(src == VFS_PROC_NR) {
 		if(unmountdone) 
 			printf("MFS: unmounted: unexpected message from FS\n");
 		else 
@@ -149,7 +149,7 @@ kipc_msg_t *m_in;				/* pointer to message */
 		printf("MFS: unexpected source %d\n", src);
   } while(!srcok);
 
-   assert((src == FS_PROC_NR && !unmountdone) || 
+   assert((src == VFS_PROC_NR && !unmountdone) || 
 	(src == PM_PROC_NR && is_notify(fs_m_in.m_type)));
 }
 

@@ -133,7 +133,7 @@ kipc_msg_t *m_ptr;
   if (rmp->mp_flags & FS_CALL)
 	panic(__FILE__, "tell_fs: not idle", m_ptr->m_type);
 
-  r = asynsend3(FS_PROC_NR, m_ptr, AMF_NOREPLY);
+  r = asynsend3(VFS_PROC_NR, m_ptr, AMF_NOREPLY);
   if (r != 0)
   	panic(__FILE__, "unable to send to FS", r);
 

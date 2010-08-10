@@ -42,7 +42,7 @@ typedef struct pty {
 
   /* Read call on /dev/ptypX. */
   char		rdsendreply;	/* send a reply (instead of notify) */
-  int		rdcaller;	/* process making the call (usually FS_PROC_NR) */
+  int		rdcaller;	/* process making the call (usually VFS_PROC_NR) */
   int		rdproc;		/* process that wants to read from the pty */
   vir_bytes	rdvir_g;	/* virtual address in readers address space */
   vir_bytes	rdvir_offset;	/* offset in above grant */
@@ -52,7 +52,7 @@ typedef struct pty {
 
   /* Write call to /dev/ptypX. */
   char		wrsendreply;	/* send a reply (instead of notify) */
-  int		wrcaller;	/* process making the call (usually FS_PROC_NR) */
+  int		wrcaller;	/* process making the call (usually VFS_PROC_NR) */
   int		wrproc;		/* process that wants to write to the pty */
   vir_bytes	wrvir_g;	/* virtual address in writers address space */
   vir_bytes	wrvir_offset;	/* offset in above grant */

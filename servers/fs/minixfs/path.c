@@ -60,7 +60,7 @@ int fs_lookup()
   if(len < 1) return(-EINVAL);			/* too small */
 
   /* Copy the pathname and set up caller's user and group id */
-  r = sys_safecopyfrom(FS_PROC_NR, grant, /*offset*/ 0, 
+  r = sys_safecopyfrom(VFS_PROC_NR, grant, /*offset*/ 0, 
             (vir_bytes) user_path, (phys_bytes) len, D);
   if(r != 0) {
 	printf("MFS %s:%d sys_safecopyfrom failed: %d\n", 
@@ -77,7 +77,7 @@ int fs_lookup()
   	cred_size = fs_m_in.REQ_UCRED_SIZE;
 
   	if (cred_size > sizeof(credentials)) return(-EINVAL); /* Too big. */
-  	r = sys_safecopyfrom(FS_PROC_NR, grant2, 0, (vir_bytes) &credentials,
+  	r = sys_safecopyfrom(VFS_PROC_NR, grant2, 0, (vir_bytes) &credentials,
   			     (phys_bytes) cred_size, D);
   	if (r != 0) {
   		printf("MFS %s:%d sys_safecopyfrom failed: %d\n",
@@ -100,7 +100,7 @@ int fs_lookup()
 	len = strlen(user_path)+1;
 	if(len > path_size) return(-ENAMETOOLONG);
 
-	r1 = sys_safecopyto(FS_PROC_NR, grant, 0, (vir_bytes) user_path,
+	r1 = sys_safecopyto(VFS_PROC_NR, grant, 0, (vir_bytes) user_path,
 			    (phys_bytes) len, D);
 	if(r1 != 0) {
 		printf("%s:%d fs_lookup: sys_safecopyto failed: %d\n",

@@ -21,7 +21,7 @@ int svrctl(int request, void *argp)
 	case 'F':
 	case 'I':
 		/* FS handles calls for itself and inet. */
-		return INLINE_SYSCALL(svrctl, 3, FS_PROC_NR, request, argp);
+		return INLINE_SYSCALL(svrctl, 3, VFS_PROC_NR, request, argp);
 	default:
 		errno = EINVAL;
 		return -1;

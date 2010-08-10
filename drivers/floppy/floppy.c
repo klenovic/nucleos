@@ -675,7 +675,7 @@ unsigned nr_req;		/* length of request vector */
 		nbytes -= iov->iov_size;
 		iov->iov_size = 0;
 		if (nbytes == 0) {
-			/* The rest is optional, so we return to give FS_PROC_NR a
+			/* The rest is optional, so we return to give VFS_PROC_NR a
 			 * chance to think it over.
 			 */
 			return 0;

@@ -172,7 +172,7 @@
 #define RBT_MONITOR	3	/* let the monitor do this */
 #define RBT_RESET	4	/* hard reset the system */
 #define RBT_INVALID	5	/* first invalid reboot flag */
-#define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to FS_PROC_NR by PM */
+#define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to VFS_PROC_NR by PM */
 
 /* What system info to retrieve with sysgetinfo(). */
 #define SI_KINFO	0	/* get kernel info via PM */

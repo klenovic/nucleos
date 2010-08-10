@@ -190,7 +190,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       return(-EDSTDIED);
   }
   
-  /* The io vector copying relies on this I/O being for FS_PROC_NR itself. */
+  /* The io vector copying relies on this I/O being for VFS_PROC_NR itself. */
   if(proc_e != SELF_E) {
       printf("MFS(%d) doing block_dev_io for non-self %d\n", SELF_E, proc_e);
       panic(__FILE__, "doing block_dev_io for non-self", proc_e);
@@ -226,7 +226,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   /* RECOVERY:
    * - send back dead driver number
    * - VFS unmaps it, waits for new driver
-   * - VFS sends the new driver endp for the FS_PROC_NR proc and the request again 
+   * - VFS sends the new driver endp for the VFS_PROC_NR proc and the request again 
    */
   if (r != 0) {
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {

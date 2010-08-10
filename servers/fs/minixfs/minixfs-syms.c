@@ -58,10 +58,10 @@ char user_path[PATH_MAX+1];	/* pathname to be processed */
 char *vfs_slink_storage;
 int Xsymloop;
 
-dev_t fs_dev;		/* The device that is handled by this FS_PROC_NR proc.
+dev_t fs_dev;		/* The device that is handled by this VFS_PROC_NR proc.
                                  */
 char fs_dev_label[16];	/* Name of the device driver that is handled
-			 * by this FS_PROC_NR proc.
+			 * by this VFS_PROC_NR proc.
 			 */
 int unmountdone;
 int exitsignaled;

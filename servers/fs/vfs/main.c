@@ -106,7 +106,7 @@ int main(void)
 			endpoint_t endpt;
 
 			endpt = m_in.REP_ENDPT;
-			if(endpt == FS_PROC_NR) {
+			if(endpt == VFS_PROC_NR) {
 				endpt = suspended_ep(m_in.m_source, m_in.REP_IO_GRANT);
 
 				if(endpt == ENDPT_NONE) {
@@ -434,7 +434,7 @@ static void fs_init(void)
 
 	/* The following initializations are needed to let dev_opcl succeed .*/
 	fp = (struct fproc *) NULL;
-	who_e = who_p = FS_PROC_NR;
+	who_e = who_p = VFS_PROC_NR;
 
 	build_dmap();			/* build device table and map boot driver */
 	init_root();			/* init root device and load super block */

@@ -169,7 +169,7 @@ static int mount_fs(endpoint_t fs_e)
   if (found) {
 	/* It is possible that we have an old root lying around that 
 	 * needs to be remounted. */
-	if (vmp->m_mounted_on || vmp->m_mounted_on == fproc[FS_PROC_NR].fp_rd) {
+	if (vmp->m_mounted_on || vmp->m_mounted_on == fproc[VFS_PROC_NR].fp_rd) {
 		/* Normally, m_mounted_on refers to the mount point. For a
 		 * root filesystem, m_mounted_on is equal to the root vnode.
 		 * We assume that the root of FS is always the real root. If

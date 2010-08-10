@@ -873,32 +873,32 @@ static int msg_write(kipc_msg_t *msg, const struct pt_regs *r)
 }
 
 static struct endpt_args scall_to_srv[] = {
-	SCALL_TO_SRV(access,		FS),
+	SCALL_TO_SRV(access,		VFS),
 	SCALL_TO_SRV(alarm,		PM),
 	SCALL_TO_SRV(brk,		PM),
-	SCALL_TO_SRV(chdir,		FS),
-	SCALL_TO_SRV(chmod,		FS),
-	SCALL_TO_SRV(chown,		FS),
-	SCALL_TO_SRV(chroot,		FS),
-	SCALL_TO_SRV(close,		FS),
+	SCALL_TO_SRV(chdir,		VFS),
+	SCALL_TO_SRV(chmod,		VFS),
+	SCALL_TO_SRV(chown,		VFS),
+	SCALL_TO_SRV(chroot,		VFS),
+	SCALL_TO_SRV(close,		VFS),
 	SCALL_TO_SRV(cprof,		PM),
-	SCALL_TO_SRV(creat,		FS),	/* 10 */
+	SCALL_TO_SRV(creat,		VFS),	/* 10 */
 
-	SCALL_TO_SRV(dup,		FS),
-	SCALL_TO_SRV(dup2,		FS),
+	SCALL_TO_SRV(dup,		VFS),
+	SCALL_TO_SRV(dup2,		VFS),
 	SCALL_TO_SRV(exec,		PM),
 	SCALL_TO_SRV(exit,		PM),
-	SCALL_TO_SRV(fchdir,		FS),
-	SCALL_TO_SRV(fchmod,		FS),
-	SCALL_TO_SRV(fchown,		FS),
-	SCALL_TO_SRV(fcntl,		FS),
+	SCALL_TO_SRV(fchdir,		VFS),
+	SCALL_TO_SRV(fchmod,		VFS),
+	SCALL_TO_SRV(fchown,		VFS),
+	SCALL_TO_SRV(fcntl,		VFS),
 	SCALL_TO_SRV(fork,		PM),
-	SCALL_TO_SRV(fstat,		FS),	/* 20 */
+	SCALL_TO_SRV(fstat,		VFS),	/* 20 */
 
-	SCALL_TO_SRV(fstatfs,		FS),
-	SCALL_TO_SRV(fsync,		FS),
-	SCALL_TO_SRV(ftruncate,		FS),
-	SCALL_TO_SRV(getdents,		FS),
+	SCALL_TO_SRV(fstatfs,		VFS),
+	SCALL_TO_SRV(fsync,		VFS),
+	SCALL_TO_SRV(ftruncate,		VFS),
+	SCALL_TO_SRV(getdents,		VFS),
 	SCALL_TO_SRV(getegid,		PM),
 	SCALL_TO_SRV(geteuid,		PM),
 	SCALL_TO_SRV(getgid,		PM),
@@ -913,30 +913,30 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_ANY(getsysinfo_up,	ENDPT_ANY),
 	SCALL_TO_SRV(gettimeofday,	PM),
 	SCALL_TO_SRV(getuid,		PM),
-	SCALL_TO_SRV(ioctl,		FS),
+	SCALL_TO_SRV(ioctl,		VFS),
 	SCALL_TO_SRV(kill,		PM),
-	SCALL_TO_SRV(link,		FS),	/* 40 */
+	SCALL_TO_SRV(link,		VFS),	/* 40 */
 
-	SCALL_TO_SRV(llseek,		FS),
-	SCALL_TO_SRV(lseek,		FS),
-	SCALL_TO_SRV(lstat,		FS),
-	SCALL_TO_SRV(mkdir,		FS),
-	SCALL_TO_SRV(mknod,		FS),
+	SCALL_TO_SRV(llseek,		VFS),
+	SCALL_TO_SRV(lseek,		VFS),
+	SCALL_TO_SRV(lstat,		VFS),
+	SCALL_TO_SRV(mkdir,		VFS),
+	SCALL_TO_SRV(mknod,		VFS),
 	SCALL_TO_SRV(mmap,		VM),
-	SCALL_TO_SRV(mount,		FS),
+	SCALL_TO_SRV(mount,		VFS),
 	SCALL_TO_SRV(munmap,		VM),
 	SCALL_TO_SRV(munmap_text,	VM),
-	SCALL_TO_SRV(open,		FS),	/* 50 */
+	SCALL_TO_SRV(open,		VFS),	/* 50 */
 
 	SCALL_TO_SRV(pause,		PM),
-	SCALL_TO_SRV(pipe,		FS),
+	SCALL_TO_SRV(pipe,		VFS),
 	SCALL_TO_SRV(ptrace,		PM),
-	SCALL_TO_SRV(read,		FS),
-	SCALL_TO_SRV(readlink,		FS),
+	SCALL_TO_SRV(read,		VFS),
+	SCALL_TO_SRV(readlink,		VFS),
 	SCALL_TO_SRV(reboot,		PM),
-	SCALL_TO_SRV(rename,		FS),
-	SCALL_TO_SRV(rmdir,		FS),
-	SCALL_TO_SRV(select,		FS),
+	SCALL_TO_SRV(rename,		VFS),
+	SCALL_TO_SRV(rmdir,		VFS),
+	SCALL_TO_SRV(select,		VFS),
 	SCALL_TO_SRV(setegid,		PM),	/* 60 */
 
 	SCALL_TO_SRV(seteuid,		PM),
@@ -954,21 +954,21 @@ static struct endpt_args scall_to_srv[] = {
 	SCALL_TO_SRV(sigreturn,		PM),
 	SCALL_TO_SRV(sigsuspend,	PM),
 	SCALL_TO_SRV(sprof,		PM),
-	SCALL_TO_SRV(stat,		FS),
+	SCALL_TO_SRV(stat,		VFS),
 	SCALL_TO_SRV(stime,		PM),
 	SCALL_TO_ANY(svrctl,		ENDPT_ANY),
-	SCALL_TO_SRV(symlink,		FS),
-	SCALL_TO_SRV(sync,		FS),
+	SCALL_TO_SRV(symlink,		VFS),
+	SCALL_TO_SRV(sync,		VFS),
 	SCALL_TO_SRV(uname,		PM),	/* 80 */
 
 	SCALL_TO_SRV(time,		PM),
 	SCALL_TO_SRV(times,		PM),
-	SCALL_TO_SRV(truncate,		FS),
-	SCALL_TO_SRV(umask,		FS),
-	SCALL_TO_SRV(umount,		FS),
-	SCALL_TO_SRV(unlink,		FS),
-	SCALL_TO_SRV(utime,		FS),
+	SCALL_TO_SRV(truncate,		VFS),
+	SCALL_TO_SRV(umask,		VFS),
+	SCALL_TO_SRV(umount,		VFS),
+	SCALL_TO_SRV(unlink,		VFS),
+	SCALL_TO_SRV(utime,		VFS),
 	SCALL_TO_SRV(wait,		PM),
 	SCALL_TO_SRV(waitpid,		PM),
-	SCALL_TO_SRV(write,		FS),	/* 90 */
+	SCALL_TO_SRV(write,		VFS),	/* 90 */
 };

@@ -23,7 +23,7 @@
  *   do_set:	  set uid or gid for some process
  *   do_revive:	  revive a process that was waiting for something (e.g. TTY)
  *   do_svrctl:	  file system control
- *   do_getsysinfo:	request copy of FS_PROC_NR data structure
+ *   do_getsysinfo:	request copy of VFS_PROC_NR data structure
  *   pm_dumpcore: create a core dump
  */
 
@@ -345,7 +345,7 @@ static void unmount_all(void)
  *===========================================================================*/
 void pm_reboot()
 {
-  /* Perform the FS_PROC_NR side of the reboot call. */
+  /* Perform the VFS_PROC_NR side of the reboot call. */
   int i;
 
   do_sync();
@@ -399,9 +399,9 @@ int cpid;	/* Child process id */
    */
   childno = _ENDPOINT_P(cproc);
   if(childno < 0 || childno >= NR_PROCS)
-	panic(__FILE__, "FS_PROC_NR: bogus child for forking", m_in.child_endpt);
+	panic(__FILE__, "VFS_PROC_NR: bogus child for forking", m_in.child_endpt);
   if(fproc[childno].fp_pid != PID_FREE)
-	panic(__FILE__, "FS_PROC_NR: forking on top of in-use child", childno);
+	panic(__FILE__, "VFS_PROC_NR: forking on top of in-use child", childno);
 
   /* Copy the parent's fproc struct to the child. */
   fproc[childno] = fproc[parentno];
@@ -614,9 +614,9 @@ int do_svrctl()
 	if (fp->fp_effuid != SU_UID && fp->fp_effuid != SERVERS_UID)
 		return(-EPERM);
 
-	/* Try to copy request structure to FS_PROC_NR. */
+	/* Try to copy request structure to VFS_PROC_NR. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
-		FS_PROC_NR, (vir_bytes) &device,
+		VFS_PROC_NR, (vir_bytes) &device,
 		(phys_bytes) sizeof(device))) != 0) 
 	    return(r);
 
@@ -649,9 +649,9 @@ int do_svrctl()
   case FSDEVUNMAP: {
 	struct fsdevunmap fdu;
 	int r, major;
-	/* Try to copy request structure to FS_PROC_NR. */
+	/* Try to copy request structure to VFS_PROC_NR. */
 	if ((r = sys_datacopy(who_e, (vir_bytes) m_in.svrctl_argp,
-		FS_PROC_NR, (vir_bytes) &fdu,
+		VFS_PROC_NR, (vir_bytes) &fdu,
 		(phys_bytes) sizeof(fdu))) != 0) 
 	    return(r);
 	major = (fdu.dev >> MAJOR) & BYTE;

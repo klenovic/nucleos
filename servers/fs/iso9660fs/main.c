@@ -40,7 +40,7 @@ int main(void) {
 
 	fs_m_in.m_type = KCNR_FS_READY;
 
-	if (kipc_send(FS_PROC_NR, &fs_m_in, 0) != 0) {
+	if (kipc_send(VFS_PROC_NR, &fs_m_in, 0) != 0) {
 		printf("ISOFS (%d): Error sending login to VFS\n", SELF_E);
 		return -1;
 	}
@@ -56,7 +56,7 @@ int main(void) {
 
 		who_e = fs_m_in.m_source;	/* source of the request */
 
-		if (who_e != FS_PROC_NR) { /* If the message is not for us just 
+		if (who_e != VFS_PROC_NR) { /* If the message is not for us just 
 					    * continue */
 			continue;
 		}

@@ -45,7 +45,7 @@ int fs_create()
 
   /* Copy the last component (i.e., file name) */
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(lastc));
-  err_code = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0,
+  err_code = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0,
 			      (vir_bytes) lastc, (phys_bytes) len, D);
   if (err_code != 0) return err_code;
   MFS_NUL(lastc, len, sizeof(lastc));
@@ -93,7 +93,7 @@ int fs_mknod()
 
   /* Copy the last component and set up caller's user and group id */
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(lastc));
-  err_code = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0,
+  err_code = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0,
 			      (vir_bytes) lastc, (phys_bytes) len, D);
   if (err_code != 0) return err_code;
   MFS_NUL(lastc, len, sizeof(lastc));
@@ -127,7 +127,7 @@ int fs_mkdir()
 
   /* Copy the last component and set up caller's user and group id */
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(lastc));
-  err_code = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0,
+  err_code = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0,
 			      (vir_bytes) lastc, (phys_bytes) len, D);
   if(err_code != 0) return(err_code);
   MFS_NUL(lastc, len, sizeof(lastc));
@@ -197,7 +197,7 @@ int fs_slink()
   
   /* Copy the link name's last component */
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
-  r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0,
+  r = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0,
 		       (vir_bytes) string, (phys_bytes) len, D);
   if (r != 0) return(r);
   MFS_NUL(string, len, sizeof(string));
@@ -214,7 +214,7 @@ int fs_slink()
    * Copy contents of symlink (the name pointed to) into first disk block. */
   if( (r = err_code) == 0) {
 	  r = (bp = new_block(sip, (off_t) 0)) == NIL_BUF ? err_code : 
-		  sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT3, 0,
+		  sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT3, 0,
 				   (vir_bytes) bp->b_data,
 				   (vir_bytes) fs_m_in.REQ_MEM_SIZE, D);
 

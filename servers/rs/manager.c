@@ -1305,7 +1305,7 @@ struct priv *privp;
 		else if (strcmp(label, "PM") == 0)
 			proc_nr_e= PM_PROC_NR;
 		else if (strcmp(label, "VFS") == 0)
-			proc_nr_e= FS_PROC_NR;
+			proc_nr_e= VFS_PROC_NR;
 		else if (strcmp(label, "RS") == 0)
 			proc_nr_e= RS_PROC_NR;
 		else if (strcmp(label, "LOG") == 0)

@@ -63,7 +63,7 @@ struct rs_start
 int minix_rs_lookup(const char *name, endpoint_t *value);
 
 #define RF_COPY		0x01	/* Copy the brinary into RS to make it possible
-				 * to restart the driver without accessing FS_PROC_NR
+				 * to restart the driver without accessing VFS_PROC_NR
 				 */
 #define RF_IPC_VALID	0x02	/* rss_ipc and rss_ipclen are valid */
 #define RF_REUSE	0x04	/* Try to reuse previously copied binary */

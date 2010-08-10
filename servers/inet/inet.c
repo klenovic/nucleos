@@ -14,7 +14,7 @@ Copyright 1995 Philip Homburg
 
 The valid messages and their parameters are:
 
-from FS_PROC_NR:
+from VFS_PROC_NR:
  __________________________________________________________________
 |		|           |         |       |          |         |
 | m_type	|   DEVICE  | PROC_NR |	COUNT |	POSITION | ADDRESS |
@@ -224,7 +224,7 @@ void main(void)
 		source= mq->mq_mess.m_source;
 		m_type= mq->mq_mess.m_type;
 
-		if (source == FS_PROC_NR) {
+		if (source == VFS_PROC_NR) {
 			sr_rec(mq);
 		} else if (is_notify(m_type)) {
 			if (_ENDPOINT_P(source) == CLOCK) {

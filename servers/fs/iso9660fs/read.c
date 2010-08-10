@@ -226,7 +226,7 @@ int fs_getdents(void) {
 			/* If the new record does not fit, then copy the buffer
 			 * and start from the beginning. */
 			if (tmpbuf_offset + reclen > GETDENTS_BUFSIZ) {
-				r = sys_safecopyto(FS_PROC_NR, gid, userbuf_off, 
+				r = sys_safecopyto(VFS_PROC_NR, gid, userbuf_off, 
 				    (vir_bytes)getdents_buf, tmpbuf_offset, D);
 
 				if (r != 0)
@@ -262,7 +262,7 @@ int fs_getdents(void) {
   }
 
   if (tmpbuf_offset != 0) {
-	r = sys_safecopyto(FS_PROC_NR, gid, userbuf_off,
+	r = sys_safecopyto(VFS_PROC_NR, gid, userbuf_off,
 			   (vir_bytes) getdents_buf, tmpbuf_offset, D);
 	if (r != 0)
 		panic(__FILE__, "fs_getdents: sys_safecopyto failed\n", r);
@@ -328,7 +328,7 @@ int *completed;			/* number of bytes copied */
     panic(__FILE__,"bp not valid in rw_chunk, this can't happen", NO_NUM);
   }
   
-  r = sys_safecopyto(FS_PROC_NR, gid, buf_off,
+  r = sys_safecopyto(VFS_PROC_NR, gid, buf_off,
 		     (vir_bytes) (bp->b_data+off), (phys_bytes) chunk, D);
 
   put_block(bp);

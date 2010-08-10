@@ -36,9 +36,9 @@ void fproc_dmp()
   int i, n=0;
   static int prev_i;
 
-  getsysinfo(FS_PROC_NR, SI_PROC_TAB, fproc);
+  getsysinfo(VFS_PROC_NR, SI_PROC_TAB, fproc);
 
-  printf("File System (FS_PROC_NR) process table dump\n");
+  printf("File System (VFS_PROC_NR) process table dump\n");
   printf("-nr- -pid- -tty- -umask- --uid-- --gid-- -ldr- -sus-rev-proc-\n");
   for (i=prev_i; i<NR_PROCS; i++) {
   	fp = &fproc[i];
@@ -82,9 +82,9 @@ void dtab_dmp()
 {
     int i;
 
-    getsysinfo(FS_PROC_NR, SI_DMAP_TAB, dmap);
+    getsysinfo(VFS_PROC_NR, SI_DMAP_TAB, dmap);
     
-    printf("File System (FS_PROC_NR) device <-> driver mappings\n");
+    printf("File System (VFS_PROC_NR) device <-> driver mappings\n");
     printf("Major  Driver ept  Flags\n");
     printf("-----  ----------  -----\n");
     for (i=0; i<NR_DEVICES; i++) {

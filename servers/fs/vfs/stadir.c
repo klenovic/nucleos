@@ -104,7 +104,7 @@ int do_chdir(void)
 
 		/* PM_PROC_NR uses access() to check permissions.  To make this work, pretend
 		 * that the user's real ids are the same as the user's effective ids.
-		 * FS_PROC_NR calls other than access() do not use the real ids, so are not
+		 * VFS_PROC_NR calls other than access() do not use the real ids, so are not
 		 * affected.
 		 */
 		fp->fp_realuid = fp->fp_effuid = rfp->fp_effuid;
@@ -190,7 +190,7 @@ int do_stat(void)
 	if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE)
 		return(err_code);
 
-	r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR, &ksb, 0);
+	r = req_stat(vp->v_fs_e, vp->v_inode_nr, VFS_PROC_NR, &ksb, 0);
 
 	if (!r) {
 		memset(&sb, 0, sizeof(struct stat));
@@ -201,7 +201,7 @@ int do_stat(void)
 			return -EFAULT;
 
 		/* copy to user */
-		r = sys_vircopy(FS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.name2,
+		r = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.name2,
 				sizeof(struct stat));
 
 		if (r) {
@@ -240,7 +240,7 @@ int do_fstat(void)
 	}
 
 	r = req_stat(rfilp->filp_vno->v_fs_e, rfilp->filp_vno->v_inode_nr,
-		     FS_PROC_NR, &ksb, pipe_pos);
+		     VFS_PROC_NR, &ksb, pipe_pos);
 
 	if (!r) {
 		memset(&sb, 0, sizeof(struct stat));
@@ -253,7 +253,7 @@ int do_fstat(void)
 		if (!m_in.buffer)
 			return -EFAULT;
 
-		r = sys_vircopy(FS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.buffer,
+		r = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.buffer,
 				sizeof(struct stat));
 
 		if (r)
@@ -293,7 +293,7 @@ int do_lstat(void)
 	if ((vp = eat_path(PATH_RET_SYMLINK)) == NIL_VNODE)
 		return(err_code);
 
-	r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR, &ksb, 0);
+	r = req_stat(vp->v_fs_e, vp->v_inode_nr, VFS_PROC_NR, &ksb, 0);
 
 	if (!r) {
 		memset(&sb, 0, sizeof(struct stat));
@@ -303,7 +303,7 @@ int do_lstat(void)
 		if (!m_in.name2)
 			return -EFAULT;
 
-		r = sys_vircopy(FS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.name2,
+		r = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)&sb, who_e, D, (vir_bytes)m_in.name2,
 				sizeof(struct stat));
 
 		if (r) {

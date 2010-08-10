@@ -50,7 +50,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 {
 /* Perform the execve(name, argv, envp) call.  The user library builds a
  * complete stack image, including pointers, args, environ, etc.  The stack
- * is copied to a buffer inside FS_PROC_NR, and then to the new core image.
+ * is copied to a buffer inside VFS_PROC_NR, and then to the new core image.
  */
 	int r, r1, round, proc_s;
 	vir_bytes vsp;
@@ -118,7 +118,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		else if ((r1 = forbidden(vp, X_BIT)) != 0)
 			r = r1;
 		else
-			r = req_stat(vp->v_fs_e, vp->v_inode_nr, FS_PROC_NR,
+			r = req_stat(vp->v_fs_e, vp->v_inode_nr, VFS_PROC_NR,
 				     (struct kstat*)&ksb, 0);
 
 		if (r != 0) {
@@ -229,7 +229,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
  *===========================================================================*/
 static int patch_stack(vp, stack, stk_bytes)
 struct vnode *vp;		/* pointer for open script file */
-char stack[ARG_MAX];		/* pointer to stack image within FS_PROC_NR */
+char stack[ARG_MAX];		/* pointer to stack image within VFS_PROC_NR */
 vir_bytes *stk_bytes;		/* size of initial stack */
 {
 /* Patch the argument vector to include the path name of the script to be
@@ -251,7 +251,7 @@ vir_bytes *stk_bytes;		/* size of initial stack */
 
 	/* Issue request */
 	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos),
-			  READING, FS_PROC_NR, buf, _MAX_BLOCK_SIZE, &new_pos, &cum_io_incr);
+			  READING, VFS_PROC_NR, buf, _MAX_BLOCK_SIZE, &new_pos, &cum_io_incr);
 
 	if (r != 0) return r;
 	
@@ -364,7 +364,7 @@ int replace;
  *				patch_ptr				     *
  *===========================================================================*/
 static void patch_ptr(stack, base)
-char stack[ARG_MAX];		/* pointer to stack image within FS_PROC_NR */
+char stack[ARG_MAX];		/* pointer to stack image within VFS_PROC_NR */
 vir_bytes base;			/* virtual address of stack base inside user */
 {
 /* When doing an exec(name, argv, envp) call, the user builds up a stack

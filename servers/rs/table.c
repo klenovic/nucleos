@@ -36,7 +36,7 @@ struct boot_image_priv boot_image_priv_table[] = {
   /*endpoint,     label,      flags,  traps,  ipcto,  kcalls  */
   { VM_PROC_NR,   "vm",       VM_F,   SRV_T,  SRV_M,  vm_kc   },
   { PM_PROC_NR,   "pm",       SRV_F,  SRV_T,  SRV_M,  pm_kc   },
-  { FS_PROC_NR,   "vfs",      SRV_F,  SRV_T,  SRV_M,  fs_kc   },
+  { VFS_PROC_NR,   "vfs",      SRV_F,  SRV_T,  SRV_M,  fs_kc   },
   { DS_PROC_NR,   "ds",       SRV_F,  SRV_T,  SRV_M,  ds_kc   },
   { TTY_PROC_NR,  "tty",      SRV_F,  SRV_T,  SRV_M,  tty_kc  },
   { MEM_PROC_NR,  "memory",   SRV_F,  SRV_T,  SRV_M,  mem_kc  },

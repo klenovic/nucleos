@@ -51,7 +51,7 @@ int fs_link()
 
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
   /* Copy the link name's last component */
-  r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
+  r = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
 		       (vir_bytes) string, (phys_bytes) len, D);
   if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
@@ -127,7 +127,7 @@ int fs_unlink()
   
   /* Copy the last component */
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
-  r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
+  r = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
 		       (vir_bytes) string, (phys_bytes) len, D);
   if (r != 0) return r;
   MFS_NUL(string, len, sizeof(string));
@@ -198,7 +198,7 @@ int fs_rdlink()
 	  if (copylen > rip->i_size)
 		  copylen = rip->i_size;
 	  bp = get_block(rip->i_dev, b, NORMAL);
-	  r = sys_safecopyto(FS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
+	  r = sys_safecopyto(VFS_PROC_NR, fs_m_in.REQ_GRANT, 0, 
 			     (vir_bytes) bp->b_data, (vir_bytes) copylen, D);
 	  put_block(bp, DIRECTORY_BLOCK);
 	  if (r == 0)
@@ -301,14 +301,14 @@ int fs_rename()
   
   /* Copy the last component of the old name */
   len = MFS_MIN(fs_m_in.REQ_REN_LEN_OLD, sizeof(old_name));
-  r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_REN_GRANT_OLD, 0, 
+  r = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_REN_GRANT_OLD, 0, 
 		       (vir_bytes) old_name, (phys_bytes) len, D);
   if (r != 0) return r;
   MFS_NUL(old_name, len, sizeof(old_name));
   
   /* Copy the last component of the new name */
   len = MFS_MIN(fs_m_in.REQ_REN_LEN_NEW, sizeof(new_name));
-  r = sys_safecopyfrom(FS_PROC_NR, fs_m_in.REQ_REN_GRANT_NEW, 0, 
+  r = sys_safecopyfrom(VFS_PROC_NR, fs_m_in.REQ_REN_GRANT_NEW, 0, 
 		       (vir_bytes) new_name, (phys_bytes) len, D);
   if (r != 0) return r;
   MFS_NUL(new_name, len, sizeof(new_name));

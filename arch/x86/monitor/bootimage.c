@@ -252,12 +252,12 @@ void patch_sizes(void)
 	}
 
 	if (k_flags & (K_HIGH|K_MEML))
-		return;  /* Doesn't need FS_PROC_NR patching. */
+		return;  /* Doesn't need VFS_PROC_NR patching. */
 
 	/* Patch cs and sizes of init into fs data. */
-	put_word(process[FS_PROC_NR].data + P_INIT_OFF+0, initp->cs >> click_shift);
-	put_word(process[FS_PROC_NR].data + P_INIT_OFF+2, text_size);
-	put_word(process[FS_PROC_NR].data + P_INIT_OFF+4, data_size);
+	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+0, initp->cs >> click_shift);
+	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+2, text_size);
+	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+4, data_size);
 }
 
 int selected(char *name)
@@ -869,7 +869,7 @@ bail_out:
 	return 0;
 }
 
-/* Check FS_PROC_NR magic */
+/* Check VFS_PROC_NR magic */
 #define SUPER_V3_MAGIC         0x4d5a
 #define SUPER_V3_MAGIC_OFFSET  0x418
 

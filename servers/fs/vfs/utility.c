@@ -76,7 +76,7 @@ int fetch_name(char *buff, const int pathmax, char __user *path)
 
 	/* Copy from user space. */
 	ret = sys_datacopy(who_e, (vir_bytes)path,
-			   FS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
+			   VFS_PROC_NR, (vir_bytes)buff, (phys_bytes)len);
 
 	if (ret) {
 		err_code = -EFAULT;

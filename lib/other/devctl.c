@@ -18,7 +18,7 @@ int devctl(int ctl_req, int proc_nr, int dev_nr, int dev_style, int force)
   m.m_data3 = dev_nr;
   m.m_data4 = dev_style;
   m.m_data5 = force;
-  if (ktaskcall(FS_PROC_NR, KCNR_DEVCTL, &m) < 0) return(-1);
+  if (ktaskcall(VFS_PROC_NR, KCNR_DEVCTL, &m) < 0) return(-1);
   return(0);
 }
 

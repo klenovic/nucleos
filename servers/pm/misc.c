@@ -112,7 +112,7 @@ int do_procstat()
   /* For the moment, this is only used to return pending signals to 
    * system processes that request the PM for their own status. 
    *
-   * Future use might include the FS_PROC_NR requesting for process status of
+   * Future use might include the VFS_PROC_NR requesting for process status of
    * any user process. 
    */
   
@@ -364,7 +364,7 @@ int do_reboot()
   else
 	monitor_code[0] = '\0';
 
-  /* Order matters here. When FS_PROC_NR is told to reboot, it exits all its
+  /* Order matters here. When VFS_PROC_NR is told to reboot, it exits all its
    * processes, and then would be confused if they're exited again by
    * SIGKILL. So first kill, then reboot. 
    */
@@ -375,7 +375,7 @@ int do_reboot()
   /* Tell FS to reboot */
   m.m_type = PM_REBOOT;
 
-  tell_fs(&mproc[FS_PROC_NR], &m);
+  tell_fs(&mproc[VFS_PROC_NR], &m);
 
   return(SUSPEND);			/* don't reply to caller */
 }

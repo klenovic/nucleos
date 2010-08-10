@@ -93,7 +93,7 @@
  * with the sys_outb() messages exchanged.
  */
 
-static int caller;		/* process to tell when printing done (FS_PROC_NR) */
+static int caller;		/* process to tell when printing done (VFS_PROC_NR) */
 static int revive_pending;	/* set to true if revive is pending */
 static int revive_status;	/* revive status */
 static int done_status;	/* status of last output completion */
@@ -213,7 +213,7 @@ int safe;			/* use virtual addresses or grant id's? */
     if (writing)  			r = -EIO;
     else if (m_ptr->COUNT <= 0)  	r = -EINVAL;
 
-    /* Reply to FS_PROC_NR, no matter what happened, possible SUSPEND caller. */
+    /* Reply to VFS_PROC_NR, no matter what happened, possible SUSPEND caller. */
     reply(KCNR_TASK_REPLY, m_ptr->m_source, m_ptr->IO_ENDPT, r);
 
     /* If no errors occurred, continue printing with SUSPENDED caller.
@@ -255,7 +255,7 @@ int safe;			/* use virtual addresses or grant id's? */
 static void output_done()
 {
 /* Previous chunk of printing is finished.  Continue if OK and more.
- * Otherwise, reply to caller (FS_PROC_NR).
+ * Otherwise, reply to caller (VFS_PROC_NR).
  */
     register int status;
 
@@ -280,7 +280,7 @@ static void output_done()
 	prepare_output();
 	return;
     } 
-    else {				/* done! report back to FS_PROC_NR */
+    else {				/* done! report back to VFS_PROC_NR */
 	status = orig_count;
     }
     revive_pending = TRUE;
@@ -317,7 +317,7 @@ register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 /* Cancel a print request that has already started.  Usually this means that
  * the process doing the printing has been killed by a signal.  It is not
  * clear if there are race conditions.  Try not to cancel the wrong process,
- * but rely on FS_PROC_NR to handle the -EINTR reply and de-suspension properly.
+ * but rely on VFS_PROC_NR to handle the -EINTR reply and de-suspension properly.
  */
 
   if (writing && m_ptr->IO_ENDPT == proc_nr) {
@@ -333,11 +333,11 @@ register kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
  *===========================================================================*/
 static void reply(code, replyee, process, status)
 int code;			/* TASK_REPLY or REVIVE */
-int replyee;			/* destination for message (normally FS_PROC_NR) */
+int replyee;			/* destination for message (normally VFS_PROC_NR) */
 int process;			/* which user requested the printing */
 int status;			/* number of  chars printed or error code */
 {
-/* Send a reply telling FS_PROC_NR that printing has started or stopped. */
+/* Send a reply telling VFS_PROC_NR that printing has started or stopped. */
 
   kipc_msg_t pr_mess;
 

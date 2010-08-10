@@ -856,7 +856,7 @@ void do_video(kipc_msg_t *m)
 
 			/* In safe ioctl mode, the POSITION field contains
 			 * the endpt number of the original requestor.
-			 * IO_ENDPT is always FS_PROC_NR.
+			 * IO_ENDPT is always VFS_PROC_NR.
 			 */
 
 			if(do_map) {

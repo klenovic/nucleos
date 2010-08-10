@@ -20,10 +20,10 @@ Created:	Aug 2, 1992 by Philip Homburg
 
 /* Two possible layouts for a partition with swapspace:
  *
- *	Sector		Swap partition		FS_PROC_NR+swap partition
+ *	Sector		Swap partition		VFS_PROC_NR+swap partition
  *
  *       0 - 1		bootblock		bootblock
- *	     2		swap header		FS_PROC_NR header
+ *	     2		swap header		VFS_PROC_NR header
  *	     3		blank			swap header
  *	 4 - m		swapspace		file system
  *	m+1 - n		-			swapspace
