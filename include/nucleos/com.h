@@ -38,15 +38,13 @@
 
 #ifndef __ASSEMBLY__
 
-/*===========================================================================*
- *          	    		Magic process numbers			     *
- *===========================================================================*/
-
-/* These may not be any valid endpoint (see <nucleos/endpoint.h>). */
+/* Magic process numbers, these may not be any valid endpoint
+ * (see <nucleos/endpoint.h>).
+ */
 #define ENDPT_ANY		0x7ace	/* used to indicate 'any process' */
-#define ENDPT_NONE 		0x6ace  /* used to indicate 'no process at all' */
-#define ENDPT_SELF		0x8ace 	/* used to indicate 'own process' */
-#define _MAX_MAGIC_PROC		(ENDPT_SELF)	/* used by <minix/endpoint.h> 
+#define ENDPT_NONE		0x6ace	/* used to indicate 'no process at all' */
+#define ENDPT_SELF		0x8ace	/* used to indicate 'own process' */
+#define _MAX_MAGIC_PROC		(ENDPT_SELF)	/* used by <nucleos/endpoint.h>
 						   to determine generation size */
 
 /*===========================================================================*
@@ -61,15 +59,15 @@
  */
 
 /* Kernel tasks. These all run in the same address space. */
-#define IDLE             -4	/* runs when no one else can run */
-#define CLOCK  		 -3	/* alarms and other clock functions */
-#define SYSTEM           -2	/* request system functionality */
-#define KERNEL           -1	/* pseudo-process for IPC and scheduling */
-#define HARDWARE     KERNEL	/* for hardware interrupt handlers */
+#define IDLE		-4	/* runs when no one else can run */
+#define CLOCK		-3	/* alarms and other clock functions */
+#define SYSTEM		-2	/* request system functionality */
+#define KERNEL		-1	/* pseudo-process for IPC and scheduling */
+#define HARDWARE	KERNEL	/* for hardware interrupt handlers */
 
 /* Number of tasks. */
 #define MAX_NR_TASKS	1023
-#define NR_TASKS	4 
+#define NR_TASKS	4
 
 /* Number of slots in the process table for non-kernel processes. The number
  * of system processes defines how many processes with special privileges
@@ -95,11 +93,11 @@
 #define INIT_PROC_NR	10	/* init -- goes multiuser */
 
 /* Root system process and root user process. */
-#define ROOT_SYS_PROC_NR  RS_PROC_NR
-#define ROOT_USR_PROC_NR  INIT_PROC_NR
+#define ROOT_SYS_PROC_NR	RS_PROC_NR
+#define ROOT_USR_PROC_NR	INIT_PROC_NR
 
 /* Number of processes contained in the system image. */
-#define NR_BOOT_PROCS 	(NR_TASKS + INIT_PROC_NR + 1)
+#define NR_BOOT_PROCS	(NR_TASKS + INIT_PROC_NR + 1)
 
 /* Which processes should receive diagnostics from the kernel and system?
  * Directly sending it to TTY only displays the output. Sending it to the
