@@ -1072,7 +1072,7 @@ int c;
           kmess.km_size += 1;		
       kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
   } else {
-      kipc_notify(LOG_PROC_NR);
+      kipc_module_call(KIPC_NOTIFY, 0, LOG_PROC_NR, 0);
   }
 }
 

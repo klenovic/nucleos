@@ -289,7 +289,7 @@ kipc_msg_t *m_ptr;
 	revivePending = 1;
 	reviveStatus = DspFragmentSize;
 	reviveProcNr = m_ptr->IO_ENDPT;
-	kipc_notify(m_ptr->m_source);
+	kipc_module_call(KIPC_NOTIFY, 0, m_ptr->m_source, 0);
 }
 
 

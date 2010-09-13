@@ -182,7 +182,7 @@ int type;		/* Driver type (DRIVER_STD or DRIVER_ASYN) */
 				(*dp->dr_alarm)(dp, &mess);	
 				break;
 			case RS_PROC_NR:
-				kipc_notify(mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, mess.m_source, 0);
 				break;
 			default:		
 				if(dp->dr_other)

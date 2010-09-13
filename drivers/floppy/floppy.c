@@ -775,7 +775,7 @@ static void start_motor()
 				f_expire_tmrs(NULL, NULL);
 				break;
 			case RS_PROC_NR:
-				kipc_notify(mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, mess.m_source, 0);
 				break;
 			default :
 				f_busy = BSY_IDLE;
@@ -867,7 +867,7 @@ static int seek()
 					f_expire_tmrs(NULL, NULL);
 					break;
 				case RS_PROC_NR:
-					kipc_notify(mess.m_source);
+					kipc_module_call(KIPC_NOTIFY, 0, mess.m_source, 0);
 					break;
 				default :
 					f_busy = BSY_IDLE;
@@ -1148,7 +1148,7 @@ static void f_reset()
 				f_expire_tmrs(NULL, NULL);
 				break;
 			case RS_PROC_NR:
-				kipc_notify(mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, mess.m_source, 0);
 				break;
 			default :
 				f_busy = BSY_IDLE;
@@ -1200,7 +1200,7 @@ static int f_intr_wait()
 				f_expire_tmrs(NULL, NULL);
 				break;
 			case RS_PROC_NR:
-				kipc_notify(mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, mess.m_source, 0);
 				break;
 			default :
 				f_busy = BSY_IDLE;

@@ -227,7 +227,7 @@ int try;
   	if (try) return 1;
 	if (tp->tty_outleft > 0) {
 		if(tp->tty_outrepcode == TTY_REVIVE) {
-			kipc_notify(tp->tty_outcaller);
+			kipc_module_call(KIPC_NOTIFY, 0, tp->tty_outcaller, 0);
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
@@ -281,7 +281,7 @@ int try;
 	if ((tp->tty_outleft -= count) == 0) {
 		/* Output is finished, reply to the writer. */
 		if(tp->tty_outrepcode == TTY_REVIVE) {
-			kipc_notify(tp->tty_outcaller);
+			kipc_module_call(KIPC_NOTIFY, 0, tp->tty_outcaller, 0);
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
@@ -375,7 +375,7 @@ pty_t *pp;
 		pp->rdleft = pp->rdcum = 0;
 	}
 	else
-		kipc_notify(pp->rdcaller);
+		kipc_module_call(KIPC_NOTIFY, 0, pp->rdcaller, 0);
   }
 
 }
@@ -397,7 +397,7 @@ int try;
 	if (try) return 1;
 	if (tp->tty_inleft > 0) {
 		if(tp->tty_inrepcode == TTY_REVIVE) {
-			kipc_notify(tp->tty_incaller);
+			kipc_module_call(KIPC_NOTIFY, 0, tp->tty_incaller, 0);
 			tp->tty_inrevived = 1;
 		} else {
 			tty_reply(tp->tty_inrepcode, tp->tty_incaller,
@@ -446,7 +446,7 @@ int try;
 			pp->wrcum = 0;
 		}
 		else
-			kipc_notify(pp->wrcaller);
+			kipc_module_call(KIPC_NOTIFY, 0, pp->wrcaller, 0);
 	}
   }
 
@@ -467,12 +467,12 @@ int try;
 
   if (pp->rdleft > 0) {
   	assert(!pp->rdsendreply);
-  	kipc_notify(pp->rdcaller);
+  	kipc_module_call(KIPC_NOTIFY, 0, pp->rdcaller, 0);
   }
 
   if (pp->wrleft > 0) {
   	assert(!pp->wrsendreply);
-  	kipc_notify(pp->wrcaller);
+  	kipc_module_call(KIPC_NOTIFY, 0, pp->wrcaller, 0);
   }
 
   if (pp->state & PTY_CLOSED) pp->state = 0; else pp->state |= TTY_CLOSED;
@@ -493,7 +493,7 @@ int try;
   if (pp->wrleft > 0) {
   	pp->wrcum += pp->wrleft;
   	pp->wrleft= 0;
-  	kipc_notify(pp->wrcaller);
+  	kipc_module_call(KIPC_NOTIFY, 0, pp->wrcaller, 0);
   }
 
   return 0;
@@ -633,7 +633,7 @@ void select_retry_pty(tty_t *tp)
 	if (pp->select_ops && (r=select_try_pty(tp, pp->select_ops))) {
 		pp->select_ops &= ~r;
 		pp->select_ready_ops |= r;
-		kipc_notify(pp->select_proc);
+		kipc_module_call(KIPC_NOTIFY, 0, pp->select_proc, 0);
 	}
 }
 

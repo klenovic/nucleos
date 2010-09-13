@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 			      result = do_fkey_pressed(&m_in);
 			      break;
 		      case RS_PROC_NR:
-			      kipc_notify(m_in.m_source);
+			      kipc_module_call(KIPC_NOTIFY, 0, m_in.m_source, 0);
 			      continue;
 	      }
       }

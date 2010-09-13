@@ -80,11 +80,6 @@ typedef struct asynmsg {
    Make them as fast as possible.
  */
 
-static inline int kipc_notify(endpoint_t dst)
-{
-	return __kipc_notify(dst);
-}
-
 static inline int kipc_receive(endpoint_t src, kipc_msg_t *m_ptr)
 {
 	return __kipc_receive(src, m_ptr);

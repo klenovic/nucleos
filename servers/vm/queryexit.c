@@ -96,7 +96,7 @@ out:
 	 * and bypass the process to be signal is IPC itself.
 	 */
 	if (ipc_ep != 0 && ep != ipc_ep) {
-		r = kipc_notify(ipc_ep);
+		r = kipc_module_call(KIPC_NOTIFY, 0, ipc_ep, 0);
 		if (r != 0)
 			printf("VM: notify IPC error!\n");
 	}

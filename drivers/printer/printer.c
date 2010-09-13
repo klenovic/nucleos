@@ -149,7 +149,7 @@ void main(void)
 				do_printer_output();
 				break;
 			case RS_PROC_NR:
-				kipc_notify(pr_mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, pr_mess.m_source, 0);
 				break;
 			case PM_PROC_NR:
 				do_signal();
@@ -285,7 +285,7 @@ static void output_done()
     }
     revive_pending = TRUE;
     revive_status = status;
-    kipc_notify(caller);
+    kipc_module_call(KIPC_NOTIFY, 0, caller, 0);
 }
 
 /*===========================================================================*

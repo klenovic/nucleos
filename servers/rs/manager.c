@@ -805,7 +805,7 @@ kipc_msg_t *m_ptr;
 		if(rs_verbose)
                   printf("RS: status request sent to %d\n", rp->r_proc_nr_e);
 #endif
-		  kipc_notify(rp->r_proc_nr_e);		/* request status */
+		  kipc_module_call(KIPC_NOTIFY, 0, rp->r_proc_nr_e, 0);		/* request status */
 		  rp->r_check_tm = now;			/* mark time */
               }
           }

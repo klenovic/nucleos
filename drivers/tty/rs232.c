@@ -289,7 +289,7 @@ int try;
 	if ((tp->tty_outleft -= count) == 0) {
 		/* Output is finished, reply to the writer. */
 		if(tp->tty_outrepcode == TTY_REVIVE) {
-			kipc_notify(tp->tty_outcaller);
+			kipc_module_call(KIPC_NOTIFY, 0, tp->tty_outcaller, 0);
 			tp->tty_outrevived = 1;
 		} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,
@@ -301,7 +301,7 @@ int try;
   if (tp->tty_outleft > 0 && tp->tty_termios.c_ospeed == B0) {
 	/* Oops, the line has hung up. */
 	if(tp->tty_outrepcode == TTY_REVIVE) {
-		kipc_notify(tp->tty_outcaller);
+		kipc_module_call(KIPC_NOTIFY, 0, tp->tty_outcaller, 0);
 		tp->tty_outrevived = 1;
 	} else {
 		tty_reply(tp->tty_outrepcode, tp->tty_outcaller,

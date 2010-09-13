@@ -2092,7 +2092,7 @@ static void w_intr_wait()
 						break;
 				case RS_PROC_NR:
 					/* RS monitor ping. */
-					kipc_notify(m.m_source);
+					kipc_module_call(KIPC_NOTIFY, 0, m.m_source, 0);
 					break;
 				default:
 					/*

@@ -313,7 +313,7 @@ int trace;			/* pass signal to tracer first? */
   if (sigismember(&rmp->mp_sig2mess, signo)) {
 	/* Mark event pending in process slot and send notification. */
 	sigaddset(&rmp->mp_sigpending, signo);
-	kipc_notify(rmp->mp_endpoint);
+	kipc_module_call(KIPC_NOTIFY, 0, rmp->mp_endpoint, 0);
 	return;
   }
 

@@ -301,7 +301,7 @@ void main( int argc, char **argv )
    /* Try to notify inet that we are present (again) */
    r= ds_retrieve_u32("inet", &tasknr);
    if (r == 0)
-      kipc_notify(tasknr);
+      kipc_module_call(KIPC_NOTIFY, 0, tasknr, 0);
    else if (r != -ESRCH)
       printf("lance: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
@@ -327,7 +327,7 @@ void main( int argc, char **argv )
       if (is_notify(m.m_type)) {
 	      switch(_ENDPOINT_P(m.m_source)) {
 		      case RS_PROC_NR:
-			      kipc_notify(m.m_source);
+			      kipc_module_call(KIPC_NOTIFY, 0, m.m_source, 0);
 			      break;
 		      case TTY_PROC_NR:
 			      lance_dump();

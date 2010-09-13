@@ -784,7 +784,7 @@ int is_revive;
 	mp->REP_IO_GRANT= ref;
 	if (is_revive)
 	{
-		kipc_notify(mq->mq_mess.m_source);
+		kipc_module_call(KIPC_NOTIFY, 0, mq->mq_mess.m_source, 0);
 		result= -ELOCKED;
 	}
 	else
@@ -995,7 +995,7 @@ unsigned ops;
 	if (ops & SR_SELECT_WRITE) sr_fd->srf_flags |= SFF_SELECT_W;
 	if (ops & SR_SELECT_EXCEPTION) sr_fd->srf_flags |= SFF_SELECT_X;
 
-	kipc_notify(sr_fd->srf_select_proc);
+	kipc_module_call(KIPC_NOTIFY, 0, sr_fd->srf_select_proc, 0);
 }
 
 static void process_req_q(mq, tail, tail_ptr)

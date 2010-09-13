@@ -208,7 +208,7 @@ int main(void)
 				expire_timers();
 				break;
 			case RS_PROC_NR:
-				kipc_notify(tty_mess.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, tty_mess.m_source, 0);
 				break;
 			case HARDWARE: 
 				/* hardware interrupt notification */
@@ -871,7 +871,7 @@ int select_try(struct tty *tp, int ops)
 int select_retry(struct tty *tp)
 {
   	if (tp->tty_select_ops && select_try(tp, tp->tty_select_ops))
-		kipc_notify(tp->tty_select_proc);
+		kipc_module_call(KIPC_NOTIFY, 0, tp->tty_select_proc, 0);
 	return 0;
 }
 
@@ -914,7 +914,7 @@ tty_t *tp;			/* TTY to check for events. */
   /* Reply if enough bytes are available. */
   if (tp->tty_incum >= tp->tty_min && tp->tty_inleft > 0) {
 	if (tp->tty_inrepcode == TTY_REVIVE) {
-		kipc_notify(tp->tty_incaller);
+		kipc_module_call(KIPC_NOTIFY, 0, tp->tty_incaller, 0);
 		tp->tty_inrevived = 1;
 	} else {
 		tty_reply(tp->tty_inrepcode, tp->tty_incaller, 
@@ -1007,7 +1007,7 @@ register tty_t *tp;		/* pointer to terminal to read from */
   /* Usually reply to the reader, possibly even if incum == 0 (EOF). */
   if (tp->tty_inleft == 0) {
 	if (tp->tty_inrepcode == TTY_REVIVE) {
-		kipc_notify(tp->tty_incaller);
+		kipc_module_call(KIPC_NOTIFY, 0, tp->tty_incaller, 0);
 		tp->tty_inrevived = 1;
 	} else {
 		tty_reply(tp->tty_inrepcode, tp->tty_incaller, 
@@ -1432,7 +1432,7 @@ tty_t *tp;
 	setattr(tp);
   }
   tp->tty_ioreq = 0;
-  kipc_notify(tp->tty_iocaller);
+  kipc_module_call(KIPC_NOTIFY, 0, tp->tty_iocaller, 0);
   tp->tty_iorevived = 1;
   tp->tty_iostatus = result;
 }

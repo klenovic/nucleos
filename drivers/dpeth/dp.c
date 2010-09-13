@@ -621,7 +621,7 @@ int main(int argc, char **argv)
   /* Try to notify inet that we are present (again) */
   rc = _pm_findproc("inet", &tasknr);
   if (rc == 0)
-	kipc_notify(tasknr);
+	kipc_module_call(KIPC_NOTIFY, 0, tasknr, 0);
 
   while (TRUE) {
 	if ((rc = kipc_receive(ENDPT_ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
@@ -636,7 +636,7 @@ int main(int argc, char **argv)
 				break;
 			case RS_PROC_NR:	
 				/* Status request from RS */
-				kipc_notify(m.m_source);
+				kipc_module_call(KIPC_NOTIFY, 0, m.m_source, 0);
 				break;
 			case HARDWARE:
 				/* Interrupt from device */

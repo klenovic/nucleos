@@ -546,10 +546,10 @@ kipc_msg_t *m_ptr;
 	 kbdp->buf[o]= scode;
 	 kbdp->avail++;
 	 if (kbdp->req_size) {
-		kipc_notify(kbdp->incaller);
+		kipc_module_call(KIPC_NOTIFY, 0, kbdp->incaller, 0);
 	 }
 	 if (kbdp->select_ops & SEL_RD)
-		kipc_notify(kbdp->select_proc);
+		kipc_module_call(KIPC_NOTIFY, 0, kbdp->select_proc, 0);
 	 return;
   }
 
@@ -1219,7 +1219,7 @@ int scode;			/* scan code for a function key */
 
   /* See if an observer is registered and send it a message. */
   if (proc_nr != ENDPT_NONE) { 
-      kipc_notify(proc_nr);
+      kipc_module_call(KIPC_NOTIFY, 0, proc_nr, 0);
   }
   return(TRUE);
 }

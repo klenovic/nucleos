@@ -109,7 +109,7 @@ void main(void)
 					break;
 				case RS_PROC_NR:
 					/* Got ping from RS. Just notify RS */
-					kipc_notify(RS_PROC_NR);
+					kipc_module_call(KIPC_NOTIFY, 0, RS_PROC_NR, 0);
 					break;
 				default:
 					dprint("%s: %d uncaught notify!\n",
