@@ -382,6 +382,36 @@ ENTRY(__kipc_entry)
 
 	jmp	restart
 
+/* Kernel internal communication */
+	.p2align 4
+ENTRY(__nkipc_entry)
+	SAVE_PROCESS_CTX(0)
+
+	/* save the pointer to the current process */
+	push	%ebp
+
+	/*
+	 * pass the syscall arguments from userspace to the handler.
+	 * SAVE_PROCESS_CTX() does not clobber these registers, they are still
+	 * set as the userspace have set them
+	 */
+	push	%edx
+	push	%ecx
+	push	%ebx
+	push	%eax
+
+	/* for stack trace */
+	movl	$0, %ebp
+
+	call	nkipc_call
+
+	/* restore the current process pointer and save the return value */
+	add	$4 * 4, %esp
+	pop	%esi
+	mov	%eax, AXREG(%esi)
+
+	jmp	restart
+
 .p2align 4
 /*
  * called by the exception interrupt vectors. If the exception does not push

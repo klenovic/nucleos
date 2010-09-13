@@ -43,6 +43,7 @@ void minix_panic(char *s, int n);
 
 /* proc.c */
 int kipc_call(int call_nr, int src_dst, kipc_msg_t *m_ptr, u32 flags);
+int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg);
 int lock_notify(int src, int dst);
 int mini_notify(struct proc *src, endpoint_t dst);
 int lock_send(int dst, kipc_msg_t *m_ptr);

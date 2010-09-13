@@ -15,7 +15,12 @@
 #define KIPC_RECEIVE	2	/* blocking receive */
 #define KIPC_SENDREC	3	/* KIPC_SEND + KIPC_RECEIVE */
 #define KIPC_NOTIFY	4	/* asynchronous notify */
-#define KIPC_SENDA	16	/* asynchronous send */
+#define KIPC_SENDA	5	/* asynchronous send */
+
+#define KIPC_SERVICES_COUNT	5	/* number of kipc services
+					 * @nucleos: Temporary until the services
+					 *           are merged.
+					 */
 
 /* Masks and flags for system calls. */
 #define KIPC_FLG_NONBLOCK	1  /* do not block if target not ready */
@@ -57,7 +62,6 @@ typedef struct kipc_msg {
 	__s32 m_data9;
 } kipc_msg_t;
 
-
 /*==========================================================================* 
  * Nucleos run-time system (IPC). 					    *
  *==========================================================================*/ 
@@ -75,6 +79,7 @@ typedef struct asynmsg {
 /* Kernel ipc routines. The __kipc_* are the arch-dependent implementations.
    Make them as fast as possible.
  */
+
 static inline int kipc_notify(endpoint_t dst)
 {
 	return __kipc_notify(dst);
@@ -111,6 +116,14 @@ static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *
 		return(status);
 
 	return(msgptr->m_type);
+}
+
+/**
+ * Interface for kernel internal communication used by modules.
+ */
+static inline int kipc_module_call(u8 type, u32 flags, endpoint_t endpt, void *msg)
+{
+	return __kipc_module_call(type, flags, endpt, msg);
 }
 
 #endif /* __ASSEMBLY__ */

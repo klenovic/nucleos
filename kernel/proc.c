@@ -1520,3 +1520,196 @@ int *p, fatalflag;
 
 	return ok;
 }
+
+/**
+ * Internal kernel modules(kernel processes) communication routine
+ * @param call_type  system call number and flags
+ * @param flags  notification event set or flags
+ * @param endpt  src to receive from or dst to send to
+ * @param msg  pointer to message in the caller's space
+ * @return 0 on success
+ */
+int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
+{
+	/* System calls are done by trapping to the kernel with an INT instruction.
+	 * The trap is caught and kipc_call() is called to send or receive a message
+	 * (or both). The caller is always given by 'proc_ptr'.
+	 */
+	register struct proc *caller_ptr = proc_ptr;	/* get pointer to caller */
+	int result;					/* the system call's result */
+	int src_dst_p;					/* Process slot number */
+	size_t msg_size;
+
+	/* If this process is subject to system call tracing, handle that first. */
+	if (caller_ptr->p_misc_flags & (MF_SC_TRACE | MF_SC_DEFER)) {
+		/* Are we tracing this process, and is it the first kipc_call entry? */
+		if ((caller_ptr->p_misc_flags & (MF_SC_TRACE | MF_SC_DEFER)) == MF_SC_TRACE) {
+			/* We must notify the tracer before processing the actual
+			 * system call. If we don't, the tracer could not obtain the
+			 * input message. Postpone the entire system call.
+			 */
+			caller_ptr->p_misc_flags &= ~MF_SC_TRACE;
+			caller_ptr->p_misc_flags |= MF_SC_DEFER;
+
+			/* Signal the "enter system call" event. Block the process. */
+			cause_sig(proc_nr(caller_ptr), SIGTRAP);
+
+			/* Preserve the return register's value. */
+			return caller_ptr->p_reg.retreg;
+		}
+
+		/* If the MF_SC_DEFER flag is set, the syscall is now being resumed. */
+		caller_ptr->p_misc_flags &= ~MF_SC_DEFER;
+
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+		if (caller_ptr->p_misc_flags & MF_SC_ACTIVE)
+			minix_panic("MF_SC_ACTIVE already set", NO_NUM);
+#endif
+
+		/* Set a flag to allow reliable tracing of leaving the system call. */
+		caller_ptr->p_misc_flags |= MF_SC_ACTIVE;
+	}
+
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+	if(caller_ptr->p_misc_flags & MF_DELIVERMSG) {
+		kprintf("kipc_call: MF_DELIVERMSG on for %s / %d\n", caller_ptr->p_name,
+								     caller_ptr->p_endpoint);
+		minix_panic("MF_DELIVERMSG on", NO_NUM);
+	}
+#endif
+
+#ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
+	if (RTS_ISSET(caller_ptr, RTS_SLOT_FREE)) {
+		kprintf("called by the dead?!?\n");
+		return -EINVAL;
+	}
+#endif
+
+	/* Check destination. SENDA is special because its argument is a table and
+	 * not a single destination. KIPC_RECEIVE is the only call that accepts ANY (in
+	 * addition to a real endpoint). The other calls (KIPC_SEND, KIPC_SENDREC,
+	 * and KIPC_NOTIFY) require an endpoint to corresponds to a process. In addition,
+	 * it is necessary to check whether a process is allowed to send to a given
+	 * destination.
+	 */
+	if (call_type == KIPC_SENDA) {
+		/* No destination argument */
+	} else if (endpt == ENDPT_ANY) {
+		if (call_type != KIPC_RECEIVE) {
+#if 0
+			kprintf("kipc_call: trap %d by %d with bad endpoint %d\n",
+				call_type, proc_nr(caller_ptr), endpt);
+#endif
+			return -EINVAL;
+		}
+		src_dst_p = endpt;
+	} else {
+		/* Require a valid source and/or destination process. */
+		if(!isokendpt(endpt, &src_dst_p)) {
+#if 0
+			kprintf("kipc_call: trap %d by %d with bad endpoint %d\n",
+				call_type, proc_nr(caller_ptr), endpt);
+#endif
+			return -EDEADSRCDST;
+		}
+
+		/* If the call is to send to a process, i.e., for KIPC_SEND, KIPC_SENDNB,
+		 * KIPC_SENDREC or KIPC_NOTIFY, verify that the caller is allowed to send to
+		 * the given destination.
+		 */
+		if (call_type != KIPC_RECEIVE) {
+			if (!may_send_to(caller_ptr, src_dst_p)) {
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
+				kprintf("kipc_call: ipc mask denied trap %d from %d to %d\n",
+					call_type, caller_ptr->p_endpoint, endpt);
+#endif
+				return(-ECALLDENIED);	/* call denied by ipc mask */
+			}
+		}
+	}
+
+	/* Only allow non-negative call_type values less than 32 */
+	if (call_type < 0 || call_type >= KIPC_SERVICES_COUNT) {
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
+		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
+			call_type, proc_nr(caller_ptr), src_dst_p);
+#endif
+		return(-ETRAPDENIED);		/* trap denied by mask or kernel */
+	}
+
+	/* Check if the process has privileges for the requested call. Calls to the
+	 * kernel may only be KIPC_SENDREC, because tasks always reply and may not block
+	 * if the caller doesn't do receive().
+	 */
+	if (!(priv(caller_ptr)->s_trap_mask & (1 << call_type))) {
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
+		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
+			call_type, proc_nr(caller_ptr), src_dst_p);
+#endif
+		return(-ETRAPDENIED);		/* trap denied by mask or kernel */
+	}
+
+	/* KIPC_SENDA has no src_dst value here, so this check is in mini_senda() as well. */
+	if (call_type != KIPC_SENDREC && call_type != KIPC_RECEIVE && call_type != KIPC_SENDA &&
+	    iskerneln(src_dst_p)) {
+#ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
+		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
+			call_type, proc_nr(caller_ptr), endpt);
+#endif
+	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
+	}
+
+	/* Get and check the size of the argument in bytes.
+	 * Normally this is just the size of a regular message, but in the
+	 * case of SENDA the argument is a table.
+	 */
+	if(call_type == KIPC_SENDA) {
+		msg_size = (size_t) endpt;
+
+		/* Limit size to something reasonable. An arbitrary choice is 16
+		 * times the number of process table entries.
+		 */
+		if (msg_size > 16*(NR_TASKS + NR_PROCS))
+			return -EDOM;
+
+		msg_size *= sizeof(asynmsg_t);	/* convert to bytes */
+	} else {
+		msg_size = sizeof(*msg);
+	}
+
+	/* Now check if the call is known and try to perform the request. The only
+	 * system calls that exist in Nucleos are sending and receiving messages.
+	 *   - KIPC_SENDREC: combines KIPC_SEND and KIPC_RECEIVE in a single system call
+	 *   - KIPC_SEND:    sender blocks until its message has been delivered
+	 *   - KIPC_RECEIVE: receiver blocks until an acceptable message has arrived
+	 *   - KIPC_NOTIFY:  asynchronous call; deliver notification or mark pending
+	 *   - KIPC_SENDA:   list of asynchronous send requests
+	 */
+	switch(call_type) {
+	case KIPC_SENDREC:
+		/* A flag is set so that notifications cannot interrupt KIPC_SENDREC. */
+		caller_ptr->p_misc_flags |= MF_REPLY_PEND;
+		/* fall through */
+	case KIPC_SEND:
+		result = mini_send(caller_ptr, endpt, msg, flags);
+		if (call_type == KIPC_SEND || result != 0)
+			break;		/* done, or KIPC_SEND failed */
+	/* fall through for KIPC_SENDREC */
+	case KIPC_RECEIVE:
+		if (call_type == KIPC_RECEIVE)
+			caller_ptr->p_misc_flags &= ~MF_REPLY_PEND;
+		result = mini_receive(caller_ptr, endpt, msg, 0);
+		break;
+	case KIPC_NOTIFY:
+		result = mini_notify(caller_ptr, endpt);
+		break;
+	case KIPC_SENDA:
+		result = mini_senda(caller_ptr, (asynmsg_t *)msg, (size_t)endpt);
+		break;
+	default:
+		result = -EBADCALL;			/* illegal system call */
+	}
+
+	/* Now, return the result of the system call to the caller. */
+	return(result);
+}
