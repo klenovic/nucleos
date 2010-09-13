@@ -43,8 +43,8 @@
 #define EXVEC_SIMD_EXCEPTION		19	/* SIMD Floating-Point Exception (#XM) */
 
 /* Fixed system call vector. */
-#define IRQVEC_SYSCALL	0x80	/* nucleos i386 system call */
-#define IRQVEC_KIPC	0x21	/* internal kernel<->server<->driver communication. */
+#define IRQVEC_SYSCALL	0x80	/* nucleos i386 system call (not for kernel modules) */
+#define IRQVEC_KIPC	0x21	/* internal communication i.e. between kernel modules */
 #define IRQVEC_LEVEL0	0x22	/* for execution of a function at level 0 */
 
 /* Suitable irq bases for hardware interrupts.  Reprogram the 8259(s) from
