@@ -187,24 +187,4 @@ extern int errno;
 # define EXTRAVAR_5
 #endif
 
-#if defined(__KERNEL__) || defined(__UKERNEL__)
-/* @nucleos: define some usefull stuffs here (see linux source) */
-
-#include <nucleos/kipc.h>
-
-static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *msgptr)
-{
-	int status;
-
-	msgptr->m_type = syscallnr;
-	status = kipc_sendrec(who, msgptr, 0);
-
-	if (status != 0)
-		return(status);
-
-	return(msgptr->m_type);
-}
-
-#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
-
 #endif /* __ASM_X86_SYSCALL_H */

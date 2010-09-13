@@ -39,8 +39,12 @@
 	((RTS_ISSET(target, RTS_RECEIVING) && !RTS_ISSET(target, RTS_SENDING)) && \
 		(target->p_getfrom_e == ENDPT_ANY || target->p_getfrom_e == source_ep))
 
+/**
+ * Generic message type common for all architecture. It is up to architecture to
+ * make the conversions arch<->generic i.e. must implement the appropriate convertors.
+ */
 typedef struct kipc_msg {
-	endpoint_t m_source;	/* who sent the message */
+	endpoint_t m_source;	/* who sent the message (filled in by kernel) */
 	int m_type;		/* what kind of message is it */
 	__s32 m_data1;
 	__s32 m_data2;
@@ -52,6 +56,7 @@ typedef struct kipc_msg {
 	__s32 m_data8;
 	__s32 m_data9;
 } kipc_msg_t;
+
 
 /*==========================================================================* 
  * Nucleos run-time system (IPC). 					    *
@@ -93,6 +98,19 @@ static inline int kipc_senda(asynmsg_t *table, size_t count)
 static inline int kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr, u32 flags)
 {
 	return __kipc_sendrec(src_dst, m_ptr, flags);
+}
+
+static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *msgptr)
+{
+	int status;
+
+	msgptr->m_type = syscallnr;
+	status = kipc_sendrec(who, msgptr, 0);
+
+	if (status != 0)
+		return(status);
+
+	return(msgptr->m_type);
 }
 
 #endif /* __ASSEMBLY__ */
