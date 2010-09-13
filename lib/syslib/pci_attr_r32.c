@@ -28,7 +28,7 @@ int port;
 	m.m_data1= devind;
 	m.m_data2= port;
 
-	r= kipc_sendrec(pci_procnr, &m, 0);
+	r= kipc_module_call(KIPC_SENDREC, 0, pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_attr_r32: can't talk to PCI", r);
 

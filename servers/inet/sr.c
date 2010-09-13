@@ -1101,7 +1101,7 @@ int size;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *)vir_cp_req;
 
-			if (kipc_sendrec(SYSTASK, &mess, 0) <0)
+			if (kipc_module_call(KIPC_SENDREC, 0, SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{
@@ -1152,7 +1152,7 @@ char *dest;
 			mess.VCP_VEC_SIZE= i;
 			mess.VCP_VEC_ADDR= (char *) vir_cp_req;
 
-			if (kipc_sendrec(SYSTASK, &mess, 0) <0)
+			if (kipc_module_call(KIPC_SENDREC, 0, SYSTASK, &mess) <0)
 				ip_panic(("unable to sendrec"));
 			if (mess.m_type <0)
 			{

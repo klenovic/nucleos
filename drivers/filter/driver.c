@@ -29,7 +29,7 @@ static int problem_stats[BD_LAST] = { 0 };
 static int driver_open(int which)
 {
 	/* Perform an open or close operation on the driver. This is
-	 * unfinished code: we should never be doing a blocking kipc_sendrec() to
+	 * unfinished code: we should never be doing a blocking kipc_module_call() to
 	 * the driver.
 	 */
 	kipc_msg_t msg;
@@ -41,17 +41,17 @@ static int driver_open(int which)
 	msg.m_type = DEV_OPEN;
 	msg.DEVICE = driver[which].minor;
 	msg.IO_ENDPT = self_ep;
-	r = kipc_sendrec(driver[which].endpt, &msg, 0);
+	r = kipc_module_call(KIPC_SENDREC, 0, driver[which].endpt, &msg);
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
-		printf("Filter: driver_open: kipc_sendrec returned %d\n", r);
+		printf("Filter: driver_open: kipc_module_call returned %d\n", r);
 
 		return RET_REDO;
 	}
 
 	if(msg.m_type != KCNR_TASK_REPLY || msg.REP_STATUS != 0) {
-		printf("Filter: driver_open: kipc_sendrec returned %d, %d\n",
+		printf("Filter: driver_open: kipc_module_call returned %d, %d\n",
 			msg.m_type, msg.REP_STATUS);
 
 		return RET_REDO;
@@ -69,7 +69,7 @@ static int driver_open(int which)
 	msg.IO_ENDPT = self_ep;
 	msg.IO_GRANT = (char *) gid;
 
-	r = kipc_sendrec(driver[which].endpt, &msg, 0);
+	r = kipc_module_call(KIPC_SENDREC, 0, driver[which].endpt, &msg);
 
 	cpf_revoke(gid);
 
@@ -117,17 +117,17 @@ static int driver_close(int which)
 	msg.m_type = DEV_CLOSE;
 	msg.DEVICE = driver[which].minor;
 	msg.IO_ENDPT = self_ep;
-	r = kipc_sendrec(driver[which].endpt, &msg, 0);
+	r = kipc_module_call(KIPC_SENDREC, 0, driver[which].endpt, &msg);
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
-		printf("Filter: driver_close: kipc_sendrec returned %d\n", r);
+		printf("Filter: driver_close: kipc_module_call returned %d\n", r);
 
 		return RET_REDO;
 	}
 
 	if(msg.m_type != KCNR_TASK_REPLY || msg.REP_STATUS != 0) {
-		printf("Filter: driver_close: kipc_sendrec returned %d, %d\n",
+		printf("Filter: driver_close: kipc_module_call returned %d, %d\n",
 			msg.m_type, msg.REP_STATUS);
 
 		return RET_REDO;
@@ -438,7 +438,7 @@ static void restart_driver(int which, int tell_rs)
 			driver[which].label);
 #endif
 
-		r = kipc_sendrec(RS_PROC_NR, &msg, 0);
+		r = kipc_module_call(KIPC_SENDREC, 0, RS_PROC_NR, &msg);
 
 		if (r != 0 || msg.m_type != 0)
 			panic(__FILE__, "RS request failed", r);

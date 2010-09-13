@@ -1537,7 +1537,7 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	 */
 	register struct proc *caller_ptr = proc_ptr;	/* get pointer to caller */
 	int result;					/* the system call's result */
-	int src_dst_p;					/* Process slot number */
+	int src_dst_p = 0;					/* Process slot number */
 	size_t msg_size;
 
 	/* If this process is subject to system call tracing, handle that first. */

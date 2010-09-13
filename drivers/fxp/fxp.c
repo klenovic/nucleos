@@ -3007,7 +3007,7 @@ int pci_func;
 	m.m_data4= buf;
 	m.m_data5= size;
 
-	r= kipc_sendrec(dev_e, &m, 0);
+	r= kipc_module_call(KIPC_SENDREC, 0, dev_e, &m);
 	if (r != 0)
 	{
 		printf("fxp`tell_dev: sendrec to %d failed: %d\n",

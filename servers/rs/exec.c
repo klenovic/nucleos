@@ -263,7 +263,7 @@ vir_bytes entry_point;
 	m.m_type = KCNR_EXEC_NEWMEM;
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)&e;
-	r = kipc_sendrec(PM_PROC_NR, &m, 0);
+	r = kipc_module_call(KIPC_SENDREC, 0, PM_PROC_NR, &m);
 	if (r != 0)
 		return r;
 #if 0
@@ -293,7 +293,7 @@ int result;
 	m.m_type= KCNR_EXEC_RESTART;
 	m.EXC_RS_PROC= proc_e;
 	m.EXC_RS_RESULT= result;
-	r= kipc_sendrec(PM_PROC_NR, &m, 0);
+	r= kipc_module_call(KIPC_SENDREC, 0, PM_PROC_NR, &m);
 	if (r != 0)
 		return r;
 	return m.m_type;

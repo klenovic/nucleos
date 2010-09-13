@@ -100,9 +100,12 @@ static inline int kipc_senda(asynmsg_t *table, size_t count)
 	return __kipc_senda(table, count);
 }
 
-static inline int kipc_sendrec(endpoint_t src_dst, kipc_msg_t *m_ptr, u32 flags)
+/**
+ * Interface for kernel internal communication used by modules.
+ */
+static inline int kipc_module_call(u8 type, u32 flags, endpoint_t endpt, void *msg)
 {
-	return __kipc_sendrec(src_dst, m_ptr, flags);
+	return __kipc_module_call(type, flags, endpt, msg);
 }
 
 static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *msgptr)
@@ -110,20 +113,12 @@ static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *
 	int status;
 
 	msgptr->m_type = syscallnr;
-	status = kipc_sendrec(who, msgptr, 0);
+	status = kipc_module_call(KIPC_SENDREC, 0, who, msgptr);
 
 	if (status != 0)
 		return(status);
 
 	return(msgptr->m_type);
-}
-
-/**
- * Interface for kernel internal communication used by modules.
- */
-static inline int kipc_module_call(u8 type, u32 flags, endpoint_t endpt, void *msg)
-{
-	return __kipc_module_call(type, flags, endpt, msg);
 }
 
 #endif /* __ASSEMBLY__ */

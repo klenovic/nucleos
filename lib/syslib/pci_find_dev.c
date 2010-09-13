@@ -31,7 +31,7 @@ int *devindp;
 	m.m_data2= dev;
 	m.m_data3= func;
 
-	r= kipc_sendrec(pci_procnr, &m, 0);
+	r= kipc_module_call(KIPC_SENDREC, 0, pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_find_dev: can't talk to PCI", r);
 

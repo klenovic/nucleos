@@ -506,7 +506,7 @@ static void or_dump (kipc_msg_t *m) {
 
 		m->m_type = FKEY_CONTROL;
 		m->FKEY_REQUEST = FKEY_EVENTS;
-		if((kipc_sendrec(TTY_PROC_NR, m, 0)) != 0)
+		if((kipc_module_call(KIPC_SENDREC, 0, TTY_PROC_NR, m)) != 0)
 			printf("Contacting the TTY failed\n");
 		
 		if(bit_isset(m->FKEY_SFKEYS, 11)) {

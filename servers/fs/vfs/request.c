@@ -598,7 +598,7 @@ endpoint_t driver_e;
     m.REQ_DRIVER_E = driver_e;
 
     /* Issue request */
-    if ((r = kipc_sendrec(fs_e, &m, 0)) != 0) {
+    if ((r = kipc_module_call(KIPC_SENDREC, 0, fs_e, &m)) != 0) {
 	  printf("%s:%d VFS req_newdriver: error sending message %d to %d\n",
 		 __FILE__, __LINE__, r, fs_e);
 	util_stacktrace();
@@ -1038,7 +1038,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
    */
   for (;;) {
       /* Do the actual send, receive */
-      if (0 != (r=kipc_sendrec(fs_e, reqm, 0))) {
+      if (0 != (r=kipc_module_call(KIPC_SENDREC, 0, fs_e, reqm))) {
 		printf("VFS:fs_sendrec:%s:%d: error sending message. "
 		       "FS_e: %d req_nr: %d err: %d\n", file, line, fs_e,
 		       reqm->m_type, r);

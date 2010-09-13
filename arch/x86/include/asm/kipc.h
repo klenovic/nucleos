@@ -89,20 +89,6 @@ static inline int __kipc_senda(asynmsg_t *table, size_t count)
 	return ret;
 }
 
-static inline int __kipc_sendrec(endpoint_t src_dst, kipc_msg_t *msg, u32 flags)
-{
-	int ret = 0;
-
-	__asm__ __volatile__ (
-		ASM_CALL_KIPC_SERVICE
-		:"=a"(ret)
-		:"0"(src_dst), "b"(msg), "c"(KIPC_SENDREC), "d"(flags)
-		:"memory", "cc"
-	);
-
-	return ret;
-}
-
 static inline int __kipc_module_call(u8 type, u32 flags, endpoint_t endpt, void *msg)
 {
 	int ret = 0;

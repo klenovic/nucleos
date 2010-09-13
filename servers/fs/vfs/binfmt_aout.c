@@ -274,7 +274,7 @@ static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_s
 	m.EXC_NM_PROC = proc_e;
 	m.EXC_NM_PTR = (char *)ex;
 
-	err = kipc_sendrec(PM_PROC_NR, &m, 0);
+	err = kipc_module_call(KIPC_SENDREC, 0, PM_PROC_NR, &m);
 
 	if (err)
 		return err;

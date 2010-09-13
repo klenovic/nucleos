@@ -42,7 +42,7 @@ u16_t did;
 	m.m_data3= sizeof(name);
 	m.m_data4= gid;
 
-	r= kipc_sendrec(pci_procnr, &m, 0);
+	r= kipc_module_call(KIPC_SENDREC, 0, pci_procnr, &m);
 	cpf_revoke(gid);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_dev_name: can't talk to PCI", r);

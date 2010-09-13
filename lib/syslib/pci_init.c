@@ -32,7 +32,7 @@ void pci_init(void)
 
 	m.m_type = BUSC_PCI_INIT;
 
-	r = kipc_sendrec(pci_procnr, &m, 0);
+	r = kipc_module_call(KIPC_SENDREC, 0, pci_procnr, &m);
 	if (r != 0)
 		panic("syslib/" __FILE__, "pci_init: can't talk to PCI", r);
 	if (m.m_type != 0)

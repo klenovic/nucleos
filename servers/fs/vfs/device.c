@@ -167,12 +167,12 @@ void dev_status(kipc_msg_t *m)
 	do {
 		int r;
 		st.m_type = DEV_STATUS;
-		if ((r=kipc_sendrec(m->m_source, &st, 0)) != 0) {
+		if ((r=kipc_module_call(KIPC_SENDREC, 0, m->m_source, &st)) != 0) {
 			printf("DEV_STATUS failed to %d: %d\n", m->m_source, r);
 			if (r == -EDEADSRCDST) return;
 			if (r == -EDSTDIED) return;
 			if (r == -ESRCDIED) return;
-			panic(__FILE__,"couldn't kipc_sendrec for DEV_STATUS", r);
+			panic(__FILE__,"couldn't kipc_module_call for DEV_STATUS", r);
 		}
 
 		switch(st.m_type) {
@@ -627,7 +627,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
   if(task_nr == SYSTEM) printf("VFS: sending %d to SYSTEM\n", mess_ptr->m_type);
 
   proc_e = mess_ptr->IO_ENDPT;
-  r = kipc_sendrec(task_nr, mess_ptr, 0);
+  r = kipc_module_call(KIPC_SENDREC, 0, task_nr, mess_ptr);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
@@ -641,7 +641,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
 		panic(__FILE__,"call_task: can't send/receive", r);
 	}
 
-  	/* Did the process we did the kipc_sendrec() for get a result? */
+  	/* Did the process we did the kipc_module_call() for get a result? */
   	if (mess_ptr->REP_ENDPT != proc_e) {
 	printf("fs: strange device reply from %d, type = %d, proc = %d "
 	       "(not %d) (2) ignored\n", mess_ptr->m_source, mess_ptr->m_type,

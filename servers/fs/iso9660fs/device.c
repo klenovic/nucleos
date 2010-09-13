@@ -216,7 +216,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   m.HIGHPOS  = ex64hi(pos);
 
   /* Call the task. */
-  r = kipc_sendrec(driver_e, &m, 0);
+  r = kipc_module_call(KIPC_SENDREC, 0, driver_e, &m);
 
   /* As block I/O never SUSPENDs, safe cleanup must be done whether
    * the I/O succeeded or not. */
@@ -239,7 +239,7 @@ int flags;			/* special flags, like O_NONBLOCK */
       else 
           panic(__FILE__,"call_task: can't send/receive", r);
   } else {
-      /* Did the process we did the kipc_sendrec() for get a result? */
+      /* Did the process we did the kipc_module_call() for get a result? */
       if (m.REP_ENDPT != proc_e) {
           printf("ISOFS (%d) strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n", SELF_E, m.m_source, m.m_type, proc_e, m.REP_ENDPT);
           r = -EIO;
@@ -299,7 +299,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
 
   proc_e = mess_ptr->IO_ENDPT;
 
-  r = kipc_sendrec(task_nr, mess_ptr, 0);
+  r = kipc_module_call(KIPC_SENDREC, 0, task_nr, mess_ptr);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
 			printf("fs: dead driver %d\n", task_nr);
@@ -315,7 +315,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
 		panic(__FILE__,"call_task: can't send/receive", r);
 	}
 
-  	/* Did the process we did the kipc_sendrec() for get a result? */
+  	/* Did the process we did the kipc_module_call() for get a result? */
   	if (mess_ptr->REP_ENDPT != proc_e) {
 		printf(
 		"fs: strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n",
