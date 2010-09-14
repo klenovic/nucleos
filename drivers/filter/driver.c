@@ -583,9 +583,9 @@ static int flt_receive(kipc_msg_t *mess, int which)
 	int r;
 
 	for (;;) {
-		r = kipc_receive(ENDPT_ANY, mess);
+		r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, mess);
 		if(r != 0)
-			panic(__FILE__, "kipc_receive returned error", r);
+			panic(__FILE__, "kipc_module_call type KIPC_RECEIVE returned error", r);
 
 		if(mess->m_source == CLOCK && is_notify(mess->m_type)) {
 			if (mess->NOTIFY_TIMESTAMP < flt_alarm(-1)) {

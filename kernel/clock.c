@@ -81,10 +81,10 @@ void clock_task()
   /* Main loop of the clock task.  Get work, process it. Never reply. */
   while(TRUE) {
 	/* Go get a message. */
-	result = kipc_receive(ENDPT_ANY, &m);
+	result = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 
 	if(result != 0)
-		minix_panic("kipc_receive() failed", result);
+		minix_panic("kipc_module_call type KIPC_RECEIVE failed", result);
 
 	/* Handle the request. Only clock ticks are expected. */
 	if (is_notify(m.m_type)) {

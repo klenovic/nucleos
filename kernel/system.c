@@ -97,7 +97,7 @@ void sys_task()
       if(!restarting) {
         int r;
 	/* Get work. Block and wait until a request message arrives. */
-	if((r=kipc_receive(ENDPT_ANY, &m)) != 0)
+	if((r=kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
 		minix_panic("receive() failed", r);
       } 
 

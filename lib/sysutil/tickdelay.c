@@ -34,7 +34,7 @@ long ticks;				/* number of ticks to wait */
     s = ktaskcall(SYSTASK, SYS_SETALARM, &m);
     if (s != 0) return(s);
 
-    kipc_receive(CLOCK,&m_alarm);		/* await synchronous alarm */
+    kipc_module_call(KIPC_RECEIVE, 0, CLOCK,&m_alarm);		/* await synchronous alarm */
 
     /* Check if we must reschedule the current alarm. */
     if (m.ALRM_TIME_LEFT > 0 && m.ALRM_TIME_LEFT != TMR_NEVER) {

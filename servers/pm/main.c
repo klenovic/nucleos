@@ -189,7 +189,7 @@ send_reply:
 static void get_work()
 {
 	/* Wait for the next message and extract useful information from it. */
-	if (kipc_receive(ENDPT_ANY, &m_in) != 0)
+	if (kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m_in) != 0)
 		panic(__FILE__,"PM receive error", NO_NUM);
 
 	who_e = m_in.m_source;	/* who sent the message */

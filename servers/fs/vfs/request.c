@@ -1091,7 +1091,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
           for (;;) {
               new_driver_e = 0;
               printf("VFSdead_driver: waiting for new driver\n");
-              r = kipc_receive(RS_PROC_NR, &m);
+              r = kipc_module_call(KIPC_RECEIVE, 0, RS_PROC_NR, &m);
               if (r != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to receive from RS", 
 				  r);

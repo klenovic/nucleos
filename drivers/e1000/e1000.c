@@ -104,9 +104,9 @@ int main(int argc, char *argv[])
      */
     while (TRUE)
     {
-	if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
+	if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
 	{
-	    panic("e1000", "kipc_receive failed", r);
+	    panic("e1000", "kipc_module_call type KIPC_RECEIVE  failed", r);
 	}
 	if (is_notify(m.m_type))
 	{

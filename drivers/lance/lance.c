@@ -314,7 +314,7 @@ void main( int argc, char **argv )
             sys_irqenable(&ec->ec_hook);
       }
 
-      if ((r= kipc_receive(ENDPT_ANY, &m)) != 0)
+      if ((r= kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
          panic( "lance", "receive failed", r);
 
       for (i=0;i<EC_PORT_NR_MAX;++i)

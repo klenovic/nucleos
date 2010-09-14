@@ -53,7 +53,7 @@ int main(void)
 
 	for(;;)
 	{
-		r= kipc_receive(ENDPT_ANY, &m);
+		r= kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 		if (r < 0)
 		{
 			printf("PCI: receive from ENDPT_ANY failed: %d\n", r);

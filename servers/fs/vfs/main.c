@@ -323,7 +323,7 @@ static void get_work(void)
 	for(;;) {
 		int r;
 		/* Normal case.  No one to revive. */
-		if ((r=kipc_receive(ENDPT_ANY, &m_in)) != 0)
+		if ((r=kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m_in)) != 0)
 			panic(__FILE__,"fs receive error", r);
 
 		who_e = m_in.m_source;
@@ -402,7 +402,7 @@ static void fs_init(void)
 	 * Then, stop and synchronize with the PM.
 	 */
 	do {
-		if ((s=kipc_receive(PM_PROC_NR, &mess)) != 0)
+		if ((s=kipc_module_call(KIPC_RECEIVE, 0, PM_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"FS couldn't receive from PM", s);
 
 		if (ENDPT_NONE == mess.PR_ENDPT)
@@ -484,7 +484,7 @@ static void init_root(void)
 	/* Wait FS login message */
 	if (last_login_fs_e != ROOT_FS_E) {
 		/* Wait FS login message */
-		if (kipc_receive(ROOT_FS_E, &m) != 0) {
+		if (kipc_module_call(KIPC_RECEIVE, 0, ROOT_FS_E, &m) != 0) {
 			printf("VFS: Error receiving login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",

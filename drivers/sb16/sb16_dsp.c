@@ -101,7 +101,7 @@ void main()
 
 	while(TRUE) {
 		/* Wait for an incoming message */
-		kipc_receive(ENDPT_ANY, &mess);
+		kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess);
 
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;
@@ -277,7 +277,7 @@ kipc_msg_t *m_ptr;
 	} else { /* Dma buffer is full, filling second buffer */ 
 
 		while(BufReadNext == BufFillNext) { /* Second buffer also full, wait for space to become available */ 
-			kipc_receive(HARDWARE, &mess);
+			kipc_module_call(KIPC_RECEIVE, 0, HARDWARE, &mess);
 			dsp_hardware_msg();
 		}
 		sys_datacopy(m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, ENDPT_SELF, (vir_bytes)Buffer + BufFillNext * DspFragmentSize, (phys_bytes)DspFragmentSize);

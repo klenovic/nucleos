@@ -104,8 +104,8 @@ static void get_work(m_in)
 kipc_msg_t *m_in;				/* pointer to message */
 {
   int s;				/* receive status */
-  if (0 != (s = kipc_receive(ENDPT_ANY, m_in))) 	/* wait for message */
-    panic("ISOFS","kipc_receive failed", s);
+  if (0 != (s = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, m_in))) 	/* wait for message */
+    panic("ISOFS","kipc_module_call type KIPC_RECEIVE failed", s);
 }
 
 /*===========================================================================*

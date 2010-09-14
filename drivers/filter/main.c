@@ -406,8 +406,8 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		/* Wait for request. */
-		if(kipc_receive(ENDPT_ANY, &m_in) != 0) {
-			panic(__FILE__, "kipc_receive failed", NO_NUM);
+		if(kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m_in) != 0) {
+			panic(__FILE__, "kipc_module_call type KIPC_RECEIVE failed", NO_NUM);
 		}
 
 #if DEBUG2

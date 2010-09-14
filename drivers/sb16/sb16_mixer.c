@@ -61,7 +61,7 @@ kipc_msg_t mess;
 	* it out, and sends a reply.
 	*/
 	while (TRUE) {
-		kipc_receive(ENDPT_ANY, &mess);
+		kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess);
 
 		caller = mess.m_source;
 		proc_nr = mess.IO_ENDPT;

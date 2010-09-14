@@ -151,7 +151,7 @@ static void get_work(m_ptr)
 kipc_msg_t *m_ptr;				/* message buffer */
 {
     int status = 0;
-    status = kipc_receive(ENDPT_ANY, m_ptr);   /* this blocks until message arrives */
+    status = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, m_ptr);   /* this blocks until message arrives */
 
     if (status != 0)
         panic("DS","failed to receive message!", status);

@@ -141,7 +141,7 @@ void main(void)
   if (sigaction(SIGTERM,&sa,NULL)<0) panic("PRN","sigaction failed", errno);
   
   while (TRUE) {
-	kipc_receive(ENDPT_ANY, &pr_mess);
+	kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &pr_mess);
 
 	if (is_notify(pr_mess.m_type)) {
 		switch (_ENDPOINT_P(pr_mess.m_source)) {

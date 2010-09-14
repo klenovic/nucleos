@@ -133,7 +133,7 @@ static void sig_handler()
 static void get_work()
 {
     int status = 0;
-    status = kipc_receive(ENDPT_ANY, &m_in);   /* this blocks until message arrives */
+    status = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m_in);   /* this blocks until message arrives */
     if (status != 0)
         panic("IS","failed to receive message!", status);
     who_e = m_in.m_source;        /* message arrived! set sender */

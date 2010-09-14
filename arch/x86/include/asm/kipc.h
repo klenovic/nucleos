@@ -33,20 +33,6 @@ typedef struct __kipc_msg {
 	__u32 si;
 } __kipc_msg_t;
 
-static inline int __kipc_receive(endpoint_t src, kipc_msg_t *msg)
-{
-	int ret = 0;
-
-	__asm__ __volatile__ (
-		ASM_CALL_KIPC_SERVICE
-		:"=a"(ret)
-		:"0"(src), "b"(msg), "c"(KIPC_RECEIVE)
-		:"memory", "cc"
-	);
-
-	return ret;
-}
-
 static inline int __kipc_send(endpoint_t dst, kipc_msg_t *msg, u32 flags)
 {
 	int ret = 0;

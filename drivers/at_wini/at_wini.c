@@ -2073,8 +2073,8 @@ static void w_intr_wait()
 		while (w_wn->w_status & (STATUS_ADMBSY|STATUS_BSY)) {
 			int rr;
 
-			if((rr=kipc_receive(ENDPT_ANY, &m)) != 0)
-				panic("at_wini", "kipc_receive(ENDPT_ANY) failed", rr);
+			if((rr =kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
+				panic("at_wini", "kipc_module_call type KIPC_RECEIVE failed", rr);
 
 			if (is_notify(m.m_type)) {
 				switch (_ENDPOINT_P(m.m_source)) {

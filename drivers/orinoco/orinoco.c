@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
 		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
-		if ((r = kipc_receive (ENDPT_ANY, &m)) != 0)
+		if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
 			panic(__FILE__, "orinoco: receive failed", NO_NUM);
 
 		if (is_notify(m.m_type)) {

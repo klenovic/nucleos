@@ -187,7 +187,7 @@ int main(void)
 	}
 
 	/* Get a request message. */
-	r= kipc_receive(ENDPT_ANY, &tty_mess);
+	r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &tty_mess);
 	if (r != 0)
 		panic("TTY", "receive failed with %d", r);
 

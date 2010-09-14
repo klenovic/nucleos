@@ -319,8 +319,8 @@ int main(int argc, char *argv[])
 		printf("rtl8169: ds_retrieve_u32 failed for 'inet': %d\n", r);
 #endif
 	while (TRUE) {
-		if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
-			panic("rtl8169", "kipc_receive failed", r);
+		if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
+			panic("rtl8169", "kipc_module_call type KIPC_RECEIVE failed", r);
 
 		if (is_notify(m.m_type)) {
 			switch (_ENDPOINT_P(m.m_source)) {
@@ -1258,8 +1258,8 @@ void transmittest(re_t *rep)
 		do {
 			kipc_msg_t m;
 			int r;
-			if ((r = kipc_receive(ENDPT_ANY, &m)) != 0)
-				panic("rtl8169", "kipc_receive failed", r);
+			if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
+				panic("rtl8169", "kipc_module_call type KIPC_RECEIVE failed", r);
 		} while(m.m_source != HARDWARE);
 		assert(!(rep->re_flags & REF_SEND_AVAIL));
 		rep->re_flags |= REF_SEND_AVAIL;

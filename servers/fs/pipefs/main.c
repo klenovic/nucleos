@@ -99,7 +99,7 @@ kipc_msg_t *m_in;				/* pointer to message */
   endpoint_t src;
 
   do {
-	if ((r = kipc_receive(ENDPT_ANY, m_in)) != 0) 	/* wait for message */
+	if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, m_in)) != 0) 	/* wait for message */
 		panic("PFS","receive failed", r);
 	src = fs_m_in.m_source;
 

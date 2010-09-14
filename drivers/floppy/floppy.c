@@ -767,7 +767,7 @@ static void start_motor()
   f_set_timer(&f_tmr_timeout, f_dp->start_ms * system_hz / 1000, f_timeout);
   f_busy = BSY_IO;
   do {
-  	kipc_receive(ENDPT_ANY, &mess); 
+  	kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess); 
 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
@@ -859,7 +859,7 @@ static int seek()
  	f_set_timer(&f_tmr_timeout, system_hz/30, f_timeout);
 	f_busy = BSY_IO;
   	do {
-  		kipc_receive(ENDPT_ANY, &mess); 
+  		kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess); 
 	
 		if (is_notify(mess.m_type)) {
 			switch (_ENDPOINT_P(mess.m_source)) {
@@ -1141,7 +1141,7 @@ static void f_reset()
    * but be prepared to handle a timeout.
    */
   do {
-  	kipc_receive(ENDPT_ANY, &mess); 
+  	kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess); 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
 			case CLOCK:
@@ -1193,7 +1193,7 @@ static int f_intr_wait()
 
   /* We expect an interrupt, but if a timeout, occurs, report an error. */
   do {
-  	kipc_receive(ENDPT_ANY, &mess); 
+  	kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &mess); 
 	if (is_notify(mess.m_type)) {
 		switch (_ENDPOINT_P(mess.m_source)) {
 			case CLOCK:
