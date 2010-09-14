@@ -1111,7 +1111,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
                           m.m_type);
               }
               m.m_type = r;
-              if ((r = kipc_send(RS_PROC_NR, &m, 0)) != 0) {
+              if ((r = kipc_module_call(KIPC_SEND, 0, RS_PROC_NR, &m)) != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to send to RS",
                           r);
               }

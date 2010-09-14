@@ -91,7 +91,7 @@ int main(void)
 		else if (m.m_type == IOMMU_MAP) {
 			r= do_add4pci(&m);
 			m.m_type= r;
-			kipc_send(m.m_source, &m, 0);
+			kipc_module_call(KIPC_SEND, 0, m.m_source, &m);
 			continue;
 		}
 		printf("amddev: got message from %d\n", m.m_source);

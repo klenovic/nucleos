@@ -350,7 +350,7 @@ kipc_msg_t *m_ptr;	/* pointer to the newly arrived message */
 		m_ptr->m_type = DEV_NO_STATUS;
 	}
 
-	kipc_send(m_ptr->m_source, m_ptr, 0);			/* send the message */
+	kipc_module_call(KIPC_SEND, 0, m_ptr->m_source, m_ptr);			/* send the message */
 }
 
 
@@ -369,7 +369,7 @@ int status;
 	m.REP_STATUS = status;	/* result of device operation */
 	m.REP_ENDPT = process;	/* which user made the request */
 
-	kipc_send(replyee, &m, 0);
+	kipc_module_call(KIPC_SEND, 0, replyee, &m);
 }
 
 

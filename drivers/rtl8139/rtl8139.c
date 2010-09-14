@@ -2318,7 +2318,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getstat: send failed: %d\n", r);
 }
@@ -2352,7 +2352,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getstat_s: send failed: %d\n", r);
 }
@@ -2368,7 +2368,7 @@ kipc_msg_t *mp;
 
 	mp->DL_NAME = progname;
 	mp->m_type= DL_NAME_REPLY;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic("RTL8139", "rl_getname: send failed: %d\n", r);
 }
@@ -2402,7 +2402,7 @@ int may_block;
 		panic("rtl8139","getuptime() failed:", r);
 	reply.DL_CLCK = now;
 
-	r= kipc_send(rep->re_client, &reply, 0);
+	r= kipc_module_call(KIPC_SEND, 0, rep->re_client, &reply);
 
 	if (r == -ELOCKED && may_block)
 	{
@@ -2428,7 +2428,7 @@ static void mess_reply(req, reply_mess)
 kipc_msg_t *req;
 kipc_msg_t *reply_mess;
 {
-	if (kipc_send(req->m_source, reply_mess, 0) != 0)
+	if (kipc_module_call(KIPC_SEND, 0, req->m_source, reply_mess) != 0)
 		panic("rtl8139","unable to mess_reply", NO_NUM);
 }
 

@@ -649,7 +649,7 @@ kipc_msg_t *m_out;                         /* reply message */
 {
     int s;				/* send status */
 
-    s = kipc_send(who, m_out, KIPC_FLG_NONBLOCK);	/* send the message */
+    s = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who, m_out);	/* send the message */
     if (s != 0)
         printf("RS: unable to send reply to %d: %d\n", who, s);
 }

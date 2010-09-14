@@ -655,7 +655,7 @@ kipc_msg_t *m;
 		repl_queue= mq->mq_next;
 
 		mq->mq_mess.m_type= DEV_REVIVE;
-		result= kipc_send(mq->mq_mess.m_source, &mq->mq_mess, 0);
+		result= kipc_module_call(KIPC_SEND, 0, mq->mq_mess.m_source, &mq->mq_mess);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		mq_free(mq);
@@ -688,14 +688,14 @@ kipc_msg_t *m;
 		m->DEV_MINOR= fd;
 		m->DEV_SEL_OPS= m_ops;
 
-		result= kipc_send(m->m_source, m, 0);
+		result= kipc_module_call(KIPC_SEND, 0, m->m_source, m);
 		if (result != 0)
 			ip_panic(("unable to send"));
 		return;
 	}
 
 	m->m_type= DEV_NO_STATUS;
-	result= kipc_send(m->m_source, m, 0);
+	result= kipc_module_call(KIPC_SEND, 0, m->m_source, m);
 	if (result != 0)
 		ip_panic(("unable to send"));
 }
@@ -789,7 +789,7 @@ int is_revive;
 	}
 	else
 	{
-		result= kipc_send(mq->mq_mess.m_source, mp, 0);
+		result= kipc_module_call(KIPC_SEND, 0, mq->mq_mess.m_source, mp);
 	}
 
 	if (result == -ELOCKED && is_revive)
@@ -1325,7 +1325,7 @@ int operation;
 
 	if (m_cancel)
 	{
-		result= kipc_send(m_cancel->mq_mess.m_source, &m_cancel->mq_mess, 0);
+		result= kipc_module_call(KIPC_SEND, 0, m_cancel->mq_mess.m_source, &m_cancel->mq_mess);
 		if (result != 0)
 			ip_panic(("unable to send: %d", result));
 		mq_free(m_cancel);

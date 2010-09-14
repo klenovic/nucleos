@@ -164,7 +164,7 @@ int main(void)
 	if(result != SUSPEND) {
 	SANITYCHECK(SCL_DETAIL);
 		msg.m_type = result;
-		if((r=kipc_send(who_e, &msg, 0)) != 0) {
+		if((r=kipc_module_call(KIPC_SEND, 0, who_e, &msg)) != 0) {
 			printf("VM: couldn't send %d to %d (err %d)\n",
 				msg.m_type, who_e, r);
 			vm_panic("send() error", NO_NUM);

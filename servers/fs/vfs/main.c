@@ -374,7 +374,7 @@ void reply(int whom, int result)
 	printf("vfs:reply: replying %d for call %d\n", result, call_nr);
 #endif
 	m_out.reply_type = result;
-	s = kipc_send(whom, &m_out, KIPC_FLG_NONBLOCK);
+	s = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, whom, &m_out);
 
 	if (s != 0)
 		printf("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);
@@ -423,7 +423,7 @@ static void fs_init(void)
 	} while (TRUE);			/* continue until process ENDPT_NONE */
 
 	mess.m_type = 0;			/* tell PM that we succeeded */
-	s = kipc_send(PM_PROC_NR, &mess, 0);		/* kipc_send synchronization message */
+	s = kipc_module_call(KIPC_SEND, 0, PM_PROC_NR, &mess);	/* send synchronization message */
 
 	/* All process table entries have been set. Continue with FS initialization.
 	 * Certain relations must hold for the file system to work at all. Some 
@@ -656,7 +656,7 @@ static void service_pm(void)
 	return;
   }
 
-  r = kipc_send(PM_PROC_NR, &m_out, 0);
+  r = kipc_module_call(KIPC_SEND, 0, PM_PROC_NR, &m_out);
   if (r != 0)
 	panic(__FILE__, "service_pm: send failed", r);
 }

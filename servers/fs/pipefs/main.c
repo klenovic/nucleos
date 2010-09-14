@@ -131,7 +131,7 @@ void reply(who, m_out)
 int who;	
 kipc_msg_t *m_out;                       	/* report result */
 {
-  if (0 != kipc_send(who, m_out, 0))    /* send the message */
+  if (kipc_module_call(KIPC_SEND, 0, who, m_out) != 0)    /* send the message */
 	printf("PFS(%d) was unable to send reply\n", SELF_E);
 }
 

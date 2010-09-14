@@ -877,7 +877,7 @@ kipc_msg_t *mp;
 		mp->m_type= DL_STAT_REPLY;
 		mp->DL_PORT= port;
 		mp->DL_STAT= 0;
-		r= kipc_send(mp->m_source, mp, 0);
+		r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 		if (r != 0)
 			panic(__FILE__, "do_getstat: send failed: %d\n", r);
 		return;
@@ -895,7 +895,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "do_getstat: send failed: %d\n", r);
 }
@@ -922,7 +922,7 @@ kipc_msg_t *mp;
 		mp->m_type= DL_STAT_REPLY;
 		mp->DL_PORT= port;
 		mp->DL_STAT= 0;
-		r= kipc_send(mp->m_source, mp, 0);
+		r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 		if (r != 0)
 			panic(__FILE__, "do_getstat: send failed: %d\n", r);
 		return;
@@ -940,7 +940,7 @@ kipc_msg_t *mp;
 	mp->m_type= DL_STAT_REPLY;
 	mp->DL_PORT= port;
 	mp->DL_STAT= 0;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic(__FILE__, "do_getstat: send failed: %d\n", r);
 }
@@ -955,7 +955,7 @@ kipc_msg_t *mp;
 
 	mp->DL_NAME = progname;
 	mp->m_type= DL_NAME_REPLY;
-	r= kipc_send(mp->m_source, mp, 0);
+	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 		panic("dp8390", "do_getname: send failed: %d\n", r);
 }
@@ -2677,7 +2677,7 @@ int may_block;
 	reply.DL_STAT = status | ((u32_t) err << 16);
 	reply.DL_COUNT = dep->de_read_s;
 	reply.DL_CLCK = 0;	/* Don't know */
-	r= kipc_send(dep->de_client, &reply, 0);
+	r= kipc_module_call(KIPC_SEND, 0, dep->de_client, &reply);
 
 	if (r == -ELOCKED && may_block)
 	{
@@ -2701,7 +2701,7 @@ static void mess_reply(req, reply_mess)
 kipc_msg_t *req;
 kipc_msg_t *reply_mess;
 {
-	if (kipc_send(req->m_source, reply_mess, 0) != 0)
+	if (kipc_module_call(KIPC_SEND, 0, req->m_source, reply_mess) != 0)
 		panic("", "dp8390: unable to mess_reply", NO_NUM);
 }
 

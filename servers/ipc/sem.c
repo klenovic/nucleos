@@ -104,7 +104,7 @@ static void send_message_to_process(endpoint_t who, int ret, int ignore)
 	int r;
 
 	m.m_type = ret;
-	r = kipc_send(who, &m, KIPC_FLG_NONBLOCK);
+	r = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who, &m);
 	if (r != 0 && !ignore)
 		printf("IPC send error!\n");
 }
@@ -581,7 +581,7 @@ out:
 	if (r != 0 || !no_reply) {
 		m->m_type = r;
 
-		r = kipc_send(who_e, m, KIPC_FLG_NONBLOCK);
+		r = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who_e, m);
 		if (r != 0)
 			printf("IPC send error!\n");
 	}

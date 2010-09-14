@@ -168,7 +168,7 @@ int who_e;                           	/* destination */
 kipc_msg_t *m_ptr;				/* message buffer */
 {
     int s;
-    s = kipc_send(who_e, m_ptr, 0);    /* send the message */
+    s = kipc_module_call(KIPC_SEND, 0, who_e, m_ptr);    /* send the message */
 
     if (s != 0)
         printf("DS: unable to send reply to %d: %d\n", who_e, s);

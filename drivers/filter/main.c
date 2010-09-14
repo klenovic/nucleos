@@ -446,7 +446,7 @@ int main(int argc, char *argv[])
 		m_out.m_type = KCNR_TASK_REPLY;
 		m_out.REP_ENDPT = proc_e;
 		m_out.REP_STATUS = r;
-		kipc_send(who_e, &m_out, 0);
+		kipc_module_call(KIPC_SEND, 0, who_e, &m_out);
 	}
 
 	return 0;

@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
   fs_m_in.m_type = KCNR_FS_READY;
 
-  if (kipc_send(VFS_PROC_NR, &fs_m_in, 0) != 0) {
+  if (kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &fs_m_in) != 0) {
 	printf("MFS(%d): Error sending login to VFS\n", SELF_E);
 	return(-1);
   }
@@ -161,7 +161,7 @@ void reply(who, m_out)
 int who;	
 kipc_msg_t *m_out;                       	/* report result */
 {
-  if (0 != kipc_send(who, m_out, 0))    /* send the message */
+  if (0 != kipc_module_call(KIPC_SEND, 0, who, m_out))    /* send the message */
 	printf("MFS(%d) was unable to send reply\n", SELF_E);
 }
 

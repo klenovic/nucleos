@@ -171,7 +171,7 @@ send_reply:
 		 */
 		if ((rmp->mp_flags & (REPLY | IN_USE | EXITING)) ==
 		   (REPLY | IN_USE)) {
-			s=kipc_send(rmp->mp_endpoint, &rmp->mp_reply, KIPC_FLG_NONBLOCK);
+			s=kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, rmp->mp_endpoint, &rmp->mp_reply);
 			if (s != 0) {
 				printf("PM can't reply to %d (%s): %d\n",
 					rmp->mp_endpoint, rmp->mp_name, s);
@@ -334,7 +334,7 @@ static void pm_init()
 		mess.PR_SLOT = ip->proc_nr;
 		mess.PR_PID = rmp->mp_pid;
 		mess.PR_ENDPT = rmp->mp_endpoint;
-  		if ((s=kipc_send(VFS_PROC_NR, &mess, 0)) != 0)
+  		if ((s=kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &mess)) != 0)
 			panic(__FILE__,"can't sync up with FS", s);
   	}
   }
