@@ -478,7 +478,7 @@ void arch_do_syscall(struct proc *proc)
 	vm_set_cr3(proc);
 
 	/* Make the system call, for real this time. */
-	proc->p_reg.retreg = kipc_call(call_nr, src_dst_e, m_ptr, bit_map);
+	proc->p_reg.retreg = kipc_call(call_nr, bit_map, src_dst_e, m_ptr);
 }
 
 struct proc * arch_finish_schedcheck(void)

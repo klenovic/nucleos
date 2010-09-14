@@ -475,7 +475,6 @@ static struct gate_table_s gate_table_ioapic[] = {
 static struct gate_table_s gate_table_common[] = {
 	{ __syscall_entry, IRQVEC_SYSCALL, USER_PRIVILEGE },
 	{ __kipc_entry, IRQVEC_KIPC, USER_PRIVILEGE },
-	{ __nkipc_entry, IRQVEC_NKIPC, USER_PRIVILEGE },
 	{ level0_call, IRQVEC_LEVEL0, TASK_PRIVILEGE },
 	{ NULL, 0, 0}
 };

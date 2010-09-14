@@ -230,9 +230,6 @@ void idt_init(void)
 		/* kernel internal communication */
 		{ __kipc_entry, IRQVEC_KIPC, USER_PRIVILEGE },
 
-		/* kernel internal communication */
-		{ __nkipc_entry, IRQVEC_NKIPC, USER_PRIVILEGE },
-
 		/* nucleos i386 system call entry */
 		{ __syscall_entry, IRQVEC_SYSCALL, USER_PRIVILEGE },
 

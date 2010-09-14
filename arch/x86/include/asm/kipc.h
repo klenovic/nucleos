@@ -20,9 +20,6 @@
 /* Internal communication */
 #define ASM_CALL_KIPC_SERVICE	"int $" __stringify(IRQVEC_KIPC) "\t\n"
 
-/* New internal communication */
-#define ASM_CALL_NKIPC_SERVICE	"int $" __stringify(IRQVEC_NKIPC) "\t\n"
-
 /* the x86 uses registers for communication */
 typedef struct __kipc_msg {
 	__u32 ax;
@@ -41,7 +38,7 @@ static inline int __kipc_module_call(u8 type, u32 flags, endpoint_t endpt, void 
 		return -EPERM;
 
 	__asm__ __volatile__ (
-		ASM_CALL_NKIPC_SERVICE
+		ASM_CALL_KIPC_SERVICE
 		:"=a"(ret)
 		:"0"(type), "b"(flags), "c"(endpt), "d"(msg)
 		:"memory", "cc"

@@ -59,7 +59,6 @@ void simd_exception(void);
 
 /* Software interrupt handlers, in numerical order. */
 void __kipc_entry(void);	/* internal comunication */
-void __nkipc_entry(void);	/* internal comunication (will replace current) */
 void __syscall_entry(void);	/* nucleos system call (C library) */
 void level0_call(void);
 

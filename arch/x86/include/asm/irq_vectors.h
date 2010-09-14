@@ -44,8 +44,7 @@
 
 /* Fixed system call vector. */
 #define IRQVEC_SYSCALL	0x80	/* nucleos i386 system call (not for kernel modules) */
-#define IRQVEC_KIPC	0x21	/* internal communication i.e. between kernel modules */
-#define IRQVEC_NKIPC	0xc0	/* internal communication (it will replace the current 0x21) */
+#define IRQVEC_KIPC	0xc0	/* internal communication i.e. between kernel modules */
 #define IRQVEC_LEVEL0	0x22	/* for execution of a function at level 0 */
 
 /* Suitable irq bases for hardware interrupts.  Reprogram the 8259(s) from
