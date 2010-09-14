@@ -76,15 +76,6 @@ typedef struct asynmsg {
 
 #include <asm/kipc.h>
 
-/* Kernel ipc routines. The __kipc_* are the arch-dependent implementations.
-   Make them as fast as possible.
- */
-
-static inline int kipc_senda(asynmsg_t *table, size_t count)
-{
-	return __kipc_senda(table, count);
-}
-
 /**
  * Interface for kernel internal communication used by modules.
  */

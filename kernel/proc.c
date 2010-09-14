@@ -60,7 +60,7 @@
 static void idle(void);
 static int mini_send(struct proc *caller_ptr, int dst_e, kipc_msg_t *m_ptr, u32 flags);
 static int mini_receive(struct proc *caller_ptr, int src, kipc_msg_t *m_ptr, u32 flags);
-static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size);
+static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, int count);
 static int deadlock(int function, register struct proc *caller, int src_dst);
 static int try_async(struct proc *caller_ptr);
 static int try_one(struct proc *src_ptr, struct proc *dst_ptr,
@@ -833,7 +833,7 @@ int mini_notify(struct proc *caller_ptr, endpoint_t dst_e)
 		return -EFAULT;							\
 	}
 
-static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size)
+static int mini_senda(struct proc *caller_ptr, asynmsg_t __user *table, int count)
 {
 	int i, dst_p, done, do_notify;
 	unsigned flags;
@@ -855,14 +855,14 @@ static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size)
 	privp->s_asyntab= -1;
 	privp->s_asynsize= 0;
 
-	if (size == 0) {
+	if (count == 0) {
 		/* Nothing to do, just return */
 		return 0;
 	}
 
-	if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) table, size*sizeof(*table)))) {
+	if(!(linaddr = umap_local(caller_ptr, D, (vir_bytes) table, count*sizeof(*table)))) {
 		printf("mini_senda: umap_local failed; 0x%lx len 0x%lx\n",
-			table, size * sizeof(*table));
+			table, count * sizeof(*table));
 		return -EFAULT;
 	}
 
@@ -872,7 +872,7 @@ static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size)
 	 * (this check has been duplicated in kipc_call but is left here
 	 * as a sanity check)
 	 */
-	if (size > 16*(NR_TASKS + NR_PROCS)) {
+	if (count > 16*(NR_TASKS + NR_PROCS)) {
 		return -EDOM;
 	}
 	
@@ -880,7 +880,7 @@ static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size)
 	do_notify= FALSE;
 	done= TRUE;
 
-	for (i= 0; i<size; i++) {
+	for (i= 0; i<count; i++) {
 		/* Read status word */
 		A_RETRIEVE(i, flags);
 		flags= tabent.flags;
@@ -995,7 +995,7 @@ static int mini_senda(struct proc *caller_ptr, asynmsg_t *table, size_t size)
 
 	if (!done) {
 		privp->s_asyntab= (vir_bytes)table;
-		privp->s_asynsize= size;
+		privp->s_asynsize= count;
 	}
 
 	return 0;
@@ -1572,7 +1572,7 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	if(caller_ptr->p_misc_flags & MF_DELIVERMSG) {
-		kprintf("kipc_call: MF_DELIVERMSG on for %s / %d\n", caller_ptr->p_name,
+		kprintf("%s: MF_DELIVERMSG on for %s / %d\n", __FUNCTION__, caller_ptr->p_name,
 								     caller_ptr->p_endpoint);
 		minix_panic("MF_DELIVERMSG on", NO_NUM);
 	}
@@ -1597,7 +1597,7 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	} else if (endpt == ENDPT_ANY) {
 		if (call_type != KIPC_RECEIVE) {
 #if 0
-			kprintf("kipc_call: trap %d by %d with bad endpoint %d\n",
+			kprintf("%s: trap %d by %d with bad endpoint %d\n", __FUNCTION__,
 				call_type, proc_nr(caller_ptr), endpt);
 #endif
 			return -EINVAL;
@@ -1607,8 +1607,8 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 		/* Require a valid source and/or destination process. */
 		if(!isokendpt(endpt, &src_dst_p)) {
 #if 0
-			kprintf("kipc_call: trap %d by %d with bad endpoint %d\n",
-				call_type, proc_nr(caller_ptr), endpt);
+			kprintf("%s: trap %d by %d with bad endpoint %d\n",
+				__FUNCTION__,call_type, proc_nr(caller_ptr), endpt);
 #endif
 			return -EDEADSRCDST;
 		}
@@ -1620,8 +1620,8 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 		if (call_type != KIPC_RECEIVE) {
 			if (!may_send_to(caller_ptr, src_dst_p)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-				kprintf("kipc_call: ipc mask denied trap %d from %d to %d\n",
-					call_type, caller_ptr->p_endpoint, endpt);
+				kprintf("%s: ipc mask denied trap %d from %d to %d\n",
+					__FUNCTION__,call_type, caller_ptr->p_endpoint, endpt);
 #endif
 				return(-ECALLDENIED);	/* call denied by ipc mask */
 			}
@@ -1629,10 +1629,10 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	}
 
 	/* Only allow non-negative call_type values less than 32 */
-	if (call_type < 0 || call_type >= KIPC_SERVICES_COUNT) {
+	if (call_type < 0 || call_type > KIPC_SERVICES_COUNT) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
-			call_type, proc_nr(caller_ptr), src_dst_p);
+		kprintf("%s: trap %d not allowed, caller %d, src_dst %d\n",
+			__FUNCTION__,call_type, proc_nr(caller_ptr), src_dst_p);
 #endif
 		return(-ETRAPDENIED);		/* trap denied by mask or kernel */
 	}
@@ -1643,8 +1643,8 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	 */
 	if (!(priv(caller_ptr)->s_trap_mask & (1 << call_type))) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
-			call_type, proc_nr(caller_ptr), src_dst_p);
+		kprintf("%s: trap %d not allowed, caller %d, src_dst %d\n",
+			__FUNCTION__, call_type, proc_nr(caller_ptr), src_dst_p);
 #endif
 		return(-ETRAPDENIED);		/* trap denied by mask or kernel */
 	}
@@ -1653,8 +1653,8 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	if (call_type != KIPC_SENDREC && call_type != KIPC_RECEIVE && call_type != KIPC_SENDA &&
 	    iskerneln(src_dst_p)) {
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-		kprintf("kipc_call: trap %d not allowed, caller %d, src_dst %d\n",
-			call_type, proc_nr(caller_ptr), endpt);
+		kprintf("%s: trap %d not allowed, caller %d, src_dst %d\n",
+			__FUNCTION__, call_type, proc_nr(caller_ptr), endpt);
 #endif
 	return(-ETRAPDENIED);		/* trap denied by mask or kernel */
 	}
@@ -1664,7 +1664,7 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	 * case of SENDA the argument is a table.
 	 */
 	if(call_type == KIPC_SENDA) {
-		msg_size = (size_t) endpt;
+		msg_size = flags;
 
 		/* Limit size to something reasonable. An arbitrary choice is 16
 		 * times the number of process table entries.
@@ -1704,7 +1704,7 @@ int nkipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 		result = mini_notify(caller_ptr, endpt);
 		break;
 	case KIPC_SENDA:
-		result = mini_senda(caller_ptr, (asynmsg_t *)msg, (size_t)endpt);
+		result = mini_senda(caller_ptr, (asynmsg_t*)msg, flags);
 		break;
 	default:
 		result = -EBADCALL;			/* illegal system call */

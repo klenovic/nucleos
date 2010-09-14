@@ -541,10 +541,10 @@ static int flt_senda(kipc_msg_t *mess, int which)
 	amp->dst = driver[which].endpt;
 	amp->msg = *mess;
 	amp->flags = AMF_VALID;
-	r = kipc_senda(amsgtable, 2);
+	r = kipc_module_call(KIPC_SENDA, 2, 0, amsgtable);
 
 	if(r != 0)
-		panic(__FILE__, "kipc_senda returned error", r);
+		panic(__FILE__, "send returned error", r);
 
 	return r;
 }
@@ -554,7 +554,7 @@ static int flt_senda(kipc_msg_t *mess, int which)
  *===========================================================================*/
 static int check_senda(int which)
 {
-	/* Check whether an earlier kipc_senda resulted in an error indicating the
+	/* Check whether an earlier send resulted in an error indicating the
 	 * message never got delivered. Only in that case can we reliably say
 	 * that the driver died. Return BD_DEAD in this case, and BD_PROTO
 	 * otherwise.

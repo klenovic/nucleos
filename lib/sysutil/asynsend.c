@@ -81,9 +81,9 @@ int fl;
 	if (next_slot >= ASYN_NR)
 	{
 		/* Tell the kernel to stop processing */
-		r= kipc_senda(NULL, 0);
+		r= kipc_module_call(KIPC_SENDA, 0, 0, 0);
 		if (r != 0)
-			panic(__FILE__, "asynsend: kipc_senda failed", r);
+			panic(__FILE__, "asynsend: send failed", r);
 
 		dst_ind= 0;
 		for (src_ind= first_slot; src_ind<next_slot; src_ind++)
@@ -131,10 +131,11 @@ int fl;
 	assert(first_slot < ASYN_NR);
 	assert(next_slot >= first_slot);
 	len = next_slot-first_slot;
+
 	assert(first_slot + len <= ASYN_NR);
 
 	/* Tell the kernel to rescan the table */
-	r = kipc_senda(msgtable+first_slot, len);
+	r = kipc_module_call(KIPC_SENDA, len, 0, msgtable+first_slot);
 
 	inside = 0;
 
