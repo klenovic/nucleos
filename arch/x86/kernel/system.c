@@ -48,7 +48,7 @@ void arch_shutdown(int how)
 	/* Mask all interrupts, including the clock. */
 	outb( INT_CTLMASK, ~0);
 
-	if(minix_panicing) {
+	if (kernel_in_panic) {
 		/* We're panicing? Then retrieve and decode currently
 		 * loaded segment selectors.
 		 */
@@ -71,7 +71,7 @@ void arch_shutdown(int how)
 		if (how != RBT_MONITOR)
 			arch_set_params("", 1);
 
-		if(minix_panicing) {
+		if(kernel_in_panic) {
 			int source, dest;
 			static char mybuffer[sizeof(params_buffer)];
 			char *lead = "echo \\n*** kernel messages:\\n";

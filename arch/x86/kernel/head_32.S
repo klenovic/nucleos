@@ -526,7 +526,7 @@ copr_return:
 coproc_not_available_in_kernel:
 	movl	$NO_NUM, 4(%esp)
 	movl	$0, (%esp)
-	call	minix_panic
+	call	kernel_panic
 
 double_fault:
 	EXCEPTION_ERR_CODE(EXVEC_DOUBLE_FAULT)

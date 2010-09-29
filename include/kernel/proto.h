@@ -39,7 +39,7 @@ void nucleos_shutdown(struct timer *tp);
 
 /* utility.c */
 int kprintf(const char *fmt, ...);
-void minix_panic(char *s, int n);
+void kernel_panic(char *s, int n);
 
 /* proc.c */
 int kipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg);

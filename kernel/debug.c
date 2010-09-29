@@ -29,14 +29,14 @@ check_runqueues_f(char *file, int line)
   register struct proc *xp;
 
   if(!intr_disabled()) {
-	minix_panic("check_runqueues called with interrupts enabled", NO_NUM);
+	kernel_panic("check_runqueues called with interrupts enabled", NO_NUM);
   }
 
   FIXME("check_runqueues being done");
 
 #define MYPANIC(msg) {		\
 	kprintf("check_runqueues:%s:%d: %s\n", file, line, msg); \
-	minix_panic("check_runqueues failed", NO_NUM);	\
+	kernel_panic("check_runqueues failed", NO_NUM);	\
 	}
 
   for (xp = BEG_PROC_ADDR; xp < END_PROC_ADDR; ++xp) {

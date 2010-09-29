@@ -103,7 +103,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	return -EFAULT;
       }
       if(phys_addr == 0)
-	minix_panic("vm_lookup returned zero physical address", NO_NUM);
+	kernel_panic("vm_lookup returned zero physical address", NO_NUM);
       break;
   default:
       if((r=arch_umap(targetpr, offset, count, seg_type, &lin_addr))

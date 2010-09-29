@@ -8,9 +8,9 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* This file contains a collection of miscellaneous procedures:
- *   minix_panic:    abort MINIX due to a fatal error
- *   kprintf:       (from lib/sysutil/kprintf.c)
- *   kputc:         buffered putc used by kernel kprintf
+ *   kernel_panic: abort Nucleos due to a fatal error
+ *   kprintf: (from lib/sysutil/kprintf.c)
+ *   kputc:  buffered putc used by kernel kprintf
  */
 #include <nucleos/unistd.h>
 #include <nucleos/signal.h>
@@ -19,45 +19,27 @@
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
 
-/*===========================================================================*
- *			panic                                        *
- *===========================================================================*/
-void panic(what, mess,nr)
-char *what;
-char *mess;
-int nr;
+void kernel_panic(char *mess, int nr)
 {
-/* This function is for when a library call wants to panic.
- * The library call calls printf() and tries to exit a process,
- * which isn't applicable in the kernel.
- */
-	minix_panic(mess, nr);
-}
+	/* The system has run aground of a fatal kernel error.
+	   Terminate execution. */
+	if (kernel_in_panic++)
+		arch_monitor();
 
-/*===========================================================================*
- *			minix_panic                                        *
- *===========================================================================*/
-void minix_panic(mess,nr)
-char *mess;
-int nr;
-{
-/* The system has run aground of a fatal kernel error. Terminate execution. */
-if (minix_panicing++) {
-	arch_monitor();
-}
+	if (mess != NULL) {
+		kprintf("kernel panic: %s", mess);
 
-  if (mess != NULL) {
-	kprintf("kernel panic: %s", mess);
-	if(nr != NO_NUM)
-		kprintf(" %d", nr);
-	kprintf("\n");
-  }
+		if(nr != NO_NUM)
+			kprintf(" %d", nr);
 
-  kprintf("kernel: ");
-  util_stacktrace();
+		kprintf("\n");
+	}
 
-  /* Abort Nucleos. */
-  nucleos_shutdown(NULL);
+	kprintf("kernel: ");
+	util_stacktrace();
+
+	/* Abort Nucleos. */
+	nucleos_shutdown(NULL);
 }
 
 
@@ -66,34 +48,36 @@ if (minix_panicing++) {
 #define printf kprintf
 #include "../lib/sysutil/kprintf.c"
 
-/*===========================================================================*
- *				kputc				     	     *
- *===========================================================================*/
-void kputc(c)
-int c;					/* character to append */
+void kputc(int c)
 {
-/* Accumulate a single character for a kernel message. Send a notification
- * to the output driver if an END_OF_KMESS is encountered. 
- */
-  if (c != END_OF_KMESS) {
-      if (do_serial_debug) {
-	if(c == '\n')
-      		ser_putc('\r');
-      	ser_putc(c);
-      }
-      kmess.km_buf[kmess.km_next] = c;	/* put normal char in buffer */
-      if (kmess.km_size < sizeof(kmess.km_buf))
-          kmess.km_size += 1;		
-      kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
-  } else {
-      int p, outprocs[] = OUTPUT_PROCS_ARRAY;
-      if(!(minix_panicing || do_serial_debug)) {
-	      for(p = 0; outprocs[p] != ENDPT_NONE; p++) {
-		 if(isokprocn(outprocs[p]) && !isemptyn(outprocs[p])) {
-       	    send_sig(outprocs[p], SIGKMESS);
-		 }
-      	}
-     }
-  }
-  return;
+	/* Accumulate a single character for a kernel message. Send a notification
+	 * to the output driver if an END_OF_KMESS is encountered.
+	 */
+	if (c != END_OF_KMESS) {
+		if (do_serial_debug) {
+			if(c == '\n')
+				ser_putc('\r');
+
+			ser_putc(c);
+		}
+
+		kmess.km_buf[kmess.km_next] = c;	/* put normal char in buffer */
+
+		if (kmess.km_size < sizeof(kmess.km_buf))
+			kmess.km_size += 1;
+
+		kmess.km_next = (kmess.km_next + 1) % KMESS_BUF_SIZE;
+	} else {
+		int p, outprocs[] = OUTPUT_PROCS_ARRAY;
+
+		if(!(kernel_in_panic || do_serial_debug)) {
+			for(p = 0; outprocs[p] != ENDPT_NONE; p++) {
+				if(isokprocn(outprocs[p]) && !isemptyn(outprocs[p])) {
+					send_sig(outprocs[p], SIGKMESS);
+				}
+			}
+		}
+	}
+
+	return;
 }

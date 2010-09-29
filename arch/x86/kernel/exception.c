@@ -99,7 +99,7 @@ void pagefault( struct proc *pr,
 			proc_stacktrace(proc_addr(SYSTEM));
 		}
 		kprintf("pc of pagefault: 0x%lx\n", frame->eip);
-		minix_panic("page fault in system process", pr->p_endpoint);
+		kernel_panic("page fault in system process", pr->p_endpoint);
 
 		return;
 	}
@@ -220,11 +220,11 @@ struct proc *t;
 			  (unsigned) saved_proc->p_reg.pc);
 	  proc_stacktrace(saved_proc);
 
-	  minix_panic("exception in a kernel task", saved_proc->p_endpoint);
+	  kernel_panic("exception in a kernel task", saved_proc->p_endpoint);
   }
   else {
 	  /* in an early stage of boot process we don't have processes yet */
-	  minix_panic("exception in kernel while booting", NO_NUM);
+	  kernel_panic("exception in kernel while booting", NO_NUM);
   }
 }
 

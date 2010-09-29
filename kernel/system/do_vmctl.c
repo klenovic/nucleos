@@ -65,7 +65,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 #if 0
 		if(!RTS_ISSET(target, RTS_VMREQTARGET)) {
 			printf("set stack: %s\n", rp->p_vmrequest.stacktrace);
-			minix_panic("RTS_VMREQTARGET not set for target",
+			kernel_panic("RTS_VMREQTARGET not set for target",
 				NO_NUM);
 		}
 #endif
@@ -120,7 +120,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 			printf("suspended with stack: %s\n",
 				p->p_vmrequest.stacktrace);
 #endif
-			minix_panic("strange request type",
+			kernel_panic("strange request type",
 				p->p_vmrequest.type);
 		}
 
@@ -132,10 +132,10 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		 */
 		lock;
 		if(vm_running) 
-			minix_panic("do_vmctl: paging already enabled", NO_NUM);
+			kernel_panic("do_vmctl: paging already enabled", NO_NUM);
 		vm_init(p);
 		if(!vm_running)
-			minix_panic("do_vmctl: paging enabling failed", NO_NUM);
+			kernel_panic("do_vmctl: paging enabling failed", NO_NUM);
 
 		if (p->syscall_0x80)
 			vmassert(p->p_delivermsg_lin == vir2phys(&p->p_delivermsg));
@@ -148,7 +148,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 			return err;
 		}
 		if(newmap(p, (struct mem_map *) m_ptr->SVMCTL_VALUE) != 0)
-			minix_panic("do_vmctl: newmap failed", NO_NUM);
+			kernel_panic("do_vmctl: newmap failed", NO_NUM);
 		FIXLINMSG(p);
 		vmassert(p->p_delivermsg_lin);
 		unlock;

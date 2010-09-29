@@ -42,7 +42,7 @@ void put_irq_handler( irq_hook_t* hook, int irq, irq_handler_t handler)
   unsigned long bitmap;
 
   if( irq < 0 || irq >= NR_IRQ_VECTORS )
-	minix_panic("invalid call to put_irq_handler", irq);
+	kernel_panic("invalid call to put_irq_handler", irq);
 
   line = &irq_handlers[irq];
 
@@ -58,7 +58,7 @@ void put_irq_handler( irq_hook_t* hook, int irq, irq_handler_t handler)
   	if (!(bitmap & id)) break;
 
   if(id == 0)
-  	minix_panic("Too many handlers for irq", irq);
+  	kernel_panic("Too many handlers for irq", irq);
   
   hook->next = NULL;
   hook->handler = handler;
@@ -86,7 +86,7 @@ void rm_irq_handler( irq_hook_t* hook ) {
   irq_hook_t **line;
 
   if( irq < 0 || irq >= NR_IRQ_VECTORS ) 
-	minix_panic("invalid call to rm_irq_handler", irq);
+	kernel_panic("invalid call to rm_irq_handler", irq);
 
   /* disable the irq.  */
   irq_actids[hook->irq] |= hook->id;

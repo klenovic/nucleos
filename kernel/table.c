@@ -62,7 +62,7 @@ int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
 char params_buffer[512];         /* boot monitor parameters */
-int minix_panicing;
+int kernel_in_panic;
 int locklevel;
 u32_t magictest;
 
@@ -86,10 +86,10 @@ void (*level0_func)(void);
 
 /* Define stack sizes for the kernel tasks included in the system image. */
 #define NO_STACK	0
-#define SMALL_STACK	(1024 * sizeof(char *))
-#define IDL_S	SMALL_STACK	/* 3 intr, 3 temps, 4 db for Intel */
-#define	HRD_S	NO_STACK	/* dummy task, uses kernel stack */
-#define	TSK_S	SMALL_STACK	/* system and clock task */
+#define SMALL_STACK	(1024 * sizeof(char*))
+#define IDL_S		SMALL_STACK	/* 3 intr, 3 temps, 4 db for Intel */
+#define	HRD_S		NO_STACK	/* dummy task, uses kernel stack */
+#define	TSK_S		SMALL_STACK	/* system and clock task */
 
 /* Stack space for all the task stacks.  Declared as (char *) to align it. */
 #define	TOT_STACK_SPACE	(IDL_S + HRD_S + (2 * TSK_S))

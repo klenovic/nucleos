@@ -308,7 +308,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		src_seg = SCP_INFO2SEG(m_ptr->SCP_INFO);
 		dst_seg = D;
 		access = CPF_WRITE;
-	} else minix_panic("Impossible system call nr. ", sys_call_code);
+	} else kernel_panic("Impossible system call nr. ", sys_call_code);
 
 	return safecopy(m_ptr->SCP_FROM_TO, who_e, m_ptr->SCP_GID,
 		src_seg, dst_seg, m_ptr->SCP_BYTES, m_ptr->SCP_OFFSET,

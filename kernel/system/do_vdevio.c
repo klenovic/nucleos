@@ -189,7 +189,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
   return 0;
 
 bad:
-	minix_panic("do_vdevio: unaligned port", port);
+	kernel_panic("do_vdevio: unaligned port", port);
 	return -EPERM;
 }
 

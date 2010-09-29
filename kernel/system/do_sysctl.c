@@ -59,7 +59,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
         return(-EINVAL);
   }
 
-  minix_panic("do_sysctl: can't happen", NO_NUM);
+  kernel_panic("do_sysctl: can't happen", NO_NUM);
 
   return 0;
 }

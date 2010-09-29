@@ -66,17 +66,17 @@
 		intr_disable();									\
 		locklevel++;									\
 		if(d && locklevel == 1) {							\
-			minix_panic("reallock while interrupts disabled first time", __LINE__);	\
+			kernel_panic("reallock while interrupts disabled first time", __LINE__);	\
 		} \
 	} while(0)
 
 #define realunlock									\
 	do {										\
 		if(!intr_disabled()) {							\
-			minix_panic("realunlock while interrupts enabled", __LINE__);	\
+			kernel_panic("realunlock while interrupts enabled", __LINE__);	\
 		}									\
 		if(locklevel < 1) {							\
-			minix_panic("realunlock while locklevel below 1", __LINE__);	\
+			kernel_panic("realunlock while locklevel below 1", __LINE__);	\
 		} locklevel--;								\
 		if(locklevel == 0) {							\
 			intr_enable();							\

@@ -10,15 +10,15 @@
 /* Copyright (c) 2009 Vrije Universiteit, Amsterdam.
  * See the copyright notice in file LICENSE.minix3.
  */
-/* This file contains the main program of MINIX as well as its shutdown code.
+/* This file contains the main program of Nucleos as well as its shutdown code.
  * The routine main() initializes the system and starts the ball rolling by
  * setting up the process table, interrupt vectors, and scheduling each task 
  * to run to initialize itself.
- * The routine shutdown() does the opposite and brings down MINIX. 
+ * The routine shutdown() does the opposite and brings down Nucleos.
  *
  * The entries into this file are:
- *   main:	    	MINIX main program
- *   prepare_shutdown:	prepare to take MINIX down
+ *   main:		Nucleos main program
+ *   prepare_shutdown:	prepare to take Nucleos down
  */
 #include <kernel/kernel.h>
 #include <nucleos/signal.h>
@@ -37,9 +37,6 @@
 /* Prototype declarations for static functions. */
 static void announce(void);
 
-/*===========================================================================*
- *				main                                         *
- *===========================================================================*/
 void main(void)
 {
 /* Start the ball rolling. */
@@ -252,7 +249,7 @@ void main(void)
 	 * enable timer interrupts and clock task on the boot CPU
 	 */
 	if (boot_cpu_init_timer(system_hz)) {
-		minix_panic("FATAL : failed to initialize timer interrupts, "
+		kernel_panic("FATAL : failed to initialize timer interrupts, "
 			    "cannot continue without any clock source!",
 			    NO_NUM);
 	}
@@ -276,9 +273,6 @@ void main(void)
 	restart();
 }
 
-/*===========================================================================*
- *				announce				     *
- *===========================================================================*/
 static void announce(void)
 {
 	/* Display the Nucleos startup banner. */
@@ -286,9 +280,6 @@ static void announce(void)
 		UTS_RELEASE);
 }
 
-/*===========================================================================*
- *				prepare_shutdown			     *
- *===========================================================================*/
 void prepare_shutdown(int how)
 {
 	/* This function prepares to shutdown Nucleos. */
@@ -305,9 +296,6 @@ void prepare_shutdown(int how)
 	set_timer(&shutdown_timer, get_uptime() + system_hz, nucleos_shutdown);
 }
 
-/*===========================================================================*
- *				shutdown 				     *
- *===========================================================================*/
 void nucleos_shutdown(timer_t *tp)
 {
 /* This function is called from prepare_shutdown or stop_sequence to bring

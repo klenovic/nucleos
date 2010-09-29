@@ -144,12 +144,12 @@ void prot_init(void)
 
   /* Click-round kernel. */
   if(kinfo.data_base % CLICK_SIZE)
-	minix_panic("kinfo.data_base not aligned", NO_NUM);
+	kernel_panic("kinfo.data_base not aligned", NO_NUM);
   kinfo.data_size = ((kinfo.data_size+CLICK_SIZE-1)/CLICK_SIZE) * CLICK_SIZE;
 
   /* Click-round kernel. */
   if(kinfo.data_base % CLICK_SIZE)
-	minix_panic("kinfo.data_base not aligned", NO_NUM);
+	kernel_panic("kinfo.data_base not aligned", NO_NUM);
   kinfo.data_size = ((kinfo.data_size+CLICK_SIZE-1)/CLICK_SIZE) * CLICK_SIZE;
 
   /* Build gdt and idt pointers in GDT where the BIOS expects them. */
@@ -361,7 +361,7 @@ for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
      }
      if(fail) {
      	printf("%d/%d checks failed\n", fail, checked);
-     	minix_panic("wrong", fail);
+     	kernel_panic("wrong", fail);
      }
 }
 
@@ -422,7 +422,7 @@ void printseg(char *banner, int iscs, struct proc *pr, u32_t selector)
 	}
 
 	if(desc->granularity & 0x20) {	/* reserved */
-		minix_panic("granularity reserved field set", NO_NUM);
+		kernel_panic("granularity reserved field set", NO_NUM);
 	}
 
 	if(!(desc->access & PRESENT))

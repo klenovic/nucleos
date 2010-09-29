@@ -10,27 +10,19 @@
 /*	printf() - system services printf()		Author: Kees J. Bot
  *								15 Jan 1994
  */
-#define nil 0
+#include <stdarg.h>
 #include <nucleos/kernel.h>
 #include <nucleos/types.h>
-#include <stdarg.h>
 #include <nucleos/stddef.h>
 #include <nucleos/limits.h>
 
 #define isdigit(c)	((unsigned) ((c) - '0') <  (unsigned) 10)
+#define count_kputc(c) do { charcount++; kputc(c); } while(0)
 
-#if !__STDC__
-/* Classic C stuff, ignore. */
-void kputc();
-int printf(fmt) char *fmt;
-#else
 /* Printf() uses kputc() to print characters. */
 void kputc(int c);
 
-#define count_kputc(c) do { charcount++; kputc(c); } while(0)
-
 int printf(const char *fmt, ...)
-#endif
 {
 	int c, charcount = 0;
 	enum { LEFT, RIGHT } adjust;

@@ -52,7 +52,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
   }
 
   if(!(pr = endpoint_lookup(who_e)))
-	minix_panic("do_vcopy: caller doesn't exist", who_e);
+	kernel_panic("do_vcopy: caller doesn't exist", who_e);
 
   /* Check if request vector size is ok. */
   nr_req = (unsigned) m_ptr->VCP_VEC_SIZE;

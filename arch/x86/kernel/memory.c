@@ -52,7 +52,7 @@ void vm_init(struct proc *newptproc)
 {
 	int i;
 	if(vm_running)
-		minix_panic("vm_init: vm_running", NO_NUM);
+		kernel_panic("vm_init: vm_running", NO_NUM);
 	vm_set_cr3(newptproc);
 	level0(vm_enable_paging);
 	vm_running = 1;
@@ -202,7 +202,7 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 				return -EFAULT_DST;
 			}
 
-			minix_panic("lin_lin_copy fault out of range", NO_NUM);
+			kernel_panic("lin_lin_copy fault out of range", NO_NUM);
 
 			/* Not reached. */
 			return -EFAULT;
@@ -236,7 +236,7 @@ phys_bytes addr;
 
 	if((r=lin_lin_copy(NULL, addr, 
 		proc_addr(SYSTEM), vir2phys(&v), sizeof(v))) != 0) {
-		minix_panic("lin_lin_copy for phys_get32 failed", r);
+		kernel_panic("lin_lin_copy for phys_get32 failed", r);
 	}
 
 	return v;
@@ -390,7 +390,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
   phys_bytes seg_base;
 
   if(seg != T && seg != D && seg != S)
-	minix_panic("umap_local: wrong seg", seg);
+	kernel_panic("umap_local: wrong seg", seg);
 
   if (bytes <= 0) return( (phys_bytes) 0);
   if (vir_addr + bytes <= vir_addr) return 0;   /* overflow */
@@ -438,7 +438,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
 				phys = 0;
 			}
 			if(phys == 0)
-				minix_panic("vm_lookup returned phys", phys);
+				kernel_panic("vm_lookup returned phys", phys);
 		}
 	}
 
@@ -643,7 +643,7 @@ int delivermsg(struct proc *rp)
 		printf("vir: 0x%lx lin was: 0x%lx umap now: 0x%lx\n",
 		rp->p_delivermsg_vir, rp->p_delivermsg_lin,
 		umap_local(rp, D, rp->p_delivermsg_vir, sizeof(kipc_msg_t)));
-		minix_panic("that's wrong", NO_NUM);
+		kernel_panic("that's wrong", NO_NUM);
 	}
 #endif
 
@@ -904,7 +904,7 @@ int vmcheck;			/* if nonzero, can return -VMSUSPEND */
 		int wr;
 		phys_bytes lin;
 		if(r != -EFAULT_SRC && r != -EFAULT_DST)
-			minix_panic("lin_lin_copy failed", r);
+			kernel_panic("lin_lin_copy failed", r);
 		if(!vmcheck) {
 	  		return r;
 		}
@@ -920,7 +920,7 @@ int vmcheck;			/* if nonzero, can return -VMSUSPEND */
 			target = procs[_DST_];
 			wr = 1;
 		} else {
-			minix_panic("r strange", r);
+			kernel_panic("r strange", r);
 		}
 
 #if 0

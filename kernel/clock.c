@@ -84,7 +84,7 @@ void clock_task()
 	result = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 
 	if(result != 0)
-		minix_panic("kipc_module_call type KIPC_RECEIVE failed", result);
+		kernel_panic("kipc_module_call type KIPC_RECEIVE failed", result);
 
 	/* Handle the request. Only clock ticks are expected. */
 	if (is_notify(m.m_type)) {
@@ -129,7 +129,7 @@ int bsp_timer_int_handler(void)
 
 	IDLE_STOP;
 
-	if(minix_panicing)
+	if(kernel_in_panic)
 		return 0;
 
 	/* Get number of ticks and update realtime. */

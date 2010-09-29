@@ -57,7 +57,7 @@ struct proc *p;
 			return -ESRCH;
 		pagefaults = rp->p_nextpagefault;
 		if(!RTS_ISSET(rp, RTS_PAGEFAULT))
-			minix_panic("non-PAGEFAULT process on pagefault chain",
+			kernel_panic("non-PAGEFAULT process on pagefault chain",
 				rp->p_endpoint);
                 m_ptr->SVMCTL_PF_WHO = rp->p_endpoint;
                 m_ptr->SVMCTL_PF_I386_CR2 = rp->p_pagefault.pf_virtual;

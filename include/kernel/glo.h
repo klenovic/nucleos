@@ -54,7 +54,7 @@ extern int who_p;			/* message source proc */
 extern int sys_call_code;		/* kernel call number in SYSTEM */
 extern time_t boottime;
 extern char params_buffer[512];		/* boot monitor parameters */
-extern int minix_panicing;
+extern int kernel_in_panic;		/* true if panic is in progress */
 extern int locklevel;
 #define MAGICTEST 0xC0FFEE23
 extern u32_t magictest;			/* global magic number */

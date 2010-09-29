@@ -203,7 +203,7 @@ check_misc_flags:
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 			if (proc_ptr->p_misc_flags & MF_SC_ACTIVE)
-				minix_panic("MF_SC_ACTIVE and MF_SC_DEFER set",
+				kernel_panic("MF_SC_ACTIVE and MF_SC_DEFER set",
 					NO_NUM);
 #endif
 
@@ -494,7 +494,7 @@ static int mini_receive(struct proc *caller_ptr, int src_e, kipc_msg_t *m_ptr, u
 				vmassert(src_e == ENDPT_ANY || hisep == src_e);
 
 				if ((r=QueueMess(hisep, vir2phys(&m), caller_ptr)) != 0) {
-					minix_panic("mini_receive: local QueueMess failed", NO_NUM);
+					kernel_panic("mini_receive: local QueueMess failed", NO_NUM);
 				}
 
 				return(0);	/* report success */
@@ -601,7 +601,7 @@ int mini_notify(struct proc *caller_ptr, endpoint_t dst_e)
 		vmassert(!(dst_ptr->p_misc_flags & MF_DELIVERMSG));
 
 		if((r=QueueMess(caller_ptr->p_endpoint, vir2phys(&m), dst_ptr)) != 0)
-			minix_panic("mini_notify: local QueueMess failed", NO_NUM);
+			kernel_panic("mini_notify: local QueueMess failed", NO_NUM);
 
 		RTS_UNSET(dst_ptr, RTS_RECEIVING);
 		return(0);
@@ -991,11 +991,11 @@ void enqueue(struct proc *rp)
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	if(!intr_disabled()) {
-		minix_panic("enqueue with interrupts enabled", NO_NUM);
+		kernel_panic("enqueue with interrupts enabled", NO_NUM);
 	}
 
 	if (rp->p_ready)
-		minix_panic("enqueue already ready process", NO_NUM);
+		kernel_panic("enqueue already ready process", NO_NUM);
 #endif
 
 	/* Determine where to insert to process. */
@@ -1050,10 +1050,10 @@ static void enqueue_head(struct proc *rp)
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	if(!intr_disabled())
-		minix_panic("enqueue with interrupts enabled", NO_NUM);
+		kernel_panic("enqueue with interrupts enabled", NO_NUM);
 
 	if (rp->p_ready)
-		minix_panic("enqueue already ready process", NO_NUM);
+		kernel_panic("enqueue already ready process", NO_NUM);
 #endif
 
 	/*
@@ -1099,16 +1099,16 @@ void dequeue(struct proc *rp)
 	/* Side-effect for kernel: check if the task's stack still is ok? */
 	if (iskernelp(rp)) {
 		if (*priv(rp)->s_stack_guard != STACK_GUARD)
-			minix_panic("stack overrun by task", proc_nr(rp));
+			kernel_panic("stack overrun by task", proc_nr(rp));
 	}
 #endif
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 	if (!intr_disabled())
-		minix_panic("dequeue with interrupts enabled", NO_NUM);
+		kernel_panic("dequeue with interrupts enabled", NO_NUM);
 
 	if (! rp->p_ready)
-		minix_panic("dequeue() already unready process", NO_NUM);
+		kernel_panic("dequeue() already unready process", NO_NUM);
 #endif
 
 	/* Now make sure that the process is not in its ready queue. Remove the 
@@ -1323,7 +1323,7 @@ int *p, fatalflag;
 		ok = 1;
 
 	if(!ok && fatalflag)
-		minix_panic("invalid endpoint ", e);
+		kernel_panic("invalid endpoint ", e);
 
 	return ok;
 }
@@ -1370,7 +1370,7 @@ int kipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 
 #ifdef CONFIG_DEBUG_KERNEL_SCHED_CHECK
 		if (caller_ptr->p_misc_flags & MF_SC_ACTIVE)
-			minix_panic("MF_SC_ACTIVE already set", NO_NUM);
+			kernel_panic("MF_SC_ACTIVE already set", NO_NUM);
 #endif
 
 		/* Set a flag to allow reliable tracing of leaving the system call. */
@@ -1381,7 +1381,7 @@ int kipc_call(u8 call_type, u32 flags, endpoint_t endpt, void *msg)
 	if(caller_ptr->p_misc_flags & MF_DELIVERMSG) {
 		kprintf("%s: MF_DELIVERMSG on for %s / %d\n", __FUNCTION__, caller_ptr->p_name,
 								     caller_ptr->p_endpoint);
-		minix_panic("MF_DELIVERMSG on", NO_NUM);
+		kernel_panic("MF_DELIVERMSG on", NO_NUM);
 	}
 #endif
 
