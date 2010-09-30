@@ -34,7 +34,6 @@ CC =	exec cc
 CFLAGS = -I$i $(CPROFILE)
 LDFLAGS = -i 
 LIBS =  -lsys 
-#-lutils -ltimers
 
 OBJ = lance.o
 
