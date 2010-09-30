@@ -50,7 +50,6 @@ static void set_cr3(void);
 
 void vm_init(struct proc *newptproc)
 {
-	int i;
 	if(vm_running)
 		kernel_panic("vm_init: vm_running", NO_NUM);
 	vm_set_cr3(newptproc);
@@ -87,7 +86,7 @@ void vm_init(struct proc *newptproc)
 	} else {						\
 		int fp;						\
 		int mustinvl;					\
-		u32_t pdeval, *pdevalptr, mask;			\
+		u32_t pdeval, mask;				\
 		phys_bytes offset;				\
 		vmassert(psok);					\
 		if(PROC) {					\
@@ -156,7 +155,6 @@ int lin_lin_copy(struct proc *srcproc, vir_bytes srclinaddr,
 	struct proc *dstproc, vir_bytes dstlinaddr, vir_bytes bytes)
 {
 	u32_t addr;
-	int o1, o2;
 	int procslot;
 	int firstloop = 1;
 
@@ -423,7 +421,7 @@ int seg;                        /* T, D, or S segment */
 vir_bytes vir_addr;             /* virtual address in bytes within the seg */
 vir_bytes bytes;                /* # of bytes to be copied */
 {
-	vir_bytes linear;
+	vir_bytes linear = 0;
 	u32_t phys = 0;
 
 	if(seg == MEM_GRANT) {
@@ -542,7 +540,8 @@ int vm_lookup(struct proc *proc, vir_bytes virtual, vir_bytes *physical, u32_t *
 int vm_contiguous(struct proc *targetproc, u32_t vir_buf, size_t bytes)
 {
 	int first = 1, r, boundaries = 0;
-	u32_t prev_phys, po;
+	u32_t prev_phys = 0;
+	u32_t po;
 	u32_t prev_vir;
 
 	vmassert(targetproc);
@@ -623,6 +622,8 @@ int vm_suspend(struct proc *caller, struct proc *target,
 	if(!(caller->p_vmrequest.nextrequestor = vmrequest))
 		mini_notify(proc_addr(SYSTEM), VM_PROC_NR);
 	vmrequest = caller;
+
+	return 0;
 }
 
 /*===========================================================================*
@@ -696,7 +697,7 @@ char *flagstr(u32_t e, int dir)
 
 void vm_pt_print(u32_t *pagetable, u32_t v)
 {
-	int pte, l = 0;
+	int pte;
 	int col = 0;
 
 	vmassert(!((u32_t) pagetable % I386_PAGE_SIZE));
@@ -758,7 +759,6 @@ u32_t read_cr3(void)
  *===========================================================================*/
 int vm_phys_memset(phys_bytes ph, u8_t c, phys_bytes bytes)
 {
-	char *v;
 	u32_t p;
 
 	p = c | (c << 8) | (c << 16) | (c << 24);
@@ -879,14 +879,11 @@ int vmcheck;			/* if nonzero, can return -VMSUSPEND */
   }
 
   if(vm_running) {
-	int r;
 	struct proc *caller;
 
 	caller = proc_addr(who_p);
 
 	if(RTS_ISSET(caller, RTS_VMREQUEST)) {
-		struct proc *target;
-		int pn;
 		vmassert(caller->p_vmrequest.vmresult != -VMSUSPEND);
 		RTS_LOCK_UNSET(caller, RTS_VMREQUEST);
 		if(caller->p_vmrequest.vmresult != 0) {
@@ -900,9 +897,10 @@ int vmcheck;			/* if nonzero, can return -VMSUSPEND */
 
 	if((r=lin_lin_copy(procs[_SRC_], phys_addr[_SRC_],
 		procs[_DST_], phys_addr[_DST_], bytes)) != 0) {
-		struct proc *target;
-		int wr;
-		phys_bytes lin;
+		struct proc *target = 0;
+		int wr = 0;
+		phys_bytes lin = 0;
+
 		if(r != -EFAULT_SRC && r != -EFAULT_DST)
 			kernel_panic("lin_lin_copy failed", r);
 		if(!vmcheck) {
@@ -1007,6 +1005,8 @@ int arch_pre_exec(struct proc *pr, u32_t ip, u32_t sp)
 		sizeof(pr->p_seg.p_ldt[0]) * (LDT_SIZE - EXTRA_LDT_INDEX));
 	pr->p_reg.pc = ip;
 	pr->p_reg.sp = sp;
+
+	return 0;
 }
 
 /*===========================================================================*
@@ -1036,7 +1036,7 @@ void i386_freepde(int pde)
 	freepdes[nfreepdes++] = pde;
 }
 
-arch_phys_map(int index, phys_bytes *addr, phys_bytes *len, int *flags)
+int arch_phys_map(int index, phys_bytes *addr, phys_bytes *len, int *flags)
 {
 #ifdef CONFIG_X86_LOCAL_APIC
 	/* map the local APIC if enabled */
@@ -1053,7 +1053,7 @@ arch_phys_map(int index, phys_bytes *addr, phys_bytes *len, int *flags)
 #endif
 }
 
-arch_phys_map_reply(int index, vir_bytes addr)
+int arch_phys_map_reply(int index, vir_bytes addr)
 {
 #ifdef CONFIG_X86_LOCAL_APIC
 	/* if local APIC is enabled */
