@@ -31,12 +31,11 @@
 
 #include <asm/servers/vm/memory.h>
 
-/*===========================================================================*
- *				arch_map2vir				     *
- *===========================================================================*/
 vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
 {
+#if SANITYCHECKS
 	vir_bytes textstart = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);
+#endif
 	vir_bytes datastart = CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys);
 
 	/* Could be a text address. */
@@ -45,14 +44,10 @@ vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
 	return addr - datastart;
 }
 
-/*===========================================================================*
- *				arch_map2str				     *
- *===========================================================================*/
 char *arch_map2str(struct vmproc *vmp, vir_bytes addr)
 {
 	static char bufstr[100];
 	vir_bytes textstart = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);
-	vir_bytes textend = textstart + CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_len);
 	vir_bytes datastart = CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys);
 
 	if(addr < textstart) {
@@ -66,9 +61,6 @@ char *arch_map2str(struct vmproc *vmp, vir_bytes addr)
 	return bufstr;
 }
 
-/*===========================================================================*
- *				arch_addrok				     *
- *===========================================================================*/
 vir_bytes arch_addrok(struct vmproc *vmp, vir_bytes addr)
 {
 	vir_bytes textstart = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);
@@ -85,9 +77,6 @@ vir_bytes arch_addrok(struct vmproc *vmp, vir_bytes addr)
 	return 0;
 }
 
-/*===========================================================================*
- *				arch_vir2map				     *
- *===========================================================================*/
 vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr)
 {
 	vir_bytes bottom = CLICK2ABS(vmp->vm_arch.vm_seg[D].mem_phys);
@@ -95,9 +84,6 @@ vir_bytes arch_vir2map(struct vmproc *vmp, vir_bytes addr)
 	return addr + bottom;
 }
 
-/*===========================================================================*
- *				arch_vir2map_text			     *
- *===========================================================================*/
 vir_bytes arch_vir2map_text(struct vmproc *vmp, vir_bytes addr)
 {
 	vir_bytes bottom = CLICK2ABS(vmp->vm_arch.vm_seg[T].mem_phys);

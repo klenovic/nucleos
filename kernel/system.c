@@ -64,10 +64,12 @@
 int (*call_vec[NR_SYS_CALLS])(kipc_msg_t *m_ptr);
 char *callnames[NR_SYS_CALLS];
 
-#define map(call_nr, handler) \
-    {extern int dummy[NR_SYS_CALLS>(unsigned)(call_nr-KERNEL_CALL) ? 1:-1];} \
-    callnames[(call_nr-KERNEL_CALL)] = #call_nr;	\
-    call_vec[(call_nr-KERNEL_CALL)] = (handler)  
+#define map(call_nr, handler)									\
+({												\
+	extern int dummy[NR_SYS_CALLS>(unsigned)(call_nr-KERNEL_CALL) ? 1:-1] __maybe_unused;	\
+	callnames[(call_nr-KERNEL_CALL)] = #call_nr;						\
+	call_vec[(call_nr-KERNEL_CALL)] = (handler);						\
+})
 
 static void initialize(void);
 static struct proc *vmrestart_check(kipc_msg_t *);

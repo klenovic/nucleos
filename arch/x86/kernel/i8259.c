@@ -45,8 +45,6 @@ int intr_init(int mine, int auto_eoi)
  * use the BIOS locations instead.  The flag "mine" is set if the 8259s are
  * to be programmed for Nucleos, or to be reset to what the BIOS expects.
  */
-	int i;
-
 	if (!intr_disabled())
 		intr_disable();
 
