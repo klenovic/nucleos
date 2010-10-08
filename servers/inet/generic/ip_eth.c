@@ -69,7 +69,7 @@ ip_port_t *ip_port;
 		0 /* no select_res */);
 	if (ip_port->ip_dl.dl_eth.de_fd < 0)
 	{
-		DBLOCK(1, printf("ip.c: unable to open eth port\n"));
+		DBLOCK(1, printk("ip.c: unable to open eth port\n"));
 		return -1;
 	}
 	ip_port->ip_dl.dl_eth.de_state= IES_EMPTY;
@@ -101,7 +101,7 @@ ip_port_t *ip_port;
 			ip_port->ip_dl.dl_eth.de_flags |= IEF_SUSPEND;
 		if (result<0)
 		{
-			DBLOCK(1, printf("eth_ioctl(..,0x%lx)=%d\n",
+			DBLOCK(1, printk("eth_ioctl(..,0x%lx)=%d\n",
 				(unsigned long)NWIOSETHOPT, result));
 			return;
 		}
@@ -114,7 +114,7 @@ ip_port_t *ip_port;
 			ipeth_arp_reply);
 		if (result != 0)
 		{
-			printf("ipeth_main: arp_set_cb failed: %d\n",
+			printk("ipeth_main: arp_set_cb failed: %d\n",
 				result);
 			return;
 		}
@@ -199,7 +199,7 @@ int for_ioctl;
 		assert (data);
 		return data;
 	default:
-		printf(
+		printk(
 		"get_eth_data(%d, 0x%d, 0x%d) called but ip_state=0x%x\n",
 			fd, offset, count, ip_port->ip_dl.dl_eth.de_state);
 		break;
@@ -227,7 +227,7 @@ int for_ioctl;
 			result= (int)offset;
 			if (result<0)
 			{
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 				"ip.c: put_eth_data(..,%d,..)\n", result));
 				return 0;
 			}
@@ -249,7 +249,7 @@ int for_ioctl;
 		ip_eth_arrived(port, data, bf_bufsize(data));
 		return 0;
 	}
-	printf("ip_port->ip_dl.dl_eth.de_state= 0x%x",
+	printk("ip_port->ip_dl.dl_eth.de_state= 0x%x",
 		ip_port->ip_dl.dl_eth.de_state);
 	ip_panic (( "strange status" ));
 }

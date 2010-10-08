@@ -599,7 +599,7 @@ endpoint_t driver_e;
 
     /* Issue request */
     if ((r = kipc_module_call(KIPC_SENDREC, 0, fs_e, &m)) != 0) {
-	  printf("%s:%d VFS req_newdriver: error sending message %d to %d\n",
+	  printk("%s:%d VFS req_newdriver: error sending message %d to %d\n",
 		 __FILE__, __LINE__, r, fs_e);
 	util_stacktrace();
 	  return(r);
@@ -1039,7 +1039,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
   for (;;) {
       /* Do the actual send, receive */
       if (0 != (r=kipc_module_call(KIPC_SENDREC, 0, fs_e, reqm))) {
-		printf("VFS:fs_sendrec:%s:%d: error sending message. "
+		printk("VFS:fs_sendrec:%s:%d: error sending message. "
 		       "FS_e: %d req_nr: %d err: %d\n", file, line, fs_e,
 		       reqm->m_type, r);
 	  util_stacktrace();
@@ -1090,7 +1090,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
           /* Wait for a new driver. */
           for (;;) {
               new_driver_e = 0;
-              printf("VFSdead_driver: waiting for new driver\n");
+              printk("VFSdead_driver: waiting for new driver\n");
               r = kipc_module_call(KIPC_RECEIVE, 0, RS_PROC_NR, &m);
               if (r != 0) {
                   panic(__FILE__, "VFSdead_driver: unable to receive from RS", 
@@ -1102,7 +1102,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
                           m.dev_style, m.m_force);
                   if (m.ctl_req == DEV_MAP && r == 0) {
                       new_driver_e = m.driver_nr;
-                      printf("VFSdead_driver: new driver endpoint: %d\n",
+                      printk("VFSdead_driver: new driver endpoint: %d\n",
                               new_driver_e);
                   }
               }
@@ -1124,7 +1124,7 @@ static int fs_sendrec_f(char *file, int line, endpoint_t fs_e, kipc_msg_t *reqm)
           continue;
       }
 
-       printf("fs_sendrec: unhandled error %d sending to %d\n", r, fs_e);
+       printk("fs_sendrec: unhandled error %d sending to %d\n", r, fs_e);
        panic(__FILE__, "fs_sendrec: unhandled error", NO_NUM);
   }
 #endif

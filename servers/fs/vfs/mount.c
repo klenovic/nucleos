@@ -89,7 +89,7 @@ int do_mount()
 
   /* Sanity check on process number. */
   if(fs_e <= 0) {
-	printf("VFS: warning: got process number %d for mount call.\n", fs_e);
+	printk("VFS: warning: got process number %d for mount call.\n", fs_e);
 	return -EINVAL;
   }
 
@@ -239,7 +239,7 @@ static int mount_fs(endpoint_t fs_e)
   /* Get driver process' endpoint */  
   dp = &dmap[(dev >> MAJOR) & BYTE];
   if (dp->dmap_driver == ENDPT_NONE) {
-	  printf("VFS: no driver for dev %x\n", dev);
+	  printk("VFS: no driver for dev %x\n", dev);
         return(-EINVAL);
   }
 
@@ -391,7 +391,7 @@ dev_t dev;
 	panic(__FILE__, "unmount: strange fs endpoint", vmp->m_fs_e);
 
   if ((r = req_unmount(vmp->m_fs_e)) != 0)              /* Not recoverable. */
-	printf("VFS: ignoring failed umount attempt (%d)\n", r);
+	printk("VFS: ignoring failed umount attempt (%d)\n", r);
   
   vmp->m_root_node->v_ref_count = 0;
   vmp->m_root_node->v_fs_count = 0;
@@ -407,17 +407,17 @@ dev_t dev;
           /* Get the driver endpoint of the block spec device */
           dp = &dmap[(dev >> MAJOR) & BYTE];
           if (dp->dmap_driver == ENDPT_NONE) {
-			printf("VFS: driver not found for device %d\n", dev);
+			printk("VFS: driver not found for device %d\n", dev);
               continue;
           }
 
-		printf("VFS: umount moving block spec %d to root FS\n", dev);
+		printk("VFS: umount moving block spec %d to root FS\n", dev);
           vp->v_bfs_e = ROOT_FS_E;
 
 		  /* Send the (potentially new) driver endpoint */
 		r = req_newdriver(vp->v_bfs_e, vp->v_sdev, dp->dmap_driver);
 		if (r != 0) 
-			printf("VFS: error sending driver endpoint for"
+			printk("VFS: error sending driver endpoint for"
 				" moved block spec\n");
 		  
       }
@@ -439,7 +439,7 @@ static dev_t name_to_dev()
   
   /* Request lookup */
   if ((vp = eat_path(PATH_NOFLAGS)) == NIL_VNODE) {
-	printf("VFS: name_to_dev: lookup of '%s' failed\n", user_fullpath);
+	printk("VFS: name_to_dev: lookup of '%s' failed\n", user_fullpath);
 	return(NO_DEV);
   }
 

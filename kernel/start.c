@@ -101,7 +101,7 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 
 	/* sanity check */
 	if(!value || system_hz < 2 || system_hz > 50000) {
-		kprintf("Wrong value of HZ=0x%x, using default HZ=0x%x\n", system_hz, HZ);
+		printk("Wrong value of HZ=0x%x, using default HZ=0x%x\n", system_hz, HZ);
 		system_hz = HZ;
 	}
 

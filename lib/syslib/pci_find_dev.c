@@ -38,14 +38,14 @@ int *devindp;
 	if (m.m_type == 1)
 	{
 		*devindp= m.m_data1;
-		printf("pci_find_dev: got device %d for %d.%d.%d\n",
+		printk("pci_find_dev: got device %d for %d.%d.%d\n",
 			*devindp, bus, dev, func);
 		return 1;
 	}
 	if (m.m_type != 0)
 		panic("syslib/" __FILE__, "pci_find_dev: got bad reply from PCI", m.m_type);
 
-	printf("pci_find_dev: got nothing\n");
+	printk("pci_find_dev: got nothing\n");
 	return 0;
 }
 

@@ -118,12 +118,12 @@ size_t size;                    /* the size to grow */
   /* Call original sbrk() and see if we observe the same effect. */
   addr = (void*)sbrk(size);
   if(_rs_startbrksize != addr) {
-      printf("Unable to synch rs_startup_sbrk() and sbrk(): addr 0x%x!=0x%x\n",
+      printk("Unable to synch rs_startup_sbrk() and sbrk(): addr 0x%x!=0x%x\n",
           (int) _rs_startbrksize, (int) addr);
       return( (char *) -1);
   }
   if(_rs_endbrksize != __curbrk) {
-      printf("Unable to synch rs_startup_sbrk() and sbrk(): size 0x%x!=0x%x\n",
+      printk("Unable to synch rs_startup_sbrk() and sbrk(): size 0x%x!=0x%x\n",
          (int) _rs_endbrksize, (int) __curbrk);
       return( (char *) -1);
   }

@@ -78,7 +78,7 @@ int count;
 	int i;
 
 #if 0
-	printf("random_update: got %d samples for source %d\n", count, source);
+	printk("random_update: got %d samples for source %d\n", count, source);
 #endif
 	if (source < 0 || source >= RANDOM_SOURCES)
 		panic("memory", "random_update: bad source", source);
@@ -165,13 +165,13 @@ unsigned long sample;
 	if (min < 2)
 	{
 #if 0
-		printf("ignoring sample '%u' from source %d\n",
+		printk("ignoring sample '%u' from source %d\n",
 			sample, source);
 #endif
 		return;
 	}
 #if 0
-	printf("accepting sample '%u' from source %d\n", sample, source);
+	printk("accepting sample '%u' from source %d\n", sample, source);
 #endif
 
 	pool_nr= pool_ind[source];

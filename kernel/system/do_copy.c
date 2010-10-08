@@ -49,7 +49,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	if (first)
 	{
 		first= 0;
-		kprintf(
+		printk(
 "do_copy: got request from %d (source %d, seg %d, destination %d, seg %d)\n",
 			m_ptr->m_source,
 			m_ptr->CP_SRC_ENDPT,
@@ -79,7 +79,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	vir_addr[i].proc_nr_e = m_ptr->m_source;
       if (vir_addr[i].segment != PHYS_SEG) {
 	if(! isokendpt(vir_addr[i].proc_nr_e, &p)) {
-	  kprintf("do_copy: %d: seg 0x%x, %d not ok endpoint\n",
+	  printk("do_copy: %d: seg 0x%x, %d not ok endpoint\n",
 		i, vir_addr[i].segment, vir_addr[i].proc_nr_e);
           return(-EINVAL); 
         }

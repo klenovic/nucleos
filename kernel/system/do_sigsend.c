@@ -130,8 +130,8 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
   if(!RTS_ISSET(rp, RTS_PROC_STOP)) {
 	struct proc *caller;
 	caller = proc_addr(who_p);
-	kprintf("system: warning: sigsend a running process\n");
-	kprintf("caller stack: ");
+	printk("system: warning: sigsend a running process\n");
+	printk("caller stack: ");
 	proc_stacktrace(caller);
   }
 

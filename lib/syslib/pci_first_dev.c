@@ -35,7 +35,7 @@ u16_t *didp;
 		*vidp= m.m_data2;
 		*didp= m.m_data3;
 #if DEBUG
-		printf("pci_first_dev: got device %d, %04x/%04x\n", 
+		printk("pci_first_dev: got device %d, %04x/%04x\n", 
 			*devindp, *vidp, *didp);
 #endif
 		return 1;
@@ -44,7 +44,7 @@ u16_t *didp;
 		panic("syslib/" __FILE__, "pci_first_dev: got bad reply from PCI", m.m_type);
 
 #if DEBUG
-	printf("pci_first_dev: got nothing\n");
+	printk("pci_first_dev: got nothing\n");
 #endif
 	return 0;
 }

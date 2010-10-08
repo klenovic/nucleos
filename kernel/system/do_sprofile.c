@@ -49,7 +49,7 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 	 * Turn on profiling.
 	 */
 	if (sprofiling) {
-		kprintf("SYSTEM: start s-profiling: already started\n");
+		printk("SYSTEM: start s-profiling: already started\n");
 		return -EBUSY;
 	}
 
@@ -83,7 +83,7 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 	 * Stop CMOS timer.  Copy info struct to user process.
 	 */
 	if (!sprofiling) {
-		kprintf("SYSTEM: stop s-profiling: not started\n");
+		printk("SYSTEM: stop s-profiling: not started\n");
 		return -EBUSY;
 	}
 

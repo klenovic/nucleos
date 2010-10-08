@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 					break;
 				}
 				case CLOCK:
-					printf("dp8390: notify from CLOCK\n");
+					printk("dp8390: notify from CLOCK\n");
 					break;
 				default:
 					panic("", "dp8390: illegal notify from",
@@ -323,45 +323,45 @@ void dp8390_dump()
 	dpeth_t *dep;
 	int i, isr;
 
-	printf("\n");
+	printk("\n");
 	for (i= 0, dep = &de_table[0]; i<DE_PORT_NR; i++, dep++)
 	{
 #if XXX
 		if (dep->de_mode == DEM_DISABLED)
-			printf("dp8390 port %d is disabled\n", i);
+			printk("dp8390 port %d is disabled\n", i);
 		else if (dep->de_mode == DEM_SINK)
-			printf("dp8390 port %d is in sink mode\n", i);
+			printk("dp8390 port %d is in sink mode\n", i);
 #endif
 
 		if (dep->de_mode != DEM_ENABLED)
 			continue;
 
-		printf("dp8390 statistics of port %d:\n", i);
+		printk("dp8390 statistics of port %d:\n", i);
 
-		printf("recvErr    :%8ld\t", dep->de_stat.ets_recvErr);
-		printf("sendErr    :%8ld\t", dep->de_stat.ets_sendErr);
-		printf("OVW        :%8ld\n", dep->de_stat.ets_OVW);
+		printk("recvErr    :%8ld\t", dep->de_stat.ets_recvErr);
+		printk("sendErr    :%8ld\t", dep->de_stat.ets_sendErr);
+		printk("OVW        :%8ld\n", dep->de_stat.ets_OVW);
 
-		printf("CRCerr     :%8ld\t", dep->de_stat.ets_CRCerr);
-		printf("frameAll   :%8ld\t", dep->de_stat.ets_frameAll);
-		printf("missedP    :%8ld\n", dep->de_stat.ets_missedP);
+		printk("CRCerr     :%8ld\t", dep->de_stat.ets_CRCerr);
+		printk("frameAll   :%8ld\t", dep->de_stat.ets_frameAll);
+		printk("missedP    :%8ld\n", dep->de_stat.ets_missedP);
 
-		printf("packetR    :%8ld\t", dep->de_stat.ets_packetR);
-		printf("packetT    :%8ld\t", dep->de_stat.ets_packetT);
-		printf("transDef   :%8ld\n", dep->de_stat.ets_transDef);
+		printk("packetR    :%8ld\t", dep->de_stat.ets_packetR);
+		printk("packetT    :%8ld\t", dep->de_stat.ets_packetT);
+		printk("transDef   :%8ld\n", dep->de_stat.ets_transDef);
 
-		printf("collision  :%8ld\t", dep->de_stat.ets_collision);
-		printf("transAb    :%8ld\t", dep->de_stat.ets_transAb);
-		printf("carrSense  :%8ld\n", dep->de_stat.ets_carrSense);
+		printk("collision  :%8ld\t", dep->de_stat.ets_collision);
+		printk("transAb    :%8ld\t", dep->de_stat.ets_transAb);
+		printk("carrSense  :%8ld\n", dep->de_stat.ets_carrSense);
 
-		printf("fifoUnder  :%8ld\t", dep->de_stat.ets_fifoUnder);
-		printf("fifoOver   :%8ld\t", dep->de_stat.ets_fifoOver);
-		printf("CDheartbeat:%8ld\n", dep->de_stat.ets_CDheartbeat);
+		printk("fifoUnder  :%8ld\t", dep->de_stat.ets_fifoUnder);
+		printk("fifoOver   :%8ld\t", dep->de_stat.ets_fifoOver);
+		printk("CDheartbeat:%8ld\n", dep->de_stat.ets_CDheartbeat);
 
-		printf("OWC        :%8ld\t", dep->de_stat.ets_OWC);
+		printk("OWC        :%8ld\t", dep->de_stat.ets_OWC);
 
 		isr= inb_reg0(dep, DP_ISR);
-		printf("dp_isr = 0x%x + 0x%x, de_flags = 0x%x\n", isr,
+		printk("dp_isr = 0x%x + 0x%x, de_flags = 0x%x\n", isr,
 					inb_reg0(dep, DP_ISR), dep->de_flags);
 	}
 }
@@ -423,7 +423,7 @@ static void pci_conf()
 		{
 			if (!dep->de_pci)
 			{
-				printf("pci: no pci for port %d\n", i);
+				printk("pci: no pci for port %d\n", i);
 				continue;
 			}
 			if (((dep->de_pcibus | dep->de_pcidev |
@@ -1004,9 +1004,9 @@ dpeth_t *dep;
 
 	if (debug)
 	{
-		printf("%s: Ethernet address ", dep->de_name);
+		printk("%s: Ethernet address ", dep->de_name);
 		for (i= 0; i < 6; i++)
-			printf("%x%c", dep->de_address.ea_addr[i],
+			printk("%x%c", dep->de_address.ea_addr[i],
 							i < 5 ? ':' : '\n');
 	}
 
@@ -1227,7 +1227,7 @@ dpeth_t *dep;
 			if (isr & ISR_TXE)
 			{
 #if DEBUG
- { printf("%s: got send Error\n", dep->de_name); }
+ { printk("%s: got send Error\n", dep->de_name); }
 #endif
 				dep->de_stat.ets_sendErr++;
 			}
@@ -1252,13 +1252,13 @@ dpeth_t *dep;
 				if (tsr & TSR_FU
 					&& ++dep->de_stat.ets_fifoUnder <= 10)
 				{
-					printf("%s: fifo underrun\n",
+					printk("%s: fifo underrun\n",
 						dep->de_name);
 				}
 				if (tsr & TSR_CDH
 					&& ++dep->de_stat.ets_CDheartbeat <= 10)
 				{
-					printf("%s: CD heart beat failure\n",
+					printk("%s: CD heart beat failure\n",
 						dep->de_name);
 				}
 				if (tsr & TSR_OWC) dep->de_stat.ets_OWC++;
@@ -1271,7 +1271,7 @@ dpeth_t *dep;
 				assert(!debug);
 
 				/* Or hardware bug? */
-				printf(
+				printk(
 				"%s: transmit interrupt, but not sending\n",
 					dep->de_name);
 				continue;
@@ -1311,12 +1311,12 @@ dpeth_t *dep;
 		{
 			dep->de_stat.ets_OVW++;
 #if 0
-			{ printW(); printf(
+			{ printW(); printk(
 				"%s: got overwrite warning\n", dep->de_name); }
 #endif
 			if (dep->de_flags & DEF_READING)
 			{
-				printf(
+				printk(
 "dp_check_ints: strange: overwrite warning and pending read request\n");
 				dp_recv(dep);
 			}
@@ -1333,7 +1333,7 @@ dpeth_t *dep;
 			 * receive buffer is empty, we reset the dp8390.
 			 */
 #if 0
-			 { printW(); printf(
+			 { printW(); printk(
 				"%s: NIC stopped\n", dep->de_name); }
 #endif
 			dep->de_flags |= DEF_STOPPED;
@@ -1385,13 +1385,13 @@ dpeth_t *dep;
 		if (length < ETH_MIN_PACK_SIZE ||
 			length > ETH_MAX_PACK_SIZE_TAGGED)
 		{
-			printf("%s: packet with strange length arrived: %d\n",
+			printk("%s: packet with strange length arrived: %d\n",
 				dep->de_name, (int) length);
 			next= curr;
 		}
 		else if (next < dep->de_startpage || next >= dep->de_stoppage)
 		{
-			printf("%s: strange next page\n", dep->de_name);
+			printk("%s: strange next page\n", dep->de_name);
 			next= curr;
 		}
 		else if (eth_type == eth_ign_proto)
@@ -1404,7 +1404,7 @@ dpeth_t *dep;
 			if (first)
 			{
 				first= 0;
-				printf("%s: dropping proto 0x%04x packets\n",
+				printk("%s: dropping proto 0x%04x packets\n",
 					dep->de_name,
 					ntohs(eth_ign_proto));
 			}
@@ -1414,7 +1414,7 @@ dpeth_t *dep;
 		{
 			/* This is very serious, so we issue a warning and
 			 * reset the buffers */
-			printf("%s: fifo overrun, resetting receive buffer\n",
+			printk("%s: fifo overrun, resetting receive buffer\n",
 				dep->de_name);
 			dep->de_stat.ets_fifoOver++;
 			next = curr;
@@ -2493,7 +2493,7 @@ dpeth_t *dep;
 		return;
 	if (!wdeth_probe(dep) && !ne_probe(dep) && !el2_probe(dep))
 	{
-		printf("%s: No ethernet card found at 0x%x\n", 
+		printk("%s: No ethernet card found at 0x%x\n", 
 			dep->de_name, dep->de_base_port);
 		dep->de_mode= DEM_DISABLED;
 		return;
@@ -2569,7 +2569,7 @@ dpeth_t *dep;
 	if (dep->de_prog_IO)
 	{
 #if 0
-		printf(
+		printk(
 		"map_hw_buffer: programmed I/O, no need to map buffer\n");
 #endif
 		dep->de_locmem = (char *)-dep->de_ramsize; /* trap errors */
@@ -2584,7 +2584,7 @@ dpeth_t *dep;
 		panic(__FILE__, "map_hw_buffer: cannot malloc size", size);
 	o= I386_PAGE_SIZE - ((vir_bytes)buf % I386_PAGE_SIZE);
 	abuf= buf + o;
-	printf("buf at 0x%x, abuf at 0x%x\n", buf, abuf);
+	printk("buf at 0x%x, abuf at 0x%x\n", buf, abuf);
 
 #if 0
 	r= sys_vm_map(ENDPT_SELF, 1 /* map */, (vir_bytes)abuf,
@@ -2682,7 +2682,7 @@ int may_block;
 	if (r == -ELOCKED && may_block)
 	{
 #if 0
-		printf("send locked\n");
+		printk("send locked\n");
 #endif
 		return;
 	}
@@ -2782,7 +2782,7 @@ u8_t inb(port_t port)
 	r= sys_inb(port, (unsigned long*)&value);
 	if (r != 0)
 	{
-		printf("inb failed for port 0x%x\n", port);
+		printk("inb failed for port 0x%x\n", port);
 		panic("DP8390","sys_inb failed", r);
 	}
 	return value;

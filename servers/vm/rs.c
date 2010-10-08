@@ -34,7 +34,7 @@ int do_rs_set_priv(kipc_msg_t *m)
 	nr = m->VM_RS_NR;
 
 	if ((r = vm_isokendpt(nr, &n)) != 0) {
-		printf("do_rs_set_priv: message from strange source %d\n", nr);
+		printk("do_rs_set_priv: message from strange source %d\n", nr);
 		return -EINVAL;
 	}
 

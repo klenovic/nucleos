@@ -47,7 +47,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	if (first)
 	{
 		first= 0;
-		kprintf("do_vcopy: got request from %d\n", m_ptr->m_source);
+		printk("do_vcopy: got request from %d\n", m_ptr->m_source);
 	}
   }
 

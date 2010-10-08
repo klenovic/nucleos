@@ -57,11 +57,11 @@ int main(int argc, char **argv)
       if (is_notify(callnr)) {
 	      switch (_ENDPOINT_P(who_e)) {
 		      case SYSTEM:
-			      printf("got message from SYSTEM\n");
+			      printk("got message from SYSTEM\n");
 			      sigset = m_in.NOTIFY_ARG;
 			      for ( result=0; result< _NSIG; result++) {
 				      if (sigismember(&sigset, result))
-					      printf("signal %d found\n", result);
+					      printk("signal %d found\n", result);
 			      }
 			      continue;
 		      case PM_PROC_NR:
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	      }
       }
       else {
-          printf("IS: warning, got illegal request %d from %d\n",
+          printk("IS: warning, got illegal request %d from %d\n",
           	callnr, m_in.m_source);
           result = -EDONTREPLY;
       }

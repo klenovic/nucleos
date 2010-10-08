@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   fs_m_in.m_type = KCNR_FS_READY;
 
   if (kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &fs_m_in) != 0) {
-	printf("MFS(%d): Error sending login to VFS\n", SELF_E);
+	printk("MFS(%d): Error sending login to VFS\n", SELF_E);
 	return(-1);
   }
 
@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 	ind = req_nr - VFS_BASE;
 
 	if (ind < 0 || ind >= NREQS) {
-		printf("mfs: bad request %d\n", req_nr); 
-		printf("ind = %d\n", ind);
+		printk("mfs: bad request %d\n", req_nr); 
+		printk("ind = %d\n", ind);
 		error = -EINVAL; 
 	} else {
 		error = (*fs_call_vec[ind])();
@@ -136,17 +136,17 @@ kipc_msg_t *m_in;				/* pointer to message */
 			if(is_notify(fs_m_in.m_type))
 				srcok = 1;	/* Normal exit request. */
 		    	else
-				printf("MFS: unexpected message from PM\n");
+				printk("MFS: unexpected message from PM\n");
 		} else
-			printf("MFS: unexpected source %d\n", src);
+			printk("MFS: unexpected source %d\n", src);
 	} else if(src == VFS_PROC_NR) {
 		if(unmountdone) 
-			printf("MFS: unmounted: unexpected message from FS\n");
+			printk("MFS: unmounted: unexpected message from FS\n");
 		else 
 			srcok = 1;		/* Normal FS request. */
 		
 	} else
-		printf("MFS: unexpected source %d\n", src);
+		printk("MFS: unexpected source %d\n", src);
   } while(!srcok);
 
    assert((src == VFS_PROC_NR && !unmountdone) || 
@@ -162,7 +162,7 @@ int who;
 kipc_msg_t *m_out;                       	/* report result */
 {
   if (0 != kipc_module_call(KIPC_SEND, 0, who, m_out))    /* send the message */
-	printf("MFS(%d) was unable to send reply\n", SELF_E);
+	printk("MFS(%d) was unable to send reply\n", SELF_E);
 }
 
 
@@ -180,7 +180,7 @@ static void cch_check(void)
 		req_nr != REQ_READSUPER &&
 		req_nr != REQ_MOUNTPOINT && req_nr != REQ_UNMOUNT &&
 		req_nr != REQ_SYNC && req_nr != REQ_LOOKUP)
-printf("MFS(%d) inode(%d) cc: %d req_nr: %d\n",
+printk("MFS(%d) inode(%d) cc: %d req_nr: %d\n",
 	SELF_E, inode[i].i_num, inode[i].i_count - cch[i], req_nr);
 	  
 	  cch[i] = inode[i].i_count;

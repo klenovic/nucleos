@@ -109,7 +109,7 @@ void osdep_eth_init()
 		r= ds_retrieve_u32(ecp->ec_task, &tasknr);
 		if (r != 0 && r != -ESRCH)
 		{
-			printf("inet: ds_retrieve_u32 failed for '%s': %d\n",
+			printk("inet: ds_retrieve_u32 failed for '%s': %d\n",
 				ecp->ec_task, r);
 		}
 
@@ -120,7 +120,7 @@ void osdep_eth_init()
 			 * the findproc can be removed.
 			 */
 #if 0
-			printf("eth%d: unable to find task %s: %d\n",
+			printk("eth%d: unable to find task %s: %d\n",
 				i, ecp->ec_task, r);
 #endif
 			tasknr= ENDPT_ANY;
@@ -147,7 +147,7 @@ void osdep_eth_init()
 				eth_port->etp_osdep.etp_state= OEPS_CONF_SENT;
 			else
 			{
-				printf(
+				printk(
 		"osdep_eth_init: unable to send to ethernet task, error= %d\n",
 					r);
 			}
@@ -173,7 +173,7 @@ void osdep_eth_init()
 			eth_port->etp_ethaddr.ea_addr[4] = mess.m_data4 & 0xff;
 			eth_port->etp_ethaddr.ea_addr[5] = (mess.m_data4 >> 1) & 0xff;
 
-			printf("osdep_eth_init: setting EPF_GOT_ADDR\n");
+			printk("osdep_eth_init: setting EPF_GOT_ADDR\n");
 			eth_port->etp_flags |= EPF_GOT_ADDR;
 			setup_read (eth_port);
 		}
@@ -195,14 +195,14 @@ void osdep_eth_init()
 		rep= &eth_port_table[rport];
 		if (!(rep->etp_flags & EPF_ENABLED))
 		{
-			printf(
+			printk(
 			"eth%d: underlying ethernet device %d not enabled",
 				i, rport);
 			continue;
 		}
 		if (rep->etp_vlan != 0)
 		{
-			printf(
+			printk(
 			"eth%d: underlying ethernet device %d is a VLAN",
 				i, rport);
 			continue;
@@ -211,7 +211,7 @@ void osdep_eth_init()
 		if (rep->etp_flags & EPF_GOT_ADDR)
 		{
 			eth_port->etp_ethaddr= rep->etp_ethaddr;
-			printf("osdep_eth_init: setting EPF_GOT_ADDR\n");
+			printk("osdep_eth_init: setting EPF_GOT_ADDR\n");
 			eth_port->etp_flags |= EPF_GOT_ADDR;
 		}
 
@@ -272,9 +272,9 @@ kipc_msg_t *m;
 	m_type= m->m_type;
 	if (m_type == DL_NAME_REPLY) {
 		if (sys_strncpy(this_proc, drivername, m->m_source, m->DL_NAME, MAX_DRV_NAME_LEN))
-			printf("inet: Can't get driver name\n");
+			printk("inet: Can't get driver name\n");
 #if 1
-		printf("eth_rec: got name: %s\n", drivername);
+		printk("eth_rec: got name: %s\n", drivername);
 
 		notification_count= 0;
 #endif
@@ -307,7 +307,7 @@ kipc_msg_t *m;
 	}
 	if (i >= eth_conf_nr)
 	{
-		printf("eth_rec: bad port %d in message type 0x%x from %d\n",
+		printk("eth_rec: bad port %d in message type 0x%x from %d\n",
 			m->DL_PORT, m_type, m->m_source);
 		return;
 	}
@@ -327,7 +327,7 @@ kipc_msg_t *m;
 
 		if (m_type != DL_CONF_REPLY)
 		{
-			printf(
+			printk(
 	"eth_rec: got bad message type 0x%x from %d in CONF state\n",
 				m_type, m->m_source);
 			return;
@@ -336,7 +336,7 @@ kipc_msg_t *m;
 		r= m->m_data1;
 		if (r == -ENXIO)
 			{
-				printf(
+				printk(
 	"eth_rec(conf_reply): no ethernet device at task=%d,port=%d\n",
 				loc_port->etp_osdep.etp_task, 
 				loc_port->etp_osdep.etp_port);
@@ -363,7 +363,7 @@ kipc_msg_t *m;
 	{
 			loc_port->etp_flags |= EPF_GOT_ADDR;
 #if 0
-			printf("eth_rec: calling eth_restart_ioctl\n");
+			printk("eth_rec: calling eth_restart_ioctl\n");
 #endif
 			eth_restart_ioctl(loc_port);
 
@@ -387,15 +387,15 @@ kipc_msg_t *m;
 #if 0
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_SEND)
 	{
-			printf("eth_rec(conf): OEPF_NEED_SEND is set\n");
+			printk("eth_rec(conf): OEPF_NEED_SEND is set\n");
 	}
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_RECV)
 		{
-			printf("eth_rec(conf): OEPF_NEED_RECV is set\n");
+			printk("eth_rec(conf): OEPF_NEED_RECV is set\n");
 		}
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_STAT)
 	{
-			printf("eth_rec(conf): OEPF_NEED_STAT is set\n");
+			printk("eth_rec(conf): OEPF_NEED_STAT is set\n");
 		}
 #endif
 
@@ -405,7 +405,7 @@ kipc_msg_t *m;
 	{
 		if (m_type != DL_STAT_REPLY)
 		{
-			printf(
+			printk(
 	"eth_rec: got bad message type 0x%x from %d in GETSTAT state\n",
 				m_type, m->m_source);
 			return;
@@ -434,15 +434,15 @@ kipc_msg_t *m;
 #if 0
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_SEND)
 	{
-			printf("eth_rec(stat): OEPF_NEED_SEND is set\n");
+			printk("eth_rec(stat): OEPF_NEED_SEND is set\n");
 	}
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_RECV)
 	{
-			printf("eth_rec(stat): OEPF_NEED_RECV is set\n");
+			printk("eth_rec(stat): OEPF_NEED_RECV is set\n");
 	}
 		if (loc_port->etp_osdep.etp_flags & OEPF_NEED_CONF)
 		{
-			printf("eth_rec(stat): OEPF_NEED_CONF is set\n");
+			printk("eth_rec(stat): OEPF_NEED_CONF is set\n");
 		}
 #endif
 
@@ -459,7 +459,7 @@ kipc_msg_t *m;
 	assert(loc_port->etp_osdep.etp_state == OEPS_IDLE  ||
 		loc_port->etp_osdep.etp_state == OEPS_RECV_SENT ||
 		loc_port->etp_osdep.etp_state == OEPS_SEND_SENT ||
-		(printf("etp_state = %d\n", loc_port->etp_osdep.etp_state), 0));
+		(printk("etp_state = %d\n", loc_port->etp_osdep.etp_state), 0));
 	loc_port->etp_osdep.etp_state= OEPS_IDLE;
 
 #if 0 /* Ethernet driver is not trusted */
@@ -470,7 +470,7 @@ kipc_msg_t *m;
 
 #if 0
 	if (!(stat & (DL_PACK_SEND|DL_PACK_RECV)))
-		printf("eth_rec: neither DL_PACK_SEND nor DL_PACK_RECV\n");
+		printk("eth_rec: neither DL_PACK_SEND nor DL_PACK_RECV\n");
 #endif
 	if (stat & DL_PACK_SEND)
 		write_int(loc_port);
@@ -478,7 +478,7 @@ kipc_msg_t *m;
 	{
 		if (recv_debug)
 		{
-			printf("eth_rec: eth%d got DL_PACK_RECV\n",
+			printk("eth_rec: eth%d got DL_PACK_RECV\n",
 				m->DL_PORT);
 		}
 		read_int(loc_port, m->DL_COUNT);
@@ -500,7 +500,7 @@ kipc_msg_t *m;
 	}
 	if (loc_port->etp_osdep.etp_flags & OEPF_NEED_CONF)
 	{
-		printf("eth_rec: OEPF_NEED_CONF is set\n");
+		printk("eth_rec: OEPF_NEED_CONF is set\n");
 	}
 	if (loc_port->etp_osdep.etp_state == OEPS_IDLE &&
 		(loc_port->etp_osdep.etp_flags & OEPF_NEED_STAT))
@@ -519,7 +519,7 @@ kipc_msg_t *m;
 	if (notification_count < 100)
 	{
 		notification_count++;
-		printf("eth_check_drivers: got a notification #%d from %d\n",
+		printk("eth_check_drivers: got a notification #%d from %d\n",
 			notification_count, tasknr);
 	}
 #endif
@@ -528,7 +528,7 @@ kipc_msg_t *m;
 	r= asynsend(tasknr, m);
 	if (r != 0)
 	{
-		printf("eth_check_drivers: asynsend to %d failed: %d\n",
+		printk("eth_check_drivers: asynsend to %d failed: %d\n",
 			tasknr, r);
 		return;
 	}
@@ -582,14 +582,14 @@ u32_t flags;
 	{
 		/* We have never seen the device. */
 #if 0
-		printf("eth_set_rec_conf: waiting for device to appear\n");
+		printk("eth_set_rec_conf: waiting for device to appear\n");
 #endif
 		return;
 	}
 
 	if (eth_port->etp_osdep.etp_state != OEPS_IDLE)
 	{
-		printf(
+		printk(
 		"eth_set_rec_conf: setting OEPF_NEED_CONF, state = %d\n",
 			eth_port->etp_osdep.etp_state);
 		eth_port->etp_osdep.etp_flags |= OEPF_NEED_CONF;
@@ -623,7 +623,7 @@ u32_t flags;
 
 	if (r < 0)
 	{
-		printf("eth_set_rec_conf: asynsend to %d failed: %d\n",
+		printk("eth_set_rec_conf: asynsend to %d failed: %d\n",
 			eth_port->etp_osdep.etp_task, r);
 		return;
 	}
@@ -705,7 +705,7 @@ eth_port_t *eth_port;
 	
 	if (r < 0)
 	{
-		printf("eth_issue_send: send to %d failed: %d\n",
+		printk("eth_issue_send: send to %d failed: %d\n",
 			eth_port->etp_osdep.etp_task, r);
 		return;
 	}
@@ -722,7 +722,7 @@ eth_port_t *eth_port;
 	pack= eth_port->etp_wr_pack;
 	if (pack == NULL)
 	{
-		printf("write_int: strange no packet on eth port %d\n",
+		printk("write_int: strange no packet on eth port %d\n",
 			eth_port-eth_port_table);
 		eth_restart_write(eth_port);
 		return;
@@ -757,13 +757,13 @@ int count;
 
 	if (count < ETH_MIN_PACK_SIZE)
 	{
-		printf("mnx_eth`read_int: packet size too small (%d)\n",
+		printk("mnx_eth`read_int: packet size too small (%d)\n",
 			count);
 		bf_afree(pack);
 	}
 	else if (count > ETH_MAX_PACK_SIZE_TAGGED)
 	{
-		printf("mnx_eth`read_int: packet size too big (%d)\n",
+		printk("mnx_eth`read_int: packet size too big (%d)\n",
 			count);
 		bf_afree(pack);
 	}
@@ -851,7 +851,7 @@ eth_port_t *eth_port;
 
 		if (r < 0)
 		{
-				printf(
+				printk(
 		"mnx_eth`setup_read: asynsend to %d failed: %d\n",
 			eth_port->etp_osdep.etp_task, r);
 		}
@@ -880,7 +880,7 @@ ev_arg_t ev_arg;
 
 	if (recv_debug)
 	{
-		printf("eth_recvev: eth%d got DL_PACK_RECV\n", m_ptr->DL_PORT);
+		printk("eth_recvev: eth%d got DL_PACK_RECV\n", m_ptr->DL_PORT);
 	}
 
 	read_int(eth_port, m_ptr->DL_COUNT);
@@ -936,14 +936,14 @@ int tasknr;
 	kipc_msg_t mess;
 
 	if (eth_port->etp_osdep.etp_state != OEPS_INIT) {
-		printf("eth_restart: restarting eth%d, task %d, port %d\n",
+		printk("eth_restart: restarting eth%d, task %d, port %d\n",
 			eth_port-eth_port_table, tasknr,
 			eth_port->etp_osdep.etp_port);
 	}
 
 	if (eth_port->etp_osdep.etp_task == tasknr)
 	{
-		printf(
+		printk(
 		"eth_restart: task number did not change. Aborting restart\n");
 		return;
 	}
@@ -1005,7 +1005,7 @@ int tasknr;
 	r= asynsend(eth_port->etp_osdep.etp_task, &mess);
 	if (r<0)
 	{
-		printf(
+		printk(
 	"eth_restart: send to ethernet task %d failed: %d\n",
 			eth_port->etp_osdep.etp_task, r);
 		return;

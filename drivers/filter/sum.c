@@ -116,7 +116,7 @@ static int read_sectors(char *buf, sector_t phys_sector, int count)
 
 	if (size != wsize) {
 #if DEBUG
-		printf("Filter: EOF reading sector %lu\n", phys_sector);
+		printk("Filter: EOF reading sector %lu\n", phys_sector);
 #endif
 
 		memset(buf + size, 0, wsize - size);
@@ -167,7 +167,7 @@ static int check_group_sum(char *bufp, char *sump, sector_t sector, int index,
 		calc_sum(sector, bufp, sum_buffer);
 
 		if (memcmp(sum_buffer, sump, SUM_SIZE)) {
-			printf("Filter: BAD CHECKSUM at sector %lu\n", sector);
+			printk("Filter: BAD CHECKSUM at sector %lu\n", sector);
 
 			if (BAD_SUM_ERROR)
 				return bad_driver(DRIVER_MAIN, BD_DATA, -EIO);
@@ -350,7 +350,7 @@ static int check_write(u64_t pos, size_t size)
 
 	if (memcmp(ext_buffer, rb0_buffer, size)) {
 #if DEBUG
-		printf("Filter: readback from disk 0 failed (size %d)\n",
+		printk("Filter: readback from disk 0 failed (size %d)\n",
 			size);
 #endif
 
@@ -359,7 +359,7 @@ static int check_write(u64_t pos, size_t size)
 
 	if (USE_MIRROR && memcmp(ext_buffer, rb1_buffer, size)) {
 #if DEBUG
-		printf("Filter: readback from disk 1 failed (size %d)\n",
+		printk("Filter: readback from disk 1 failed (size %d)\n",
 			size);
 #endif
 
@@ -542,7 +542,7 @@ int transfer(u64_t pos, char *buffer, size_t *sizep, int flag_rw)
 	phys_pos = SEC2POS(LOG2PHYS(first_sector));
 
 #if DEBUG2
-	printf("Filter: transfer: pos 0x%lx:0x%lx -> phys_pos 0x%lx:0x%lx\n",
+	printk("Filter: transfer: pos 0x%lx:0x%lx -> phys_pos 0x%lx:0x%lx\n",
 		ex64hi(pos), ex64lo(pos), ex64hi(phys_pos), ex64lo(phys_pos));
 #endif
 
@@ -568,7 +568,7 @@ int transfer(u64_t pos, char *buffer, size_t *sizep, int flag_rw)
 	r = read_write(phys_pos, ext_buffer, ext_buffer, &res_size, flag_rw);
 
 #if DEBUG2
-	printf("Filter: transfer: read_write(%x:%x, %u, %d) = %d, %u\n",
+	printk("Filter: transfer: read_write(%x:%x, %u, %d) = %d, %u\n",
 		ex64hi(phys_pos), ex64lo(phys_pos), ext_size, flag_rw, r,
 		res_size);
 #endif

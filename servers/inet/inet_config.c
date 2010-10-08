@@ -51,7 +51,7 @@ static int ifdefault= -1;		/* Default network interface. */
 
 static void fatal(char *label)
 {
-	printf("init: %s: %s\n", label, strerror(errno));
+	printk("init: %s: %s\n", label, strerror(errno));
 	exit(1);
 }
 
@@ -62,7 +62,7 @@ static void check_rm(char *device)
 		if (errno == ENOENT) return;
 		fatal(device);
 	}
-	printf("rm %s\n", device);
+	printk("rm %s\n", device);
 }
 
 static void check_mknod(char *device, mode_t mode, int minor)
@@ -81,7 +81,7 @@ static void check_mknod(char *device, mode_t mode, int minor)
 	}
 
 	if (mknod(device, S_IFCHR | mode, dev) < 0) fatal(device);
-	printf("mknod %s c %d %d\n", device, (ip_dev >> 8), minor);
+	printk("mknod %s c %d %d\n", device, (ip_dev >> 8), minor);
 }
 
 static void check_ln(char *old, char *new)
@@ -101,7 +101,7 @@ static void check_ln(char *old, char *new)
 	}
 
 	if (link(old, new) < 0) fatal(new);
-	printf("ln %s %s\n", old, new);
+	printk("ln %s %s\n", old, new);
 }
 
 static void check_dev(int type, int ifno)
@@ -155,7 +155,7 @@ static unsigned line;
 
 static void error(void)
 {
-	printf("inet: error on line %u\n", line);
+	printk("inet: error on line %u\n", line);
 	exit(1);
 }
 
@@ -206,7 +206,7 @@ static unsigned number(char *str, unsigned max)
 		s++;
 	}
 	if (*s != 0 || n > max) {
-		printf("inet: '%s' is not a number <= %u\n", str, max);
+		printk("inet: '%s' is not a number <= %u\n", str, max);
 		error();
 	}
 	return n;
@@ -248,7 +248,7 @@ void read_conf(void)
 				ecp->ec_vlan= number(word, (1<<12)-1);
 				token(1);
 				if (strncmp(word, "eth", 3) != 0) {
-					printf(
+					printk(
 				"inet: VLAN eth%d can't be built on %s\n",
 						ifno, word);
 					exit(1);
@@ -270,7 +270,7 @@ void read_conf(void)
 			pcp++;
 			psip_conf_nr++;
 		} else {
-			printf("inet: Unknown device '%s'\n", word);
+			printk("inet: Unknown device '%s'\n", word);
 			error();
 		}
 		iftype[ifno]= type;
@@ -288,7 +288,7 @@ void read_conf(void)
 			while (word[0] != '}') {
 				if (strcmp(word, "default") == 0) {
 					if (ifdefault != -1) {
-						printf(
+						printk(
 				"inet: ip%d and ip%d can't both be default\n",
 							ifdefault, ifno);
 						error();
@@ -307,14 +307,14 @@ void read_conf(void)
 					if (strcmp(word, "udp") == 0) {
 						enable &= ~4;
 					} else {
-						printf(
+						printk(
 						"inet: Can't do 'no %s'\n",
 							word);
 						exit(1);
 					}
 					token(0);
 				} else {
-					printf("inet: Unknown option '%s'\n",
+					printk("inet: Unknown option '%s'\n",
 						word);
 					exit(1);
 				}
@@ -332,7 +332,7 @@ void read_conf(void)
 	}
 
 	if (ifdefault == -1) {
-		printf("inet: No networks or no default network defined\n");
+		printk("inet: No networks or no default network defined\n");
 		exit(1);
 	}
 
@@ -349,7 +349,7 @@ void read_conf(void)
 				}
 			}
 			if (j == eth_conf_nr) {
-				printf(
+				printk(
 				"inet: VLAN eth%d can't be built on eth%d\n",
 					ecp->ec_ifno, ecp->ec_port);
 				exit(1);

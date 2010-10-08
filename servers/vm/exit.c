@@ -64,12 +64,12 @@ int do_exit(kipc_msg_t *msg)
 SANITYCHECK(SCL_FUNCTIONS);
 
 	if(vm_isokendpt(msg->VME_ENDPOINT, &proc) != 0) {
-		printf("VM: bogus endpoint VM_EXIT %d\n", msg->VME_ENDPOINT);
+		printk("VM: bogus endpoint VM_EXIT %d\n", msg->VME_ENDPOINT);
 		return -EINVAL;
 	}
 	vmp = &vmproc[proc];
 	if(!(vmp->vm_flags & VMF_EXITING)) {
-		printf("VM: unannounced VM_EXIT %d\n", msg->VME_ENDPOINT);
+		printk("VM: unannounced VM_EXIT %d\n", msg->VME_ENDPOINT);
 		return -EINVAL;
 	}
 
@@ -113,7 +113,7 @@ int do_willexit(kipc_msg_t *msg)
 	struct vmproc *vmp;
 
 	if(vm_isokendpt(msg->VMWE_ENDPOINT, &proc) != 0) {
-		printf("VM: bogus endpoint VM_EXITING %d\n",
+		printk("VM: bogus endpoint VM_EXITING %d\n",
 			msg->VMWE_ENDPOINT);
 		return -EINVAL;
 	}

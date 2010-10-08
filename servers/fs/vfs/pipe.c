@@ -58,7 +58,7 @@ int scall_pipe(void)
 
 	/* See if a free vnode is available */
 	if ( (vp = get_free_vnode()) == NIL_VNODE) {
-		printf("VFS: no vnode available!\n");
+		printk("VFS: no vnode available!\n");
 		return err_code;
 	}
 
@@ -500,7 +500,7 @@ int proc_nr_e;
   int wasreviving = 0;
 
   if(isokendpt(proc_nr_e, &proc_nr_p) != 0) {
-	printf("VFS: ignoring unpause for bogus endpoint %d\n", proc_nr_e);
+	printk("VFS: ignoring unpause for bogus endpoint %d\n", proc_nr_e);
 	return;
   }
 
@@ -664,7 +664,7 @@ int check_pipe(void)
         }
 
 	if(mycount != susp_count) {
-		printf("check_pipe: mycount %d susp_count %d\n",
+		printk("check_pipe: mycount %d susp_count %d\n",
 			mycount, susp_count);
 		return 0;
 	}

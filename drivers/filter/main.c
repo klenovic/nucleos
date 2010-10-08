@@ -135,7 +135,7 @@ static int do_rdwt(int flag_rw)
 	size = m_in.COUNT;
 
 	if (rem64u(pos, SECTOR_SIZE) != 0 || size % SECTOR_SIZE != 0) {
-		printf("Filter: unaligned request from caller!\n");
+		printk("Filter: unaligned request from caller!\n");
 
 		return -EINVAL;
 	}
@@ -154,7 +154,7 @@ static int do_rdwt(int flag_rw)
 			break;
 
 #if DEBUG
-		printf("Filter: transfer yielded RET_REDO, checking drivers\n");
+		printk("Filter: transfer yielded RET_REDO, checking drivers\n");
 #endif
 		if((r = check_driver(DRIVER_MAIN)) != 0) break;
 		if((r = check_driver(DRIVER_BACKUP)) != 0) break;
@@ -190,7 +190,7 @@ static int do_vrdwt(int flag_rw)
 		size += iov_proc[i].iov_size;
 
 	if (rem64u(pos, SECTOR_SIZE) != 0 || size % SECTOR_SIZE != 0) {
-		printf("Filter: unaligned request from caller!\n");
+		printk("Filter: unaligned request from caller!\n");
 		return -EINVAL;
 	}
 
@@ -208,7 +208,7 @@ static int do_vrdwt(int flag_rw)
 			break;
 
 #if DEBUG
-		printf("Filter: transfer yielded RET_REDO, checking drivers\n");
+		printk("Filter: transfer yielded RET_REDO, checking drivers\n");
 #endif
 		if((r = check_driver(DRIVER_MAIN)) != 0) break;
 		if((r = check_driver(DRIVER_BACKUP)) != 0) break;
@@ -265,13 +265,13 @@ static int do_ioctl(kipc_msg_t *m)
 		if(sys_safecopyto(proc_e, (vir_bytes) grant_id, 0,
 				(vir_bytes) &sizepart,
 				sizeof(struct partition), D) != 0) {
-			printf("Filter: DIOCGETP safecopyto failed\n");
+			printk("Filter: DIOCGETP safecopyto failed\n");
 			return -EIO;
 		}
 		break;
 
 	default:
-		printf("Filter: unknown ioctl request: %d!\n", m->REQUEST);
+		printk("Filter: unknown ioctl request: %d!\n", m->REQUEST);
 		return -EINVAL;
 	}
 
@@ -321,35 +321,35 @@ static int parse_arguments(int argc, char *argv[])
 		return -EINVAL;
 
 #if DEBUG
-	printf("Filter starting. Configuration:\n");
-	printf("  USE_CHECKSUM :   %3s ", USE_CHECKSUM ? "yes" : "no");
-	printf("  USE_MIRROR : %3s\n", USE_MIRROR ? "yes" : "no");
+	printk("Filter starting. Configuration:\n");
+	printk("  USE_CHECKSUM :   %3s ", USE_CHECKSUM ? "yes" : "no");
+	printk("  USE_MIRROR : %3s\n", USE_MIRROR ? "yes" : "no");
 
 	if (USE_CHECKSUM) {
-		printf("  BAD_SUM_ERROR :  %3s ",
+		printk("  BAD_SUM_ERROR :  %3s ",
 			BAD_SUM_ERROR ? "yes" : "no");
-		printf("  NR_SUM_SEC : %3d\n", NR_SUM_SEC);
+		printk("  NR_SUM_SEC : %3d\n", NR_SUM_SEC);
 
-		printf("  SUM_TYPE :       ");
+		printk("  SUM_TYPE :       ");
 
 		switch (SUM_TYPE) {
-		case ST_NIL: printf("nil"); break;
-		case ST_XOR: printf("xor"); break;
-		case ST_CRC: printf("crc"); break;
-		case ST_MD5: printf("md5"); break;
+		case ST_NIL: printk("nil"); break;
+		case ST_XOR: printk("xor"); break;
+		case ST_CRC: printk("crc"); break;
+		case ST_MD5: printk("md5"); break;
 		}
 
-		printf("   SUM_SIZE :   %3d\n", SUM_SIZE);
+		printk("   SUM_SIZE :   %3d\n", SUM_SIZE);
 	}
-	else printf("  USE_SUM_LAYOUT : %3s\n", USE_SUM_LAYOUT ? "yes" : "no");
+	else printk("  USE_SUM_LAYOUT : %3s\n", USE_SUM_LAYOUT ? "yes" : "no");
 
-	printf("  N : %3dx       M : %3dx        T : %3ds\n",
+	printk("  N : %3dx       M : %3dx        T : %3ds\n",
 		NR_RETRIES, NR_RESTARTS, DRIVER_TIMEOUT);
 
-	printf("  MAIN_LABEL / MAIN_MINOR : %19s / %d\n",
+	printk("  MAIN_LABEL / MAIN_MINOR : %19s / %d\n",
 		MAIN_LABEL, MAIN_MINOR);
 	if (USE_MIRROR) {
-		printf("  BACKUP_LABEL / BACKUP_MINOR : %15s / %d\n",	
+		printk("  BACKUP_LABEL / BACKUP_MINOR : %15s / %d\n",	
 			BACKUP_LABEL, BACKUP_MINOR);
 	}
 
@@ -375,7 +375,7 @@ static void got_signal(void)
 
 	/* If so, shut down this driver. */
 #if DEBUG
-	printf("Filter: shutdown...\n");
+	printk("Filter: shutdown...\n");
 #endif
 
 	driver_shutdown();
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
 
 	r = parse_arguments(argc, argv);
 	if(r != 0) {
-		printf("Filter: wrong argument!\n");
+		printk("Filter: wrong argument!\n");
 		return 1;
 	}
 
@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
 		}
 
 #if DEBUG2
-		printf("Filter: got request %d from %d\n",
+		printk("Filter: got request %d from %d\n",
 			m_in.m_type, m_in.m_source);
 #endif
 
@@ -433,13 +433,13 @@ int main(int argc, char *argv[])
 		case DEV_IOCTL_S:	r = do_ioctl(&m_in);		break;
 
 		default:
-			printf("Filter: ignoring unknown request %d from %d\n", 
+			printk("Filter: ignoring unknown request %d from %d\n", 
 				m_in.m_type, m_in.m_source);
 			continue;
 		}
 
 #if DEBUG2
-		printf("Filter: replying with code %d\n", r);
+		printk("Filter: replying with code %d\n", r);
 #endif
 
 		/* Send back reply message. */

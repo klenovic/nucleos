@@ -346,7 +346,7 @@ pty_t *pp;
 	} else {
 	if ((s = sys_vircopy(ENDPT_SELF, D, (vir_bytes)pp->otail,
 		(vir_bytes) pp->rdproc, D, (vir_bytes) pp->rdvir_g, (phys_bytes) count)) != 0) {
-		printf("pty tty: copy failed (error %d)\n",  s);
+		printk("pty tty: copy failed (error %d)\n",  s);
 		break;
 	}
 	  pp->rdvir_g += count;
@@ -421,14 +421,14 @@ int try;
 	if(pp->wrsafe) {
 	   if ((s = sys_safecopyfrom(pp->wrproc, pp->wrvir_g,
 	     pp->wrvir_offset, (vir_bytes) &c, 1, D)) != 0) {
-		printf("pty: safecopy failed (error %d)\n", s);
+		printk("pty: safecopy failed (error %d)\n", s);
 		break;
 	   }
 	  pp->wrvir_offset++;
 	} else {
   	  if ((s = sys_vircopy(pp->wrproc, D, (vir_bytes) pp->wrvir_g,
 		ENDPT_SELF, D, (vir_bytes) &c, (phys_bytes) 1)) != 0) {
-		printf("pty: copy failed (error %d)\n", s);
+		printk("pty: copy failed (error %d)\n", s);
 		break;
 	}
 	  pp->wrvir_g++;

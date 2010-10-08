@@ -29,7 +29,7 @@ sys_hz(void)
 		/* Get HZ. */
 		if((r=sys_getinfo(GET_HZ, &hz, sizeof(hz), 0, 0)) != 0) {
 			hz = HZ;
-			printf("sys_hz: %d: reverting to HZ = %d\n", r, hz);
+			printk("sys_hz: %d: reverting to HZ = %d\n", r, hz);
 		}
 	}
 

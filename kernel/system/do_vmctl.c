@@ -34,7 +34,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
   if(ep == ENDPT_SELF) { ep = m_ptr->m_source; }
 
   if(!isokendpt(ep, &proc_nr)) {
-	kprintf("do_vmctl: unexpected endpoint %d from VM\n", ep);
+	printk("do_vmctl: unexpected endpoint %d from VM\n", ep);
 	return -EINVAL;
   }
 
@@ -92,7 +92,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		vmassert(p->p_vmrequest.vmresult != -VMSUSPEND);
 #ifdef CONFIG_DEBUG_KERNEL_VMASSERT
 		if(p->p_vmrequest.vmresult != 0)
-			kprintf("SYSTEM: VM replied %d to mem request\n",
+			printk("SYSTEM: VM replied %d to mem request\n",
 				p->p_vmrequest.vmresult);
 
 		printf("memreq reply: vm request sent by: %s / %d about %d; 0x%lx-0x%lx, wr %d, stack: %s ",

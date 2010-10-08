@@ -18,11 +18,11 @@
 #define DEBUG 0
 
 #if DEBUG
-#define dprint printf 
+#define dprint printk 
 #else
 #define dprint (void) 
 #endif
-#define error printf
+#define error printk
 
 void main(void);
 

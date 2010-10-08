@@ -191,7 +191,7 @@ static int ip_select(fd, operations)
 int fd;
 unsigned operations;
 {
-	printf("ip_select: not implemented\n");
+	printk("ip_select: not implemented\n");
 	return 0;
 }
 
@@ -217,7 +217,7 @@ select_res_t select_res;
 
 	if (i>=IP_FD_NR)
 	{
-		DBLOCK(1, printf("out of fds\n"));
+		DBLOCK(1, printk("out of fds\n"));
 		return -EAGAIN;
 	}
 
@@ -328,7 +328,7 @@ int priority;
 				if (ev_in_queue(&ip_port->ip_loopb_event))
 				{
 #if DEBUG
-					printf(
+					printk(
 "not freeing ip_loopb_head, ip_loopb_event enqueued\n");
 #endif
 				}
@@ -352,7 +352,7 @@ int priority;
 				if (ev_in_queue(&ip_port->ip_routeq_event))
 				{
 #if DEBUG
-					printf(
+					printk(
 "not freeing ip_loopb_head, ip_routeq_event enqueued\n");
 #endif
 				}

@@ -123,7 +123,7 @@ int exec_newmem()
 
 		rmp->entry_point = args.entry_point;
 	} else {
-		printf("PM: newmem failed for %s\n", args.progname);
+		printk("PM: newmem failed for %s\n", args.progname);
 	}
 
 	return r;

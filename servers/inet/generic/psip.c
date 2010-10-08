@@ -515,7 +515,7 @@ static int psip_select(fd, operations)
 int fd;
 unsigned operations;
 {
-	printf("psip_select: not implemented\n");
+	printk("psip_select: not implemented\n");
 	return 0;
 }
 
@@ -552,7 +552,7 @@ int which_operation;
 	psip_fd_t *psip_fd, *prev_fd, *tmp_fd;
 	int result;
 
-	DBLOCK(1, printf("psip_cancel(%d, %d)\n", fd, which_operation));
+	DBLOCK(1, printk("psip_cancel(%d, %d)\n", fd, which_operation));
 
 	assert(fd >= 0 && fd < PSIP_FD_NR);
 	psip_fd= &psip_fd_table[fd];
@@ -682,7 +682,7 @@ nwio_psipopt_t *newoptp;
 	if ((new_flags & NWPO_EN_PROMISC) &&
 		(psip_fd->pf_port->pp_flags & PPF_PROMISC))
 	{
-		printf("psip_setopt: -EBUSY for port %d, flags 0x%x\n",
+		printk("psip_setopt: -EBUSY for port %d, flags 0x%x\n",
 			psip_fd->pf_port - psip_port_table,
 			psip_fd->pf_port->pp_flags);
 		/* We can support only one at a time. */
@@ -718,7 +718,7 @@ psip_port_t *psip_port;
 		}
 		if (psip_fd->pf_port != psip_port)
 			continue;
-		printf("check_promisc: setting PROMISC for port %d\n",
+		printk("check_promisc: setting PROMISC for port %d\n",
 			psip_port-psip_port_table);
 		psip_port->pp_flags |= PPF_PROMISC;
 		break;

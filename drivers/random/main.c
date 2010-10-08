@@ -140,7 +140,7 @@ unsigned nr_req;		/* length of request vector */
 			(vir_bytes) random_buf, chunk, D);
 		    if (r != 0)
 		    {
-			printf(
+			printk(
 			"random: sys_safecopyto failed for proc %d, grant %d\n",
 				proc_nr, user_vir);
 			return r;
@@ -150,7 +150,7 @@ unsigned nr_req;		/* length of request vector */
 			(vir_bytes) random_buf, chunk, D);
 		    if (r != 0)
 		    {
-			printf(
+			printk(
 		"random: sys_safecopyfrom failed for proc %d, grant %d\n",
 				proc_nr, user_vir);
 			return r;
@@ -209,7 +209,7 @@ static void r_init()
   /* Do sanity check on parameters. */
   if(krandom.random_sources != RANDOM_SOURCES ||
      krandom.random_elements != RANDOM_ELEMENTS) {
-     printf("random: parameters (%d, %d) don't match kernel's (%d, %d)\n",
+     printk("random: parameters (%d, %d) don't match kernel's (%d, %d)\n",
 	RANDOM_SOURCES, RANDOM_ELEMENTS,
 	krandom.random_sources, krandom.random_elements);
      exit(1);

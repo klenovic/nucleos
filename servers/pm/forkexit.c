@@ -67,7 +67,7 @@ int do_fork()
   if ((procs_in_use == NR_PROCS) || 
   		(procs_in_use >= NR_PROCS-LAST_FEW && rmp->mp_effuid != 0))
   {
-  	printf("PM: warning, process table is full!\n");
+  	printk("PM: warning, process table is full!\n");
   	return(-EAGAIN);
   }
 
@@ -84,7 +84,7 @@ int do_fork()
 
   /* Memory part of the forking. */
   if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != 0) {
-	printf("PM: vm_fork failed: %d\n", s);
+	printk("PM: vm_fork failed: %d\n", s);
 	return s;
   }
 
@@ -157,7 +157,7 @@ int do_fork_nb()
   if ((procs_in_use == NR_PROCS) || 
   		(procs_in_use >= NR_PROCS-LAST_FEW && rmp->mp_effuid != 0))
   {
-  	printf("PM: warning, process table is full!\n");
+  	printk("PM: warning, process table is full!\n");
   	return(-EAGAIN);
   }
 
@@ -173,7 +173,7 @@ int do_fork_nb()
 	panic(__FILE__,"do_fork finds wrong child slot", next_child);
 
   if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != 0) {
-	printf("PM: vm_fork failed: %d\n", s);
+	printk("PM: vm_fork failed: %d\n", s);
 	return s;
   }
 
@@ -292,7 +292,7 @@ int dump_core;			/* flag indicating whether to dump core */
 
   if (proc_nr_e == INIT_PROC_NR)
   {
-	printf("PM: INIT died\n");
+	printk("PM: INIT died\n");
 	return;
   }
   if (proc_nr_e == VFS_PROC_NR)

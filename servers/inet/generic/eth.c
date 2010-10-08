@@ -141,7 +141,7 @@ select_res_t select_res;
 	eth_port_t *eth_port;
 	eth_fd_t *eth_fd;
 
-	DBLOCK(0x20, printf("eth_open (%d, %d, %lx, %lx)\n", port, srfd, 
+	DBLOCK(0x20, printk("eth_open (%d, %d, %lx, %lx)\n", port, srfd, 
 		(unsigned long)get_userdata, (unsigned long)put_userdata));
 	eth_port= &eth_port_table[port];
 	if (!(eth_port->etp_flags & EPF_ENABLED))
@@ -152,7 +152,7 @@ select_res_t select_res;
 
 	if (i>=ETH_FD_NR)
 	{
-		DBLOCK(1, printf("out of fds\n"));
+		DBLOCK(1, printk("out of fds\n"));
 		return -EAGAIN;
 	}
 
@@ -179,7 +179,7 @@ ioreq_t req;
 	eth_fd_t *eth_fd;
 	eth_port_t *eth_port;
 
-	DBLOCK(0x20, printf("eth_ioctl (%d, 0x%lx)\n", fd, (unsigned long)req));
+	DBLOCK(0x20, printk("eth_ioctl (%d, 0x%lx)\n", fd, (unsigned long)req));
 	eth_fd= &eth_fd_table[fd];
 	eth_port= eth_fd->ef_port;
 
@@ -348,7 +348,7 @@ ioreq_t req;
 			if (!(eth_port->etp_flags & EPF_GOT_ADDR))
 			{
 #if 0
-				printf(
+				printk(
 				"eth_ioctl: suspending NWIOGETHSTAT ioctl\n");
 #endif
 
@@ -360,7 +360,7 @@ ioreq_t req;
 
 			if (eth_port->etp_getstat)
 			{
-				printf(
+				printk(
 	"eth_ioctl: pending eth_get_stat request, suspending caller\n");
 				assert(!(eth_fd->ef_flags & EFF_IOCTL_IP));
 				eth_fd->ef_flags |= EFF_IOCTL_IP;
@@ -380,7 +380,7 @@ ioreq_t req;
 				if (result == SUSPEND)
 				{
 #if 0
-					printf(
+					printk(
 				"eth_ioctl: eth_get_stat returned SUSPEND\n");
 #endif
 					eth_fd->ef_ioctl_req= req;
@@ -388,7 +388,7 @@ ioreq_t req;
 						EFF_IOCTL_IP));
 					eth_fd->ef_flags |= EFF_IOCTL_IP;
 #if 0
-printf("eth_ioctl: setting etp_getstat in port %d to %p\n",
+printk("eth_ioctl: setting etp_getstat in port %d to %p\n",
 	eth_port-eth_port_table, acc);
 #endif
 					eth_port->etp_getstat= acc;
@@ -448,7 +448,7 @@ size_t count;
 
 	if (count<ETH_MIN_PACK_SIZE || count>ETH_MAX_PACK_SIZE)
 	{
-		DBLOCK(1, printf("illegal packetsize (%d)\n",count));
+		DBLOCK(1, printk("illegal packetsize (%d)\n",count));
 		reply_thr_get (eth_fd, -EPACKSIZE, FALSE);
 		return 0;
 	}
@@ -510,7 +510,7 @@ size_t data_len;
 
 	if (count<ETH_MIN_PACK_SIZE || count>ETH_MAX_PACK_SIZE)
 	{
-		DBLOCK(1, printf("illegal packetsize (%d)\n",count));
+		DBLOCK(1, printk("illegal packetsize (%d)\n",count));
 		return -EPACKSIZE;
 	}
 	rep= eth_port->etp_vlan_port;
@@ -615,7 +615,7 @@ int which_operation;
 	eth_fd_t *eth_fd, *prev, *loc_fd;
 	eth_port_t *eth_port;
 
-	DBLOCK(2, printf("eth_cancel (%d)\n", fd));
+	DBLOCK(2, printk("eth_cancel (%d)\n", fd));
 	eth_fd= &eth_fd_table[fd];
 
 	switch (which_operation)
@@ -687,7 +687,7 @@ unsigned operations;
 	}
 	if (operations & SR_SELECT_EXCEPTION)
 	{
-		printf("eth_select: not implemented for exceptions\n");
+		printk("eth_select: not implemented for exceptions\n");
 	}
 	return resops;
 }
@@ -882,7 +882,7 @@ size_t pack_size;
 
 	DIFBLOCK(0x20, dst_addr->ea_addr[0] != 0xFF &&
 		(dst_addr->ea_addr[0] & 0x1),
-		printf("got multicast packet\n"));
+		printk("got multicast packet\n"));
 
 	if (dst_addr->ea_addr[0] & 0x1)
 	{
@@ -1007,12 +1007,12 @@ size_t pack_size;
 		if (pack_stat == NWEO_EN_LOC)
 		{
 			DBLOCK(0x01,
-			printf("eth_arrive: dropping packet for proto 0x%x\n",
+			printk("eth_arrive: dropping packet for proto 0x%x\n",
 				ntohs(type)));
 		}
 		else
 		{
-			DBLOCK(0x20, printf("dropping packet for proto 0x%x\n",
+			DBLOCK(0x20, printk("dropping packet for proto 0x%x\n",
 				ntohs(type)));
 		}			
 		bf_afree(pack);
@@ -1061,7 +1061,7 @@ eth_port_t *eth_port;
 	acc_t *acc;
 
 #if 0
-	printf("in eth_restart_ioctl\n");
+	printk("in eth_restart_ioctl\n");
 #endif
 
 	/* eth_restart_ioctl is called on too occasions: when a device
@@ -1083,14 +1083,14 @@ eth_port_t *eth_port;
 			continue;
 
 #if 0
-printf("eth_restart_ioctl: etp_getstat in port %d is %p\n",
+printk("eth_restart_ioctl: etp_getstat in port %d is %p\n",
 	eth_port-eth_port_table, acc);
 #endif
 
 		if (acc != NULL)
 		{
 #if 0
-			printf("eth_restart_ioctl: completed getstat\n");
+			printk("eth_restart_ioctl: completed getstat\n");
 #endif
 			acc->acc_linkC++;
 			r= (*eth_fd->ef_put_userdata)(eth_fd->ef_srfd, 0,
@@ -1110,7 +1110,7 @@ printf("eth_restart_ioctl: etp_getstat in port %d is %p\n",
 	if (acc != NULL)
 	{
 #if 0
-printf("eth_restart_ioctl: clearing etp_getstat in port %d\n",
+printk("eth_restart_ioctl: clearing etp_getstat in port %d\n",
 	eth_port-eth_port_table);
 #endif
 		assert(acc == eth_port->etp_getstat);
@@ -1181,7 +1181,7 @@ time_t exp_time;
 			if (eth_fd->ef_select_res)
 				eth_fd->ef_select_res(eth_fd->ef_srfd, SR_SELECT_READ);
 			else
-				printf("packet2user: no select_res\n");
+				printk("packet2user: no select_res\n");
 		}
 		return;
 	}
@@ -1348,7 +1348,7 @@ acc_t *pack;
 		/* Packeted is already tagged. Should update vlan number.
 		 * For now, just discard packet.
 		 */
-		printf("insert_vlan_hdr: discarding vlan packet\n");
+		printk("insert_vlan_hdr: discarding vlan packet\n");
 		bf_afree(head_acc); head_acc= NULL;
 		bf_afree(pack); pack= NULL;
 		return NULL;

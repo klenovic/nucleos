@@ -167,7 +167,7 @@ void arp_prep()
 	if (arp_cache_nr < (eth_conf_nr+1)*AP_REQ_NR)
 	{
 		arp_cache_nr= (eth_conf_nr+1)*AP_REQ_NR;
-		printf("arp: using %d cache entries instead of %d\n",
+		printk("arp: using %d cache entries instead of %d\n",
 			arp_cache_nr, ARP_CACHE_NR);
 	}
 	arp_cache= alloc(arp_cache_nr * sizeof(arp_cache[0]));
@@ -219,7 +219,7 @@ arp_port_t *arp_port;
 
 		if (arp_port->ap_eth_fd<0)
 		{
-			DBLOCK(1, printf("arp[%d]: unable to open eth[%d]\n",
+			DBLOCK(1, printk("arp[%d]: unable to open eth[%d]\n",
 				arp_port-arp_port_table,
 				arp_port->ap_eth_port));
 			return;
@@ -324,7 +324,7 @@ int for_ioctl;
 			if (result<0)
 			{
 				DIFBLOCK(1, (result != NW_SUSPEND),
-					printf(
+					printk(
 				"arp[%d]: write error on port %d: error %d\n",
 					fd, arp_port->ap_eth_fd, result));
 
@@ -343,7 +343,7 @@ int for_ioctl;
 
 		return data;
 	default:
-		printf("arp_getdata(%d, 0x%d, 0x%d) called but ap_state=0x%x\n",
+		printk("arp_getdata(%d, 0x%d, 0x%d) called but ap_state=0x%x\n",
 			fd, offset, count, arp_port->ap_state);
 		break;
 	}
@@ -371,7 +371,7 @@ int for_ioctl;
 			result= (int)offset;
 			if (result<0)
 			{
-				DIFBLOCK(1, (result != NW_SUSPEND), printf(
+				DIFBLOCK(1, (result != NW_SUSPEND), printk(
 				"arp[%d]: read error on port %d: error %d\n",
 					fd, arp_port->ap_eth_fd, result));
 
@@ -443,7 +443,7 @@ int for_ioctl;
 		bf_afree(data);
 		return 0;
 	default:
-		printf("arp_putdata(%d, 0x%d, 0x%lx) called but ap_state=0x%x\n",
+		printk("arp_putdata(%d, 0x%d, 0x%lx) called but ap_state=0x%x\n",
 			fd, offset, (unsigned long)data, arp_port->ap_state);
 		break;
 	}
@@ -465,7 +465,7 @@ arp_port_t *arp_port;
 			return;
 		}
 		DIFBLOCK(1, (result != 0),
-			printf("arp[%d]: eth_read(..,%d)=%d\n",
+			printk("arp[%d]: eth_read(..,%d)=%d\n",
 			arp_port-arp_port_table, ETH_MAX_PACK_SIZE, result));
 	}
 }
@@ -486,7 +486,7 @@ arp_port_t *arp_port;
 		if (arp_port->ap_ipaddr == HTONL(0x00000000))
 		{
 			/* Interface is down */
-			printf(
+			printk(
 		"arp[%d]: not sending ARP packet, interface is down\n",
 				arp_port-arp_port_table);
 			bf_afree(data); data= NULL;
@@ -507,7 +507,7 @@ arp_port_t *arp_port;
 		if (result<0)
 		{
 			DIFBLOCK(1, (result != NW_SUSPEND),
-				printf("arp[%d]: eth_write(..,%d)=%d\n",
+				printk("arp[%d]: eth_write(..,%d)=%d\n",
 				arp_port-arp_port_table, sizeof(arp46_t),
 				result));
 			return;
@@ -560,7 +560,7 @@ acc_t *data;
 	{
 		/* Interface is down */
 #if DEBUG
-		printf("arp[%d]: dropping ARP packet, interface is down\n",
+		printk("arp[%d]: dropping ARP packet, interface is down\n",
 			arp_port-arp_port_table);
 #endif
 		return;
@@ -598,9 +598,9 @@ acc_t *data;
 		if (!do_reply)
 			return;
 
-		DBLOCK(0x10, printf("arp[%d]: allocating entry for ",
+		DBLOCK(0x10, printk("arp[%d]: allocating entry for ",
 			arp_port-arp_port_table);
-			writeIpAddr(spa); printf("\n"));
+			writeIpAddr(spa); printk("\n"));
 
 		ce= alloc_cache_ent(ACF_EMPTY);
 		ce->ac_flags= ACF_EMPTY;
@@ -640,14 +640,14 @@ acc_t *data;
 	if (memcmp(&ce->ac_ethaddr, &arp->a46_sha,
 		sizeof(ce->ac_ethaddr)) != 0)
 	{
-		printf("arp[%d]: ethernet address for IP address ",
+		printk("arp[%d]: ethernet address for IP address ",
 			arp_port-arp_port_table);
 		writeIpAddr(spa);
-		printf(" changed from ");
+		printk(" changed from ");
 		writeEtherAddr(&ce->ac_ethaddr);
-		printf(" to ");
+		printk(" to ");
 		writeEtherAddr(&arp->a46_sha);
-		printf("\n");
+		printk("\n");
 		ce->ac_ethaddr= arp->a46_sha;
 	}
 	ce->ac_expire= curr_time+ARP_EXP_TIME;
@@ -878,7 +878,7 @@ ether_addr_t *ethaddr;
 	assert(eth_port >= 0 && eth_port < eth_conf_nr);
 	arp_port= &arp_port_table[eth_port];
 	assert(arp_port->ap_state == APS_ARPMAIN ||
-		(printf("arp[%d]: ap_state= %d\n", arp_port-arp_port_table,
+		(printk("arp[%d]: ap_state= %d\n", arp_port-arp_port_table,
 		arp_port->ap_state), 0));
 
 	curr_time= get_time();
@@ -905,10 +905,10 @@ ether_addr_t *ethaddr;
 		else
 		{
 			/* Continue using this entry for a while */
-			printf("arp[%d]: Overloaded! Keeping entry for ",
+			printk("arp[%d]: Overloaded! Keeping entry for ",
 				arp_port-arp_port_table);
 			writeIpAddr(ipaddr);
-			printf("\n");
+			printk("\n");
 			ce->ac_expire= curr_time+ARP_NOTRCH_EXP_TIME;
 		}
 	}
@@ -981,7 +981,7 @@ put_userdata_t put_userdata;
 	assert(eth_port >= 0 && eth_port < eth_conf_nr);
 	arp_port= &arp_port_table[eth_port];
 	assert(arp_port->ap_state == APS_ARPMAIN ||
-		(printf("arp[%d]: ap_state= %d\n", arp_port-arp_port_table,
+		(printk("arp[%d]: ap_state= %d\n", arp_port-arp_port_table,
 		arp_port->ap_state), 0));
 
 	switch(req)
@@ -1297,7 +1297,7 @@ int priority;
 			{
 				if (ev_in_queue(&arp_port->ap_event))
 				{
-					DBLOCK(1, printf(
+					DBLOCK(1, printk(
 			"not freeing ap_reclist, ap_event enqueued\n"));
 				}
 				else
@@ -1321,7 +1321,7 @@ int priority;
 			{
 				if (ev_in_queue(&arp_port->ap_event))
 				{
-					DBLOCK(1, printf(
+					DBLOCK(1, printk(
 			"not freeing ap_sendlist, ap_event enqueued\n"));
 				}
 				else

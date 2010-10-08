@@ -64,7 +64,7 @@ int dev_execve(int proc_e, char *exec, size_t exec_len, char **argv,
 	}
 
 #if 0
-printf("here: %s, %d\n", __FILE__, __LINE__);
+printk("here: %s, %d\n", __FILE__, __LINE__);
 	for (ep= envp; *ep != NULL; ep++) {
 		n = sizeof(*ep) + strlen(*ep) + 1;
 		frame_size+= n;
@@ -150,7 +150,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		&tot_bytes, &pc, &hdrlen);
 	if (r != 0)
 	{
-		printf("do_exec: read_header failed\n");
+		printk("do_exec: read_header failed\n");
 		goto fail;
 	}
 	need_restart= 1;
@@ -164,7 +164,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		&allow_setuid, pc);
 	if (r != 0)
 	{
-		printf("do_exec: exec_newmap failed: %d\n", r);
+		printk("do_exec: exec_newmap failed: %d\n", r);
 		error= r;
 		goto fail;
 	}
@@ -176,9 +176,9 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	r = sys_datacopy(ENDPT_SELF, (vir_bytes) frame,
 		proc_e, (vir_bytes) vsp, (phys_bytes)frame_len);
 	if (r != 0) {
-		printf("RS: stack_top is 0x%lx; tried to copy to 0x%lx in %d\n",
+		printk("RS: stack_top is 0x%lx; tried to copy to 0x%lx in %d\n",
 			stack_top, vsp);
-		printf("do_exec: copying out new stack failed: %d\n", r);
+		printk("do_exec: copying out new stack failed: %d\n", r);
 		error= r;
 		goto fail;
 	}
@@ -190,19 +190,19 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 		r= read_seg(exec, exec_len, off, proc_e, T, text_bytes);
 		if (r != 0)
 		{
-			printf("do_exec: read_seg failed: %d\n", r);
+			printk("do_exec: read_seg failed: %d\n", r);
 			error= r;
 			goto fail;
 		}
 	}
 	else
-		printf("do_exec: not loading text segment\n");
+		printk("do_exec: not loading text segment\n");
 
 	off += text_bytes;
 	r= read_seg(exec, exec_len, off, proc_e, D, data_bytes);
 	if (r != 0)
 	{
-		printf("do_exec: read_seg failed: %d\n", r);
+		printk("do_exec: read_seg failed: %d\n", r);
 		error= r;
 		goto fail;
 	}
@@ -210,7 +210,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	return exec_restart(proc_e, 0);
 
 fail:
-	printf("do_exec(fail): error = %d\n", error);
+	printk("do_exec(fail): error = %d\n", error);
 	if (need_restart)
 		exec_restart(proc_e, error);
 
@@ -267,14 +267,14 @@ vir_bytes entry_point;
 	if (r != 0)
 		return r;
 #if 0
-	printf("exec_newmem: r = %d, m_type = %d\n", r, m.m_type);
+	printk("exec_newmem: r = %d, m_type = %d\n", r, m.m_type);
 #endif
 	*stack_topp = m.m_data1;
 	*load_textp = !!(m.m_data2 & EXC_NM_RF_LOAD_TEXT);
 	*allow_setuidp = !!(m.m_data2 & EXC_NM_RF_ALLOW_SETUID);
 #if 0
-	printf("RS: exec_newmem: stack_top = 0x%x\n", *stack_topp);
-	printf("RS: exec_newmem: load_text = %d\n", *load_textp);
+	printk("RS: exec_newmem: stack_top = 0x%x\n", *stack_topp);
+	printk("RS: exec_newmem: load_text = %d\n", *load_textp);
 #endif
 	return m.m_type;
 }

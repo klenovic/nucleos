@@ -38,7 +38,7 @@ void prepare_shutdown(int how);
 void nucleos_shutdown(struct timer *tp);
 
 /* utility.c */
-int kprintf(const char *fmt, ...);
+int printk(const char *fmt, ...);
 void kernel_panic(char *s, int n);
 
 /* proc.c */

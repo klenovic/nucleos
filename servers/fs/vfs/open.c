@@ -160,7 +160,7 @@ static int common_open(register int oflags, mode_t omode)
 	  /* Get the driver endpoint of the block spec device */
 	  dp = &dmap[(vp->v_sdev >> MAJOR) & BYTE];
 	  if (dp->dmap_driver == ENDPT_NONE) {
-				printf("VFS: driver not found for device %d\n",
+				printk("VFS: driver not found for device %d\n",
 		      vp->v_sdev);
 				r = -ENXIO;
 	      break;
@@ -169,7 +169,7 @@ static int common_open(register int oflags, mode_t omode)
 			/* Send the driver endpoint (even when known already)*/
 			if ((r = req_newdriver(vp->v_bfs_e, vp->v_sdev,
 					       dp->dmap_driver)) != 0) {
-				printf("VFS: error sending driver endpoint\n");
+				printk("VFS: error sending driver endpoint\n");
 				r = -ENXIO;
 	  }
           break;
@@ -636,14 +636,14 @@ int do_vm_open()
 
 	/* Do open() call on behalf of any process, performed by VM. */ 
 	if(len < 2 || len > sizeof(user_fullpath)) {
-		printf("do_vm_open: strange length %d\n", len);
+		printk("do_vm_open: strange length %d\n", len);
 		m_out.VMVRO_FD = -EINVAL;
 	return(VM_VFS_REPLY_OPEN);
 	}
 
 	/* Do open on behalf of which process? */
 	if(isokendpt(ep, &n) != 0) {
-		printf("do_vm_open: strange endpoint %d\n", ep);
+		printk("do_vm_open: strange endpoint %d\n", ep);
 		m_out.VMVRO_FD = -EINVAL;
 	return(VM_VFS_REPLY_OPEN);
 	}
@@ -654,14 +654,14 @@ int do_vm_open()
 	/* Get path name from VM address space. */
 	if((r=sys_safecopyfrom(VM_PROC_NR, m_in.VMVO_NAME_GRANT, 0,
 		(vir_bytes) user_fullpath, len, D)) != 0) {
-		printf("do_vm_open: sys_safecopyfrom failed: %d\n", r);
+		printk("do_vm_open: sys_safecopyfrom failed: %d\n", r);
 		m_out.VMVRO_FD = -EPERM;
 	return(VM_VFS_REPLY_OPEN);
 	}
 
 	/* Check if path is null-terminated. */
 	if(user_fullpath[len-1] != '\0') {
-		printf("do_vm_open: name (len %d) not 0-terminated\n", len);
+		printk("do_vm_open: name (len %d) not 0-terminated\n", len);
 		m_out.VMVRO_FD = -EINVAL;
 	return(VM_VFS_REPLY_OPEN);
 	}
@@ -688,7 +688,7 @@ int do_vm_close()
 	/* Do close() call on behalf of any process, performed by VM. */ 
 	m_out.VMV_ENDPOINT = ep = m_in.VMVC_ENDPOINT;
 	if(isokendpt(ep, &n) != 0) {
-		printf("do_vm_close: strange endpoint %d\n", ep);
+		printk("do_vm_close: strange endpoint %d\n", ep);
 	return(VM_VFS_REPLY_CLOSE);
 	}
 

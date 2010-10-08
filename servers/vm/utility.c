@@ -153,7 +153,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	}
 
 	if (!found) {
-		printf("VM: Couldn't find initial ramdisk at 0x%x\n", initrd_base_clicks);
+		printk("VM: Couldn't find initial ramdisk at 0x%x\n", initrd_base_clicks);
 		return -ENXIO;
 	}
 

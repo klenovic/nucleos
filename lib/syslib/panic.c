@@ -45,16 +45,16 @@ int num;			/* number to go with format string */
 	me = proc.p_endpoint;
   }
 
-  printf("%s(%d): ", name, me);
+  printk("%s(%d): ", name, me);
 
-  printf("syslib:panic.c: stacktrace: ");
+  printk("syslib:panic.c: stacktrace: ");
   util_stacktrace();
 
   if (NULL != who && NULL != mess) {
       if (num != NO_NUM) {
-          printf("Panic in %s: %s: %d\n", who, mess, num);
+          printk("Panic in %s: %s: %d\n", who, mess, num);
       } else {
-          printf("Panic in %s: %s\n", who, mess); 
+          printk("Panic in %s: %s\n", who, mess); 
       }
   }
 

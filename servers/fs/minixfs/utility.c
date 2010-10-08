@@ -27,7 +27,7 @@
 int no_sys()
 {
 /* Somebody has used an illegal system call number */
-  printf("no_sys: invalid call %d\n", req_nr);
+  printk("no_sys: invalid call %d\n", req_nr);
   return(-EINVAL);
 }
 
@@ -91,7 +91,7 @@ time_t clock_time()
 int mfs_min_f(char *file, int line, int v1, int v2)
 {
 	if(v1 < 0 || v2 < 0) {
-		printf("mfs:%s:%d: strange string lengths: %d, %d\n",
+		printk("mfs:%s:%d: strange string lengths: %d, %d\n",
 			file, line, v1, v2);
 		panic(file, "strange string lengths", NO_NUM);
 	}
@@ -107,17 +107,17 @@ int mfs_min_f(char *file, int line, int v1, int v2)
 void mfs_nul_f(char *file, int line, char *str, int len, int maxlen)
 {
 	if(len < 1) {
-		printf("mfs:%s:%d: %d-length string?!\n", file, line, len);
+		printk("mfs:%s:%d: %d-length string?!\n", file, line, len);
 		panic(file, "strange string length", NO_NUM);
 	}
 	if(len < maxlen && str[len-1] != '\0') {
-		printf("mfs:%s:%d: string (length %d, maxlen %d) "
+		printk("mfs:%s:%d: string (length %d, maxlen %d) "
 			"not null-terminated\n",
 			file, line, len, maxlen);
 	}
 }
 
-#define MYASSERT(c) if(!(c)) { printf("MFS:%s:%d: sanity check: %s failed\n", \
+#define MYASSERT(c) if(!(c)) { printk("MFS:%s:%d: sanity check: %s failed\n", \
   file, line, #c); panic("MFS", "sanity check " #c " failed", __LINE__); }
 
 

@@ -27,7 +27,7 @@ int fs_putnode()
   if (count <= 0) return(-EINVAL);
   
   if (count > dir->d_count) {
-     printf("put_inode: count too high: %d > %d\n", count, dir->d_count);
+     printk("put_inode: count too high: %d > %d\n", count, dir->d_count);
      return(-EINVAL);
   }
 

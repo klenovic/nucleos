@@ -90,7 +90,7 @@ int r;
   case DEV_READ_S:
   case DEV_WRITE_S:
 	if (r == SUSPEND)
-		printf("driver_task: reviving %d with SUSPEND\n", proc_nr);
+		printk("driver_task: reviving %d with SUSPEND\n", proc_nr);
 
 	reply_mess.m_type = DEV_REVIVE;
 	reply_mess.REP_ENDPT = proc_nr;
@@ -119,7 +119,7 @@ int r;
   r= asynsend(device_caller, &reply_mess);
   if (r != 0)
   {
-	printf("driver_task: unable to asynsend to %d: %d\n",
+	printk("driver_task: unable to asynsend to %d: %d\n",
 		device_caller, r);
   }
 }
@@ -239,7 +239,7 @@ send_reply:
 		r= asynsend(device_caller, &mess);
 		if (r != 0)
 		{
-			printf("driver_task: unable to send reply to %d: %d\n",
+			printk("driver_task: unable to send reply to %d: %d\n",
 				device_caller, r);
 		}
 
@@ -380,7 +380,7 @@ kipc_msg_t *mp;
   case DEV_OPEN:	return(-ENODEV);
   case DEV_CLOSE:	return 0;
   case DEV_IOCTL_S:	
-  default:		printf("nop: ignoring code %d\n", mp->m_type);
+  default:		printk("nop: ignoring code %d\n", mp->m_type);
 			return(-EIO);
   }
 }

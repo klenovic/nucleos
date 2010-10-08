@@ -126,14 +126,14 @@ void mapping_dmp(void)
 {
   int h;
 
-  printf("Function key mappings for debug dumps in IS server.\n");
-  printf("        Key   Description\n");
-  printf("-------------------------------------");
-  printf("------------------------------------\n");
+  printk("Function key mappings for debug dumps in IS server.\n");
+  printk("        Key   Description\n");
+  printk("-------------------------------------");
+  printk("------------------------------------\n");
 
   for(h=0; h < NHOOKS; h++)
-      printf(" %10s.  %s\n", key_name(hooks[h].key), hooks[h].name);
-  printf("\n");
+      printk(" %10s.  %s\n", key_name(hooks[h].key), hooks[h].name);
+  printk("\n");
 }
 
 /*===========================================================================*

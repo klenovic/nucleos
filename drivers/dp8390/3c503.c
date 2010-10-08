@@ -115,11 +115,11 @@ dpeth_t * dep;
   outb_el2(dep, EL2_CFGR, ECFGR_NORM);	/* Enable shared memory */
 
   if (!debug) {
-	printf("%s: 3c503 at %X:%d:%lX\n",
+	printk("%s: 3c503 at %X:%d:%lX\n",
 		dep->de_name, dep->de_base_port, dep->de_irq,
 		dep->de_linmem + dep->de_offset_page);
   } else {
-	printf("%s: 3Com Etherlink II %sat I/O address 0x%X, "
+	printk("%s: 3Com Etherlink II %sat I/O address 0x%X, "
 			"memory address 0x%lX, irq %d\n",
 		dep->de_name, dep->de_16bit ? "(16-bit) " : "",
 		dep->de_base_port,
@@ -137,7 +137,7 @@ dpeth_t * dep;
   /* Stops board by disabling interrupts. */
 
 #if DEBUG
-  printf("%s: stopping Etherlink\n", dep->de_name);
+  printk("%s: stopping Etherlink\n", dep->de_name);
 #endif
   outb_el2(dep, EL2_CFGR, ECFGR_IRQOFF);
   return;

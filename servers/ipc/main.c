@@ -30,19 +30,19 @@ int main(int argc, char *argv[])
 	SELF_E = getprocnr();
 
 	if(verbose)
-		printf("IPC: self: %d\n", SELF_E);
+		printk("IPC: self: %d\n", SELF_E);
 
 	while (TRUE) {
 		int r;
 		int i;
 
 		if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
-			printf("IPC receive error %d.\n", r);
+			printk("IPC receive error %d.\n", r);
 		who_e = m.m_source;
 		call_type = m.m_type;
 
 		if(verbose)
-			printf("IPC: get %d from %d\n", call_type, who_e);
+			printk("IPC: get %d from %d\n", call_type, who_e);
 
 		if (call_type & NOTIFY_MESSAGE) {
 			switch (who_e) {
@@ -52,14 +52,14 @@ int main(int argc, char *argv[])
 				 * give warning messages.
 				 */
 				if (!is_sem_nil() || !is_shm_nil())
-					printf("IPC: exit with un-clean states.\n");
+					printk("IPC: exit with un-clean states.\n");
 				break;
 			case VM_PROC_NR:
 				/* currently, only semaphore needs such information. */
 				sem_process_vm_notify();
 				break;
 			default:
-				printf("IPC: ignoring notify() from %d\n",
+				printk("IPC: ignoring notify() from %d\n",
 					who_e);
 				break;
 			}
@@ -79,18 +79,18 @@ int main(int argc, char *argv[])
 				m.m_type = result;
 
 				if(verbose && result != 0)
-					printf("IPC: error for %d: %d\n",
+					printk("IPC: error for %d: %d\n",
 						call_type, result);
 
 				if ((r = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who_e, &m)) != 0)
-					printf("IPC send error %d.\n", r);
+					printk("IPC send error %d.\n", r);
 				break;
 			}
 		}
 
 		if (i == SIZE(ipc_calls)) {
 			/* warn and then ignore */
-			printf("IPC unknown call type: %d from %d.\n",
+			printk("IPC unknown call type: %d from %d.\n",
 				call_type, who_e);
 		}
 		update_refcount_and_destroy();

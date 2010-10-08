@@ -123,7 +123,7 @@ select_res_t select_res;
 
 	if (i>= UDP_FD_NR)
 	{
-		DBLOCK(1, printf("out of fds\n"));
+		DBLOCK(1, printk("out of fds\n"));
 		return -EAGAIN;
 	}
 
@@ -244,7 +244,7 @@ udp_port_t *udp_port;
 		if (udp_port->up_ipfd < 0)
 		{
 			udp_port->up_state= UPS_ERROR;
-			DBLOCK(1, printf("%s, %d: unable to open ip port\n",
+			DBLOCK(1, printk("%s, %d: unable to open ip port\n",
 				__FILE__, __LINE__));
 			return;
 		}
@@ -287,7 +287,7 @@ udp_port_t *udp_port;
 		read_ip_packets(udp_port);
 		return;
 	default:
-		DBLOCK(1, printf("udp_port_table[%d].up_state= %d\n",
+		DBLOCK(1, printk("udp_port_table[%d].up_state= %d\n",
 			udp_port->up_ipdev, udp_port->up_state));
 		ip_panic(( "unknown state" ));
 		break;
@@ -321,7 +321,7 @@ unsigned operations;
 	}
 	if (operations & SR_SELECT_EXCEPTION)
 	{
-		printf("udp_select: not implemented for exceptions\n");
+		printk("udp_select: not implemented for exceptions\n");
 	}
 	return resops;
 }
@@ -405,7 +405,7 @@ assert (udp_port->up_wr_pack);
 		}
 		break;
 	default:
-		printf("udp_get_data(%d, 0x%x, 0x%x) called but up_state= 0x%x\n",
+		printk("udp_get_data(%d, 0x%x, 0x%x) called but up_state= 0x%x\n",
 			port, offset, count, udp_port->up_state);
 		break;
 	}
@@ -513,7 +513,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 
 	if (new_en_flags & new_di_flags)
 	{
-		DBLOCK(1, printf("returning -EBADMODE\n"));
+		DBLOCK(1, printk("returning -EBADMODE\n"));
 
 		reply_thr_get(udp_fd, -EBADMODE, TRUE);
 		return 0;
@@ -522,7 +522,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	/* NWUO_ACC_MASK */
 	if (new_di_flags & NWUO_ACC_MASK)
 	{
-		DBLOCK(1, printf("returning -EBADMODE\n"));
+		DBLOCK(1, printk("returning -EBADMODE\n"));
 
 		reply_thr_get(udp_fd, -EBADMODE, TRUE);
 		return 0;
@@ -535,7 +535,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	/* NWUO_LOCPORT_MASK */
 	if (new_di_flags & NWUO_LOCPORT_MASK)
 	{
-		DBLOCK(1, printf("returning -EBADMODE\n"));
+		DBLOCK(1, printk("returning -EBADMODE\n"));
 
 		reply_thr_get(udp_fd, -EBADMODE, TRUE);
 		return 0;
@@ -554,7 +554,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 	{
 		if (!newopt.nwuo_locport)
 		{
-			DBLOCK(1, printf("returning -EBADMODE\n"));
+			DBLOCK(1, printk("returning -EBADMODE\n"));
 
 			reply_thr_get(udp_fd, -EBADMODE, TRUE);
 			return 0;
@@ -610,7 +610,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 		((new_flags & NWUO_LOCPORT_MASK) == NWUO_LP_ANY || 
 		(new_flags & (NWUO_RP_ANY|NWUO_RA_ANY|NWUO_EN_IPOPT))))
 	{
-		DBLOCK(1, printf("returning -EBADMODE\n"));
+		DBLOCK(1, printk("returning -EBADMODE\n"));
 
 		reply_thr_get(udp_fd, -EBADMODE, TRUE);
 		return 0;
@@ -640,7 +640,7 @@ assert (data->acc_length == sizeof(nwio_udpopt_t));
 			if ((flags & NWUO_ACC_MASK) != 
 				(new_flags & NWUO_ACC_MASK))
 			{
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 			"address inuse: new fd= %d, old_fd= %d, port= %u\n",
 					udp_fd-udp_fd_table,
 					fd_ptr-udp_fd_table,
@@ -937,11 +937,11 @@ size_t pack_size;
 			/* IP layer reports new IP address */
 			ipaddr= ip_hdr->ih_src;
 			udp_port->up_ipaddr= ipaddr;
-			DBLOCK(1, printf("udp_ip_arrived: using address ");
-				writeIpAddr(ipaddr); printf("\n"));
+			DBLOCK(1, printk("udp_ip_arrived: using address ");
+				writeIpAddr(ipaddr); printk("\n"));
 		}
 		else
-			DBLOCK(1, printf("packet too small\n"));
+			DBLOCK(1, printk("packet too small\n"));
 
 		bf_afree(ip_hdr_acc);
 		bf_afree(pack);
@@ -957,7 +957,7 @@ size_t pack_size;
 	udp_size= ntohs(udp_hdr->uh_length);
 	if (udp_size > pack_size)
 	{
-		DBLOCK(1, printf("packet too large\n"));
+		DBLOCK(1, printk("packet too large\n"));
 
 		bf_afree(ip_hdr_acc);
 		bf_afree(udp_acc);
@@ -979,13 +979,13 @@ size_t pack_size;
 			sizeof(udp_hdr->uh_length));
 		if (~chksum & 0xffff)
 		{
-			DBLOCK(1, printf("checksum error in udp packet\n");
-				printf("src ip_addr= ");
+			DBLOCK(1, printk("checksum error in udp packet\n");
+				printk("src ip_addr= ");
 				writeIpAddr(src_addr);
-				printf(" dst ip_addr= ");
+				printk(" dst ip_addr= ");
 				writeIpAddr(dst_addr);
-				printf("\n");
-				printf("packet chksum= 0x%x, sum= 0x%x\n",
+				printk("\n");
+				printk("packet chksum= 0x%x, sum= 0x%x\n",
 					udp_hdr->uh_chksum, chksum));
 
 			bf_afree(ip_hdr_acc);
@@ -1013,11 +1013,11 @@ size_t pack_size;
 		delivered= 1;
 	}
 
-	DBLOCK(0x20, printf("udp: got packet from ");
+	DBLOCK(0x20, printk("udp: got packet from ");
 		writeIpAddr(src_addr);
-		printf(".%u to ", ntohs(src_port));
+		printk(".%u to ", ntohs(src_port));
 		writeIpAddr(dst_addr);
-		printf(".%u\n", ntohs(dst_port)));
+		printk(".%u\n", ntohs(dst_port)));
 
 	no_ipopt_pack= bf_memreq(UDP_IO_HDR_SIZE);
 	udp_io_hdr= (udp_io_hdr_t *)ptr2acc_data(no_ipopt_pack);
@@ -1144,11 +1144,11 @@ size_t pack_size;
 
 	if (!delivered)
 	{
-		DBLOCK(0x2, printf("udp: could not deliver packet from ");
+		DBLOCK(0x2, printk("udp: could not deliver packet from ");
 			writeIpAddr(src_addr);
-			printf(".%u to ", ntohs(src_port));
+			printk(".%u to ", ntohs(src_port));
 			writeIpAddr(dst_addr);
-			printf(".%u\n", ntohs(dst_port)));
+			printk(".%u\n", ntohs(dst_port)));
 
 		pack= bf_append(ip_hdr_acc, udp_acc);
 		ip_hdr_acc= NULL;
@@ -1214,7 +1214,7 @@ assert (!(udp_fd->uf_flags & UFF_WRITE_IP));
 
 	if (udp_fd->uf_flags & UFF_WRITE_IP)
 	{
-		DBLOCK(1, printf("replying NW_SUSPEND\n"));
+		DBLOCK(1, printk("replying NW_SUSPEND\n"));
 
 		return NW_SUSPEND;
 	}
@@ -1475,7 +1475,7 @@ int which_operation;
 {
 	udp_fd_t *udp_fd;
 
-	DBLOCK(0x10, printf("udp_cancel(%d, %d)\n", fd, which_operation));
+	DBLOCK(0x10, printk("udp_cancel(%d, %d)\n", fd, which_operation));
 
 	udp_fd= &udp_fd_table[fd];
 
@@ -1584,7 +1584,7 @@ clock_t exp_tim;
 		if (udp_fd->uf_select_res)
 			udp_fd->uf_select_res(udp_fd->uf_srfd, SR_SELECT_READ);
 		else
-			printf("udp_rd_enqueue: no select_res\n");
+			printk("udp_rd_enqueue: no select_res\n");
 	}
 }
 

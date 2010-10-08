@@ -289,8 +289,8 @@ register struct minix3_super_block *sp; /* pointer to a superblock */
 				|| sp->s_firstdatazone <= 4
 				|| sp->s_firstdatazone >= sp->s_zones
 				|| (unsigned) sp->s_log_zone_size > 4) {
-  	printf("not enough imap or zone map blocks, \n");
-  	printf("or not enough inodes, or not enough zones, \n"
+  	printk("not enough imap or zone map blocks, \n");
+  	printk("or not enough inodes, or not enough zones, \n"
   		"or invalid first data zone, or zone size too large\n");
 	return(-EINVAL);
   }

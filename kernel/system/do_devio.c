@@ -51,7 +51,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
     privp= priv(rp);
     if (!privp)
     {
-	kprintf("no priv structure!\n");
+	printk("no priv structure!\n");
 	goto doit;
     }
     if (privp->s_flags & CHECK_IO_PORT)
@@ -72,7 +72,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	}
 	if (i >= nr_io_range)
 	{
-			kprintf("do_devio: port 0x%x (size %d) not allowed\n",
+			printk("do_devio: port 0x%x (size %d) not allowed\n",
 				m_ptr->DIO_PORT, size);
 		return -EPERM;
 	}
@@ -81,7 +81,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 doit:
     if (m_ptr->DIO_PORT & (size-1))
     {
-		kprintf("do_devio: unaligned port 0x%x (size %d)\n",
+		printk("do_devio: unaligned port 0x%x (size %d)\n",
 			m_ptr->DIO_PORT, size);
 	return -EPERM;
     }

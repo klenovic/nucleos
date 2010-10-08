@@ -248,7 +248,7 @@ int main(void)
 #if 0
 		if (tty_mess.m_source != LOG_PROC_NR)
 		{
-			printf("[%d ", tty_mess.m_source);
+			printk("[%d ", tty_mess.m_source);
 		}
 #endif
 		do_diagnostics(&tty_mess, 0);
@@ -308,7 +308,7 @@ int main(void)
 
 	/* If the device doesn't exist or is not configured return -ENXIO. */
 	if (tp == NULL || ! tty_active(tp)) {
-		printf("Warning, TTY got illegal request %d from %d\n",
+		printk("Warning, TTY got illegal request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
 		if (tty_mess.m_source != LOG_PROC_NR)
 		{
@@ -328,7 +328,7 @@ int main(void)
 	    case DEV_SELECT:	 do_select(tp, &tty_mess);	  break;
 	    case CANCEL:	 do_cancel(tp, &tty_mess);	  break;
 	    default:		
-		printf("Warning, TTY got unexpected request %d from %d\n",
+		printk("Warning, TTY got unexpected request %d from %d\n",
 			tty_mess.m_type, tty_mess.m_source);
 	    tty_reply(KCNR_TASK_REPLY, tty_mess.m_source,
 						tty_mess.IO_ENDPT, -EINVAL);
@@ -438,7 +438,7 @@ kipc_msg_t *m_ptr;
   /* Almost done. Send back the reply message to the caller. */
   status = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, m_ptr->m_source, m_ptr);
   if (status != 0) {
-	printf("tty`do_status: send to %d failed: %d\n",
+	printk("tty`do_status: send to %d failed: %d\n",
 		m_ptr->m_source, status);
   }
 }
@@ -727,7 +727,7 @@ int safe;
 	break;
 
     case TIOCSFON_OLD:
-	printf("TTY: old TIOCSFON ignored.\n");
+	printk("TTY: old TIOCSFON ignored.\n");
 	break;
     case TIOCSFON:
 	/* Load a font into an EGA or VGA card (hs@hck.hr) */
@@ -1516,13 +1516,13 @@ int status;			/* reply code */
    */
   if(code == TTY_REVIVE) {
 	panicing = 1;
-	printf("%s:%d: ", file, line);
+	printk("%s:%d: ", file, line);
 	panic("TTY","tty_reply sending TTY_REVIVE", NO_NUM);
   }
 
   status = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, replyee, &tty_mess);
   if (status != 0)
-	printf("tty`tty_reply: send to %d failed: %d\n", replyee, status);
+	printk("tty`tty_reply: send to %d failed: %d\n", replyee, status);
 }
 
 /*===========================================================================*

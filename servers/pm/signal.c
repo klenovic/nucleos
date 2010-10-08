@@ -168,13 +168,13 @@ sigset_t sig_map;
   pid_t proc_id, id;
 
   if(pm_isokendpt(proc_nr_e, &proc_nr) != 0 || proc_nr < 0) {
-	printf("PM: handle_ksig: %d?? not ok\n", proc_nr_e);
+	printk("PM: handle_ksig: %d?? not ok\n", proc_nr_e);
 	return;
   }
   rmp = &mproc[proc_nr];
   if ((rmp->mp_flags & (IN_USE | EXITING)) != IN_USE) {
 #if 0
-	printf("PM: handle_ksig: %d?? exiting / not in use\n", proc_nr_e);
+	printk("PM: handle_ksig: %d?? exiting / not in use\n", proc_nr_e);
 #endif
 	return;
   }
@@ -193,7 +193,7 @@ sigset_t sig_map;
   for (i = 1; i < _NSIG; i++) {
 	if (!sigismember(&sig_map, i)) continue;
 #if 0
-	printf("PM: sig %d for %d from kernel\n", 
+	printk("PM: sig %d for %d from kernel\n", 
 		i, proc_nr_e);
 #endif
 	switch (i) {
@@ -269,7 +269,7 @@ int trace;			/* pass signal to tracer first? */
 
   slot = (int) (rmp - mproc);
   if ((rmp->mp_flags & (IN_USE | EXITING)) != IN_USE) {
-	printf("PM: signal %d sent to exiting process %d\n", signo, slot);
+	printk("PM: signal %d sent to exiting process %d\n", signo, slot);
 	panic(__FILE__,"", NO_NUM);
   }
 
@@ -358,7 +358,7 @@ int trace;			/* pass signal to tracer first? */
   /* Terminate process */
   rmp->mp_sigstatus = (char) signo;
   if (sigismember(&core_sset, signo)) {
-	printf("PM: coredump signal %d for %d / %s\n", signo, rmp->mp_pid,
+	printk("PM: coredump signal %d for %d / %s\n", signo, rmp->mp_pid,
 		rmp->mp_name);
 	exit_proc(rmp, 0, TRUE /*dump_core*/);
   }

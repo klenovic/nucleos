@@ -260,14 +260,14 @@ int ipps_check(ip_port_t *ip_port)
 	bad= 0;
 	if (prev != NULL && prev != ip_port->ip_dl.dl_ps.ps_send_tail_)
 	{
-		printf("ipps_check, ip[%d]: wrong tail: got %p, expected %p\n",
+		printk("ipps_check, ip[%d]: wrong tail: got %p, expected %p\n",
 			ip_port-ip_port_table,
 			ip_port->ip_dl.dl_ps.ps_send_tail_, prev);
 		bad++;
 	}
 	if (n != ip_port->ip_dl.dl_ps.ps_send_nr)
 	{
-		printf("ipps_check, ip[%d]: wrong count: got %d, expected %d\n",
+		printk("ipps_check, ip[%d]: wrong count: got %d, expected %d\n",
 			ip_port-ip_port_table,
 			ip_port->ip_dl.dl_ps.ps_send_nr, n);
 		bad++;

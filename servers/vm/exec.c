@@ -85,7 +85,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 
 	if (vm_isokendpt(proc_e, &proc_n) != 0)
 	{
-		printf("VM: exec_newmem: bad endpoint %d from %d\n",
+		printk("VM: exec_newmem: bad endpoint %d from %d\n",
 			proc_e, msg->m_source);
 		return -ESRCH;
 	}
@@ -95,7 +95,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 	NOTRUNNABLE(vmp->vm_endpoint);
 
 	if (msg->VMEN_ARGSSIZE != sizeof(args)) {
-		printf("VM: exec_newmem: args size %d != %ld\n",
+		printk("VM: exec_newmem: args size %d != %ld\n",
 			msg->VMEN_ARGSSIZE, sizeof(args));
 		return -EINVAL;
 	}
@@ -114,7 +114,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 	sc = (args.args_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
 
 	if (dc >= totc) {
-		printf("VM: newmem: no stack?\n");
+		printk("VM: newmem: no stack?\n");
 		return(-ENOEXEC); /* stack must be at least 1 click */
 	}
 
@@ -124,7 +124,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 	r = (dvir + dc > s_vir) ? -ENOMEM : 0;
 
 	if (r != 0) {
-		printf("VM: newmem: no virtual space?\n");
+		printk("VM: newmem: no virtual space?\n");
 		return r;
 	}
 
@@ -149,7 +149,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 		args.bss_bytes, args.args_bytes, args.tot_bytes, &stack_top);
 
 	if (r != 0) {
-		printf("VM: newmem: new_mem failed\n");
+		printk("VM: newmem: new_mem failed\n");
 		return(r);
 	}
 
@@ -220,7 +220,7 @@ vir_bytes *stack_top;		/* top of process stack */
   tot_clicks = (tot_bytes + CLICK_SIZE - 1) >> CLICK_SHIFT;
   gap_clicks = tot_clicks - data_clicks - stack_clicks;
   if ( (int) gap_clicks < 0) {
-	printf("VM: new_mem: no gap?\n");
+	printk("VM: new_mem: no gap?\n");
 	return(-ENOMEM);
   }
 
@@ -265,7 +265,7 @@ SANITYCHECK(SCL_DETAIL);
 	SANITYCHECK(SCL_DETAIL);
 	if((r=pt_new(&rmp->vm_pt)) != 0) {
 		ptok = 0;
-		printf("exec_newmem: no new pagetable\n");
+		printk("exec_newmem: no new pagetable\n");
 	}
 
 	SANITYCHECK(SCL_DETAIL);
@@ -279,7 +279,7 @@ SANITYCHECK(SCL_DETAIL);
 	 VM_STACKTOP		/* regular stack top */
 	 )) != 0) {
 		SANITYCHECK(SCL_DETAIL);
-		printf("VM: new_mem: failed\n");
+		printk("VM: new_mem: failed\n");
 		if(ptok) {
 			pt_free(&rmp->vm_pt);
 		}
@@ -296,7 +296,7 @@ SANITYCHECK(SCL_DETAIL);
 			rmp->vm_flags |= VMF_HASPT;
 			SANITYCHECK(SCL_DETAIL);
 			if(map_writept(rmp) != 0) {
-				printf("VM: warning: exec undo failed\n");
+				printk("VM: warning: exec undo failed\n");
 			}
 			SANITYCHECK(SCL_DETAIL);
 		}
@@ -316,7 +316,7 @@ SANITYCHECK(SCL_DETAIL);
 
 	new_base = ALLOC_MEM(text_clicks + tot_clicks, 0);
 	if (new_base == NO_MEM) {
-		printf("VM: new_mem: ALLOC_MEM failed\n");
+		printk("VM: new_mem: ALLOC_MEM failed\n");
 		return(-ENOMEM);
 	}
 
@@ -449,7 +449,7 @@ int proc_new(struct vmproc *vmp,
 		  text_start ? text_start : MAP_NONE,
 		  VR_ANON | VR_WRITABLE, text_start ? 0 : MF_PREALLOC)) {
 			SANITYCHECK(SCL_DETAIL);
-			printf("VM: proc_new: map_page_region failed (text)\n");
+			printk("VM: proc_new: map_page_region failed (text)\n");
 			map_free_proc(vmp);
 			SANITYCHECK(SCL_DETAIL);
 			return(-ENOMEM);
@@ -465,7 +465,7 @@ int proc_new(struct vmproc *vmp,
 	if(!(vmp->vm_heap = map_page_region(vmp, vstart + text_bytes, 0,
 	  data_bytes, data_start ? data_start : MAP_NONE, VR_ANON | VR_WRITABLE,
 		data_start ? 0 : MF_PREALLOC))) {
-		printf("VM: exec: map_page_region for data failed\n");
+		printk("VM: exec: map_page_region for data failed\n");
 		map_free_proc(vmp);
 		SANITYCHECK(SCL_DETAIL);
 		return -ENOMEM;

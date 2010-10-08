@@ -56,7 +56,7 @@ int main(void)
 		r= kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 		if (r < 0)
 		{
-			printf("PCI: receive from ENDPT_ANY failed: %d\n", r);
+			printk("PCI: receive from ENDPT_ANY failed: %d\n", r);
 			break;
 		}
 
@@ -65,7 +65,7 @@ int main(void)
 				case PM_PROC_NR:
 					break;
 				default:
-					printf("PCI: got notify from %d\n",
+					printk("PCI: got notify from %d\n",
 								m.m_source);
 					break;
 			}
@@ -95,7 +95,7 @@ int main(void)
 		case BUSC_PCI_SET_ACL: do_set_acl(&m); break;
 		case BUSC_PCI_DEL_ACL: do_del_acl(&m); break;
 		default:
-			printf("PCI: got message from %d, type %d\n",
+			printk("PCI: got message from %d, type %d\n",
 				m.m_source, m.m_type);
 			break;
 		}
@@ -110,13 +110,13 @@ kipc_msg_t *mp;
 	int r;
 
 #if DEBUG
-	printf("PCI: pci_init: called by '%d'\n", mp->m_source);
+	printk("PCI: pci_init: called by '%d'\n", mp->m_source);
 #endif
 
 	mp->m_type= 0;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
-		printf("PCI: do_init: unable to send to %d: %d\n",
+		printk("PCI: do_init: unable to send to %d: %d\n",
 			mp->m_source, r);
 }
 
@@ -130,7 +130,7 @@ kipc_msg_t *mp;
 	aclp= find_acl(mp->m_source);
 
 	if (!aclp && debug)
-		printf("PCI: do_first_dev: no acl for caller %d\n",
+		printk("PCI: do_first_dev: no acl for caller %d\n",
 			mp->m_source);
 
 	r= pci_first_dev_a(aclp, &devind, &vid, &did);
@@ -144,7 +144,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_first_dev: unable to send to %d: %d\n",
+		printk("PCI: do_first_dev: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -170,7 +170,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_next_dev: unable to send to %d: %d\n",
+		printk("PCI: do_next_dev: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -192,7 +192,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_find_dev: unable to send to %d: %d\n",
+		printk("PCI: do_find_dev: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -208,7 +208,7 @@ kipc_msg_t *mp;
 	r= pci_ids_s(devind, &vid, &did);
 	if (r != 0)
 	{
-		printf("pci:do_ids: failed for devind %d: %d\n",
+		printk("pci:do_ids: failed for devind %d: %d\n",
 			devind, r);
 	}
 
@@ -218,7 +218,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_ids: unable to send to %d: %d\n",
+		printk("PCI: do_ids: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -246,7 +246,7 @@ kipc_msg_t *mp;
 		len= strlen(name)+1;
 		if (len > name_len)
 			len= name_len;
-		printf("PCI: pci`do_dev_name: calling do_vircopy\n");
+		printk("PCI: pci`do_dev_name: calling do_vircopy\n");
 		r= sys_vircopy(ENDPT_SELF, D, (vir_bytes)name, mp->m_source, D,
 			(vir_bytes)name_ptr, len);
 	}
@@ -255,7 +255,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_dev_name: unable to send to %d: %d\n",
+		printk("PCI: do_dev_name: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -292,7 +292,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_dev_name: unable to send to %d: %d\n",
+		printk("PCI: do_dev_name: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -311,7 +311,7 @@ kipc_msg_t *mp;
 	r= pci_slot_name_s(devind, &name);
 	if (r != 0)
 	{
-		printf("pci:do_slot_name_s: failed for devind %d: %d\n",
+		printk("pci:do_slot_name_s: failed for devind %d: %d\n",
 			devind, r);
 	}
 
@@ -328,7 +328,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("PCI: do_slot_name: unable to send to %d: %d\n",
+		printk("PCI: do_slot_name: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -340,7 +340,7 @@ kipc_msg_t *mp;
 
 	if (mp->m_source != RS_PROC_NR)
 	{
-		printf("PCI: do_set_acl: not from RS\n");
+		printk("PCI: do_set_acl: not from RS\n");
 		reply(mp, -EPERM);
 		return;
 	}
@@ -352,7 +352,7 @@ kipc_msg_t *mp;
 	}
 	if (i >= NR_DRIVERS)
 	{
-		printf("PCI: do_set_acl: table is full\n");
+		printk("PCI: do_set_acl: table is full\n");
 		reply(mp, -ENOMEM);
 		return;
 	}
@@ -363,13 +363,13 @@ kipc_msg_t *mp;
 		sizeof(acl[i].acl), D);
 	if (r != 0)
 	{
-		printf("PCI: do_set_acl: safecopyfrom failed\n");
+		printk("PCI: do_set_acl: safecopyfrom failed\n");
 		reply(mp, r);
 		return;
 	}
 	acl[i].inuse= 1;
 	if(debug)
-	  printf("PCI: do_acl: setting ACL for %d ('%s') at entry %d\n",
+	  printk("PCI: do_acl: setting ACL for %d ('%s') at entry %d\n",
 		acl[i].acl.rsp_endpoint, acl[i].acl.rsp_label,
 		i);
 
@@ -383,7 +383,7 @@ kipc_msg_t *mp;
 
 	if (mp->m_source != RS_PROC_NR)
 	{
-		printf("do_del_acl: not from RS\n");
+		printk("do_del_acl: not from RS\n");
 		reply(mp, -EPERM);
 		return;
 	}
@@ -400,14 +400,14 @@ kipc_msg_t *mp;
 
 	if (i >= NR_DRIVERS)
 	{
-		printf("do_del_acl: nothing found for %d\n", proc_nr);
+		printk("do_del_acl: nothing found for %d\n", proc_nr);
 		reply(mp, -EINVAL);
 		return;
 	}
 
 	acl[i].inuse= 0;
 #if 0
-	printf("do_acl: deleting ACL for %d ('%s') at entry %d\n",
+	printk("do_acl: deleting ACL for %d ('%s') at entry %d\n",
 		acl[i].acl.rsp_endpoint, acl[i].acl.rsp_label, i);
 #endif
 
@@ -428,7 +428,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_reserve: unable to send to %d: %d\n",
+		printk("do_reserve: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -445,7 +445,7 @@ kipc_msg_t *mp;
 	r= pci_attr_r8_s(devind, port, &v);
 	if (r != 0)
 	{
-		printf(
+		printk(
 		"pci:do_attr_r8: pci_attr_r8_s(%d, %d, ...) failed: %d\n",
 			devind, port, r);
 	}
@@ -454,7 +454,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_r8: unable to send to %d: %d\n",
+		printk("do_attr_r8: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -474,7 +474,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_r16: unable to send to %d: %d\n",
+		printk("do_attr_r16: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -491,7 +491,7 @@ kipc_msg_t *mp;
 	r= pci_attr_r32_s(devind, port, &v);
 	if (r != 0)
 	{
-		printf(
+		printk(
 		"pci:do_attr_r32: pci_attr_r32_s(%d, %d, ...) failed: %d\n",
 			devind, port, r);
 	}
@@ -500,7 +500,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_r32: unable to send to %d: %d\n",
+		printk("do_attr_r32: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -520,7 +520,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_w8: unable to send to %d: %d\n",
+		printk("do_attr_w8: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -540,7 +540,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_w16: unable to send to %d: %d\n",
+		printk("do_attr_w16: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -560,7 +560,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_attr_w32: unable to send to %d: %d\n",
+		printk("do_attr_w32: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -577,7 +577,7 @@ kipc_msg_t *mp;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, mp);
 	if (r != 0)
 	{
-		printf("do_rescan_bus: unable to send to %d: %d\n",
+		printk("do_rescan_bus: unable to send to %d: %d\n",
 			mp->m_source, r);
 	}
 }
@@ -593,7 +593,7 @@ int result;
 	m.m_type= result;
 	r= kipc_module_call(KIPC_SEND, 0, mp->m_source, &m);
 	if (r != 0)
-		printf("reply: unable to send to %d: %d\n", mp->m_source, r);
+		printk("reply: unable to send to %d: %d\n", mp->m_source, r);
 }
 
 

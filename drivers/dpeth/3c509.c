@@ -255,7 +255,7 @@ static void el3_send(dpeth_t * dep, int from_int, int count)
   if ((dep->de_flags & DEF_XMIT_BUSY) &&
       (now - dep->de_xmit_start) > 4) {
 
-	DEBUG(printf("3c509:  Transmitter timed out. Resetting ....\n");)
+	DEBUG(printk("3c509:  Transmitter timed out. Resetting ....\n");)
 	dep->de_stat.ets_sendErr += 1;
 	/* Resets and restars the transmitter */
 	outw_el3(dep, REG_CmdStatus, CMD_TxReset);
@@ -317,7 +317,7 @@ static void el3_close(dpeth_t * dep)
 		 NOT((MediaLBeatEnable | MediaJabberEnable)));
 	/* milli_delay(5); */
   }
-  DEBUG(printf("%s: stopping Etherlink ... \n", dep->de_name));
+  DEBUG(printk("%s: stopping Etherlink ... \n", dep->de_name));
   /* Issues a global reset
   outw_el3(dep, REG_CmdStatus, CMD_GlobalReset); */
   sys_irqdisable(&dep->de_hook);	/* Disable interrupt */
@@ -342,7 +342,7 @@ static void el3_interrupt(dpeth_t * dep)
 		el3_rx_complete(dep);
 
 	if (isr & INT_TxAvailable) {	/* Tx has room for big packets */
-		DEBUG(printf("3c509: got Tx interrupt, Status=0x%04x\n", isr);)
+		DEBUG(printk("3c509: got Tx interrupt, Status=0x%04x\n", isr);)
 		dep->de_flags &= NOT(DEF_XMIT_BUSY);
 		outw_el3(dep, REG_CmdStatus, CMD_Acknowledge | INT_TxAvailable);
 		if (dep->de_flags & DEF_SENDING)	/* Send pending */
@@ -358,7 +358,7 @@ static void el3_interrupt(dpeth_t * dep)
 
 		if (isr & INT_AdapterFail) {
 			/* Adapter error. Reset and re-enable receiver */
-			DEBUG(printf("3c509: got Rx fail interrupt, Status=0x%04x\n", isr);)
+			DEBUG(printk("3c509: got Rx fail interrupt, Status=0x%04x\n", isr);)
 			el3_rx_mode(dep);
 			outw_el3(dep, REG_CmdStatus, CMD_Acknowledge | INT_AdapterFail);
 		}
@@ -504,11 +504,11 @@ static void el3_open(dpeth_t * dep)
   dep->de_dumpstatsf = el3_dodump;
   dep->de_interruptf = el3_interrupt;
 
-  printf("%s: Etherlink III (%s) at %X:%d, %s port - ",
+  printk("%s: Etherlink III (%s) at %X:%d, %s port - ",
          dep->de_name, "3c509", dep->de_base_port, dep->de_irq,
          IfNamesMsg[dep->de_if_port >> 14]);
   for (ix = 0; ix < SA_ADDR_LEN; ix += 1)
-	printf("%02X%c", dep->de_address.ea_addr[ix],
+	printk("%02X%c", dep->de_address.ea_addr[ix],
 	       ix < SA_ADDR_LEN - 1 ? ':' : '\n');
 
   return;			/* Done */

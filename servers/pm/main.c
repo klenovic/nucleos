@@ -173,7 +173,7 @@ send_reply:
 		   (REPLY | IN_USE)) {
 			s=kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, rmp->mp_endpoint, &rmp->mp_reply);
 			if (s != 0) {
-				printf("PM can't reply to %d (%s): %d\n",
+				printk("PM can't reply to %d (%s): %d\n",
 					rmp->mp_endpoint, rmp->mp_name, s);
 			}
 			rmp->mp_flags &= ~REPLY;
@@ -393,7 +393,7 @@ void checkme(char *str, int line)
 		   (REPLY | IN_USE)) {
 			int tp;
 			if(pm_isokendpt(trmp->mp_endpoint, &tp) != 0) {
-			   printf("PM: %s:%d: reply %d to %s is bogus endpoint %d after call %d by %d\n",
+			   printk("PM: %s:%d: reply %d to %s is bogus endpoint %d after call %d by %d\n",
 				str, line, trmp->mp_reply.m_type,
 				trmp->mp_name, trmp->mp_endpoint, call_nr, who_e);
 			   boned=1;

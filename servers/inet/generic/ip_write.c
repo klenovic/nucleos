@@ -214,9 +214,9 @@ size_t data_len;
 	if (r<0)
 	{
 		DIFBLOCK(1, r == -EAFNOSUPPORT,
-			printf("bad destination: ");
+			printk("bad destination: ");
 			writeIpAddr(ip_hdr->ih_dst);
-			printf("\n"));
+			printk("\n"));
 		bf_afree(data);
 		return r;
 	}
@@ -231,7 +231,7 @@ size_t data_len;
 		req_mtu= bf_bufsize(data);
 		if (req_mtu > ip_port->ip_mtu)
 		{
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 			"packet is larger than link MTU and DF is set\n"));
 			bf_afree(data);
 			return -EPACKSIZE;
@@ -337,7 +337,7 @@ size_t data_len;
 	}
 	else
 	{
-		DBLOCK(0x10, printf("got error %d\n", r));
+		DBLOCK(0x10, printk("got error %d\n", r));
 		bf_afree(data);
 	}
 	return r;

@@ -171,7 +171,7 @@ lapic_intr_dummy_handler_msg:
 #define lapic_intr_dummy_handler(vect)			\
 	pushl	$vect;					\
 	push	$lapic_intr_dummy_handler_msg;		\
-	call	kprintf;				\
+	call	printk;				\
 1:	jmp	1b; /* never return */
 
 #define LAPIC_INTR_DUMMY_HANDLER(vect)			\

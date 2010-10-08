@@ -74,7 +74,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
       privp= priv(rp);
       if (!privp)
       {
-	kprintf("do_irqctl: no priv structure!\n");
+	printk("do_irqctl: no priv structure!\n");
 	return -EPERM;
       }
       if (privp->s_flags & CHECK_IRQ)
@@ -86,7 +86,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	}
 	if (i >= privp->s_nr_irq)
 	{
-		kprintf(
+		printk(
 		"do_irqctl: IRQ check failed for proc %d, IRQ %d\n",
 			m_ptr->m_source, irq_vec);
 		return -EPERM;

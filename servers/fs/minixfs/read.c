@@ -388,7 +388,7 @@ int index;			/* index into *bp */
 
   if (zone != NO_ZONE &&
 		(zone < (zone_t) sp->s_firstdatazone || zone >= sp->s_zones)) {
-	printf("Illegal zone number %ld in indirect block, index %d\n",
+	printk("Illegal zone number %ld in indirect block, index %d\n",
 	       (long) zone, index);
 	panic(__FILE__,"check file system", NO_NUM);
   }

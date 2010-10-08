@@ -104,8 +104,8 @@
  * log driver will cause the diagnostics to be buffered and displayed.
  * Messages are sent by src/lib/sysutil/kputc.c to these processes, in
  * the order of this array, which must be terminated by ENDPT_NONE. This is used
- * by drivers and servers that printf().
- * The kernel does this for its own kprintf() in kernel/utility.c, also using
+ * by drivers and servers that printk().
+ * The kernel does this for its own printk() in kernel/utility.c, also using
  * this array, but a slightly different mechanism.
  */
 #define OUTPUT_PROCS_ARRAY	{ TTY_PROC_NR, LOG_PROC_NR, ENDPT_NONE }

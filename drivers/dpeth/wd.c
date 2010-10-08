@@ -166,7 +166,7 @@ dpeth_t *dep;
 	irr = inb_we(dep, EPL_IRR);
 	int_indx = (icr & E_ICR_IR2) | ((irr & (E_IRR_IR0 | E_IRR_IR1)) >> 5);
 	int_nr = we_int_table[int_indx];
-	DEBUG(printf("%s: encoded irq= %d\n", dep->de_name, int_nr));
+	DEBUG(printk("%s: encoded irq= %d\n", dep->de_name, int_nr));
 	if (dep->de_irq & DEI_DEFAULT) dep->de_irq = int_nr;
 	outb_we(dep, EPL_IRR, irr | E_IRR_IEN);
   }
@@ -181,7 +181,7 @@ dpeth_t *dep;
 	int_indx = ((gcr & E_790_GCR_IR2) >> 4) |
 		((gcr & (E_790_GCR_IR1 | E_790_GCR_IR0)) >> 2);
 	int_nr = we_790int_table[int_indx];
-	DEBUG(printf("%s: encoded irq= %d\n", dep->de_name, int_nr));
+	DEBUG(printk("%s: encoded irq= %d\n", dep->de_name, int_nr));
 	if (dep->de_irq & DEI_DEFAULT) dep->de_irq = int_nr;
 	icr = inb_we(dep, EPL_790_ICR);
 	outb_we(dep, EPL_790_ICR, icr | E_790_ICR_EIL);
@@ -206,7 +206,7 @@ dpeth_t *dep;
 
   ns_init(dep);			/* Initialize DP controller */
 
-  printf("%s: WD80%d3 (%dkB RAM) at %X:%d:%lX - ",
+  printk("%s: WD80%d3 (%dkB RAM) at %X:%d:%lX - ",
          dep->de_name,
          we_type & WET_BRD_16BIT ? 1 : 0,
          dep->de_ramsize / 1024,
@@ -214,7 +214,7 @@ dpeth_t *dep;
          dep->de_irq,
          dep->de_linmem);
   for (i = 0; i < SA_ADDR_LEN; i += 1)
-	printf("%02X%c", dep->de_address.ea_addr[i],
+	printk("%02X%c", dep->de_address.ea_addr[i],
 	       i < SA_ADDR_LEN - 1 ? ':' : '\n');
 
   return;
@@ -285,7 +285,7 @@ dpeth_t *dep;
   if (inb_we(dep, EPL_ICR) == icr) {
 	tlb = inb_we(dep, EPL_TLB);
 
-	DEBUG(printf("%s: tlb= 0x%x\n", dep->de_name, tlb));
+	DEBUG(printk("%s: tlb= 0x%x\n", dep->de_name, tlb));
 
 	return tlb == E_TLB_EB || tlb == E_TLB_E ||
 		tlb == E_TLB_SMCE || tlb == E_TLB_SMC8216C;

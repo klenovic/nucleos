@@ -233,7 +233,7 @@ int safe;			/* use virtual addresses or grant id's? */
         retries = MAX_ONLINE_RETRIES + 1;  
         while (--retries > 0) {
             if(sys_inb(port_base + 1, &status) != 0) {
-		printf("printer: sys_inb of %x failed\n", port_base+1);
+		printk("printer: sys_inb of %x failed\n", port_base+1);
 		panic(__FILE__,"sys_inb failed", NO_NUM);
 	    }
             if ((status & ON_LINE)) {		/* printer online! */
@@ -263,12 +263,12 @@ static void output_done()
     if (done_status != 0) {      	/* printer error occurred */
         status = -EIO;
 	if ((done_status & ON_LINE) == 0) { 
-	    printf("Printer is not on line\n");
+	    printk("Printer is not on line\n");
 	} else if ((done_status & NO_PAPER)) { 
-	    printf("Printer is out of paper\n");
+	    printk("Printer is out of paper\n");
 	    status = -EAGAIN;	
 	} else {
-	    printf("Printer error, status is 0x%02X\n", done_status);
+	    printk("Printer error, status is 0x%02X\n", done_status);
 	}
 	/* Some characters have been printed, tell how many. */
 	if (status == -EAGAIN && user_left < orig_count) {
@@ -363,12 +363,12 @@ static void do_initialize()
 	panic(__FILE__, "do_initialize: sys_vircopy failed", NO_NUM);
   }
   if(sys_outb(port_base + 2, INIT_PRINTER) != 0) {
-	printf("printer: sys_outb of %x failed\n", port_base+2);
+	printk("printer: sys_outb of %x failed\n", port_base+2);
 	panic(__FILE__, "do_initialize: sys_outb init failed", NO_NUM);
   }
   micro_delay(1000000/20);	/* easily satisfies Centronics minimum */
   if(sys_outb(port_base + 2, PR_SELECT) != 0) {
-	printf("printer: sys_outb of %x failed\n", port_base+2);
+	printk("printer: sys_outb of %x failed\n", port_base+2);
 	panic(__FILE__, "do_initialize: sys_outb select failed", NO_NUM);
   }
   irq_hook_id = 0;
@@ -425,7 +425,7 @@ static void do_printer_output()
 	 * interrupt status does not affect the printer.
 	 */
 	if(sys_outb(port_base + 2, PR_SELECT) != 0) {
-		printf("printer: sys_outb of %x failed\n", port_base+2);
+		printk("printer: sys_outb of %x failed\n", port_base+2);
 		panic(__FILE__,"sys_outb failed", NO_NUM);
 	}
 	if(sys_irqenable(&irq_hook_id) != 0) {
@@ -439,7 +439,7 @@ static void do_printer_output()
 	 * processor interrupts are not disabled here, just printer interrupts.
 	 */
 	if(sys_inb(port_base + 1, &status) != 0) {
-		printf("printer: sys_inb of %x failed\n", port_base+1);
+		printk("printer: sys_inb of %x failed\n", port_base+1);
 		panic(__FILE__,"sys_inb failed", NO_NUM);
 	}
 	if ((status & STATUS_MASK) == BUSY_STATUS) {

@@ -838,7 +838,7 @@ void do_video(kipc_msg_t *m)
 
 			/* Get request structure */
 			if(!safe) {
-				printf("tty: safecopy only\n");
+				printk("tty: safecopy only\n");
 				return;
 			}
 
@@ -848,7 +848,7 @@ void do_video(kipc_msg_t *m)
 
 			if (r != 0)
 			{
-				printf("tty: sys_safecopyfrom failed\n");
+				printk("tty: sys_safecopyfrom failed\n");
 				tty_reply(KCNR_TASK_REPLY, m->m_source, m->IO_ENDPT,
 					r);
 				return;
@@ -866,7 +866,7 @@ void do_video(kipc_msg_t *m)
 				  (vir_bytes)m->ADDRESS, 0,
 				  (vir_bytes) &mapreqvm,
 				  sizeof(mapreqvm), D)) != 0) {
-				  printf("tty: sys_safecopyto failed\n");
+				  printk("tty: sys_safecopyto failed\n");
 				}
 			} else {
 				r = vm_unmap_phys(m->POSITION, 
@@ -880,7 +880,7 @@ void do_video(kipc_msg_t *m)
 		break;
 
 	    default:		
-		printf(
+		printk(
 		"Warning, TTY(video) got unexpected request %d from %d\n",
 			m->m_type, m->m_source);
 		r= -EINVAL;
@@ -1095,7 +1095,7 @@ kipc_msg_t *m;
    * Hence, don't check the return value. 
    */
   if ((r=sys_getkmessages(&kmess)) != 0) {
-  	printf("TTY: couldn't get copy of kmessages: %d, 0x%x\n", r,r);
+  	printk("TTY: couldn't get copy of kmessages: %d, 0x%x\n", r,r);
   	return;
   }
 #endif
@@ -1144,7 +1144,7 @@ int safe;
 	if(safe) {
 	   r = sys_safecopyfrom(proc_nr, src, offset, (vir_bytes) &c, 1, D);
 	   if(r != 0)
-	  	   printf("<tty: proc %d, grant %ld>", proc_nr, src);
+	  	   printk("<tty: proc %d, grant %ld>", proc_nr, src);
 	} else {
 	   r = sys_vircopy(proc_nr, D, src+offset, ENDPT_SELF, D, (vir_bytes) &c, 1);
 	}
@@ -1232,7 +1232,7 @@ void toggle_scroll()
 
   cons_org0();
   softscroll = !softscroll;
-  printf("%sware scrolling enabled.\n", softscroll ? "Soft" : "Hard");
+  printk("%sware scrolling enabled.\n", softscroll ? "Soft" : "Hard");
 }
 
 /*===========================================================================*
@@ -1356,7 +1356,7 @@ kipc_msg_t *m;
 
   if(sys_safecopyfrom(m->IO_ENDPT, (cp_grant_id_t) m->ADDRESS, 0,
 	(vir_bytes) font_memory, GA_FONT_SIZE, D) != 0) {
-	printf("tty: copying from %d failed\n", m->IO_ENDPT);
+	printk("tty: copying from %d failed\n", m->IO_ENDPT);
 	return -EFAULT;
   }
 

@@ -143,7 +143,7 @@ tcp_port_t *tcp_port;
 		if (tcp_port->tp_ipfd < 0)
 		{
 			tcp_port->tp_state= TPS_ERROR;
-			DBLOCK(1, printf("%s, %d: unable to open ip port\n",
+			DBLOCK(1, printk("%s, %d: unable to open ip port\n",
 				__FILE__, __LINE__));
 			return;
 		}
@@ -430,7 +430,7 @@ assert (count == sizeof(struct nwio_ipopt));
 		}
 		break;
 	default:
-		printf("tcp_get_data(%d, 0x%x, 0x%x) called but tp_state= 0x%x\n",
+		printk("tcp_get_data(%d, 0x%x, 0x%x) called but tp_state= 0x%x\n",
 			port, offset, count, tcp_port->tp_state);
 		break;
 	}
@@ -502,7 +502,7 @@ assert (ipconf->nwic_flags & NWIC_IPADDR_SET);
 		}
 		break;
 	default:
-		printf(
+		printk(
 		"tcp_put_data(%d, 0x%x, %p) called but tp_state= 0x%x\n",
 			fd, offset, data, tcp_port->tp_state);
 		break;
@@ -548,11 +548,11 @@ size_t datalen;
 			tcp_port->tp_ipaddr= ipaddr;
 			tcp_port->tp_subnetmask= mask;
 			tcp_port->tp_mtu= mtu;
-			DBLOCK(1, printf("tcp_put_pkt: using address ");
+			DBLOCK(1, printk("tcp_put_pkt: using address ");
 				writeIpAddr(ipaddr);
-				printf(", netmask ");
+				printk(", netmask ");
 				writeIpAddr(mask);
-				printf(", mtu %u\n", mtu));
+				printk(", mtu %u\n", mtu));
 			for (i= 0, tcp_conn= tcp_conn_table+i;
 				i<TCP_CONN_NR; i++, tcp_conn++)
 			{
@@ -564,7 +564,7 @@ size_t datalen;
 			}
 		}
 		else
-			DBLOCK(1, printf("tcp_put_pkt: no TCP header\n"));
+			DBLOCK(1, printk("tcp_put_pkt: no TCP header\n"));
 		bf_afree(data);
 		return;
 	}
@@ -580,7 +580,7 @@ size_t datalen;
 	/* Extract the TCP header */
 	if (ip_datalen < TCP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("truncated TCP header\n"));
+		DBLOCK(1, printk("truncated TCP header\n"));
 		bf_afree(ip_pack);
 		bf_afree(data);
 		return;
@@ -593,12 +593,12 @@ size_t datalen;
 	{
 		if (tcp_hdr_len < TCP_MIN_HDR_SIZE)
 		{
-			DBLOCK(1, printf("strange tcp header length %d\n",
+			DBLOCK(1, printk("strange tcp header length %d\n",
 				tcp_hdr_len));
 		}
 		else
 		{
-			DBLOCK(1, printf("truncated TCP header\n"));
+			DBLOCK(1, printk("truncated TCP header\n"));
 		}
 		bf_afree(ip_pack);
 		bf_afree(data);
@@ -619,11 +619,11 @@ size_t datalen;
 
 	if ((u16_t)~sum)
 	{
-		DBLOCK(1, printf("checksum error in tcp packet\n");
-			printf("tcp_pack_oneCsum(...)= 0x%x length= %d\n", 
+		DBLOCK(1, printk("checksum error in tcp packet\n");
+			printk("tcp_pack_oneCsum(...)= 0x%x length= %d\n", 
 			(u16_t)~sum, tcp_datalen);
-			printf("src ip_addr= "); writeIpAddr(ip_hdr->ih_src);
-			printf("\n"));
+			printk("src ip_addr= "); writeIpAddr(ip_hdr->ih_src);
+			printk("\n"));
 		bf_afree(ip_pack);
 		bf_afree(tcp_pack);
 		bf_afree(data);
@@ -2327,7 +2327,7 @@ tcp_fd_t *tcp_fd;
 	dst_nr= cookie.tc_ref;
 	if (dst_nr < 0 || dst_nr >= TCP_FD_NR)
 	{
-		printf("tcp_acceptto: bad fd %d\n", dst_nr);
+		printk("tcp_acceptto: bad fd %d\n", dst_nr);
 		tcp_reply_ioctl(tcp_fd, -EINVAL);
 		return 0;
 	}
@@ -2337,14 +2337,14 @@ tcp_fd_t *tcp_fd;
 		dst_fd->tf_conn != NULL ||
 		!(dst_fd->tf_flags & TFF_COOKIE))
 	{
-		printf("tcp_acceptto: bad flags 0x%x or conn %p for fd %d\n",
+		printk("tcp_acceptto: bad flags 0x%x or conn %p for fd %d\n",
 			dst_fd->tf_flags, dst_fd->tf_conn, dst_nr);
 		tcp_reply_ioctl(tcp_fd, -EINVAL);
 		return 0;
 	}
 	if (memcmp(&cookie, &dst_fd->tf_cookie, sizeof(cookie)) != 0)
 	{
-		printf("tcp_acceptto: bad cookie\n");
+		printk("tcp_acceptto: bad cookie\n");
 		return 0;
 	}
 
@@ -2565,7 +2565,7 @@ tcp_conn_t *tcp_conn;
 		mtu -= mtu/TCP_PMTU_INCR_FRAC;
 		tcp_conn->tc_mtu= mtu;
 		tcp_conn->tc_mtutim= curr_time;
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"tcp_mtu_exceeded: new (lowered) mtu %d for conn %d\n",
 			mtu, tcp_conn-tcp_conn_table));
 		tcp_conn->tc_stt= 0;
@@ -2590,12 +2590,12 @@ tcp_conn_t *tcp_conn;
 		 */
 		tcp_conn->tc_flags &= ~TCF_PMTU;
 		tcp_conn->tc_mtu= TCP_MIN_PATH_MTU;
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"tcp_mtu_exceeded: clearing TCF_PMTU for conn %d\n",
 			tcp_conn-tcp_conn_table););
 
 	}
-	DBLOCK(1, printf("tcp_mtu_exceeded: new mtu %d for conn %d\n",
+	DBLOCK(1, printk("tcp_mtu_exceeded: new mtu %d for conn %d\n",
 		mtu, tcp_conn-tcp_conn_table););
 	tcp_conn->tc_stt= 0;
 	tcp_conn->tc_SND_TRM= tcp_conn->tc_SND_UNA;
@@ -2619,7 +2619,7 @@ tcp_conn_t *tcp_conn;
 		if (curr_time > tcp_conn->tc_mtutim+TCP_PMTU_EN_IV)
 		{
 			tcp_conn->tc_flags |= TCF_PMTU;
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 				"tcp_mtu_incr: setting TCF_PMTU for conn %d\n",
 				tcp_conn-tcp_conn_table););
 		}
@@ -2631,7 +2631,7 @@ tcp_conn_t *tcp_conn;
 	if (mtu > tcp_conn->tc_max_mtu)
 		mtu= tcp_conn->tc_max_mtu;
 	tcp_conn->tc_mtu= mtu;
-	DBLOCK(0x1, printf("tcp_mtu_incr: new mtu %ld for conn %d\n",
+	DBLOCK(0x1, printk("tcp_mtu_incr: new mtu %ld for conn %d\n",
 		mtu, tcp_conn-tcp_conn_table););
 }
 

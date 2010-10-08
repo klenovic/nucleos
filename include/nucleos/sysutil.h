@@ -50,7 +50,7 @@ int env_parse(char *env, char *fmt, int field, long *param, long min, long max);
 #define fkey_events(fkeys, sfkeys) fkey_ctl(FKEY_EVENTS, (fkeys), (sfkeys))
 int fkey_ctl(int req, int *fkeys, int *sfkeys);
 
-int printf(const char *fmt, ...);
+int printk(const char *fmt, ...);
 void kputc(int c);
 void report(char *who, char *mess, int num);
 void panic(char *who, char *mess, int num);

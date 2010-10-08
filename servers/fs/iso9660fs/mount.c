@@ -35,13 +35,13 @@ int fs_readsuper() {
 		       label_len, D);
 
   if (r != 0) {
-	printf("ISOFS %s:%d safecopyfrom failed: %d\n", __FILE__, __LINE__, r);
+	printk("ISOFS %s:%d safecopyfrom failed: %d\n", __FILE__, __LINE__, r);
 	return(-EINVAL);
   }
 
   r = ds_retrieve_u32(fs_dev_label, (u32_t*)&tasknr);
   if (r != 0) {
-	printf("ISOFS %s:%d ds_retrieve_u32 failed for '%s': %d\n",
+	printk("ISOFS %s:%d ds_retrieve_u32 failed for '%s': %d\n",
 	       __FILE__, __LINE__, fs_dev_label, r);
 	return(-EINVAL);
   }

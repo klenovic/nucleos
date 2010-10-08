@@ -92,7 +92,7 @@ int fetch_name(char *buff, const int pathmax, char __user *path)
 int no_sys()
 {
 /* Somebody has used an illegal system call number */
-  printf("VFS no_sys: call %d from %d (pid %d)\n", call_nr, who_e, who_p);
+  printk("VFS no_sys: call %d from %d (pid %d)\n", call_nr, who_e, who_p);
   return(-ENOSYS);
 }
 
@@ -105,19 +105,19 @@ int isokendpt_f(char *file, int line, int endpoint, int *proc, int fatal)
     endpoint_t ke;
     *proc = _ENDPOINT_P(endpoint);
     if(endpoint == ENDPT_NONE) {
-        printf("vfs:%s: endpoint is ENDPT_NONE\n", file, line, endpoint);
+        printk("vfs:%s: endpoint is ENDPT_NONE\n", file, line, endpoint);
         failed = 1;
     } else if(*proc < 0 || *proc >= NR_PROCS) {
-        printf("vfs:%s:%d: proc (%d) from endpoint (%d) out of range\n",
+        printk("vfs:%s:%d: proc (%d) from endpoint (%d) out of range\n",
                 file, line, *proc, endpoint);
         failed = 1;
     } else if((ke=fproc[*proc].fp_endpoint) != endpoint) {
 	if(ke == ENDPT_NONE) {
-        	printf("vfs:%s:%d: endpoint (%d) points to ENDPT_NONE slot (%d)\n",
+        	printk("vfs:%s:%d: endpoint (%d) points to ENDPT_NONE slot (%d)\n",
                 	file, line, endpoint, *proc);
 		assert(fproc[*proc].fp_pid == PID_FREE);
 	} else {
-	        printf("vfs:%s:%d: proc (%d) from endpoint (%d) doesn't match "
+	        printk("vfs:%s:%d: proc (%d) from endpoint (%d) doesn't match "
 			"known endpoint (%d)\n", file, line, *proc, endpoint,
 			fproc[*proc].fp_endpoint);
 		assert(fproc[*proc].fp_pid != PID_FREE);

@@ -149,7 +149,7 @@ int do_map_phys(kipc_msg_t *m)
 	 * help it if we can't map in lower than page granularity.
 	 */
 	if(map_perm_check(m->m_source, target, startaddr, len) != 0) {
-		printf("VM: unauthorized mapping of 0x%lx by %d\n",
+		printk("VM: unauthorized mapping of 0x%lx by %d\n",
 			startaddr, m->m_source);
 		return -EPERM;
 	}
@@ -273,17 +273,17 @@ int do_shared_unmap(kipc_msg_t *m)
 	addr = arch_vir2map(vmp, m->VMUN_ADDR);
 
 	if(!(vr = map_lookup(vmp, addr))) {
-		printf("VM: addr 0x%lx not found.\n", m->VMUN_ADDR);
+		printk("VM: addr 0x%lx not found.\n", m->VMUN_ADDR);
 		return -EFAULT;
 	}
 
 	if(vr->vaddr != addr) {
-		printf("VM: wrong address for shared_unmap.\n");
+		printk("VM: wrong address for shared_unmap.\n");
 		return -EFAULT;
 	}
 
 	if(!(vr->flags & VR_SHARED)) {
-		printf("VM: address does not point to shared region.\n");
+		printk("VM: address does not point to shared region.\n");
 		return -EFAULT;
 	}
 
@@ -373,7 +373,7 @@ int do_munmap(kipc_msg_t *m)
 	}
 
         if(!(vr = map_lookup(vmp, addr))) {
-                printf("VM: unmap: virtual address 0x%lx not found in %d\n",
+                printk("VM: unmap: virtual address 0x%lx not found in %d\n",
                         m->VMUM_ADDR, vmp->vm_endpoint);
                 return -EFAULT;
         }
@@ -400,18 +400,18 @@ int unmap_ok = 0;
 static int munmap_lin(vir_bytes addr, size_t len)
 {
 	if(addr % VM_PAGE_SIZE) {
-		printf("munmap_lin: offset not page aligned\n");
+		printk("munmap_lin: offset not page aligned\n");
 		return -EFAULT;
 	}
 
 	if(len % VM_PAGE_SIZE) {
-		printf("munmap_lin: len not page aligned\n");
+		printk("munmap_lin: len not page aligned\n");
 		return -EFAULT;
 	}
 
 	if(pt_writemap(&vmproc[VM_PROC_NR].vm_pt, addr, MAP_NONE, len, 0,
 		WMF_OVERWRITE | WMF_FREE) != 0) {
-		printf("munmap_lin: pt_writemap failed\n");
+		printk("munmap_lin: pt_writemap failed\n");
 		return -EFAULT;
 	}
 
@@ -520,7 +520,7 @@ int scall_munmap(kipc_msg_t *m)
 	}
 
 	if (!(vr = map_lookup(vmp, addr))) {
-		printf("VM: unmap: virtual address 0x%lx not found in %d\n",
+		printk("VM: unmap: virtual address 0x%lx not found in %d\n",
 			m->VMUM_ADDR, vmp->vm_endpoint);
 		return -EFAULT;
 	}

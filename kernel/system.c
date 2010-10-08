@@ -111,7 +111,7 @@ void sys_task()
 
       /* See if the caller made a valid request and try to handle it. */
       if (call_nr < 0 || call_nr >= NR_SYS_CALLS) {	/* check call number */
-	  kprintf("SYSTEM: illegal request %d from %d.\n",
+	  printk("SYSTEM: illegal request %d from %d.\n",
 		call_nr,m.m_source);
 	  result = -EBADREQUEST;			/* illegal message type */
       } 
@@ -144,11 +144,11 @@ void sys_task()
 		m.m_type = result;		/* report status of call */
 		if(WILLRECEIVE(caller_ptr, SYSTEM)) {
 		  if ((s=lock_send(m.m_source, &m)) != 0) {
-			kprintf("SYSTEM, reply to %d failed: %d\n",
+			printk("SYSTEM, reply to %d failed: %d\n",
 			m.m_source, s);
 		  }
 		} else {
-			kprintf("SYSTEM: not replying to %d; not ready\n", 
+			printk("SYSTEM: not replying to %d; not ready\n", 
 				caller_ptr->p_endpoint);
 		}
 	}
@@ -424,7 +424,7 @@ vir_bytes bytes;		/* # of bytes to be copied */
   else if (vir_addr >= BASE_MEM_TOP && vir_addr + bytes <= UPPER_MEM_END)
   	return (phys_bytes) vir_addr;
 
-  kprintf("Warning, error in umap_bios, virtual address 0x%x\n", vir_addr);
+  printk("Warning, error in umap_bios, virtual address 0x%x\n", vir_addr);
   return 0;
 }
 #endif
@@ -449,19 +449,19 @@ vir_bytes bytes;                /* size */
          */
         if(verify_grant(rp->p_endpoint, ENDPT_ANY, grant, bytes, 0, 0,
                 &offset, &granter) != 0) {
-		kprintf("SYSTEM: umap_grant: verify_grant failed\n");
+		printk("SYSTEM: umap_grant: verify_grant failed\n");
                 return 0;
         }
 
         if(!isokendpt(granter, &proc_nr)) {
-		kprintf("SYSTEM: umap_grant: isokendpt failed\n");
+		printk("SYSTEM: umap_grant: isokendpt failed\n");
                 return 0;
         }
  
         /* Do the mapping from virtual to physical. */
         ret = umap_virtual(proc_addr(proc_nr), D, offset, bytes);
 	if(!ret) {
-		kprintf("SYSTEM:umap_grant:umap_virtual failed; grant %s:%d -> %s: vir 0x%lx\n",
+		printk("SYSTEM:umap_grant:umap_virtual failed; grant %s:%d -> %s: vir 0x%lx\n",
 			rp->p_name, grant, 
 			proc_addr(proc_nr)->p_name, offset);
 	}
@@ -486,7 +486,7 @@ register struct proc *rc;		/* slot of process to clean up */
 	/* This test is great for debugging system processes dying,
 	 * but as this happens normally on reboot, not good permanent code.
 	 */
-	kprintf("died: ");
+	printk("died: ");
 	proc_stacktrace(rc);
 	kernel_panic("system process died", rc->p_endpoint);
   }
@@ -496,7 +496,7 @@ register struct proc *rc;		/* slot of process to clean up */
   if (priv(rc)->s_flags & SYS_PROC)
   {
 	if (priv(rc)->s_asynsize) {
-		kprintf("clear_endpoint: clearing s_asynsize of %s / %d\n",
+		printk("clear_endpoint: clearing s_asynsize of %s / %d\n",
 			rc->p_name, rc->p_endpoint);
 		proc_stacktrace(rc);
 	}
@@ -515,7 +515,7 @@ register struct proc *rc;		/* slot of process to clean up */
           if (*xpp == rc) {			/* process is on the queue */
               *xpp = (*xpp)->p_q_link;		/* replace by next process */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-	      kprintf("endpoint %d / %s removed from queue at %d\n",
+	      printk("endpoint %d / %s removed from queue at %d\n",
 	          rc->p_endpoint, rc->p_name, rc->p_sendto_e);
 #endif
               break;				/* can only be queued once */
@@ -542,7 +542,7 @@ register struct proc *rc;		/* slot of process to clean up */
           rp->p_reg.retreg = -ESRCDIED;		/* report source died */
 	  RTS_LOCK_UNSET(rp, RTS_RECEIVING);	/* no longer receiving */
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-	  kprintf("endpoint %d / %s receiving from dead src ep %d / %s\n",
+	  printk("endpoint %d / %s receiving from dead src ep %d / %s\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
 #endif
       } 
@@ -551,7 +551,7 @@ register struct proc *rc;		/* slot of process to clean up */
           rp->p_reg.retreg = -EDSTDIED;		/* report destination died */
 	  RTS_LOCK_UNSET(rp, RTS_SENDING);
 #ifdef CONFIG_DEBUG_KERNEL_IPC_WARNINGS
-	  kprintf("endpoint %d / %s send to dying dst ep %d (%s)\n",
+	  printk("endpoint %d / %s send to dying dst ep %d (%s)\n",
 		rp->p_endpoint, rp->p_name, rc->p_endpoint, rc->p_name);
 #endif
       } 
@@ -585,7 +585,7 @@ static struct proc *vmrestart_check(kipc_msg_t *m)
 			vmassert(m->m_source == restarting->p_endpoint);
 			/* Original caller could've disappeared in the meantime. */
 		        if(!isokendpt(m->m_source, &who_p)) {
-				kprintf("SYSTEM: ignoring call %d from dead %d\n",
+				printk("SYSTEM: ignoring call %d from dead %d\n",
 					m->m_type, m->m_source);
 				return NULL;
 			}
@@ -593,7 +593,7 @@ static struct proc *vmrestart_check(kipc_msg_t *m)
 				i = m->m_type - KERNEL_CALL;
 				if(i >= 0 && i < NR_SYS_CALLS) {
 #if 0
-					kprintf("SYSTEM: restart %s from %d\n",
+					printk("SYSTEM: restart %s from %d\n",
 					callnames[i], m->m_source);
 #endif
 				} else {

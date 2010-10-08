@@ -36,7 +36,7 @@ typedef struct { u16_t port; u32_t value; } pvl_pair_t;
 	(pv).port = _p;						\
 	(pv).value = _v;					\
 	if((pv).port != _p || (pv).value != _v) {		\
-		printf("%s:%d: actual port: 0x%x != 0x%lx || "	\
+		printk("%s:%d: actual port: 0x%x != 0x%lx || "	\
 			"actual value: 0x%x != 0x%lx\n",	\
 			__FILE__, __LINE__, (pv).port, _p, (pv).value, _v); \
 		panic(__FILE__, "pv_set(" #pv ", " #p ", " #v ")", NO_NUM); \

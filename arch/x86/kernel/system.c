@@ -201,10 +201,10 @@ void arch_init(void)
 
 #if defined(CONFIG_X86_LOCAL_APIC) && !defined(CONFIG_SMP)
 	if (config_no_apic) {
-		BOOT_VERBOSE(kprintf("APIC disabled, using legacy PIC\n"));
+		BOOT_VERBOSE(printk("APIC disabled, using legacy PIC\n"));
 	}
 	else if (!apic_single_cpu_init()) {
-		BOOT_VERBOSE(kprintf("APIC not present, using legacy PIC\n"));
+		BOOT_VERBOSE(printk("APIC not present, using legacy PIC\n"));
 	}
 #endif
 }
@@ -252,12 +252,12 @@ static void ser_dump_queues(void)
 		struct proc *p;
 
 		if(rdy_head[q])
-			printf("%2d: ", q);
+			printk("%2d: ", q);
 
 		for(p = rdy_head[q]; p; p = p->p_nextready) {
-			printf("%s / %d  ", p->p_name, p->p_endpoint);
+			printk("%s / %d  ", p->p_name, p->p_endpoint);
 		}
-		printf("\n");
+		printk("\n");
 	}
 }
 
@@ -268,7 +268,7 @@ static void ser_dump_segs(void)
 	{
 		if (isemptyp(pp))
 			continue;
-		kprintf("%d: %s ep %d\n", proc_nr(pp), pp->p_name, pp->p_endpoint);
+		printk("%d: %s ep %d\n", proc_nr(pp), pp->p_name, pp->p_endpoint);
 		printseg("cs: ", 1, pp, pp->p_reg.cs);
 		printseg("ds: ", 0, pp, pp->p_reg.ds);
 
@@ -302,10 +302,10 @@ static void ser_debug(int c)
 	case ch: {						\
 			if(verboseflags & flag) {		\
 				verboseflags &= ~flag;		\
-				printf("%s disabled\n", #flag);	\
+				printk("%s disabled\n", #flag);	\
 			} else {				\
 				verboseflags |= flag;		\
-				printf("%s enabled\n", #flag);	\
+				printk("%s enabled\n", #flag);	\
 			}					\
 			break;					\
 		}
@@ -321,16 +321,16 @@ static void printslot(struct proc *pp, int level)
 {
 	struct proc *depproc = NULL;
 	int dep = ENDPT_NONE;
-#define COL { int i; for(i = 0; i < level; i++) printf("> "); }
+#define COL { int i; for(i = 0; i < level; i++) printk("> "); }
 
 	if(level >= NR_PROCS) {
-		kprintf("loop??\n");
+		printk("loop??\n");
 		return;
 	}
 
 	COL
 
-	kprintf("%d: %s %d prio %d/%d time %d/%d cr3 0x%lx rts %s misc %s",
+	printk("%d: %s %d prio %d/%d time %d/%d cr3 0x%lx rts %s misc %s",
 		proc_nr(pp), pp->p_name, pp->p_endpoint,
 		pp->p_priority, pp->p_max_priority, pp->p_user_time,
 		pp->p_sys_time, pp->p_seg.p_cr3,
@@ -338,31 +338,31 @@ static void printslot(struct proc *pp, int level)
 
 	if(pp->p_rts_flags & RTS_SENDING) {
 		dep = pp->p_sendto_e;
-		kprintf(" to: ");
+		printk(" to: ");
 	} else if(pp->p_rts_flags & RTS_RECEIVING) {
 		dep = pp->p_getfrom_e;
-		kprintf(" from: ");
+		printk(" from: ");
 	}
 
 	if(dep != ENDPT_NONE) {
 		if(dep == ENDPT_ANY) {
-			kprintf(" ENDPT_ANY\n");
+			printk(" ENDPT_ANY\n");
 		} else {
 			int procno;
 			if(!isokendpt(dep, &procno)) {
-				kprintf(" ??? %d\n", dep);
+				printk(" ??? %d\n", dep);
 			} else {
 				depproc = proc_addr(procno);
 				if(isemptyp(depproc)) {
-					kprintf(" empty slot %d???\n", procno);
+					printk(" empty slot %d???\n", procno);
 					depproc = NULL;
 				} else {
-					kprintf(" %s\n", depproc->p_name);
+					printk(" %s\n", depproc->p_name);
 				}
 			}
 		}
 	} else {
-		kprintf("\n");
+		printk("\n");
 	}
 
 	COL

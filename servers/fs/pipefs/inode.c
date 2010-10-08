@@ -39,18 +39,18 @@ int fs_putnode()
   rip = find_inode(fs_m_in.REQ_INODE_NR);
 
   if(!rip) {
-	  printf("%s:%d put_inode: inode #%d dev: %d not found\n", __FILE__,
+	  printk("%s:%d put_inode: inode #%d dev: %d not found\n", __FILE__,
 		 __LINE__, fs_m_in.REQ_INODE_NR, fs_m_in.REQ_DEV);
 	  panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
 
   count = fs_m_in.REQ_COUNT;
   if (count <= 0) {
-	printf("%s:%d put_inode: bad value for count: %d\n", __FILE__,
+	printk("%s:%d put_inode: bad value for count: %d\n", __FILE__,
 	       __LINE__, count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
   } else if(count > rip->i_count) {
-	printf("%s:%d put_inode: count too high: %d > %d\n", __FILE__,
+	printk("%s:%d put_inode: count too high: %d > %d\n", __FILE__,
 	       __LINE__, count, rip->i_count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
@@ -88,7 +88,7 @@ void init_inode_cache()
   }
 
   /* Reserve the first inode (bit 0) to prevent it from being allocated later*/
-  if (alloc_bit() != NO_BIT) printf("PFS could not reserve NO_BIT\n");
+  if (alloc_bit() != NO_BIT) printk("PFS could not reserve NO_BIT\n");
   busy = 0; /* This bit does not make the server 'in use/busy'. */
 }
 
@@ -250,7 +250,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
   b = alloc_bit();
   if (b == NO_BIT) {
   	err_code = -ENOSPC;
-  	printf("PipeFS is out of inodes\n");
+  	printk("PipeFS is out of inodes\n");
   	return(NIL_INODE);
   }
   i_num = (ino_t) b;

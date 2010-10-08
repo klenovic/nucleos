@@ -5,7 +5,7 @@
 #define FIXME(str) { \
 	static int fixme_warned = 0; \
 	if(!fixme_warned) { \
-		printf("FIXME: %s:%d: %s\n", __FILE__, __LINE__, str); \
+		printk("FIXME: %s:%d: %s\n", __FILE__, __LINE__, str); \
 		fixme_warned = 1; \
 	} \
 }

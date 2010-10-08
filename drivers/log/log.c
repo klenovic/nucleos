@@ -157,7 +157,7 @@ subwrite(struct logdevice *log, int count, int proc_nr,
   		r= kipc_module_call(KIPC_SEND, 0, log->log_source, &m);
 		if (r != 0)
 		{
-			printf("log`subwrite: send to %d failed: %d\n",
+			printk("log`subwrite: send to %d failed: %d\n",
 				log->log_source, r);
 		}
 		log->log_proc_nr = 0;
@@ -179,12 +179,12 @@ subwrite(struct logdevice *log, int count, int proc_nr,
 			m.DEV_SEL_OPS = log->log_select_ready_ops;
 			m.DEV_MINOR   = d;
 #if LOG_DEBUG
-			printf("select sending DEV_SEL_REPL2\n");
+			printk("select sending DEV_SEL_REPL2\n");
 #endif
   			r= kipc_module_call(KIPC_SEND, 0, log->log_select_proc, &m);
 			if (r != 0)
 			{
-				printf(	
+				printk(	
 				"log`subwrite: send to %d failed: %d\n",
 					log->log_select_proc, r);
 			}
@@ -296,7 +296,7 @@ unsigned nr_req;		/* length of request vector */
 			/* Device_caller is a global in drivers library. */
 	    		log->log_source = device_caller;
 #if LOG_DEBUG
-	    		printf("blocked %d (%d)\n", 
+	    		printk("blocked %d (%d)\n", 
 	    			log->log_source, log->log_proc_nr);
 #endif
 	    		return(-EDONTREPLY);
@@ -413,7 +413,7 @@ kipc_msg_t *m_ptr;
 		r = do_diagnostics(m_ptr, 1);
 		break;
 	case DEV_STATUS: {
-		printf("log_other: unexpected DEV_STATUS request\n");
+		printk("log_other: unexpected DEV_STATUS request\n");
 		r = -EDONTREPLY;
 		break;
 	}
@@ -435,7 +435,7 @@ kipc_msg_t *m_ptr;
   d = m_ptr->TTY_LINE;
   if(d < 0 || d >= NR_DEVS) {
 #if LOG_DEBUG
-  	printf("line %d? -EINVAL\n", d);
+  	printk("line %d? -EINVAL\n", d);
 #endif
   	return -EINVAL;
   }
@@ -445,7 +445,7 @@ kipc_msg_t *m_ptr;
   	/* Read blocks when there is no log. */
   if((m_ptr->IO_ENDPT & SEL_RD) && logdevices[d].log_size > 0) {
 #if LOG_DEBUG
-  	printf("log can read; size %d\n", logdevices[d].log_size);
+  	printk("log can read; size %d\n", logdevices[d].log_size);
 #endif
   	ready_ops |= SEL_RD; /* writes never block */
  }
@@ -461,12 +461,12 @@ kipc_msg_t *m_ptr;
   	logdevices[d].log_selected |= ops;
   	logdevices[d].log_select_proc = m_ptr->m_source;
 #if LOG_DEBUG
-  	printf("log setting selector.\n");
+  	printk("log setting selector.\n");
 #endif
   }
 
 #if LOG_DEBUG
-  printf("log returning ops %d\n", ready_ops);
+  printk("log returning ops %d\n", ready_ops);
 #endif
 
   return(ready_ops);

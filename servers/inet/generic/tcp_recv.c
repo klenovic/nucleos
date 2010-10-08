@@ -54,8 +54,8 @@ size_t data_len;
 	seg_wnd= ntohs(tcp_hdr->th_window);
 
 #if 0
- { where(); tcp_print_conn(tcp_conn); printf("\n");
-	tcp_print_pack(ip_hdr, tcp_hdr); printf("\n"); }
+ { where(); tcp_print_conn(tcp_conn); printk("\n");
+	tcp_print_pack(ip_hdr, tcp_hdr); printk("\n"); }
 #endif
 
 	switch (tcp_conn->tc_state)
@@ -128,7 +128,7 @@ LISTEN:
 			{
 				tcp_conn->tc_max_mtu= mtu;
 				tcp_conn->tc_mtu= mtu;
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 					"tcp[%d]: conn[%d]: mtu = %d\n",
 					tcp_conn->tc_port-tcp_port_table,
 					tcp_conn-tcp_conn_table, 
@@ -156,9 +156,9 @@ LISTEN:
 			tcp_conn_write(tcp_conn, 1);
 
 			DIFBLOCK(0x10, seg_seq == 0,
-				printf("warning got 0 IRS from ");
+				printk("warning got 0 IRS from ");
 				writeIpAddr(tcp_conn->tc_remaddr);
-				printf("\n"));
+				printk("\n"));
 
 			/* Start the timer (if necessary) */
 			tcp_set_send_timer(tcp_conn);
@@ -242,7 +242,7 @@ SYN-SENT:
 		{
 			if (acceptable_ACK)
 			{
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 					"calling tcp_close_connection\n"));
 
 				tcp_close_connection(tcp_conn,
@@ -264,7 +264,7 @@ SYN-SENT:
 			{
 				tcp_conn->tc_max_mtu= mtu;
 				tcp_conn->tc_mtu= mtu;
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 					"tcp[%d]: conn[%d]: mtu = %d\n",
 					tcp_conn->tc_port-tcp_port_table,
 					tcp_conn-tcp_conn_table, 
@@ -558,12 +558,12 @@ TIME-WAIT:
 			if (!(tcp_hdr_flags & THF_RST))
 			{
 				DBLOCK(0x20,
-					printf("segment is not acceptable\n");
-					printf("\t");
+					printk("segment is not acceptable\n");
+					printk("\t");
 					tcp_print_pack(ip_hdr, tcp_hdr);
-					printf("\n\t");
+					printk("\n\t");
 					tcp_print_conn(tcp_conn);
-					printf("\n"));
+					printk("\n"));
 				tcp_conn->tc_flags |= TCF_SEND_ACK;
 				tcp_conn_write(tcp_conn, 1);
 
@@ -692,7 +692,7 @@ TIME-WAIT:
 			if (tcp_conn->tc_snd_cwnd == snd_una &&
 				seg_wnd != 0)
 			{
-				DBLOCK(2, printf("zero window opened\n"));
+				DBLOCK(2, printk("zero window opened\n"));
 				/* The other side opened up its receive
 				 * window. */
 				mss= tcp_conn->tc_mtu-IP_TCP_MIN_HDR_SIZE;
@@ -719,9 +719,9 @@ TIME-WAIT:
 		{
 			tcp_conn->tc_flags |= TCF_SEND_ACK;
 			tcp_conn_write(tcp_conn, 1);
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 			"got an ack of something I haven't send\n");
-				printf( "seg_ack= %lu, SND_NXT= %lu\n",
+				printk( "seg_ack= %lu, SND_NXT= %lu\n",
 				seg_ack, snd_nxt));
 			break;
 		}
@@ -791,7 +791,7 @@ TIME-WAIT:
 		}
 		break;
 	default:
-		printf("tcp_frag2conn: unknown state ");
+		printk("tcp_frag2conn: unknown state ");
 		tcp_print_state(tcp_conn);
 		break;
 	}
@@ -830,14 +830,14 @@ int data_len;
 	if (tcp_Lmod4G(lo_seq, tcp_conn->tc_RCV_NXT))
 	{
 		DBLOCK(0x10,
-			printf("segment is a retransmission\n"));
+			printk("segment is a retransmission\n"));
 		offset= tcp_conn->tc_RCV_NXT-lo_seq;
 		tcp_data= bf_delhead(tcp_data, offset);
 		lo_seq += offset;
 		data_len -= offset;
 		if (tcp_hdr_flags & THF_URG)
 		{
-			printf("process_data: updating urgent pointer\n");
+			printk("process_data: updating urgent pointer\n");
 			if (urgptr >= offset)
 				urgptr -= offset;
 			else
@@ -872,7 +872,7 @@ int data_len;
 			if (tcp_Gmod4G(tcp_conn->tc_RCV_NXT,
 				tcp_conn->tc_RCV_LO))
 			{
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 					"ignoring urgent data\n"));
 
 				bf_afree(tcp_data);
@@ -952,14 +952,14 @@ int data_len;
 		tcp_rsel_read(tcp_conn);
 
 	DIFBLOCK(2, (tcp_conn->tc_RCV_NXT == tcp_conn->tc_RCV_HI),
-		printf("conn[[%d] full receive buffer\n", 
+		printk("conn[[%d] full receive buffer\n", 
 		tcp_conn-tcp_conn_table));
 
 	if (tcp_conn->tc_adv_data == NULL)
 		return;
 	if (tcp_hdr_flags & THF_FIN)
 	{
-		printf("conn[%d]: advanced data after FIN\n",
+		printk("conn[%d]: advanced data after FIN\n",
 			tcp_conn-tcp_conn_table);
 		tcp_data= tcp_conn->tc_adv_data;
 		tcp_conn->tc_adv_data= NULL;
@@ -1000,7 +1000,7 @@ int data_len;
 
 	assert (tcp_conn->tc_RCV_LO + bf_bufsize(tcp_conn->tc_rcvd_data) ==
 		tcp_conn->tc_RCV_NXT ||
-		(tcp_print_conn(tcp_conn), printf("\n"), 0));
+		(tcp_print_conn(tcp_conn), printk("\n"), 0));
 
 	if (tcp_conn->tc_fd && (tcp_conn->tc_fd->tf_flags & TFF_READ_IP))
 		tcp_fd_read(tcp_conn, 1);
@@ -1034,7 +1034,7 @@ int data_len;
 			data_len -= len_diff;
 		}
 
-		DBLOCK(1, printf("using advanced data\n"));
+		DBLOCK(1, printk("using advanced data\n"));
 
 		/* Append data to the input buffer */
 		if (tcp_conn->tc_rcvd_data == NULL)
@@ -1136,9 +1136,9 @@ int data_len;
 	tcp_hdr_t *RST_tcp_hdr;
 	size_t pack_size, ip_hdr_len, mss;
 
-	DBLOCK(0x10, printf("in create_RST, bad pack is:\n"); 
+	DBLOCK(0x10, printk("in create_RST, bad pack is:\n"); 
 		tcp_print_pack(ip_hdr, tcp_hdr); tcp_print_state(tcp_conn);
-		printf("\n"));
+		printk("\n"));
 
 	assert(tcp_conn->tc_busy);
 
@@ -1155,7 +1155,7 @@ int data_len;
 		data_len == 0)
 	{
 #if DEBUG
- { printf("tcp_recv`create_RST: no data, no RST\n"); }
+ { printk("tcp_recv`create_RST: no data, no RST\n"); }
 #endif
 		return;
 	}
@@ -1213,8 +1213,8 @@ int data_len;
 	RST_tcp_hdr->th_chksum= ~tcp_pack_oneCsum (RST_ip_hdr, tcp_pack);
 	bf_afree(tcp_pack);
 	
-	DBLOCK(2, tcp_print_pack(ip_hdr, tcp_hdr); printf("\n");
-		tcp_print_pack(RST_ip_hdr, RST_tcp_hdr); printf("\n"));
+	DBLOCK(2, tcp_print_pack(ip_hdr, tcp_hdr); printk("\n");
+		tcp_print_pack(RST_ip_hdr, RST_tcp_hdr); printk("\n"));
 
 	if (tcp_conn->tc_frag2send)
 		bf_afree(tcp_conn->tc_frag2send);
@@ -1258,7 +1258,7 @@ int enq;					/* Enqueue writes. */
 	if (urg)
 	{
 #if DEBUG
-		printf("tcp_fd_read: RCV_UP = 0x%x, RCV_LO = 0x%x\n",
+		printk("tcp_fd_read: RCV_UP = 0x%x, RCV_LO = 0x%x\n",
 			tcp_conn->tc_RCV_UP, tcp_conn->tc_RCV_LO);
 #endif
 		read_size= tcp_conn->tc_RCV_UP-tcp_conn->tc_RCV_LO;
@@ -1351,16 +1351,16 @@ int enq;					/* Enqueue writes. */
 	if (tcp_conn->tc_RCV_LO - tcp_conn->tc_IRS > 0x40000000)
 	{
 		tcp_conn->tc_IRS += 0x20000000;
-		DBLOCK(1, printf("tcp_fd_read: updating IRS to 0x%lx\n",
+		DBLOCK(1, printk("tcp_fd_read: updating IRS to 0x%lx\n",
 			(unsigned long)tcp_conn->tc_IRS););
 		if (tcp_Lmod4G(tcp_conn->tc_RCV_UP, tcp_conn->tc_IRS))
 		{
 			tcp_conn->tc_RCV_UP= tcp_conn->tc_IRS;
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 				"tcp_fd_read: updating RCV_UP to 0x%lx\n",
 				(unsigned long)tcp_conn->tc_RCV_UP););
 		}
-		DBLOCK(1, printf("tcp_fd_read: RCP_LO = 0x%lx\n",
+		DBLOCK(1, printk("tcp_fd_read: RCP_LO = 0x%lx\n",
 			(unsigned long)tcp_conn->tc_RCV_LO););
 	}
 
@@ -1376,7 +1376,7 @@ int enq;					/* Enqueue writes. */
 		if (old_window < mss && new_window >= mss)
 		{
 			tcp_conn->tc_flags |= TCF_SEND_ACK;
-			DBLOCK(2, printf("opening window\n"));
+			DBLOCK(2, printk("opening window\n"));
 			tcp_conn_write(tcp_conn, 1);
 		}
 	}
@@ -1444,7 +1444,7 @@ tcp_conn_t *tcp_conn;
 	if (tcp_fd->tf_select_res)
 		tcp_fd->tf_select_res(tcp_fd->tf_srfd, SR_SELECT_READ);
 	else
-		printf("tcp_rsel_read: no select_res\n");
+		printk("tcp_rsel_read: no select_res\n");
 }
 
 void tcp_bytesavailable(tcp_fd, bytesp)

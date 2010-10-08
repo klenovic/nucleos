@@ -10,12 +10,12 @@ app-y += sysenv.elf32
 #            They are _not_ the user part of kernel!
 ccflags-y := -D__UKERNEL__
 
-cdprobe.elf32-obj-y     := cdprobe.o
-dev2name.elf32-obj-y    := dev2name.o
-loadramdisk.elf32-obj-y := loadramdisk.o
-newroot.elf32-obj-y     := newroot.o
-service.elf32-obj-y     := service.o
-sysenv.elf32-obj-y      := sysenv.o
+cdprobe.elf32-obj-y     := cdprobe.o printf.o
+dev2name.elf32-obj-y    := dev2name.o printf.o
+loadramdisk.elf32-obj-y := loadramdisk.o printf.o
+newroot.elf32-obj-y     := newroot.o printf.o
+service.elf32-obj-y     := service.o printf.o
+sysenv.elf32-obj-y      := sysenv.o printf.o
 
 extobj-y := $(lib-arch)/rts/crtso.o
 

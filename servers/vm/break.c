@@ -58,7 +58,7 @@ int do_brk(kipc_msg_t *msg)
 	int proc;
 
 	if(vm_isokendpt(msg->VMB_ENDPOINT, &proc) != 0) {
-		printf("VM: bogus endpoint VM_BRK %d\n", msg->VMB_ENDPOINT);
+		printk("VM: bogus endpoint VM_BRK %d\n", msg->VMB_ENDPOINT);
 		return -EINVAL;
 	}
 
@@ -134,14 +134,14 @@ vir_bytes sp;			/* new value of sp */
 		vir_bytes more;
 		more = (data_clicks - old_clicks) << CLICK_SHIFT;
 		if(map_region_extend(rmp, rmp->vm_heap, more) != 0) {
-			printf("VM: brk: map_region_extend failed\n");
+			printk("VM: brk: map_region_extend failed\n");
 			return -ENOMEM;
 		}
 	} else if(old_clicks > data_clicks) {
 		vir_bytes less;
 		less = (old_clicks - data_clicks) << CLICK_SHIFT;
 		if(map_region_shrink(rmp->vm_heap, less) != 0) {
-			printf("VM: brk: map_region_shrink failed\n");
+			printk("VM: brk: map_region_shrink failed\n");
 			return -ENOMEM;
 		}
 	}
@@ -173,7 +173,7 @@ vir_bytes v;
 
 	new_clicks = (vir_clicks) ( ((long) v + CLICK_SIZE - 1) >> CLICK_SHIFT);
 	if (new_clicks < vmp->vm_arch.vm_seg[D].mem_vir) {
-		printf("VM: real_brk failed because new_clicks too high: %d\n",
+		printk("VM: real_brk failed because new_clicks too high: %d\n",
 			new_clicks);
 		return(-ENOMEM);
 	}

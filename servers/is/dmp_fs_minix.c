@@ -38,13 +38,13 @@ void fproc_dmp()
 
   getsysinfo(VFS_PROC_NR, SI_PROC_TAB, fproc);
 
-  printf("File System (VFS_PROC_NR) process table dump\n");
-  printf("-nr- -pid- -tty- -umask- --uid-- --gid-- -ldr- -sus-rev-proc-\n");
+  printk("File System (VFS_PROC_NR) process table dump\n");
+  printk("-nr- -pid- -tty- -umask- --uid-- --gid-- -ldr- -sus-rev-proc-\n");
   for (i=prev_i; i<NR_PROCS; i++) {
   	fp = &fproc[i];
   	if (fp->fp_pid <= 0) continue;
   	if (++n > 22) break;
-  	printf("%3d  %4d  %2d/%d  0x%05x %2d (%2d) %2d (%2d) %3d   %3d %3d ",
+  	printk("%3d  %4d  %2d/%d  0x%05x %2d (%2d) %2d (%2d) %3d   %3d %3d ",
   		i, fp->fp_pid, 
   		((fp->fp_tty>>MAJOR)&BYTE), ((fp->fp_tty>>MINOR)&BYTE), 
   		fp->fp_umask,
@@ -53,12 +53,12 @@ void fproc_dmp()
   		fp->fp_blocked_on, !!fp->fp_revived
   	);
 	if (fp->fp_blocked_on == FP_BLOCKED_ON_OTHER)
-		printf("%4d\n", fp->fp_task);
+		printk("%4d\n", fp->fp_task);
 	else
-		printf(" nil\n");
+		printk(" nil\n");
   }
   if (i >= NR_PROCS) i = 0;
-  else printf("--more--\r");
+  else printk("--more--\r");
   prev_i = i;
 }
 
@@ -84,12 +84,12 @@ void dtab_dmp()
 
     getsysinfo(VFS_PROC_NR, SI_DMAP_TAB, dmap);
     
-    printf("File System (VFS_PROC_NR) device <-> driver mappings\n");
-    printf("Major  Driver ept  Flags\n");
-    printf("-----  ----------  -----\n");
+    printk("File System (VFS_PROC_NR) device <-> driver mappings\n");
+    printk("Major  Driver ept  Flags\n");
+    printk("-----  ----------  -----\n");
     for (i=0; i<NR_DEVICES; i++) {
         if (dmap[i].dmap_driver == ENDPT_NONE) continue;
-        printf("%5d  %10d  %s\n",
+        printk("%5d  %10d  %s\n",
 		i, dmap[i].dmap_driver, dmap_flags(dmap[i].dmap_flags));
     }
 }

@@ -159,7 +159,7 @@ void update_refcount_and_destroy(void)
 
 		rc = vm_getrefcount(SELF_E, (void *) shm_list[i].page);
 		if (rc == (u8_t) -1) {
-			printf("IPC: can't find physical region.\n");
+			printk("IPC: can't find physical region.\n");
 			continue;
 		}
 		shm_list[i].shmid_ds.shm_nattch = rc - 1;
@@ -331,9 +331,9 @@ int do_shmctl(kipc_msg_t *m)
 void list_shm_ds(void)
 {
 	int i;
-	printf("key\tid\tpage\n");
+	printk("key\tid\tpage\n");
 	for (i = 0; i < shm_list_nr; i++)
-		printf("%d\t%d\t%x\n",
+		printk("%d\t%d\t%x\n",
 			shm_list[i].key,
 			shm_list[i].id,
 			shm_list[i].page);

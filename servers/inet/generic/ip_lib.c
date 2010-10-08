@@ -40,7 +40,7 @@ int optlen;
 	i= 0;
 	while (i<optlen)
 	{
-		DBLOCK(2, printf("*opt= %d\n", *opt));
+		DBLOCK(2, printk("*opt= %d\n", *opt));
 
 		switch (*opt)
 		{
@@ -62,14 +62,14 @@ int optlen;
 		case IP_OPT_LSRR:	/* Lose Source and Record Route */
 			if (lose_source_present)
 			{
-				DBLOCK(1, printf("2nd lose soruce route\n"));
+				DBLOCK(1, printk("2nd lose soruce route\n"));
 				return -EINVAL;
 			}
 			lose_source_present= TRUE;
 			if (opt[1]<3)
 			{
 				DBLOCK(1,
-				printf("wrong length in source route\n"));
+				printk("wrong length in source route\n"));
 				return -EINVAL;
 			}
 			i += opt[1];
@@ -123,7 +123,7 @@ int optlen;
 	}
 	if (i > optlen)
 	{
-		DBLOCK(1, printf("option of wrong length\n"));
+		DBLOCK(1, printk("option of wrong length\n"));
 		return -EINVAL;
 	}
 	return 0;
@@ -137,7 +137,7 @@ acc_t *acc;
 	int first;
 
 	if (!acc)
-		printf("(null)");
+		printk("(null)");
 
 	for (first= 1; acc; acc= acc->acc_ext_link, first= 0)
 	{
@@ -146,10 +146,10 @@ assert (acc->acc_length >= IP_MIN_HDR_SIZE);
 		if (first)
 		{
 			writeIpAddr(ip_hdr->ih_src);
-			printf(" > ");
+			printk(" > ");
 			writeIpAddr(ip_hdr->ih_dst);
 		}
-		printf(" {%x:%d@%d%c}", ntohs(ip_hdr->ih_id),
+		printk(" {%x:%d@%d%c}", ntohs(ip_hdr->ih_id),
 			ntohs(ip_hdr->ih_length), 
 			(ntohs(ip_hdr->ih_flags_fragoff) & IH_FRAGOFF_MASK)*8,
 			(ntohs(ip_hdr->ih_flags_fragoff) & IH_MORE_FRAGS) ?

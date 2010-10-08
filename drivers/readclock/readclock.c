@@ -106,13 +106,13 @@ int main(int argc, char **argv)
   unsigned char mach_id, cmos_state;
 
   if((s=sys_readbios(MACH_ID_ADDR, &mach_id, sizeof(mach_id))) != 0) {
-	printf("readclock: sys_readbios failed: %d.\n", s);
+	printk("readclock: sys_readbios failed: %d.\n", s);
 	exit(1);
   }
 
   if (mach_id != PS_386 && mach_id != PC_AT) {
 	errmsg("Machine ID unknown." );
-	printf("Machine ID byte = %02x\n", mach_id );
+	printk("Machine ID byte = %02x\n", mach_id );
 
 	exit(1);
   }
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 
   if (cmos_state & (CS_LOST_POWER | CS_BAD_CHKSUM | CS_BAD_TIME)) {
 	errmsg( "CMOS RAM error(s) found..." );
-	printf("CMOS state = 0x%02x\n", cmos_state );
+	printk("CMOS state = 0x%02x\n", cmos_state );
 
 	if (cmos_state & CS_LOST_POWER)
 	    errmsg( "RTC lost power. Reset CMOS RAM with SETUP." );
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 
 	if (rtc != -1) break;
 
-	printf(
+	printk(
 "readclock: Invalid time read from CMOS RTC: %d-%02d-%02d %02d:%02d:%02d\n",
 		time2.tm_year+1900, time2.tm_mon+1, time2.tm_mday,
 		time2.tm_hour, time2.tm_min, time2.tm_sec);
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
   if (!wflag) {
 	/* Set system time. */
 	if (nflag) {
-		printf("stime(%lu)\n", (unsigned long) rtc);
+		printk("stime(%lu)\n", (unsigned long) rtc);
 	} else {
 		if (stime(&rtc) < 0) {
 			errmsg( "Not allowed to set time." );
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
 	}
 
 	time_to_tm(rtc,0,&tmnow);
-	printf("%04d-%02d-%02d %02d:%02d:%02d\n",
+	printk("%04d-%02d-%02d %02d:%02d:%02d\n",
 		tmnow.tm_year + 1900,
 		tmnow.tm_mon + 1,
 		tmnow.tm_mday,
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 	/* Set the CMOS clock to the system time. */
 	time_to_tm(now, 0, &tmnow);
 	if (nflag) {
-		printf("%04d-%02d-%02d %02d:%02d:%02d\n",
+		printk("%04d-%02d-%02d %02d:%02d:%02d\n",
 			tmnow.tm_year + 1900,
 			tmnow.tm_mon + 1,
 			tmnow.tm_mday,
@@ -215,7 +215,7 @@ void errmsg(char *s)
 {
   static char *prompt = "readclock: ";
 
-  printf("%s%s\n", prompt, s);
+  printk("%s%s\n", prompt, s);
   prompt = "";
 }
 
@@ -252,7 +252,7 @@ void get_time(struct tm *t)
 	n = 0;
 	do {
 		if (dead) {
-			printf("readclock: CMOS clock appears dead\n");
+			printk("readclock: CMOS clock appears dead\n");
 			exit(1);
 		}
 
@@ -311,11 +311,11 @@ int read_register(int reg_addr)
   u32_t r;
 
   if(sys_outb(RTC_INDEX, reg_addr) != 0) {
-	printf("cmos: outb failed of %x\n", RTC_INDEX);
+	printk("cmos: outb failed of %x\n", RTC_INDEX);
 	exit(1);
   }
   if(sys_inb(RTC_IO, (unsigned long*)&r) != 0) {
-	printf("cmos: inb failed of %x (index %x) failed\n", RTC_IO, reg_addr);
+	printk("cmos: inb failed of %x (index %x) failed\n", RTC_IO, reg_addr);
 	exit(1);
   }
   return r;
@@ -384,11 +384,11 @@ void set_time(struct tm *t)
 void write_register(int reg_addr, int value)
 {
   if(sys_outb(RTC_INDEX, reg_addr) != 0) {
-	printf("cmos: outb failed of %x\n", RTC_INDEX);
+	printk("cmos: outb failed of %x\n", RTC_INDEX);
 	exit(1);
   }
   if(sys_outb(RTC_IO, value) != 0) {
-	printf("cmos: outb failed of %x (index %x)\n", RTC_IO, reg_addr);
+	printk("cmos: outb failed of %x (index %x)\n", RTC_IO, reg_addr);
 	exit(1);
   }
 }
@@ -405,6 +405,6 @@ int dec_to_bcd(int n)
 
 void usage(void)
 {
-  printf("Usage: readclock [-nwW2]\n");
+  printk("Usage: readclock [-nwW2]\n");
   exit(1);
 }

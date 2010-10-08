@@ -97,7 +97,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	 */
 	if ((i=get_priv(rp, priv_id)) != 0)
 	{
-		kprintf("do_privctl: unable to allocate priv_id %d: %d\n",
+		printk("do_privctl: unable to allocate priv_id %d: %d\n",
 			priv_id, i);
 		return(i);
 	}
@@ -144,7 +144,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 			{
 				priv(rp)->s_irq_tab[i]= priv.s_irq_tab[i];
 #if 0
-				kprintf("do_privctl: adding IRQ %d for %d\n",
+				printk("do_privctl: adding IRQ %d for %d\n",
 					priv(rp)->s_irq_tab[i], rp->p_endpoint);
 #endif
 			}
@@ -159,7 +159,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 			{
 				priv(rp)->s_io_tab[i]= priv.s_io_tab[i];
 #if 0
-				kprintf("do_privctl: adding I/O range [%x..%x] for %d\n",
+				printk("do_privctl: adding I/O range [%x..%x] for %d\n",
 					priv(rp)->s_io_tab[i].ior_base,
 					priv(rp)->s_io_tab[i].ior_limit,
 					rp->p_endpoint);
@@ -176,7 +176,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 			{
 				priv(rp)->s_mem_tab[i]= priv.s_mem_tab[i];
 #if 0
-				kprintf("do_privctl: adding mem range [%x..%x] for %d\n",
+				printk("do_privctl: adding mem range [%x..%x] for %d\n",
 					priv(rp)->s_mem_tab[i].mr_base,
 					priv(rp)->s_mem_tab[i].mr_limit,
 					rp->p_endpoint);
@@ -228,7 +228,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	if (strcmp(rp->p_name, "fxp") == 0 ||
 		strcmp(rp->p_name, "rtl8139") == 0)
 	{
-		kprintf("setting ipc_stats_target to %d\n", rp->p_endpoint);
+		printk("setting ipc_stats_target to %d\n", rp->p_endpoint);
 		ipc_stats_target= rp->p_endpoint;
 	}
 #endif
@@ -312,7 +312,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	return -EPERM;
   }
   default:
-	kprintf("do_privctl: bad request %d\n", m_ptr->CTL_REQUEST);
+	printk("do_privctl: bad request %d\n", m_ptr->CTL_REQUEST);
 	return -EINVAL;
   }
 }

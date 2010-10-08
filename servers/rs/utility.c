@@ -23,7 +23,7 @@ struct rproc *rp;				/* pointer to process slot */
 		return s;
 	}
 	if (rs_verbose) {
-		printf("RS: publish_service: DS label registration done: %s -> %d\n", 
+		printk("RS: publish_service: DS label registration done: %s -> %d\n", 
 			rp->r_label, rp->r_proc_nr_e);
 	}
 

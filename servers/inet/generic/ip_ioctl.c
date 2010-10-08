@@ -437,7 +437,7 @@ ioreq_t req;
 		{
 			ip_fd->if_ioctl= req;
 			ip_fd->if_flags |= IFF_IOCTL_IP;
-			printf("ip_ioctl: suspending ARP request\n");
+			printk("ip_ioctl: suspending ARP request\n");
 			return NW_SUSPEND;
 		}
 
@@ -451,7 +451,7 @@ ioreq_t req;
 	default:
 		break;
 	}
-	DBLOCK(1, printf("replying -EBADIOCTL: 0x%x\n", req));
+	DBLOCK(1, printk("replying -EBADIOCTL: 0x%x\n", req));
 	return (*ip_fd->if_put_userdata)(ip_fd->if_srfd, -EBADIOCTL,
 		(acc_t *)0, TRUE);
 }

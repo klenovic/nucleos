@@ -33,31 +33,31 @@ void data_store_dmp()
   static int prev_i=0;
 
 
-  printf("Data Store (DS) contents dump\n");
+  printk("Data Store (DS) contents dump\n");
 
   if((s=getsysinfo(DS_PROC_NR, SI_DATA_STORE, store)) != 0) {
-	printf("Couldn't talk to DS: %d.\n", s);
+	printk("Couldn't talk to DS: %d.\n", s);
 	return;
   }
 
-  printf("slot key                  type value\n");
+  printk("slot key                  type value\n");
 
   for (i=prev_i; i<NR_DS_KEYS; i++) {
   	dsp = &store[i];
   	if (! dsp->ds_flags & DS_IN_USE) continue;
   	if (++n > 22) break;
-  	printf("%3d  %-20s ",
+  	printk("%3d  %-20s ",
 		i, dsp->ds_key);
 	if(dsp->ds_flags & DS_TYPE_U32) {
-		printf("u32  %lu\n", dsp->ds_val.ds_val_u32);
+		printk("u32  %lu\n", dsp->ds_val.ds_val_u32);
 	} else if(dsp->ds_flags & DS_TYPE_STR) {
-		printf("str  \"%s\"\n", dsp->ds_val.ds_val_str);
+		printk("str  \"%s\"\n", dsp->ds_val.ds_val_str);
 	} else {
-		printf("Bogus type\n");
+		printk("Bogus type\n");
 	}
   }
   if (i >= NR_DS_KEYS) i = 0;
-  else printf("--more--\r");
+  else printk("--more--\r");
   prev_i = i;
 }
 

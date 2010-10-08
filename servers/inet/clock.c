@@ -65,7 +65,7 @@ time_t tim;
 	}
 	else if (!curr_time)
 	{
-		DBLOCK(0x20, printf("set_time: new time %ld < prev_time %ld\n",
+		DBLOCK(0x20, printk("set_time: new time %ld < prev_time %ld\n",
 			tim, prev_time));
 	}
 }

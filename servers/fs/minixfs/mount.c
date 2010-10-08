@@ -54,14 +54,14 @@ int fs_readsuper()
   r = sys_safecopyfrom(fs_m_in.m_source, label_gid, 0,
                        (vir_bytes)fs_dev_label, label_len, D);
   if (r != 0) {
-	printf("%s:%d fs_readsuper: safecopyfrom failed: %d\n",
+	printk("%s:%d fs_readsuper: safecopyfrom failed: %d\n",
 	       __FILE__, __LINE__, r);
 	return(-EINVAL);
   }
 
   r = ds_retrieve_u32(fs_dev_label, &tasknr);
   if (r != 0) {
-	printf("%s:%d fs_readsuper: ds_retrieve_u32 failed for '%s': %d\n",
+	printk("%s:%d fs_readsuper: ds_retrieve_u32 failed for '%s': %d\n",
 	       fs_dev_label, __FILE__, __LINE__, r);
 	return(-EINVAL);
   }
@@ -96,14 +96,14 @@ int fs_readsuper()
   
   /* Get the root inode of the mounted file system. */
   if( (root_ip = get_inode(fs_dev, ROOT_INODE)) == NIL_INODE)  {
-	  printf("MFS: couldn't get root inode\n");
+	  printk("MFS: couldn't get root inode\n");
 	  superblock.s_dev = NO_DEV;
 	  dev_close(driver_e, fs_dev);
 	  return(-EINVAL);
   }
   
   if(root_ip != NIL_INODE && root_ip->i_mode == 0) {
-	  printf("%s:%d zero mode for root inode?\n", __FILE__, __LINE__);
+	  printk("%s:%d zero mode for root inode?\n", __FILE__, __LINE__);
 	  put_inode(root_ip);
 	  superblock.s_dev = NO_DEV;
 	  dev_close(driver_e, fs_dev);
@@ -174,7 +174,7 @@ int fs_unmount()
 	  if (rip->i_count > 0 && rip->i_dev == fs_dev) count += rip->i_count;
 
   if ((root_ip = find_inode(fs_dev, ROOT_INODE)) == NIL_INODE) {
-  	printf("MFS: couldn't find root inode. Unmount failed.\n");
+  	printk("MFS: couldn't find root inode. Unmount failed.\n");
   	panic(__FILE__, "MFS: couldn't find root inode", -EINVAL);
   	return(-EINVAL);
   }

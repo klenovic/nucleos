@@ -45,14 +45,14 @@ int do_fork(kipc_msg_t *msg)
   SANITYCHECK(SCL_FUNCTIONS);
 
   if(vm_isokendpt(msg->VMF_ENDPOINT, &proc) != 0) {
-	printf("VM: bogus endpoint VM_FORK %d\n", msg->VMF_ENDPOINT);
+	printk("VM: bogus endpoint VM_FORK %d\n", msg->VMF_ENDPOINT);
   SANITYCHECK(SCL_FUNCTIONS);
 	return -EINVAL;
   }
 
   childproc = msg->VMF_SLOTNO;
   if(childproc < 0 || childproc >= NR_PROCS) {
-	printf("VM: bogus slotno VM_FORK %d\n", msg->VMF_SLOTNO);
+	printk("VM: bogus slotno VM_FORK %d\n", msg->VMF_SLOTNO);
   SANITYCHECK(SCL_FUNCTIONS);
 	return -EINVAL;
   }
@@ -64,7 +64,7 @@ int do_fork(kipc_msg_t *msg)
   NOTRUNNABLE(vmp->vm_endpoint);
 
   if(vmp->vm_flags & VMF_HAS_DMA) {
-	printf("VM: %d has DMA memory and may not fork\n", msg->VMF_ENDPOINT);
+	printk("VM: %d has DMA memory and may not fork\n", msg->VMF_ENDPOINT);
 	return -EINVAL;
   }
 
@@ -89,14 +89,14 @@ int do_fork(kipc_msg_t *msg)
 	SANITYCHECK(SCL_DETAIL);
 
 	if(pt_new(&vmc->vm_pt) != 0) {
-		printf("VM: fork: pt_new failed\n");
+		printk("VM: fork: pt_new failed\n");
 		return -ENOMEM;
 	}
 
 	SANITYCHECK(SCL_DETAIL);
 
 	if(map_proc_copy(vmc, vmp) != 0) {
-		printf("VM: fork: map_proc_copy failed\n");
+		printk("VM: fork: map_proc_copy failed\n");
 		pt_free(&vmc->vm_pt);
 		return(-ENOMEM);
 	}
@@ -140,7 +140,7 @@ int do_fork(kipc_msg_t *msg)
            (vmp->vm_arch.vm_seg[S].mem_vir - vmp->vm_arch.vm_seg[D].mem_vir);
 
 	if(pt_identity(&vmc->vm_pt) != 0) {
-		printf("VM: fork: pt_identity failed\n");
+		printk("VM: fork: pt_identity failed\n");
 		return -ENOMEM;
 	}
   }

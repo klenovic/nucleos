@@ -10,12 +10,11 @@
 /*
  * printf - write on the standard output stream
  */
-#include	<stdio.h>
-#include	<stdarg.h>
-#include	"loc_incl.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include "loc_incl.h"
 
-int
-printf(const char *format, ...)
+int printf(const char *format, ...)
 {
 	va_list ap;
 	int retval;
@@ -28,3 +27,4 @@ printf(const char *format, ...)
 
 	return retval;
 }
+

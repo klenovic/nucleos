@@ -20,7 +20,7 @@
  */
 #define MYASSERT(c) do {						\
 	if (!(c)) {							\
-		printf("VM:%s:%d: %s failed\n", file, line, #c);	\
+		printk("VM:%s:%d: %s failed\n", file, line, #c);	\
 		vm_panic("sanity check failed", NO_NUM); }		\
 	} while(0)
 
@@ -56,7 +56,7 @@
 
 #define SLABSANE(ptr) { \
 	if(!slabsane_f(__FILE__, __LINE__, ptr, sizeof(*(ptr)))) { \
-		printf("VM:%s:%d: SLABSANE(%s)\n", __FILE__, __LINE__, #ptr); \
+		printk("VM:%s:%d: SLABSANE(%s)\n", __FILE__, __LINE__, #ptr); \
 		vm_panic("SLABSANE failed", NO_NUM);	\
 	} \
 }

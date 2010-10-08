@@ -65,15 +65,15 @@ void panic0(char *file, int line);
 void inet_panic(void) __noreturn; 
 
 #define ip_panic(print_list)  \
-	(panic0(__FILE__, __LINE__), printf print_list, panic())
+	(panic0(__FILE__, __LINE__), printk print_list, panic())
 #define panic() inet_panic()
 
 #if DEBUG
 #define ip_warning(print_list)  \
 	( \
-		printf("warning at %s, %d: ", __FILE__, __LINE__), \
-		printf print_list, \
-		printf("\ninet stacktrace: "), \
+		printk("warning at %s, %d: ", __FILE__, __LINE__), \
+		printk print_list, \
+		printk("\ninet stacktrace: "), \
 		util_stacktrace() \
 	)
 #else

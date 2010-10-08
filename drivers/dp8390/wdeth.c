@@ -193,7 +193,7 @@ dpeth_t *dep;
 			((irr & (E_IRR_IR0|E_IRR_IR1)) >> 5);
 		int_nr= we_int_table[int_indx];
 #if DEBUG
- { printf("%s: encoded irq= %d\n", dep->de_name, int_nr); }
+ { printk("%s: encoded irq= %d\n", dep->de_name, int_nr); }
 #endif
 		if (dep->de_irq & DEI_DEFAULT) dep->de_irq= int_nr;
 
@@ -212,7 +212,7 @@ dpeth_t *dep;
 			((gcr & (E_790_GCR_IR1|E_790_GCR_IR0)) >> 2);
 		int_nr= we_790int_table[int_indx];
 #if DEBUG
- { printf("%s: encoded irq= %d\n", dep->de_name, int_nr); }
+ { printk("%s: encoded irq= %d\n", dep->de_name, int_nr); }
 #endif
 		if (dep->de_irq & DEI_DEFAULT) dep->de_irq= int_nr;
 
@@ -225,13 +225,13 @@ dpeth_t *dep;
 
 	if (!debug)
 	{
-		printf("%s: WD80%d3 at %X:%d:%lX\n",
+		printk("%s: WD80%d3 at %X:%d:%lX\n",
 			dep->de_name, we_type & WET_BRD_16BIT ? 1 : 0,
 			dep->de_base_port, dep->de_irq, dep->de_linmem);
 	}
 	else
 	{
-		printf("%s: Western Digital %s%s card %s%s at I/O "
+		printk("%s: Western Digital %s%s card %s%s at I/O "
 			"address 0x%X, memory address 0x%lX, "
 			"memory size 0x%X, irq %d\n",
 			dep->de_name,
@@ -331,7 +331,7 @@ dpeth_t *dep;
 	{
 		tlb= inb_we(dep, EPL_TLB);
 #if DEBUG
-		printf("%s: tlb= 0x%x\n", dep->de_name, tlb);
+		printk("%s: tlb= 0x%x\n", dep->de_name, tlb);
 #endif
 		return tlb == E_TLB_EB || tlb == E_TLB_E ||
 			tlb == E_TLB_SMCE || tlb == E_TLB_SMC8216T ||

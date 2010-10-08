@@ -109,7 +109,7 @@ int main(void)
 	      if (rproc_ptr[who_p] != NULL) {	/* mark heartbeat time */ 
                 rproc_ptr[who_p]->r_alive_tm = m.NOTIFY_TIMESTAMP;
 	      } else {
-		  printf("Warning, RS got unexpected notify message from %d\n",
+		  printk("Warning, RS got unexpected notify message from %d\n",
 		      m.m_source);
 	      }
           }
@@ -123,7 +123,7 @@ int main(void)
 	  	(call_nr < RS_RQ_BASE || call_nr >= RS_RQ_BASE+0x100))
 	  {
 		/* Ignore invalid requests. Do not try to reply. */
-		printf("RS: got invalid request %d from endpoint %d\n",
+		printk("RS: got invalid request %d from endpoint %d\n",
 			call_nr, m.m_source);
 		continue;
 	  }
@@ -138,7 +138,7 @@ int main(void)
           case __NR_getsysinfo: 	result = do_getsysinfo(&m); 	break;
 	  case RS_LOOKUP:	result = do_lookup(&m);		break;
           default: 
-              printf("Warning, RS got unexpected request %d from %d\n",
+              printk("Warning, RS got unexpected request %d from %d\n",
                   m.m_type, m.m_source);
               result = -EINVAL;
           }
@@ -651,5 +651,5 @@ kipc_msg_t *m_out;                         /* reply message */
 
     s = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who, m_out);	/* send the message */
     if (s != 0)
-        printf("RS: unable to send reply to %d: %d\n", who, s);
+        printk("RS: unable to send reply to %d: %d\n", who, s);
 }

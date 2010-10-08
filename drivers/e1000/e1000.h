@@ -92,12 +92,12 @@
 /**
  * @brief Print a debug message.
  * @param level Debug verbosity level.
- * @param args Arguments to printf().
+ * @param args Arguments to printk().
  */
 #define E1000_DEBUG(level, args) \
 	if ((level) <= E1000_VERBOSE) \
 	{ \
-	    printf args; \
+	    printk args; \
 	} \
 
 /**

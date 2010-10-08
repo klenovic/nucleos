@@ -191,13 +191,13 @@ dpeth_t *dep;
 
 	if (!debug)
 	{
-		printf("%s: NE%d000 at %X:%d\n",
+		printk("%s: NE%d000 at %X:%d\n",
 			dep->de_name, dep->de_16bit ? 2 : 1,
 			dep->de_base_port, dep->de_irq);
 	}
 	else
 	{
-		printf("%s: Novell NE%d000 ethernet card at I/O address "
+		printk("%s: Novell NE%d000 ethernet card at I/O address "
 			"0x%X, memory size 0x%X, irq %d\n",
 			dep->de_name, dep->de_16bit ? 2 : 1,
 			dep->de_base_port, dep->de_ramsize, dep->de_irq);
@@ -237,7 +237,7 @@ u8_t *pat;
 	{
 		if (debug)
 		{
-			printf("%s: NE1000 remote DMA test failed\n",
+			printk("%s: NE1000 remote DMA test failed\n",
 				dep->de_name);
 		}
 		return 0;
@@ -291,7 +291,7 @@ u8_t *pat;
 	{
 		if (debug)
 		{
-			printf("%s: NE2000 remote DMA test failed\n",
+			printk("%s: NE2000 remote DMA test failed\n",
 				dep->de_name);
 		}
 		return 0;

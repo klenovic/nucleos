@@ -28,7 +28,7 @@
 static void warning(const char *type, int err)
 {
 
-  printf("Warning: eth#0 sys_%s failed (%d)\n", type, err);
+  printk("Warning: eth#0 sys_%s failed (%d)\n", type, err);
   return;
 }
 

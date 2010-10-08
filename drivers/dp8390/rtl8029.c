@@ -69,7 +69,7 @@ struct dpeth *dep;
 			dep->de_pcifunc, &devind);
 		if (r == 0)
 		{
-			printf("%s: no PCI found at %d.%d.%d\n",
+			printk("%s: no PCI found at %d.%d.%d\n",
 				dep->de_name, dep->de_pcibus,
 				dep->de_pcidev, dep->de_pcifunc);
 			return 0;
@@ -106,7 +106,7 @@ struct dpeth *dep;
 
 		if (just_one)
 		{
-			printf(
+			printk(
 		"%s: wrong PCI device (%04X/%04X) found at %d.%d.%d\n",
 				dep->de_name, vid, did,
 				dep->de_pcibus,
@@ -122,11 +122,11 @@ struct dpeth *dep;
 	dname= pci_dev_name(vid, did);
 	if (!dname)
 		dname= "unknown device";
-	printf("%s: %s (%04X/%04X) at %s\n",
+	printk("%s: %s (%04X/%04X) at %s\n",
 		dep->de_name, dname, vid, did, pci_slot_name(devind));
         if(pci_reserve_ok(devind) != 0)
                return 0;
-	/* printf("cr = 0x%x\n", pci_attr_r16(devind, PCI_CR)); */
+	/* printk("cr = 0x%x\n", pci_attr_r16(devind, PCI_CR)); */
 	bar= pci_attr_r32(devind, PCI_BAR) & 0xffffffe0;
 
 	if (bar < 0x400)
@@ -138,7 +138,7 @@ struct dpeth *dep;
 	dep->de_irq= ilr;
 	if (debug)
 	{
-		printf("%s: using I/O address 0x%lx, IRQ %d\n",
+		printk("%s: using I/O address 0x%lx, IRQ %d\n",
 			dep->de_name, (unsigned long)bar, ilr);
 	}
 	dep->de_initf= rtl_init;
@@ -153,7 +153,7 @@ dpeth_t *dep;
 	int i;
 
 #if DEBUG
-	printf("rtl_init called\n");
+	printk("rtl_init called\n");
 #endif
 	ne_init(dep);
 
@@ -163,7 +163,7 @@ dpeth_t *dep;
 	reg_b = inb_reg0(dep, DP_DUM2);
 
 #if DEBUG
-	printf("rtl_init: '%c', '%c'\n", reg_a, reg_b);
+	printk("rtl_init: '%c', '%c'\n", reg_a, reg_b);
 #endif
 
 	outb_reg0(dep, DP_CR, CR_PS_P3);
@@ -173,13 +173,13 @@ dpeth_t *dep;
 	outb_reg0(dep, DP_CR, CR_PS_P0);
 
 #if DEBUG
-	printf("rtl_init: config 0/2/3 = %x/%x/%x\n",
+	printk("rtl_init: config 0/2/3 = %x/%x/%x\n",
 		config0, config2, config3);
 #endif
 
 	if (getenv("RTL8029FD"))
 	{
-		printf("rtl_init: setting full-duplex mode\n");
+		printk("rtl_init: setting full-duplex mode\n");
 		outb_reg0(dep, DP_CR, CR_PS_P3);
 
 		cr= inb_reg3(dep, 1);
@@ -197,15 +197,15 @@ dpeth_t *dep;
 		outb_reg0(dep, DP_CR, CR_PS_P0);
 
 #if DEBUG
-		printf("rtl_init: config 2 = %x\n", config2);
-		printf("rtl_init: config 3 = %x\n", config3);
+		printk("rtl_init: config 2 = %x\n", config2);
+		printk("rtl_init: config 3 = %x\n", config3);
 #endif
 	}
 
 #if DEBUG
 	for (i= 0; i<64; i++)
-		printf("%x ", get_ee_word(dep, i));
-	printf("\n");
+		printk("%x ", get_ee_word(dep, i));
+	printk("\n");
 #endif
 
 #if 0

@@ -62,7 +62,7 @@ micro_delay_calibrate(void)
 			"for TSC frequency\n", NO_NUM);
 	calib_tsc = ex64lo(diff);
 #if 0
-	printf("micro_delay_calibrate: "
+	printk("micro_delay_calibrate: "
 		"%lu cycles/%d ticks of %d Hz; %lu cycles/s\n",
 			calib_tsc, CALIBRATE_TICKS(Hz), Hz,
 			div64u(mul64u(calib_tsc, Hz), CALIBRATE_TICKS(Hz)));

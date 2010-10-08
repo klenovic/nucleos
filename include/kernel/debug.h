@@ -11,7 +11,7 @@
 
 #define TRACE(code, statement)				\
 	if (verboseflags & code) {			\
-		printf("%s:%d: ", __FILE__, __LINE__);	\
+		printk("%s:%d: ", __FILE__, __LINE__);	\
 		statement				\
 	}
 
@@ -27,13 +27,13 @@
 #endif /* CONFIG_DEBUG_KERNEL_VMASSERT */
 
 #define NOT_REACHABLE(__x) do {						\
-	kprintf("NOT_REACHABLE at %s:%d\n", __FILE__, __LINE__);	\
+	printk("NOT_REACHABLE at %s:%d\n", __FILE__, __LINE__);	\
 	kernel_panic("execution at an unexpected location\n", NO_NUM);	\
 	for(;;);							\
 } while(0)
 
 #define NOT_IMPLEMENTED do {	\
-		kprintf("NOT_IMPLEMENTED at %s:%d\n", __FILE__, __LINE__); \
+		printk("NOT_IMPLEMENTED at %s:%d\n", __FILE__, __LINE__); \
 		kernel_panic("NOT_IMPLEMENTED", NO_NUM); \
 } while(0)
 

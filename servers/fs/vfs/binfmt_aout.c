@@ -208,7 +208,7 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 				n= sizeof(buf);
 
 #if CONFIG_DEBUG_VFS_AOUT
-			printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
+			printk("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 			proc_e, seg, buf, n, off+k);
 #endif
 
@@ -218,19 +218,19 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 					  &cum_io);
 
 			if (err) {
-				printf("VFS: read_seg: req_readwrite failed (text)\n");
+				printk("VFS: read_seg: req_readwrite failed (text)\n");
 				return err;
 			}
 
 			if (cum_io != n) {
-				printf("read_seg segment has not been read properly by exec()\n");
+				printk("read_seg segment has not been read properly by exec()\n");
 				return -EIO;
 			}
 
 			err = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
 			if (err) {
-				printf("VFS: read_seg: copy failed (text)\n");
+				printk("VFS: read_seg: copy failed (text)\n");
 				return err;
 			}
 
@@ -246,12 +246,12 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 			    READING, proc_e, 0, seg_bytes, &new_pos, &cum_io);
 
 	if (err) {
-		printf("VFS: read_seg: req_readwrite failed (data)\n");
+		printk("VFS: read_seg: req_readwrite failed (data)\n");
 		return err;
 	}
 
 	if (!err && cum_io != seg_bytes)
-		printf("VFSread_seg segment has not been read properly by exec() \n");
+		printk("VFSread_seg segment has not been read properly by exec() \n");
 
 	return err;
 }
@@ -279,14 +279,14 @@ static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_s
 	if (err)
 		return err;
 #if CONFIG_DEBUG_VFS_AOUT
-	printf("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
+	printk("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
 #endif
 	*stack_topp= m.m_data1;
 	*load_textp= !!(m.m_data2 & EXC_NM_RF_LOAD_TEXT);
 	*allow_setuidp= !!(m.m_data2 & EXC_NM_RF_ALLOW_SETUID);
 #if CONFIG_DEBUG_VFS_AOUT
-	printf("exec_newmem: stack_top = 0x%x\n", *stack_topp);
-	printf("exec_newmem: load_text = %d\n", *load_textp);
+	printk("exec_newmem: stack_top = 0x%x\n", *stack_topp);
+	printk("exec_newmem: load_text = %d\n", *load_textp);
 #endif
 	return m.m_type;
 }

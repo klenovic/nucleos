@@ -212,7 +212,7 @@ static int my_inb(port_t port)
 	unsigned long v = 0;
 	r = sys_inb(port, &v);
 	if (r != 0)
-		printf("RS232 warning: failed inb 0x%x\n", port);
+		printk("RS232 warning: failed inb 0x%x\n", port);
 
 	return (int) v;
 }
@@ -517,10 +517,10 @@ tty_t *tp;			/* which TTY */
   rs->irq = irq;
   rs->irq_hook_id = rs->irq;	/* call back with irq line number */
   if (sys_irqsetpolicy(irq, IRQ_REENABLE, &rs->irq_hook_id) != 0) {
-  	printf("RS232: Couldn't obtain hook for irq %d\n", irq);
+  	printk("RS232: Couldn't obtain hook for irq %d\n", irq);
   } else {
   	if (sys_irqenable(&rs->irq_hook_id) != 0)  {
-  		printf("RS232: Couldn't enable irq %d (hooked)\n", irq);
+  		printk("RS232: Couldn't enable irq %d (hooked)\n", irq);
   	}
   }
 
@@ -676,7 +676,7 @@ int dummy;
   sys_outb(rs->line_ctl_port, line_controls | LC_BREAK);
   /* XXX */
   /* milli_delay(400); */				/* ouch */
-  printf("RS232 break\n");
+  printk("RS232 break\n");
   sys_outb(rs->line_ctl_port, line_controls);
   return 0;	/* dummy */
 }
@@ -766,7 +766,7 @@ register rs232_t *rs;		/* line with input interrupt */
 
   if (rs->icount == buflen(rs->ibuf))
   {
-	printf("in_int: discarding byte\n");
+	printk("in_int: discarding byte\n");
 	return;	/* input buffer full, discard */
   }
 
@@ -778,7 +778,7 @@ register rs232_t *rs;		/* line with input interrupt */
 	force_timeout();
   }
   else
-	printf("in_int: icount = %d\n", rs->icount);
+	printk("in_int: icount = %d\n", rs->icount);
 }
 
 /*===========================================================================*

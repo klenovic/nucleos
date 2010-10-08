@@ -489,13 +489,13 @@ static void init_params()
 	panic("at_wini", "atapi_debug", NO_NUM);
 
   if(w_identify_wakeup_ticks <= 0) {
-	printf("changing wakeup from %d to %d ticks.\n",
+	printk("changing wakeup from %d to %d ticks.\n",
 		w_identify_wakeup_ticks, WAKEUP_TICKS);
 	w_identify_wakeup_ticks = WAKEUP_TICKS;
   }
 
   if (disable_dma) {
-	printf("at_wini%d: DMA for ATA devices is disabled.\n", w_instance);
+	printk("at_wini%d: DMA for ATA devices is disabled.\n", w_instance);
   } else {
 	/* Ask for anonymous memory for DMA, that is physically contiguous. */
 	dma_buf = mmap(0, ATA_DMA_BUF_SIZE, PROT_READ|PROT_WRITE,
@@ -505,7 +505,7 @@ static void init_params()
 		MAP_PREALLOC | MAP_CONTIG | MAP_ANONYMOUS, -1, 0);
 	if(dma_buf == MAP_FAILED || prdt == MAP_FAILED) {
 		disable_dma = 1;
-		printf("at_wini%d: no dma\n", w_instance);
+		printk("at_wini%d: no dma\n", w_instance);
 	} else {
 		s= sys_umap(ENDPT_SELF, VM_D, (vir_bytes)dma_buf,
 			ATA_DMA_BUF_SIZE, &dma_buf_phys);
@@ -517,7 +517,7 @@ static void init_params()
 		if (s != 0)
 			panic("at_wini", "can't map prd table", s);
 #if 0
-		printf("at_wini%d: physical dma_buf: 0x%lx, "
+		printk("at_wini%d: physical dma_buf: 0x%lx, "
 			"prdt tab: 0x%lx\n",
 			w_instance, dma_buf_phys, prdt_phys);
 #endif
@@ -589,7 +589,7 @@ static void init_drive(struct wini *w, int base_cmd, int base_ctl,
 	w->base_ctl = base_ctl;
 	w->base_dma = base_dma;
 	if(w_pci_debug)
-	   printf("at_wini%d: drive %d: base_cmd 0x%x, base_ctl 0x%x, base_dma 0x%x\n",
+	   printk("at_wini%d: drive %d: base_cmd 0x%x, base_ctl 0x%x, base_dma 0x%x\n",
 		w_instance, w-wini, w->base_cmd, w->base_ctl, w->base_dma);
 	w->irq = irq;
 	w->irq_need_ack = ack;
@@ -640,12 +640,12 @@ static void init_params_pci(int skip)
 		}
 		if (raid_table[i].vendor == 0)
 		{
-		  	printf(
+		  	printk(
 	"atapci skipping unsupported RAID controller 0x%04x / 0x%04x\n",
 				vid, did);
 			continue;
 		}
-		printf("found supported RAID controller\n");
+		printk("found supported RAID controller\n");
 		raid= 1;
 	}
 	else
@@ -672,7 +672,7 @@ static void init_params_pci(int skip)
   		if (skip > 0) {
   			if (w_pci_debug)
 			{
-				printf(
+				printk(
 				"atapci skipping controller (remain %d)\n",
 					skip);
 			}
@@ -680,20 +680,20 @@ static void init_params_pci(int skip)
   			continue;
   		}
 		if(pci_reserve_ok(devind) != 0) {
-			printf("at_wini%d: pci_reserve %d failed - "
+			printk("at_wini%d: pci_reserve %d failed - "
 				"ignoring controller!\n",
 				w_instance, devind);
 			continue;
 		}
   		if ((s=sys_irqsetpolicy(irq, 0, &irq_hook)) != 0) {
-		  	printf("atapci: couldn't set IRQ policy %d\n", irq);
+		  	printk("atapci: couldn't set IRQ policy %d\n", irq);
 		  	continue;
 		}
 		if ((s=sys_irqenable(&irq_hook)) != 0) {
-			printf("atapci: couldn't enable IRQ line %d\n", irq);
+			printk("atapci: couldn't enable IRQ line %d\n", irq);
 		  	continue;
 		}
-  	} else if(w_pci_debug) printf("at_wini%d: dev %d: only compat drives\n", w_instance, devind); 
+  	} else if(w_pci_debug) printk("at_wini%d: dev %d: only compat drives\n", w_instance, devind); 
 
   	base_dma = pci_attr_r32(devind, PCI_BAR_5) & 0xfffffffc;
 
@@ -711,9 +711,9 @@ static void init_params_pci(int skip)
   				base_cmd, base_ctl+PCI_CTL_OFF,
 				base_dma, irq, 1, irq_hook, 1);
 	  		if (w_pci_debug)
-		  		printf("at_wini%d: atapci %d: 0x%x 0x%x irq %d\n", w_instance, devind, base_cmd, base_ctl, irq);
+		  		printk("at_wini%d: atapci %d: 0x%x 0x%x irq %d\n", w_instance, devind, base_cmd, base_ctl, irq);
 			w_next_drive += 2;
-  		} else printf("at_wini%d: atapci: ignored drives on primary channel, base %x\n", w_instance, base_cmd);
+  		} else printk("at_wini%d: atapci: ignored drives on primary channel, base %x\n", w_instance, base_cmd);
   	}
 	else
 	{
@@ -723,7 +723,7 @@ static void init_params_pci(int skip)
 			if (wini[i].base_cmd == REG_CMD_BASE0) {
 				wini[i].base_dma= base_dma;
 				if(w_pci_debug)
-	   			  printf("at_wini%d: drive %d: base_dma 0x%x\n",
+	   			  printk("at_wini%d: drive %d: base_dma 0x%x\n",
 					w_instance, i, wini[i].base_dma);
 				pci_compat = 1;
 			}
@@ -746,10 +746,10 @@ static void init_params_pci(int skip)
 	  			base_cmd, base_ctl+PCI_CTL_OFF, base_dma,
 				irq, 1, irq_hook, 3);
 	  		if (w_pci_debug)
-  			  printf("at_wini%d: atapci %d: 0x%x 0x%x irq %d\n",
+  			  printk("at_wini%d: atapci %d: 0x%x 0x%x irq %d\n",
 				w_instance, devind, base_cmd, base_ctl, irq);
 			w_next_drive += 2;
-  		} else printf("at_wini%d: atapci: ignored drives on "
+  		} else printk("at_wini%d: atapci: ignored drives on "
 			"secondary channel, base %x\n", w_instance, base_cmd);
   	}
 	else
@@ -760,7 +760,7 @@ static void init_params_pci(int skip)
 			if (wini[i].base_cmd == REG_CMD_BASE1 && base_dma != 0) {
 				wini[i].base_dma= base_dma+PCI_DMA_2ND_OFF;
 	  			if (w_pci_debug)
-	   			  printf("at_wini%d: drive %d: base_dma 0x%x\n",
+	   			  printk("at_wini%d: drive %d: base_dma 0x%x\n",
 					w_instance, i, wini[i].base_dma);
 				pci_compat = 1;
 			}
@@ -769,7 +769,7 @@ static void init_params_pci(int skip)
 
 	if(pci_compat) {
 		if(pci_reserve_ok(devind) != 0) {
-			printf("at_wini%d (compat): pci_reserve %d failed!\n",
+			printk("at_wini%d (compat): pci_reserve %d failed!\n",
 				w_instance, devind);
 		}
 	}
@@ -801,7 +801,7 @@ kipc_msg_t *m_ptr;
 	/* Try to identify the device. */
 	if (w_identify() != 0) {
 #if VERBOSE
-  		printf("%s: probe failed\n", w_name());
+  		printk("%s: probe failed\n", w_name());
 #endif
 		if (wn->state & DEAF) w_reset();
 		wn->state = IGNORING;
@@ -909,7 +909,7 @@ check_dma(struct wini *wn)
 		w= id_word(ID_MULTIWORD_DMA);
 		if (w_pci_debug &&
 		(w & (ID_MWDMA_2_SUP|ID_MWDMA_1_SUP|ID_MWDMA_0_SUP))) {
-			printf(
+			printk(
 			"%s: multiword DMA modes supported:%s%s%s\n",
 				w_name(),
 				(w & ID_MWDMA_0_SUP) ? " 0" : "",
@@ -918,7 +918,7 @@ check_dma(struct wini *wn)
 		}
 		if (w_pci_debug &&
 		(w & (ID_MWDMA_0_SEL|ID_MWDMA_1_SEL|ID_MWDMA_2_SEL))) {
-			printf(
+			printk(
 			"%s: multiword DMA mode selected:%s%s%s\n",
 				w_name(),
 				(w & ID_MWDMA_0_SEL) ? " 0" : "",
@@ -930,7 +930,7 @@ check_dma(struct wini *wn)
 			if (w & (ID_UDMA_0_SUP|ID_UDMA_1_SUP|
 				ID_UDMA_2_SUP|ID_UDMA_3_SUP|
 				ID_UDMA_4_SUP|ID_UDMA_5_SUP)) {
-				printf(
+				printk(
 			"%s: Ultra DMA modes supported:%s%s%s%s%s%s\n",
 				w_name(),
 				(w & ID_UDMA_0_SUP) ? " 0" : "",
@@ -943,7 +943,7 @@ check_dma(struct wini *wn)
 			if (w & (ID_UDMA_0_SEL|ID_UDMA_1_SEL|
 				ID_UDMA_2_SEL|ID_UDMA_3_SEL|
 				ID_UDMA_4_SEL|ID_UDMA_5_SEL)) {
-				printf(
+				printk(
 			"%s: Ultra DMA mode selected:%s%s%s%s%s%s\n",
 				w_name(),
 				(w & ID_UDMA_0_SEL) ? " 0" : "",
@@ -956,9 +956,9 @@ check_dma(struct wini *wn)
 		}
 		wn->dma= 1;
 	} else if (id_dma || dma_base) {
-		printf("id_dma %d, dma_base 0x%x\n", id_dma, dma_base);
+		printk("id_dma %d, dma_base 0x%x\n", id_dma, dma_base);
 	} else
-		printf("no DMA support\n");
+		printk("no DMA support\n");
 }
 
 /*===========================================================================*
@@ -1000,7 +1000,7 @@ static int w_identify()
 #if 0
 	if (id_word(0) & ID_GEN_NOT_ATA)
 	{
-		printf("%s: not an ATA device?\n", w_name());
+		printk("%s: not an ATA device?\n", w_name());
   		wakeup_ticks = prev_wakeup;
 		w_testing = 0;
 		return ERR;
@@ -1332,9 +1332,9 @@ int error_dma(struct wini *wn)
 	u32_t v;
 
 #define DMAERR(msg) \
-	printf("at_wini%d: bad DMA: %s. Disabling DMA for drive %d.\n",	\
+	printk("at_wini%d: bad DMA: %s. Disabling DMA for drive %d.\n",	\
 		w_instance, msg, wn - wini);				\
-	printf("at_wini%d: workaround: set %s=1 in boot monitor.\n", \
+	printk("at_wini%d: workaround: set %s=1 in boot monitor.\n", \
 		w_instance, NO_DMA_VAR); \
 	return 1;	\
 
@@ -1416,7 +1416,7 @@ unsigned nr_req;		/* length of request vector */
 		setup_dma(&nbytes, proc_nr, iov, addr_offset, do_write,
 			&do_copyout);
 #if 0
-		printf("nbytes = %d\n", nbytes);
+		printk("nbytes = %d\n", nbytes);
 #endif
 	}
 
@@ -1608,7 +1608,7 @@ struct command *cmd;		/* Command block */
   if (w_wn->state & IGNORING) return ERR;
 
   if (!w_waitfor(STATUS_BSY, 0)) {
-	printf("%s: controller not ready\n", w_name());
+	printk("%s: controller not ready\n", w_name());
 	return(ERR);
   }
 
@@ -1617,7 +1617,7 @@ struct command *cmd;		/* Command block */
   	panic(w_name(),"Couldn't write register to select drive",s);
 
   if (!w_waitfor(STATUS_BSY, 0)) {
-	printf("%s: com_out: drive not ready\n", w_name());
+	printk("%s: com_out: drive not ready\n", w_name());
 	return(ERR);
   }
 
@@ -1660,7 +1660,7 @@ struct command *cmd;		/* Command block */
   if (w_wn->state & IGNORING) return ERR;
 
   if (!w_waitfor(STATUS_BSY, 0)) {
-	printf("%s: controller not ready\n", w_name());
+	printk("%s: controller not ready\n", w_name());
 	return(ERR);
   }
 
@@ -1669,7 +1669,7 @@ struct command *cmd;		/* Command block */
   	panic(w_name(),"Couldn't write register to select drive",s);
 
   if (!w_waitfor(STATUS_BSY, 0)) {
-	printf("%s: com_out: drive not ready\n", w_name());
+	printk("%s: com_out: drive not ready\n", w_name());
 	return(ERR);
   }
 
@@ -1724,12 +1724,12 @@ int *do_copyoutp;
 	offset= 0;	/* Offset in current iov */
 
 	if(verbose)
-		printf("at_wini: setup_dma: proc_nr %d\n", proc_nr);
+		printk("at_wini: setup_dma: proc_nr %d\n", proc_nr);
 
 	while (size > 0)
 	{
 	   if(verbose)  {
-		printf(
+		printk(
 		"at_wini: setup_dma: iov[%d]: addr 0x%x, size %d offset %d, size %d\n",
 			i, iov[i].iov_addr, iov[i].iov_size, offset, size);
 	   }
@@ -1757,7 +1757,7 @@ int *do_copyoutp;
 		if (user_phys & 1)
 		{
 			/* Buffer is not aligned */
-			printf("setup_dma: user buffer is not aligned\n");
+			printk("setup_dma: user buffer is not aligned\n");
 			bad= 1;
 			break;
 		}
@@ -1802,9 +1802,9 @@ int *do_copyoutp;
 		prdt[j-1].prdte_flags |= PRDTE_FL_EOT;
 
 	   if(verbose) {
-		printf("dma not bad\n");
+		printk("dma not bad\n");
 		for (i= 0; i<j; i++) {
-			printf("prdt[%d]: base 0x%x, size %d, flags 0x%x\n",
+			printk("prdt[%d]: base 0x%x, size %d, flags 0x%x\n",
 				i, prdt[i].prdte_base, prdt[i].prdte_count,
 				prdt[i].prdte_flags);
 		}
@@ -1820,7 +1820,7 @@ int *do_copyoutp;
 	if (bad)
 	{
 		if(verbose)
-			printf("partially bad dma\n");
+			printk("partially bad dma\n");
 		/* Adjust request size */
 		size= *sizep;
 		if (size > ATA_DMA_BUF_SIZE)
@@ -1901,7 +1901,7 @@ int *do_copyoutp;
 	   if(verbose) {
 		for (i= 0; i<=j; i++)
 		{
-			printf("prdt[%d]: base 0x%x, size %d, flags 0x%x\n",
+			printk("prdt[%d]: base 0x%x, size %d, flags 0x%x\n",
 				i, prdt[i].prdte_base, prdt[i].prdte_count,
 				prdt[i].prdte_flags);
 		}
@@ -2001,7 +2001,7 @@ static void w_timeout(void)
   default:
 	/* Some other command. */
 	if (w_testing)  wn->state |= IGNORING;	/* Kick out this drive. */
-	else if (!w_silent) printf("%s: timeout on command 0x%02x\n",
+	else if (!w_silent) printk("%s: timeout on command 0x%02x\n",
 		w_name(), w_command);
 	w_need_reset();
 	wn->w_status = 0;
@@ -2035,7 +2035,7 @@ static int w_reset()
 
   /* Wait for controller ready */
   if (!w_waitfor(STATUS_BSY, 0)) {
-	printf("%s: reset failed, drive busy\n", w_name());
+	printk("%s: reset failed, drive busy\n", w_name());
 	return(ERR);
   }
 
@@ -2165,7 +2165,7 @@ int value;			/* required status */
         	return 1;
 	}
   } while ((s=getuptime(&t1)) == 0 && (t1-t0) < timeout_ticks );
-  if (s != 0) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
+  if (s != 0) printk("AT_WINI: warning, get_uptime failed: %d\n",s);
 
   w_need_reset();			/* controller gone deaf */
   return(0);
@@ -2195,7 +2195,7 @@ int value;			/* required status */
         	return 1;
 	}
   } while ((s=getuptime(&t1)) == 0 && (t1-t0) < timeout_ticks );
-  if (s != 0) printf("AT_WINI: warning, get_uptime failed: %d\n",s);
+  if (s != 0) printk("AT_WINI: warning, get_uptime failed: %d\n",s);
 
   return(0);
 }
@@ -2260,15 +2260,15 @@ void sense_request(void)
 
 	for(i = 0; i < SENSE_PACKETSIZE; i++) sense[i] = 0xff;
 	r = atapi_sendpacket(packet, SENSE_PACKETSIZE, 0);
-	if (r != 0) { printf("request sense command failed\n"); return; }
-	if (atapi_intr_wait(0, 0) <= 0) { printf("WARNING: request response failed\n"); }
+	if (r != 0) { printk("request sense command failed\n"); return; }
+	if (atapi_intr_wait(0, 0) <= 0) { printk("WARNING: request response failed\n"); }
 
 	if (sys_insw(w_wn->base_cmd + REG_DATA, ENDPT_SELF, (void *) sense, SENSE_PACKETSIZE) != 0)
-		printf("WARNING: sense reading failed\n");
+		printk("WARNING: sense reading failed\n");
 
-	printf("sense data:");
-	for(i = 0; i < SENSE_PACKETSIZE; i++) printf(" %02x", sense[i]);
-	printf("\n");
+	printk("sense data:");
+	for(i = 0; i < SENSE_PACKETSIZE; i++) printk(" %02x", sense[i]);
+	printk("\n");
 }
 
 /*===========================================================================*
@@ -2366,7 +2366,7 @@ unsigned nr_req;		/* length of request vector */
 			}
 		}
 		if(error_dma(wn)) {
-			printf("Disabling DMA (ATAPI)\n");
+			printk("Disabling DMA (ATAPI)\n");
 			wn->dma = 0;
 		} else {
 			dmabytes += nbytes;
@@ -2447,17 +2447,17 @@ unsigned nr_req;		/* length of request vector */
 		if (atapi_debug) sense_request();
 		if (++errors == max_errors) {
 			w_command = CMD_IDLE;
-			if (atapi_debug) printf("giving up (%d)\n", errors);
+			if (atapi_debug) printk("giving up (%d)\n", errors);
 			return(-EIO);
 		}
-		if (atapi_debug) printf("retry (%d)\n", errors);
+		if (atapi_debug) printk("retry (%d)\n", errors);
 	}
   }
 
 #if 0
-  if(dmabytes) printf("dmabytes %d ", dmabytes);
-  if(piobytes) printf("piobytes %d", piobytes);
-  if(dmabytes || piobytes) printf("\n");
+  if(dmabytes) printk("dmabytes %d ", dmabytes);
+  if(piobytes) printk("piobytes %d", piobytes);
+  if(dmabytes || piobytes) printk("\n");
 #endif
 
   w_command = CMD_IDLE;
@@ -2484,7 +2484,7 @@ int do_dma;
   	panic(w_name(),"Couldn't select master/ slave drive",s);
 
   if (!w_waitfor(STATUS_BSY | STATUS_DRQ, 0)) {
-	printf("%s: atapi_sendpacket: drive not ready\n", w_name());
+	printk("%s: atapi_sendpacket: drive not ready\n", w_name());
 	return(ERR);
   }
 
@@ -2505,12 +2505,12 @@ int do_dma;
   pv_set(outbyte[3], wn->base_cmd + REG_CNT_LO, (cnt >> 0) & 0xFF);
   pv_set(outbyte[4], wn->base_cmd + REG_CNT_HI, (cnt >> 8) & 0xFF);
   pv_set(outbyte[5], wn->base_cmd + REG_COMMAND, w_command);
-  if (atapi_debug) printf("cmd: %x  ", w_command);
+  if (atapi_debug) printk("cmd: %x  ", w_command);
   if ((s=sys_voutb(outbyte,6)) != 0)
   	panic(w_name(),"Couldn't write registers with sys_voutb()",s);
 
   if (!w_waitfor(STATUS_BSY | STATUS_DRQ, STATUS_DRQ)) {
-	printf("%s: timeout (BSY|DRQ -> DRQ)\n", w_name());
+	printk("%s: timeout (BSY|DRQ -> DRQ)\n", w_name());
 	return(ERR);
   }
   wn->w_status |= STATUS_ADMBSY;		/* Command not at all done yet. */
@@ -2628,7 +2628,7 @@ static void ack_irqs(unsigned int irqs)
 	  		wini[drive].dma_intseen = 1;
   		}
 	 	if (sys_irqenable(&wini[drive].irq_hook_id) != 0)
-		  	printf("couldn't re-enable drive %d\n", drive);
+		  	printk("couldn't re-enable drive %d\n", drive);
 	}
   }
 }
@@ -2701,7 +2701,7 @@ static int atapi_intr_wait(int do_dma, size_t max)
 
   if (wn->w_status & (STATUS_BSY | STATUS_CHECK)) {
 	if (atapi_debug) {
-		printf("atapi fail:  S=%x=%s E=%02x=%s L=%04x I=%02x\n", wn->w_status, strstatus(wn->w_status), e, strerr(e), len, irr);
+		printk("atapi fail:  S=%x=%s E=%02x=%s L=%04x I=%02x\n", wn->w_status, strstatus(wn->w_status), e, strerr(e), len, irr);
 	}
   	return ERR;
   }
@@ -2710,27 +2710,27 @@ static int atapi_intr_wait(int do_dma, size_t max)
 
   switch (phase) {
   case IRR_COD | IRR_IO:
-	if (ATAPI_DEBUG) printf("ACD: Phase Command Complete\n");
+	if (ATAPI_DEBUG) printk("ACD: Phase Command Complete\n");
 	r = 0;
 	break;
   case 0:
-	if (ATAPI_DEBUG) printf("ACD: Phase Command Aborted\n");
+	if (ATAPI_DEBUG) printk("ACD: Phase Command Aborted\n");
 	r = ERR;
 	break;
   case STATUS_DRQ | IRR_COD:
-	if (ATAPI_DEBUG) printf("ACD: Phase Command Out\n");
+	if (ATAPI_DEBUG) printk("ACD: Phase Command Out\n");
 	r = ERR;
 	break;
   case STATUS_DRQ:
-	if (ATAPI_DEBUG) printf("ACD: Phase Data Out %d\n", len);
+	if (ATAPI_DEBUG) printk("ACD: Phase Data Out %d\n", len);
 	r = len;
 	break;
   case STATUS_DRQ | IRR_IO:
-	if (ATAPI_DEBUG) printf("ACD: Phase Data In %d\n", len);
+	if (ATAPI_DEBUG) printk("ACD: Phase Data In %d\n", len);
 	r = len;
 	break;
   default:
-	if (ATAPI_DEBUG) printf("ACD: Phase Unknown\n");
+	if (ATAPI_DEBUG) printk("ACD: Phase Unknown\n");
 	r = ERR;
 	break;
   }
@@ -2749,9 +2749,9 @@ static int at_voutb(int line, pvb_pair_t *pvb, int n)
   int s, i;
   if ((s=sys_voutb(pvb,n)) == 0)
 	return 0;
-  printf("at_wini%d: sys_voutb failed: %d pvb (%d):\n", w_instance, s, n);
+  printk("at_wini%d: sys_voutb failed: %d pvb (%d):\n", w_instance, s, n);
   for(i = 0; i < n; i++)
-	printf("%2d: %4x -> %4x\n", i, pvb[i].value, pvb[i].port);
+	printk("%2d: %4x -> %4x\n", i, pvb[i].value, pvb[i].port);
   panic(w_name(), "sys_voutb failed", NO_NUM);
 }
 
@@ -2760,9 +2760,9 @@ static int at_vinb(int line, pvb_pair_t *pvb, int n)
   int s, i;
   if ((s=sys_vinb(pvb,n)) == 0)
 	return 0;
-  printf("at_wini%d: sys_vinb failed: %d pvb (%d):\n", w_instance, s, n);
+  printk("at_wini%d: sys_vinb failed: %d pvb (%d):\n", w_instance, s, n);
   for(i = 0; i < n; i++)
-	printf("%2d: %4x\n", i, pvb[i].port);
+	printk("%2d: %4x\n", i, pvb[i].port);
   panic(w_name(), "sys_vinb failed", NO_NUM);
 }
 
@@ -2773,7 +2773,7 @@ static int at_out(int line, u32_t port, u32_t value,
 	s = sys_out(port, value, type);
 	if(s == 0)
 		return 0;
-	printf("at_wini%d: line %d: %s failed: %d; %x -> %x\n", 
+	printk("at_wini%d: line %d: %s failed: %d; %x -> %x\n", 
 		w_instance, line, typename, s, value, port);
         panic(w_name(), "sys_out failed", NO_NUM);
 }
@@ -2786,7 +2786,7 @@ static int at_in(int line, u32_t port, u32_t *value,
 	s = sys_in(port, (unsigned long*)value, type);
 	if(s == 0)
 		return 0;
-	printf("at_wini%d: line %d: %s failed: %d; port %x\n", 
+	printk("at_wini%d: line %d: %s failed: %d; port %x\n", 
 		w_instance, line, typename, s, value, port);
         panic(w_name(), "sys_in failed", NO_NUM);
 }

@@ -190,7 +190,7 @@ unsigned nr_req;		/* length of request vector */
 		    return(-EINVAL);
 	    }
   	    if(!dev_vaddr || dev_vaddr == (vir_bytes) MAP_FAILED) {
-		printf("MEM: dev %d not initialized\n", m_device);
+		printk("MEM: dev %d not initialized\n", m_device);
 		return -EIO;
 	    }
 	    if (position >= dv_size) return 0; 	/* check for EOF */
@@ -244,7 +244,7 @@ unsigned nr_req;		/* length of request vector */
 	     else
 		r = 0;
 	     if(r != 0) {
-		printf("memory: vm_map_phys failed\n");
+		printk("memory: vm_map_phys failed\n");
 		return r;
 	     }
 	     any_mapped = 1;
@@ -313,7 +313,7 @@ kipc_msg_t *m_ptr;
 	r = sys_enable_iop(m_ptr->IO_ENDPT);
 	if (r != 0)
 	{
-		printf("m_do_open: sys_enable_iop failed for %d: %d\n",
+		printk("m_do_open: sys_enable_iop failed for %d: %d\n",
 			m_ptr->IO_ENDPT, r);
 		return r;
 	}
@@ -370,7 +370,7 @@ static void m_init()
   m_geom[KMEM_DEV].dv_size = cvul64(kinfo.kmem_size);
   if((m_vaddrs[KMEM_DEV] = vm_map_phys(ENDPT_SELF, (void *) kinfo.kmem_base,
 	kinfo.kmem_size)) == MAP_FAILED) {
-	printf("MEM: Couldn't map in /dev/kmem.");
+	printk("MEM: Couldn't map in /dev/kmem.");
   }
 #endif
 
@@ -384,9 +384,9 @@ static void m_init()
   m_vaddrs[IMGRD_DEV] = (vir_bytes) vm_map_phys(ENDPT_SELF, (void *) initrd_base, initrd_size);
 
   if((void*)m_vaddrs[IMGRD_DEV] == MAP_FAILED) {
-    printf("MEM: Couldn't map initial ramdisk.");
+    printk("MEM: Couldn't map initial ramdisk.");
   } else {
-    printf("memory: initrd (physical: 0x%x) mapped at 0x%x\n", initrd_base, m_vaddrs[IMGRD_DEV]);
+    printk("memory: initrd (physical: 0x%x) mapped at 0x%x\n", initrd_base, m_vaddrs[IMGRD_DEV]);
   }
 #else /* CONFIG_BUILTIN_INITRD */
   /* Ramdisk image built into the memory driver */
@@ -432,10 +432,10 @@ kipc_msg_t *m_ptr;				/* pointer to control message */
 	/* A ramdisk can be created only once, and only on RAM disk device. */
 	dev = m_ptr->DEVICE;
 	if(dev < 0 || dev >= NR_DEVS) {
-		printf("MEM: MIOCRAMSIZE: %d not a valid device\n", dev);
+		printk("MEM: MIOCRAMSIZE: %d not a valid device\n", dev);
 	}
 	if((dev < RAM_DEV_FIRST || dev > RAM_DEV_LAST) && dev != RAM_DEV_OLD) {
-		printf("MEM: MIOCRAMSIZE: %d not a ramdisk\n", dev);
+		printk("MEM: MIOCRAMSIZE: %d not a ramdisk\n", dev);
 	}
         if ((dv = m_prepare(dev)) == NIL_DEV) return(-ENXIO);
 
@@ -449,7 +449,7 @@ kipc_msg_t *m_ptr;				/* pointer to control message */
 	}
 	/* openct is 1 for the ioctl(). */
 	if(openct[dev] != 1) {
-		printf("MEM: MIOCRAMSIZE: %d in use (count %d)\n",
+		printk("MEM: MIOCRAMSIZE: %d in use (count %d)\n",
 			dev, openct[dev]);
 		return(-EBUSY);
 	}
@@ -464,13 +464,13 @@ kipc_msg_t *m_ptr;				/* pointer to control message */
 	}
 
 #if DEBUG
-	printf("MEM:%d: allocating ramdisk of size 0x%x\n", dev, ramdev_size);
+	printk("MEM:%d: allocating ramdisk of size 0x%x\n", dev, ramdev_size);
 #endif
 
 	/* Try to allocate a piece of memory for the RAM disk. */
 	if((mem = mmap(0, ramdev_size, PROT_READ|PROT_WRITE,
 		MAP_PREALLOC|MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
-	    printf("MEM: failed to get memory for ramdisk\n");
+	    printk("MEM: failed to get memory for ramdisk\n");
             return(-ENOMEM);
         }
 

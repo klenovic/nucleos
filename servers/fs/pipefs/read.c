@@ -26,7 +26,7 @@ int fs_readwrite(void)
   inumb = fs_m_in.REQ_INODE_NR;
   rw_flag = (fs_m_in.m_type == REQ_READ ? READING : WRITING);
 #if 0  
-  printf("PFS: going to %s inode %d\n", (rw_flag == READING? "read from": "write to"), inumb);
+  printk("PFS: going to %s inode %d\n", (rw_flag == READING? "read from": "write to"), inumb);
 #endif
 
   /* Find the inode referred */

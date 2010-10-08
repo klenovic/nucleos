@@ -36,12 +36,12 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
         buf = (vir_bytes) m_ptr->SYSCTL_ARG1;
         len = (vir_bytes) m_ptr->SYSCTL_ARG2;
 	if(len < 1 || len > DIAG_BUFSIZE) {
-		kprintf("do_sysctl: diag for %d: len %d out of range\n",
+		printk("do_sysctl: diag for %d: len %d out of range\n",
 			caller->p_endpoint, len);
 		return -EINVAL;
 	}
 	if((s=data_copy_vmcheck(who_e, buf, SYSTEM, (vir_bytes) mybuf, len)) != 0) {
-		kprintf("do_sysctl: diag for %d: len %d: copy failed: %d\n",
+		printk("do_sysctl: diag for %d: len %d: copy failed: %d\n",
 			caller->p_endpoint, len, s);
 		return s;
 	}
@@ -55,7 +55,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	proc_stacktrace(proc_addr(proc_nr));
 	return 0;
     default:
-	kprintf("do_sysctl: invalid request %d\n", m_ptr->SYSCTL_CODE);
+	printk("do_sysctl: invalid request %d\n", m_ptr->SYSCTL_CODE);
         return(-EINVAL);
   }
 

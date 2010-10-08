@@ -30,7 +30,7 @@
 /* Is vnode pointer reasonable? */
 #define SANEVP(v) ((((v) >= &vnode[0] && (v) < &vnode[NR_VNODES])))
 
-#define BADVP(v, f, l) printf("%s:%d: bad vp 0x%x\n", f, l, v)
+#define BADVP(v, f, l) printk("%s:%d: bad vp 0x%x\n", f, l, v)
 
 /* vp check that returns 0 for use in check_vrefs() */
 #define CHECKVN(v) if(!SANEVP(v)) {				\
@@ -122,13 +122,13 @@ void put_vnode(struct vnode *vp)
 
   /* A vnode that's not in use can't be put. */
   if (vp->v_ref_count <= 0) {
-	printf("put_vnode: bad v_ref_count %d\n", vp->v_ref_count);
+	printk("put_vnode: bad v_ref_count %d\n", vp->v_ref_count);
 	panic(__FILE__, "put_vnode failed", NO_NUM);
   }
 
   /* fs_count should indicate that the file is in use. */
   if (vp->v_fs_count <= 0) {
-	printf("put_vnode: bad v_fs_count %d\n", vp->v_fs_count);
+	printk("put_vnode: bad v_fs_count %d\n", vp->v_fs_count);
 	panic(__FILE__, "put_vnode failed", NO_NUM);
   }
 
@@ -218,11 +218,11 @@ int check_vrefs()
 	{
 		if (vp->v_ref_count != vp->v_ref_check)
 		{
-			printf(
+			printk(
 "Bad reference count for inode %d on device 0x%x: found %d, listed %d\n",
 				vp->v_inode_nr, vp->v_dev, vp->v_ref_check,
 				vp->v_ref_count);
-			printf("last marked at %s, %d\n",
+			printk("last marked at %s, %d\n",
 				vp->v_file, vp->v_line);
 			bad= 1;
 		}
@@ -234,11 +234,11 @@ int check_vrefs()
 			ispipe_mode= ((vp->v_mode & I_TYPE) == I_NAMED_PIPE);
 			if (ispipe_flag != ispipe_mode)
 			{
-				printf(
+				printk(
 "Bad v_pipe for inode %d on device 0x%x: found %d, mode 0%o\n",
 				vp->v_inode_nr, vp->v_dev, vp->v_pipe,
 				vp->v_mode);
-				printf("last marked at %s, %d\n",
+				printk("last marked at %s, %d\n",
 					vp->v_file, vp->v_line);
 				bad= 1;
 			}

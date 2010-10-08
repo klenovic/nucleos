@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
 	ind = req_nr - VFS_BASE;
 
 	if (ind < 0 || ind >= NREQS) {
-		printf("pipefs: bad request %d\n", req_nr); 
-		printf("ind = %d\n", ind);
+		printk("pipefs: bad request %d\n", req_nr); 
+		printk("ind = %d\n", ind);
 		error = -EINVAL; 
 	} else {
 		error = (*fs_call_vec[ind])();
@@ -109,13 +109,13 @@ kipc_msg_t *m_in;				/* pointer to message */
 				exitsignaled = 1; /* Normal exit request. */
 				srcok = 1;	
 			} else
-				printf("PFS: unexpected message from PM\n");
+				printk("PFS: unexpected message from PM\n");
 		} else
-			printf("PFS: unexpected source %d\n", src);
+			printk("PFS: unexpected source %d\n", src);
 	} else if(src == VFS_PROC_NR) {
 		srcok = 1;		/* Normal FS request. */
 	} else
-		printf("PFS: unexpected source %d\n", src);
+		printk("PFS: unexpected source %d\n", src);
   } while(!srcok);
 
    assert( src == VFS_PROC_NR || 
@@ -132,6 +132,6 @@ int who;
 kipc_msg_t *m_out;                       	/* report result */
 {
   if (kipc_module_call(KIPC_SEND, 0, who, m_out) != 0)    /* send the message */
-	printf("PFS(%d) was unable to send reply\n", SELF_E);
+	printk("PFS(%d) was unable to send reply\n", SELF_E);
 }
 

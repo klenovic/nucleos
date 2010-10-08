@@ -39,14 +39,14 @@ int do_adddma()
 	size= m_in.m_data5;
 
 	if((r = vm_adddma(req_proc_e, target_proc_e, base, size)) != 0) {
-		printf("pm:do_adddma: vm_adddma failed (%d)\n", r);
+		printk("pm:do_adddma: vm_adddma failed (%d)\n", r);
 		return r;
 	}
 
 	/* Find target process */
 	if (pm_isokendpt(target_proc_e, &proc_n) != 0)
 	{
-		printf("pm:do_adddma: endpoint %d not found\n", target_proc_e);
+		printk("pm:do_adddma: endpoint %d not found\n", target_proc_e);
 		return -EINVAL;
 	}
 
@@ -89,7 +89,7 @@ int do_getdma()
 	if((r=vm_getdma(req_proc_e, &proc, &base, &size)) != 0)
 		return r;
 
-	printf("pm:do_getdma: setting reply to 0x%lx@0x%lx proc %d\n",
+	printk("pm:do_getdma: setting reply to 0x%lx@0x%lx proc %d\n",
 		size, base, proc);
 
 	mp->mp_reply.m_data1= proc;

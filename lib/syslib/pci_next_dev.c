@@ -38,7 +38,7 @@ u16_t *didp;
 		*vidp= m.m_data2;
 		*didp= m.m_data3;
 #if 0
-		printf("pci_next_dev: got device %d, %04x/%04x\n", 
+		printk("pci_next_dev: got device %d, %04x/%04x\n", 
 			*devindp, *vidp, *didp);
 #endif
 		return 1;

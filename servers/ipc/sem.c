@@ -106,7 +106,7 @@ static void send_message_to_process(endpoint_t who, int ret, int ignore)
 	m.m_type = ret;
 	r = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who, &m);
 	if (r != 0 && !ignore)
-		printf("IPC send error!\n");
+		printk("IPC send error!\n");
 }
 
 static void remove_semaphore(struct sem_struct *sem)
@@ -138,31 +138,31 @@ static void show_semaphore(void)
 	for (i = 0; i < sem_list_nr; i++) {
 		int nr = sem_list[i].semid_ds.sem_nsems;
 
-		printf("===== [%d] =====\n", i);
+		printk("===== [%d] =====\n", i);
 		for (j = 0; j < nr; j++) {
 			struct semaphore *semaphore = &sem_list[i].sems[j];
 
 			if (!semaphore->semzcnt && !semaphore->semncnt)
 				continue;
 
-			printf("  (%d): ", semaphore->semval);
+			printk("  (%d): ", semaphore->semval);
 			if (semaphore->semzcnt) {
-				printf("zero(");
+				printk("zero(");
 				for (k = 0; k < semaphore->semzcnt; k++)
-					printf("%d,", semaphore->zlist[k].who);
-				printf(")    ");
+					printk("%d,", semaphore->zlist[k].who);
+				printk(")    ");
 			}
 			if (semaphore->semncnt) {
-				printf("incr(");
+				printk("incr(");
 				for (k = 0; k < semaphore->semncnt; k++)
-					printf("%d-%d,",
+					printk("%d-%d,",
 						semaphore->nlist[k].who, semaphore->nlist[k].val);
-				printf(")");
+				printk(")");
 			}
-			printf("\n");
+			printk("\n");
 		}
 	}
-	printf("\n");
+	printk("\n");
 }
 
 static void remove_process(endpoint_t pt)
@@ -299,7 +299,7 @@ int do_semctl(kipc_msg_t *m)
 		opt = m->SEMCTL_OPT;
 
 	if (!(sem = sem_find_id(id))) {
-		printf("IPC: not found %d\n", id);
+		printk("IPC: not found %d\n", id);
 		return -EINVAL;
 	}
 
@@ -397,9 +397,9 @@ int do_semctl(kipc_msg_t *m)
 		if (r != 0)
 			return -EINVAL;
 #ifdef DEBUG_SEM
-		printf("SEMCTL: SETALL: opt: %p\n");
+		printk("SEMCTL: SETALL: opt: %p\n");
 		for (i = 0; i < sem->semid_ds.sem_nsems; i++)
-			printf("SEMCTL: SETALL val: [%d] %d\n", i, buf[i]);
+			printk("SEMCTL: SETALL val: [%d] %d\n", i, buf[i]);
 #endif
 		for (i = 0; i < sem->semid_ds.sem_nsems; i++) {
 			if (buf[i] < 0 || buf[i] > SEMVMX) {
@@ -424,7 +424,7 @@ int do_semctl(kipc_msg_t *m)
 			return -ERANGE;
 		sem->sems[num].semval = val;
 #ifdef DEBUG_SEM
-		printf("SEMCTL: SETVAL: %d %d\n", num, val);
+		printk("SEMCTL: SETVAL: %d %d\n", num, val);
 #endif
 		sem->semid_ds.sem_ctime = time(NULL);
 		/* awaken if possible */
@@ -482,7 +482,7 @@ int do_semop(kipc_msg_t *m)
 
 #ifdef DEBUG_SEM
 	for (i = 0; i < nsops; i++)
-		printf("SEMOP: num:%d  op:%d  flg:%d\n",
+		printk("SEMOP: num:%d  op:%d  flg:%d\n",
 			sops[i].sem_num, sops[i].sem_op, sops[i].sem_flg);
 #endif
 	/* check for value range */
@@ -537,14 +537,14 @@ int do_semop(kipc_msg_t *m)
 				s->semzcnt++;
 				s->zlist = realloc(s->zlist, sizeof(struct waiting) * s->semzcnt);
 				if (!s->zlist) {
-					printf("IPC: zero waiting list lost...\n");
+					printk("IPC: zero waiting list lost...\n");
 					break;
 				}
 				s->zlist[s->semzcnt-1].who = who_e;
 				s->zlist[s->semzcnt-1].val = op_n;
 
 #ifdef DEBUG_SEM
-				printf("SEMOP: Put into sleep... %d\n", who_e);
+				printk("SEMOP: Put into sleep... %d\n", who_e);
 #endif
 				no_reply++;
 			}
@@ -560,7 +560,7 @@ int do_semop(kipc_msg_t *m)
 				s->semncnt++;
 				s->nlist = realloc(s->nlist, sizeof(struct waiting) * s->semncnt);
 				if (!s->nlist) {
-					printf("IPC: increase waiting list lost...\n");
+					printk("IPC: increase waiting list lost...\n");
 					break;
 				}
 				s->nlist[s->semncnt-1].who = who_e;
@@ -583,7 +583,7 @@ out:
 
 		r = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, who_e, m);
 		if (r != 0)
-			printf("IPC send error!\n");
+			printk("IPC send error!\n");
 	}
 
 	/* awaken process if possible */
@@ -616,6 +616,6 @@ void sem_process_vm_notify(void)
 			break;
 	}
 	if (r < 0)
-		printf("IPC: query exit error!\n");
+		printk("IPC: query exit error!\n");
 }
 

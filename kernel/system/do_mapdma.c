@@ -43,7 +43,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
         phys_base= umap_virtual(proc, D, base, size);
         if (!phys_base)
         {
-                kprintf("do_mapdma: umap_virtual failed\n");
+                printk("do_mapdma: umap_virtual failed\n");
 		return -EFAULT;
 	}
 

@@ -49,7 +49,7 @@ int do_sdevio(kipc_msg_t *m_ptr)
 	if (first)
 	{
 		first= 0;
-		kprintf("do_sdevio: for %d, req %d\n",
+		printk("do_sdevio: for %d, req %d\n",
 			m_ptr->m_source, m_ptr->DIO_REQUEST);
 	}
   }
@@ -78,7 +78,7 @@ int do_sdevio(kipc_msg_t *m_ptr)
 	req_dir == _DIO_INPUT ? CPF_WRITE : CPF_READ,
 	(vir_bytes) m_ptr->DIO_OFFSET, 
 	&newoffset, &newep) != 0) {
-	printf("do_sdevio: verify_grant failed\n");
+	printk("do_sdevio: verify_grant failed\n");
 	return -EPERM;
     }
 	if(!isokendpt(newep, &proc_nr))
@@ -86,13 +86,13 @@ int do_sdevio(kipc_msg_t *m_ptr)
      destproc = proc_addr(proc_nr);
      if ((phys_buf = umap_local(destproc, D,
 	 (vir_bytes) newoffset, count)) == 0) {
-	printf("do_sdevio: umap_local failed\n");
+	printk("do_sdevio: umap_local failed\n");
          return(-EFAULT);
      }
   } else {
      if(proc_nr != who_p)
      {
-	kprintf("do_sdevio: unsafe sdevio by %d in %d denied\n",
+	printk("do_sdevio: unsafe sdevio by %d in %d denied\n",
 		who_e, proc_nr_e);
 	return -EPERM;
      }
@@ -127,7 +127,7 @@ int do_sdevio(kipc_msg_t *m_ptr)
 	}
 	if (i >= nr_io_range)
 	{
-		kprintf(
+		printk(
 		"do_sdevio: I/O port check failed for proc %d, port 0x%x\n",
 			m_ptr->m_source, port);
 		return -EPERM;
@@ -136,7 +136,7 @@ int do_sdevio(kipc_msg_t *m_ptr)
 
   if (port & (size-1))
   {
-	kprintf("do_devio: unaligned port 0x%x (size %d)\n", port, size);
+	printk("do_devio: unaligned port 0x%x (size %d)\n", port, size);
 	return -EPERM;
   }
 

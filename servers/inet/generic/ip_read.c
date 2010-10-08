@@ -160,7 +160,7 @@ ip_hdr_t *pack_hdr;
 		{
 			if (broadcast_dst(ip_port, pack_hdr->ih_dst))
 			{
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 	"ip_read'reassemble: reassembly timeout for broadcast packet\n"););
 				bf_afree(pack); pack= NULL;
 				return NULL;
@@ -209,7 +209,7 @@ assert (second->acc_length >= IP_MIN_HDR_SIZE);
 
 	if (second_offset > first_offset+first_datasize)
 	{
-		DBLOCK(1, printf("ip fragments out of order\n"));
+		DBLOCK(1, printk("ip fragments out of order\n"));
 		first->acc_ext_link= second;
 		return first;
 	}
@@ -263,7 +263,7 @@ ipaddr_t dst;
 		if (!tmp_ass_ent->ia_frags && tmp_ass_ent->ia_first_time)
 		{
 			DBLOCK(1,
-		printf("strange ip_ass entry (can be a race condition)\n"));
+		printk("strange ip_ass entry (can be a race condition)\n"));
 			continue;
 		}
 
@@ -284,12 +284,12 @@ ipaddr_t dst;
 
 	if (new_ass_ent->ia_frags)
 	{
-		DBLOCK(2, printf("old frags id= %u, proto= %u, src= ",
+		DBLOCK(2, printk("old frags id= %u, proto= %u, src= ",
 			ntohs(new_ass_ent->ia_id),
 			new_ass_ent->ia_proto);
-			writeIpAddr(new_ass_ent->ia_srcaddr); printf(" dst= ");
-			writeIpAddr(new_ass_ent->ia_dstaddr); printf(": ");
-			ip_print_frags(new_ass_ent->ia_frags); printf("\n"));
+			writeIpAddr(new_ass_ent->ia_srcaddr); printk(" dst= ");
+			writeIpAddr(new_ass_ent->ia_dstaddr); printk(": ");
+			ip_print_frags(new_ass_ent->ia_frags); printk("\n"));
 		curr_acc= new_ass_ent->ia_frags->acc_ext_link;
 		while (curr_acc)
 		{
@@ -301,7 +301,7 @@ ipaddr_t dst;
 		new_ass_ent->ia_frags= 0;
 		if (broadcast_dst(ip_port, new_ass_ent->ia_dstaddr))
 		{
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 	"ip_read'find_ass_ent: reassembly timeout for broadcast packet\n"));
 			bf_afree(curr_acc); curr_acc= NULL;
 		}
@@ -330,7 +330,7 @@ acc_t *pack;
 
 	if (pack->acc_length < sizeof(ip_hdr_t))
 	{
-		DBLOCK(1, printf("wrong length\n"));
+		DBLOCK(1, printk("wrong length\n"));
 		return FALSE;
 	}
 
@@ -339,7 +339,7 @@ acc_t *pack;
 	hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) * 4;
 	if (pack->acc_length < hdr_len)
 	{
-		DBLOCK(1, printf("wrong length\n"));
+		DBLOCK(1, printk("wrong length\n"));
 
 		return FALSE;
 	}
@@ -347,19 +347,19 @@ acc_t *pack;
 	if (((ip_hdr->ih_vers_ihl >> 4) & IH_VERSION_MASK) !=
 		IP_VERSION)
 	{
-		DBLOCK(1, printf("wrong version (ih_vers_ihl=0x%x)\n",
+		DBLOCK(1, printk("wrong version (ih_vers_ihl=0x%x)\n",
 			ip_hdr->ih_vers_ihl));
 		return FALSE;
 	}
 	if (ntohs(ip_hdr->ih_length) != bf_bufsize(pack))
 	{
-		DBLOCK(1, printf("wrong size\n"));
+		DBLOCK(1, printk("wrong size\n"));
 
 		return FALSE;
 	}
 	if ((u16_t)~oneC_sum(0, (u16_t *)ip_hdr, hdr_len))
 	{
-		DBLOCK(1, printf("packet with wrong checksum (= %x)\n", 
+		DBLOCK(1, printk("packet with wrong checksum (= %x)\n", 
 			(u16_t)~oneC_sum(0, (u16_t *)ip_hdr, hdr_len)));
 		return FALSE;
 	}
@@ -367,7 +367,7 @@ acc_t *pack;
 		(ptr2acc_data(pack) + IP_MIN_HDR_SIZE),
 		hdr_len-IP_MIN_HDR_SIZE))
 	{
-		DBLOCK(1, printf("packet with wrong options\n"));
+		DBLOCK(1, printk("packet with wrong options\n"));
 		return FALSE;
 	}
 	return TRUE;
@@ -556,12 +556,12 @@ ip_hdr_t *ip_hdr;
 		if (ip_pack_stat == NWIO_EN_LOC)
 		{
 			DBLOCK(0x01,
-			printf("ip_port_arrive: dropping packet for proto %d\n",
+			printk("ip_port_arrive: dropping packet for proto %d\n",
 				proto));
 		}
 		else
 		{
-			DBLOCK(0x20, printf("dropping packet for proto %d\n",
+			DBLOCK(0x20, printk("dropping packet for proto %d\n",
 				proto));
 		}
 		bf_afree(pack);
@@ -583,7 +583,7 @@ acc_t *pack;
 
 	if (pack_size < IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("wrong acc_length\n"));
+		DBLOCK(1, printk("wrong acc_length\n"));
 		bf_afree(pack);
 		return;
 	}
@@ -604,7 +604,7 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 		if (pack_size < ip_frag_len)
 		{
 			/* Sent ICMP? */
-			DBLOCK(1, printf("wrong acc_length\n"));
+			DBLOCK(1, printk("wrong acc_length\n"));
 			bf_afree(pack);
 			return;
 		}
@@ -617,7 +617,7 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 
 	if (!ip_frag_chk(pack))
 	{
-		DBLOCK(1, printf("fragment not allright\n"));
+		DBLOCK(1, printk("fragment not allright\n"));
 		bf_afree(pack);
 		return;
 	}
@@ -710,7 +710,7 @@ acc_t *pack;
 
 	if (pack_size < IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("wrong acc_length\n"));
+		DBLOCK(1, printk("wrong acc_length\n"));
 		bf_afree(pack);
 		return;
 	}
@@ -721,7 +721,7 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(pack);
 
 	DIFBLOCK(0x20, (ip_hdr->ih_dst & HTONL(0xf0000000)) == HTONL(0xe0000000),
-		printf("got multicast packet\n"));
+		printk("got multicast packet\n"));
 
 	ip_hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) << 2;
 	if (ip_hdr_len>IP_MIN_HDR_SIZE)
@@ -740,7 +740,7 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 
 	if (!ip_frag_chk(pack))
 	{
-		DBLOCK(1, printf("fragment not allright\n"));
+		DBLOCK(1, printk("fragment not allright\n"));
 		bf_afree(pack);
 		return;
 	}
@@ -748,13 +748,13 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 	if (!broadcast_dst(ip_port, ip_hdr->ih_dst))
 	{
 #if 0
-		printf(
+		printk(
 		"ip[%d]: broadcast packet for ip-nonbroadcast addr, src=",
 			ip_port->ip_port);
 		writeIpAddr(ip_hdr->ih_src);
-		printf(" dst=");
+		printk(" dst=");
 		writeIpAddr(ip_hdr->ih_dst);
-		printf("\n");
+		printk("\n");
 #endif
 		bf_afree(pack);
 		return;
@@ -795,10 +795,10 @@ ev_arg_t ev_arg;
 			 */
 			if (iroute == NULL)
 			{
-				printf("ip[%d]: no route to ",
+				printk("ip[%d]: no route to ",
 					ip_port-ip_port_table);
 				writeIpAddr(dest);
-				printf("\n");
+				printk("\n");
 			}
 			icmp_snd_unreachable(ip_port->ip_port, pack,
 				ICMP_HOST_UNRCH);
@@ -829,13 +829,13 @@ ev_arg_t ev_arg;
 					pack, IP_LT_NORMAL);
 				if (r == -EHOSTUNREACH)
 				{
-					printf("ip[%d]: gw ",
+					printk("ip[%d]: gw ",
 						ip_port-ip_port_table);
 					writeIpAddr(iroute->irt_gateway);
-					printf(" on ip[%d] is down for dest ",
+					printk(" on ip[%d] is down for dest ",
 						next_port-ip_port_table);
 					writeIpAddr(dest);
-					printf("\n");
+					printk("\n");
 					icmp_snd_unreachable(next_port-
 						ip_port_table, pack,
 						ICMP_HOST_UNRCH);
@@ -864,11 +864,11 @@ ev_arg_t ev_arg;
 				type= IP_LT_BROADCAST;
 #else
 				/* Bogus destination address */
-				DBLOCK(1, printf(
+				DBLOCK(1, printk(
 			"ip[%d]: dropping old-fashioned directed broadcast ",
 						ip_port-ip_port_table);
 					writeIpAddr(dest);
-					printf("\n"););
+					printk("\n"););
 				icmp_snd_unreachable(next_port-ip_port_table,
 					pack, ICMP_HOST_UNRCH);
 				continue;
@@ -880,11 +880,11 @@ ev_arg_t ev_arg;
 				if (!ip_forward_directed_bcast)
 				{
 					/* Do not forward directed broadcasts */
-					DBLOCK(1, printf(
+					DBLOCK(1, printk(
 					"ip[%d]: dropping directed broadcast ",
 							ip_port-ip_port_table);
 						writeIpAddr(dest);
-						printf("\n"););
+						printk("\n"););
 					icmp_snd_unreachable(next_port-
 						ip_port_table, pack,
 						ICMP_HOST_UNRCH);
@@ -901,10 +901,10 @@ ev_arg_t ev_arg;
 			r= next_port->ip_dev_send(next_port, dest, pack, type);
 			if (r == -EHOSTUNREACH)
 			{
-				DBLOCK(1, printf("ip[%d]: next hop ",
+				DBLOCK(1, printk("ip[%d]: next hop ",
 					ip_port-ip_port_table);
 					writeIpAddr(dest);
-					printf(" on ip[%d] is down\n",
+					printk(" on ip[%d] is down\n",
 					next_port-ip_port_table););
 				icmp_snd_unreachable(next_port-ip_port_table,
 					pack, ICMP_HOST_UNRCH);
@@ -912,7 +912,7 @@ ev_arg_t ev_arg;
 			}
 			else
 			{
-				assert(r == 0 || (printf("r = %d\n", r), 0));
+				assert(r == 0 || (printk("r = %d\n", r), 0));
 				bf_afree(pack); pack= NULL;
 			}
 			continue;
@@ -926,11 +926,11 @@ ev_arg_t ev_arg;
 		 */
 		if (iroute->irt_gateway == 0)
 		{
-			printf("ip_arrived: packet should not be here, src=");
+			printk("ip_arrived: packet should not be here, src=");
 			writeIpAddr(ip_hdr->ih_src);
-			printf(" dst=");
+			printk(" dst=");
 			writeIpAddr(ip_hdr->ih_dst);
-			printf("\n");
+			printk("\n");
 			bf_afree(pack);
 			continue;
 		}
@@ -946,20 +946,20 @@ ev_arg_t ev_arg;
 		}
 		else
 		{
-			printf("ip_arrived: packet is wrongly routed, src=");
+			printk("ip_arrived: packet is wrongly routed, src=");
 			writeIpAddr(ip_hdr->ih_src);
-			printf(" dst=");
+			printk(" dst=");
 			writeIpAddr(ip_hdr->ih_dst);
-			printf("\n");
-			printf("in port %d, output %d, dest net ",
+			printk("\n");
+			printk("in port %d, output %d, dest net ",
 				ip_port->ip_port, 
 				iroute->irt_port);
 			writeIpAddr(iroute->irt_dest);
-			printf("/");
+			printk("/");
 			writeIpAddr(iroute->irt_subnetmask);
-			printf(" next hop ");
+			printk(" next hop ");
 			writeIpAddr(iroute->irt_gateway);
-			printf("\n");
+			printk("\n");
 			bf_afree(pack);
 			continue;
 		}

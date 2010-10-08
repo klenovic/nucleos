@@ -243,19 +243,19 @@ kipc_msg_t *m;
 
 	if (minor<0 || minor>FD_NR)
 	{
-		DBLOCK(1, printf("replying -EINVAL\n"));
+		DBLOCK(1, printk("replying -EINVAL\n"));
 		return -EINVAL;
 	}
 	if (!(sr_fd_table[minor].srf_flags & SFF_MINOR))
 	{
-		DBLOCK(1, printf("replying -ENXIO\n"));
+		DBLOCK(1, printk("replying -ENXIO\n"));
 		return -ENXIO;
 	}
 	for (i=0; i<FD_NR && (sr_fd_table[i].srf_flags & SFF_INUSE); i++);
 
 	if (i>=FD_NR)
 	{
-		DBLOCK(1, printf("replying -ENFILE\n"));
+		DBLOCK(1, printk("replying -ENFILE\n"));
 		return -ENFILE;
 	}
 
@@ -267,7 +267,7 @@ kipc_msg_t *m;
 	if (fd<0)
 	{
 		sr_fd->srf_flags= SFF_FREE;
-		DBLOCK(1, printf("replying %d\n", fd));
+		DBLOCK(1, printk("replying %d\n", fd));
 		return fd;
 	}
 	sr_fd->srf_fd= fd;
@@ -364,7 +364,7 @@ mq_t *m;
 		size= (request >> 16) & _IOCPARM_MASK;
 		if (size>MAX_IOCTL_S)
 		{
-			DBLOCK(1, printf("replying -EINVAL\n"));
+			DBLOCK(1, printk("replying -EINVAL\n"));
 			r= sr_put_userdata(sr_fd-sr_fd_table, -EINVAL, 
 				NULL, 1);
 			assert(r == 0);
@@ -383,7 +383,7 @@ mq_t *m;
 	sr_fd->srf_flags &= ~first_flag;
 
 	assert(r == 0 || r == SUSPEND || 
-		(printf("r= %d\n", r), 0));
+		(printk("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= susp_flag;
 	else
@@ -462,7 +462,7 @@ mq_t *m;
 		size= (request >> 16) & _IOCPARM_MASK;
 		if (size>MAX_IOCTL_S)
 		{
-			DBLOCK(1, printf("replying -EINVAL\n"));
+			DBLOCK(1, printk("replying -EINVAL\n"));
 			r= sr_put_userdata(sr_fd-sr_fd_table, -EINVAL, 
 				NULL, 1);
 			assert(r == 0);
@@ -480,7 +480,7 @@ mq_t *m;
 	sr_fd->srf_flags &= ~first_flag;
 
 	assert(r == 0 || r == SUSPEND || 
-		(printf("r= %d\n", r), 0));
+		(printk("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= susp_flag;
 	else
@@ -508,7 +508,7 @@ sr_fd_t *sr_fd;
 		mp->mq_mess.NDEV_COUNT);
 
 	assert(r == 0 || r == SUSPEND || 
-		(printf("r= %d\n", r), 0));
+		(printk("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_READ_SUSP;
 	return r;
@@ -534,7 +534,7 @@ sr_fd_t *sr_fd;
 		mp->mq_mess.NDEV_COUNT);
 
 	assert(r == 0 || r == SUSPEND || 
-		(printf("r= %d\n", r), 0));
+		(printk("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_WRITE_SUSP;
 	return r;
@@ -560,7 +560,7 @@ sr_fd_t *sr_fd;
 		mp->mq_mess.NDEV_COUNT);
 
 	assert(r == 0 || r == SUSPEND || 
-		(printf("r= %d\n", r), 0));
+		(printk("r= %d\n", r), 0));
 	if (r == SUSPEND)
 		sr_fd->srf_flags |= SFF_IOCTL_SUSP;
 	return r;
@@ -1203,7 +1203,7 @@ int size;
 				s_cp_req[0].v_addr, s_cp_req[0].v_bytes, D);
 			if (r <0)
 			{
-				printf("sys_safecopyfrom failed: %d\n", r);
+				printk("sys_safecopyfrom failed: %d\n", r);
 				bf_afree(*var_acc_ptr);
 				*var_acc_ptr= 0;
 				return r;
@@ -1217,7 +1217,7 @@ int size;
 
 			if (r <0)
 			{
-				printf("cp_u2b_s: sys_vsafecopy failed: %d\n",
+				printk("cp_u2b_s: sys_vsafecopy failed: %d\n",
 					r);
 				bf_afree(*var_acc_ptr);
 				*var_acc_ptr= 0;
@@ -1267,7 +1267,7 @@ vir_bytes offset;
 				s_cp_req[0].v_addr, s_cp_req[0].v_bytes, D);
 			if (r <0)
 			{
-				printf("sys_safecopyto failed: %d\n", r);
+				printk("sys_safecopyto failed: %d\n", r);
 				bf_afree(acc_ptr);
 				return r;
 			}
@@ -1280,7 +1280,7 @@ vir_bytes offset;
 
 			if (r <0)
 			{
-				printf("cp_b2u_s: sys_vsafecopy failed: %d\n",
+				printk("cp_b2u_s: sys_vsafecopy failed: %d\n",
 					r);
 				bf_afree(acc_ptr);
 				return r;

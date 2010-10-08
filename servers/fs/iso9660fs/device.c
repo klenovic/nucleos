@@ -191,7 +191,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   
   /* The io vector copying relies on this I/O being for FS itself. */
   if(proc_e != SELF_E) {
-      printf("ISOFS(%d) doing block_dev_io for non-self %d\n", SELF_E, proc_e);
+      printk("ISOFS(%d) doing block_dev_io for non-self %d\n", SELF_E, proc_e);
       panic(__FILE__, "doing block_dev_io for non-self", proc_e);
   }
   
@@ -229,7 +229,7 @@ int flags;			/* special flags, like O_NONBLOCK */
    */
   if (r != 0) {
       if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
-          printf("ISOFS(%d) dead driver %d\n", SELF_E, driver_e);
+          printk("ISOFS(%d) dead driver %d\n", SELF_E, driver_e);
           driver_endpoints[(dev >> MAJOR) & BYTE].driver_e = ENDPT_NONE;
           return(r);
       }
@@ -241,7 +241,7 @@ int flags;			/* special flags, like O_NONBLOCK */
   } else {
       /* Did the process we did the kipc_module_call() for get a result? */
       if (m.REP_ENDPT != proc_e) {
-          printf("ISOFS (%d) strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n", SELF_E, m.m_source, m.m_type, proc_e, m.REP_ENDPT);
+          printk("ISOFS (%d) strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n", SELF_E, m.m_source, m.m_type, proc_e, m.REP_ENDPT);
           r = -EIO;
       }
   }
@@ -302,14 +302,14 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
   r = kipc_module_call(KIPC_SENDREC, 0, task_nr, mess_ptr);
 	if (r != 0) {
 		if (r == -EDEADSRCDST || r == -EDSTDIED || r == -ESRCDIED) {
-			printf("fs: dead driver %d\n", task_nr);
+			printk("fs: dead driver %d\n", task_nr);
 			panic(__FILE__, "should handle crashed drivers",
 				NO_NUM);
 			/* dmap_unmap_by_endpt(task_nr); */
 			return r;
 		}
 		if (r == -ELOCKED) {
-			printf("fs: -ELOCKED talking to %d\n", task_nr);
+			printk("fs: -ELOCKED talking to %d\n", task_nr);
 			return r;
 		}
 		panic(__FILE__,"call_task: can't send/receive", r);
@@ -317,7 +317,7 @@ kipc_msg_t *mess_ptr;		/* pointer to message for task */
 
   	/* Did the process we did the kipc_module_call() for get a result? */
   	if (mess_ptr->REP_ENDPT != proc_e) {
-		printf(
+		printk(
 		"fs: strange device reply from %d, type = %d, proc = %d (not %d) (2) ignored\n",
 			mess_ptr->m_source,
 			mess_ptr->m_type,

@@ -96,7 +96,7 @@ char *name;
 
   /* Increase stack. */
   if (++cprof_stk_top == CPROF_STACK_SIZE) {
-	printf("CPROFILE error: stack overrun\n");
+	printk("CPROFILE error: stack overrun\n");
 	control.err |= CPROF_STACK_OVERRUN;
 	return;
   }
@@ -106,7 +106,7 @@ char *name;
 
   /* Check available call path len. */
   if (cpath_len + strlen(name) + 1 > CPROF_CPATH_MAX_LEN) {
-	printf("CPROFILE error: call path overrun\n");
+	printk("CPROFILE error: call path overrun\n");
 	control.err |= CPROF_CPATH_OVERRUN;
 	return;
   }
@@ -140,7 +140,7 @@ char *name;
   else {
 	/* Not found: insert path into hash table. */
 	if (control.slots_used == cprof_tbl_size) {
-		printf("CPROFILE error: table overrun\n");
+		printk("CPROFILE error: table overrun\n");
 		control.err |= CPROF_TABLE_OVERRUN;
 		return;
 	}

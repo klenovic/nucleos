@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
 	if (r == 0)
 		kipc_module_call(KIPC_NOTIFY, 0, tasknr, 0);
 	else if (r != -ESRCH)
-		printf("fxp: ds_retrieve_u32 failed for 'inet': %d\n", r);
+		printk("fxp: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 
 	while (TRUE)
@@ -559,7 +559,7 @@ fxp_t *fp;
 			fp->fxp_pcifunc, &devind);
 		if (r == 0)
 		{
-			printf("%s: no PCI device found at %d.%d.%d\n",
+			printk("%s: no PCI device found at %d.%d.%d\n",
 				fp->fxp_name, fp->fxp_pcibus,
 				fp->fxp_pcidev, fp->fxp_pcifunc);
 			return FALSE;
@@ -595,7 +595,7 @@ fxp_t *fp;
 
 		if (just_one)
 		{
-			printf(
+			printk(
 		"%s: wrong PCI device (%04x/%04x) found at %d.%d.%d\n",
 				fp->fxp_name, vid, did,
 				fp->fxp_pcibus,
@@ -612,7 +612,7 @@ fxp_t *fp;
 #if VERBOSE
 	if (!dname)
 		dname= "unknown device";
-	printf("%s: %s (%04x/%04x) at %s\n",
+	printk("%s: %s (%04x/%04x) at %s\n",
 		fp->fxp_name, dname, vid, did, pci_slot_name(devind));
 #endif
 	pci_reserve(devind);
@@ -629,7 +629,7 @@ fxp_t *fp;
 	fp->fxp_irq= ilr;
 	if (debug)
 	{
-		printf("%s: using I/O address 0x%lx, IRQ %d\n",
+		printk("%s: using I/O address 0x%lx, IRQ %d\n",
 			fp->fxp_name, (unsigned long)bar, ilr);
 	}
 
@@ -677,14 +677,14 @@ fxp_t *fp;
 
 #if VERBOSE
 	if (str)
-		printf("%s: device revision: %s\n", fp->fxp_name, str);
+		printk("%s: device revision: %s\n", fp->fxp_name, str);
 	else
-		printf("%s: unknown revision: 0x%x\n", fp->fxp_name, rev);
+		printk("%s: unknown revision: 0x%x\n", fp->fxp_name, rev);
 #endif
 
 	if (fp->fxp_type == FT_UNKNOWN)
 	{
-		printf("fxp_probe: device is not supported by this driver\n");
+		printk("fxp_probe: device is not supported by this driver\n");
 		return FALSE;
 	}
 
@@ -756,8 +756,8 @@ fxp_t *fp;
 
 #if VERBOSE
 	for (i= 0; i<CC_BYTES_NR; i++)
-		printf("%d: %0x, ", i, fp->fxp_conf_bytes[i]);
-	printf("\n");
+		printk("%d: %0x, ", i, fp->fxp_conf_bytes[i]);
+	printk("\n");
 #endif
 
 	mwi= 0;		/* Do we want "Memory Write and Invalidate"? */
@@ -812,8 +812,8 @@ fxp_t *fp;
 
 #if VERBOSE
 	for (i= 0; i<CC_BYTES_NR; i++)
-		printf("%d: %0x, ", i, fp->fxp_conf_bytes[i]);
-	printf("\n");
+		printk("%d: %0x, ", i, fp->fxp_conf_bytes[i]);
+	printk("\n");
 #endif
 }
 
@@ -872,10 +872,10 @@ fxp_t *fp;
 	fxp_confaddr(fp);
 	if (debug)
 	{
-		printf("%s: Ethernet address ", fp->fxp_name);
+		printk("%s: Ethernet address ", fp->fxp_name);
 		for (i= 0; i < 6; i++)
 		{
-			printf("%x%c", fp->fxp_address.ea_addr[i],
+			printk("%x%c", fp->fxp_address.ea_addr[i],
 				i < 5 ? ':' : '\n');
 		}
 	}
@@ -927,7 +927,7 @@ fxp_t *fp;
 		panic("FXP","sys_umap failed", r);
 
 #if 0
-	printf("fxp_init_buf: got phys 0x%x for vir 0x%x\n",
+	printk("fxp_init_buf: got phys 0x%x for vir 0x%x\n",
 		fp->fxp_rx_busaddr, fp->fxp_rx_buf);
 #endif
 
@@ -1074,13 +1074,13 @@ fxp_t *fp;
 		panic("FXP","fxp_confaddr: CU command failed", NO_NUM);
 
 #if VERBOSE
-	printf("%s: hardware ethernet address: ", fp->fxp_name);
+	printk("%s: hardware ethernet address: ", fp->fxp_name);
 	for (i= 0; i<6; i++)
 	{
-		printf("%02x%s", fp->fxp_address.ea_addr[i], 
+		printk("%02x%s", fp->fxp_address.ea_addr[i], 
 			i < 5 ? ":" : "");
 	}
-	printf("\n");
+	printk("\n");
 #endif
 }
 
@@ -1109,7 +1109,7 @@ fxp_t *fp;
 	}
 	else
 	{
-		printf("fxp_rec_mode: setting fxp_need_conf\n");
+		printk("fxp_rec_mode: setting fxp_need_conf\n");
 		fp->fxp_need_conf= TRUE;
 	}
 }
@@ -1576,7 +1576,7 @@ suspend:
 		if ((scb_status & SS_RUS_MASK) != SS_RU_NORES)
 		{
 			/* Race condition? */
-			printf("fxp_readv: restart race: 0x%x\n",
+			printk("fxp_readv: restart race: 0x%x\n",
 				scb_status);
 			assert((scb_status & SS_RUS_MASK) == SS_RU_READY);
 		}
@@ -1749,7 +1749,7 @@ suspend:
 		if ((scb_status & SS_RUS_MASK) != SS_RU_NORES)
 		{
 			/* Race condition? */
-			printf("fxp_readv: restart race: 0x%x\n",
+			printk("fxp_readv: restart race: 0x%x\n",
 				scb_status);
 			assert((scb_status & SS_RUS_MASK) == SS_RU_READY);
 		}
@@ -2155,7 +2155,7 @@ fxp_t *fp;
 	}
 	if (isr)
 	{
-		printf("fxp_handler: unhandled interrupt: isr = 0x%02x\n",
+		printk("fxp_handler: unhandled interrupt: isr = 0x%02x\n",
 			isr);
 	}
 
@@ -2225,7 +2225,7 @@ fxp_t *fp;
 					fxp_tx_threshold++;
 					fp->fxp_tx_threshold= fxp_tx_threshold;
 				}
-				printf(
+				printk(
 			"fxp_check_ints: fxp_tx_threshold = 0x%x\n",
 					fxp_tx_threshold);
 			}
@@ -2250,11 +2250,11 @@ fxp_t *fp;
 			if ((scb_status & SS_CUS_MASK) != SS_CU_IDLE)
 			{
 				/* Nothing to do */
-				printf("scb_status = 0x%x\n", scb_status);
+				printk("scb_status = 0x%x\n", scb_status);
 			}
 			else
 			{
-				printf("fxp_check_ints: fxp_need_conf\n");
+				printk("fxp_check_ints: fxp_need_conf\n");
 				fp->fxp_need_conf= FALSE;
 				fxp_do_conf(fp);
 			}
@@ -2272,7 +2272,7 @@ fxp_t *fp;
 				if ((scb_status & SS_CUS_MASK) != SS_CU_IDLE)
 				{
 					/* Nothing to do */
-					printf("scb_status = 0x%x\n",
+					printk("scb_status = 0x%x\n",
 						scb_status);
 
 				}
@@ -2346,7 +2346,7 @@ timer_t *tp;
 			if (fxp_link_changed(fp))
 			{
 #if VERBOSE
-				printf("fxp_watchdog_f: link changed\n");
+				printk("fxp_watchdog_f: link changed\n");
 #endif
 				fp->fxp_report_link= TRUE;
 				fp->fxp_got_int= TRUE;
@@ -2442,7 +2442,7 @@ fxp_t *fp;
 	if (!link_up)
 	{
 #if VERBOSE
-		printf("%s: link down\n", fp->fxp_name);
+		printk("%s: link down\n", fp->fxp_name);
 #endif
 		return;
 	}
@@ -2453,177 +2453,177 @@ fxp_t *fp;
 	rev= (mii_id2 & MII_PL_REV_MASK);
 
 #if VERBOSE
-	printf("OUI 0x%06lx, Model 0x%02x, Revision 0x%x\n", oui, model, rev);
+	printk("OUI 0x%06lx, Model 0x%02x, Revision 0x%x\n", oui, model, rev);
 #endif
 
 	if (mii_ctrl & (MII_CTRL_LB|MII_CTRL_PD|MII_CTRL_ISO))
 	{
-		printf("%s: PHY: ", fp->fxp_name);
+		printk("%s: PHY: ", fp->fxp_name);
 		f= 1;
 		if (mii_ctrl & MII_CTRL_LB)
 		{
-			printf("loopback mode");
+			printk("loopback mode");
 			f= 0;
 		}
 		if (mii_ctrl & MII_CTRL_PD)
 		{
-			if (!f) printf(", ");
+			if (!f) printk(", ");
 			f= 0;
-			printf("powered down");
+			printk("powered down");
 		}
 		if (mii_ctrl & MII_CTRL_ISO)
 		{
-			if (!f) printf(", ");
+			if (!f) printk(", ");
 			f= 0;
-			printf("isolated");
+			printk("isolated");
 		}
-		printf("\n");
+		printk("\n");
 		return;
 	}
 	if (!(mii_ctrl & MII_CTRL_ANE))
 	{
-		printf("%s: manual config: ", fp->fxp_name);
+		printk("%s: manual config: ", fp->fxp_name);
 		switch(mii_ctrl & (MII_CTRL_SP_LSB|MII_CTRL_SP_MSB))
 		{
-		case MII_CTRL_SP_10:	printf("10 Mbps"); break;
-		case MII_CTRL_SP_100:	printf("100 Mbps"); break;
-		case MII_CTRL_SP_1000:	printf("1000 Mbps"); break;
-		case MII_CTRL_SP_RES:	printf("reserved speed"); break;
+		case MII_CTRL_SP_10:	printk("10 Mbps"); break;
+		case MII_CTRL_SP_100:	printk("100 Mbps"); break;
+		case MII_CTRL_SP_1000:	printk("1000 Mbps"); break;
+		case MII_CTRL_SP_RES:	printk("reserved speed"); break;
 		}
 		if (mii_ctrl & MII_CTRL_DM)
-			printf(", full duplex");
+			printk(", full duplex");
 		else
-			printf(", half duplex");
-		printf("\n");
+			printk(", half duplex");
+		printk("\n");
 		return;
 	}
 
 	if (!debug) goto resspeed;
 
-	printf("%s: ", fp->fxp_name);
+	printk("%s: ", fp->fxp_name);
 	mii_print_stat_speed(mii_status, mii_extstat);
-	printf("\n");
+	printk("\n");
 
 	if (!(mii_status & MII_STATUS_ANC))
-		printf("%s: auto-negotiation not complete\n", fp->fxp_name);
+		printk("%s: auto-negotiation not complete\n", fp->fxp_name);
 	if (mii_status & MII_STATUS_RF)
-		printf("%s: remote fault detected\n", fp->fxp_name);
+		printk("%s: remote fault detected\n", fp->fxp_name);
 	if (!(mii_status & MII_STATUS_ANA))
 	{
-		printf("%s: local PHY has no auto-negotiation ability\n",
+		printk("%s: local PHY has no auto-negotiation ability\n",
 			fp->fxp_name);
 	}
 	if (!(mii_status & MII_STATUS_LS))
-		printf("%s: link down\n", fp->fxp_name);
+		printk("%s: link down\n", fp->fxp_name);
 	if (mii_status & MII_STATUS_JD)
-		printf("%s: jabber condition detected\n", fp->fxp_name);
+		printk("%s: jabber condition detected\n", fp->fxp_name);
 	if (!(mii_status & MII_STATUS_EC))
 	{
-		printf("%s: no extended register set\n", fp->fxp_name);
+		printk("%s: no extended register set\n", fp->fxp_name);
 		goto resspeed;
 	}
 	if (!(mii_status & MII_STATUS_ANC))
 		goto resspeed;
 
-	printf("%s: local cap.: ", fp->fxp_name);
+	printk("%s: local cap.: ", fp->fxp_name);
 	if (mii_ms_ctrl & (MII_MSC_1000T_FD | MII_MSC_1000T_HD))
 	{
-		printf("1000 Mbps: T-");
+		printk("1000 Mbps: T-");
 		switch(mii_ms_ctrl & (MII_MSC_1000T_FD | MII_MSC_1000T_HD))
 		{
-		case MII_MSC_1000T_FD:	printf("FD"); break;
-		case MII_MSC_1000T_HD:	printf("HD"); break;
-		default:		printf("FD/HD"); break;
+		case MII_MSC_1000T_FD:	printk("FD"); break;
+		case MII_MSC_1000T_HD:	printk("HD"); break;
+		default:		printk("FD/HD"); break;
 		}
 		if (mii_ana)
-			printf(", ");
+			printk(", ");
 	}
 	mii_print_techab(mii_ana);
-	printf("\n");
+	printk("\n");
 
 	if (mii_ane & MII_ANE_PDF)
-		printf("%s: parallel detection fault\n", fp->fxp_name);
+		printk("%s: parallel detection fault\n", fp->fxp_name);
 	if (!(mii_ane & MII_ANE_LPANA))
 	{
-		printf("%s: link-partner does not support auto-negotiation\n",
+		printk("%s: link-partner does not support auto-negotiation\n",
 			fp->fxp_name);
 		goto resspeed;
 	}
 
-	printf("%s: remote cap.: ", fp->fxp_name);
+	printk("%s: remote cap.: ", fp->fxp_name);
 	if (mii_ms_ctrl & (MII_MSC_1000T_FD | MII_MSC_1000T_HD))
 	if (mii_ms_status & (MII_MSS_LP1000T_FD | MII_MSS_LP1000T_HD))
 	{
-		printf("1000 Mbps: T-");
+		printk("1000 Mbps: T-");
 		switch(mii_ms_status &
 			(MII_MSS_LP1000T_FD | MII_MSS_LP1000T_HD))
 		{
-		case MII_MSS_LP1000T_FD:	printf("FD"); break;
-		case MII_MSS_LP1000T_HD:	printf("HD"); break;
-		default:			printf("FD/HD"); break;
+		case MII_MSS_LP1000T_FD:	printk("FD"); break;
+		case MII_MSS_LP1000T_HD:	printk("HD"); break;
+		default:			printk("FD/HD"); break;
 		}
 		if (mii_anlpa)
-			printf(", ");
+			printk(", ");
 	}
 	mii_print_techab(mii_anlpa);
-	printf("\n");
+	printk("\n");
 
 	if (ms_regs)
 	{
-		printf("%s: ", fp->fxp_name);
+		printk("%s: ", fp->fxp_name);
 		if (mii_ms_ctrl & MII_MSC_MS_MANUAL)
 		{
-			printf("manual %s",
+			printk("manual %s",
 				(mii_ms_ctrl & MII_MSC_MS_VAL) ?
 				"MASTER" : "SLAVE");
 		}
 		else
 		{
-			printf("%s device",
+			printk("%s device",
 				(mii_ms_ctrl & MII_MSC_MULTIPORT) ?
 				"multiport" : "single-port");
 		}
 		if (mii_ms_ctrl & MII_MSC_RES)
-			printf(" reserved<0x%x>", mii_ms_ctrl & MII_MSC_RES);
-		printf(": ");
+			printk(" reserved<0x%x>", mii_ms_ctrl & MII_MSC_RES);
+		printk(": ");
 		if (mii_ms_status & MII_MSS_FAULT)
-			printf("M/S config fault");
+			printk("M/S config fault");
 		else if (mii_ms_status & MII_MSS_MASTER)
-			printf("MASTER");
+			printk("MASTER");
 		else
-			printf("SLAVE");
-		printf("\n");
+			printk("SLAVE");
+		printk("\n");
 	}
 
 	if (mii_ms_status & (MII_MSS_LP1000T_FD|MII_MSS_LP1000T_HD))
 	{
 		if (!(mii_ms_status & MII_MSS_LOCREC))
 		{
-			printf("%s: local receiver not OK\n",
+			printk("%s: local receiver not OK\n",
 				fp->fxp_name);
 		}
 		if (!(mii_ms_status & MII_MSS_REMREC))
 		{
-			printf("%s: remote receiver not OK\n",
+			printk("%s: remote receiver not OK\n",
 				fp->fxp_name);
 		}
 	}
 	if (mii_ms_status & (MII_MSS_RES|MII_MSS_IDLE_ERR))
 	{
-		printf("%s", fp->fxp_name);
+		printk("%s", fp->fxp_name);
 		if (mii_ms_status & MII_MSS_RES)
-			printf(" reserved<0x%x>", mii_ms_status & MII_MSS_RES);
+			printk(" reserved<0x%x>", mii_ms_status & MII_MSS_RES);
 		if (mii_ms_status & MII_MSS_IDLE_ERR)
 		{
-			printf(" idle error %d",
+			printk(" idle error %d",
 				mii_ms_status & MII_MSS_IDLE_ERR);
 		}
-		printf("\n");
+		printk("\n");
 	}
 
 resspeed:
 #if VERBOSE
-	printf("%s: link up, %d Mbps, %s duplex\n",
+	printk("%s: link up, %d Mbps, %s duplex\n",
 		fp->fxp_name, (scr & MII_SCR_100) ? 100 : 10,
 		(scr & MII_SCR_FD) ? "full" : "half");
 #endif
@@ -2649,7 +2649,7 @@ static void fxp_stop()
 
 		/* Reset device */
 		if (debug)
-			printf("%s: resetting device\n", fp->fxp_name);
+			printk("%s: resetting device\n", fp->fxp_name);
 		fxp_outl(port, CSR_PORT, CP_CMD_SOFT_RESET);
 	}
 	exit(0);
@@ -2689,7 +2689,7 @@ int may_block;
 	if (r == -ELOCKED && may_block)
 	{
 #if 0
-		printW(); printf("send locked\n");
+		printW(); printk("send locked\n");
 #endif
 		return;
 	}
@@ -2825,7 +2825,7 @@ fxp_t *fp;
 	micro_delay(EECS_DELAY);
 
 #if VERBOSE
-	printf("%s EEPROM address length: %d\n",
+	printk("%s EEPROM address length: %d\n",
 		fp->fxp_name, fp->fxp_ee_addrlen);
 #endif
 }
@@ -2894,7 +2894,7 @@ tmr_func_t watchdog;			/* watchdog function to be called */
 	{
 		fxp_next_timeout= fxp_timers->tmr_exp_time; 
 #if VERBOSE
-		printf("fxp_set_timer: calling sys_setalarm for %d (now+%d)\n",
+		printk("fxp_set_timer: calling sys_setalarm for %d (now+%d)\n",
 			fxp_next_timeout, fxp_next_timeout-now);
 #endif
 		r= sys_setalarm(fxp_next_timeout, 1);
@@ -2991,7 +2991,7 @@ int pci_func;
 	if (r != 0)
 	{
 #if 0
-		printf(
+		printk(
 		"fxp`tell_dev: ds_retrieve_u32 failed for 'amddev': %d\n",
 			r);
 #endif
@@ -3010,13 +3010,13 @@ int pci_func;
 	r= kipc_module_call(KIPC_SENDREC, 0, dev_e, &m);
 	if (r != 0)
 	{
-		printf("fxp`tell_dev: sendrec to %d failed: %d\n",
+		printk("fxp`tell_dev: sendrec to %d failed: %d\n",
 			dev_e, r);
 		return;
 	}
 	if (m.m_type != 0)
 	{
-		printf("fxp`tell_dev: dma map request failed: %d\n",
+		printk("fxp`tell_dev: dma map request failed: %d\n",
 			m.m_type);
 		return;
 	}

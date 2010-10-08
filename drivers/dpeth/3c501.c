@@ -184,7 +184,7 @@ static void el1_send(dpeth_t * dep, int from_int, int pktsize)
 	getuptime(&now);
 	if ((now - dep->de_xmit_start) > 4) {
 		/* Transmitter timed out */
-		DEBUG(printf("3c501: transmitter timed out ... \n"));
+		DEBUG(printk("3c501: transmitter timed out ... \n"));
 		dep->de_stat.ets_sendErr += 1;
 		dep->de_flags &= NOT(DEF_XMIT_BUSY);
 		el1_reset(dep);
@@ -232,7 +232,7 @@ static void el1_stop(dpeth_t * dep)
 {
   int ix;
 
-  DEBUG(printf("%s: stopping Etherlink ....\n", dep->de_name));
+  DEBUG(printk("%s: stopping Etherlink ....\n", dep->de_name));
   for (ix = 0; ix < 8; ix += 1)	/* Reset board */
 	outb_el1(dep, EL1_CSR, ECSR_RESET);
   outb_el1(dep, EL1_CSR, ECSR_SYS);
@@ -257,7 +257,7 @@ static void el1_interrupt(dpeth_t * dep)
 	/* Got a transmit interrupt */
 	isr = inb_el1(dep, EL1_XMIT);
 	if ((isr & (EXSR_16JAM | EXSR_UNDER | EXSR_JAM)) || !(isr & EXSR_IDLE)) {
-	DEBUG(printf("3c501: got xmit interrupt (ASR=0x%02X XSR=0x%02X)\n", csr, isr));
+	DEBUG(printk("3c501: got xmit interrupt (ASR=0x%02X XSR=0x%02X)\n", csr, isr));
 		if (isr & EXSR_JAM) {
 			/* Sending, packet got a collision */
 			dep->de_stat.ets_collision += 1;
@@ -274,7 +274,7 @@ static void el1_interrupt(dpeth_t * dep)
 		} else if (isr & EXSR_UNDER) {
 			dep->de_stat.ets_fifoUnder += 1;
 		}
-		DEBUG(printf("3c501: got xmit interrupt (0x%02X)\n", isr));
+		DEBUG(printk("3c501: got xmit interrupt (0x%02X)\n", isr));
 		el1_reset(dep);
 
 	} else {
@@ -298,11 +298,11 @@ static void el1_interrupt(dpeth_t * dep)
 	isr = inb_el1(dep, EL1_RECV);
 	pktsize = inw_el1(dep, EL1_RECVPTR);
 	if ((isr & ERSR_RERROR) || (isr & ERSR_STALE)) {
-	DEBUG(printf("Rx0 (ASR=0x%02X RSR=0x%02X size=%d)\n", csr, isr, pktsize));
+	DEBUG(printk("Rx0 (ASR=0x%02X RSR=0x%02X size=%d)\n", csr, isr, pktsize));
 		dep->de_stat.ets_recvErr += 1;
 
 	} else if (pktsize < ETH_MIN_PACK_SIZE || pktsize > ETH_MAX_PACK_SIZE) {
-	DEBUG(printf("Rx1 (ASR=0x%02X RSR=0x%02X size=%d)\n", csr, isr, pktsize));
+	DEBUG(printk("Rx1 (ASR=0x%02X RSR=0x%02X size=%d)\n", csr, isr, pktsize));
 		dep->de_stat.ets_recvErr += 1;
 
 	} else if ((rxptr = alloc_buff(dep, pktsize + sizeof(buff_t))) == NULL) {
@@ -331,7 +331,7 @@ static void el1_interrupt(dpeth_t * dep)
 	}
   } else {			/* Nasty condition, should never happen */
 	DEBUG(
-	      printf("3c501: got interrupt with status 0x%02X\n"
+	      printk("3c501: got interrupt with status 0x%02X\n"
 		     "       de_flags=0x%04X  XSR=0x%02X RSR=0x%02X \n"
 		     "       xmit buffer = 0x%4X recv buffer = 0x%4X\n",
 			csr, dep->de_flags,
@@ -374,10 +374,10 @@ static void el1_init(dpeth_t * dep)
   init_buff(dep, NULL);
   el1_mode_init(dep);
 
-  printf("%s: Etherlink (%s) at %X:%d - ",
+  printk("%s: Etherlink (%s) at %X:%d - ",
          dep->de_name, "3c501", dep->de_base_port, dep->de_irq);
   for (ix = 0; ix < SA_ADDR_LEN; ix += 1)
-	printf("%02X%c", (dep->de_address.ea_addr[ix] = StationAddress[ix]),
+	printk("%02X%c", (dep->de_address.ea_addr[ix] = StationAddress[ix]),
 	       ix < SA_ADDR_LEN - 1 ? ':' : '\n');
 
   /* Device specific functions */

@@ -18,20 +18,20 @@
 
 #ifdef CONFIG_DEBUG_VFS
 #define app_dbg(format, args...) \
-	printf("D:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
+	printk("D:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
 					__FUNCTION__, __LINE__, ##args);
 #else
 #define app_dbg(format, args...)
 #endif
 
 #define app_info(format, args...) \
-	printf("I:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
+	printk("I:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
 
 #define app_warn(format, args...) \
-	printf("W:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
+	printk("W:%s:%s:" format, __stringify(APPTYPE), __stringify(APPNAME), ##args);
 
 #define app_err(format, args...) \
-	printf("E:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
+	printk("E:%s:%s:%s:%d:" format, __stringify(APPTYPE), __stringify(APPNAME), \
 					__FUNCTION__, __LINE__, ##args);
 
 /* This is the master header for fs.  It includes some other files
@@ -42,7 +42,7 @@
 #if DO_SANITYCHECKS
 #define SANITYCHECK do { 			\
 	if(!check_vrefs() || !check_pipe()) {				\
-	   printf("VFS:%s:%d: call_nr %d who_e %d\n", \
+	   printk("VFS:%s:%d: call_nr %d who_e %d\n", \
 			__FILE__, __LINE__, call_nr, who_e); 	\
 	   panic(__FILE__, "sanity check failed", NO_NUM);	\
 	}							\

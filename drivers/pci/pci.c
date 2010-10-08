@@ -153,37 +153,37 @@ unsigned pci_inb(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inb(port, (unsigned long*)&value)) != 0)
-		printf("PCI: warning, sys_inb failed: %d\n", s);
+		printk("PCI: warning, sys_inb failed: %d\n", s);
 	return value;
 }
 unsigned pci_inw(u16 port) {
 	u32_t value;
 	int s;
 	if ((s=sys_inw(port, (unsigned long*)&value)) != 0)
-		printf("PCI: warning, sys_inw failed: %d\n", s);
+		printk("PCI: warning, sys_inw failed: %d\n", s);
 	return value;
 }
 unsigned pci_inl(u16 port) {
 	u32 value;
 	int s;
 	if ((s=sys_inl(port, (unsigned long*)&value)) != 0)
-		printf("PCI: warning, sys_inl failed: %d\n", s);
+		printk("PCI: warning, sys_inl failed: %d\n", s);
 	return value;
 }
 void pci_outb(u16 port, u8 value) {
 	int s;
 	if ((s=sys_outb(port, value)) != 0)
-		printf("PCI: warning, sys_outb failed: %d\n", s);
+		printk("PCI: warning, sys_outb failed: %d\n", s);
 }
 void pci_outw(u16 port, u16 value) {
 	int s;
 	if ((s=sys_outw(port, value)) != 0)
-		printf("PCI: warning, sys_outw failed: %d\n", s);
+		printk("PCI: warning, sys_outw failed: %d\n", s);
 }
 void pci_outl(u16 port, u32 value) {
 	int s;
 	if ((s=sys_outl(port, value)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 }
 
 /*===========================================================================*
@@ -316,7 +316,7 @@ endpoint_t proc;
 
 	if (devind < 0 || devind >= nr_pcidev)
 	{
-		printf("pci:pci_reserve2: bad devind: %d\n", devind);
+		printk("pci:pci_reserve2: bad devind: %d\n", devind);
 		return -EINVAL;
 	}
 	if(pcidev[devind].pd_inuse)
@@ -328,7 +328,7 @@ endpoint_t proc;
 	{
 		if (pcidev[devind].pd_bar[i].pb_flags & PBF_INCOMPLETE)
 		{
-			printf("pci_reserve3: BAR %d is incomplete\n", i);
+			printk("pci_reserve3: BAR %d is incomplete\n", i);
 			continue;
 		}
 		if (pcidev[devind].pd_bar[i].pb_flags & PBF_IO)
@@ -338,14 +338,14 @@ endpoint_t proc;
 				pcidev[devind].pd_bar[i].pb_size-1;
 
 			if(debug) {
-			   printf(
+			   printk(
 		"pci_reserve3: for proc %d, adding I/O range [0x%x..0x%x]\n",
 				proc, ior.ior_base, ior.ior_limit);
 			}
 			r= sys_privctl(proc, SYS_PRIV_ADD_IO, &ior);
 			if (r != 0)
 			{
-				printf("sys_privctl failed for proc %d: %d\n",
+				printk("sys_privctl failed for proc %d: %d\n",
 					proc, r);
 			}
 		}
@@ -358,7 +358,7 @@ endpoint_t proc;
 			r= sys_privctl(proc, SYS_PRIV_ADD_MEM, &mr);
 			if (r != 0)
 			{
-				printf("sys_privctl failed for proc %d: %d\n",
+				printk("sys_privctl failed for proc %d: %d\n",
 					proc, r);
 			}
 		}
@@ -366,11 +366,11 @@ endpoint_t proc;
 	ilr= pcidev[devind].pd_ilr;
 	if (ilr != PCI_ILR_UNKNOWN)
 	{
-		if(debug) printf("pci_reserve3: adding IRQ %d\n", ilr);
+		if(debug) printk("pci_reserve3: adding IRQ %d\n", ilr);
 		r= sys_privctl(proc, SYS_PRIV_ADD_IRQ, &ilr);
 		if (r != 0)
 		{
-			printf("sys_privctl failed for proc %d: %d\n",
+			printk("sys_privctl failed for proc %d: %d\n",
 				proc, r);
 		}
 	}
@@ -623,7 +623,7 @@ static void pci_intel_init()
 	did= PCII_RREG16_(bus, dev, func, PCI_DID);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -643,7 +643,7 @@ static void pci_intel_init()
 
 	if (!pci_intel_ctrl[i].vid)
 	{
-		printf("pci_intel_init (warning): unknown PCI-controller:\n"
+		printk("pci_intel_init (warning): unknown PCI-controller:\n"
 			"\tvendor %04X (%s), device %04X\n",
 			vid, pci_vid_name(vid), did);
 	}
@@ -673,7 +673,7 @@ static void pci_intel_init()
 		dstr= "unknown device";
 	if (debug)
 	{
-		printf("pci_intel_init: %s (%04X/%04X)\n",
+		printk("pci_intel_init: %s (%04X/%04X)\n",
 			dstr, vid, did);
 	}
 
@@ -718,7 +718,7 @@ int busind;
 	char *s, *dstr;
 
 #if DEBUG
-printf("probe_bus(%d)\n", busind);
+printk("probe_bus(%d)\n", busind);
 #endif
 	if (nr_pcidev >= NR_PCIDEV)
 		panic("PCI","too many PCI devices", nr_pcidev);
@@ -742,7 +742,7 @@ printf("probe_bus(%d)\n", busind);
 			sts= pci_attr_rsts(devind);
 
 #if 0
-			printf("vid 0x%x, did 0x%x, headt 0x%x, sts 0x%x\n",
+			printk("vid 0x%x, did 0x%x, headt 0x%x, sts 0x%x\n",
 				vid, did, headt, sts);
 #endif
 
@@ -759,7 +759,7 @@ printf("probe_bus(%d)\n", busind);
 
 			if (sts & (PSR_SSE|PSR_RMAS|PSR_RTAS))
 			{
-				printf(
+				printk(
 					"PCI: ignoring bad value 0x%x in sts for QEMU\n",
 					sts & (PSR_SSE|PSR_RMAS|PSR_RTAS));
 			}
@@ -769,21 +769,21 @@ printf("probe_bus(%d)\n", busind);
 			{
 				if (dstr)
 				{
-					printf("%d.%lu.%lu: %s (%04X/%04X)\n",
+					printk("%d.%lu.%lu: %s (%04X/%04X)\n",
 						busind, (unsigned long)dev,
 						(unsigned long)func, dstr,
 						vid, did);
 				}
 				else
 				{
-					printf(
+					printk(
 		"%d.%lu.%lu: Unknown device, vendor %04X (%s), device %04X\n",
 						busind, (unsigned long)dev,
 						(unsigned long)func, vid,
 						pci_vid_name(vid), did);
 				}
-				printf("Device index: %d\n", devind);
-				printf("Subsystem: Vid 0x%x, did 0x%x\n",
+				printk("Device index: %d\n", devind);
+				printk("Subsystem: Vid 0x%x, did 0x%x\n",
 					pci_attr_r16(devind, PCI_SUBVID),
 					pci_attr_r16(devind, PCI_SUBDID));
 			}
@@ -800,13 +800,13 @@ printf("probe_bus(%d)\n", busind);
 			}
 			if (debug)
 			{
-				printf("\tclass %s (%X/%X/%X)\n", s,
+				printk("\tclass %s (%X/%X/%X)\n", s,
 					baseclass, subclass, infclass);
 			}
 
 			if (is_duplicate(busnr, dev, func))
 			{
-				printf("\tduplicate!\n");
+				printk("\tduplicate!\n");
 				if (func == 0 && !(headt & PHT_MULTIFUNC))
 					break;
 				continue;
@@ -834,7 +834,7 @@ printf("probe_bus(%d)\n", busind);
 				record_bars_cardbus(devind);
 				break;
 			default:
-				printf("\t%d.%d.%d: unknown header type %d\n",
+				printk("\t%d.%d.%d: unknown header type %d\n",
 					busind, dev, func,
 					headt & PHT_MASK);
 				break;
@@ -896,7 +896,7 @@ int devind;
 		if (ipr && first && debug)
 		{
 			first= 0;
-			printf("PCI: strange, BIOS assigned IRQ0\n");
+			printk("PCI: strange, BIOS assigned IRQ0\n");
 		}
 		ilr= PCI_ILR_UNKNOWN;
 	}
@@ -907,11 +907,11 @@ int devind;
 	else if (ilr != PCI_ILR_UNKNOWN && ipr)
 	{
 		if (debug)
-			printf("\tIRQ %d for INT%c\n", ilr, 'A' + ipr-1);
+			printk("\tIRQ %d for INT%c\n", ilr, 'A' + ipr-1);
 	}
 	else if (ilr != PCI_ILR_UNKNOWN)
 	{
-		printf(
+		printk(
 	"PCI: IRQ %d is assigned, but device %d.%d.%d does not need it\n",
 			ilr, pcidev[devind].pd_busnr, pcidev[devind].pd_dev,
 			pcidev[devind].pd_func);
@@ -929,7 +929,7 @@ int devind;
 			{
 				if (debug)
 				{
-					printf(
+					printk(
 					"assigning IRQ %d to Cardbus device\n",
 						ilr);
 				}
@@ -939,7 +939,7 @@ int devind;
 			}
 		}
 		if(debug) {
-			printf(
+			printk(
 		"PCI: device %d.%d.%d uses INT%c but is not assigned any IRQ\n",
 			pcidev[devind].pd_busnr, pcidev[devind].pd_dev,
 			pcidev[devind].pd_func, 'A' + ipr-1);
@@ -972,7 +972,7 @@ int devind;
 		{
 			if (debug)
 			{
-				printf(
+				printk(
 	"primary channel is not in native mode, clearing BARs 0 and 1\n");
 			}
 			clear_01= 1;
@@ -981,7 +981,7 @@ int devind;
 		{
 			if (debug)
 			{
-				printf(
+				printk(
 	"secondary channel is not in native mode, clearing BARs 2 and 3\n");
 			}
 			clear_23= 1;
@@ -993,12 +993,12 @@ int devind;
 			pb_nr= pcidev[devind].pd_bar[i].pb_nr;
 			if ((pb_nr == 0 || pb_nr == 1) && clear_01)
 			{
-				if (debug) printf("skipping bar %d\n", pb_nr);
+				if (debug) printk("skipping bar %d\n", pb_nr);
 				continue;	/* Skip */
 			}
 			if ((pb_nr == 2 || pb_nr == 3) && clear_23)
 			{
-				if (debug) printf("skipping bar %d\n", pb_nr);
+				if (debug) printk("skipping bar %d\n", pb_nr);
 				continue;	/* Skip */
 			}
 			if (i == j)
@@ -1034,7 +1034,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tI/O window: base 0x%x, limit 0x%x, size %d\n",
+		printk("\tI/O window: base 0x%x, limit 0x%x, size %d\n",
 			base, limit, size);
 	}
 
@@ -1045,7 +1045,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tMemory window: base 0x%x, limit 0x%x, size 0x%x\n",
+		printk("\tMemory window: base 0x%x, limit 0x%x, size 0x%x\n",
 			base, limit, size);
 	}
 
@@ -1058,7 +1058,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf(
+		printk(
 	"\tPrefetchable memory window: base 0x%x, limit 0x%x, size 0x%x\n",
 			base, limit, size);
 	}
@@ -1080,7 +1080,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tMemory window 0: base 0x%x, limit 0x%x, size %d\n",
+		printk("\tMemory window 0: base 0x%x, limit 0x%x, size %d\n",
 			base, limit, size);
 	}
 
@@ -1090,7 +1090,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tMemory window 1: base 0x%x, limit 0x%x, size %d\n",
+		printk("\tMemory window 1: base 0x%x, limit 0x%x, size %d\n",
 			base, limit, size);
 	}
 
@@ -1100,7 +1100,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tI/O window 0: base 0x%x, limit 0x%x, size %d\n",
+		printk("\tI/O window 0: base 0x%x, limit 0x%x, size %d\n",
 			base, limit, size);
 	}
 
@@ -1110,7 +1110,7 @@ int devind;
 	size= limit-base + 1;
 	if (debug)
 	{
-		printf("\tI/O window 1: base 0x%x, limit 0x%x, size %d\n",
+		printk("\tI/O window 1: base 0x%x, limit 0x%x, size %d\n",
 			base, limit, size);
 	}
 }
@@ -1148,7 +1148,7 @@ int bar_nr;
 		bar2= (~bar2 & 0xffff)+1;
 		if (debug)
 		{
-			printf("\tbar_%d: %d bytes at 0x%x I/O\n",
+			printk("\tbar_%d: %d bytes at 0x%x I/O\n",
 				bar_nr, bar2, bar);
 		}
 
@@ -1187,11 +1187,11 @@ int bar_nr;
 		bar2= (~bar2)+1;
 		if (debug)
 		{
-			printf("\tbar_%d: 0x%x bytes at 0x%x%s memory\n",
+			printk("\tbar_%d: 0x%x bytes at 0x%x%s memory\n",
 				bar_nr, bar2, bar,
 				prefetch ? " prefetchable" : "");
 			if (type != 0)
-				printf("type = 0x%x\n", type);
+				printk("type = 0x%x\n", type);
 		}
 
 		dev_bar_nr= pcidev[devind].pd_bar_nr++;
@@ -1218,32 +1218,32 @@ static void complete_bridges()
 	{
 		if (!pcibus[i].pb_needinit)
 			continue;
-		printf("should allocate bus number for bus %d\n", i);
+		printk("should allocate bus number for bus %d\n", i);
 		freebus= get_freebus();
-		printf("got bus number %d\n", freebus);
+		printk("got bus number %d\n", freebus);
 
 		devind= pcibus[i].pb_devind;
 
 		prim_busnr= pcidev[devind].pd_busnr;
 		if (prim_busnr != 0)
 		{
-			printf(
+			printk(
 	"complete_bridge: updating subordinate bus number not implemented\n");
 		}
 
 		pcibus[i].pb_needinit= 0;
 		pcibus[i].pb_busnr= freebus;
 
-		printf("devind = %d\n", devind);
-		printf("prim_busnr= %d\n", prim_busnr);
+		printk("devind = %d\n", devind);
+		printk("prim_busnr= %d\n", prim_busnr);
 
 		pci_attr_w8(devind, PPB_PRIMBN, prim_busnr);
 		pci_attr_w8(devind, PPB_SECBN, freebus);
 		pci_attr_w8(devind, PPB_SUBORDBN, freebus);
 
-		printf("CR = 0x%x\n", pci_attr_r16(devind, PCI_CR));
-		printf("SECBLT = 0x%x\n", pci_attr_r8_u(devind, PPB_SECBLT));
-		printf("BRIDGECTRL = 0x%x\n",
+		printk("CR = 0x%x\n", pci_attr_r16(devind, PCI_CR));
+		printk("SECBLT = 0x%x\n", pci_attr_r8_u(devind, PPB_SECBLT));
+		printk("BRIDGECTRL = 0x%x\n",
 			pci_attr_r16(devind, PPB_BRIDGECTRL));
 	}
 }
@@ -1289,7 +1289,7 @@ static void complete_bars(void)
 
 	if (debug)
 	{
-		printf("complete_bars: initial gap: [0x%x .. 0x%x>\n",
+		printk("complete_bars: initial gap: [0x%x .. 0x%x>\n",
 			memgap_low, memgap_high);
 	}
 
@@ -1323,14 +1323,14 @@ static void complete_bars(void)
 
 	if (debug)
 	{
-		printf("complete_bars: intermediate gap: [0x%x .. 0x%x>\n",
+		printk("complete_bars: intermediate gap: [0x%x .. 0x%x>\n",
 			memgap_low, memgap_high);
 	}
 
 	/* Should check main memory size */
 	if (memgap_high < memgap_low)
 	{
-		printf("PCI: bad memory gap: [0x%x .. 0x%x>\n",
+		printk("PCI: bad memory gap: [0x%x .. 0x%x>\n",
 			memgap_low, memgap_high);
 		panic(NULL, NULL, NO_NUM);
 	}
@@ -1356,7 +1356,7 @@ static void complete_bars(void)
 #if 0
 			if (debug)
 			{
-				printf(
+				printk(
 		"pci device %d (%04x/%04x), bar %d: base 0x%x, size 0x%x\n",
 					i, pcidev[i].pd_vid, pcidev[i].pd_did,
 					j, base, size);
@@ -1373,13 +1373,13 @@ static void complete_bars(void)
 	{
 		if (debug)
 		{
-			printf("iogap_high too low, should panic\n");
+			printk("iogap_high too low, should panic\n");
 		}
 		else
 			panic("pci", "iogap_high too low", iogap_high);
 	}
 	if (debug)
-		printf("I/O range = [0x%x..0x%x>\n", iogap_low, iogap_high);
+		printk("I/O range = [0x%x..0x%x>\n", iogap_low, iogap_high);
 
 	for (i= 0; i<nr_pcidev; i++)
 	{
@@ -1403,7 +1403,7 @@ static void complete_bars(void)
 			pci_attr_w32(i, reg, v32 | base);
 			if (debug)
 			{
-				printf(
+				printk(
 		"complete_bars: allocated 0x%x size %d to %d.%d.%d, bar_%d\n",
 					base, size, pcidev[i].pd_busnr,
 					pcidev[i].pd_dev, pcidev[i].pd_func,
@@ -1439,7 +1439,7 @@ static void complete_bars(void)
 			pci_attr_w32(i, reg, v32 | base);
 			if (debug)
 			{
-				printf(
+				printk(
 		"complete_bars: allocated 0x%x size %d to %d.%d.%d, bar_%d\n",
 					base, size, pcidev[i].pd_busnr,
 					pcidev[i].pd_dev, pcidev[i].pd_func,
@@ -1462,13 +1462,13 @@ static void complete_bars(void)
 		{
 			if (!(pcidev[i].pd_bar[j].pb_flags & PBF_INCOMPLETE))
 				continue;
-			printf("should allocate resources for device %d\n", i);
+			printk("should allocate resources for device %d\n", i);
 		}
 	}
 	return;
 
 bad_mem_string:
-	printf("PCI: bad memory environment string '%s'\n", memstr);
+	printk("PCI: bad memory environment string '%s'\n", memstr);
 	panic(NULL, NULL, NO_NUM);
 }
 
@@ -1490,7 +1490,7 @@ u32_t io_size;
 		return;	/* Nothing to do for host controller */
 	if (type == PBT_PCIBRIDGE)
 	{
-		printf(
+		printk(
 		"update_bridge4dev_io: not implemented for PCI bridges\n");
 		return;	
 	}
@@ -1499,7 +1499,7 @@ u32_t io_size;
 
 	if (debug)
 	{
-		printf("update_bridge4dev_io: adding 0x%x at 0x%x\n",
+		printk("update_bridge4dev_io: adding 0x%x at 0x%x\n",
 			io_size, io_base);
 	}
 	br_devind= pcibus[busind].pb_devind;
@@ -1527,7 +1527,7 @@ static int get_freebus()
 			continue;
 		if (pcibus[i].pb_busnr <= freebus)
 			freebus= pcibus[i].pb_busnr+1;
-		printf("get_freebus: should check suboridinate bus number\n");
+		printk("get_freebus: should check suboridinate bus number\n");
 	}
 	return freebus;
 }
@@ -1594,7 +1594,7 @@ int busind;
 			dstr= "unknown device";
 		if (debug)
 		{
-			printf("found ISA bridge (%04X/%04X) %s\n",
+			printk("found ISA bridge (%04X/%04X) %s\n",
 				vid, did, dstr);
 		}
 		pcibus[busind].pb_isabridge_dev= bridge_dev;
@@ -1624,14 +1624,14 @@ int busind;
 	{
 		if (debug)
 		{
-			printf("(warning) no ISA bridge found on bus %d\n",
+			printk("(warning) no ISA bridge found on bus %d\n",
 				busind);
 		}
 		return 0;
 	}
 	if (debug)
 	{
-		printf(
+		printk(
 		"(warning) unsupported ISA bridge %04X/%04X for bus %d\n",
 			pcidev[unknown_bridge].pd_vid,
 			pcidev[unknown_bridge].pd_did, busind);
@@ -1656,7 +1656,7 @@ int busind;
 	for (devind= 0; devind< nr_pcidev; devind++)
 	{
 #if 0
-		printf("do_pcibridge: trying %u.%u.%u\n",
+		printk("do_pcibridge: trying %u.%u.%u\n",
 			pcidev[devind].pd_busind, pcidev[devind].pd_dev, 
 			pcidev[devind].pd_func);
 #endif
@@ -1664,7 +1664,7 @@ int busind;
 		if (pcidev[devind].pd_busnr != busnr)
 		{
 #if 0
-			printf("wrong bus\n");
+			printk("wrong bus\n");
 #endif
 			continue;
 		}
@@ -1691,7 +1691,7 @@ int busind;
 			else
 			{
 #if 0
-				printf("not a bridge\n");
+				printk("not a bridge\n");
 #endif
 				continue;	/* Not a bridge */
 			}
@@ -1704,7 +1704,7 @@ int busind;
 				t3 != PCI_T3_PCI2PCI &&
 				t3 != PCI_T3_PCI2PCI_SUBTR)
 			{
-				printf(
+				printk(
 "Unknown PCI class %02x:%02x:%02x for PCI-to-PCI bridge, device %04X/%04X\n",
 					baseclass, subclass, infclass,
 					vid, did);
@@ -1713,7 +1713,7 @@ int busind;
 			if (type == PCI_PPB_CB &&
 				t3 != PCI_T3_CARDBUS)
 			{
-				printf(
+				printk(
 "Unknown PCI class %02x:%02x:%02x for Cardbus bridge, device %04X/%04X\n",
 					baseclass, subclass, infclass,
 					vid, did);
@@ -1723,7 +1723,7 @@ int busind;
 
 		if (debug)
 		{
-			printf("%u.%u.%u: PCI-to-PCI bridge: %04X/%04X\n",
+			printk("%u.%u.%u: PCI-to-PCI bridge: %04X/%04X\n",
 				pcidev[devind].pd_busnr,
 				pcidev[devind].pd_dev, 
 				pcidev[devind].pd_func, vid, did);
@@ -1770,13 +1770,13 @@ int busind;
 		}
 		if (debug)
 		{
-			printf(
+			printk(
 			"bus(table) = %d, bus(sec) = %d, bus(subord) = %d\n",
 				ind, sbusn, pci_attr_r8_u(devind, PPB_SUBORDBN));
 		}
 		if (sbusn == 0)
 		{
-			printf("Secondary bus number not initialized\n");
+			printk("Secondary bus number not initialized\n");
 			continue;
 		}
 		pcibus[ind].pb_needinit= 0;
@@ -1814,15 +1814,15 @@ int devind;
 	u32_t elcr1, elcr2, elcr;
 
 #if DEBUG
-	printf("in piix\n");
+	printk("in piix\n");
 #endif
 	dev= pcidev[devind].pd_dev;
 	func= pcidev[devind].pd_func;
 #if USER_SPACE
 	if ((s=sys_inb(PIIX_ELCR1, (unsigned long*)&elcr1)) != 0)
-		printf("Warning, sys_inb failed: %d\n", s);
+		printk("Warning, sys_inb failed: %d\n", s);
 	if ((s=sys_inb(PIIX_ELCR2, (unsigned long*)&elcr2)) != 0)
-		printf("Warning, sys_inb failed: %d\n", s);
+		printk("Warning, sys_inb failed: %d\n", s);
 #else
 	elcr1= inb(PIIX_ELCR1);
 	elcr2= inb(PIIX_ELCR2);
@@ -1834,18 +1834,18 @@ int devind;
 		if (irqrc & PIIX_IRQ_DI)
 		{
 			if (debug)
-				printf("INT%c: disabled\n", 'A'+i);
+				printk("INT%c: disabled\n", 'A'+i);
 		}
 		else
 		{
 			irq= irqrc & PIIX_IRQ_MASK;
 			if (debug)
-				printf("INT%c: %d\n", 'A'+i, irq);
+				printk("INT%c: %d\n", 'A'+i, irq);
 			if (!(elcr & (1 << irq)))
 			{
 				if (debug)
 				{
-					printf(
+					printk(
 				"(warning) IRQ %d is not level triggered\n", 
 						irq);
 				}
@@ -1890,15 +1890,15 @@ int devind;
 		if (!irq)
 		{
 			if (debug)
-				printf("INT%c: disabled\n", 'A'+i);
+				printk("INT%c: disabled\n", 'A'+i);
 		}
 		else
 		{
 			if (debug)
-				printf("INT%c: %d\n", 'A'+i, irq);
+				printk("INT%c: %d\n", 'A'+i, irq);
 			if (edge && debug)
 			{
-				printf(
+				printk(
 				"(warning) IRQ %d is not level triggered\n",
 					irq);
 			}
@@ -1926,13 +1926,13 @@ int devind;
 		if (irq & SIS_IRQ_DISABLED)
 		{
 			if (debug)
-				printf("INT%c: disabled\n", 'A'+i);
+				printk("INT%c: disabled\n", 'A'+i);
 		}
 		else
 		{
 			irq &= SIS_IRQ_MASK;
 			if (debug)
-				printf("INT%c: %d\n", 'A'+i, irq);
+				printk("INT%c: %d\n", 'A'+i, irq);
 			irq_mode_pci(irq);
 		}
 	}
@@ -1980,15 +1980,15 @@ int devind;
 		if (!irq)
 		{
 			if (debug)
-				printf("INT%c: disabled\n", 'A'+i);
+				printk("INT%c: disabled\n", 'A'+i);
 		}
 		else
 		{
 			if (debug)
-				printf("INT%c: %d\n", 'A'+i, irq);
+				printk("INT%c: %d\n", 'A'+i, irq);
 			if (edge && debug)
 			{
-				printf(
+				printk(
 				"(warning) IRQ %d is not level triggered\n",
 					irq);
 			}
@@ -2025,7 +2025,7 @@ int devind;
 	}
 	if (size != 0)
 	{
-		printf("PCI: video memory for device at %d.%d.%d: %d bytes\n",
+		printk("PCI: video memory for device at %d.%d.%d: %d bytes\n",
 			pcidev[devind].pd_busnr,
 			pcidev[devind].pd_dev,
 			pcidev[devind].pd_func,
@@ -2169,7 +2169,7 @@ u16_t value;
 	devind= pcibus[busind].pb_devind;
 
 #if 0
-	printf("pcibr_std_wsts(%d, 0x%X), devind= %d\n", 
+	printk("pcibr_std_wsts(%d, 0x%X), devind= %d\n", 
 		busind, value, devind);
 #endif
 	pci_attr_w16(devind, PPB_SSTS, value);
@@ -2198,7 +2198,7 @@ u16_t value;
 	devind= pcibus[busind].pb_devind;
 
 #if 0
-	printf("pcibr_cb_wsts(%d, 0x%X), devind= %d\n", 
+	printk("pcibr_cb_wsts(%d, 0x%X), devind= %d\n", 
 		busind, value, devind);
 #endif
 	pci_attr_w16(devind, CBB_SSTS, value);
@@ -2227,7 +2227,7 @@ u16_t value;
 	devind= pcibus[busind].pb_devind;
 
 #if 0
-	printf("pcibr_via_wsts(%d, 0x%X), devind= %d (not implemented)\n", 
+	printk("pcibr_via_wsts(%d, 0x%X), devind= %d (not implemented)\n", 
 		busind, value, devind);
 #endif
 }
@@ -2263,12 +2263,12 @@ int port;
 		port);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
 #if 0
-	printf("pcii_rreg8(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
+	printk("pcii_rreg8(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
 		busind, devind, port,
 		pcibus[busind].pb_bus, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func, v);
@@ -2292,12 +2292,12 @@ int port;
 		port);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n");
+		printk("PCI: warning, sys_outl failed: %d\n");
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
 #if 0
-	printf("pcii_rreg16(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
+	printk("pcii_rreg16(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
 		busind, devind, port,
 		pcibus[busind].pb_bus, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func, v);
@@ -2321,12 +2321,12 @@ int port;
 		port);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
 #if 0
-	printf("pcii_rreg32(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
+	printk("pcii_rreg32(%d, %d, 0x%X): %d.%d.%d= 0x%X\n",
 		busind, devind, port,
 		pcibus[busind].pb_bus, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func, v);
@@ -2345,7 +2345,7 @@ u8_t value;
 {
 	int s;
 #if 0
-	printf("pcii_wreg8(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
+	printk("pcii_wreg8(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
 		busind, devind, port, value,
 		pcibus[busind].pb_bus, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func);
@@ -2355,7 +2355,7 @@ u8_t value;
 		port, value);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -2372,7 +2372,7 @@ u16_t value;
 {
 	int s;
 #if 0
-	printf("pcii_wreg16(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
+	printk("pcii_wreg16(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
 		busind, devind, port, value,
 		pcibus[busind].pb_bus, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func);
@@ -2382,7 +2382,7 @@ u16_t value;
 		port, value);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -2399,7 +2399,7 @@ u32_t value;
 {
 	int s;
 #if 0
-	printf("pcii_wreg32(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
+	printk("pcii_wreg32(%d, %d, 0x%X, 0x%X): %d.%d.%d\n",
 		busind, devind, port, value,
 		pcibus[busind].pb_busnr, pcidev[devind].pd_dev,
 		pcidev[devind].pd_func);
@@ -2409,7 +2409,7 @@ u32_t value;
 		port, value);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n");
+		printk("PCI: warning, sys_outl failed: %d\n");
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -2427,7 +2427,7 @@ int busind;
 	v= PCII_RREG16_(pcibus[busind].pb_busnr, 0, 0, PCI_SR);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -2445,7 +2445,7 @@ u16_t value;
 	PCII_WREG16_(pcibus[busind].pb_busnr, 0, 0, PCI_SR, value);
 #if USER_SPACE
 	if ((s=sys_outl(PCII_CONFADD, PCII_UNSEL)) != 0)
-		printf("PCI: warning, sys_outl failed: %d\n", s);
+		printk("PCI: warning, sys_outl failed: %d\n", s);
 #else
 	outl(PCII_CONFADD, PCII_UNSEL);
 #endif
@@ -2484,7 +2484,7 @@ int devind;
 		default: str= "(unknown type)"; break;
 		}
 
-		printf(" @0x%x (0x%08x): capability type 0x%x: %s",
+		printk(" @0x%x (0x%08x): capability type 0x%x: %s",
 			capptr, pci_attr_r32_u(devind, capptr), type, str);
 		if (type == 0x08)
 			print_hyper_cap(devind, capptr);
@@ -2497,9 +2497,9 @@ int devind;
 			case 3: str= "IOMMU"; break;
 			default: str= "(unknown type)"; break;
 			}
-			printf(", sub type 0%o: %s", subtype, str);
+			printk(", sub type 0%o: %s", subtype, str);
 		}
-		printf("\n");
+		printk("\n");
 		capptr= next;
 	}
 }
@@ -2557,60 +2557,60 @@ u8_t capptr;
 	u16_t cmd;
 	int type0, type1;
 
-	printf("\n");
+	printk("\n");
 	v= pci_attr_r32_u(devind, capptr);
-	printf("print_hyper_cap: @0x%x, off 0 (cap):", capptr);
+	printk("print_hyper_cap: @0x%x, off 0 (cap):", capptr);
 	cmd= (v >> 16) & 0xffff;
 #if 0
 	if (v & 0x10000)
 	{
-		printf(" WarmReset");
+		printk(" WarmReset");
 		v &= ~0x10000;
 	}
 	if (v & 0x20000)
 	{
-		printf(" DblEnded");
+		printk(" DblEnded");
 		v &= ~0x20000;
 	}
-	printf(" DevNum %d", (v & 0x7C0000) >> 18);
+	printk(" DevNum %d", (v & 0x7C0000) >> 18);
 	v &= ~0x7C0000;
 #endif
 	type0= (cmd & 0xE000) >> 13;
 	type1= (cmd & 0xF800) >> 11;
 	if (type0 == 0 || type0 == 1)
 	{
-		printf("Capability Type: %s\n",
+		printk("Capability Type: %s\n",
 			type0 == 0 ? "Slave or Primary Interface" :
 			"Host or Secondary Interface");
 		cmd &= ~0xE000;
 	}
 	else
 	{
-		printf(" Capability Type 0x%x", type1);
+		printk(" Capability Type 0x%x", type1);
 		cmd &= ~0xF800;
 	}
 	if (cmd)
-		printf(" undecoded 0x%x\n", cmd);
+		printk(" undecoded 0x%x\n", cmd);
 
 #if 0
-	printf("print_hyper_cap: off 4 (ctl): 0x%x\n", 
+	printk("print_hyper_cap: off 4 (ctl): 0x%x\n", 
 		pci_attr_r32_u(devind, capptr+4));
-	printf("print_hyper_cap: off 8 (freq/rev): 0x%x\n", 
+	printk("print_hyper_cap: off 8 (freq/rev): 0x%x\n", 
 		pci_attr_r32_u(devind, capptr+8));
-	printf("print_hyper_cap: off 12 (cap): 0x%x\n", 
+	printk("print_hyper_cap: off 12 (cap): 0x%x\n", 
 		pci_attr_r32_u(devind, capptr+12));
-	printf("print_hyper_cap: off 16 (buf count): 0x%x\n", 
+	printk("print_hyper_cap: off 16 (buf count): 0x%x\n", 
 		pci_attr_r32_u(devind, capptr+16));
 	v= pci_attr_r32_u(devind, capptr+20);
-	printf("print_hyper_cap: @0x%x, off 20 (bus nr): ", 
+	printk("print_hyper_cap: @0x%x, off 20 (bus nr): ", 
 		capptr+20);
-	printf("prim %d", v & 0xff);
-	printf(", sec %d", (v >> 8) & 0xff);
-	printf(", sub %d", (v >> 16) & 0xff);
+	printk("prim %d", v & 0xff);
+	printk(", sec %d", (v >> 8) & 0xff);
+	printk(", sub %d", (v >> 16) & 0xff);
 	if (v >> 24)
-		printf(", reserved %d", (v >> 24) & 0xff);
-	printf("\n");
-	printf("print_hyper_cap: off 24 (type): 0x%x\n", 
+		printk(", reserved %d", (v >> 24) & 0xff);
+	printk("\n");
+	printk("print_hyper_cap: off 24 (type): 0x%x\n", 
 		pci_attr_r32_u(devind, capptr+24));
 #endif
 }

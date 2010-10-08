@@ -276,7 +276,7 @@ void main(void)
 static void announce(void)
 {
 	/* Display the Nucleos startup banner. */
-	kprintf("\nNucleos %s Copyright (c) 2010, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
+	printk("\nNucleos %s Copyright (c) 2010, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
 		UTS_RELEASE);
 }
 
@@ -291,7 +291,7 @@ void prepare_shutdown(int how)
 	 * do shutdown work.  Set a watchog timer to call shutdown(). The timer
 	 * argument passes the shutdown status.
 	 */
-	kprintf("Nucleos will now be shut down ...\n");
+	printk("Nucleos will now be shut down ...\n");
 	tmr_arg(&shutdown_timer)->ta_int = how;
 	set_timer(&shutdown_timer, get_uptime() + system_hz, nucleos_shutdown);
 }

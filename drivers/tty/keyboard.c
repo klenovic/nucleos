@@ -231,7 +231,7 @@ kipc_msg_t *m;
 		kbdp->nr_open--;
 		if (kbdp->nr_open < 0)
 		{
-			printf("TTY(kbd): open count is negative\n");
+			printk("TTY(kbd): open count is negative\n");
 			kbdp->nr_open= 0;
 		}
 		if (kbdp->nr_open == 0)
@@ -280,7 +280,7 @@ kipc_msg_t *m;
 			kbdp->avail -= n;
 			r= n;
 		} else {
-			printf("copy in read kbd failed: %d\n", r);
+			printk("copy in read kbd failed: %d\n", r);
 		}
 
 		break;
@@ -289,7 +289,7 @@ kipc_msg_t *m;
 	        safecopy = 1;
 		if (kbdp != &kbdaux)
 		{
-			printf("write to keyboard not implemented\n");
+			printk("write to keyboard not implemented\n");
 			r= -EINVAL;
 			break;
 		}
@@ -408,7 +408,7 @@ kipc_msg_t *m;
 		break;
 
 	    default:		
-		printf("Warning, TTY(kbd) got unexpected request %d from %d\n",
+		printk("Warning, TTY(kbd) got unexpected request %d from %d\n",
 			m->m_type, m->m_source);
 		r= -EINVAL;
 	}
@@ -448,7 +448,7 @@ kipc_msg_t *m;
 			kbdp->offset= (kbdp->offset+n) % KBD_BUFSZ;
 			kbdp->avail -= n;
 			r= n;
-		} else printf("copy in revive kbd failed: %d\n", r);
+		} else printk("copy in revive kbd failed: %d\n", r);
 
 		m->m_type = DEV_REVIVE;
   		m->REP_ENDPT= kbdp->req_proc;
@@ -537,7 +537,7 @@ kipc_msg_t *m_ptr;
 	if (kbdp->avail >= KBD_BUFSZ)
 	{
 #if 0
-		printf("kbd_interrupt: %s buffer is full\n",
+		printk("kbd_interrupt: %s buffer is full\n",
 			isaux ? "kbdaux" : "keyboard");
 #endif
 		return;	/* Buffer is full */
@@ -679,29 +679,29 @@ static void kbd_send()
 		return;
 
 	if((r=sys_inb(KB_STATUS, &sb)) != 0) {
-		printf("kbd_send: 1 sys_inb() failed: %d\n", r);
+		printk("kbd_send: 1 sys_inb() failed: %d\n", r);
 	}
 	if (sb & (KB_OUT_FULL|KB_IN_FULL))
 	{
-		printf("not sending 1: sb = 0x%lx\n", sb);
+		printk("not sending 1: sb = 0x%lx\n", sb);
 		return;
 	}
 	micro_delay(KBC_IN_DELAY);
 	if((r=sys_inb(KB_STATUS, &sb)) != 0) {
-		printf("kbd_send: 2 sys_inb() failed: %d\n", r);
+		printk("kbd_send: 2 sys_inb() failed: %d\n", r);
 	}
 	if (sb & (KB_OUT_FULL|KB_IN_FULL))
 	{
-		printf("not sending 2: sb = 0x%lx\n", sb);
+		printk("not sending 2: sb = 0x%lx\n", sb);
 		return;
 	}
 
 	/* Okay, buffer is really empty */
 #if 0
-	printf("sending byte 0x%x to keyboard\n", kbdout.buf[kbdout.offset]);
+	printk("sending byte 0x%x to keyboard\n", kbdout.buf[kbdout.offset]);
 #endif
 	if((r=sys_outb(KEYBD, kbdout.buf[kbdout.offset])) != 0) {
-		printf("kbd_send: 3 sys_inb() failed: %d\n", r);
+		printk("kbd_send: 3 sys_inb() failed: %d\n", r);
 	}
 	kbdout.offset++;
 	kbdout.avail--;
@@ -819,10 +819,10 @@ int scode;			/* scan code of key just struck or released */
 				notseen = !seen[ei][scode];
 				seen[ei][scode] = 1;
 			} else {
-				printf("tty: scode %d makes no sense\n", scode);
+				printk("tty: scode %d makes no sense\n", scode);
 			}
 			if(notseen) {
-		  		printf("tty: ignoring unrecognized %s "
+		  		printk("tty: ignoring unrecognized %s "
 					"scancode 0x%x\n",
   				escape ? "escaped" : "straight", scode);
 			}
@@ -845,13 +845,13 @@ static void set_leds()
 
   kb_wait();			/* wait for buffer empty  */
   if ((s=sys_outb(KEYBD, LED_CODE)) != 0)
-      printf("Warning, sys_outb couldn't prepare for LED values: %d\n", s);
+      printk("Warning, sys_outb couldn't prepare for LED values: %d\n", s);
    				/* prepare keyboard to accept LED values */
   kb_ack();			/* wait for ack response  */
 
   kb_wait();			/* wait for buffer empty  */
   if ((s=sys_outb(KEYBD, locks[ccurrent])) != 0)
-      printf("Warning, sys_outb couldn't give LED values: %d\n", s);
+      printk("Warning, sys_outb couldn't give LED values: %d\n", s);
 				/* give keyboard LED values */
   kb_ack();			/* wait for ack response  */
 }
@@ -864,7 +864,7 @@ int cmd;
 {
 	kb_wait();
 	if(sys_outb(KB_COMMAND, cmd) != 0)
-		printf("kbc_cmd0: sys_outb failed\n");
+		printk("kbc_cmd0: sys_outb failed\n");
 }
 
 /*===========================================================================*
@@ -876,10 +876,10 @@ int data;
 {
 	kb_wait();
 	if(sys_outb(KB_COMMAND, cmd) != 0)
-		printf("kbc_cmd1: 1 sys_outb failed\n");
+		printk("kbc_cmd1: 1 sys_outb failed\n");
 	kb_wait();
 	if(sys_outb(KEYBD, data) != 0)
-		printf("kbc_cmd1: 2 sys_outb failed\n");
+		printk("kbc_cmd1: 2 sys_outb failed\n");
 }
 
 
@@ -895,7 +895,7 @@ static int kbc_read()
 #endif
 
 #if DEBUG
-	printf("in kbc_read\n");
+	printk("in kbc_read\n");
 #endif
 
 	/* Wait at most 1 second for a byte from the keyboard or
@@ -908,16 +908,16 @@ static int kbc_read()
 #endif
 	{
 		if(sys_inb(KB_STATUS, &st) != 0)
-			printf("kbc_read: 1 sys_inb failed\n");
+			printk("kbc_read: 1 sys_inb failed\n");
 		if (st & KB_OUT_FULL)
 		{
 			micro_delay(KBC_IN_DELAY);
 			if(sys_inb(KEYBD, &byte) != 0)
-				printf("kbc_read: 2 sys_inb failed\n");
+				printk("kbc_read: 2 sys_inb failed\n");
 			if (st & KB_AUX_BYTE)
-				printf("kbc_read: aux byte 0x%x\n", byte);
+				printk("kbc_read: aux byte 0x%x\n", byte);
 #if DEBUG
-			printf("keyboard`kbc_read: returning byte 0x%x\n",
+			printk("keyboard`kbc_read: returning byte 0x%x\n",
 				byte);
 #endif
 			return byte;
@@ -948,12 +948,12 @@ static int kb_wait()
   do {
       s = sys_inb(KB_STATUS, &status);
       if(s != 0)
-	printf("kb_wait: sys_inb failed: %d\n", s);
+	printk("kb_wait: sys_inb failed: %d\n", s);
       if (status & KB_OUT_FULL) {
 	  if (scan_keyboard(&byte, &isaux))
 	  {
 #if 0
-		  printf("ignoring %sbyte in kb_wait\n", isaux ? "AUX " : "");
+		  printk("ignoring %sbyte in kb_wait\n", isaux ? "AUX " : "");
 #endif
 	  }
       }
@@ -978,7 +978,7 @@ static int kb_ack()
   do {
       s = sys_inb(KEYBD, &u8val);
 	if(s != 0)
-		printf("kb_ack: sys_inb failed: %d\n", s);
+		printk("kb_ack: sys_inb failed: %d\n", s);
       if (u8val == KB_ACK)	
           break;		/* wait for ack */
   } while(--retries != 0);	/* continue unless timeout */
@@ -1106,7 +1106,7 @@ kipc_msg_t *m_ptr;			/* pointer to the request message */
     	          bit_unset(m_ptr->FKEY_FKEYS, i+1);
 #if DEAD_CODE
     	      } else {
-    	          printf("WARNING, fkey_map failed F%d\n", i+1);
+    	          printk("WARNING, fkey_map failed F%d\n", i+1);
     	          result = -EBUSY;	/* report failure, but try rest */
     	      }
 #endif
@@ -1122,7 +1122,7 @@ kipc_msg_t *m_ptr;			/* pointer to the request message */
     	          bit_unset(m_ptr->FKEY_SFKEYS, i+1);
 #if DEAD_CODE
     	      } else {
-    	          printf("WARNING, fkey_map failed Shift F%d\n", i+1);
+    	          printk("WARNING, fkey_map failed Shift F%d\n", i+1);
     	          result = -EBUSY;	/* report failure but try rest */
     	      }
 #endif
@@ -1232,35 +1232,35 @@ static void show_key_mappings()
     int i,s;
     struct proc proc;
 
-    printf("\n");
-    printf("System information.   Known function key mappings to request debug dumps:\n");
-    printf("-------------------------------------------------------------------------\n");
+    printk("\n");
+    printk("System information.   Known function key mappings to request debug dumps:\n");
+    printk("-------------------------------------------------------------------------\n");
     for (i=0; i<12; i++) {
 
-      printf(" %sF%d: ", i+1<10? " ":"", i+1);
+      printk(" %sF%d: ", i+1<10? " ":"", i+1);
       if (fkey_obs[i].proc_nr != ENDPT_NONE) {
           if ((s = sys_getproc(&proc, fkey_obs[i].proc_nr))!=0)
-              printf("%-14.14s", "<unknown>");
+              printk("%-14.14s", "<unknown>");
           else
-              printf("%-14.14s", proc.p_name);
+              printk("%-14.14s", proc.p_name);
       } else {
-          printf("%-14.14s", "<none>");
+          printk("%-14.14s", "<none>");
       }
 
-      printf("    %sShift-F%d: ", i+1<10? " ":"", i+1);
+      printk("    %sShift-F%d: ", i+1<10? " ":"", i+1);
       if (sfkey_obs[i].proc_nr != ENDPT_NONE) {
           if ((s = sys_getproc(&proc, sfkey_obs[i].proc_nr))!=0)
-              printf("%-14.14s", "<unknown>");
+              printk("%-14.14s", "<unknown>");
           else
-              printf("%-14.14s", proc.p_name);
+              printk("%-14.14s", proc.p_name);
       } else {
-          printf("%-14.14s", "<none>");
+          printk("%-14.14s", "<none>");
       }
-      printf("\n");
+      printk("\n");
     }
-    printf("\n");
-    printf("Press one of the registered function keys to trigger a debug dump.\n");
-    printf("\n");
+    printk("\n");
+    printk("Press one of the registered function keys to trigger a debug dump.\n");
+    printk("\n");
 }
 
 /*===========================================================================*
@@ -1273,7 +1273,7 @@ int *isauxp;
   unsigned long b, sb;
 
   if(sys_inb(KB_STATUS, &sb) != 0)
-	printf("scan_keyboard: sys_inb failed\n");
+	printk("scan_keyboard: sys_inb failed\n");
 
   if (!(sb & KB_OUT_FULL))
   {
@@ -1282,14 +1282,14 @@ int *isauxp;
 	return 0;
   }
   if(sys_inb(KEYBD, &b) != 0)
-	printf("scan_keyboard: 2 sys_inb failed\n");
+	printk("scan_keyboard: 2 sys_inb failed\n");
 #if 0
-  printf("got byte 0x%x from %s\n", b, (sb & KB_AUX_BYTE) ? "AUX" : "keyboard");
+  printk("got byte 0x%x from %s\n", b, (sb & KB_AUX_BYTE) ? "AUX" : "keyboard");
 #endif
   if (!(sb & KB_AUX_BYTE) && b == KB_ACK && kbdout.expect_ack)
   {
 #if 0
-	printf("got ACK from keyboard\n");
+	printk("got ACK from keyboard\n");
 #endif
 	kbdout.expect_ack= 0;
 	micro_delay(KBC_IN_DELAY);
@@ -1322,7 +1322,7 @@ timer_t *tmrp;
 		return;	/* Watchdog is no longer needed */
 	if (!kbd_alive)
 	{
-		printf("kbd_watchdog: should reset keyboard\n");
+		printk("kbd_watchdog: should reset keyboard\n");
 	}
 	kbd_alive= 0;
 

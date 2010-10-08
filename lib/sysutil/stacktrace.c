@@ -64,8 +64,8 @@ void util_nstrcat(char *str, unsigned long number)
 
 void util_stacktrace(void)
 {
-	FUNC_STACKTRACE(printf("0x%lx ", (unsigned long) pc));
-	printf("\n");
+	FUNC_STACKTRACE(printk("0x%lx ", (unsigned long) pc));
+	printk("\n");
 }
 
 void util_stacktrace_strcat(char *str)

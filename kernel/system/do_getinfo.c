@@ -129,7 +129,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		bin = m_ptr->I_VAL_LEN2_E;
 
 		if(bin < 0 || bin >= RANDOM_SOURCES) {
-			kprintf("SYSTEM: GET_RANDOMNESS_BIN: %d out of range\n", bin);
+			printk("SYSTEM: GET_RANDOMNESS_BIN: %d out of range\n", bin);
 			return -EINVAL;
 		}
 
@@ -163,7 +163,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		src_vir = (vir_bytes) &idle_tsc;
 		break;
 #else
-		kprintf("do_getinfo: kernel not compiled with CONFIG_IDLE_TSC\n");
+		printk("do_getinfo: kernel not compiled with CONFIG_IDLE_TSC\n");
 		return(-EINVAL);
 #endif
 
@@ -189,7 +189,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	}
 
 	default:
-		kprintf("do_getinfo: invalid request %d\n", m_ptr->I_REQUEST);
+		printk("do_getinfo: invalid request %d\n", m_ptr->I_REQUEST);
 		return(-EINVAL);
 	}
 

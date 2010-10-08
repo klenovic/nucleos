@@ -38,7 +38,7 @@ int fs_lookup() {
   r = sys_safecopyfrom(VFS_PROC_NR, grant, 0, (vir_bytes) user_path, 
 		       (phys_bytes) len, D);
   if (r != 0) {
-	printf("ISOFS %s:%d sys_safecopyfrom failed: %d\n",
+	printk("ISOFS %s:%d sys_safecopyfrom failed: %d\n",
 		__FILE__, __LINE__, r);
 	return(r);
   }
@@ -200,7 +200,7 @@ size_t *offsetp;
 
   /* Find starting inode inode according to the request message */
   if ((start_dir = get_dir_record(dir_ino)) == NULL) {
-    printf("ISOFS: couldn't find starting inode %d\n", dir_ino);
+    printk("ISOFS: couldn't find starting inode %d\n", dir_ino);
     return(-ENOENT);
   }
   

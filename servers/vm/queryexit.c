@@ -78,7 +78,7 @@ int do_notify_sig(kipc_msg_t *m)
 	}
 	if (!avails) {
 		/* no slot for signals, impossible */
-		printf("VM: no slot for signals!\n");
+		printk("VM: no slot for signals!\n");
 		return -ENOMEM;
 	}
 
@@ -98,7 +98,7 @@ out:
 	if (ipc_ep != 0 && ep != ipc_ep) {
 		r = kipc_module_call(KIPC_NOTIFY, 0, ipc_ep, 0);
 		if (r != 0)
-			printf("VM: notify IPC error!\n");
+			printk("VM: notify IPC error!\n");
 	}
 	return 0;
 }

@@ -86,7 +86,7 @@ int arch_init_local_timer(unsigned freq)
 		lapic_set_timer_periodic(freq);
 	} else
 	{
-		BOOT_VERBOSE(kprintf("Initiating legacy i8253 timer\n"));
+		BOOT_VERBOSE(printk("Initiating legacy i8253 timer\n"));
 #else
 	{
 #endif
@@ -113,7 +113,7 @@ int arch_register_local_timer_handler(irq_handler_t handler)
 #ifdef CONFIG_X86_LOCAL_APIC
 	if (lapic_addr) {
 		/* Using APIC, it is configured in apic_idt_init() */
-		BOOT_VERBOSE(kprintf("Using LAPIC timer as tick source\n"));
+		BOOT_VERBOSE(printk("Using LAPIC timer as tick source\n"));
 	} else
 #endif
 	{

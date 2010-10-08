@@ -55,13 +55,13 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 
   /* needs to be receiving so we know where the message buffer is */
   if(!RTS_ISSET(rpp, RTS_RECEIVING)) {
-	printf("kernel: fork not done synchronously?\n");
+	printk("kernel: fork not done synchronously?\n");
 	return -EINVAL;
   }
 
   /* memory becomes readonly */
   if (priv(rpp)->s_asynsize > 0) {
-	printf("kernel: process with waiting asynsend table can't fork\n");
+	printk("kernel: process with waiting asynsend table can't fork\n");
 	return -EINVAL;
   }
 

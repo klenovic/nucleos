@@ -51,7 +51,7 @@ struct mem_map *map_ptr;	/* virtual address of map inside caller */
 /* Fetch the memory map. */
   if((r=data_copy(who_e, (vir_bytes) map_ptr,
 	SYSTEM, (vir_bytes) rp->p_memmap, sizeof(rp->p_memmap))) != 0) {
-	kprintf("newmap: data_copy failed! (%d)\n", r);
+	printk("newmap: data_copy failed! (%d)\n", r);
 	return r;
   }
 

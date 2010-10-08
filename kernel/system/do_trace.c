@@ -71,7 +71,7 @@ register kipc_msg_t *m_ptr;
 	fromaddr.segment = D;				\
 	toaddr.segment = (seg);				\
 	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != 0) { \
-		printf("Can't copy in sys_trace: %d\n", r);\
+		printk("Can't copy in sys_trace: %d\n", r);\
 		return r;\
 	}  \
 }
@@ -86,7 +86,7 @@ register kipc_msg_t *m_ptr;
 	fromaddr.segment = (seg);			\
 	toaddr.segment = D;				\
 	if((r=virtual_copy_vmcheck(&fromaddr, &toaddr, length)) != 0) { \
-		printf("Can't copy in sys_trace: %d\n", r);\
+		printk("Can't copy in sys_trace: %d\n", r);\
 		return r;\
 	}  \
 }

@@ -199,7 +199,7 @@ node_details_t *node;
   }
 
   if(!fp->fp_rd || !fp->fp_wd) {
-	printf("VFS: lookup_rel %d: no rd/wd\n", fp->fp_endpoint);
+	printk("VFS: lookup_rel %d: no rd/wd\n", fp->fp_endpoint);
 	return(-ENOENT);
   }
 
@@ -275,7 +275,7 @@ node_details_t *node;
 		 * must've encountered ".." in the path, and that is exactly
 		 * what we're going to feed to the parent */
 		if(strncmp(user_fullpath, "..", 2) != 0) {
-			printf("VFS: bogus path: %s\n", user_fullpath);
+			printk("VFS: bogus path: %s\n", user_fullpath);
 			return(-ENOENT);
 		}
 

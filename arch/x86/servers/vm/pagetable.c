@@ -121,7 +121,7 @@ void pt_sanitycheck(pt_t *pt, char *file, int line)
 	for(i = proc_pde; i < I386_VM_DIR_ENTRIES; i++) {
 		if(pt->pt_pt[i]) {
 			if(!(pt->pt_dir[i] & I386_VM_PRESENT)) {
-				printf("slot %d: pt->pt_pt[%d] = 0x%lx, but pt_dir entry 0x%lx\n",
+				printk("slot %d: pt->pt_pt[%d] = 0x%lx, but pt_dir entry 0x%lx\n",
 					slot, i, pt->pt_pt[i], pt->pt_dir[i]);
 			}
 			MYASSERT(pt->pt_dir[i] & I386_VM_PRESENT);
@@ -203,7 +203,7 @@ static u32_t findhole(pt_t *pt, u32_t vmin, u32_t vmax)
 		}
 	}
 
-	printf("VM: out of virtual address space in vm\n");
+	printk("VM: out of virtual address space in vm\n");
 
 	return NO_MEM;
 }
@@ -223,7 +223,7 @@ static void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
 				vm_panic("vm_freepages: pt_writemap failed",
 					NO_NUM);
 	} else {
-		printf("VM: vm_freepages not freeing VM heap pages (%d)\n",
+		printk("VM: vm_freepages not freeing VM heap pages (%d)\n",
 			pages);
 	}
 }
@@ -266,7 +266,7 @@ static void *vm_checkspares(void)
 			vm_assert(missing_spares >= 0);
 			vm_assert(missing_spares <= SPAREPAGES);
 		} else {
-			printf("VM: warning: couldn't get new spare page\n");
+			printk("VM: warning: couldn't get new spare page\n");
 		}
 	}
 	if(worst < n) worst = n;
@@ -302,7 +302,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 		level--;
 		if(!s) {
 			util_stacktrace();
-			printf("VM: warning: out of spare pages\n");
+			printk("VM: warning: out of spare pages\n");
 		}
 		return s;
 	}
@@ -314,7 +314,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 		vmp->vm_arch.vm_data_top);
 	if(loc == NO_MEM) {
 		level--;
-		printf("VM: vm_allocpage: findhole failed\n");
+		printk("VM: vm_allocpage: findhole failed\n");
 		return NULL;
 	}
 
@@ -323,7 +323,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 	 */
 	if((newpage = ALLOC_MEM(CLICKSPERPAGE, 0)) == NO_MEM) {
 		level--;
-		printf("VM: vm_allocpage: ALLOC_MEM failed\n");
+		printk("VM: vm_allocpage: ALLOC_MEM failed\n");
 		return NULL;
 	}
 
@@ -333,7 +333,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 	if((r=pt_writemap(pt, loc, *phys, I386_PAGE_SIZE,
 		I386_VM_PRESENT | I386_VM_USER | I386_VM_WRITE, 0)) != 0) {
 		FREE_MEM(newpage, CLICKSPERPAGE);
-		printf("vm_allocpage writemap failed\n", r);
+		printk("vm_allocpage writemap failed\n", r);
 		level--;
 		return NULL;
 	}
@@ -461,14 +461,14 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 	for(pdecheck = I386_VM_PDE(v); pdecheck <= finalpde; pdecheck++) {
 		vm_assert(pdecheck >= 0 && pdecheck < I386_VM_DIR_ENTRIES);
 		if(pt->pt_dir[pdecheck] & I386_VM_BIGPAGE) {
-			printf("pt_writemap: trying to write 0x%lx into 0x%lx\n",
+			printk("pt_writemap: trying to write 0x%lx into 0x%lx\n",
 				physaddr, v);
                         vm_panic("pt_writemap: BIGPAGE found", NO_NUM);
 		}
 		if(!(pt->pt_dir[pdecheck] & I386_VM_PRESENT)) {
 			int r;
 			if(verify) {
-				printf("pt_writemap verify: no pde %d\n", pdecheck);
+				printk("pt_writemap verify: no pde %d\n", pdecheck);
 				return -EFAULT;
 			}
 			vm_assert(!pt->pt_dir[pdecheck]);
@@ -480,7 +480,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 				 * and pt_ptalloc leaves the directory
 				 * and other data in a consistent state.
 				 */
-				printf("pt_writemap: pt_ptalloc failed\n", pdecheck);
+				printk("pt_writemap: pt_ptalloc failed\n", pdecheck);
 				return r;
 			}
 		}
@@ -527,7 +527,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 			maskedentry &= ~(I386_VM_ACC|I386_VM_DIRTY);
 			/* Verify pagetable entry. */
 			if(maskedentry != entry) {
-				printf("pt_writemap: 0x%lx found, masked 0x%lx, 0x%lx expected\n",
+				printk("pt_writemap: 0x%lx found, masked 0x%lx, 0x%lx expected\n",
 					pt->pt_pt[pde][pte], maskedentry, entry);
 				return -EFAULT;
 			}
@@ -890,7 +890,7 @@ int pt_bind(pt_t *pt, struct vmproc *who)
 	page_directories[slot] = phys | I386_VM_PRESENT|I386_VM_WRITE;
 
 #if 0
-	printf("VM: slot %d has pde val 0x%lx\n", slot, page_directories[slot]);
+	printk("VM: slot %d has pde val 0x%lx\n", slot, page_directories[slot]);
 #endif
 	/* Tell kernel about new page table root. */
 	return sys_vmctl(who->vm_endpoint, VMCTL_I386_SETCR3,

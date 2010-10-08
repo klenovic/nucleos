@@ -130,7 +130,7 @@ int line;
 {
 #define myassert(c) { \
   if(!(c)) { \
-	printf("holes_sanity_f:%s:%d: %s failed\n", file, line, #c); \
+	printk("holes_sanity_f:%s:%d: %s failed\n", file, line, #c); \
 	util_stacktrace();	\
 	vm_panic("assert failed.", NO_NUM); } \
   }	
@@ -517,7 +517,7 @@ static phys_bytes alloc_pages(int pages, int memflags)
 	}
 
 	if(!pr) {
-		printf("VM: alloc_pages: alloc failed of %d pages\n", pages);
+		printk("VM: alloc_pages: alloc failed of %d pages\n", pages);
 		util_stacktrace();
 		printmemstats();
 #if SANITYCHECKS
@@ -676,10 +676,10 @@ int do_adddma(kipc_msg_t *msg)
 	}
 	if (i >= NR_DMA)
 	{
-		printf("vm:do_adddma: dma table full\n");
+		printk("vm:do_adddma: dma table full\n");
 		for (i= 0; i<NR_DMA; i++)
 		{
-			printf("%d: flags 0x%x proc %d base 0x%x size 0x%x\n",
+			printk("%d: flags 0x%x proc %d base 0x%x size 0x%x\n",
 				i, dmatab[i].dt_flags,
 				dmatab[i].dt_proc,
 				dmatab[i].dt_base,
@@ -692,7 +692,7 @@ int do_adddma(kipc_msg_t *msg)
 	/* Find target process */
 	if (vm_isokendpt(target_proc_e, &proc_n) != 0)
 	{
-		printf("vm:do_adddma: endpoint %d not found\n", target_proc_e);
+		printk("vm:do_adddma: endpoint %d not found\n", target_proc_e);
 		return -EINVAL;
 	}
 	vmp= &vmproc[proc_n];
@@ -735,7 +735,7 @@ int do_deldma(kipc_msg_t *msg)
 	}
 	if (i >= NR_DMA)
 	{
-		printf("vm:do_deldma: slot not found\n");
+		printk("vm:do_deldma: slot not found\n");
 		return -ESRCH;
 	}
 
@@ -784,7 +784,7 @@ int do_getdma(kipc_msg_t *msg)
 		if (!(dmatab[i].dt_flags & DTF_RELEASE_DMA))
 			continue;
 
-		printf("do_getdma: setting reply to 0x%x@0x%x proc %d\n",
+		printk("do_getdma: setting reply to 0x%x@0x%x proc %d\n",
 			dmatab[i].dt_size, dmatab[i].dt_base,
 			dmatab[i].dt_proc);
 		msg->VMGD_PROCP= dmatab[i].dt_proc;
@@ -848,7 +848,7 @@ int do_allocmem(kipc_msg_t *m)
 	m->VMAM_MEMBASE = CLICK2ABS(mem);
 
 #if 0
-	printf("VM: do_allocmem: 0x%lx clicks OK at 0x%lx\n", m->VMAM_CLICKS, mem);
+	printk("VM: do_allocmem: 0x%lx clicks OK at 0x%lx\n", m->VMAM_CLICKS, mem);
 #endif
 
 	return 0;
@@ -861,7 +861,7 @@ void printmemstats(void)
 {
 	int nodes, pages, largest;
         memstats(&nodes, &pages, &largest);
-        printf("%d blocks, %d pages (%ukB) free, largest %d pages (%ukB)\n",
+        printk("%d blocks, %d pages (%ukB) free, largest %d pages (%ukB)\n",
                 nodes, pages, (u32_t) pages * (VM_PAGE_SIZE/1024),
 		largest, (u32_t) largest * (VM_PAGE_SIZE/1024));
 }
@@ -903,7 +903,7 @@ int usedpages_add_f(phys_bytes addr, phys_bytes len, char *file, int line)
 		thisaddr = pagestart * VM_PAGE_SIZE;
 		if(GET_BIT(pagemap, pagestart)) {
 			int i;
-			printf("%s:%d: usedpages_add: addr 0x%lx reused.\n",
+			printk("%s:%d: usedpages_add: addr 0x%lx reused.\n",
 				file, line, thisaddr);
 			return -EFAULT;
 		}

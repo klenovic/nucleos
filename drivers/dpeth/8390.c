@@ -430,12 +430,12 @@ static void ns_recv(dpeth_t *dep, int fromint, int size)
 	next = header.dr_next;
 
 	if (length < ETH_MIN_PACK_SIZE || length > ETH_MAX_PACK_SIZE) {
-		printf("%s: packet with strange length arrived: %d\n", dep->de_name, length);
+		printk("%s: packet with strange length arrived: %d\n", dep->de_name, length);
 		dep->de_stat.ets_recvErr += 1;
 		next = curr;
 
 	} else if (next < dep->de_startpage || next >= dep->de_stoppage) {
-		printf("%s: strange next page\n", dep->de_name);
+		printk("%s: strange next page\n", dep->de_name);
 		dep->de_stat.ets_recvErr += 1;
 		next = curr;
 
@@ -445,13 +445,13 @@ static void ns_recv(dpeth_t *dep, int fromint, int size)
 		static int first = TRUE;
 		if (first) {
 			first = FALSE;
-			printf("%s: dropping proto %04x packet\n", dep->de_name, ntohs(eth_ign_proto));
+			printk("%s: dropping proto %04x packet\n", dep->de_name, ntohs(eth_ign_proto));
 		}
 		next = curr;
 #endif
 	} else if (header.dr_status & RSR_FO) {
 		/* This is very serious, issue a warning and reset buffers */
-		printf("%s: fifo overrun, resetting receive buffer\n", dep->de_name);
+		printk("%s: fifo overrun, resetting receive buffer\n", dep->de_name);
 		dep->de_stat.ets_fifoOver += 1;
 		next = curr;
 
@@ -503,13 +503,13 @@ static void ns_interrupt(dpeth_t * dep)
 			dep->de_stat.ets_fifoUnder++;
 		}
 		if ((isr & ISR_TXE) || (tsr & (TSR_CRS | TSR_CDH | TSR_OWC))) {
-			printf("%s: got send Error (0x%02X)\n", dep->de_name, tsr);
+			printk("%s: got send Error (0x%02X)\n", dep->de_name, tsr);
 			dep->de_stat.ets_sendErr++;
 		}
 		queue = dep->de_sendq_tail;
 
 		if (!(dep->de_sendq[queue].sq_filled)) {	/* Hardware bug? */
-			printf("%s: transmit interrupt, but not sending\n", dep->de_name);
+			printk("%s: transmit interrupt, but not sending\n", dep->de_name);
 			continue;
 		}
 		dep->de_sendq[queue].sq_filled = FALSE;
@@ -527,7 +527,7 @@ static void ns_interrupt(dpeth_t * dep)
 		ns_recv(dep, TRUE, 0);
 	}
 	if (isr & ISR_RXE) {
-		printf("%s: got recv Error (0x%04X)\n", dep->de_name, inb_reg0(dep, DP_RSR));
+		printk("%s: got recv Error (0x%04X)\n", dep->de_name, inb_reg0(dep, DP_RSR));
 		dep->de_stat.ets_recvErr++;
 	}
 	if (isr & ISR_CNT) {
@@ -536,7 +536,7 @@ static void ns_interrupt(dpeth_t * dep)
 		dep->de_stat.ets_fifoOver += inb_reg0(dep, DP_CNTR2);
 	}
 	if (isr & ISR_OVW) {
-		printf("%s: got overwrite warning\n", dep->de_name);
+		printk("%s: got overwrite warning\n", dep->de_name);
 	}
 	if (isr & ISR_RDC) {
 		/* Nothing to do */
@@ -546,7 +546,7 @@ static void ns_interrupt(dpeth_t * dep)
 		 * chip is shutdown. We set the flag DEF_STOPPED, and
 		 * continue processing arrived packets. When the
 		 * receive buffer is empty, we reset the dp8390. */
-		printf("%s: network interface stopped\n", dep->de_name);
+		printk("%s: network interface stopped\n", dep->de_name);
 		dep->de_flags |= DEF_STOPPED;
 		break;
 	}

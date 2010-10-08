@@ -18,7 +18,7 @@
 #if SANITYCHECKS
 #define vm_assert(cond) {				\
 	if(vm_sanitychecklevel > 0 && !(cond)) {	\
-		printf("VM:%s:%d: assert failed: %s\n",	\
+		printk("VM:%s:%d: assert failed: %s\n",	\
 			__FILE__, __LINE__, #cond);	\
 		panic("VM", "assert failed", NO_NUM);	\
 	}						\

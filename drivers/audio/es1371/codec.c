@@ -44,7 +44,7 @@ u16_t  wBaseAddr = pCC->base;
     /* remember, register CONC_dCODECCTL_OFF (0x14) 
        is a pseudo read-write register */
     if (WaitBitd (wBaseAddr + CONC_dCODECCTL_OFF, 30, 0, WIP_TIMEOUT)){
-        printf("CODEC_ERR_WIP_TIMEOUT\n");
+        printk("CODEC_ERR_WIP_TIMEOUT\n");
         return (CODEC_ERR_WIP_TIMEOUT);
     }
     if (SRC_UNSYNCED != SrcSyncState)

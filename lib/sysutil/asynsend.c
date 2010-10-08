@@ -36,7 +36,7 @@ int fl;
 	static int inside = 0;
 	int len;
 
-	/* printf() causes asynsend? */
+	/* printk() causes asynsend? */
 	if(inside) {
 		exit(1);
 	}
@@ -60,7 +60,7 @@ int fl;
 			if (msgtable[first_slot].result != 0)
 			{
 #if 0
-				printf(
+				printk(
 			"asynsend: found completed entry %d with error %d\n",
 					first_slot,
 					msgtable[first_slot].result);
@@ -95,7 +95,7 @@ int fl;
 				if (msgtable[src_ind].result != 0)
 				{
 #if 0
-					printf(
+					printk(
 			"asynsend: found completed entry %d with error %d\n",
 						src_ind,
 						msgtable[src_ind].result);
@@ -106,7 +106,7 @@ int fl;
 			if (flags == AMF_EMPTY)
 				continue;
 #if 0
-			printf("asynsend: copying entry %d to %d\n",
+			printk("asynsend: copying entry %d to %d\n",
 				src_ind, dst_ind);
 #endif
 			if (src_ind != dst_ind)

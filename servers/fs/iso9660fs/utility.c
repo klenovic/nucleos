@@ -31,7 +31,7 @@ int num;			/* number to go with it */
   if (panicking) return;	/* do not panic during a sync */
   panicking = TRUE;		/* prevent another panic during the sync */
 
-  printf("FS panic (%s): %s ", who, mess);
-  if (num != NO_NUM) printf("%d",num);
+  printk("FS panic (%s): %s ", who, mess);
+  if (num != NO_NUM) printk("%d",num);
   exit(1);
 }

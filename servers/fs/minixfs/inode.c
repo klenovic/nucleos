@@ -51,18 +51,18 @@ int fs_putnode()
   rip = find_inode(fs_dev, fs_m_in.REQ_INODE_NR);
 
   if(!rip) {
-	  printf("%s:%d put_inode: inode #%d dev: %d not found\n", __FILE__,
+	  printk("%s:%d put_inode: inode #%d dev: %d not found\n", __FILE__,
 		 __LINE__, fs_m_in.REQ_INODE_NR, fs_dev);
 	  panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
 
   count = fs_m_in.REQ_COUNT;
   if (count <= 0) {
-	printf("%s:%d put_inode: bad value for count: %d\n", __FILE__,
+	printk("%s:%d put_inode: bad value for count: %d\n", __FILE__,
 	       __LINE__, count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
   } else if(count > rip->i_count) {
-	printf("%s:%d put_inode: count too high: %d > %d\n", __FILE__,
+	printk("%s:%d put_inode: count too high: %d > %d\n", __FILE__,
 	       __LINE__, count, rip->i_count);
 	panic(__FILE__, "fs_putnode failed", NO_NUM);
   }
@@ -276,7 +276,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
 	err_code = -ENFILE;
 	major = (int) (sp->s_dev >> MAJOR) & BYTE;
 	minor = (int) (sp->s_dev >> MINOR) & BYTE;
-	printf("Out of i-nodes on device %d/%d\n", major, minor);
+	printk("Out of i-nodes on device %d/%d\n", major, minor);
 	return(NIL_INODE);
   }
   sp->s_isearch = b;		/* next time start here */

@@ -25,15 +25,15 @@ void kernel_panic(char *mess, int nr)
 		arch_monitor();
 
 	if (mess != NULL) {
-		kprintf("kernel panic: %s", mess);
+		printk("kernel panic: %s", mess);
 
 		if(nr != NO_NUM)
-			kprintf(" %d", nr);
+			printk(" %d", nr);
 
-		kprintf("\n");
+		printk("\n");
 	}
 
-	kprintf("kernel: ");
+	printk("kernel: ");
 	util_stacktrace();
 
 	/* Abort Nucleos. */

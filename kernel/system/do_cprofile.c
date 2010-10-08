@@ -48,15 +48,15 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 
 	cprof_ctl_inst.reset = 1;
 
-	kprintf("CPROFILE notice: resetting tables:");
+	printk("CPROFILE notice: resetting tables:");
 
 	for (i=0; i<cprof_procs_no; i++) {
 
-		kprintf(" %s", cprof_proc_info[i].name);
+		printk(" %s", cprof_proc_info[i].name);
 
 		/* Test whether proc still alive. */
 		if (!isokendpt(cprof_proc_info[i].endpt, &proc_nr)) {
-			kprintf("endpt not valid %u (%s)\n",
+			printk("endpt not valid %u (%s)\n",
 			cprof_proc_info[i].endpt, cprof_proc_info[i].name);
 			continue;
 		}
@@ -66,7 +66,7 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 			cprof_proc_info[i].endpt, cprof_proc_info[i].ctl_v,
 			sizeof(cprof_ctl_inst.reset));
 	}
-	kprintf("\n");
+	printk("\n");
 	
 	return 0;
 
@@ -84,7 +84,7 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 
 	cprof_mem_size = m_ptr->PROF_MEM_SIZE;
 
-	kprintf("CPROFILE notice: getting tables:");
+	printk("CPROFILE notice: getting tables:");
 
 	/* Copy control structs of profiled processes to calculate total
 	 * nr of bytes to be copied to user program and find out if any
@@ -94,11 +94,11 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 
 	for (i=0; i<cprof_procs_no; i++) {
 
-		kprintf(" %s", cprof_proc_info[i].name);
+		printk(" %s", cprof_proc_info[i].name);
 
 		/* Test whether proc still alive. */
 		if (!isokendpt(cprof_proc_info[i].endpt, &proc_nr)) {
-			kprintf("endpt not valid %u (%s)\n",
+			printk("endpt not valid %u (%s)\n",
 			cprof_proc_info[i].endpt, cprof_proc_info[i].name);
 			continue;
 		}
@@ -117,7 +117,7 @@ register kipc_msg_t *m_ptr;    /* pointer to request message */
 		/* Collect errors. */
 		cprof_info.err |= cprof_ctl_inst.err;
 	}
-	kprintf("\n");
+	printk("\n");
 
 	/* Do we have the space available? */
 	if (cprof_mem_size < cprof_info.mem_used) cprof_info.mem_used = -1;

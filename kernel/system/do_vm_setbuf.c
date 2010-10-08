@@ -30,7 +30,7 @@ kipc_msg_t *m_ptr;			/* pointer to request message */
 	vm_mem_high= m_ptr->m_data3;
 
 #if VM_DEBUG
-	kprintf("do_vm_setbuf: got 0x%x @ 0x%x for 0x%x\n",
+	printk("do_vm_setbuf: got 0x%x @ 0x%x for 0x%x\n",
 		vm_size, vm_base, vm_mem_high);
 #endif
 

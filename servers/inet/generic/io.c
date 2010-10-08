@@ -23,7 +23,7 @@ ipaddr_t addr;
 {
 #define addrInBytes ((u8_t *)&addr)
 
-	printf("%d.%d.%d.%d", addrInBytes[0], addrInBytes[1],
+	printk("%d.%d.%d.%d", addrInBytes[0], addrInBytes[1],
 		addrInBytes[2], addrInBytes[3]);
 #undef addrInBytes
 }
@@ -33,7 +33,7 @@ ether_addr_t *addr;
 {
 #define addrInBytes ((u8_t *)addr->ea_addr)
 
-	printf("%x:%x:%x:%x:%x:%x", addrInBytes[0], addrInBytes[1],
+	printk("%x:%x:%x:%x:%x:%x", addrInBytes[0], addrInBytes[1],
 		addrInBytes[2], addrInBytes[3], addrInBytes[4], addrInBytes[5]);
 #undef addrInBytes
 }

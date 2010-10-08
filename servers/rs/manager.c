@@ -59,7 +59,7 @@ endpoint_t endpoint;				/* caller endpoint */
   euid = getnuid(endpoint);
   if (rs_verbose && euid != 0)
   {
-	printf("RS: got unauthorized request from endpoint %d\n", endpoint);
+	printk("RS: got unauthorized request from endpoint %d\n", endpoint);
   }
   
   return euid == 0;
@@ -105,7 +105,7 @@ char *label;
   }
 
   if (rs_verbose) {
-	printf("RS: allowing %u control over %s via policy: %s\n",
+	printk("RS: allowing %u control over %s via policy: %s\n",
 		endpoint, label, control_allowed ? "yes" : "no");
   }
   return control_allowed;
@@ -166,7 +166,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   }
   if (slot_nr >= NR_SYS_PROCS)
   {
-      printf("RS: do_up: system process table full\n");
+      printk("RS: do_up: system process table full\n");
 	return -ENOMEM;
   }
 
@@ -216,7 +216,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   memcpy(rp->r_proc_name, cmd_ptr, len);
   rp->r_proc_name[len]= '\0';
   if(rs_verbose)
-      printf("RS: do_up: using proc_name (from binary %s) '%s'\n",
+      printk("RS: do_up: using proc_name (from binary %s) '%s'\n",
           rp->r_argv[0], rp->r_proc_name);
 
   if(rs_start.rss_label.l_len > 0) {
@@ -226,7 +226,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	if(s != 0)
 		return s;
         if(rs_verbose)
-	  printf("RS: do_up: using label (custom) '%s'\n", rp->r_label);
+	  printk("RS: do_up: using label (custom) '%s'\n", rp->r_label);
   } else {
 	/* Default label for the module. */
 	label = rp->r_proc_name;
@@ -236,7 +236,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   	memcpy(rp->r_label, label, len);
   	rp->r_label[len]= '\0';
         if(rs_verbose)
-          printf("RS: do_up: using label (from proc_name) '%s'\n",
+          printk("RS: do_up: using label (from proc_name) '%s'\n",
 		rp->r_label);
   }
 
@@ -244,7 +244,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	int i, s;
 	if (rs_start.rss_nr_control > RSS_NR_CONTROL)
 	{
-		printf("RS: do_up: too many control labels\n");
+		printk("RS: do_up: too many control labels\n");
 		return -EINVAL;
 	}
 	for (i=0; i<rs_start.rss_nr_control; i++) {
@@ -256,10 +256,10 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	rp->r_nr_control = rs_start.rss_nr_control;
 
 	if (rs_verbose) {
-		printf("RS: do_up: control labels:");
+		printk("RS: do_up: control labels:");
 		for (i=0; i<rp->r_nr_control; i++)
-			printf(" %s", rp->r_control[i]);
-		printf("\n");
+			printk(" %s", rp->r_control[i]);
+		printk("\n");
 	}
   }
 
@@ -272,7 +272,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	  continue;				/* Our slot */
       if (strcmp(tmp_rp->r_label, rp->r_label) == 0)
       {
-	  printf("RS: found duplicate label '%s': slot %d\n",
+	  printk("RS: found duplicate label '%s': slot %d\n",
 		rp->r_label, slot_nr);
 	  return -EBUSY;
       }
@@ -294,7 +294,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   {
 	if (rs_start.rss_ipclen+1 > sizeof(rp->r_ipc_list))
 	{
-		printf("rs: ipc list too long for '%s'\n", rp->r_label);
+		printk("rs: ipc list too long for '%s'\n", rp->r_label);
 		return -EINVAL;
 	}
 	s=sys_datacopy(m_ptr->m_source, (vir_bytes) rs_start.rss_ipc, 
@@ -348,7 +348,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   /* Copy granted resources */
   if (rs_start.rss_nr_irq > NR_IRQ)
   {
-	printf("RS: do_up: too many IRQs requested\n");
+	printk("RS: do_up: too many IRQs requested\n");
 	return -EINVAL;
   }
   rp->r_priv.s_nr_irq= rs_start.rss_nr_irq;
@@ -356,12 +356,12 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   {
 	rp->r_priv.s_irq_tab[i]= rs_start.rss_irq[i];
 	if(rs_verbose)
-		printf("RS: do_up: IRQ %d\n", rp->r_priv.s_irq_tab[i]);
+		printk("RS: do_up: IRQ %d\n", rp->r_priv.s_irq_tab[i]);
   }
 
   if (rs_start.rss_nr_io > NR_IO_RANGE)
   {
-	printf("RS: do_up: too many I/O ranges requested\n");
+	printk("RS: do_up: too many I/O ranges requested\n");
 	return -EINVAL;
   }
   rp->r_priv.s_nr_io_range= rs_start.rss_nr_io;
@@ -371,14 +371,14 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	rp->r_priv.s_io_tab[i].ior_limit=
 		rs_start.rss_io[i].base+rs_start.rss_io[i].len-1;
 	if(rs_verbose)
-	   printf("RS: do_up: I/O [%x..%x]\n",
+	   printk("RS: do_up: I/O [%x..%x]\n",
 		rp->r_priv.s_io_tab[i].ior_base,
 		rp->r_priv.s_io_tab[i].ior_limit);
   }
 
   if (rs_start.rss_nr_pci_id > RSS_NR_PCI_ID)
   {
-	printf("RS: do_up: too many PCI device IDs\n");
+	printk("RS: do_up: too many PCI device IDs\n");
 	return -EINVAL;
   }
   rp->r_nr_pci_id= rs_start.rss_nr_pci_id;
@@ -387,12 +387,12 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	rp->r_pci_id[i].vid= rs_start.rss_pci_id[i].vid;
 	rp->r_pci_id[i].did= rs_start.rss_pci_id[i].did;
 	if(rs_verbose)
-	   printf("RS: do_up: PCI %04x/%04x\n",
+	   printk("RS: do_up: PCI %04x/%04x\n",
 		rp->r_pci_id[i].vid, rp->r_pci_id[i].did);
   }
   if (rs_start.rss_nr_pci_class > RSS_NR_PCI_CLASS)
   {
-	printf("RS: do_up: too many PCI class IDs\n");
+	printk("RS: do_up: too many PCI class IDs\n");
 	return -EINVAL;
   }
   rp->r_nr_pci_class= rs_start.rss_nr_pci_class;
@@ -401,7 +401,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
 	rp->r_pci_class[i].class= rs_start.rss_pci_class[i].class;
 	rp->r_pci_class[i].mask= rs_start.rss_pci_class[i].mask;
 	if(rs_verbose)
-	    printf("RS: do_up: PCI class %06x mask %06x\n",
+	    printk("RS: do_up: PCI class %06x mask %06x\n",
 		rp->r_pci_class[i].class, rp->r_pci_class[i].mask);
   }
 
@@ -414,7 +414,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   }
   else
   {
-	printf(
+	printk(
 	"RS: do_up: internal inconsistency: bad size of r_call_mask\n");
 	memset(rp->r_call_mask, '\0', sizeof(rp->r_call_mask));
   }
@@ -433,7 +433,7 @@ kipc_msg_t *m_ptr;					/* request message pointer */
   }
   else
   {
-	  printf("RS: do_up: internal inconsistency: bad size of r_vm\n");
+	  printk("RS: do_up: internal inconsistency: bad size of r_vm\n");
 	  memset(rp->r_vm, '\0', sizeof(rp->r_vm));
   }
 
@@ -469,7 +469,7 @@ int do_down(kipc_msg_t *m_ptr)
 	for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
 		if (rp->r_flags & RS_IN_USE && strcmp(rp->r_label, label) == 0) {
 			if(rs_verbose)
-				printf("RS: stopping '%s' (%d)\n", label, rp->r_pid);
+				printk("RS: stopping '%s' (%d)\n", label, rp->r_pid);
 
 			stop_service(rp,RS_EXITING);
 			if (rp->r_pid == -1)
@@ -486,7 +486,7 @@ int do_down(kipc_msg_t *m_ptr)
 		}
 	}
 
-	if(rs_verbose) printf("RS: do_down: '%s' not found\n", label);
+	if(rs_verbose) printk("RS: do_down: '%s' not found\n", label);
 
 	return(-ESRCH);
 }
@@ -520,23 +520,23 @@ int do_restart(kipc_msg_t *m_ptr)
 
   for (rp=BEG_RPROC_ADDR; rp<END_RPROC_ADDR; rp++) {
       if ((rp->r_flags & RS_IN_USE) && strcmp(rp->r_label, label) == 0) {
-	  if(rs_verbose) printf("RS: restarting '%s' (%d)\n", label, rp->r_pid);
+	  if(rs_verbose) printk("RS: restarting '%s' (%d)\n", label, rp->r_pid);
 	  if (rp->r_pid >= 0)
 	  {
 		if(rs_verbose)
-		  printf("RS: do_restart: '%s' is (still) running, pid = %d\n",
+		  printk("RS: do_restart: '%s' is (still) running, pid = %d\n",
 			rp->r_pid);
 		return -EBUSY;
 	  }
 	  rp->r_flags &= ~(RS_REFRESHING|RS_NOPINGREPLY);
 	  r = start_service(rp, 0, &ep);	
-	  if (r != 0) printf("do_restart: start_service failed: %d\n", r);
+	  if (r != 0) printk("do_restart: start_service failed: %d\n", r);
 	  m_ptr->RS_ENDPOINT = ep;
 	  return(r);
       }
   }
   if(rs_verbose) {
-      printf("RS: do_restart: '%s' not found\n", label);
+      printk("RS: do_restart: '%s' not found\n", label);
   }
   
   return(-ESRCH);
@@ -572,14 +572,14 @@ int do_refresh(kipc_msg_t *m_ptr)
       if (rp->r_flags & RS_IN_USE && strcmp(rp->r_label, label) == 0) {
 
 	if (rs_verbose) {
-	  printf("RS: refreshing %s (%d)\n", rp->r_label, rp->r_pid);
+	  printk("RS: refreshing %s (%d)\n", rp->r_label, rp->r_pid);
 	}
 	stop_service(rp,RS_REFRESHING);
   return(0);
 }
   }
 	if (rs_verbose) {
-		  printf("RS: do_refresh: '%s' not found\n", label);
+		  printk("RS: do_refresh: '%s' not found\n", label);
 	}
 
   return(-ESRCH);
@@ -609,7 +609,7 @@ void do_exit(kipc_msg_t *m_ptr)
   endpoint_t ep;
 
   if(rs_verbose)
-  printf("RS: got SIGCHLD signal, doing wait to get exited child.\n");
+  printk("RS: got SIGCHLD signal, doing wait to get exited child.\n");
 
   /* See which child exited and what the exit status is. This is done in a
    * loop because multiple children may have exited, all reported by one 
@@ -620,16 +620,16 @@ void do_exit(kipc_msg_t *m_ptr)
 
     if(rs_verbose) {
 #if 0
-      printf("RS: pid %d, ", exit_pid); 
+      printk("RS: pid %d, ", exit_pid); 
 #endif
       if (WIFSIGNALED(exit_status)) {
 #if 0
-          printf("killed, signal number %d\n", WTERMSIG(exit_status));
+          printk("killed, signal number %d\n", WTERMSIG(exit_status));
 #endif
       } 
       else if (WIFEXITED(exit_status)) {
 #if 0
-          printf("normal exit, status %d\n", WEXITSTATUS(exit_status));
+          printk("normal exit, status %d\n", WEXITSTATUS(exit_status));
 #endif
       }
     }
@@ -647,7 +647,7 @@ void do_exit(kipc_msg_t *m_ptr)
 			panic("RS", "do_exit: unaligned read from exec pipe",
 				r);
 		}
-		printf("do_exit: got slot %d\n", slot_nr);
+		printk("do_exit: got slot %d\n", slot_nr);
 		if (slot_nr < 0 || slot_nr >= NR_SYS_PROCS)
 		{
 			panic("RS", "do_exit: bad slot number from exec pipe",
@@ -714,11 +714,11 @@ rp->r_restarts= 0;
 
 		  if (rp->r_script[0] != '\0') {
 			if(rs_verbose)
-				printf("RS: running restart script for %s\n",
+				printk("RS: running restart script for %s\n",
 					rp->r_cmd);
 		      run_script(rp);
 		  } else if (rp->r_restarts > 0) {
-		      printf("RS: restarting %s, restarts %d\n",
+		      printk("RS: restarting %s, restarts %d\n",
 				rp->r_cmd, rp->r_backoff);
 		      rp->r_backoff = 1 << MIN(rp->r_restarts,(BACKOFF_BITS-2));
 		      rp->r_backoff = MIN(rp->r_backoff,MAX_BACKOFF); 
@@ -726,7 +726,7 @@ rp->r_restarts= 0;
 			rp->r_backoff= 1;
 		  }
 		  else {
-		      printf("RS: restarting %s\n", rp->r_cmd);
+		      printk("RS: restarting %s\n", rp->r_cmd);
 		      start_service(rp, 0, &ep);	/* direct restart */
 		      if(m_ptr)
 		  	      m_ptr->RS_ENDPOINT = ep;
@@ -790,7 +790,7 @@ kipc_msg_t *m_ptr;
 	          if (now - rp->r_alive_tm > 2*rp->r_period &&
 		      rp->r_pid > 0 && !(rp->r_flags & RS_NOPINGREPLY)) { 
 		      if(rs_verbose)
-                           printf("RS: service %d reported late\n",
+                           printk("RS: service %d reported late\n",
 				rp->r_proc_nr_e); 
 		      rp->r_flags |= RS_NOPINGREPLY;
                       kill(rp->r_pid, SIGKILL);		/* simulate crash */
@@ -803,7 +803,7 @@ kipc_msg_t *m_ptr;
 	      else if (now - rp->r_check_tm > rp->r_period) {
 #if 0
 		if(rs_verbose)
-                  printf("RS: status request sent to %d\n", rp->r_proc_nr_e);
+                  printk("RS: status request sent to %d\n", rp->r_proc_nr_e);
 #endif
 		  kipc_module_call(KIPC_NOTIFY, 0, rp->r_proc_nr_e, 0);		/* request status */
 		  rp->r_check_tm = now;			/* mark time */
@@ -842,17 +842,17 @@ endpoint_t *endpoint;
 
   /* See if we are not using a copy but we do need one to start the service. */
   if(!use_copy && (rp->r_sys_flags & SF_NEED_COPY)) {
-	printf("RS: unable to start service %s without an in-memory copy\n",
+	printk("RS: unable to start service %s without an in-memory copy\n",
 	    rp->r_label);
 	return(-EPERM);
   }
 
   /* Now fork and branch for parent and child process (and check for error). */
   if (use_copy) {
-  if(rs_verbose) printf("RS: fork_nb..\n");
+  if(rs_verbose) printk("RS: fork_nb..\n");
 	child_pid= fork_nb();
   } else {
-  if(rs_verbose) printf("RS: fork regular..\n");
+  if(rs_verbose) printk("RS: fork regular..\n");
   child_pid = fork();
   }
 
@@ -877,20 +877,20 @@ endpoint_t *endpoint;
       file_only = strrchr(rp->r_argv[0], '/') + 1;
 	execve(file_only, rp->r_argv, &null_env);	/* POSIX execute */
       }
-      printf("RS: exec failed for %s: %d\n", rp->r_argv[0], errno);
+      printk("RS: exec failed for %s: %d\n", rp->r_argv[0], errno);
       slot_nr= rp-rproc;
       s= write(exec_pipe[1], &slot_nr, sizeof(slot_nr));
       if (s != sizeof(slot_nr))
-	printf("RS: write to exec pipe failed: %d/%d\n", s, errno);
+	printk("RS: write to exec pipe failed: %d/%d\n", s, errno);
       exit(1);						/* terminate child */
 
   default:						/* parent process */
 #if 0
-      if(rs_verbose) printf("RS: parent forked, pid %d..\n", child_pid);
+      if(rs_verbose) printk("RS: parent forked, pid %d..\n", child_pid);
 #endif
       child_proc_nr_e = getnprocnr(child_pid);		/* get child slot */ 
 #if 0
-      if(rs_verbose) printf("RS: forked into %d..\n", child_proc_nr_e);
+      if(rs_verbose) printk("RS: forked into %d..\n", child_proc_nr_e);
 #endif
       break;						/* continue below */
   }
@@ -957,7 +957,7 @@ endpoint_t *endpoint;
   /* Publish the new system service. */
   s = publish_service(rp);
   if (s != 0) {
-	printf("RS: warning: publish_service failed: %d\n", s);
+	printk("RS: warning: publish_service failed: %d\n", s);
   }
 
   /* The purpose of non-blocking forks is to avoid involving VFS in the forking
@@ -992,7 +992,7 @@ endpoint_t *endpoint;
   }
 
   if(rs_verbose)
-      printf("RS: started '%s', major %d, pid %d, endpoint %d, proc %d\n", 
+      printk("RS: started '%s', major %d, pid %d, endpoint %d, proc %d\n", 
           rp->r_cmd, rp->r_dev_nr, child_pid,
 	  child_proc_nr_e, child_proc_nr_n);
 
@@ -1017,11 +1017,11 @@ int how;
    * handler, it will be killed. If it did and ignores the signal, we'll
    * find out because we record the time here and send a SIGKILL.
    */
-  if(rs_verbose) printf("RS tries to stop %s (pid %d)\n", rp->r_cmd, rp->r_pid);
+  if(rs_verbose) printk("RS tries to stop %s (pid %d)\n", rp->r_cmd, rp->r_pid);
 
   rp->r_flags |= how;				/* what to on exit? */
   if(rp->r_pid > 0) kill(rp->r_pid, SIGTERM);	/* first try friendly */
-  else if(rs_verbose) printf("RS: no process to kill\n");
+  else if(rs_verbose) printk("RS: no process to kill\n");
   getuptime(&rp->r_stop_tm); 			/* record current time */
 }
 
@@ -1073,7 +1073,7 @@ static int share_exec(rp_dst, rp_src)
 struct rproc *rp_dst, *rp_src;
 {
   if(rs_verbose) {
-      printf("RS: share_exec: sharing exec image from %s to %s\n",
+      printk("RS: share_exec: sharing exec image from %s to %s\n",
           rp_src->r_label, rp_dst->r_label);
   }
 
@@ -1096,7 +1096,7 @@ struct rproc *rp;
 
 	e_name= rp->r_argv[0];
   if(rs_verbose) {
-      printf("RS: read_exec: copying exec image from: %s\n", e_name);
+      printk("RS: read_exec: copying exec image from: %s\n", e_name);
   }
 
 	r= stat(e_name, &sb);
@@ -1111,7 +1111,7 @@ struct rproc *rp;
 	rp->r_exec= malloc(rp->r_exec_len);
 	if (rp->r_exec == NULL)
 	{
-		printf("RS: read_exec: unable to allocate %d bytes\n",
+		printk("RS: read_exec: unable to allocate %d bytes\n",
 			rp->r_exec_len);
 		close(fd);
 		return -ENOMEM;
@@ -1123,7 +1123,7 @@ struct rproc *rp;
 	if (r == rp->r_exec_len)
 		return 0;
 
-	printf("RS: read_exec: read failed %d, errno %d\n", r, e);
+	printk("RS: read_exec: read failed %d, errno %d\n", r, e);
 
 	free(rp->r_exec);
 	rp->r_exec= NULL;
@@ -1158,7 +1158,7 @@ struct rproc *rp;
       /* If nobody uses our copy of the exec image, we can get rid of it. */
       if(!has_shared_exec) {
           if(rs_verbose) {
-              printf("RS: free_slot: free exec image from %s\n", rp->r_label);
+              printk("RS: free_slot: free exec image from %s\n", rp->r_label);
           }
           free(rp->r_exec);
           rp->r_exec = NULL;
@@ -1195,7 +1195,7 @@ struct rproc *rp;
 		reason= "signaled";
 	else
 	{
-		printf(
+		printk(
 		"RS: run_script: can't find reason for termination of '%s'\n",
 			rp->r_label);
 		return;
@@ -1203,22 +1203,22 @@ struct rproc *rp;
 	sprintf(incarnation_str, "%d", rp->r_restarts);
 
  	if(rs_verbose) {
-	  printf("RS: calling script '%s'\n", rp->r_script);
-	  printf("RS: sevice name: '%s'\n", rp->r_label);
-	  printf("RS: reason: '%s'\n", reason);
-	  printf("RS: incarnation: '%s'\n", incarnation_str);
+	  printk("RS: calling script '%s'\n", rp->r_script);
+	  printk("RS: sevice name: '%s'\n", rp->r_label);
+	  printk("RS: reason: '%s'\n", reason);
+	  printk("RS: incarnation: '%s'\n", incarnation_str);
 	}
 
 	pid= fork();
 	switch(pid)
 	{
 	case -1:	
-		printf("RS: run_script: fork failed: %s\n", strerror(errno));
+		printk("RS: run_script: fork failed: %s\n", strerror(errno));
 		break;
 	case 0:
 		execle(rp->r_script, rp->r_script, rp->r_label, reason,
 			incarnation_str, NULL, envp);
-		printf("RS: run_script: execl '%s' failed: %s\n",
+		printk("RS: run_script: execl '%s' failed: %s\n",
 			rp->r_script, strerror(errno));
 		exit(1);
 	default:
@@ -1227,7 +1227,7 @@ struct rproc *rp;
 		 */
 		proc_nr_e = getnprocnr(pid);
 		if ((r= set_privs(proc_nr_e, NULL, SYS_PRIV_SET_USER)) != 0) {
-			printf("RS: run_script: set_privs call failed: %d\n",r);
+			printk("RS: run_script: set_privs call failed: %d\n",r);
 		}
 		/* Do not wait for the child */
 		break;
@@ -1263,7 +1263,7 @@ char *caller_label;
 		len= q-p;
 		if (len > MAX_LABEL_LEN)
 		{
-			printf(
+			printk(
 	"rs:get_next_label: bad ipc list entry '.*s' for %s: too long\n",
 				len, p, caller_label);
 			continue;
@@ -1331,7 +1331,7 @@ struct priv *privp;
 			if (slot_nr >= NR_SYS_PROCS)
 			{
 				if (rs_verbose)
-					printf(
+					printk(
 			"add_forward_ipc: unable to find '%s'\n", label);
 				continue;
 			}
@@ -1340,7 +1340,7 @@ struct priv *privp;
 
 		if ((r = sys_getpriv(&priv, proc_nr_e)) < 0)
 		{
-			printf(
+			printk(
 		"add_forward_ipc: unable to get priv_id for '%s': %d\n",
 				label, r);
 			continue;
@@ -1426,13 +1426,13 @@ struct priv *privp;
 			call_nr= src_word*src_bits_per_word+src_bit;
 #if 0
 			if(rs_verbose)
-			  printf("RS: init_privs: system call %d\n", call_nr);
+			  printk("RS: init_privs: system call %d\n", call_nr);
 #endif
 			dst_word= call_nr / dst_bits_per_word;
 			mask= (1UL << (call_nr % dst_bits_per_word));
 			if (dst_word >= CALL_MASK_SIZE)
 			{
-				printf(
+				printk(
 				"RS: init_privs: call number %d doesn't fit\n",
 					call_nr);
 			}
@@ -1504,7 +1504,7 @@ int endpoint;
 	if (strcmp(rp->r_label, "pci") == 0)
 	{
 		if(rs_verbose)
-			printf("RS: init_pci: not when starting 'pci'\n");
+			printk("RS: init_pci: not when starting 'pci'\n");
 		return;
 	}
 
@@ -1512,7 +1512,7 @@ int endpoint;
 	if (len+1 > sizeof(rs_pci.rsp_label))
 	{
 		if(rs_verbose)
-		  printf("RS: init_pci: label '%s' too long for rsp_label\n",
+		  printk("RS: init_pci: label '%s' too long for rsp_label\n",
 			rp->r_label);
 		return;
 	}
@@ -1522,7 +1522,7 @@ int endpoint;
 	rs_pci.rsp_nr_device= rp->r_nr_pci_id;
 	if (rs_pci.rsp_nr_device > RSP_NR_DEVICE)
 	{
-		printf("RS: init_pci: too many PCI devices (max %d) "
+		printk("RS: init_pci: too many PCI devices (max %d) "
 		  "truncating\n",
 			RSP_NR_DEVICE);
 		rs_pci.rsp_nr_device= RSP_NR_DEVICE;
@@ -1536,7 +1536,7 @@ int endpoint;
 	rs_pci.rsp_nr_class= rp->r_nr_pci_class;
 	if (rs_pci.rsp_nr_class > RSP_NR_CLASS)
 	{
-		printf("RS: init_pci: too many PCI classes "
+		printk("RS: init_pci: too many PCI classes "
 		   "(max %d) truncating\n",
 			RSP_NR_CLASS);
 		rs_pci.rsp_nr_class= RSP_NR_CLASS;
@@ -1548,16 +1548,16 @@ int endpoint;
 	}
 
 	if(rs_verbose)
-		printf("RS: init_pci: calling pci_set_acl\n");
+		printk("RS: init_pci: calling pci_set_acl\n");
 
 	r= pci_set_acl(&rs_pci);
 
 	if(rs_verbose)
-		printf("RS: init_pci: after pci_set_acl\n");
+		printk("RS: init_pci: after pci_set_acl\n");
 
 	if (r != 0)
 	{
-		printf("RS: init_pci: pci_set_acl failed: %s\n",
+		printk("RS: init_pci: pci_set_acl failed: %s\n",
 			strerror(errno));
 		return;
 	}
@@ -1576,13 +1576,13 @@ kipc_msg_t *m_ptr;
 	len = m_ptr->RS_NAME_LEN;
 
 	if(len < 2 || len >= sizeof(namebuf)) {
-		printf("RS: len too weird (%d)\n", len);
+		printk("RS: len too weird (%d)\n", len);
 		return -EINVAL;
 	}
 
 	if((r=sys_vircopy(m_ptr->m_source, D, (vir_bytes) m_ptr->RS_NAME,
 		ENDPT_SELF, D, (vir_bytes) namebuf, len)) != 0) {
-		printf("RS: name copy failed\n");
+		printk("RS: name copy failed\n");
 		return r;
 
 	}

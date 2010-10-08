@@ -133,7 +133,7 @@ icmp_port_t *icmp_port;
 			0 /* no put_pkt */, 0 /* no select_res */);
 		if (icmp_port->icp_ipfd<0)
 		{
-			DBLOCK(1, printf("unable to open ip_port %d\n",
+			DBLOCK(1, printk("unable to open ip_port %d\n",
 				icmp_port->icp_ipport));
 			break;
 		}
@@ -154,7 +154,7 @@ icmp_port_t *icmp_port;
 		icmp_read(icmp_port);
 		break;
 	default:
-		DBLOCK(1, printf("unknown state %d\n",
+		DBLOCK(1, printk("unknown state %d\n",
 			icmp_port->icp_state));
 		break;
 	}
@@ -183,7 +183,7 @@ int for_ioctl;
 			result= (int)offset;
 			if (result<0)
 			{
-				DBLOCK(1, printf("got write error %d\n",
+				DBLOCK(1, printk("got write error %d\n",
 					result));
 			}
 			if (icmp_port->icp_flags & ICPF_WRITE_SP)
@@ -225,7 +225,7 @@ int for_ioctl;
 	default:
 		break;
 	}
-	DBLOCK(1, printf("unknown state %d\n", icmp_port->icp_state));
+	DBLOCK(1, printk("unknown state %d\n", icmp_port->icp_state));
 	return NULL;
 }
 
@@ -247,7 +247,7 @@ int for_ioctl;
 			result= (int)offset;
 			if (result<0)
 			{
-				DBLOCK(1, printf("got read error %d\n",
+				DBLOCK(1, printk("got read error %d\n",
 					result));
 			}
 			if (icmp_port->icp_flags & ICPF_READ_SP)
@@ -264,7 +264,7 @@ int for_ioctl;
 	switch (icmp_port->icp_state)
 	{
 	default:
-		DBLOCK(1, printf("unknown state %d\n",
+		DBLOCK(1, printk("unknown state %d\n",
 			icmp_port->icp_state));
 		return 0;
 	}
@@ -301,7 +301,7 @@ int code;
 		icmp_port= &icmp_port_table[port_nr];
 	else
 	{
-		printf("icmp_snd_time_exceeded: strange port %d\n", port_nr);
+		printk("icmp_snd_time_exceeded: strange port %d\n", port_nr);
 		bf_afree(pack);
 		return;
 	}
@@ -328,7 +328,7 @@ ipaddr_t gw;
 		icmp_port= &icmp_port_table[port_nr];
 	else
 	{
-		printf("icmp_snd_redirect: strange port %d\n", port_nr);
+		printk("icmp_snd_redirect: strange port %d\n", port_nr);
 		bf_afree(pack);
 		return;
 	}
@@ -357,7 +357,7 @@ int code;
 		icmp_port= &icmp_port_table[port_nr];
 	else
 	{
-		printf("icmp_snd_unreachable: strange port %d\n", port_nr);
+		printk("icmp_snd_unreachable: strange port %d\n", port_nr);
 		bf_afree(pack);
 		return;
 	}
@@ -383,7 +383,7 @@ u16_t mtu;
 		icmp_port= &icmp_port_table[port_nr];
 	else
 	{
-		printf("icmp_snd_mtu: strange port %d\n", port_nr);
+		printk("icmp_snd_mtu: strange port %d\n", port_nr);
 		bf_afree(pack);
 		return;
 	}
@@ -417,7 +417,7 @@ acc_t *data;
 	data= bf_packIffLess(data, IP_MIN_HDR_SIZE);
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(data);
 	DIFBLOCK(0x10, (ip_hdr->ih_dst & HTONL(0xf0000000)) == HTONL(0xe0000000),
-		printf("got multicast packet\n"));
+		printk("got multicast packet\n"));
 	ip_hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) << 2;
 
 	if (ip_hdr_len>IP_MIN_HDR_SIZE)
@@ -437,7 +437,7 @@ acc_t *data;
 			 */
 		}
 		else
-			DBLOCK(1, printf("got an incomplete icmp packet\n"));
+			DBLOCK(1, printk("got an incomplete icmp packet\n"));
 		bf_afree(data);
 		return;
 	}
@@ -449,7 +449,7 @@ acc_t *data;
 
 	if ((u16_t)~icmp_pack_oneCsum(icmp_data))
 	{
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"got packet with bad checksum (= 0x%x, 0x%x)\n",
 			icmp_hdr->ih_chksum,
 			(u16_t)~icmp_pack_oneCsum(icmp_data)));
@@ -468,7 +468,7 @@ acc_t *data;
 		break;
 	case ICMP_TYPE_SRC_QUENCH:
 		/* Ignore src quench ICMPs */
-		DBLOCK(2, printf("ignoring SRC QUENCH ICMP.\n"));
+		DBLOCK(2, printk("ignoring SRC QUENCH ICMP.\n"));
 		break;
 	case ICMP_TYPE_REDIRECT:
 		icmp_redirect (icmp_port, ip_hdr, icmp_data, pack_len,
@@ -489,9 +489,9 @@ acc_t *data;
 			icmp_data, pack_len, icmp_hdr);
 		break;
 	default:
-		DBLOCK(1, printf("got an unknown icmp (%d) from ",
+		DBLOCK(1, printk("got an unknown icmp (%d) from ",
 			icmp_hdr->ih_type); 
-			writeIpAddr(ip_hdr->ih_src); printf("\n"));
+			writeIpAddr(ip_hdr->ih_src); printk("\n"));
 		break;
 	}
 	bf_afree(data);
@@ -515,7 +515,7 @@ icmp_hdr_t *icmp_hdr;
 	if (icmp_hdr->ih_code != 0)
 	{
 		DBLOCK(1,
-		printf("got an icmp echo request with unknown code (%d)\n",
+		printk("got an icmp echo request with unknown code (%d)\n",
 			icmp_hdr->ih_code));
 		bf_afree(ip_data);
 		bf_afree(icmp_data);
@@ -523,7 +523,7 @@ icmp_hdr_t *icmp_hdr;
 	}
 	if (icmp_len < ICMP_MIN_HDR_SIZE + sizeof(icmp_id_seq_t))
 	{
-		DBLOCK(1, printf("got an incomplete icmp echo request\n"));
+		DBLOCK(1, printk("got an incomplete icmp echo request\n"));
 		bf_afree(ip_data);
 		bf_afree(icmp_data);
 		return;
@@ -564,7 +564,7 @@ icmp_hdr_t *icmp_hdr;
 	repl_icmp_hdr->ih_code= 0;
 
 	DBLOCK(2,
-	printf("ih_chksum= 0x%x, ih_type= 0x%x, repl->ih_type= 0x%x\n",
+	printk("ih_chksum= 0x%x, ih_type= 0x%x, repl->ih_type= 0x%x\n",
 		icmp_hdr->ih_chksum, *(u16_t *)&icmp_hdr->ih_type, 
 		*(u16_t *)&repl_icmp_hdr->ih_type));
 	tmp_chksum= (~icmp_hdr->ih_chksum & 0xffff) - 
@@ -573,7 +573,7 @@ icmp_hdr_t *icmp_hdr;
 	tmp_chksum= (tmp_chksum >> 16) + (tmp_chksum & 0xffff);
 	tmp_chksum= (tmp_chksum >> 16) + (tmp_chksum & 0xffff);
 	repl_icmp_hdr->ih_chksum= ~tmp_chksum;
-	DBLOCK(2, printf("sending chksum 0x%x\n", repl_icmp_hdr->ih_chksum));
+	DBLOCK(2, printk("sending chksum 0x%x\n", repl_icmp_hdr->ih_chksum));
 
 	repl_ip_hdr->acc_next= repl_icmp;
 	repl_icmp->acc_next= bf_cut (icmp_data, ICMP_MIN_HDR_SIZE,
@@ -637,7 +637,7 @@ int ip_len;
 
 	if (ip_len>IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("ip_hdr options NOT supported (yet?)\n"));
+		DBLOCK(1, printk("ip_hdr options NOT supported (yet?)\n"));
 		ip_len= IP_MIN_HDR_SIZE;
 	}
 
@@ -738,7 +738,7 @@ acc_t *reply_ip_hdr;
 	pack= bf_dupacc(reply_ip_hdr);
 	pack= bf_packIffLess(pack, IP_MIN_HDR_SIZE);
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(pack);
-	printf("icmp[%d]: dropping ICMP packet #%d to ",
+	printk("icmp[%d]: dropping ICMP packet #%d to ",
 		icmp_port->icp_ipport, icmp_port->icp_rate_count);
 	writeIpAddr(ip_hdr->ih_dst);
 	hdrlen= (ip_hdr->ih_vers_ihl & IH_IHL_MASK)*4;
@@ -746,7 +746,7 @@ acc_t *reply_ip_hdr;
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(pack);
 	icmp_hdr= (icmp_hdr_t *)(ptr2acc_data(pack)+hdrlen);
 	type= icmp_hdr->ih_type;
-	printf(" type %d, code %d\n", type, icmp_hdr->ih_code);
+	printk(" type %d, code %d\n", type, icmp_hdr->ih_code);
 	switch(type)
 	{
 	case ICMP_TYPE_DST_UNRCH:
@@ -759,10 +759,10 @@ acc_t *reply_ip_hdr;
 			hdrlen+icmp_hdr_len+IP_MIN_HDR_SIZE);
 		ip_hdr= (ip_hdr_t *)(ptr2acc_data(pack)+hdrlen+icmp_hdr_len);
 		icmp_hdr= (icmp_hdr_t *)(ptr2acc_data(pack)+hdrlen);
-		printf("\tinfo %08x, original dst ",
+		printk("\tinfo %08x, original dst ",
 			ntohs(icmp_hdr->ih_hun.ihh_unused));
 		writeIpAddr(ip_hdr->ih_dst);
-		printf(", proto %d, length %u\n",
+		printk(", proto %d, length %u\n",
 			ip_hdr->ih_proto, ntohs(ip_hdr->ih_length));
 		break;
 	default:
@@ -798,7 +798,7 @@ ev_arg_t ev_arg;
 		{
 			if (result == 0)
 				continue;
-			DBLOCK(1, printf("icmp_write: error %d\n", result););
+			DBLOCK(1, printk("icmp_write: error %d\n", result););
 			continue;
 		}
 
@@ -877,7 +877,7 @@ icmp_hdr_t *icmp_hdr;
 
 	if (icmp_len < 8 + IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("dest unrch with wrong size\n"));
+		DBLOCK(1, printk("dest unrch with wrong size\n"));
 		return;
 	}
 	old_ip_pack= bf_cut (icmp_pack, 8, icmp_len-8);
@@ -886,7 +886,7 @@ icmp_hdr_t *icmp_hdr;
 
 	if (old_ip_hdr->ih_src != ip_hdr->ih_dst)
 	{
-		DBLOCK(1, printf("dest unrch based on wrong packet\n"));
+		DBLOCK(1, printk("dest unrch based on wrong packet\n"));
 		bf_afree(old_ip_pack);
 		return;
 	}
@@ -912,11 +912,11 @@ icmp_hdr_t *icmp_hdr;
 		break;
 	case ICMP_FRAGM_AND_DF:
 
-		DBLOCK(1, printf("icmp_dst_unreach: got mtu icmp from ");
+		DBLOCK(1, printk("icmp_dst_unreach: got mtu icmp from ");
 			writeIpAddr(ip_hdr->ih_src);
-			printf("; original destination: ");
+			printk("; original destination: ");
 			writeIpAddr(old_ip_hdr->ih_dst);
-			printf("; protocol: %d\n",
+			printk("; protocol: %d\n",
 			old_ip_hdr->ih_proto));
 		old_pack_size= ntohs(old_ip_hdr->ih_length);
 		if (!old_pack_size)
@@ -929,12 +929,12 @@ icmp_hdr_t *icmp_hdr;
 		break;
 
 	default:
-		DBLOCK(1, printf("icmp_dst_unreach: got strange code %d from ",
+		DBLOCK(1, printk("icmp_dst_unreach: got strange code %d from ",
 			icmp_hdr->ih_code);
 			writeIpAddr(ip_hdr->ih_src);
-			printf("; original destination: ");
+			printk("; original destination: ");
 			writeIpAddr(old_ip_hdr->ih_dst);
-			printf("; protocol: %d\n",
+			printk("; protocol: %d\n",
 			old_ip_hdr->ih_proto));
 		break;
 	}
@@ -957,7 +957,7 @@ icmp_hdr_t *icmp_hdr;
 
 	if (icmp_len < 8 + IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("time exceeded with wrong size\n"));
+		DBLOCK(1, printk("time exceeded with wrong size\n"));
 		return;
 	}
 	old_ip_pack= bf_cut (icmp_pack, 8, icmp_len-8);
@@ -966,7 +966,7 @@ icmp_hdr_t *icmp_hdr;
 
 	if (old_ip_hdr->ih_src != ip_hdr->ih_dst)
 	{
-		DBLOCK(1, printf("time exceeded based on wrong packet\n"));
+		DBLOCK(1, printk("time exceeded based on wrong packet\n"));
 		bf_afree(old_ip_pack);
 		return;
 	}
@@ -983,7 +983,7 @@ icmp_hdr_t *icmp_hdr;
 		/* Ignore reassembly time-outs. */
 		break;
 	default:
-		DBLOCK(1, printf("got strange code: %d\n",
+		DBLOCK(1, printk("got strange code: %d\n",
 			icmp_hdr->ih_code));
 		break;
 	}
@@ -1008,14 +1008,14 @@ icmp_hdr_t *icmp_hdr;
 	if (icmp_len < 8)
 	{
 		DBLOCK(1,
-		printf("router advertisement with wrong size (%d)\n",
+		printk("router advertisement with wrong size (%d)\n",
 			icmp_len));
 		return;
 	}
 	if (icmp_hdr->ih_code != 0)
 	{
 		DBLOCK(1,
-		printf("router advertisement with wrong code (%d)\n", 
+		printk("router advertisement with wrong code (%d)\n", 
 			icmp_hdr->ih_code));
 		return;
 	}
@@ -1023,14 +1023,14 @@ icmp_hdr_t *icmp_hdr;
 	entry_size= icmp_hdr->ih_hun.ihh_ram.iram_aes * 4;
 	if (entries < 1)
 	{
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 		"router advertisement with wrong number of entries (%d)\n", 
 			entries));
 		return;
 	}
 	if (entry_size < 8)
 	{
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 		"router advertisement with wrong entry size (%d)\n", 
 			entry_size));
 		return;
@@ -1038,8 +1038,8 @@ icmp_hdr_t *icmp_hdr;
 	if (icmp_len < 8 + entries * entry_size)
 	{
 		DBLOCK(1,
-			printf("router advertisement with wrong size\n"); 
-			printf(
+			printk("router advertisement with wrong size\n"); 
+			printk(
 			"\t(entries= %d, entry_size= %d, icmp_len= %d)\n",
 			entries, entry_size, icmp_len));
 		return;
@@ -1047,7 +1047,7 @@ icmp_hdr_t *icmp_hdr;
 	lifetime= ntohs(icmp_hdr->ih_hun.ihh_ram.iram_lt);
 	if (lifetime > 9000)
 	{
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"router advertisement with wrong lifetime (%d)\n",
 			lifetime));
 		return;
@@ -1078,7 +1078,7 @@ icmp_hdr_t *icmp_hdr;
 
 	if (icmp_len < 8 + IP_MIN_HDR_SIZE)
 	{
-		DBLOCK(1, printf("redirect with wrong size\n"));
+		DBLOCK(1, printk("redirect with wrong size\n"));
 		return;
 	}
 	old_ip_pack= bf_cut (icmp_pack, 8, icmp_len-8);
@@ -1102,7 +1102,7 @@ icmp_hdr_t *icmp_hdr;
 			IPR_REDIRECT_TIMEOUT);
 		break;
 	default:
-		DBLOCK(1, printf("got strange code: %d\n",
+		DBLOCK(1, printk("got strange code: %d\n",
 			icmp_hdr->ih_code));
 		break;
 	}
@@ -1167,9 +1167,9 @@ icmp_hdr_t **icmp_hdr_pp;
 	if (nettype != IPNT_CLASS_A && nettype != IPNT_LOCAL &&
 		nettype != IPNT_CLASS_B && nettype != IPNT_CLASS_C)
 	{
-		printf("icmp_err_pack: invalid source address: ");
+		printk("icmp_err_pack: invalid source address: ");
 		writeIpAddr(dest);
-		printf("\n");
+		printk("\n");
 		bf_afree(pack);
 		return NULL;
 	}
@@ -1178,8 +1178,8 @@ icmp_hdr_t **icmp_hdr_pp;
 	size= ntohs(ip_hdr->ih_length);
 	if (size < ip_hdr_len || pack_len < size)
 	{
-		printf("icmp_err_pack: wrong packet size:\n");
-		printf("\thdrlen= %d, ih_length= %d, bufsize= %d\n",
+		printk("icmp_err_pack: wrong packet size:\n");
+		printk("\thdrlen= %d, ih_length= %d, bufsize= %d\n",
 			ip_hdr_len, size, pack_len);
 		bf_afree(pack);
 		return NULL;

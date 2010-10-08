@@ -75,7 +75,7 @@ void do_pagefaults(void)
 		/* See if address is valid at all. */
 		if(!(region = map_lookup(vmp, addr))) {
 			vm_assert(PFERR_NOPAGE(err));
-			printf("VM: pagefault: SIGSEGV %d bad addr 0x%lx %s\n", 
+			printk("VM: pagefault: SIGSEGV %d bad addr 0x%lx %s\n", 
 				ep, arch_map2vir(vmp, addr), pf_errstr(err));
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
 			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
@@ -97,7 +97,7 @@ void do_pagefaults(void)
 
 		/* If process was writing, see if it's writable. */
 		if(!(region->flags & VR_WRITABLE) && wr) {
-			printf("VM: pagefault: SIGSEGV %d ro map 0x%lx %s\n", 
+			printk("VM: pagefault: SIGSEGV %d ro map 0x%lx %s\n", 
 				ep, arch_map2vir(vmp, addr), pf_errstr(err));
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
 			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
@@ -112,7 +112,7 @@ void do_pagefaults(void)
 
 		/* Access is allowed; handle it. */
 		if((r=map_pf(vmp, region, offset, wr)) != 0) {
-			printf("VM: pagefault: SIGSEGV %d pagefault not handled\n", ep);
+			printk("VM: pagefault: SIGSEGV %d pagefault not handled\n", ep);
 			sys_sysctl_stacktrace(vmp->vm_endpoint);
 			if((s=sys_kill(vmp->vm_endpoint, SIGSEGV)) != 0)
 				vm_panic("sys_kill failed", s);
@@ -174,12 +174,12 @@ int handle_memory(struct vmproc *vmp, vir_bytes mem, vir_bytes len, int wrflag)
 		if(!(region = map_lookup(vmp, mem))) {
 #ifdef CONFIG_DEBUG_VM
 			map_printmap(vmp);
-			printf("VM: do_memory: memory doesn't exist\n");
+			printk("VM: do_memory: memory doesn't exist\n");
 #endif
 			r = -EFAULT;
 		} else if(!(region->flags & VR_WRITABLE) && wrflag) {
 #ifdef CONFIG_DEBUG_VM
-			printf("VM: do_memory: write to unwritable map\n");
+			printk("VM: do_memory: write to unwritable map\n");
 #endif
 			r = -EFAULT;
 		} else {
@@ -201,7 +201,7 @@ int handle_memory(struct vmproc *vmp, vir_bytes mem, vir_bytes len, int wrflag)
 	
 		if(r != 0) {
 #ifdef CONFIG_DEBUG_VM
-			printf("VM: memory range 0x%lx-0x%lx not available in %d\n",
+			printk("VM: memory range 0x%lx-0x%lx not available in %d\n",
 				arch_map2vir(vmp, mem), arch_map2vir(vmp, mem+len),
 				vmp->vm_endpoint);
 #endif

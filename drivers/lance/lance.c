@@ -154,7 +154,7 @@ unsigned long vir2phys( unsigned long x )
    unsigned long value;
 
    if ( (r=sys_umap( ENDPT_SELF, VM_D, x, 4, &value )) != 0 ) {
-      printf("lance: umap of 0x%lx failed\n",x );
+      printk("lance: umap of 0x%lx failed\n",x );
       panic( "lance", "sys_umap failed", r );
    }
 
@@ -291,7 +291,7 @@ void main( int argc, char **argv )
    fkeys = sfkeys = 0;
    bit_set( sfkeys, 7 );
    if ( (r = fkey_map(&fkeys, &sfkeys)) != 0 )
-      printf("Warning: lance couldn't observe Shift+F7 key: %d\n",r);
+      printk("Warning: lance couldn't observe Shift+F7 key: %d\n",r);
 #endif
 
    v= 0;
@@ -303,7 +303,7 @@ void main( int argc, char **argv )
    if (r == 0)
       kipc_module_call(KIPC_NOTIFY, 0, tasknr, 0);
    else if (r != -ESRCH)
-      printf("lance: ds_retrieve_u32 failed for 'inet': %d\n", r);
+      printk("lance: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
    while (TRUE)
    {
@@ -401,58 +401,58 @@ static void lance_dump()
    int i, isr, csr;
    unsigned short ioaddr;
   
-   printf("\n");
+   printk("\n");
    for (i= 0, ec = &ec_table[0]; i<EC_PORT_NR_MAX; i++, ec++)
    {
       if (ec->mode == EC_DISABLED)
-         printf("lance port %d is disabled\n", i);
+         printk("lance port %d is disabled\n", i);
       else if (ec->mode == EC_SINK)
-         printf("lance port %d is in sink mode\n", i);
+         printk("lance port %d is in sink mode\n", i);
       
       if (ec->mode != EC_ENABLED)
          continue;
       
-      printf("lance statistics of port %d:\n", i);
+      printk("lance statistics of port %d:\n", i);
       
-      printf("recvErr    :%8ld\t", ec->eth_stat.ets_recvErr);
-      printf("sendErr    :%8ld\t", ec->eth_stat.ets_sendErr);
-      printf("OVW        :%8ld\n", ec->eth_stat.ets_OVW);
+      printk("recvErr    :%8ld\t", ec->eth_stat.ets_recvErr);
+      printk("sendErr    :%8ld\t", ec->eth_stat.ets_sendErr);
+      printk("OVW        :%8ld\n", ec->eth_stat.ets_OVW);
       
-      printf("CRCerr     :%8ld\t", ec->eth_stat.ets_CRCerr);
-      printf("frameAll   :%8ld\t", ec->eth_stat.ets_frameAll);
-      printf("missedP    :%8ld\n", ec->eth_stat.ets_missedP);
+      printk("CRCerr     :%8ld\t", ec->eth_stat.ets_CRCerr);
+      printk("frameAll   :%8ld\t", ec->eth_stat.ets_frameAll);
+      printk("missedP    :%8ld\n", ec->eth_stat.ets_missedP);
       
-      printf("packetR    :%8ld\t", ec->eth_stat.ets_packetR);
-      printf("packetT    :%8ld\t", ec->eth_stat.ets_packetT);
-      printf("transDef   :%8ld\n", ec->eth_stat.ets_transDef);
+      printk("packetR    :%8ld\t", ec->eth_stat.ets_packetR);
+      printk("packetT    :%8ld\t", ec->eth_stat.ets_packetT);
+      printk("transDef   :%8ld\n", ec->eth_stat.ets_transDef);
       
-      printf("collision  :%8ld\t", ec->eth_stat.ets_collision);
-      printf("transAb    :%8ld\t", ec->eth_stat.ets_transAb);
-      printf("carrSense  :%8ld\n", ec->eth_stat.ets_carrSense);
+      printk("collision  :%8ld\t", ec->eth_stat.ets_collision);
+      printk("transAb    :%8ld\t", ec->eth_stat.ets_transAb);
+      printk("carrSense  :%8ld\n", ec->eth_stat.ets_carrSense);
       
-      printf("fifoUnder  :%8ld\t", ec->eth_stat.ets_fifoUnder);
-      printf("fifoOver   :%8ld\t", ec->eth_stat.ets_fifoOver);
-      printf("CDheartbeat:%8ld\n", ec->eth_stat.ets_CDheartbeat);
+      printk("fifoUnder  :%8ld\t", ec->eth_stat.ets_fifoUnder);
+      printk("fifoOver   :%8ld\t", ec->eth_stat.ets_fifoOver);
+      printk("CDheartbeat:%8ld\n", ec->eth_stat.ets_CDheartbeat);
       
-      printf("OWC        :%8ld\t", ec->eth_stat.ets_OWC);
+      printk("OWC        :%8ld\t", ec->eth_stat.ets_OWC);
       
       ioaddr = ec->ec_port;
       isr = read_csr(ioaddr, LANCE_CSR0);
-      printf("isr = 0x%x, flags = 0x%x\n", isr,
+      printk("isr = 0x%x, flags = 0x%x\n", isr,
              ec->flags);
 
-      printf("irq = %d\tioadr = 0x%x\n", ec->ec_irq, ec->ec_port);
+      printk("irq = %d\tioadr = 0x%x\n", ec->ec_irq, ec->ec_port);
 
       csr = read_csr(ioaddr, LANCE_CSR0);
-      printf("CSR0: 0x%x\n", csr);
+      printk("CSR0: 0x%x\n", csr);
       csr = read_csr(ioaddr, LANCE_CSR3);
-      printf("CSR3: 0x%x\n", csr);
+      printk("CSR3: 0x%x\n", csr);
       csr = read_csr(ioaddr, LANCE_CSR4);
-      printf("CSR4: 0x%x\n", csr);
+      printk("CSR4: 0x%x\n", csr);
       csr = read_csr(ioaddr, LANCE_CSR5);
-      printf("CSR5: 0x%x\n", csr);
+      printk("CSR5: 0x%x\n", csr);
       csr = read_csr(ioaddr, LANCE_CSR15);
-      printf("CSR15: 0x%x\n", csr);
+      printk("CSR15: 0x%x\n", csr);
       
    }
 }
@@ -475,7 +475,7 @@ static void lance_stop()
    }
 
 #if VERBOSE
-   printf("LANCE driver stopped.\n");
+   printk("LANCE driver stopped.\n");
 #endif
 
    exit( 0 );
@@ -622,7 +622,7 @@ ether_card_t *ec;
 
    if (!lance_probe(ec))
    {
-      printf("%s: No ethernet card found on PCI-BIOS info.\n", 
+      printk("%s: No ethernet card found on PCI-BIOS info.\n", 
              ec->port_name);
       ec->mode= EC_DISABLED;
       return;
@@ -693,9 +693,9 @@ ether_card_t *ec;
    ec_confaddr(ec);
 
 #if VERBOSE
-   printf("%s: Ethernet address ", ec->port_name);
+   printk("%s: Ethernet address ", ec->port_name);
    for (i= 0; i < 6; i++)
-      printf("%x%c", ec->mac_address.ea_addr[i],
+      printk("%x%c", ec->mac_address.ea_addr[i],
              i < 5 ? ':' : '\n');
 #endif
 
@@ -705,7 +705,7 @@ ether_card_t *ec;
    /* Set the interrupt handler */
    ec->ec_hook = ec->ec_irq;
    if ((r=sys_irqsetpolicy(ec->ec_irq, 0, &ec->ec_hook)) != 0)
-      printf("lance: error, couldn't set IRQ policy: %d\n", r);
+      printk("lance: error, couldn't set IRQ policy: %d\n", r);
 
    return;
 }
@@ -864,7 +864,7 @@ ether_card_t *ec;
    for (;;)
    {
 #if VERBOSE
-      printf("ETH: Reading ISR...");
+      printk("ETH: Reading ISR...");
 #endif
       isr = read_csr(ioaddr, LANCE_CSR0);
       if (isr & (LANCE_CSR0_ERR|LANCE_CSR0_RINT|LANCE_CSR0_TINT)) {
@@ -882,7 +882,7 @@ ether_card_t *ec;
                   |LANCE_CSR0_BABL|LANCE_CSR0_ERR)) == 0x0000)
       {
 #if VERBOSE
-         printf("OK\n");
+         printk("OK\n");
 #endif
          break;
       }
@@ -890,7 +890,7 @@ ether_card_t *ec;
       if (isr & LANCE_CSR0_MISS)
       {
 #if VERBOSE
-         printf("RX Missed Frame\n");
+         printk("RX Missed Frame\n");
 #endif
          ec->eth_stat.ets_recvErr++;
       }
@@ -899,14 +899,14 @@ ether_card_t *ec;
          if (isr & LANCE_CSR0_BABL)
          {
 #if VERBOSE
-            printf("TX Timeout\n");
+            printk("TX Timeout\n");
 #endif
             ec->eth_stat.ets_sendErr++;
          }
          if (isr & LANCE_CSR0_TINT)
          {
 #if VERBOSE
-            printf("TX INT\n");
+            printk("TX INT\n");
 #endif
             /* status check: restart if needed. */
             status = lp->tx_ring[cur_tx_slot_nr].u.base;
@@ -969,7 +969,7 @@ ether_card_t *ec;
       if (isr & LANCE_CSR0_RINT)
       {
 #if VERBOSE
-         printf("RX INT\n");
+         printk("RX INT\n");
 #endif
          ec_recv(ec);
       }
@@ -978,7 +978,7 @@ ether_card_t *ec;
       {
          ec->flags = ECF_STOPPED;
 #if VERBOSE
-         printf("ISR_RST\n");
+         printk("ISR_RST\n");
 #endif
          break;
       }
@@ -987,7 +987,7 @@ ether_card_t *ec;
       if (must_restart == 1)
       {
 #if VERBOSE
-         printf("ETH: restarting...\n");
+         printk("ETH: restarting...\n");
 #endif
          /* stop */
          write_csr(ioaddr, LANCE_CSR0, LANCE_CSR0_STOP);
@@ -999,7 +999,7 @@ ether_card_t *ec;
    if ((ec->flags & (ECF_READING|ECF_STOPPED)) == (ECF_READING|ECF_STOPPED))
    {
 #if VERBOSE
-      printf("ETH: resetting...\n");
+      printk("ETH: resetting...\n");
 #endif
       ec_reset(ec);
    }
@@ -1489,7 +1489,7 @@ ether_card_t *ec;
                       ec->ec_pcifunc, &devind);
       if (r == 0)
       {
-         printf("%s: no PCI found at %d.%d.%d\n",
+         printk("%s: no PCI found at %d.%d.%d\n",
                 ec->port_name, ec->ec_pcibus,
                 ec->ec_pcidev, ec->ec_pcifunc);
          return 0;
@@ -1525,7 +1525,7 @@ ether_card_t *ec;
 
       if (just_one)
       {
-         printf(
+         printk(
             "%s: wrong PCI device (%04x/%04x) found at %d.%d.%d\n",
             ec->port_name, vid, did,
             ec->ec_pcibus,
@@ -1586,7 +1586,7 @@ ether_card_t *ec;
    }
 
 #if VERBOSE
-   printf("%s: %s at %X:%d\n",
+   printk("%s: %s at %X:%d\n",
           ec->port_name, chip_table[lance_version].name,
           ec->ec_port, ec->ec_irq);
 #endif

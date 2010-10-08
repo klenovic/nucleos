@@ -79,15 +79,6 @@ int main(int argc, char *argv[])
 		panic("ti1225", "micro_delay_calibrate failed", r);
 
 	debug= 0;
-	while (c= getopt(argc, argv, "d?"), c != -1)
-	{
-		switch(c)
-		{
-		case '?': panic("ti1225", "Usage: ti1225 [-d]", NO_NUM);
-		case 'd': debug++; break;
-		default: panic("ti1225", "getopt failed", NO_NUM);
-		}
-	}
 
 	init();
 
@@ -96,7 +87,7 @@ int main(int argc, char *argv[])
 		r= kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 		if (r != 0)
 			panic("ti1225", "receive failed", r);
-		printf("ti1225: got message %u from %d\n",
+		printk("ti1225: got message %u from %d\n",
 			m.m_type, m.m_source);
 	}
 	return 0;
@@ -143,7 +134,7 @@ static void init()
 		pci_reserve(devind);
 
 		if (debug)
-			printf("ti1225: found device %04x/%04x\n", vid, did);
+			printk("ti1225: found device %04x/%04x\n", vid, did);
 		ports[port].p_devind= devind;
 		ports[port].p_flags |= PF_PRESENT;
 		port++;
@@ -169,45 +160,45 @@ struct port *pp;
 
 	devind= pp->p_devind;
 	if (debug)
-		printf("hw_init: devind = %d\n", devind);
+		printk("hw_init: devind = %d\n", devind);
 
 	if (debug)
 	{
 		v16= pci_attr_r16(devind, PCI_CR);
-		printf("ti1225: command register 0x%x\n", v16);
+		printk("ti1225: command register 0x%x\n", v16);
 	}
 
 	v32= pci_attr_r32(devind, TI_CB_BASEADDR);
 	if (debug)
-		printf("ti1225: Cardbus/ExCA base address 0x%x\n", v32);
+		printk("ti1225: Cardbus/ExCA base address 0x%x\n", v32);
 	map_regs(pp, v32);
 	pp->csr_ptr= (struct csr *)pp->base_ptr;
 
 	if (debug)
 	{
 		v8= pci_attr_r8(devind, TI_PCI_BUS_NR);
-		printf("ti1225: PCI bus number %d\n", v8);
+		printk("ti1225: PCI bus number %d\n", v8);
 	}
 	v8= pci_attr_r8(devind, TI_CB_BUS_NR);
 	pp->p_cb_busnr= v8;
 	if (debug)
 	{
-		printf("ti1225: CardBus bus number %d\n", v8);
+		printk("ti1225: CardBus bus number %d\n", v8);
 		v8= pci_attr_r8(devind, TI_SO_BUS_NR);
-		printf("ti1225: Subordinate bus number %d\n", v8);
+		printk("ti1225: Subordinate bus number %d\n", v8);
 	}
 
 #if USE_INTS
 	irq= pci_attr_r8(devind, PCI_ILR);
 	pp->p_irq= irq;
-	printf("ti1225 using IRQ %d\n", irq);
+	printk("ti1225 using IRQ %d\n", irq);
 #endif
 
 	v32= pci_attr_r32(devind, TI_LEGACY_BA);
 	v32 &= ~1;
 	if (debug)
 	{
-		printf("ti1225: PC Card 16-bit legacy-mode base address 0x%x\n",
+		printk("ti1225: PC Card 16-bit legacy-mode base address 0x%x\n",
 			v32);
 	}
 
@@ -218,7 +209,7 @@ struct port *pp;
 	if (debug)
 	{
 		v32= pci_attr_r32(devind, TI_MF_ROUTE);
-		printf("ti1225: Multifunction routing 0x%08x\n", v32);
+		printk("ti1225: Multifunction routing 0x%08x\n", v32);
 	}
 
 #if USE_INTS
@@ -231,20 +222,20 @@ struct port *pp;
 	/* Clear CBB_BC_INTEXCA */
 	v16= pci_attr_r16(devind, CBB_BRIDGECTRL);
 	if (debug)
-		printf("ti1225: Bridge control 0x%04x\n", v16);
+		printk("ti1225: Bridge control 0x%04x\n", v16);
 	v16 &= ~CBB_BC_INTEXCA;
 	pci_attr_w16(devind, CBB_BRIDGECTRL, v16);
 
 	if (debug)
 	{
 		v32= pci_attr_r32(devind, TI_SYSCTRL);
-		printf("ti1225: System Control Register 0x%08x\n", v32);
+		printk("ti1225: System Control Register 0x%08x\n", v32);
 
 		v8= pci_attr_r8(devind, TI_CARD_CTRL);
-		printf("ti1225: Card Control 0x%02x\n", v8);
+		printk("ti1225: Card Control 0x%02x\n", v8);
 
 		v8= pci_attr_r8(devind, TI_DEV_CTRL);
-		printf("ti1225: Device Control 0x%02x\n", v8);
+		printk("ti1225: Device Control 0x%02x\n", v8);
 	}
 
 	/* Enable socket interrupts */
@@ -272,7 +263,7 @@ u32_t base;
 	pp->base_ptr= (char *)buf_base;
 	if (debug)
 	{
-		printf("ti1225: map_regs: using %p for %p\n",
+		printk("ti1225: map_regs: using %p for %p\n",
 			pp->base_ptr, pp->buffer);
 	}
 
@@ -303,14 +294,14 @@ struct port *pp;
 	v8= pci_attr_r8(devind, TI_CARD_CTRL);
 	if (v8 & TI_CCR_IFG)
 	{
-		printf("ti1225: got functional interrupt\n");
+		printk("ti1225: got functional interrupt\n");
 		pci_attr_w8(devind, TI_CARD_CTRL, v8);
 	}
 
 	if (debug)
 	{
-		printf("Socket event: 0x%x\n", pp->csr_ptr->csr_event);
-		printf("Socket mask: 0x%x\n", pp->csr_ptr->csr_mask);
+		printk("Socket event: 0x%x\n", pp->csr_ptr->csr_event);
+		printk("Socket mask: 0x%x\n", pp->csr_ptr->csr_mask);
 	}
 
 	csr_present= pp->csr_ptr->csr_present;
@@ -319,37 +310,37 @@ struct port *pp;
 	if ((csr_present & (CP_CDETECT1|CP_CDETECT2)) != 0)
 	{
 		if (debug)
-			printf("do_int: no card present\n");
+			printk("do_int: no card present\n");
 		return;
 	}
 	if (csr_present & CP_BADVCCREQ)
 	{
-		printf("do_int: Bad Vcc request\n");
+		printk("do_int: Bad Vcc request\n");
 		/* return; */
 	}
 	if (csr_present & CP_DATALOST)
 	{
 		/* Do we care? */
 		if (debug)
-			printf("do_int: Data lost\n");
+			printk("do_int: Data lost\n");
 		/* return; */
 	}
 	if (csr_present & CP_NOTACARD)
 	{
-		printf("do_int: Not a card\n");
+		printk("do_int: Not a card\n");
 		return;
 	}
 	if (debug)
 	{
 		if (csr_present & CP_CBCARD)
-			printf("do_int: Cardbus card detected\n");
+			printk("do_int: Cardbus card detected\n");
 		if (csr_present & CP_16BITCARD)
-			printf("do_int: 16-bit card detected\n");
+			printk("do_int: 16-bit card detected\n");
 	}
 	if (csr_present & CP_PWRCYCLE)
 	{
 		if (debug)
-			printf("do_int: powered up\n");
+			printk("do_int: powered up\n");
 		return;
 	}
 	vcc_5v= !!(csr_present & CP_5VCARD);
@@ -358,7 +349,7 @@ struct port *pp;
 	vcc_Yv= !!(csr_present & CP_YVCARD);
 	if (debug)
 	{
-		printf("do_int: card supports:%s%s%s%s\n",
+		printk("do_int: card supports:%s%s%s%s\n",
 			vcc_5v ? " 5V" : "", vcc_3v ? " 3V" : "",
 			vcc_Xv ? " X.X V" : "", vcc_Yv ? " Y.Y V" : "");
 	}
@@ -368,7 +359,7 @@ struct port *pp;
 	socket_Yv= !!(csr_present & CP_YVSOCKET);
 	if (debug)
 	{
-		printf("do_int: socket supports:%s%s%s%s\n",
+		printk("do_int: socket supports:%s%s%s%s\n",
 			socket_5v ? " 5V" : "", socket_3v ? " 3V" : "",
 			socket_Xv ? " X.X V" : "", socket_Yv ? " Y.Y V" : "");
 	}
@@ -377,30 +368,30 @@ struct port *pp;
 		csr_control= (csr_control & ~CC_VCCCTRL) | CC_VCC_5V;
 		pp->csr_ptr->csr_control= csr_control;
 		if (debug)
-			printf("do_int: applying 5V\n");
+			printk("do_int: applying 5V\n");
 	}
 	else if (vcc_3v && socket_3v)
 	{
 		csr_control= (csr_control & ~CC_VCCCTRL) | CC_VCC_3V;
 		pp->csr_ptr->csr_control= csr_control;
 		if (debug)
-			printf("do_int: applying 3V\n");
+			printk("do_int: applying 3V\n");
 	}
 	else if (vcc_Xv && socket_Xv)
 	{
 		csr_control= (csr_control & ~CC_VCCCTRL) | CC_VCC_XV;
 		pp->csr_ptr->csr_control= csr_control;
-		printf("do_int: applying X.X V\n");
+		printk("do_int: applying X.X V\n");
 	}
 	else if (vcc_Yv && socket_Yv)
 	{
 		csr_control= (csr_control & ~CC_VCCCTRL) | CC_VCC_YV;
 		pp->csr_ptr->csr_control= csr_control;
-		printf("do_int: applying Y.Y V\n");
+		printk("do_int: applying Y.Y V\n");
 	}
 	else
 	{
-		printf("do_int: socket and card are not compatible\n");
+		printk("do_int: socket and card are not compatible\n");
 		return;
 	}
 
@@ -408,11 +399,11 @@ struct port *pp;
 	if (csr_event)
 	{
 		if (debug)
-			printf("clearing socket event\n");
+			printk("clearing socket event\n");
 		pp->csr_ptr->csr_event= csr_event;
 		if (debug)
 		{
-			printf("Socket event (cleared): 0x%x\n",
+			printk("Socket event (cleared): 0x%x\n",
 				pp->csr_ptr->csr_event);
 		}
 	}
@@ -421,14 +412,14 @@ struct port *pp;
 	v8= pci_attr_r8(devind, TI_CARD_CTRL);
 	if (v8 & TI_CCR_IFG)
 	{
-		printf("ti1225: got functional interrupt\n", v8);
+		printk("ti1225: got functional interrupt\n", v8);
 		pci_attr_w8(devind, TI_CARD_CTRL, v8);
 	}
 
 	if (debug)
 	{
 		v8= pci_attr_r8(devind, TI_CARD_CTRL);
-		printf("TI_CARD_CTRL: 0x%02x\n", v8);
+		printk("TI_CARD_CTRL: 0x%02x\n", v8);
 	}
 
 	getuptime(&t0);
@@ -440,7 +431,7 @@ struct port *pp;
 
 	if (!(csr_present & CP_PWRCYCLE))
 	{
-		printf("do_int: not powered up?\n");
+		printk("do_int: not powered up?\n");
 		return;
 	}
 

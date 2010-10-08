@@ -45,13 +45,13 @@ static int driver_open(int which)
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
-		printf("Filter: driver_open: kipc_module_call returned %d\n", r);
+		printk("Filter: driver_open: kipc_module_call returned %d\n", r);
 
 		return RET_REDO;
 	}
 
 	if(msg.m_type != KCNR_TASK_REPLY || msg.REP_STATUS != 0) {
-		printf("Filter: driver_open: kipc_module_call returned %d, %d\n",
+		printk("Filter: driver_open: kipc_module_call returned %d, %d\n",
 			msg.m_type, msg.REP_STATUS);
 
 		return RET_REDO;
@@ -75,7 +75,7 @@ static int driver_open(int which)
 
 	if (r != 0 || msg.m_type != KCNR_TASK_REPLY || msg.REP_STATUS != 0) {
 		/* Not sure what to do here, either. */
-		printf("Filter: ioctl(DIOCGETP) returned (%d, %d)\n", 
+		printk("Filter: ioctl(DIOCGETP) returned (%d, %d)\n", 
 			r, msg.m_type);
 
 		return RET_REDO;
@@ -86,17 +86,17 @@ static int driver_open(int which)
 		size_known = 1;
 		sectors = div64u(disk_size, SECTOR_SIZE);
 		if(cmp64(mul64u(sectors, SECTOR_SIZE), disk_size)) {
-			printf("Filter: partition too large\n");
+			printk("Filter: partition too large\n");
 
 			return RET_REDO;
 		}
 #if DEBUG
-		printf("Filter: partition size: 0x%s / %lu sectors\n",
+		printk("Filter: partition size: 0x%s / %lu sectors\n",
 			print64(disk_size), sectors);
 #endif
 	} else {
 		if(cmp64(disk_size, part.size)) {
-			printf("Filter: partition size mismatch (%s != %s)\n",
+			printk("Filter: partition size mismatch (%s != %s)\n",
 				print64(part.size), print64(disk_size));
 
 			return RET_REDO;
@@ -121,13 +121,13 @@ static int driver_close(int which)
 
 	if (r != 0) {
 		/* Should we restart the driver now? */
-		printf("Filter: driver_close: kipc_module_call returned %d\n", r);
+		printk("Filter: driver_close: kipc_module_call returned %d\n", r);
 
 		return RET_REDO;
 	}
 
 	if(msg.m_type != KCNR_TASK_REPLY || msg.REP_STATUS != 0) {
-		printf("Filter: driver_close: kipc_module_call returned %d, %d\n",
+		printk("Filter: driver_close: kipc_module_call returned %d, %d\n",
 			msg.m_type, msg.REP_STATUS);
 
 		return RET_REDO;
@@ -159,7 +159,7 @@ void driver_init(void)
 	r = ds_retrieve_u32(driver[DRIVER_MAIN].label,
 		(u32_t *) &driver[DRIVER_MAIN].endpt);
 	if (r != 0) {
-		printf("Filter: failed to get main disk driver's endpoint: "
+		printk("Filter: failed to get main disk driver's endpoint: "
 			"%d\n", r);
 		bad_driver(DRIVER_MAIN, BD_DEAD, -EFAULT);
 		check_driver(DRIVER_MAIN);
@@ -180,7 +180,7 @@ void driver_init(void)
 		r = ds_retrieve_u32(driver[DRIVER_BACKUP].label,
 			(u32_t *) &driver[DRIVER_BACKUP].endpt);
 		if (r != 0) {
-			printf("Filter: failed to get backup disk driver's "
+			printk("Filter: failed to get backup disk driver's "
 				"endpoint: %d\n", r);
 			bad_driver(DRIVER_BACKUP, BD_DEAD, -EFAULT);
 			check_driver(DRIVER_BACKUP);
@@ -200,17 +200,17 @@ void driver_shutdown(void)
 	/* Clean up. */
 
 #if DEBUG
-	printf("Filter: %u driver deaths, %u protocol errors, "
+	printk("Filter: %u driver deaths, %u protocol errors, "
 		"%u data errors\n", problem_stats[BD_DEAD],
 		problem_stats[BD_PROTO], problem_stats[BD_DATA]);
 #endif
 
 	if(driver_close(DRIVER_MAIN) != 0)
-		printf("Filter: DEV_CLOSE failed on shutdown (1)\n");
+		printk("Filter: DEV_CLOSE failed on shutdown (1)\n");
 
 	if(USE_MIRROR)
 		if(driver_close(DRIVER_BACKUP) != 0)
-			printf("Filter: DEV_CLOSE failed on shutdown (2)\n");
+			printk("Filter: DEV_CLOSE failed on shutdown (2)\n");
 }
 
 /*===========================================================================*
@@ -266,7 +266,7 @@ static int new_driver_ep(int which)
 	r = ds_retrieve_u32(driver[which].label, (u32_t *) &endpt);
 
 	if (r != 0) {
-		printf("Filter: DS query for %s failed\n",
+		printk("Filter: DS query for %s failed\n",
 			driver[which].label);
 
 		return 0;
@@ -274,13 +274,13 @@ static int new_driver_ep(int which)
 
 	if (endpt == driver[which].endpt) {
 #if DEBUG
-		printf("Filter: same endpoint for %s\n", driver[which].label);
+		printk("Filter: same endpoint for %s\n", driver[which].label);
 #endif
 		return 0;
 	}
 
 #if DEBUG
-	printf("Filter: new enpdoint for %s: %d -> %d\n", driver[which].label,
+	printk("Filter: new enpdoint for %s: %d -> %d\n", driver[which].label,
 		driver[which].endpt, endpt);
 #endif
 
@@ -300,7 +300,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 	 */
 
 #if DEBUG
-	printf("Filter: check_driver processing driver %d, problem %d\n",
+	printk("Filter: check_driver processing driver %d, problem %d\n",
 		which, problem);
 #endif
 
@@ -308,17 +308,17 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 
 	if(new_driver_ep(which)) {
 #if DEBUG
-		printf("Filter: check_problem: noticed a new driver\n");
+		printk("Filter: check_problem: noticed a new driver\n");
 #endif
 
 		if(driver_open(which) == 0) {
 #if DEBUG2
-			printf("Filter: open 0 -> no recovery\n");
+			printk("Filter: open 0 -> no recovery\n");
 #endif
 			return 0;
 		} else {
 #if DEBUG2
-			printf("Filter: open not 0 -> recovery\n");
+			printk("Filter: open not 0 -> recovery\n");
 #endif
 			problem = BD_PROTO;
 			problem_stats[problem]++;
@@ -339,7 +339,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 		driver[which].retries++;
 
 #if DEBUG
-		printf("Filter: disk driver %d has had "
+		printk("Filter: disk driver %d has had "
 			"%d/%d retry attempts, %d/%d kills\n", which, 
 			driver[which].retries, NR_RETRIES,
 			driver[which].kills, NR_RESTARTS);
@@ -348,7 +348,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 		if (driver[which].retries < NR_RETRIES) {
 			if(retries == 1) {
 #if DEBUG
-				printf("Filter: not restarting; retrying "
+				printk("Filter: not restarting; retrying "
 					"(retries %d/%d, kills %d/%d)\n",
 					driver[which].retries, NR_RETRIES,
 					driver[which].kills, NR_RESTARTS);
@@ -356,7 +356,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 				return 0;
 			}
 #if DEBUG
-			printf("Filter: restarting (retries %d/%d, "
+			printk("Filter: restarting (retries %d/%d, "
 				"kills %d/%d, internal retry %d)\n",
 				driver[which].retries, NR_RETRIES,
 				driver[which].kills, NR_RESTARTS, retries);
@@ -364,7 +364,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 		}
 
 #if DEBUG
-		printf("Filter: disk driver %d has reached error "
+		printk("Filter: disk driver %d has reached error "
 			"threshold, restarting driver\n", which);
 #endif
 
@@ -389,7 +389,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 
 	/* We've reached the maximum number of restarts for this driver. */
 	if (USE_MIRROR) {
-		printf("Filter: kill threshold reached, disabling mirroring\n");
+		printk("Filter: kill threshold reached, disabling mirroring\n");
 
 		USE_MIRROR = 0;
 
@@ -408,7 +408,7 @@ static int check_problem(int which, int problem, int retries, int *tell_rs)
 	else {
 		/* We tried, we really did. But now we give up. Tell the user.
 		 */
-		printf("Filter: kill threshold reached, returning error\n");
+		printk("Filter: kill threshold reached, returning error\n");
 
 		if (driver[which].error == -EAGAIN) return -EIO;
 
@@ -434,7 +434,7 @@ static void restart_driver(int which, int tell_rs)
 		msg.RS_CMD_LEN = strlen(driver[which].label);
 
 #if DEBUG
-		printf("Filter: asking RS to refresh %s..\n",
+		printk("Filter: asking RS to refresh %s..\n",
 			driver[which].label);
 #endif
 
@@ -444,13 +444,13 @@ static void restart_driver(int which, int tell_rs)
 			panic(__FILE__, "RS request failed", r);
 
 #if DEBUG
-		printf("Filter: RS call succeeded\n");
+		printk("Filter: RS call succeeded\n");
 #endif
 	}
 
 	/* Wait until the new driver instance is up, and get its endpoint. */
 #if DEBUG
-	printf("Filter: endpoint update driver %d; old endpoint %d\n",
+	printk("Filter: endpoint update driver %d; old endpoint %d\n",
 		which, driver[which].endpt);
 #endif
 
@@ -462,11 +462,11 @@ static void restart_driver(int which, int tell_rs)
 
 #if DEBUG2
 		if (r != 0)
-			printf("Filter: DS request failed (%d)\n", r);
+			printk("Filter: DS request failed (%d)\n", r);
 		else if (endpt == driver[which].endpt)
-			printf("Filter: DS returned same endpoint\n");
+			printk("Filter: DS returned same endpoint\n");
 		else
-			printf("Filter: DS request 0, new endpoint\n");
+			printk("Filter: DS request 0, new endpoint\n");
 #endif
 	} while (r != 0 || endpt == driver[which].endpt);
 
@@ -492,7 +492,7 @@ int check_driver(int which)
 	do {
 		if(retries) {
 #if DEBUG
-			printf("Filter: check_driver: retry number %d\n",
+			printk("Filter: check_driver: retry number %d\n",
 				retries);
 #endif
 			problem = BD_PROTO;
@@ -516,7 +516,7 @@ int check_driver(int which)
 	} while (driver_open(which) != 0);
 
 #if DEBUG
-	printf("Filter: check_driver restarted driver %d, endpoint %d\n",
+	printk("Filter: check_driver restarted driver %d, endpoint %d\n",
 		which, driver[which].endpt);
 #endif
 
@@ -590,14 +590,14 @@ static int flt_receive(kipc_msg_t *mess, int which)
 		if(mess->m_source == CLOCK && is_notify(mess->m_type)) {
 			if (mess->NOTIFY_TIMESTAMP < flt_alarm(-1)) {
 #if DEBUG
-				printf("Filter: SKIPPING old alarm "
+				printk("Filter: SKIPPING old alarm "
 					"notification\n");
 #endif
 				continue;
 			}
 
 #if DEBUG
-			printf("Filter: timeout waiting for disk driver %d "
+			printk("Filter: timeout waiting for disk driver %d "
 				"reply!\n", which);
 #endif
 
@@ -620,7 +620,7 @@ static int flt_receive(kipc_msg_t *mess, int which)
 		if (mess->m_source != driver[DRIVER_MAIN].endpt &&
 				mess->m_source != driver[DRIVER_BACKUP].endpt) {
 #if DEBUG
-			printf("Filter: got STRAY message %d from %d\n",
+			printk("Filter: got STRAY message %d from %d\n",
 				mess->m_type, mess->m_source);
 #endif
 
@@ -643,7 +643,7 @@ static int flt_receive(kipc_msg_t *mess, int which)
 			 * messages...
 			 */
 #if DEBUG
-			printf("Filter: got UNEXPECTED reply from %d\n",
+			printk("Filter: got UNEXPECTED reply from %d\n",
 				mess->m_source);
 #endif
 
@@ -775,7 +775,7 @@ static int paired_sendrec(kipc_msg_t *m1, kipc_msg_t *m2, int both)
 	int r;
 
 #if DEBUG2
-	printf("paired_sendrec(%d) - <%d,%x:%x,%d> - %x,%x\n",
+	printk("paired_sendrec(%d) - <%d,%x:%x,%d> - %x,%x\n",
 		both, m1->m_type, m1->HIGHPOS, m1->POSITION, m1->COUNT,
 		m1->IO_GRANT, m2->IO_GRANT);
 #endif
@@ -787,7 +787,7 @@ static int paired_sendrec(kipc_msg_t *m1, kipc_msg_t *m2, int both)
 
 #if DEBUG2
 	if (r != 0)
-		printf("paired_sendrec about to return %d\n", r);
+		printk("paired_sendrec about to return %d\n", r);
 #endif
 
 	return r;
@@ -945,13 +945,13 @@ int read_write(u64_t pos, char *bufa, char *bufb, size_t *sizep, int request)
 	if(r != 0) {
 #if DEBUG
 		if (r != RET_REDO)
-			printf("Filter: paired_sendrec returned %d\n", r);
+			printk("Filter: paired_sendrec returned %d\n", r);
 #endif
 		return r;
 	}
 
 	if (m1.m_type != KCNR_TASK_REPLY || m1.REP_STATUS != 0) {
-		printf("Filter: unexpected/invalid reply from main driver: "
+		printk("Filter: unexpected/invalid reply from main driver: "
 			"(%x, %d)\n", m1.m_type, m1.REP_STATUS);
 
 		return bad_driver(DRIVER_MAIN, BD_PROTO,
@@ -959,7 +959,7 @@ int read_write(u64_t pos, char *bufa, char *bufb, size_t *sizep, int request)
 	}
 
 	if (sizes[0] != *sizep) {
-		printf("Filter: truncated reply from main driver\n");
+		printk("Filter: truncated reply from main driver\n");
 
 		/* If the driver returned a value *larger* than we requested,
 		 * OR if we did NOT exceed the disk size, then we should
@@ -975,7 +975,7 @@ int read_write(u64_t pos, char *bufa, char *bufb, size_t *sizep, int request)
 
 	if (both) {
 		if (m2.m_type != KCNR_TASK_REPLY || m2.REP_STATUS != 0) {
-			printf("Filter: unexpected/invalid reply from "
+			printk("Filter: unexpected/invalid reply from "
 				"backup driver (%x, %d)\n",
 				m2.m_type, m2.REP_STATUS);
 
@@ -984,7 +984,7 @@ int read_write(u64_t pos, char *bufa, char *bufb, size_t *sizep, int request)
 				-EFAULT);
 		}
 		if (sizes[1] != *sizep) {
-			printf("Filter: truncated reply from backup driver\n");
+			printk("Filter: truncated reply from backup driver\n");
 
 			/* As above */
 			if (sizes[1] < 0 || sizes[1] > *sizep ||

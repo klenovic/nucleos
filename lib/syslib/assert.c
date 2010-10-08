@@ -11,12 +11,12 @@
  * assert.c - diagnostics
  */
 
-#include	<assert.h>
-#include	<stdio.h>
-#include	<nucleos/const.h>
-#include	<nucleos/sysutil.h>
+#include <assert.h>
+#include <stdio.h>
+#include <nucleos/const.h>
+#include <nucleos/sysutil.h>
 
 void __bad_assertion(const char *mess) {
-	printf("%s", mess);
+	printk("%s", mess);
 	panic(NULL, NULL, NO_NUM);
 }

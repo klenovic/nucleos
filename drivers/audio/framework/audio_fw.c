@@ -423,7 +423,7 @@ static int msg_ioctl(kipc_msg_t *m_ptr)
 		if(sys_safecopyfrom(m_ptr->IO_ENDPT, 
 					(vir_bytes)m_ptr->ADDRESS, 0,
 					(vir_bytes)io_ctl_buf, len, D) != 0) {
-			printf("%s:%d: safecopyfrom failed\n", __FILE__, __LINE__);
+			printk("%s:%d: safecopyfrom failed\n", __FILE__, __LINE__);
 		}
 	}
 
@@ -436,7 +436,7 @@ static int msg_ioctl(kipc_msg_t *m_ptr)
 
 		if(sys_safecopyto(m_ptr->IO_ENDPT, (vir_bytes)m_ptr->ADDRESS, 0, 
 					(vir_bytes)io_ctl_buf, len, D) != 0) {
-			printf("%s:%d: safecopyto failed\n", __FILE__, __LINE__);
+			printk("%s:%d: safecopyto failed\n", __FILE__, __LINE__);
 		}
 
 	}
@@ -825,7 +825,7 @@ static void data_from_user(sub_dev_t *subdev)
 	r= kipc_module_call(KIPC_SEND, 0, subdev->NotifyProcNr, &m);	/* send the message */
 	if (r != 0)
 	{
-		printf("audio_fw: send to %d failed: %d\n",
+		printk("audio_fw: send to %d failed: %d\n",
 			subdev->NotifyProcNr, r);
 	}
 
@@ -887,7 +887,7 @@ static void data_to_user(sub_dev_t *sub_dev_ptr)
 	r= kipc_module_call(KIPC_SEND, 0, sub_dev_ptr->NotifyProcNr, &m);	/* send the message */
 	if (r != 0)
 	{
-		printf("audio_fw: send to %d failed: %d\n",
+		printk("audio_fw: send to %d failed: %d\n",
 			sub_dev_ptr->NotifyProcNr, r);
 	}
 
@@ -1002,7 +1002,7 @@ int pci_func;
 	if (r != 0)
 	{
 #if 0
-		printf("tell_dev: ds_retrieve_u32 failed for 'amddev': %d\n",
+		printk("tell_dev: ds_retrieve_u32 failed for 'amddev': %d\n",
 			r);
 #endif
 		return;
@@ -1020,12 +1020,12 @@ int pci_func;
 	r= kipc_module_call(KIPC_SENDREC, 0, dev_e, &m);
 	if (r != 0)
 	{
-		printf("tell_dev: sendrec to %d failed: %d\n", dev_e, r);
+		printk("tell_dev: sendrec to %d failed: %d\n", dev_e, r);
 		return;
 	}
 	if (m.m_type != 0)
 	{
-		printf("tell_dev: dma map request failed: %d\n", m.m_type);
+		printk("tell_dev: dma map request failed: %d\n", m.m_type);
 		return;
 	}
 }

@@ -7,8 +7,8 @@
  * timestart = getidle(&idlestart);
  * ...
  * timestop = getidle(&idlestop);
- * printf("Measured time interval: %d\n", timestop - timestart);
- * printf("CPU usage (idle): %d\n", idlestop - idlestart);
+ * printk("Measured time interval: %d\n", timestop - timestart);
+ * printk("CPU usage (idle): %d\n", idlestop - idlestart);
  *
  * This routine goes through PM to get the idle time, rather than making the
  * sys_getinfo() call to the kernel directly. This means that it can be used

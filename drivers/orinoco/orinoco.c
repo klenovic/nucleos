@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 	/* Observe some function key for debug dumps. */
 	fkeys = sfkeys = 0; bit_set(sfkeys, 11);
 	if ((r=fkey_map(&fkeys, &sfkeys)) != 0) 
-	    printf("Warning: orinoco couldn't observe F-key(s): %d\n",r);
+	    printk("Warning: orinoco couldn't observe F-key(s): %d\n",r);
 
 	/* Try to notify INET that we are present (again). If INET cannot
 	 * be found, assume this is the first time we started and INET is
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
 	if (r == 0) 
 		kipc_module_call(KIPC_NOTIFY, 0, inet_proc_nr, 0);
 	else if (r != -ESRCH)
-		printf("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
+		printk("orinoco: ds_retrieve_u32 failed for 'inet': %d\n", r);
 
 	while (TRUE) {
 		if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
@@ -412,8 +412,8 @@ static int do_hard_int(void) {
 
 		/* Reenable interrupts for this hook. */
 		if ((s=sys_irqenable(&or_table[i].or_hook_id)) != 0) {
-			printf("orinoco: error, couldn't enable");
-			printf(" interrupts: %d\n", s);
+			printk("orinoco: error, couldn't enable");
+			printk(" interrupts: %d\n", s);
 		}
 	}
 }
@@ -454,13 +454,13 @@ static void or_reset() {
 		panic(__FILE__, "orinoco: getuptime() failed:", r);
 
 	if(now - last_reset < system_hz * 10) {
-		printf("Resetting card too often. Going to reset driver\n");
+		printk("Resetting card too often. Going to reset driver\n");
 		exit(1);
 	}
 	
 	for (i = 0, orp = or_table; orp < or_table + OR_PORT_NR; i++, orp++) {
 		if(orp->or_mode == OR_M_DISABLED) 
-			printf("orinoco port %d is disabled\n", i);
+			printk("orinoco port %d is disabled\n", i);
 		
 		if(orp->or_mode != OR_M_ENABLED) {
 			continue;
@@ -498,7 +498,7 @@ static void or_dump (kipc_msg_t *m) {
 
 	for (i = 0, orp = or_table; orp < or_table + OR_PORT_NR; i++, orp++) {
 		if(orp->or_mode == OR_M_DISABLED) {
-			printf("%s is disabled\n", orp->or_name);
+			printk("%s is disabled\n", orp->or_name);
 		}
 		
 		if(orp->or_mode != OR_M_ENABLED)
@@ -507,7 +507,7 @@ static void or_dump (kipc_msg_t *m) {
 		m->m_type = FKEY_CONTROL;
 		m->FKEY_REQUEST = FKEY_EVENTS;
 		if((kipc_module_call(KIPC_SENDREC, 0, TTY_PROC_NR, m)) != 0)
-			printf("Contacting the TTY failed\n");
+			printk("Contacting the TTY failed\n");
 		
 		if(bit_isset(m->FKEY_SFKEYS, 11)) {
 			print_linkstatus(orp, orp->last_linkstatus);
@@ -673,7 +673,7 @@ static int or_probe (t_or * orp) {
 		r = pci_find_dev (orp->or_pci_bus, orp->or_pci_dev,
 				  orp->or_pci_func, &devind);
 		if (r == 0)	{
-			printf ("%s: no PCI found at %d.%d.%d\n",
+			printk ("%s: no PCI found at %d.%d.%d\n",
 				orp->or_name, orp->or_pci_bus,
 				orp->or_pci_dev, orp->or_pci_func);
 			return (0);
@@ -711,8 +711,8 @@ static int or_probe (t_or * orp) {
 			break;
 
 		if (just_one) {
-			printf ("%s: wrong PCI device", orp->or_name);
-			printf (" (%04x/%04x) found at %d.%d.%d\n", vid, did,
+			printk ("%s: wrong PCI device", orp->or_name);
+			printk (" (%04x/%04x) found at %d.%d.%d\n", vid, did,
 				orp->or_pci_bus, orp->or_pci_dev,
 				orp->or_pci_func);
 			return (0);
@@ -729,7 +729,7 @@ static int or_probe (t_or * orp) {
 	dname = pci_dev_name (vid, did);
 	if (!dname)
 		dname = "unknown device";
-	printf ("%s: %s (%04x/%04x) at %s\n",
+	printk ("%s: %s (%04x/%04x) at %s\n",
 		orp->or_name, dname, vid, did, pci_slot_name (devind));
 
 	pci_reserve (devind);
@@ -818,7 +818,7 @@ static u32_t or_get_bar (int devind, t_or * orp) {
 				    HERMES_16BIT_REGSPACING);
 
 		if (debug) {
-			printf ("%s: using I/O space address 0x%lx, IRQ %d\n",
+			printk ("%s: using I/O space address 0x%lx, IRQ %d\n",
 				orp->or_name, bar, orp->or_irq);
 		}
 
@@ -840,9 +840,9 @@ static u32_t or_get_bar (int devind, t_or * orp) {
 				    HERMES_32BIT_REGSPACING);
 
 		if (debug){
-			printf ("%s: using shared memory address",
+			printk ("%s: using shared memory address",
 				orp->or_name);
-			printf (" 0x%lx, IRQ %d\n", bar, orp->or_irq);
+			printk (" 0x%lx, IRQ %d\n", bar, orp->or_irq);
 		}
 
 		return bar;
@@ -914,12 +914,12 @@ static void or_init_hw (t_or * orp) {
 
 	/* first step in starting the card */
 	if (hermes_cor_reset(hw) != 0) {
-		printf ("%s: Failed to start the card\n", orp->or_name);
+		printk ("%s: Failed to start the card\n", orp->or_name);
 	}
 
 	/* here begins the real things, yeah! ;) */
 	if (err = hermes_init (hw))	{
-		printf ("error value of hermes_init(): %d\n", err);
+		printk ("error value of hermes_init(): %d\n", err);
 	}
 
 	/* Get the MAC address (which is a data item in the card)*/
@@ -929,9 +929,9 @@ static void or_init_hw (t_or * orp) {
 	or_writerids (hw, orp);
 
 	if (debug) {
-		printf ("%s: Ethernet address ", orp->or_name);
+		printk ("%s: Ethernet address ", orp->or_name);
 		for (i = 0; i < 6; i++)	{
-			printf ("%x%c", orp->or_address.ea_addr[i],
+			printk ("%x%c", orp->or_address.ea_addr[i],
 				i < 5 ? ':' : '\n');
 		}
 	}
@@ -942,7 +942,7 @@ static void or_init_hw (t_or * orp) {
 				   &(orp->or_tx.or_txfid));
 
 	if (err)
-		printf ("%s:Error %d allocating Tx buffer\n",
+		printk ("%s:Error %d allocating Tx buffer\n",
 			orp->or_name, err);
 
 	/* Establish event handle */
@@ -950,10 +950,10 @@ static void or_init_hw (t_or * orp) {
 		orp->or_hook_id = orp->or_irq;	
 		if ((s=sys_irqsetpolicy(orp->or_irq, 0, 
 			&orp->or_hook_id)) != 0)
-			printf("orinoco: couldn't set IRQ policy: %d\n", s);
+			printk("orinoco: couldn't set IRQ policy: %d\n", s);
 
 		if ((s=sys_irqenable(&orp->or_hook_id)) != 0)
-			printf("orinoco: couldn't enable interrupts: %d\n", s);
+			printk("orinoco: couldn't enable interrupts: %d\n", s);
 		first_time = FALSE;
 	}
 
@@ -963,7 +963,7 @@ static void or_init_hw (t_or * orp) {
 	/* Enable operation */
 	err = hermes_docmd_wait (hw, HERMES_CMD_ENABLE, 0, NULL);
 	if (err) {
-		printf ("%s: Error %d enabling MAC port\n", orp->or_name, err);
+		printk ("%s: Error %d enabling MAC port\n", orp->or_name, err);
 	}
 }
 
@@ -985,7 +985,7 @@ static void or_readrids (hermes_t * hw, t_or * orp) {
 	err = hermes_read_ltv (hw, USER_BAP, HERMES_RID_CNFOWNMACADDR,
 			       ETH_ALEN, NULL, &orp->or_address);
 	if (err) {
-		printf ("%s: failed to read MAC address!\n", orp->or_name);
+		printk ("%s: failed to read MAC address!\n", orp->or_name);
 		return;
 	}
 
@@ -1009,7 +1009,7 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 	err = hermes_write_wordrec (hw, USER_BAP, HERMES_RID_CNFPORTTYPE,
 				    port_type);
 	if (err) {
-		printf ("%s: Error %d setting port type\n", orp->or_name, err);
+		printk ("%s: Error %d setting port type\n", orp->or_name, err);
 		return;
 	}
 
@@ -1018,9 +1018,9 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 	}
 
 	if(strlen(essid) == 0) {
-		printf("%s: no essid provided in boot monitor!\n",
+		printk("%s: no essid provided in boot monitor!\n",
 			orp->or_name);
-		printf("Hope you'll connect to the right network... \n");
+		printk("Hope you'll connect to the right network... \n");
 	}
 
 	/* Set the desired ESSID */
@@ -1031,7 +1031,7 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 				HERMES_BYTES_TO_RECLEN (strlen (essid) + 2),
                                 &idbuf);
 	if (err) {
-		printf ("%s: Error %d setting DESIREDSSID\n", 
+		printk ("%s: Error %d setting DESIREDSSID\n", 
 				orp->or_name, err);
 		return;
 	}
@@ -1048,7 +1048,7 @@ static void or_writerids (hermes_t * hw, t_or * orp) {
 			setup_wepkey(orp, wepkey0);
 		break;
 		default:
-			printf("Invalid key provided. Has to be 13 chars\n");
+			printk("Invalid key provided. Has to be 13 chars\n");
 		break;
 	}
 }
@@ -1070,7 +1070,7 @@ static void setup_wepkey(t_or *orp, char *wepkey0) {
 					HERMES_RID_CNFWEPDEFAULTKEYID,
 					default_key);
 	if (err)
-		printf ("%s: Error %d setting the default WEP-key entry\n",
+		printk ("%s: Error %d setting the default WEP-key entry\n",
 				orp->or_name, err);	
 	
 	err = hermes_write_ltv (hw, USER_BAP, 
@@ -1078,21 +1078,21 @@ static void setup_wepkey(t_or *orp, char *wepkey0) {
 				HERMES_BYTES_TO_RECLEN(LARGE_KEY_LENGTH),
 				wepkey0);
 	if (err) 
-		printf ("%s: Error %d setting the WEP-key0\n",
+		printk ("%s: Error %d setting the WEP-key0\n",
 				orp->or_name, err);	
 	
 	err = hermes_write_wordrec (hw, USER_BAP, 
 					HERMES_RID_CNFAUTHENTICATION,
 					HERMES_AUTH_OPEN);
 	if (err)
-		printf ("%s: Error %d setting the authentication flag\n",
+		printk ("%s: Error %d setting the authentication flag\n",
 			orp->or_name, err);	
 
 	err = hermes_write_wordrec (hw, USER_BAP, 
 					HERMES_RID_CNFWEPFLAGS_INTERSIL,
 					HERMES_WEP_PRIVACY_INVOKED);
 	if (err)
-		printf ("%s: Error %d setting the master wep setting flag\n",
+		printk ("%s: Error %d setting the master wep setting flag\n",
 			orp->or_name, err);	
 	
 }
@@ -1166,7 +1166,7 @@ beginning:
 		fid = hermes_read_reg(hw, HERMES_TXCOMPLFID);
 		if(fid == 0xFFFF) {
 			/* Illegal fid found */
-			printf("unexpected txexc_fid interrupted\n");
+			printk("unexpected txexc_fid interrupted\n");
 		}
 
 		orp->or_tx.ret_busy = FALSE;
@@ -1194,7 +1194,7 @@ beginning:
 		fid = hermes_read_reg (hw, HERMES_TXCOMPLFID);
 		if(fid == 0xFFFF) {
 			/* Illegal fid found */
-			printf("unexpected tx_fid interrupted\n");
+			printk("unexpected tx_fid interrupted\n");
 		}
 
 		orp->or_tx.ret_busy = FALSE;
@@ -1225,7 +1225,7 @@ beginning:
 		fid = hermes_read_reg (hw, HERMES_ALLOCFID);
 		if (fid == 0xFFFF){
 			/* An illegal frame identifier is found. Ignore */
-			printf("Allocate event on unexpected fid\n");
+			printk("Allocate event on unexpected fid\n");
 			return ;
 		}
 
@@ -1262,7 +1262,7 @@ beginning:
 
 		if(length < 0) {
 			/* Error happened. */
-			printf("length < 0\n");
+			printk("length < 0\n");
 			goto next;
 		} else {
 			orp->rx_length[orp->rx_last] = length;
@@ -1279,7 +1279,7 @@ beginning:
 	}
 next:
 	if (events)	{
-		printf("Unknown event: 0x%x\n", events);
+		printk("Unknown event: 0x%x\n", events);
 	}
 
 	/* Acknowledge to the card that the events have been processed. After 
@@ -1328,7 +1328,7 @@ static void or_watchdog_f(timer_t *tp) {
 			continue;
 		}
 		
-		printf("or_watchdog_f: resetting port %d\n", i);
+		printk("or_watchdog_f: resetting port %d\n", i);
 		
 		orp->or_need_reset= TRUE;
 		orp->or_got_int= TRUE;
@@ -1414,33 +1414,33 @@ static void or_writev (kipc_msg_t * mp, int from_int, int vectored) {
 				((vir_bytes) mp->DL_ADDR) + iov_offset,
 				ENDPT_SELF, D, (vir_bytes) orp->or_iovec,
 				n * sizeof(orp->or_iovec[0]));
-			if (cps != 0) printf("sys_vircopy failed: %d\n", cps);
+			if (cps != 0) printk("sys_vircopy failed: %d\n", cps);
 
 			for (j = 0, iovp = orp->or_iovec; j < n; j++, iovp++) {
 				s = iovp->iov_size;
 				if (size + s > ETH_MAX_PACK_SIZE_TAGGED) {
-					printf("invalid packet size\n");
+					printk("invalid packet size\n");
 				}
 				cps = sys_vircopy(or_client, D, iovp->iov_addr,
 					ENDPT_SELF, D, (vir_bytes) databuf + o, s);
 				if (cps != 0) 
-					printf("sys_vircopy failed: %d\n",cps);
+					printk("sys_vircopy failed: %d\n",cps);
 
 				size += s;
 				o += s;
 			}
 		}
 		if (size < ETH_MIN_PACK_SIZE)
-			printf("invalid packet size %d\n", size);
+			printk("invalid packet size %d\n", size);
 	} else {
 		size = mp->DL_COUNT;
 		if (size < ETH_MIN_PACK_SIZE
 		    || size > ETH_MAX_PACK_SIZE_TAGGED)
-			printf("invalid packet size %d\n", size);
+			printk("invalid packet size %d\n", size);
 
 		cps = sys_vircopy(or_client, D, (vir_bytes)mp->DL_ADDR, 
 			ENDPT_SELF, D, (vir_bytes) databuf, size);
-		if (cps != 0) printf("sys_abscopy failed: %d\n", cps);
+		if (cps != 0) printk("sys_abscopy failed: %d\n", cps);
 	}
 
 	memset (&desc, 0, sizeof (desc));
@@ -1469,7 +1469,7 @@ static void or_writev (kipc_msg_t * mp, int from_int, int vectored) {
 		err = hermes_bap_pwrite (hw, USER_BAP, &hdr, sizeof (hdr),
 					 txfid, HERMES_802_3_OFFSET);
 		if (err) {
-			printf ("%s: Error %d writing packet header to BAP\n",
+			printk ("%s: Error %d writing packet header to BAP\n",
 				orp->or_name, err);
 			goto fail;
 		}
@@ -1485,7 +1485,7 @@ static void or_writev (kipc_msg_t * mp, int from_int, int vectored) {
 				 (void *) &(databuf[p]), RUP_EVEN (data_len),
 				 txfid, data_off);
 	if (err) {
-		printf ("hermes_bap_pwrite(data): error %d\n", err);
+		printk ("hermes_bap_pwrite(data): error %d\n", err);
 		goto fail;
 	}
 
@@ -1495,7 +1495,7 @@ static void or_writev (kipc_msg_t * mp, int from_int, int vectored) {
 				 txfid, NULL);
 	if (err) {
 		orp->or_tx.ret_busy = FALSE;
-		printf ("hermes_docmd_wait(TX|RECL): error %d\n", err);
+		printk ("hermes_docmd_wait(TX|RECL): error %d\n", err);
 		goto fail;
 	}
 
@@ -1600,18 +1600,18 @@ static void or_writev_s (kipc_msg_t * mp, int from_int) {
 			(vir_bytes) orp->or_iovec_s, 
 			n * sizeof(orp->or_iovec_s[0]), D);
 		if (cps != 0) 
-			printf("orinoco: sys_safecopyfrom failed: %d\n", cps);
+			printk("orinoco: sys_safecopyfrom failed: %d\n", cps);
 
 		for (j = 0, iovp = orp->or_iovec_s; j < n; j++, iovp++)	{
 			s = iovp->iov_size;
 			if (size + s > ETH_MAX_PACK_SIZE_TAGGED) {
-				printf("Orinoco: invalid pkt size\n");
+				printk("Orinoco: invalid pkt size\n");
 			}
 
 			cps = sys_safecopyfrom(or_client, iovp->iov_grant, 0,
 						(vir_bytes) databuf + o, s, D);
 			if (cps != 0) 
-				printf("orinoco: sys_safecopyfrom failed:%d\n",
+				printk("orinoco: sys_safecopyfrom failed:%d\n",
 						cps);
 
 			size += s;
@@ -1631,7 +1631,7 @@ static void or_writev_s (kipc_msg_t * mp, int from_int) {
 	err = hermes_bap_pwrite (hw, USER_BAP, &desc, sizeof (desc), txfid,
 				 0);
 	if (err) {
-		printf("hermes_bap_pwrite() descriptor error:resetting card\n");
+		printk("hermes_bap_pwrite() descriptor error:resetting card\n");
 		/* When this happens, the card is quite confused: it will not 
 		 * recover. Reset it */
 		or_reset();
@@ -1657,7 +1657,7 @@ static void or_writev_s (kipc_msg_t * mp, int from_int) {
 		err = hermes_bap_pwrite (hw, USER_BAP, &hdr, sizeof (hdr),
 					 txfid, HERMES_802_3_OFFSET);
 		if (err) {
-			printf ("%s: Error %d writing packet header to BAP\n",
+			printk ("%s: Error %d writing packet header to BAP\n",
 				orp->or_name, err);
 			goto fail;
 		}
@@ -1675,7 +1675,7 @@ static void or_writev_s (kipc_msg_t * mp, int from_int) {
 				 (void *) &(databuf[p]), RUP_EVEN (data_len),
 				 txfid, data_off);
 	if (err) {
-		printf ("hermes_bap_pwrite(data): error %d\n", err);
+		printk ("hermes_bap_pwrite(data): error %d\n", err);
 		goto fail;
 	}
 
@@ -1688,7 +1688,7 @@ static void or_writev_s (kipc_msg_t * mp, int from_int) {
 	err = hermes_docmd_wait (hw, HERMES_CMD_TX | HERMES_CMD_RECL,
 				 txfid, NULL);
 	if (err) {
-		printf ("hermes_docmd_wait(TX|RECL): error %d\n", err);
+		printk ("hermes_docmd_wait(TX|RECL): error %d\n", err);
 		/* Mark the buffer as available again */
 		orp->or_tx.ret_busy = FALSE;
 		goto fail;
@@ -1776,7 +1776,7 @@ static void or_ev_info (t_or * orp) {
 	err = hermes_bap_pread (hw, IRQ_BAP, &info, sizeof (info), infofid,
 				0);
 	if (err) {
-		printf ("%s: error %d reading info frame.\n", orp->or_name,
+		printk ("%s: error %d reading info frame.\n", orp->or_name,
 			err);
 		return;
 	}
@@ -1790,9 +1790,9 @@ static void or_ev_info (t_or * orp) {
 			struct hermes_tallies_frame tallies;
 
 			if (len > sizeof (tallies))	{
-				printf ("%s: Tallies frame too long ",
+				printk ("%s: Tallies frame too long ",
 					orp->or_name);
-				printf ("(%d bytes)\n", len);
+				printk ("(%d bytes)\n", len);
 				len = sizeof (tallies);
 			}
 			hermes_read_words (hw, HERMES_DATA1,
@@ -1806,9 +1806,9 @@ static void or_ev_info (t_or * orp) {
 			struct hermes_linkstatus linkstatus;
 
 			if (len != sizeof (linkstatus))	{
-				printf ("%s: Unexpected size for linkstatus ",
+				printk ("%s: Unexpected size for linkstatus ",
 					orp->or_name);
-				printf ("frame (%d bytes)\n", len);
+				printk ("frame (%d bytes)\n", len);
 			}
 
 			hermes_read_words (hw, HERMES_DATA1,
@@ -1846,7 +1846,7 @@ static void or_ev_info (t_or * orp) {
 		}
 		break;
 	default:
-		printf ("%s:Unknown information frame received(type %04x).\n",
+		printk ("%s:Unknown information frame received(type %04x).\n",
 			orp->or_name, type);
 		break;
 	}
@@ -1889,15 +1889,15 @@ static void print_linkstatus (t_or * orp, u16_t status) {
 		s = "UNKNOWN";
 	}
 
-	printf ("%s: link status: %s, ", orp->or_name, s);
+	printk ("%s: link status: %s, ", orp->or_name, s);
 
 	err = hermes_read_wordrec (hw, USER_BAP, 
 			HERMES_RID_CURRENTCHANNEL, &d);
 	if (err) {
-		printf ("%s: Error %d \n", orp->or_name, err);
+		printk ("%s: Error %d \n", orp->or_name, err);
 		return;
 	}
-	printf("channel: %d, freq: %d MHz ", 
+	printk("channel: %d, freq: %d MHz ", 
 		d, (channel_frequency[d-1]));
 
 }
@@ -2032,7 +2032,7 @@ static void or_readv (kipc_msg_t * mp, int from_int, int vectored) {
 					(vir_bytes) mp->DL_ADDR + iov_offset,
 					ENDPT_SELF, D, (vir_bytes) orp->or_iovec, 
 					n * sizeof(orp->or_iovec[0]));
-			if (cps != 0) printf("sys_vircopy failed: %d (%d)\n", 
+			if (cps != 0) printk("sys_vircopy failed: %d (%d)\n", 
 							cps, __LINE__);
 
 			for (j = 0, iovp = orp->or_iovec; j < n; j++, iovp++) {
@@ -2047,7 +2047,7 @@ static void or_readv (kipc_msg_t * mp, int from_int, int vectored) {
 						or_client, D, 
 						iovp->iov_addr, s);
 				if (cps != 0) 
-					printf("sys_vircopy failed:%d (%d)\n", 
+					printk("sys_vircopy failed:%d (%d)\n", 
 						cps, __LINE__);
 
 				size += s;
@@ -2246,7 +2246,7 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
 	 * healthy*/
 	err = hermes_bap_pread (hw, IRQ_BAP, &desc, sizeof (desc), rxfid, 0);
 	if (err) {
-		printf("Orinoco: error %d reading Rx descriptor. "
+		printk("Orinoco: error %d reading Rx descriptor. "
 			"Frame dropped\n", err);
 		orp->or_stat.ets_recvErr++;
 		return -1;
@@ -2256,10 +2256,10 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
 
 	if (status & HERMES_RXSTAT_ERR)	{
 		if (status & HERMES_RXSTAT_UNDECRYPTABLE) {
-			printf("Error reading Orinoco Rx descriptor.Dropped");
+			printk("Error reading Orinoco Rx descriptor.Dropped");
 		} else {
 			orp->or_stat.ets_CRCerr++;
-			printf("Orinoco: Bad CRC on Rx. Frame dropped\n");
+			printk("Orinoco: Bad CRC on Rx. Frame dropped\n");
 		}
 		orp->or_stat.ets_recvErr++;
 		return -1;
@@ -2272,7 +2272,7 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
 				rxfid, HERMES_802_3_OFFSET);
 
 	if (err) {
-		printf("Orinoco: error %d reading frame header. "
+		printk("Orinoco: error %d reading frame header. "
 			"Frame dropped\n", err);
 		orp->or_stat.ets_recvErr++;
 		return -1;
@@ -2283,14 +2283,14 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
 	/* Sanity checks */
 	if (length < 3)	{
 		/* No for even an 802.2 LLC header */
-		printf("Orinoco: error in frame length: length = %d\n",
+		printk("Orinoco: error in frame length: length = %d\n",
 			length);
 		/* orp->or_stat.ets_recvErr++; */
 		return -1;
 	}
 
 	if (length > IEEE802_11_DATA_LEN) {
-		printf("Orinoco: Oversized frame received (%d bytes)\n",
+		printk("Orinoco: Oversized frame received (%d bytes)\n",
 			length);
 		orp->or_stat.ets_recvErr++;
 		return -1;
@@ -2306,7 +2306,7 @@ static int or_get_recvd_packet(t_or *orp, u16_t rxfid, u8_t *databuf) {
 				rxfid, offset);
 
 	if (err) {
-		printf("Orinoco: error doing hermes_bap_pread()\n");
+		printk("Orinoco: error doing hermes_bap_pread()\n");
 		orp->or_stat.ets_recvErr++;
 		return -1;
 	}

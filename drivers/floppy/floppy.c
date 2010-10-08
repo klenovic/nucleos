@@ -482,7 +482,7 @@ unsigned nr_req;		/* length of request vector */
 
 #if 0	/* XXX hack to create a disk driver that crashes */
   { static int count= 0; if (++count > 10) {
-	printf("floppy: time to die\n"); *(int *)-1= 42;
+	printk("floppy: time to die\n"); *(int *)-1= 42;
   }}
 #endif
 
@@ -924,7 +924,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
 
   /* Block, waiting for disk interrupt. */
   if (f_intr_wait() != 0) {
-	printf("%s: disk interrupt timed out.\n", f_name());
+	printk("%s: disk interrupt timed out.\n", f_name());
   	return(ERR_TIMEOUT);
   }
 
@@ -933,7 +933,7 @@ int opcode;			/* DEV_GATHER_S or DEV_SCATTER_S */
   if (r != 0) return(r);
 
   if (f_results[ST1] & WRITE_PROTECT) {
-	printf("%s: diskette is write protected.\n", f_name());
+	printk("%s: diskette is write protected.\n", f_name());
 	return(ERR_WR_PROTECT);
   }
 
@@ -999,7 +999,7 @@ static int fdc_results()
 		return 0;			/* only good exit */
 	}
   } while ( (s=getuptime(&t1)) == 0 && (t1-t0) < TIMEOUT_TICKS );
-  if (s != 0) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
+  if (s != 0) printk("FLOPPY: warning, getuptime failed: %d\n", s); 
   need_reset = TRUE;		/* controller chip must be reset */
 
   if ((s=sys_irqenable(&irq_hook_id)) != 0)
@@ -1051,7 +1051,7 @@ int val;		/* write this byte to floppy disk controller */
   getuptime(&t0);
   do {
   	if ( (s=getuptime(&t1)) == 0 && (t1-t0) > TIMEOUT_TICKS ) {
-  		if (s != 0) printf("FLOPPY: warning, getuptime failed: %d\n", s); 
+  		if (s != 0) printk("FLOPPY: warning, getuptime failed: %d\n", s); 
 		need_reset = TRUE;	/* hit it over the head */
 		return;
 	}

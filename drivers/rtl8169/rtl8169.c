@@ -194,7 +194,7 @@ static unsigned my_inb(u16_t port)
 	u32_t value;
 	int s;
 	if ((s = sys_inb(port, &value)) != 0)
-		printf("RTL8169: warning, sys_inb failed: %d\n", s);
+		printk("RTL8169: warning, sys_inb failed: %d\n", s);
 	return value;
 }
 static unsigned my_inw(u16_t port)
@@ -202,7 +202,7 @@ static unsigned my_inw(u16_t port)
 	u32_t value;
 	int s;
 	if ((s = sys_inw(port, &value)) != 0)
-		printf("RTL8169: warning, sys_inw failed: %d\n", s);
+		printk("RTL8169: warning, sys_inw failed: %d\n", s);
 	return value;
 }
 static unsigned my_inl(u16_t port)
@@ -210,7 +210,7 @@ static unsigned my_inl(u16_t port)
 	u32_t value;
 	int s;
 	if ((s = sys_inl(port, &value)) != 0)
-		printf("RTL8169: warning, sys_inl failed: %d\n", s);
+		printk("RTL8169: warning, sys_inl failed: %d\n", s);
 	return value;
 }
 #define rl_inb(port, offset)	(my_inb((port) + (offset)))
@@ -225,21 +225,21 @@ static void my_outb(u16_t port, u8_t value)
 	int s;
 
 	if ((s = sys_outb(port, value)) != 0)
-		printf("RTL8169: warning, sys_outb failed: %d\n", s);
+		printk("RTL8169: warning, sys_outb failed: %d\n", s);
 }
 static void my_outw(u16_t port, u16_t value)
 {
 	int s;
 
 	if ((s = sys_outw(port, value)) != 0)
-		printf("RTL8169: warning, sys_outw failed: %d\n", s);
+		printk("RTL8169: warning, sys_outw failed: %d\n", s);
 }
 static void my_outl(u16_t port, u32_t value)
 {
 	int s;
 
 	if ((s = sys_outl(port, value)) != 0)
-		printf("RTL8169: warning, sys_outl failed: %d\n", s);
+		printk("RTL8169: warning, sys_outl failed: %d\n", s);
 }
 #define rl_outb(port, offset, value)	(my_outb((port) + (offset), (value)))
 #define rl_outw(port, offset, value)	(my_outw((port) + (offset), (value)))
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
 	if (r == 0)
 		kipc_module_call(KIPC_NOTIFY, 0, inet_proc_nr, 0);
 	else if (r != -ESRCH)
-		printf("rtl8169: ds_retrieve_u32 failed for 'inet': %d\n", r);
+		printk("rtl8169: ds_retrieve_u32 failed for 'inet': %d\n", r);
 #endif
 	while (TRUE) {
 		if ((r = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0)
@@ -492,80 +492,80 @@ static void rtl8169_dump(void)
 	re_t *rep;
 	int i;
 
-	printf("\n");
+	printk("\n");
 	for (i = 0, rep = &re_table[0]; i < RE_PORT_NR; i++, rep++) {
 		if (rep->re_mode == REM_DISABLED)
-			printf("Realtek RTL 8169 port %d is disabled\n", i);
+			printk("Realtek RTL 8169 port %d is disabled\n", i);
 
 		if (rep->re_mode != REM_ENABLED)
 			continue;
 
 		rtl8169_update_stat(rep);
 
-		printf("Realtek RTL 8169 statistics of port %d:\n", i);
+		printk("Realtek RTL 8169 statistics of port %d:\n", i);
 
-		printf("recvErr    :%8ld\t", rep->re_stat.ets_recvErr);
-		printf("sendErr    :%8ld\t", rep->re_stat.ets_sendErr);
-		printf("OVW        :%8ld\n", rep->re_stat.ets_OVW);
+		printk("recvErr    :%8ld\t", rep->re_stat.ets_recvErr);
+		printk("sendErr    :%8ld\t", rep->re_stat.ets_sendErr);
+		printk("OVW        :%8ld\n", rep->re_stat.ets_OVW);
 
-		printf("CRCerr     :%8ld\t", rep->re_stat.ets_CRCerr);
-		printf("frameAll   :%8ld\t", rep->re_stat.ets_frameAll);
-		printf("missedP    :%8ld\n", rep->re_stat.ets_missedP);
+		printk("CRCerr     :%8ld\t", rep->re_stat.ets_CRCerr);
+		printk("frameAll   :%8ld\t", rep->re_stat.ets_frameAll);
+		printk("missedP    :%8ld\n", rep->re_stat.ets_missedP);
 
-		printf("packetR    :%8ld\t", rep->re_stat.ets_packetR);
-		printf("packetT    :%8ld\t", rep->re_stat.ets_packetT);
-		printf("transDef   :%8ld\n", rep->re_stat.ets_transDef);
+		printk("packetR    :%8ld\t", rep->re_stat.ets_packetR);
+		printk("packetT    :%8ld\t", rep->re_stat.ets_packetT);
+		printk("transDef   :%8ld\n", rep->re_stat.ets_transDef);
 
-		printf("collision  :%8ld\t", rep->re_stat.ets_collision);
-		printf("transAb    :%8ld\t", rep->re_stat.ets_transAb);
-		printf("carrSense  :%8ld\n", rep->re_stat.ets_carrSense);
+		printk("collision  :%8ld\t", rep->re_stat.ets_collision);
+		printk("transAb    :%8ld\t", rep->re_stat.ets_transAb);
+		printk("carrSense  :%8ld\n", rep->re_stat.ets_carrSense);
 
-		printf("fifoUnder  :%8ld\t", rep->re_stat.ets_fifoUnder);
-		printf("fifoOver   :%8ld\t", rep->re_stat.ets_fifoOver);
-		printf("OWC        :%8ld\n", rep->re_stat.ets_OWC);
-		printf("interrupts :%8lu\n", rep->interrupts);
+		printk("fifoUnder  :%8ld\t", rep->re_stat.ets_fifoUnder);
+		printk("fifoOver   :%8ld\t", rep->re_stat.ets_fifoOver);
+		printk("OWC        :%8ld\n", rep->re_stat.ets_OWC);
+		printk("interrupts :%8lu\n", rep->interrupts);
 
-		printf("\nRealtek RTL 8169 Tally Counters:\n");
+		printk("\nRealtek RTL 8169 Tally Counters:\n");
 
 		dtcc = rep->v_dtcc_buf;
 
 		if (dtcc->TxOk_high)
-			printf("TxOk       :%8ld%08ld\t", dtcc->TxOk_high, dtcc->TxOk_low);
+			printk("TxOk       :%8ld%08ld\t", dtcc->TxOk_high, dtcc->TxOk_low);
 		else
-			printf("TxOk       :%16lu\t", dtcc->TxOk_low);
+			printk("TxOk       :%16lu\t", dtcc->TxOk_low);
 
 		if (dtcc->RxOk_high)
-			printf("RxOk       :%8ld%08ld\n", dtcc->RxOk_high, dtcc->RxOk_low);
+			printk("RxOk       :%8ld%08ld\n", dtcc->RxOk_high, dtcc->RxOk_low);
 		else
-			printf("RxOk       :%16lu\n", dtcc->RxOk_low);
+			printk("RxOk       :%16lu\n", dtcc->RxOk_low);
 
 		if (dtcc->TxEr_high)
-			printf("TxEr       :%8ld%08ld\t", dtcc->TxEr_high, dtcc->TxEr_low);
+			printk("TxEr       :%8ld%08ld\t", dtcc->TxEr_high, dtcc->TxEr_low);
 		else
-			printf("TxEr       :%16ld\t", dtcc->TxEr_low);
+			printk("TxEr       :%16ld\t", dtcc->TxEr_low);
 
-		printf("RxEr       :%16ld\n", dtcc->RxEr);
+		printk("RxEr       :%16ld\n", dtcc->RxEr);
 
-		printf("Tx1Col     :%16ld\t", dtcc->Tx1Col);
-		printf("TxMCol     :%16ld\n", dtcc->TxMCol);
+		printk("Tx1Col     :%16ld\t", dtcc->Tx1Col);
+		printk("TxMCol     :%16ld\n", dtcc->TxMCol);
 
 		if (dtcc->RxOkPhy_high)
-			printf("RxOkPhy    :%8ld%08ld\t", dtcc->RxOkPhy_high, dtcc->RxOkPhy_low);
+			printk("RxOkPhy    :%8ld%08ld\t", dtcc->RxOkPhy_high, dtcc->RxOkPhy_low);
 		else
-			printf("RxOkPhy    :%16ld\t", dtcc->RxOkPhy_low);
+			printk("RxOkPhy    :%16ld\t", dtcc->RxOkPhy_low);
 
 		if (dtcc->RxOkBrd_high)
-			printf("RxOkBrd    :%8ld%08ld\n", dtcc->RxOkBrd_high, dtcc->RxOkBrd_low);
+			printk("RxOkBrd    :%8ld%08ld\n", dtcc->RxOkBrd_high, dtcc->RxOkBrd_low);
 		else
-			printf("RxOkBrd    :%16ld\n", dtcc->RxOkBrd_low);
+			printk("RxOkBrd    :%16ld\n", dtcc->RxOkBrd_low);
 
-		printf("RxOkMul    :%16ld\t", dtcc->RxOkMul);
-		printf("MissPkt    :%16d\n", dtcc->MissPkt);
+		printk("RxOkMul    :%16ld\t", dtcc->RxOkMul);
+		printk("MissPkt    :%16d\n", dtcc->MissPkt);
 
-		printf("\nRealtek RTL 8169 Miscellaneous Info:\n");
+		printk("\nRealtek RTL 8169 Miscellaneous Info:\n");
 
-		printf("re_flags   :      0x%08x\n", rep->re_flags);
-		printf("tx_head    :%8d  busy %d\t",
+		printk("re_flags   :      0x%08x\n", rep->re_flags);
+		printk("tx_head    :%8d  busy %d\t",
 			rep->re_tx_head, rep->re_tx[rep->re_tx_head].ret_busy);
 	}
 }
@@ -706,7 +706,7 @@ re_t *rep;
 		r = pci_find_dev(rep->re_pcibus, rep->re_pcidev,
 			rep->re_pcifunc, &devind);
 		if (r == 0) {
-			printf("%s: no PCI found at %d.%d.%d\n",
+			printk("%s: no PCI found at %d.%d.%d\n",
 				rep->re_name, rep->re_pcibus,
 				rep->re_pcidev, rep->re_pcifunc);
 			return 0;
@@ -736,7 +736,7 @@ re_t *rep;
 			break;
 
 		if (just_one) {
-			printf("%s: wrong PCI device (%04x/%04x) found at %d.%d.%d\n",
+			printk("%s: wrong PCI device (%04x/%04x) found at %d.%d.%d\n",
 				rep->re_name, vid, did,
 				rep->re_pcibus,
 				rep->re_pcidev, rep->re_pcifunc);
@@ -751,8 +751,8 @@ re_t *rep;
 	dname = pci_dev_name(vid, did);
 	if (!dname)
 		dname = "unknown device";
-	printf("%s: ", rep->re_name);
-	printf("%s (%x/%x) at %s\n", dname, vid, did, pci_slot_name(devind));
+	printk("%s: ", rep->re_name);
+	printk("%s (%x/%x) at %s\n", dname, vid, did, pci_slot_name(devind));
 
 	pci_reserve(devind);
 	bar = pci_attr_r32(devind, PCI_BAR) & 0xffffffe0;
@@ -765,7 +765,7 @@ re_t *rep;
 	ilr = pci_attr_r8(devind, PCI_ILR);
 	rep->re_irq = ilr;
 	if (debug) {
-		printf("%s: using I/O address 0x%lx, IRQ %d\n",
+		printk("%s: using I/O address 0x%lx, IRQ %d\n",
 			rep->re_name, (unsigned long)bar, ilr);
 	}
 
@@ -903,21 +903,21 @@ re_t *rep;
 	 */
 	rep->re_hook_id = rep->re_irq;
 	if ((s = sys_irqsetpolicy(rep->re_irq, 0, &rep->re_hook_id)) != 0)
-		printf("RTL8169: error, couldn't set IRQ policy: %d\n", s);
+		printk("RTL8169: error, couldn't set IRQ policy: %d\n", s);
 
 	rl_reset_hw(rep);
 
 	if ((s = sys_irqenable(&rep->re_hook_id)) != 0)
-		printf("RTL8169: error, couldn't enable interrupts: %d\n", s);
+		printk("RTL8169: error, couldn't enable interrupts: %d\n", s);
 
-	printf("%s: model: %s mac: 0x%08lx\n",
+	printk("%s: model: %s mac: 0x%08lx\n",
 		rep->re_name, rep->re_model, rep->re_mac);
 
 	rl_confaddr(rep);
 	if (debug) {
-		printf("%s: Ethernet address ", rep->re_name);
+		printk("%s: Ethernet address ", rep->re_name);
 		for (i = 0; i < 6; i++) {
-			printf("%x%c", rep->re_address.ea_addr[i],
+			printk("%x%c", rep->re_address.ea_addr[i],
 				i < 5 ? ':' : '\n');
 		}
 	}
@@ -1043,7 +1043,7 @@ re_t *rep;
 	rl_outw(port, RL_IMR, 0x0000);
 
 	/* Reset the device */
-	printf("rl_reset_hw: (before reset) port = 0x%x, RL_CR = 0x%x\n",
+	printk("rl_reset_hw: (before reset) port = 0x%x, RL_CR = 0x%x\n",
 		port, rl_inb(port, RL_CR));
 	rl_outb(port, RL_CR, RL_CR_RST);
 	getuptime(&t0);
@@ -1051,10 +1051,10 @@ re_t *rep;
 		if (!(rl_inb(port, RL_CR) & RL_CR_RST))
 			break;
 	} while (getuptime(&t1) == 0 && (t1 - t0) < system_hz);
-	printf("rl_reset_hw: (after reset) port = 0x%x, RL_CR = 0x%x\n",
+	printk("rl_reset_hw: (after reset) port = 0x%x, RL_CR = 0x%x\n",
 		port, rl_inb(port, RL_CR));
 	if (rl_inb(port, RL_CR) & RL_CR_RST)
-		printf("rtl8169: reset failed to complete");
+		printk("rtl8169: reset failed to complete");
 	rl_outw(port, RL_ISR, 0xFFFF);
 
 	/* Get Model and MAC info */
@@ -1064,7 +1064,7 @@ re_t *rep;
 	case RL_TCR_HWVER_RTL8169:
 		rep->re_model = "RTL8169";
 
-		printf("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
+		printk("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
 		rl_outw(port, 0x82, 0x01);
 		break;
 	case RL_TCR_HWVER_RTL8169S:
@@ -1072,9 +1072,9 @@ re_t *rep;
 
 		rtl8169s_phy_config(port);
 
-		printf("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
+		printk("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
 		rl_outw(port, 0x82, 0x01);
-		printf("Set PHY Reg 0x0bh = 0x00h\n");
+		printk("Set PHY Reg 0x0bh = 0x00h\n");
 		mdio_write(port, 0x0b, 0x0000);		/* w 0x0b 15 0 0 */
 		break;
 	case RL_TCR_HWVER_RTL8110S:
@@ -1082,7 +1082,7 @@ re_t *rep;
 
 		rtl8169s_phy_config(port);
 
-		printf("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
+		printk("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
 		rl_outw(port, 0x82, 0x01);
 		break;
 	case RL_TCR_HWVER_RTL8169SB:
@@ -1092,7 +1092,7 @@ re_t *rep;
 		mdio_write(port, 0x01, 0x90d0);
 		mdio_write(port, 0x1f, 0x00);
 
-		printf("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
+		printk("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
 		rl_outw(port, 0x82, 0x01);
 		break;
 	case RL_TCR_HWVER_RTL8110SCd:
@@ -1100,7 +1100,7 @@ re_t *rep;
 
 		rtl8169scd_phy_config(port);
 
-		printf("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
+		printk("Set MAC Reg C+CR Offset 0x82h = 0x01h\n");
 		rl_outw(port, 0x82, 0x01);
 		break;
 	default:
@@ -1138,7 +1138,7 @@ re_t *rep;
 	t = rl_inw(port, RL_CPLUSCMD);
 	if ((rep->re_mac == RL_TCR_HWVER_RTL8169S) ||
 	    (rep->re_mac == RL_TCR_HWVER_RTL8110S)) {
-		printf("Set MAC Reg C+CR Offset 0xE0. "
+		printk("Set MAC Reg C+CR Offset 0xE0. "
 			"Bit-3 and bit-14 MUST be 1\n");
 		rl_outw(port, RL_CPLUSCMD, t | RL_CPLUS_MULRW | (1 << 14));
 	} else
@@ -1319,7 +1319,7 @@ readvs_loop:
 		rep->re_stat.ets_CRCerr++;
 
 	if ((rxstat & (DESC_FS | DESC_LS)) != (DESC_FS | DESC_LS)) {
-		printf("rl_readv_s: packet is fragmented\n");
+		printk("rl_readv_s: packet is fragmented\n");
 		/* Fix the fragmented packet */
 		if (index == N_RX_DESC - 1) {
 			desc->status =  DESC_EOR | DESC_OWN | (RX_BUFSIZE & DESC_RX_LENMASK);
@@ -1336,7 +1336,7 @@ readvs_loop:
 	totlen = rxstat & DESC_RX_LENMASK;
 	if (totlen < 8 || totlen > 2 * ETH_MAX_PACK_SIZE) {
 		/* Someting went wrong */
-		printf("rl_readv_s: bad length (%u) in status 0x%08lx\n",
+		printk("rl_readv_s: bad length (%u) in status 0x%08lx\n",
 			totlen, rxstat);
 		panic(NULL, NULL, NO_NUM);
 	}
@@ -1461,7 +1461,7 @@ int from_int;
 	desc += tx_head;
 
 	if(!desc || !rep->re_tx_desc) {
-		printf("desc 0x%lx, re_tx_desc 0x%lx, tx_head %d, setup %d\n",
+		printk("desc 0x%lx, re_tx_desc 0x%lx, tx_head %d, setup %d\n",
 			desc, rep->re_tx_desc, tx_head, rep->setup);
 	}
 
@@ -1483,7 +1483,7 @@ int from_int;
 		 * ret_busy twice should be sufficient.
 		 */
 #if VERBOSE
-		printf("rl_writev_s: race detected\n");
+		printk("rl_writev_s: race detected\n");
 #endif
 		rep->re_flags &= ~REF_SEND_AVAIL;
 		rep->re_send_int = FALSE;
@@ -1610,25 +1610,25 @@ re_t *rep;
 
 	if (mii_status & RL_STAT_LINK) {
 		rep->re_link_up = 1;
-		printf("%s: link up at ", rep->re_name);
+		printk("%s: link up at ", rep->re_name);
 	} else {
 		rep->re_link_up = 0;
-		printf("%s: link down\n", rep->re_name);
+		printk("%s: link down\n", rep->re_name);
 		return;
 	}
 
 	if (mii_status & RL_STAT_1000)
-		printf("1000 Mbps");
+		printk("1000 Mbps");
 	else if (mii_status & RL_STAT_100)
-		printf("100 Mbps");
+		printk("100 Mbps");
 	else if (mii_status & RL_STAT_10)
-		printf("10 Mbps");
+		printk("10 Mbps");
 
 	if (mii_status & RL_STAT_FULLDUP)
-		printf(", full duplex");
+		printk(", full duplex");
 	else
-		printf(", half duplex");
-	printf("\n");
+		printk(", half duplex");
+	printk("\n");
 
 	dump_phy(rep);
 }
@@ -1766,12 +1766,12 @@ int may_block;
 	r = send(rep->re_client, &reply);
 
 	if (r == -ELOCKED && may_block) {
-		printW(); printf("send locked\n");
+		printW(); printk("send locked\n");
 		return;
 	}
 
 	if (r < 0) {
-		printf("RTL8169 tried sending to %d, type %d\n",
+		printk("RTL8169 tried sending to %d, type %d\n",
 			rep->re_client, reply.m_type);
 		panic("rtl8169", "send failed:", r);
 	}
@@ -1800,174 +1800,174 @@ static void dump_phy(re_t *rep)
 	port = rep->re_base_port;
 
 	t = rl_inb(port, RL_CONFIG0);
-	printf("CONFIG0\t\t:");
+	printk("CONFIG0\t\t:");
 	t = t & RL_CFG0_ROM;
 	if (t == RL_CFG0_ROM128K)
-		printf(" 128K Boot ROM");
+		printk(" 128K Boot ROM");
 	else if (t == RL_CFG0_ROM64K)
-		printf(" 64K Boot ROM");
+		printk(" 64K Boot ROM");
 	else if (t == RL_CFG0_ROM32K)
-		printf(" 32K Boot ROM");
+		printk(" 32K Boot ROM");
 	else if (t == RL_CFG0_ROM16K)
-		printf(" 16K Boot ROM");
+		printk(" 16K Boot ROM");
 	else if (t == RL_CFG0_ROM8K)
-		printf(" 8K Boot ROM");
+		printk(" 8K Boot ROM");
 	else if (t == RL_CFG0_ROMNO)
-		printf(" No Boot ROM");
-	printf("\n");
+		printk(" No Boot ROM");
+	printk("\n");
 
 	t = rl_inb(port, RL_CONFIG1);
-	printf("CONFIG1\t\t:");
+	printk("CONFIG1\t\t:");
 	if (t & RL_CFG1_LEDS1)
-		printf(" LED1");
+		printk(" LED1");
 	if (t & RL_CFG1_LEDS0)
-		printf(" LED0");
+		printk(" LED0");
 	if (t & RL_CFG1_DVRLOAD)
-		printf(" Driver");
+		printk(" Driver");
 	if (t & RL_CFG1_LWACT)
-		printf(" LWAKE");
+		printk(" LWAKE");
 	if (t & RL_CFG1_IOMAP)
-		printf(" IOMAP");
+		printk(" IOMAP");
 	if (t & RL_CFG1_MEMMAP)
-		printf(" MEMMAP");
+		printk(" MEMMAP");
 	if (t & RL_CFG1_VPD)
-		printf(" VPD");
+		printk(" VPD");
 	if (t & RL_CFG1_PME)
-		printf(" PME");
-	printf("\n");
+		printk(" PME");
+	printk("\n");
 
 	t = rl_inb(port, RL_CONFIG2);
-	printf("CONFIG2\t\t:");
+	printk("CONFIG2\t\t:");
 	if (t & RL_CFG2_AUX)
-		printf(" AUX");
+		printk(" AUX");
 	if (t & RL_CFG2_PCIBW)
-		printf(" PCI-64-Bit");
+		printk(" PCI-64-Bit");
 	else
-		printf(" PCI-32-Bit");
+		printk(" PCI-32-Bit");
 	t = t & RL_CFG2_PCICLK;
 	if (t == RL_CFG2_66MHZ)
-		printf(" 66 MHz");
+		printk(" 66 MHz");
 	else if (t == RL_CFG2_33MHZ)
-		printf(" 33 MHz");
-	printf("\n");
+		printk(" 33 MHz");
+	printk("\n");
 
 	t = mdio_read(port, MII_CTRL);
-	printf("MII_CTRL\t:");
+	printk("MII_CTRL\t:");
 	if (t & MII_CTRL_RST)
-		printf(" Reset");
+		printk(" Reset");
 	if (t & MII_CTRL_LB)
-		printf(" Loopback");
+		printk(" Loopback");
 	if (t & MII_CTRL_ANE)
-		printf(" ANE");
+		printk(" ANE");
 	if (t & MII_CTRL_PD)
-		printf(" Power-down");
+		printk(" Power-down");
 	if (t & MII_CTRL_ISO)
-		printf(" Isolate");
+		printk(" Isolate");
 	if (t & MII_CTRL_RAN)
-		printf(" RAN");
+		printk(" RAN");
 	if (t & MII_CTRL_DM)
-		printf(" Full-duplex");
+		printk(" Full-duplex");
 	if (t & MII_CTRL_CT)
-		printf(" COL-signal");
+		printk(" COL-signal");
 	t = t & (MII_CTRL_SP_LSB | MII_CTRL_SP_MSB);
 	if (t == MII_CTRL_SP_10)
-		printf(" 10 Mb/s");
+		printk(" 10 Mb/s");
 	else if (t == MII_CTRL_SP_100)
-		printf(" 100 Mb/s");
+		printk(" 100 Mb/s");
 	else if (t == MII_CTRL_SP_1000)
-		printf(" 1000 Mb/s");
-	printf("\n");
+		printk(" 1000 Mb/s");
+	printk("\n");
 
 	t = mdio_read(port, MII_STATUS);
-	printf("MII_STATUS\t:");
+	printk("MII_STATUS\t:");
 	if (t & MII_STATUS_100T4)
-		printf(" 100Base-T4");
+		printk(" 100Base-T4");
 	if (t & MII_STATUS_100XFD)
-		printf(" 100BaseX-FD");
+		printk(" 100BaseX-FD");
 	if (t & MII_STATUS_100XHD)
-		printf(" 100BaseX-HD");
+		printk(" 100BaseX-HD");
 	if (t & MII_STATUS_10FD)
-		printf(" 10Mbps-FD");
+		printk(" 10Mbps-FD");
 	if (t & MII_STATUS_10HD)
-		printf(" 10Mbps-HD");
+		printk(" 10Mbps-HD");
 	if (t & MII_STATUS_100T2FD)
-		printf(" 100Base-T2-FD");
+		printk(" 100Base-T2-FD");
 	if (t & MII_STATUS_100T2HD)
-		printf(" 100Base-T2-HD");
+		printk(" 100Base-T2-HD");
 	if (t & MII_STATUS_EXT_STAT)
-		printf(" Ext-stat");
+		printk(" Ext-stat");
 	if (t & MII_STATUS_RES)
-		printf(" res-0x%lx", t & MII_STATUS_RES);
+		printk(" res-0x%lx", t & MII_STATUS_RES);
 	if (t & MII_STATUS_MFPS)
-		printf(" MFPS");
+		printk(" MFPS");
 	if (t & MII_STATUS_ANC)
-		printf(" ANC");
+		printk(" ANC");
 	if (t & MII_STATUS_RF)
-		printf(" remote-fault");
+		printk(" remote-fault");
 	if (t & MII_STATUS_ANA)
-		printf(" ANA");
+		printk(" ANA");
 	if (t & MII_STATUS_LS)
-		printf(" Link");
+		printk(" Link");
 	if (t & MII_STATUS_JD)
-		printf(" Jabber");
+		printk(" Jabber");
 	if (t & MII_STATUS_EC)
-		printf(" Extended-capability");
-	printf("\n");
+		printk(" Extended-capability");
+	printk("\n");
 
 	t = mdio_read(port, MII_ANA);
-	printf("MII_ANA\t\t: 0x%04lx\n", t);
+	printk("MII_ANA\t\t: 0x%04lx\n", t);
 
 	t = mdio_read(port, MII_ANLPA);
-	printf("MII_ANLPA\t: 0x%04lx\n", t);
+	printk("MII_ANLPA\t: 0x%04lx\n", t);
 
 	t = mdio_read(port, MII_ANE);
-	printf("MII_ANE\t\t:");
+	printk("MII_ANE\t\t:");
 	if (t & MII_ANE_RES)
-		printf(" res-0x%lx", t & MII_ANE_RES);
+		printk(" res-0x%lx", t & MII_ANE_RES);
 	if (t & MII_ANE_PDF)
-		printf(" Par-Detect-Fault");
+		printk(" Par-Detect-Fault");
 	if (t & MII_ANE_LPNPA)
-		printf(" LP-Next-Page-Able");
+		printk(" LP-Next-Page-Able");
 	if (t & MII_ANE_NPA)
-		printf(" Loc-Next-Page-Able");
+		printk(" Loc-Next-Page-Able");
 	if (t & MII_ANE_PR)
-		printf(" Page-Received");
+		printk(" Page-Received");
 	if (t & MII_ANE_LPANA)
-		printf(" LP-Auto-Neg-Able");
-	printf("\n");
+		printk(" LP-Auto-Neg-Able");
+	printk("\n");
 
 	t = mdio_read(port, MII_1000_CTRL);
-	printf("MII_1000_CTRL\t:");
+	printk("MII_1000_CTRL\t:");
 	if (t & MII_1000C_FULL)
-		printf(" 1000BaseT-FD");
+		printk(" 1000BaseT-FD");
 	if (t & MII_1000C_HALF)
-		printf(" 1000BaseT-HD");
-	printf("\n");
+		printk(" 1000BaseT-HD");
+	printk("\n");
 
 	t = mdio_read(port, MII_1000_STATUS);
 	if (t) {
-		printf("MII_1000_STATUS\t:");
+		printk("MII_1000_STATUS\t:");
 		if (t & MII_1000S_LRXOK)
-			printf(" Local-Receiver");
+			printk(" Local-Receiver");
 		if (t & MII_1000S_RRXOK)
-			printf(" Remote-Receiver");
+			printk(" Remote-Receiver");
 		if (t & MII_1000S_HALF)
-			printf(" 1000BaseT-HD");
+			printk(" 1000BaseT-HD");
 		if (t & MII_1000S_FULL)
-			printf(" 1000BaseT-FD");
-		printf("\n");
+			printk(" 1000BaseT-FD");
+		printk("\n");
 
 		t = mdio_read(port, MII_EXT_STATUS);
-		printf("MII_EXT_STATUS\t:");
+		printk("MII_EXT_STATUS\t:");
 		if (t & MII_ESTAT_1000XFD)
-			printf(" 1000BaseX-FD");
+			printk(" 1000BaseX-FD");
 		if (t & MII_ESTAT_1000XHD)
-			printf(" 1000BaseX-HD");
+			printk(" 1000BaseX-HD");
 		if (t & MII_ESTAT_1000TFD)
-			printf(" 1000BaseT-FD");
+			printk(" 1000BaseT-FD");
 		if (t & MII_ESTAT_1000THD)
-			printf(" 1000BaseT-HD");
-		printf("\n");
+			printk(" 1000BaseT-HD");
+		printk("\n");
 	}
 #endif
 }
@@ -1983,7 +1983,7 @@ static void do_hard_int(void)
 
 		/* Reenable interrupts for this hook. */
 		if ((s = sys_irqenable(&re_table[i].re_hook_id)) != 0)
-			printf("RTL8169: error, couldn't enable interrupts: %d\n", s);
+			printk("RTL8169: error, couldn't enable interrupts: %d\n", s);
 	}
 }
 
@@ -2093,7 +2093,7 @@ re_t *rep;
 		isr &= ~RL_ISR_RES;
 
 	if (isr)
-		printf("rl_handler: unhandled interrupt isr = 0x%04x\n", isr);
+		printk("rl_handler: unhandled interrupt isr = 0x%04x\n", isr);
 
 	return 1;
 }
@@ -2126,9 +2126,9 @@ timer_t *tp;
 			rep->re_tx_alive = FALSE;
 			continue;
 		}
-		printf("rl_watchdog_f: resetting port %d mode 0x%x flags 0x%x\n",
+		printk("rl_watchdog_f: resetting port %d mode 0x%x flags 0x%x\n",
 			i, rep->re_mode, rep->re_flags);
-		printf("tx_head    :%8d  busy %d\t",
+		printk("tx_head    :%8d  busy %d\t",
 			rep->re_tx_head, rep->re_tx[rep->re_tx_head].ret_busy);
 		rep->re_need_reset = TRUE;
 		rep->re_got_int = TRUE;

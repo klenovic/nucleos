@@ -191,7 +191,7 @@ struct slabdata *newslabdata(int list)
 	vm_assert(sizeof(*n) == VM_PAGE_SIZE);
 
 	if(!(n = vm_allocpage(&p, VMP_SLAB))) {
-		printf("newslabdata: vm_allocpage failed\n");
+		printk("newslabdata: vm_allocpage failed\n");
 		return NULL;
 	}
 	memset(n->sdh.usebits, 0, sizeof(n->sdh.usebits));
@@ -355,7 +355,7 @@ void *slaballoc(int bytes)
 
 #if SANITYCHECKS
 	if(bytes >= SLABSIZES+MINSIZE) {
-		printf("slaballoc: odd, bytes %d?\n", bytes);
+		printk("slaballoc: odd, bytes %d?\n", bytes);
 	}
 			if(!slabsane_f(__FILE__, __LINE__, ret, bytes))
 				vm_panic("slaballoc: slabsane failed", NO_NUM);
@@ -384,7 +384,7 @@ static int objstats(void *mem, int bytes,
 #if SANITYCHECKS
 #define OBJSTATSCHECK(cond) \
 	if(!(cond)) { \
-		printf("VM: objstats: %s failed for ptr 0x%p, %d bytes\n", \
+		printk("VM: objstats: %s failed for ptr 0x%p, %d bytes\n", \
 			#cond, mem, bytes); \
 		return -EINVAL; \
 	}
@@ -401,7 +401,7 @@ static int objstats(void *mem, int bytes,
 #if SANITYCHECKS
 	if(*(u32_t *) mem == JUNK && !nojunkwarning) {
 		util_stacktrace();
-		printf("VM: WARNING: JUNK seen in slab object\n");
+		printk("VM: WARNING: JUNK seen in slab object\n");
 	}
 #endif
 	/* Retrieve entry in slabs[]. */
@@ -451,7 +451,7 @@ void slabfree(void *mem, int bytes)
 
 #if SANITYCHECKS
 	if(*(u32_t *) mem == JUNK) {
-		printf("VM: WARNING: likely double free, JUNK seen\n");
+		printk("VM: WARNING: likely double free, JUNK seen\n");
 	}
 
 	slabunlock(mem, bytes);
@@ -547,14 +547,14 @@ void slabstats(void)
 
 			if(t > 0) {
 				int bytes = t * b;
-				printf("VMSTATS: %2d slabs: %d (%dkB)\n", b, t, bytes/1024);
+				printk("VMSTATS: %2d slabs: %d (%dkB)\n", b, t, bytes/1024);
 				totalbytes += bytes;
 			}
 		}
 	}
 
 	if(pages > 0) {
-		printf("VMSTATS: %dK net used in slab objects in %d pages (%dkB): %d%% utilization\n",
+		printk("VMSTATS: %dK net used in slab objects in %d pages (%dkB): %d%% utilization\n",
 			totalbytes/1024, pages, pages*VM_PAGE_SIZE/1024,
 				100 * totalbytes / (pages*VM_PAGE_SIZE));
 	}

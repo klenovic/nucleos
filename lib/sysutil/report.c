@@ -20,9 +20,9 @@ int num;				/* number to go with the message */
 /* Display a message for a server. */ 
 
   if (num != NO_NUM) {
-      printf("%s: %s %d\n", who, mess, num);
+      printk("%s: %s %d\n", who, mess, num);
   } else {
-      printf("%s: %s\n", who, mess);
+      printk("%s: %s\n", who, mess);
   }
 }
 

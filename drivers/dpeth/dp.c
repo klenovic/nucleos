@@ -122,7 +122,7 @@ static void reply(dpeth_t * dep, int err, int m_type)
   reply.DL_COUNT = dep->de_read_s;
   getuptime(&reply.DL_CLCK);
 
-  DEBUG(printf("\t reply %d (%ld)\n", reply.m_type, reply.DL_STAT));
+  DEBUG(printk("\t reply %d (%ld)\n", reply.m_type, reply.DL_STAT));
 
   if ((status = kipc_module_call(KIPC_SEND, 0, dep->de_client, &reply)) == 0) {
 	dep->de_read_s = 0;
@@ -200,37 +200,37 @@ static void do_dump(kipc_msg_t *mp)
   dpeth_t *dep;
   int port;
 
-  printf("\n\n");
+  printk("\n\n");
   for (port = 0, dep = de_table; port < DE_PORT_NR; port += 1, dep += 1) {
 
 	if (dep->de_mode == DEM_DISABLED) continue;
 
-	printf("%s statistics:\t\t", dep->de_name);
+	printk("%s statistics:\t\t", dep->de_name);
 
 	/* Network interface status  */
-	printf("Status: 0x%04x (%d)\n\n", dep->de_flags, dep->de_int_pending);
+	printk("Status: 0x%04x (%d)\n\n", dep->de_flags, dep->de_int_pending);
 
 	(*dep->de_dumpstatsf) (dep);
 
 	/* Transmitted/received bytes */
-	printf("Tx bytes:%10ld\t", dep->bytes_Tx);
-	printf("Rx bytes:%10ld\n", dep->bytes_Rx);
+	printk("Tx bytes:%10ld\t", dep->bytes_Tx);
+	printk("Rx bytes:%10ld\n", dep->bytes_Rx);
 
 	/* Transmitted/received packets */
-	printf("Tx OK:     %8ld\t", dep->de_stat.ets_packetT);
-	printf("Rx OK:     %8ld\n", dep->de_stat.ets_packetR);
+	printk("Tx OK:     %8ld\t", dep->de_stat.ets_packetT);
+	printk("Rx OK:     %8ld\n", dep->de_stat.ets_packetR);
 
 	/* Transmit/receive errors */
-	printf("Tx Err:    %8ld\t", dep->de_stat.ets_sendErr);
-	printf("Rx Err:    %8ld\n", dep->de_stat.ets_recvErr);
+	printk("Tx Err:    %8ld\t", dep->de_stat.ets_sendErr);
+	printk("Rx Err:    %8ld\n", dep->de_stat.ets_recvErr);
 
 	/* Transmit unnerruns/receive overrruns */
-	printf("Tx Und:    %8ld\t", dep->de_stat.ets_fifoUnder);
-	printf("Rx Ovr:    %8ld\n", dep->de_stat.ets_fifoOver);
+	printk("Tx Und:    %8ld\t", dep->de_stat.ets_fifoUnder);
+	printk("Rx Ovr:    %8ld\n", dep->de_stat.ets_fifoOver);
 
 	/* Transmit collisions/receive CRC errors */
-	printf("Tx Coll:   %8ld\t", dep->de_stat.ets_collision);
-	printf("Rx CRC:    %8ld\n", dep->de_stat.ets_CRCerr);
+	printk("Tx Coll:   %8ld\t", dep->de_stat.ets_collision);
+	printk("Rx CRC:    %8ld\n", dep->de_stat.ets_CRCerr);
   }
   return;
 }
@@ -310,7 +310,7 @@ static void do_init(kipc_msg_t * mp)
 		    !ne_probe(dep) &&	/* Probe for NEx000 */
 		    !el2_probe(dep) &&	/* Probe for 3c503  */
 		    !el3_probe(dep)) {	/* Probe for 3c509  */
-			printf("%s: warning no ethernet card found at 0x%04X\n",
+			printk("%s: warning no ethernet card found at 0x%04X\n",
 			       dep->de_name, dep->de_base_port);
 			dep->de_mode = DEM_DISABLED;
 		}
@@ -360,7 +360,7 @@ static void do_init(kipc_msg_t * mp)
   reply_mess.m_type = DL_CONF_REPLY;
   reply_mess.m_data1 = port;
   reply_mess.m_data2 = DE_PORT_NR;
-  DEBUG(printf("\t reply %d\n", reply_mess.m_type));
+  DEBUG(printk("\t reply %d\n", reply_mess.m_type));
   if (kipc_module_call(KIPC_SEND, 0, mp->m_source, &reply_mess) != 0)	/* Can't send */
 	panic(dep->de_name, SendErrMsg, mp->m_source);
 
@@ -550,7 +550,7 @@ static void do_stop(kipc_msg_t * mp)
 static void do_watchdog(void *kipc_msg_t)
 {
 
-  DEBUG(printf("\t no reply"));
+  DEBUG(printk("\t no reply"));
   return;
 }
 
@@ -606,7 +606,7 @@ int main(int argc, char **argv)
   /* Request function key for debug dumps */
   fkeys = sfkeys = 0; bit_set(sfkeys, 8);
   if ((fkey_map(&fkeys, &sfkeys)) != 0) 
-	printf("%s: couldn't program Shift+F8 key (%d)\n", DevName, errno);
+	printk("%s: couldn't program Shift+F8 key (%d)\n", DevName, errno);
 
 #ifdef ETH_IGN_PROTO
   {
@@ -626,7 +626,7 @@ int main(int argc, char **argv)
   while (TRUE) {
 	if ((rc = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m)) != 0) panic(dep->de_name, RecvErrMsg, rc);
 
-	DEBUG(printf("eth: got message %d, ", m.m_type));
+	DEBUG(printk("eth: got message %d, ", m.m_type));
 
 	if (is_notify(m.m_type)) {
 		switch(_ENDPOINT_P(m.m_source)) {

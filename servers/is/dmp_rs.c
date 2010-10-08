@@ -38,22 +38,22 @@ void rproc_dmp()
 
   getsysinfo(RS_PROC_NR, SI_PROC_TAB, rproc);
 
-  printf("Reincarnation Server (RS) system process table dump\n");
-  printf("----label---- endpoint- -pid- flags -dev- -T- alive_tm starts command\n");
+  printk("Reincarnation Server (RS) system process table dump\n");
+  printk("----label---- endpoint- -pid- flags -dev- -T- alive_tm starts command\n");
   for (i=prev_i; i<NR_SYS_PROCS; i++) {
   	rp = &rproc[i];
   	if (!(rp->r_flags & RS_IN_USE)) continue;
   	if (++n > 22) break;
-  	printf("%13s %9d %5d %5s %3d/%1d %3u %8u %5dx %s",
+  	printk("%13s %9d %5d %5s %3d/%1d %3u %8u %5dx %s",
   		rp->r_label, rp->r_proc_nr_e, rp->r_pid,
 		s_flags_str(rp->r_flags), rp->r_dev_nr, rp->r_dev_style,
 		rp->r_period, rp->r_alive_tm, rp->r_restarts,
 		rp->r_cmd
   	);
-	printf("\n");
+	printk("\n");
   }
   if (i >= NR_SYS_PROCS) i = 0;
-  else printf("--more--\r");
+  else printk("--more--\r");
   prev_i = i;
 }
 

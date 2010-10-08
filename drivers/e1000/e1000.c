@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     }
     else if (r != -ESRCH)
     {
-        printf("e1000: ds_retrieve_u32 failed for 'inet': %d\n", r);
+        printk("e1000: ds_retrieve_u32 failed for 'inet': %d\n", r);
     }
 
     /*

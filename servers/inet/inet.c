@@ -109,8 +109,8 @@ void main(void)
 	struct timeval tv;
 
 #if DEBUG
-	printf("Starting inet...\n");
-	printf("%s\n", version);
+	printk("Starting inet...\n");
+	printk("%s\n", version);
 #endif
 
 #if HZ_DYNAMIC
@@ -130,7 +130,7 @@ void main(void)
 			timerand= 0;
 		else
 		{
-			printf("inet: unable to read random data from %s: %s\n",
+			printk("inet: unable to read random data from %s: %s\n",
 				RANDOM_DEV_NAME, r == -1 ? strerror(errno) :
 				r == 0 ? "EOF" : "not enough data");
 		}
@@ -138,16 +138,16 @@ void main(void)
 	}
 	else
 	{
-		printf("inet: unable to open random device %s: %s\n",
+		printk("inet: unable to open random device %s: %s\n",
 			RANDOM_DEV_NAME, strerror(errno));
 	}
 	if (timerand)
 	{
-		printf("inet: using current time for random-number seed\n");
+		printk("inet: using current time for random-number seed\n");
 		r= gettimeofday(&tv, NULL);
 		if (r == -1)
 		{
-			printf("sysutime failed: %s\n", strerror(errno));
+			printk("sysutime failed: %s\n", strerror(errno));
 			exit(1);
 		}
 		memcpy(randbits, &tv, sizeof(tv));
@@ -164,7 +164,7 @@ void main(void)
 	device.dev= ip_dev;
 	device.style= STYLE_CLONE;
 	if (svrctl(FSSIGNON, (void *) &device) == -1) {
-		printf("inet: error %d on registering ethernet devices\n",
+		printk("inet: error %d on registering ethernet devices\n",
 			errno);
 		pause();
 	}
@@ -244,7 +244,7 @@ void main(void)
 			eth_rec(&mq->mq_mess);
 			mq_free(mq);
 		} else {
-			printf("inet: got bad message type 0x%x from %d\n",
+			printk("inet: got bad message type 0x%x from %d\n",
 				mq->mq_mess.m_type, mq->mq_mess.m_source);
 			mq_free(mq);
 		}
@@ -282,12 +282,12 @@ void panic0(file, line)
 char *file;
 int line;
 {
-	printf("panic at %s, %d: ", file, line);
+	printk("panic at %s, %d: ", file, line);
 }
 
 void inet_panic()
 {
-	printf("\ninet stacktrace: ");
+	printk("\ninet stacktrace: ");
 	util_stacktrace();
 	(panic)("INET","aborted due to a panic",NO_NUM);
 	for(;;);
@@ -300,7 +300,7 @@ int line;
 char *what;
 {
 	panic0(file, line);
-	printf("assertion \"%s\" failed", what);
+	printk("assertion \"%s\" failed", what);
 	panic();
 }
 
@@ -313,7 +313,7 @@ char *what;
 int rhs;
 {
 	panic0(file, line);
-	printf("compare (%d) %s (%d) failed", lhs, what, rhs);
+	printk("compare (%d) %s (%d) failed", lhs, what, rhs);
 	panic();
 }
 #endif /* !NDEBUG */

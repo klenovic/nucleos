@@ -7,7 +7,7 @@
 int no_sys()
 {
 /* Somebody has used an illegal system call number */
-  printf("no_sys: invalid call %d\n", req_nr);
+  printk("no_sys: invalid call %d\n", req_nr);
   return(-EINVAL);
 }
 

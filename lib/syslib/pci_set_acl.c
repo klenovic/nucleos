@@ -45,7 +45,7 @@ struct rs_pci *rs_pci;
 		CPF_READ);
 	if (gid == -1)
 	{
-		printf("pci_set_acl: cpf_grant_direct failed: %d\n",
+		printk("pci_set_acl: cpf_grant_direct failed: %d\n",
 			errno);
 		return -EINVAL;
 	}

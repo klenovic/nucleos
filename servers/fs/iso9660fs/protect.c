@@ -18,7 +18,7 @@ int fs_access()
   
   /* Temporarily open the file. */
   if ( (rip = get_dir_record(fs_m_in.REQ_INODE_NR)) == NULL) {
-    printf("ISOFS(%d) get_dir_record by fs_access() failed\n", SELF_E);
+    printk("ISOFS(%d) get_dir_record by fs_access() failed\n", SELF_E);
     return(-EINVAL);
   }
 

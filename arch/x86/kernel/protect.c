@@ -346,7 +346,7 @@ for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
 	ds = (DS_LDT_INDEX*DESC_SIZE) | TI | privilege;
 
 #define CHECK(s1, s2) if(s1 != s2) {		\
-	printf("%s:%d: " #s1 " != " #s2 " for ep %d\n", \
+	printk("%s:%d: " #s1 " != " #s2 " for ep %d\n", \
 		File, line, rp->p_endpoint); fail++; } checked++;
 
 	CHECK(rp->p_reg.cs, cs);
@@ -359,7 +359,7 @@ for (rp = BEG_PROC_ADDR; rp < END_PROC_ADDR; ++rp) {
 	CHECK(rp->p_reg.ds, ds);
      }
      if(fail) {
-     	printf("%d/%d checks failed\n", fail, checked);
+     	printk("%d/%d checks failed\n", fail, checked);
      	kernel_panic("wrong", fail);
      }
 }
@@ -372,28 +372,28 @@ void printseg(char *banner, int iscs, struct proc *pr, u32_t selector)
 	u32_t base, limit, index, dpl;
 	struct segdesc_s *desc;
 
-	if(banner) { kprintf("%s", banner); }
+	if(banner) { printk("%s", banner); }
 
 	index = selector >> 3;
 
-	kprintf("RPL %d, ind %d of ",
+	printk("RPL %d, ind %d of ",
 		(selector & RPL_MASK), index);
 
 	if(selector & TI) {
-		kprintf("LDT");
+		printk("LDT");
 		if(index < 0 || index >= LDT_SIZE) {
-			kprintf("invalid index in ldt\n");
+			printk("invalid index in ldt\n");
 			return;
 		}
 		if(!pr) {
-			kprintf("local selector but unknown process\n");
+			printk("local selector but unknown process\n");
 			return;
 		}
 		desc = &pr->p_seg.p_ldt[index];
 	} else {
-		kprintf("GDT");
+		printk("GDT");
 		if(index < 0 || index >= GDT_SIZE) {
-			kprintf("invalid index in gdt\n");
+			printk("invalid index in gdt\n");
 			return;
 		}
 		desc = &gdt[index];
@@ -410,14 +410,14 @@ void printseg(char *banner, int iscs, struct proc *pr, u32_t selector)
 		((u32_t) desc->base_middle << BASE_MIDDLE_SHIFT) |
 		((u32_t) desc->base_high << BASE_HIGH_SHIFT);
 
-	kprintf(" -> base 0x%08lx size 0x%08lx ", base, limit+1);
+	printk(" -> base 0x%08lx size 0x%08lx ", base, limit+1);
 
 	if(iscs) {
 		if(!(desc->granularity & BIG))
-			kprintf("16bit ");
+			printk("16bit ");
 	} else {
 		if(!(desc->granularity & BIG)) 
-			kprintf("not big ");
+			printk("not big ");
 	}
 
 	if(desc->granularity & 0x20) {	/* reserved */
@@ -425,28 +425,28 @@ void printseg(char *banner, int iscs, struct proc *pr, u32_t selector)
 	}
 
 	if(!(desc->access & PRESENT))
-		kprintf("notpresent ");
+		printk("notpresent ");
 
 	if(!(desc->access & SEGMENT))
-		kprintf("system ");
+		printk("system ");
 
 	if(desc->access & EXECUTABLE) {
-		kprintf("   exec ");
-		if(desc->access & CONFORMING) kprintf("conforming ");
-		if(!(desc->access & READABLE)) kprintf("non-readable ");
+		printk("   exec ");
+		if(desc->access & CONFORMING) printk("conforming ");
+		if(!(desc->access & READABLE)) printk("non-readable ");
 	} else {
-		kprintf("nonexec ");
-		if(desc->access & EXPAND_DOWN) kprintf("non-expand-down ");
-		if(!(desc->access & WRITEABLE)) kprintf("non-writable ");
+		printk("nonexec ");
+		if(desc->access & EXPAND_DOWN) printk("non-expand-down ");
+		if(!(desc->access & WRITEABLE)) printk("non-writable ");
 	}
 
 	if(!(desc->access & ACCESSED)) {
-		kprintf("nonacc ");
+		printk("nonacc ");
 	}
 
 	dpl = ((u32_t) desc->access & DPL) >> DPL_SHIFT;
 
-	kprintf("DPL %d\n", dpl);
+	printk("DPL %d\n", dpl);
 
 	return;
 }
@@ -461,7 +461,7 @@ int prot_set_kern_seg_limit(vir_bytes limit)
 	int incr_clicks;
 
 	if(limit <= kinfo.data_base) {
-		kprintf("prot_set_kern_seg_limit: limit bogus\n");
+		printk("prot_set_kern_seg_limit: limit bogus\n");
 		return -EINVAL;
 	}
 

@@ -55,7 +55,7 @@ Copyright 1995 Philip Homburg
 #define ALLOC_STORAGE(Ident, Nitems, Label)				\
 	do								\
 	{								\
-		printf("buf.c: malloc %d %s\n", Nitems, Label);		\
+		printk("buf.c: malloc %d %s\n", Nitems, Label);		\
 		Ident= malloc(sizeof(*Ident) * Nitems);			\
 		if (!Ident)						\
 			ip_panic(( "unable to alloc %s", Label ));	\
@@ -274,7 +274,7 @@ size_t size;
 #endif
 #undef ALLOC_BUF
 		{
-			DBLOCK(2, printf("freeing buffers\n"));
+			DBLOCK(2, printk("freeing buffers\n"));
 
 			bf_free_bufsize= 0;
 			for (i=0; bf_free_bufsize<size && i<MAX_BUFREQ_PRI;
@@ -288,11 +288,11 @@ size_t size;
 #if DEBUG && 0
  { acc_t *acc;
    j= 0; for(acc= buf512_freelist; acc; acc= acc->acc_next) j++;
-   printf("# of free 512-bytes buffer is now %d\n", j); }
+   printk("# of free 512-bytes buffer is now %d\n", j); }
 #endif
 			}
 #if DEBUG && 0
- { printf("last level was level %d\n", i-1); }
+ { printk("last level was level %d\n", i-1); }
 #endif
 			if (bf_free_bufsize<size)
 				ip_panic(( "not enough buffers freed" ));
@@ -358,7 +358,7 @@ acc_t *acc;
 	{
 #if defined(bf_afree)
 		DIFBLOCK(1, (acc->acc_linkC <= 0),
-			printf("clnt_file= %s, clnt_line= %d\n", 
+			printk("clnt_file= %s, clnt_line= %d\n", 
 			clnt_file, clnt_line));
 #endif
 		assert (acc->acc_linkC>0);
@@ -374,7 +374,7 @@ acc_t *acc;
 
 #if defined(bf_afree)
 		DIFBLOCK(1, (buf->buf_linkC == 0),
-			printf("clnt_file= %s, clnt_line= %d\n", 
+			printk("clnt_file= %s, clnt_line= %d\n", 
 			clnt_file, clnt_line));
 #endif
 		assert (buf->buf_linkC>0);
@@ -475,7 +475,7 @@ int min_len;
 
 #if DEBUG
 #ifdef bf_packIffLess
- { where(); printf("calling bf_pack because of %s %d: %d\n", bf_pack_file,
+ { where(); printk("calling bf_pack because of %s %d: %d\n", bf_pack_file,
 	bf_pack_line, min_len); }
 #endif
 #endif
@@ -557,7 +557,7 @@ register unsigned length;
 		return NULL;
 #ifdef BUF_TRACK_ALLOC_FREE
 	assert(data ||
-		(printf("from %s, %d: %u, %u\n",
+		(printk("from %s, %d: %u, %u\n",
 		clnt_file, clnt_line, offset, length), 0));
 #else
 	assert(data);
@@ -608,7 +608,7 @@ register unsigned length;
 	{
 #ifdef bf_cut
 		assert (data ||
-			(printf("bf_cut called from %s:%d\n",
+			(printk("bf_cut called from %s:%d\n",
 			clnt_file, clnt_line), 0));
 #else
 		assert (data);
@@ -643,7 +643,7 @@ register unsigned offset;
 		offset -= new_acc->acc_length;
 		new_acc= new_acc->acc_next;
 #ifdef BUF_TRACK_ALLOC_FREE
-		assert(new_acc || (printf("called from %s, %d\n",
+		assert(new_acc || (printk("called from %s, %d\n",
 			clnt_file, clnt_line),0));
 #else
 		assert(new_acc);
@@ -918,7 +918,7 @@ int bf_consistency_check()
 			acc->acc_generation= buf_generation;
 			if (!silent)
 			{
-				printf(
+				printk(
 "acc[%d] (%p) has been lost with count %d, last allocated at %s, %d\n",
 	i, acc, acc->acc_linkC, acc->acc_alloc_file, acc->acc_alloc_line);
 #if 0
@@ -934,7 +934,7 @@ int bf_consistency_check()
 		{
 			if (!silent)
 			{
-				printf(
+				printk(
 "acc[%d] is freed but still in use, allocated at %s, %d, freed at %s, %d\n",
 				i, acc->acc_alloc_file, acc->acc_alloc_line, 
 				acc->acc_free_file, acc->acc_free_line);
@@ -948,10 +948,10 @@ int bf_consistency_check()
 		}
 		if (!silent)
 		{
-			printf(
+			printk(
 "# of tracked links (%d) for acc[%d] don't match with stored link count %d\n",
 				acc->acc_check_linkC, i, acc->acc_linkC);
-			printf("acc[%d] was allocated at %s, %d\n",
+			printk("acc[%d] was allocated at %s, %d\n",
 				i, acc->acc_alloc_file, acc->acc_alloc_line);
 			silent=1;
 		}
@@ -1029,7 +1029,7 @@ int i;
 	{
 		assert(buf->buf_generation == buf_generation-1);
 		buf->buf_generation= buf_generation;
-		printf(
+		printk(
 "%s[%d] (%p) has been lost with count %d, last allocated at %s, %d\n",
 			label, i, buf,
 			buf->buf_linkC, buf->buf_alloc_file,
@@ -1040,7 +1040,7 @@ int i;
 		return 0;
 	if (buf->buf_check_linkC < 0)
 	{
-		printf(
+		printk(
 "%s[%d] is freed but still in use, allocated at %s, %d, freed at %s, %d\n",
 			label, i, buf->buf_alloc_file, buf->buf_alloc_line, 
 			buf->buf_free_file, buf->buf_free_line);
@@ -1048,10 +1048,10 @@ int i;
 		if (buf->buf_check_linkC == buf->buf_linkC)
 			return 1;
 	}
-	printf(
+	printk(
 "# of tracked links (%d) for %s[%d] don't match with stored link count %d\n",
 			buf->buf_check_linkC, label, i, buf->buf_linkC);
-	printf("%s[%d] was allocated at %s, %d\n",
+	printk("%s[%d] was allocated at %s, %d\n",
 		label, i, buf->buf_alloc_file, buf->buf_alloc_line);
 	return 1;
 }
@@ -1127,38 +1127,38 @@ acc_t *acc;
 	{
 		if (acc->acc_linkC <= 0)
 		{
-			printf("wrong acc_linkC (%d) for acc %p\n", 
+			printk("wrong acc_linkC (%d) for acc %p\n", 
 				acc->acc_linkC, acc);
 			return 0;
 		}
 		if (acc->acc_offset < 0)
 		{
-			printf("wrong acc_offset (%d) for acc %p\n",
+			printk("wrong acc_offset (%d) for acc %p\n",
 				acc->acc_offset, acc);
 			return 0;
 		}
 		if (acc->acc_length < 0)
 		{
-			printf("wrong acc_length (%d) for acc %p\n",
+			printk("wrong acc_length (%d) for acc %p\n",
 				acc->acc_length, acc);
 			return 0;
 		}
 		buffer= acc->acc_buffer;
 		if (buffer == NULL)
 		{
-			printf("no buffer for acc %p\n", acc);
+			printk("no buffer for acc %p\n", acc);
 			return 0;
 		}
 		if (buffer->buf_linkC <= 0)
 		{
-			printf(
+			printk(
 			"wrong buf_linkC (%d) for buffer %p, from acc %p\n",
 				buffer->buf_linkC, buffer, acc);
 			return 0;
 		}
 		if (acc->acc_offset + acc->acc_length > buffer->buf_size)
 		{
-			printf("%d + %d > %d for buffer %p, and acc %p\n",
+			printk("%d + %d > %d for buffer %p, and acc %p\n",
 				acc->acc_offset, acc->acc_length, 
 				buffer->buf_size, buffer, acc);
 			return 0;
@@ -1166,7 +1166,7 @@ acc_t *acc;
 	}
 	if (acc != NULL)
 	{
-		printf("loop\n");
+		printk("loop\n");
 		return 0;
 	}
 	return 1;
@@ -1176,7 +1176,7 @@ static void free_accs()
 {
 	int i, j;
 
-	DBLOCK(1, printf("free_accs\n"));
+	DBLOCK(1, printk("free_accs\n"));
 
 assert(bf_linkcheck(bf_linkcheck_acc));
 	for (i=0; !acc_freelist && i<MAX_BUFREQ_PRI; i++)
@@ -1188,13 +1188,13 @@ assert(bf_linkcheck(bf_linkcheck_acc));
 			{
 				(*freereq[j])(i);
 				assert(bf_linkcheck(bf_linkcheck_acc) ||
-					(printf("just called %p\n",
+					(printk("just called %p\n",
 					freereq[i]),0));
 			}
 		}
 	}
 #if DEBUG
-	printf("last level was level %d\n", i-1);
+	printk("last level was level %d\n", i-1);
 #endif
 }
 
@@ -1223,7 +1223,7 @@ size_t alignment;
 	buf_size= bf_bufsize(acc);
 #ifdef bf_align
 	assert((size != 0 && buf_size != 0) ||
-		(printf("bf_align(..., %d, %d) from %s, %d\n",
+		(printk("bf_align(..., %d, %d) from %s, %d\n",
 			size, alignment, clnt_file, clnt_line),0));
 #else
 	assert(size != 0 && buf_size != 0);

@@ -138,7 +138,7 @@ tcp_port_t *tcp_port;
 					continue;
 			}
 			assert(r == 0 ||
-				(printf("ip_send failed, error %d\n", r),0));
+				(printk("ip_send failed, error %d\n", r),0));
 		}
 
 		if (pack2write)
@@ -221,7 +221,7 @@ tcp_conn_t *tcp_conn;
 
 		if (!pack2write)
 		{
-			DBLOCK(1, printf("connection closed while inuse\n"));
+			DBLOCK(1, printk("connection closed while inuse\n"));
 			return 0;
 		}
 		tot_hdr_size= bf_bufsize(pack2write);
@@ -235,7 +235,7 @@ tcp_conn_t *tcp_conn;
 		if (seg_seq == tcp_conn->tc_ISS)
 		{
 			assert(tcp_conn->tc_transmit_timer.tim_active ||
-				(tcp_print_conn(tcp_conn), printf("\n"), 0));
+				(tcp_print_conn(tcp_conn), printk("\n"), 0));
 			seg_flags |= THF_SYN;
 			tcp_conn->tc_SND_TRM++;
 		}
@@ -286,7 +286,7 @@ tcp_conn_t *tcp_conn;
 			if (seg_seq == tcp_conn->tc_snd_cwnd)
 			{
 				DBLOCK(2,
-					printf("no data: window is closed\n"));
+					printk("no data: window is closed\n"));
 				goto after_data;
 			}
 
@@ -333,10 +333,10 @@ tcp_conn_t *tcp_conn;
 					 * for a future push.
 					 */
 					DBLOCK(0x20,
-					    printf("no data: no push\n"));
+					    printk("no data: no push\n"));
 					if (head)
 					{
-						DBLOCK(0x1, printf(
+						DBLOCK(0x1, printk(
 					"no data: setting TCF_NO_PUSH\n"));
 						tcp_conn->tc_flags |=
 							TCF_NO_PUSH;
@@ -348,7 +348,7 @@ tcp_conn_t *tcp_conn;
 
 			if (tot_hdr_size != IP_TCP_MIN_HDR_SIZE)
 			{
-				printf(
+				printk(
 				"tcp_write`make_pack: tot_hdr_size = %d\n",
 					tot_hdr_size);
 				mss= tcp_conn->tc_mtu-tot_hdr_size;
@@ -364,18 +364,18 @@ tcp_conn_t *tcp_conn;
 			if (no_push &&
 				seg_hi_data-seg_lo_data != mss)
 			{
-				DBLOCK(0x20, printf(
+				DBLOCK(0x20, printk(
 				"no data: no push for partial segment\n"));
 				more2write= (tcp_conn->tc_fd &&
 					(tcp_conn->tc_fd->tf_flags &
 					TFF_WRITE_IP));
 				DIFBLOCK(2, more2write, 
-					printf(
+					printk(
 			"tcp_send`make_pack: more2write -> !TCF_NO_PUSH\n");
 				);
 				if (head && !more2write)
 				{
-					DBLOCK(0x1, printf(
+					DBLOCK(0x1, printk(
 				"partial segment: setting TCF_NO_PUSH\n"));
 					tcp_conn->tc_flags |= TCF_NO_PUSH;
 				}
@@ -396,12 +396,12 @@ tcp_conn_t *tcp_conn;
 				if (tcp_conn->tc_flags & TCF_PUSH_NOW)
 				{
 					DBLOCK(0x20,
-					printf("push: no Nagle\n"));
+					printk("push: no Nagle\n"));
 				}
 				else
 				{
 				DBLOCK(0x20,
-					printf("no data: partial packet\n"));
+					printk("no data: partial packet\n"));
 				seg_flags &= ~THF_FIN;
 				goto after_data;
 				}
@@ -410,7 +410,7 @@ tcp_conn_t *tcp_conn;
 			if (seg_hi-seg_seq == 0)
 			{
 				DBLOCK(0x20,
-				printf("no data: no data available\n"));
+				printk("no data: no data available\n"));
 				goto after_data;
 			}
 
@@ -458,7 +458,7 @@ tcp_conn_t *tcp_conn;
 			tcp_conn->tc_SND_TRM= seg_hi;
 
 			assert(tcp_conn->tc_transmit_timer.tim_active ||
-				(tcp_print_conn(tcp_conn), printf("\n"), 0));
+				(tcp_print_conn(tcp_conn), printk("\n"), 0));
 			if (tcp_conn->tc_rt_seq == 0 && 
 				tcp_Gmod4G(seg_seq, tcp_conn->tc_rt_threshold))
 			{
@@ -477,7 +477,7 @@ tcp_conn_t *tcp_conn;
 					bf_bufsize(tcp_conn->tc_send_data) &&
 					seg_hi_data>seg_lo_data)||
 					(tcp_print_conn(tcp_conn),
-					printf(
+					printk(
 		" seg_hi_data= 0x%x, seg_lo_data= 0x%x, queue_lo_data= 0x%x\n",
 					seg_hi_data, seg_lo_data,
 					queue_lo_data), 0));
@@ -524,7 +524,7 @@ after_data:
 
 		return pack2write;
 	default:
-		DBLOCK(1, tcp_print_conn(tcp_conn); printf("\n"));
+		DBLOCK(1, tcp_print_conn(tcp_conn); printk("\n"));
 		ip_panic(( "Illegal state" ));
 	}
 	assert(0);
@@ -548,7 +548,7 @@ u16_t new_win;
 	u16_t mss, cthresh;
 	unsigned window;
 
-	DBLOCK(0x10, printf("tcp_release_retrans, conn[%d]: ack %lu, win %u\n",
+	DBLOCK(0x10, printk("tcp_release_retrans, conn[%d]: ack %lu, win %u\n",
 		tcp_conn-tcp_conn_table, (unsigned long)seg_ack, new_win););
 
 	assert(tcp_conn->tc_busy);
@@ -598,7 +598,7 @@ u16_t new_win;
 
 				if (!warned)
 				{
-					printf(
+					printk(
 "tcp_release_retrans: warning retransmission time is limited to %d ms\n",
 						TCP_RTT_MAX*1000/HZ);
 					warned= 1;
@@ -606,13 +606,13 @@ u16_t new_win;
 #endif
 				rtt= TCP_RTT_MAX;
 			}
-			DBLOCK(0x10, printf(
+			DBLOCK(0x10, printk(
 	"tcp_release_retrans, conn[%d]: retrans_time= %ld ms, rtt = %ld ms\n",
 				tcp_conn-tcp_conn_table,
 				retrans_time*1000/HZ,
 				rtt*1000/HZ));
 
-			DBLOCK(0x10, printf(
+			DBLOCK(0x10, printk(
 	"tcp_release_retrans: artt= %ld -> %ld, drtt= %ld -> %ld\n",
 				tcp_conn->tc_artt, artt,
 				tcp_conn->tc_drtt, drtt));
@@ -673,13 +673,13 @@ u16_t new_win;
 	if (tcp_conn->tc_SND_UNA - tcp_conn->tc_ISS > 0x40000000)
 	{
 		tcp_conn->tc_ISS += 0x20000000;
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"tcp_release_retrans: updating ISS to 0x%lx\n",
 			(unsigned long)tcp_conn->tc_ISS););
 		if (tcp_Lmod4G(tcp_conn->tc_SND_UP, tcp_conn->tc_ISS))
 		{
 			tcp_conn->tc_SND_UP= tcp_conn->tc_ISS;
-			DBLOCK(1, printf(
+			DBLOCK(1, printk(
 			"tcp_release_retrans: updating SND_UP to 0x%lx\n",
 				(unsigned long)tcp_conn->tc_SND_UP););
 		}
@@ -741,7 +741,7 @@ u16_t new_win;
 		{
 			assert(tcp_conn->tc_state == TCS_CLOSING);
 			DBLOCK(0x10,
-			printf("all data sent in abondoned connection\n"));
+			printk("all data sent in abondoned connection\n"));
 			tcp_close_connection(tcp_conn, -ENOTCONN);
 			return;
 		}
@@ -754,7 +754,7 @@ u16_t new_win;
 	}
 
 	DIFBLOCK(2, (tcp_conn->tc_snd_cwnd == tcp_conn->tc_SND_TRM),
-		printf("not sending: zero window\n"));
+		printk("not sending: zero window\n"));
 
 	if (tcp_conn->tc_snd_cwnd != tcp_conn->tc_SND_TRM &&
 		tcp_conn->tc_SND_NXT != tcp_conn->tc_SND_TRM)
@@ -822,7 +822,7 @@ struct timer *timer;
 	acc_t *pkt;
 	int new_ttl, no_push;
 
-	DBLOCK(0x20, printf("tcp_send_timeout: conn[%d]\n", conn));
+	DBLOCK(0x20, printk("tcp_send_timeout: conn[%d]\n", conn));
 
 	curr_time= get_time();
 
@@ -845,12 +845,12 @@ struct timer *timer;
 		tcp_conn->tc_0wnd_to= 0;
 		assert(!tcp_conn->tc_fd ||
 			!(tcp_conn->tc_fd->tf_flags & TFF_WRITE_IP) ||
-			(tcp_print_conn(tcp_conn), printf("\n"), 0));
+			(tcp_print_conn(tcp_conn), printk("\n"), 0));
 
 		if (snd_nxt != snd_una)
 		{
 			assert(no_push);
-			DBLOCK(1, printf("not setting keepalive timer\n"););
+			DBLOCK(1, printk("not setting keepalive timer\n"););
 
 			/* No point in setting the keepalive timer if we
 			 * still have to send more data.
@@ -859,13 +859,13 @@ struct timer *timer;
 		}
 
 		assert(tcp_conn->tc_send_data == NULL);
-		DBLOCK(0x20, printf("keep alive timer\n"));
+		DBLOCK(0x20, printk("keep alive timer\n"));
 		if (tcp_conn->tc_ka_snd != tcp_conn->tc_SND_NXT ||
 			tcp_conn->tc_ka_rcv != tcp_conn->tc_RCV_NXT)
 		{
 			tcp_conn->tc_ka_snd= tcp_conn->tc_SND_NXT;
 			tcp_conn->tc_ka_rcv= tcp_conn->tc_RCV_NXT;
-			DBLOCK(0x20, printf(
+			DBLOCK(0x20, printk(
 "tcp_send_timeout: conn[%d] setting keepalive timer (+%ld ms)\n",
 				tcp_conn-tcp_conn_table,
 				tcp_conn->tc_ka_time*1000/HZ));
@@ -875,7 +875,7 @@ struct timer *timer;
 				tcp_conn-tcp_conn_table);
 			return;
 		}
-		DBLOCK(0x10, printf(
+		DBLOCK(0x10, printk(
 		"tcp_send_timeout, conn[%d]: triggering keep alive probe\n",
 			tcp_conn-tcp_conn_table));
 		tcp_conn->tc_ka_snd--;
@@ -920,7 +920,7 @@ struct timer *timer;
 		tcp_conn->tc_stt= 0;
 		tcp_conn->tc_0wnd_to= 0;
 
-		DBLOCK(0x20, printf(
+		DBLOCK(0x20, printk(
 	"tcp_send_timeout: conn[%d] setting timer to %ld ms (+%ld ms)\n",
 			tcp_conn-tcp_conn_table,
 			(curr_time+rtt)*1000/HZ, rtt*1000/HZ));
@@ -939,7 +939,7 @@ struct timer *timer;
 		 * reason to transmit. We can asume a zero window.
 		 */
 
-		DBLOCK(0x10, printf("conn[%d] setting zero window timer\n",
+		DBLOCK(0x10, printk("conn[%d] setting zero window timer\n",
 			tcp_conn-tcp_conn_table));
 
 		if (tcp_conn->tc_0wnd_to < TCP_0WND_MIN)
@@ -955,7 +955,7 @@ struct timer *timer;
 		tcp_conn->tc_stt= curr_time;
 		tcp_conn->tc_rt_seq= 0;
 
-		DBLOCK(0x10, printf(
+		DBLOCK(0x10, printk(
 	"tcp_send_timeout: conn[%d] setting timer to %ld ms (+%ld ms)\n",
 			tcp_conn-tcp_conn_table,
 			(curr_time+tcp_conn->tc_0wnd_to)*1000/HZ,
@@ -969,14 +969,14 @@ struct timer *timer;
 	assert(stt <= curr_time);
 
 	DIFBLOCK(0x10, (tcp_conn->tc_fd == 0),
-		printf("conn[%d] timeout in abondoned connection\n",
+		printk("conn[%d] timeout in abondoned connection\n",
 		tcp_conn-tcp_conn_table));
 
 	/* At this point, we have do a retransmission, or send a zero window
 	 * probe, which is almost the same.
 	 */
 
-	DBLOCK(0x20, printf("tcp_send_timeout: conn[%d] una= %lu, rtt= %ldms\n",
+	DBLOCK(0x20, printk("tcp_send_timeout: conn[%d] una= %lu, rtt= %ldms\n",
 		tcp_conn-tcp_conn_table,
 		(unsigned long)tcp_conn->tc_SND_UNA, rtt*1000/HZ));
 
@@ -993,11 +993,11 @@ struct timer *timer;
 		 * and a broken link. Assume a PMTU blackhole, and switch
 		 * off PMTU discovery.
 		 */
-		DBLOCK(1, printf(
+		DBLOCK(1, printk(
 			"tcp[%d]: PMTU blackhole (or broken link) on route to ",
 			tcp_conn-tcp_conn_table);
 			writeIpAddr(tcp_conn->tc_remaddr);
-			printf(", max mtu = %u\n", tcp_conn->tc_max_mtu););
+			printk(", max mtu = %u\n", tcp_conn->tc_max_mtu););
 		tcp_conn->tc_flags &= ~TCF_PMTU;
 		tcp_conn->tc_mtutim= curr_time;
 		if (tcp_conn->tc_max_mtu > IP_DEF_MTU)
@@ -1031,7 +1031,7 @@ struct timer *timer;
 		timeout= rtt;
 	timeout += curr_time;
 
-	DBLOCK(0x20, printf(
+	DBLOCK(0x20, printk(
 	"tcp_send_timeout: conn[%d] setting timer to %ld ms (+%ld ms)\n",
 		tcp_conn-tcp_conn_table, timeout*1000/HZ,
 		(timeout-curr_time)*1000/HZ));
@@ -1042,7 +1042,7 @@ struct timer *timer;
 #if 0
 	if (tcp_conn->tc_rt_seq == 0)
 	{
-		printf("tcp_send_timeout: conn[%d]: setting tc_rt_time\n",
+		printk("tcp_send_timeout: conn[%d]: setting tc_rt_time\n",
 			tcp_conn-tcp_conn_table);
 		tcp_conn->tc_rt_time= curr_time-rtt;
 		tcp_conn->tc_rt_seq= tcp_conn->tc_SND_UNA;
@@ -1079,7 +1079,7 @@ tcp_conn_t *tcp_conn;
 	{
 		if (tcp_fd->tf_ioreq != NWIOTCPSHUTDOWN)
 			return;
-		DBLOCK(0x10, printf("NWIOTCPSHUTDOWN\n"));
+		DBLOCK(0x10, printk("NWIOTCPSHUTDOWN\n"));
 		if (tcp_conn->tc_state == TCS_CLOSED)
 		{
 			tcp_reply_ioctl (tcp_fd, tcp_conn->tc_error);
@@ -1087,7 +1087,7 @@ tcp_conn_t *tcp_conn;
 		}
 		if (!(tcp_conn->tc_flags & TCF_FIN_SENT))
 		{
-			DBLOCK(0x10, printf("calling tcp_shutdown\n"));
+			DBLOCK(0x10, printk("calling tcp_shutdown\n"));
 			tcp_shutdown (tcp_conn);
 		}
 		else
@@ -1095,12 +1095,12 @@ tcp_conn_t *tcp_conn;
 			if (tcp_conn->tc_SND_UNA == tcp_conn->tc_SND_NXT)
 			{
 				tcp_reply_ioctl (tcp_fd, 0);
-				DBLOCK(0x10, printf("shutdown completed\n"));
+				DBLOCK(0x10, printk("shutdown completed\n"));
 			}
 			else
 			{
 				DBLOCK(0x10,
-					printf("shutdown still inprogress\n"));
+					printk("shutdown still inprogress\n"));
 			}
 		}
 		return;
@@ -1140,7 +1140,7 @@ tcp_conn_t *tcp_conn;
 				if ((urg && nourg) || (!urg && !nourg))
 				{
 					DBLOCK(0x20,
-						printf("not sending\n"));
+						printk("not sending\n"));
 					return;
 				}
 			}
@@ -1213,7 +1213,7 @@ tcp_conn_t *tcp_conn;
 				if ((urg && nourg) || (!urg && !nourg))
 				{
 					DBLOCK(0x20,
-						printf("not sending\n"));
+						printk("not sending\n"));
 					return 0;
 				}
 			}
@@ -1238,7 +1238,7 @@ tcp_conn_t *tcp_conn;
 	if (tcp_fd->tf_select_res)
 		tcp_fd->tf_select_res(tcp_fd->tf_srfd, SR_SELECT_WRITE);
 	else
-		printf("tcp_rsel_write: no select_res\n");
+		printk("tcp_rsel_write: no select_res\n");
 }
 
 /*
@@ -1266,7 +1266,7 @@ tcp_conn_t *tcp_conn;
 	tcp_conn->tc_SND_PSH= tcp_conn->tc_SND_NXT;
 
 	assert (tcp_check_conn(tcp_conn) ||
-		(tcp_print_conn(tcp_conn), printf("\n"), 0));
+		(tcp_print_conn(tcp_conn), printk("\n"), 0));
 
 	tcp_conn_write(tcp_conn, 1);
 
@@ -1286,7 +1286,7 @@ tcp_conn_t *tcp_conn;
 	curr_time= get_time();
 	rtt= tcp_conn->tc_rtt;
 
-	DBLOCK(0x20, printf(
+	DBLOCK(0x20, printk(
 	"tcp_set_send_timer: conn[%d] setting timer to %ld ms (+%ld ms)\n",
 		tcp_conn-tcp_conn_table,
 		(curr_time+rtt)*1000/HZ, rtt*1000/HZ));
@@ -1312,7 +1312,7 @@ int error;
 	tcp_conn_t *tc;
 
 	assert (tcp_check_conn(tcp_conn) ||
-		(tcp_print_conn(tcp_conn), printf("\n"), 0));
+		(tcp_print_conn(tcp_conn), printk("\n"), 0));
 	assert (tcp_conn->tc_flags & TCF_INUSE);
 
 	tcp_conn->tc_error= error;
@@ -1322,7 +1322,7 @@ int error;
 		return;
 
 	tcp_conn->tc_state= TCS_CLOSED;
-	DBLOCK(0x10, tcp_print_state(tcp_conn); printf("\n"));
+	DBLOCK(0x10, tcp_print_state(tcp_conn); printk("\n"));
 
 	if (tcp_fd && (tcp_fd->tf_flags & TFF_LISTENQ))
 	{
@@ -1372,7 +1372,7 @@ int error;
 			tcp_restart_connect(tcp_conn);
 		assert (!tcp_conn->tc_connInprogress);
 		assert (!(tcp_fd->tf_flags & TFF_IOCTL_IP) ||
-			(printf("req= 0x%lx\n",
+			(printk("req= 0x%lx\n",
 			(unsigned long)tcp_fd->tf_ioreq), 0));
 		tcp_conn->tc_busy--;
 	}

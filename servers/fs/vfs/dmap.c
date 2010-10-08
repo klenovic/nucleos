@@ -74,7 +74,7 @@ int do_devctl()
 {
 	if (!super_user)
 	{
-		printf("VFS_PROC_NR: unauthorized call of do_devctl by proc %d\n",
+		printk("VFS_PROC_NR: unauthorized call of do_devctl by proc %d\n",
 			who_e);
 		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_devctl.
@@ -142,7 +142,7 @@ int do_mapdriver()
 
 	if (!super_user)
 	{
-		printf("VFS_PROC_NR: unauthorized call of do_mapdriver by proc %d\n",
+		printk("VFS_PROC_NR: unauthorized call of do_mapdriver by proc %d\n",
 			who_e);
 		return(-EPERM);	/* only su (should be only RS or some drivers)
 				 * may call do_mapdriver.
@@ -155,7 +155,7 @@ int do_mapdriver()
 
 	if (label_len+1 > sizeof(label))
 	{
-		printf("vfs:do_mapdriver: label too long\n");
+		printk("vfs:do_mapdriver: label too long\n");
 		return -EINVAL;
 	}
 
@@ -163,7 +163,7 @@ int do_mapdriver()
 		label_len);
 	if (r != 0)
 	{
-		printf("vfs:do_mapdriver: sys_vircopy failed: %d\n", r);
+		printk("vfs:do_mapdriver: sys_vircopy failed: %d\n", r);
 		return -EINVAL;
 	}
 
@@ -172,13 +172,13 @@ int do_mapdriver()
 	r= ds_retrieve_u32(label, (u32_t*)&tasknr);
 	if (r != 0)
 	{
-		printf("vfs:do_mapdriver: ds doesn't know '%s'\n", label);
+		printk("vfs:do_mapdriver: ds doesn't know '%s'\n", label);
 		return -EINVAL;
 	}
 
 	if (isokendpt(tasknr, &proc_nr_n) != 0)
 	{
-		printf("vfs:do_mapdriver: bad endpoint %d\n", tasknr);
+		printk("vfs:do_mapdriver: bad endpoint %d\n", tasknr);
 		return(-EINVAL);
 	}
 
@@ -342,7 +342,7 @@ void dmap_unmap_by_endpt(int proc_nr_e)
 	for (i=0; i<NR_DEVICES; i++)
 	  if(dmap[i].dmap_driver && dmap[i].dmap_driver == proc_nr_e)
 	    if((r=map_driver(i, ENDPT_NONE, 0, 0)) != 0)
-		printf("VFS_PROC_NR: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
+		printk("VFS_PROC_NR: unmap of p %d / d %d failed: %d\n", proc_nr_e,i,r);
 
 	return;
 

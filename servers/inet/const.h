@@ -28,7 +28,7 @@ Copyright 1995 Philip Homburg
 
 #define CLOCK_GRAN	1	/* in HZ */
 
-#define where()	printf("%s, %d: ", __FILE__, __LINE__)
+#define where()	printk("%s, %d: ", __FILE__, __LINE__)
 
 #define NW_SUSPEND	SUSPEND
 

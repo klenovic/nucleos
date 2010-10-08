@@ -106,13 +106,13 @@ int info_size;
   /* Check if supplied pointers point into user process. */
   if ((r = sys_umap(who_e, D, (vir_bytes) m_in.PROF_CTL_PTR,
 	 					 1, &p)) != 0) {
-	printf("PM: PROFILE: umap failed for process %d\n", who_e);
+	printk("PM: PROFILE: umap failed for process %d\n", who_e);
 	return r;
   }
 
   if ((r =sys_umap(who_e, D, (vir_bytes) m_in.PROF_MEM_PTR,
  					 1, &p)) != 0) {
-	printf("PM: PROFILE: umap failed for process %d\n", who_e);
+	printk("PM: PROFILE: umap failed for process %d\n", who_e);
 	return r;
   }
   return 0;

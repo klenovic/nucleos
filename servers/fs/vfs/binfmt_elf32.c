@@ -178,16 +178,16 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 	}
 
 #ifdef CONFIG_DEBUG_VFS_ELF32
-	printf("---[ELF header]---\n");
+	printk("---[ELF header]---\n");
 	elf32_dump_ehdr(&ehdr);
 
 	for(i=0; i<ehdr.e_phnum; i++) {
-		printf("---[%d. program header]---\n",i);
+		printk("---[%d. program header]---\n",i);
 		elf32_dump_phdr(&phdrs[i]);
 	}
 
 	for(i=0; i<ehdr.e_shnum; i++) {
-		printf("---[%d. section header]---\n",i);
+		printk("---[%d. section header]---\n",i);
 		elf32_dump_shdr(&shdrs[i]);
 	}
 #endif
@@ -316,7 +316,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 			if (n > sizeof(buf))
 				n = sizeof(buf);
 #ifdef CONFIG_DEBUG_VFS_ELF32
-			printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
+			printk("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 			proc_e, seg, buf, n, off+k);
 #endif
 			/* Issue request */
@@ -325,7 +325,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 					    &cum_io);
 
 			if (err) {
-				printf("VFS: read_seg: req_readwrite failed (text)\n");
+				printk("VFS: read_seg: req_readwrite failed (text)\n");
 				return err;
 			}
 
@@ -337,7 +337,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 			err = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
 			if (err) {
-				printf("VFS: read_seg: copy failed (text)\n");
+				printk("VFS: read_seg: copy failed (text)\n");
 				return err;
 			}
 
@@ -348,7 +348,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 	}
 
 #ifdef CONFIG_DEBUG_VFS_ELF32
-	printf("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
+	printk("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
 	proc_e, seg, addr_off, seg_bytes, off);
 #endif
 
@@ -357,7 +357,7 @@ static int elf32_read_seg(struct vnode *vp, off_t off, vir_bytes addr_off, int p
 			    READING, proc_e, (char*)addr_off, seg_bytes, &new_pos, &cum_io);
 
 	if (err) {
-		printf("VFS: read_seg: req_readwrite failed (data)\n");
+		printk("VFS: read_seg: req_readwrite failed (data)\n");
 		return err;
 	}
 
@@ -391,15 +391,15 @@ static int elf32_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_
 		return err;
 
 #ifdef CONFIG_DEBUG_VFS_ELF32
-	printf("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
+	printk("exec_newmem: err = %d, m_type = %d\n", err, m.m_type);
 #endif
 	*stack_topp= m.m_data1;
 	*load_textp= !!(m.m_data2 & EXC_NM_RF_LOAD_TEXT);
 	*allow_setuidp= !!(m.m_data2 & EXC_NM_RF_ALLOW_SETUID);
 
 #ifdef CONFIG_DEBUG_VFS_ELF32
-	printf("exec_newmem: stack_top = 0x%x\n", *stack_topp);
-	printf("exec_newmem: load_text = %d\n", *load_textp);
+	printk("exec_newmem: stack_top = 0x%x\n", *stack_topp);
+	printk("exec_newmem: load_text = %d\n", *load_textp);
 #endif
 	/* the status is saved in m_type */
 	return m.m_type;
@@ -654,17 +654,17 @@ int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 #ifdef CONFIG_DEBUG_VFS_ELF32
 static void elf32_dump_exec(elf32_exec_info_t* e)
 {
-	printf("text_pstart=0x%x  ", e->text_pstart);
-	printf("text_vstart=0x%x  ", e->text_vstart);
-	printf("text_size=0x%x\n", e->text_size);
-	printf("data_pstart=0x%x  ", e->data_pstart);
-	printf("data_vstart=0x%x  ", e->data_vstart);
-	printf("data_size=0x%x\n", e->data_size);
-	printf("bss_pstart=0x%x  ", e->bss_pstart);
-	printf("bss_vstart=0x%x  ", e->bss_vstart);
-	printf("bss_size=0x%x\n", e->bss_size);
-	printf("entry_point=0x%x  ", e->entry_point);
-	printf("sep_id=0x%x\n", e->sep_id);
+	printk("text_pstart=0x%x  ", e->text_pstart);
+	printk("text_vstart=0x%x  ", e->text_vstart);
+	printk("text_size=0x%x\n", e->text_size);
+	printk("data_pstart=0x%x  ", e->data_pstart);
+	printk("data_vstart=0x%x  ", e->data_vstart);
+	printk("data_size=0x%x\n", e->data_size);
+	printk("bss_pstart=0x%x  ", e->bss_pstart);
+	printk("bss_vstart=0x%x  ", e->bss_vstart);
+	printk("bss_size=0x%x\n", e->bss_size);
+	printk("entry_point=0x%x  ", e->entry_point);
+	printk("sep_id=0x%x\n", e->sep_id);
 
 	return;
 }
@@ -673,73 +673,73 @@ static void elf32_dump_ehdr(elf32_ehdr_t* eh)
 {
 	int i=0;
 
-	printf("e_ident: ");
+	printk("e_ident: ");
 	for(i = 0; i < EI_NIDENT; i++) {
-		printf("0x%x ",eh->e_ident[i]);     /* Magic number and other info */
+		printk("0x%x ",eh->e_ident[i]);     /* Magic number and other info */
 	}
-	printf("\n");
+	printk("\n");
 
-	printf("type: 0x%x ", eh->e_type);            /* Object file type */
-	printf("machine: 0x%x ", eh->e_machine);      /* Architecture */
-	printf("version: 0x%x ", eh->e_version);      /* Object file version */
-	printf("entry: 0x%x ", eh->e_entry);          /* Entry point virtual address */
-	printf("phoff: 0x%x\n", eh->e_phoff);         /* Program header table file offset */
-	printf("shoff: 0x%x ", eh->e_shoff);          /* Section header table file offset */
-	printf("flags: 0x%x ", eh->e_flags);          /* Processor-specific flags */
-	printf("ehsize: 0x%x ", eh->e_ehsize);        /* ELF header size in bytes */
-	printf("phentsize: 0x%x\n", eh->e_phentsize); /* Program header table entry size */
-	printf("phnum: 0x%x ", eh->e_phnum);          /* Program header table entry count */
-	printf("shentsize: 0x%x ", eh->e_shentsize);  /* Section header table entry size */
-	printf("shnum: 0x%x ", eh->e_shnum);          /* Section header table entry count */
-	printf("shstrndx: 0x%x\n", eh->e_shstrndx);   /* Section header string table index */
+	printk("type: 0x%x ", eh->e_type);            /* Object file type */
+	printk("machine: 0x%x ", eh->e_machine);      /* Architecture */
+	printk("version: 0x%x ", eh->e_version);      /* Object file version */
+	printk("entry: 0x%x ", eh->e_entry);          /* Entry point virtual address */
+	printk("phoff: 0x%x\n", eh->e_phoff);         /* Program header table file offset */
+	printk("shoff: 0x%x ", eh->e_shoff);          /* Section header table file offset */
+	printk("flags: 0x%x ", eh->e_flags);          /* Processor-specific flags */
+	printk("ehsize: 0x%x ", eh->e_ehsize);        /* ELF header size in bytes */
+	printk("phentsize: 0x%x\n", eh->e_phentsize); /* Program header table entry size */
+	printk("phnum: 0x%x ", eh->e_phnum);          /* Program header table entry count */
+	printk("shentsize: 0x%x ", eh->e_shentsize);  /* Section header table entry size */
+	printk("shnum: 0x%x ", eh->e_shnum);          /* Section header table entry count */
+	printk("shstrndx: 0x%x\n", eh->e_shstrndx);   /* Section header string table index */
 
 	return;
 }
 
 static void elf32_dump_phdr(elf32_phdr_t* ph)
 {
-	printf("type: 0x%x ", ph->p_type);     /* Segment type */
-	printf("offset: 0x%x ", ph->p_offset); /* Segment file offset */
-	printf("vaddr: 0x%x ", ph->p_vaddr);   /* Segment virtual address */
-	printf("paddr: 0x%x\n", ph->p_paddr);  /* Segment physical address */
-	printf("filesz: 0x%x ", ph->p_filesz); /* Segment size in file */
-	printf("memsz: 0x%x ", ph->p_memsz);   /* Segment size in memory */
-	printf("flags: 0x%x ", ph->p_flags);   /* Segment flags */
-	printf("align: 0x%x\n", ph->p_align);  /* Segment alignment */
+	printk("type: 0x%x ", ph->p_type);     /* Segment type */
+	printk("offset: 0x%x ", ph->p_offset); /* Segment file offset */
+	printk("vaddr: 0x%x ", ph->p_vaddr);   /* Segment virtual address */
+	printk("paddr: 0x%x\n", ph->p_paddr);  /* Segment physical address */
+	printk("filesz: 0x%x ", ph->p_filesz); /* Segment size in file */
+	printk("memsz: 0x%x ", ph->p_memsz);   /* Segment size in memory */
+	printk("flags: 0x%x ", ph->p_flags);   /* Segment flags */
+	printk("align: 0x%x\n", ph->p_align);  /* Segment alignment */
 
 	return;
 }
 
 static void elf32_dump_shdr(elf32_shdr_t* sh)
 {
-	printf("name: 0x%x ", sh->sh_name);           /* Section name (string tbl index) */
-	printf("type: 0x%x ", sh->sh_type);           /* Section type */
-	printf("flags: 0x%x ", sh->sh_flags);         /* Section flags */
-	printf("addr: 0x%x ", sh->sh_addr);           /* Section virtual addr at execution */
-	printf("offset: 0x%x\n", sh->sh_offset);      /* Section file offset */
-	printf("size: 0x%x ", sh->sh_size);           /* Section size in bytes */
-	printf("link: 0x%x ", sh->sh_link);           /* Link to another section */
-	printf("info: 0x%x ", sh->sh_info);           /* Additional section information */
-	printf("addralign: 0x%x ", sh->sh_addralign); /* Section alignment */
-	printf("entsize: 0x%x\n", sh->sh_entsize);    /* Entry size if section holds table */
+	printk("name: 0x%x ", sh->sh_name);           /* Section name (string tbl index) */
+	printk("type: 0x%x ", sh->sh_type);           /* Section type */
+	printk("flags: 0x%x ", sh->sh_flags);         /* Section flags */
+	printk("addr: 0x%x ", sh->sh_addr);           /* Section virtual addr at execution */
+	printk("offset: 0x%x\n", sh->sh_offset);      /* Section file offset */
+	printk("size: 0x%x ", sh->sh_size);           /* Section size in bytes */
+	printk("link: 0x%x ", sh->sh_link);           /* Link to another section */
+	printk("info: 0x%x ", sh->sh_info);           /* Additional section information */
+	printk("addralign: 0x%x ", sh->sh_addralign); /* Section alignment */
+	printk("entsize: 0x%x\n", sh->sh_entsize);    /* Entry size if section holds table */
 
 	return;
 }
 
 static void elf32_dump_exec_newmem(struct exec_newmem *ex)
 {
-	printf("text_bytes: 0x%x ", ex->text_bytes);
-	printf("data_bytes: 0x%x ", ex->data_bytes);
-	printf("bss_bytes: 0x%x ", ex->bss_bytes);
-	printf("tot_bytes: 0x%x ", ex->tot_bytes);
-	printf("args_bytes: 0x%x\n", ex->args_bytes);
-	printf("sep_id: 0x%x ", ex->sep_id);
-	printf("st_dev: 0x%x ", ex->st_dev);
-	printf("st_ino: 0x%x ", ex->st_ino);
-	printf("st_ctime: 0x%x ", ex->st_ctime);
-	printf("new_uid: 0x%x\n", ex->new_uid);
-	printf("new_gid: 0x%x ", ex->new_gid);
-	printf("progname: %s\n", ex->progname);
+	printk("text_bytes: 0x%x ", ex->text_bytes);
+	printk("data_bytes: 0x%x ", ex->data_bytes);
+	printk("bss_bytes: 0x%x ", ex->bss_bytes);
+	printk("tot_bytes: 0x%x ", ex->tot_bytes);
+	printk("args_bytes: 0x%x\n", ex->args_bytes);
+	printk("sep_id: 0x%x ", ex->sep_id);
+	printk("st_dev: 0x%x ", ex->st_dev);
+	printk("st_ino: 0x%x ", ex->st_ino);
+	printk("st_ctime: 0x%x ", ex->st_ctime);
+	printk("new_uid: 0x%x\n", ex->new_uid);
+	printk("new_gid: 0x%x ", ex->new_gid);
+	printk("progname: %s\n", ex->progname);
 
 	return;
 }

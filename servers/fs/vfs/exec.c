@@ -75,8 +75,8 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 	r = fetch_name(user_fullpath, PATH_MAX, path);
 
 	if (r < 0) {
-		printf("pm_exec: fetch_name failed\n");
-		printf("return at %s, %d\n", __FILE__, __LINE__);
+		printk("pm_exec: fetch_name failed\n");
+		printk("return at %s, %d\n", __FILE__, __LINE__);
 
 		return(r);	/* file name not in user data segment */
 	}
@@ -92,8 +92,8 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 
 	/* can't fetch stack (e.g. bad virtual addr) */
 	if (r != 0) {
-		printf("pm_exec: sys_datacopy failed\n");
-		printf("return at %s, %d\n", __FILE__, __LINE__);
+		printk("pm_exec: sys_datacopy failed\n");
+		printk("return at %s, %d\n", __FILE__, __LINE__);
 
 		return(r);
 	}
@@ -161,7 +161,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		r = fetch_name(user_fullpath, PATH_MAX, path);
 
 		if (r < 0) {
-			printf("pm_exec: 2nd fetch_name failed\n");
+			printk("pm_exec: 2nd fetch_name failed\n");
 			put_vnode(vp);
 			return(r); /* strange */
 		}
@@ -172,14 +172,14 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 		put_vnode(vp);
 
 		if (r != 0) {
-			printf("pm_exec: patch stack\n");
+			printk("pm_exec: patch stack\n");
 			return r;
 		}
 	}
 
 	if (r != 0) {
-		printf("pm_exec: returning -ENOEXEC, r = %d\n", r);
-		printf("pm_exec: progname = '%s'\n", bfmt_param.ex.progname);
+		printk("pm_exec: returning -ENOEXEC, r = %d\n", r);
+		printk("pm_exec: progname = '%s'\n", bfmt_param.ex.progname);
 		put_vnode(vp);
 		return -ENOEXEC;
 	}
@@ -202,7 +202,7 @@ int pm_exec(int proc_e, char *path, vir_bytes path_len, char *frame, vir_bytes f
 			(phys_bytes)bfmt_param.ex.args_bytes);
 
 	if (r != 0) {
-		printf("vfs: datacopy returns %d trying to copy to %p\n", r, vsp);
+		printk("vfs: datacopy returns %d trying to copy to %p\n", r, vsp);
 		return r;
 	}
 

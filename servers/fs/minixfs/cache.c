@@ -98,7 +98,7 @@ int only_search;		/* if NO_READ, don't read, else act normal */
 	ASSERT(!bp->bp);
 	ASSERT(bp->b_bytes == 0);
 	if(!(bp->bp = alloc_contig(fs_block_size, 0, NULL))) {
-		printf("MFS: couldn't allocate a new block.\n");
+		printk("MFS: couldn't allocate a new block.\n");
 		for(bp = front;
 			bp && bp->b_bytes < fs_block_size; bp = bp->b_next)
 			;
@@ -257,7 +257,7 @@ zone_t z;			/* try to allocate new zone near this one */
 	err_code = -ENOSPC;
 	major = (int) (sp->s_dev >> MAJOR) & BYTE;
 	minor = (int) (sp->s_dev >> MINOR) & BYTE;
-	printf("No space on device %d/%d\n", major, minor);
+	printk("No space on device %d/%d\n", major, minor);
 	return(NO_ZONE);
   }
   if (z == sp->s_firstdatazone) sp->s_zsearch = b;	/* for next time */
@@ -307,7 +307,7 @@ int rw_flag;			/* READING or WRITING */
 	  if (r != fs_block_size) {
 		  if (r >= 0) r = END_OF_FILE;
 		  if (r != END_OF_FILE)
-			printf("MFS(%d) I/O error on device %d/%d, block %ld\n",
+			printk("MFS(%d) I/O error on device %d/%d, block %ld\n",
 			SELF_E, (dev>>MAJOR)&BYTE, (dev>>MINOR)&BYTE, 
 			bp->b_blocknr);
 		  
@@ -416,7 +416,7 @@ int rw_flag;			/* READING or WRITING */
 		if (iop->iov_size != 0) {
 			/* Transfer failed. An error? Do we care? */
 			if (r != 0 && i == 0) {
-				printf(
+				printk(
 				"fs: I/O error on device %d/%d, block %lu\n",
 					(dev>>MAJOR)&BYTE, (dev>>MINOR)&BYTE,
 					bp->b_blocknr);

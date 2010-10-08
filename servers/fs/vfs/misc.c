@@ -421,11 +421,11 @@ int cpid;	/* Child process id */
    * as it isn't blocking on i/o.
    */
   if(GRANT_VALID(fp->fp_grant)) {
-	printf("vfs: fork: fp (endpoint %d) has grant %d\n", fp->fp_endpoint, fp->fp_grant);
+	printk("vfs: fork: fp (endpoint %d) has grant %d\n", fp->fp_endpoint, fp->fp_grant);
 	panic(__FILE__, "fp contains valid grant", NO_NUM);
   }
   if(GRANT_VALID(cp->fp_grant)) {
-	printf("vfs: fork: cp (endpoint %d) has grant %d\n", cp->fp_endpoint, cp->fp_grant);
+	printk("vfs: fork: cp (endpoint %d) has grant %d\n", cp->fp_endpoint, cp->fp_grant);
 	panic(__FILE__, "cp contains valid grant", NO_NUM);
   }
 
@@ -634,7 +634,7 @@ int do_svrctl()
 		if(fproc[proc_nr_n].fp_execced) {
 			/* Reply before calling dev_up */
 #if 0
-			printf("do_svrctl: replying before dev_up\n");
+			printk("do_svrctl: replying before dev_up\n");
 #endif
 			reply(who_e, r);
 			dev_up(major);

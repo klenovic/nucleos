@@ -110,7 +110,7 @@ int main(void)
 				endpt = suspended_ep(m_in.m_source, m_in.REP_IO_GRANT);
 
 				if(endpt == ENDPT_NONE) {
-					printf("FS: proc with "
+					printk("FS: proc with "
 					       "grant %d from %d not found (revive)\n",
 					m_in.REP_IO_GRANT, m_in.m_source);
 					continue;
@@ -164,7 +164,7 @@ int main(void)
 
 		/* We only expect notify()s from tasks. */
 		if(who_p < 0) {
-			printf("FS: ignoring message from %d (%d)\n",
+			printk("FS: ignoring message from %d (%d)\n",
 			who_e, m_in.m_type);
 			continue;
 		}
@@ -175,7 +175,7 @@ int main(void)
 
 #if DO_SANITYCHECKS
 		if(fp_is_blocked(fp)) {
-			printf("VFS: requester %d call %d: suspended\n",
+			printk("VFS: requester %d call %d: suspended\n",
 			panic(__FILE__, "requester suspended", NO_NUM);
 		}
 #endif
@@ -234,11 +234,11 @@ int main(void)
 			if (call_nr < 0 || call_nr >= NR_syscalls) {
 				error = SUSPEND;
 				/* Not supposed to happen. */
-				printf("VFS: illegal %d system call by %d\n",
+				printk("VFS: illegal %d system call by %d\n",
 					call_nr, who_e);
 			} else if (fp->fp_pid == PID_FREE) {
 				error = -ENOSYS;
-				printf("FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
+				printk("FS, bad process, who = %d, call_nr = %d, endpt1 = %d\n",
 					who_e, call_nr, m_in.endpt1);
 			} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
@@ -337,16 +337,16 @@ static void get_work(void)
 			panic(__FILE__,"receive process out of range", who_p);
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint == ENDPT_NONE) {
-			printf("FS: ignoring request from %d, endpointless slot %d (%d)\n",
+			printk("FS: ignoring request from %d, endpointless slot %d (%d)\n",
 			m_in.m_source, who_p, m_in.m_type);
 			continue;
 		}
 
 		if(who_p >= 0 && fproc[who_p].fp_endpoint != who_e) {
 	if(fproc[who_p].fp_endpoint == ENDPT_NONE) { 
-		printf("slot unknown even\n");
+		printk("slot unknown even\n");
 	}
-    	printf("FS: receive endpoint inconsistent (source %d, who_p %d, stored ep %d, who_e %d).\n",
+    	printk("FS: receive endpoint inconsistent (source %d, who_p %d, stored ep %d, who_e %d).\n",
 		m_in.m_source, who_p, fproc[who_p].fp_endpoint, who_e);
 #if 0
 			panic(__FILE__, "FS: inconsistent endpoint ", NO_NUM);
@@ -371,13 +371,13 @@ void reply(int whom, int result)
 
 #if 0
 	if (call_nr == __NR_symlink)
-	printf("vfs:reply: replying %d for call %d\n", result, call_nr);
+	printk("vfs:reply: replying %d for call %d\n", result, call_nr);
 #endif
 	m_out.reply_type = result;
 	s = kipc_module_call(KIPC_SEND, KIPC_FLG_NONBLOCK, whom, &m_out);
 
 	if (s != 0)
-		printf("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);
+		printk("VFS: couldn't send reply %d to %d: %d\n", result, whom, s);
 }
 
 /*===========================================================================*
@@ -485,14 +485,14 @@ static void init_root(void)
 	if (last_login_fs_e != ROOT_FS_E) {
 		/* Wait FS login message */
 		if (kipc_module_call(KIPC_RECEIVE, 0, ROOT_FS_E, &m) != 0) {
-			printf("VFS: Error receiving login request from FS_e %d\n", 
+			printk("VFS: Error receiving login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",
 			      ROOT_FS_E);
 		}
 
 		if (m.m_type != KCNR_FS_READY) {
-			printf("VFS: Invalid login request from FS_e %d\n", 
+			printk("VFS: Invalid login request from FS_e %d\n", 
 				ROOT_FS_E);
 			panic(__FILE__, "Error receiving login request from root filesystem\n",
 			      ROOT_FS_E);
@@ -651,7 +651,7 @@ static void service_pm(void)
 	break;
 
   default:
-	printf("VFS: don't know how to handle PM request %x\n", call_nr);
+	printk("VFS: don't know how to handle PM request %x\n", call_nr);
 
 	return;
   }

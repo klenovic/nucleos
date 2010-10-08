@@ -105,7 +105,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		}
 		if (j >= nr_io_range)
 		{
-			kprintf(
+			printk(
 		"do_vdevio: I/O port check failed for proc %d, port 0x%x\n",
 				m_ptr->m_source, port);
 			return -EPERM;
@@ -121,12 +121,12 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
   if(who_e == 71091)  {
 	static int vd = 0;
 	if(vd++ < 100) {
-		  kprintf("proc %d does vdevio no %d; type %d, direction %s\n",
+		  printk("proc %d does vdevio no %d; type %d, direction %s\n",
 		who_e, vd, io_type, io_in ? "input" : "output");
-		kprintf("(");
+		printk("(");
 		for (i=0; i<vec_size; i++) 
-			kprintf("%2d:0x%x,0x%x  ", i, pvb[i].port, pvb[i].value); 
-		kprintf(")\n");
+			printk("%2d:0x%x,0x%x  ", i, pvb[i].port, pvb[i].value); 
+		printk(")\n");
 	}
   }
 #endif

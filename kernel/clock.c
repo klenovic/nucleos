@@ -95,13 +95,13 @@ void clock_task()
 					TMR_NEVER : clock_timers->tmr_exp_time;
 				break;
 			default:	/* illegal request type */
-				kprintf("CLOCK: illegal notify %d from %d.\n",
+				printk("CLOCK: illegal notify %d from %d.\n",
 					m.m_type, m.m_source);
 		}
 	}
 	else {
 		/* illegal request type */
-		kprintf("CLOCK: illegal request %d from %d.\n",
+		printk("CLOCK: illegal request %d from %d.\n",
 			m.m_type, m.m_source);
 	}
   }

@@ -91,7 +91,7 @@ int do_freemem()
    */
   if (mp->mp_effuid != 0)
   {
-	printf("PM: unauthorized call of do_freemem by proc %d\n",
+	printk("PM: unauthorized call of do_freemem by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
 	return -EPERM;
@@ -145,7 +145,7 @@ int do_getsysinfo()
   /* This call leaks important information (the contents of registers). */
   if (mp->mp_effuid != 0)
   {
-	printf("PM: unauthorized call of do_getsysinfo by proc %d '%s'\n",
+	printk("PM: unauthorized call of do_getsysinfo by proc %d '%s'\n",
 		mp->mp_endpoint, mp->mp_name);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
 	return -EPERM;
@@ -262,14 +262,14 @@ int do_getprocnr()
 		return 0;
 	}
 
-	printf("PM: unauthorized call of do_getprocnr by proc %d\n",
+	printk("PM: unauthorized call of do_getprocnr by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
 	return -EPERM;
   }
 
 #if 0
-  printf("PM: do_getprocnr(%d) call from endpoint %d, %s\n",
+  printk("PM: do_getprocnr(%d) call from endpoint %d, %s\n",
 	m_in.pid, mp->mp_endpoint, mp->mp_name);
 #endif
 
@@ -277,7 +277,7 @@ int do_getprocnr()
 	if ((rmp = find_proc(m_in.pid)) != NIL_MPROC) {
 		mp->mp_reply.PM_ENDPT = rmp->mp_endpoint;
 #if 0
-		printf("PM: pid result: %d\n", rmp->mp_endpoint);
+		printk("PM: pid result: %d\n", rmp->mp_endpoint);
 #endif
 		return(0);
 	}
@@ -298,7 +298,7 @@ int do_getprocnr()
   	return(-ESRCH);			
   } else {			/* return own/parent process number */
 #if 0
-	printf("PM: endpt result: %d\n", mp->mp_reply.PM_ENDPT);
+	printk("PM: endpt result: %d\n", mp->mp_reply.PM_ENDPT);
 #endif
   	mp->mp_reply.PM_ENDPT = who_e;
 	mp->mp_reply.PM_PENDPT = mproc[mp->mp_parent].mp_endpoint;
@@ -318,7 +318,7 @@ int do_getepinfo()
   /* This call should be moved to DS. */
   if (mp->mp_effuid != 0)
   {
-	printf("PM: unauthorized call of do_getepinfo by proc %d\n",
+	printk("PM: unauthorized call of do_getepinfo by proc %d\n",
 		mp->mp_endpoint);
 	sys_sysctl_stacktrace(mp->mp_endpoint);
 	return -EPERM;
@@ -499,7 +499,7 @@ void *brk_addr;
 /* PM wants to call brk() itself. */
 	if((r=vm_brk(PM_PROC_NR, brk_addr)) != 0) {
 #if 0
-		printf("PM: own brk(%p) failed: vm_brk() returned %d\n",
+		printk("PM: own brk(%p) failed: vm_brk() returned %d\n",
 			brk_addr, r);
 #endif
 		return -1;

@@ -163,7 +163,7 @@ int do_select(void)
 		}
 
 		/* File descriptor is 'ready' to return -EIO */
-		printf("VFS do_select: -EIO after driver failure\n");
+		printk("VFS do_select: -EIO after driver failure\n");
 		ops2tab(SEL_RD|SEL_WR|SEL_ERR, fd, se);
 		continue;
 	}
@@ -446,13 +446,13 @@ static void select_cancel_all(struct selectentry *e)
 		fp = e->filps[fd];
 		if (!fp) {
 #if DEBUG_SELECT
-			printf("[ fd %d/%d NULL ] ", fd, e->nfds);
+			printk("[ fd %d/%d NULL ] ", fd, e->nfds);
 #endif
 			continue;
 		}
 		if (fp->filp_selectors < 1) {
 #if DEBUG_SELECT
-			printf("select: %d selectors?!\n", fp->filp_selectors);
+			printk("select: %d selectors?!\n", fp->filp_selectors);
 #endif
 			continue;
 		}
@@ -463,7 +463,7 @@ static void select_cancel_all(struct selectentry *e)
 
 	if (e->expiry > 0) {
 #if DEBUG_SELECT
-		printf("cancelling timer %d\n", e - selecttab);
+		printk("cancelling timer %d\n", e - selecttab);
 #endif
 		fs_cancel_timer(&e->timer); 
 		e->expiry = 0;
@@ -488,7 +488,7 @@ static int select_reevaluate(struct filp *fp)
 	int s, remain_ops = 0, fd, type = -1;
 
 	if (!fp) {
-		printf("fs: select: reevalute NULL fp\n");
+		printk("fs: select: reevalute NULL fp\n");
 		return 0;
 	}
 
@@ -508,7 +508,7 @@ static int select_reevaluate(struct filp *fp)
 	 */
 	fp->filp_select_ops = remain_ops;
 #if DEBUG_SELECT
-	printf("remaining operations on fp are %d\n", fp->filp_select_ops);
+	printk("remaining operations on fp are %d\n", fp->filp_select_ops);
 #endif
 
 	return remain_ops;
@@ -574,7 +574,7 @@ int select_notified(int major, int minor, int selected_ops)
 	int s, f, t;
 
 #if DEBUG_SELECT
-	printf("select callback: %d, %d: %d\n", major, minor, selected_ops);
+	printk("select callback: %d, %d: %d\n", major, minor, selected_ops);
 #endif
 
 	for(t = 0; t < SEL_FDS; t++)
@@ -583,7 +583,7 @@ int select_notified(int major, int minor, int selected_ops)
 
 	if (t >= SEL_FDS) {
 #if DEBUG_SELECT
-		printf("select callback: no fdtype found for device %d\n", major);
+		printk("select callback: no fdtype found for device %d\n", major);
 #endif
 		return 0;
 	}
@@ -644,7 +644,7 @@ void select_forget(int proc_e)
 
 	if (s >= MAXSELECTS) {
 #if DEBUG_SELECT
-		printf("select: cancelled select() not found");
+		printk("select: cancelled select() not found");
 #endif
 		return;
 	}
@@ -666,7 +666,7 @@ void select_timeout_check(timer_t *timer)
 	s = tmr_arg(timer)->ta_int;
 	if (s < 0 || s >= MAXSELECTS) {
 #if DEBUG_SELECT
-		printf("select: bogus slot arg to watchdog %d\n", s);
+		printk("select: bogus slot arg to watchdog %d\n", s);
 #endif
 		return;
 	}
@@ -674,14 +674,14 @@ void select_timeout_check(timer_t *timer)
 
   if (se->requestor == NULL) {
 #if DEBUG_SELECT
-		printf("select: no requestor in watchdog\n");
+		printk("select: no requestor in watchdog\n");
 #endif
 		return;
 	}
 
   if (se->expiry <= 0) {
 #if DEBUG_SELECT
-		printf("select: strange expiry value in watchdog\n", s);
+		printk("select: strange expiry value in watchdog\n", s);
 #endif
 		return;
 	}
@@ -741,7 +741,7 @@ void select_reply1()
 	}
 	if (i >= NR_DEVICES)
 	{
-		printf("select_reply1: proc %d is not a recoqnized driver\n",
+		printk("select_reply1: proc %d is not a recoqnized driver\n",
 			driver_e);
 		return;
 	}
@@ -750,7 +750,7 @@ void select_reply1()
 	fp= dp->dmap_sel_filp;
 	if (!fp)
 	{
-		printf("select_reply1: strange, no dmap_sel_filp\n");
+		printk("select_reply1: strange, no dmap_sel_filp\n");
 		return;
 	}
 
@@ -769,7 +769,7 @@ void select_reply1()
 
 	if (vp->v_sdev != dev)
 	{
-		printf("select_reply1: strange, reply from wrong dev\n");
+		printk("select_reply1: strange, reply from wrong dev\n");
 		return;
 	}
 
@@ -828,7 +828,7 @@ void select_reply2()
 	}
 	if (i >= NR_DEVICES)
 	{
-		printf("select_reply2: proc %d is not a recognized driver\n",
+		printk("select_reply2: proc %d is not a recognized driver\n",
 			driver_e);
 		return;
 	}
@@ -856,7 +856,7 @@ void select_reply2()
 
 			if (status < 0)
 			{
-				printf("select_reply2: should handle error\n");
+				printk("select_reply2: should handle error\n");
 			}
 			else 
 			{
@@ -918,7 +918,7 @@ static void sel_restart_dev()
 			if (dp->dmap_sel_filp)
 				continue;
 
-			printf(
+			printk(
 			"sel_restart_dev: should consider fd %d in slot %d\n",
 				i, s);
 		}
@@ -943,7 +943,7 @@ int status;
 
 			if (status < 0)
 			{
-				printf("filp_status: should handle error\n");
+				printk("filp_status: should handle error\n");
 			}
 			else 
 				ops2tab(status, i, &selecttab[s]);

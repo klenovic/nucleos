@@ -300,15 +300,15 @@ main (int argc, char **argv)
 	}
 	for (j = 1; j < argc; ++j)
 	{
-		printf ("MD5 (\"%s\") = ", argv[j]);
+		printk ("MD5 (\"%s\") = ", argv[j]);
 		MD5Init (&context);
 		MD5Update (&context, (unsigned char *)argv[j], strlen (argv[j]));
 		MD5Final (checksum, &context);
 		for (i = 0; i < 16; i++)
 		{
-			printf ("%02x", (unsigned int) checksum[i]);
+			printk ("%02x", (unsigned int) checksum[i]);
 		}
-		printf ("\n");
+		printk ("\n");
 	}
 	return 0;
 }

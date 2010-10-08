@@ -41,7 +41,7 @@ int main(void) {
 	fs_m_in.m_type = KCNR_FS_READY;
 
 	if (kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &fs_m_in) != 0) {
-		printf("ISOFS (%d): Error sending login to VFS\n", SELF_E);
+		printk("ISOFS (%d): Error sending login to VFS\n", SELF_E);
 		return -1;
 	}
 
@@ -116,5 +116,5 @@ int who;
 kipc_msg_t *m_out;                       	/* report result */
 {
   if (0 != kipc_module_call(KIPC_SEND, 0, who, m_out))    /* send the message */
-    printf("ISOFS(%d) was unable to send reply\n", SELF_E);
+    printk("ISOFS(%d) was unable to send reply\n", SELF_E);
 }

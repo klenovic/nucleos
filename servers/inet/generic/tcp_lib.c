@@ -65,7 +65,7 @@ ip_hdr_t *ip_hdr;
 	if (ip_hdr_len == IP_MIN_HDR_SIZE)
 		return;
 
-	DBLOCK(1, printf("ip_hdr options NOT supported (yet?)\n"));
+	DBLOCK(1, printk("ip_hdr options NOT supported (yet?)\n"));
 }
 
 void tcp_extract_tcpopt(tcp_conn, tcp_hdr, mssp)
@@ -106,7 +106,7 @@ size_t *mssp;
 			if (len != 4)
 				break;
 			mss= (cp[2] << 8) | cp[3];
-			DBLOCK(1, printf("tcp_extract_tcpopt: got mss %d\n",
+			DBLOCK(1, printk("tcp_extract_tcpopt: got mss %d\n",
 				mss););
 			*mssp= mss;
 			break;
@@ -118,7 +118,7 @@ size_t *mssp;
 			break;
 		default:
 			DBLOCK(0x1,
-				printf(
+				printk(
 			"tcp_extract_tcpopt: unknown option %d, len %d\n",
 					type, len));
 			break;
@@ -181,7 +181,7 @@ ip_hdropt_t *ip_hdropt;
 		ip_hdropt->iho_opt_siz= 0;
 		return;
 	}
-	DBLOCK(1, printf("ip_hdr options NOT supported (yet?)\n"));
+	DBLOCK(1, printk("ip_hdr options NOT supported (yet?)\n"));
 	ip_hdropt->iho_opt_siz= 0;
 	return;
 }
@@ -277,7 +277,7 @@ acc_t *data;
 
 	if (!closed_connection && (tcp_conn->tc_state == TCS_CLOSED))
 	{
-		DBLOCK(1, printf("connection closed while inuse\n"));
+		DBLOCK(1, printk("connection closed while inuse\n"));
 		bf_afree(hdr_acc);
 		return 0;
 	}
@@ -306,22 +306,22 @@ void tcp_print_state (tcp_conn)
 tcp_conn_t *tcp_conn;
 {
 #if DEBUG
-	printf("tcp_conn_table[%d]->tc_state= ", tcp_conn-
+	printk("tcp_conn_table[%d]->tc_state= ", tcp_conn-
 		tcp_conn_table);
 	if (!(tcp_conn->tc_flags & TCF_INUSE))
 	{
-		printf("not inuse\n");
+		printk("not inuse\n");
 		return;
 	}
 	switch (tcp_conn->tc_state)
 	{
-	case TCS_CLOSED: printf("CLOSED"); break;
-	case TCS_LISTEN: printf("LISTEN"); break;
-	case TCS_SYN_RECEIVED: printf("SYN_RECEIVED"); break;
-	case TCS_SYN_SENT: printf("SYN_SENT"); break;
-	case TCS_ESTABLISHED: printf("ESTABLISHED"); break;
-	case TCS_CLOSING: printf("CLOSING"); break;
-	default: printf("unknown (=%d)", tcp_conn->tc_state); break;
+	case TCS_CLOSED: printk("CLOSED"); break;
+	case TCS_LISTEN: printk("LISTEN"); break;
+	case TCS_SYN_RECEIVED: printk("SYN_RECEIVED"); break;
+	case TCS_SYN_SENT: printk("SYN_SENT"); break;
+	case TCS_ESTABLISHED: printk("ESTABLISHED"); break;
+	case TCS_CLOSING: printk("CLOSING"); break;
+	default: printk("unknown (=%d)", tcp_conn->tc_state); break;
 	}
 #endif
 }
@@ -337,7 +337,7 @@ tcp_conn_t *tcp_conn;
 	if (tcp_conn->tc_inconsistent)
 	{
 		assert(tcp_conn->tc_inconsistent == 1);
-		printf("tcp_check_conn: connection is inconsistent\n");
+		printk("tcp_check_conn: connection is inconsistent\n");
 		return allright;
 	}
 
@@ -357,32 +357,32 @@ tcp_conn_t *tcp_conn;
 	size= hi_queue-lo_queue;
 	if (size<0)
 	{
-		printf("rcv hi_queue-lo_queue < 0\n");
-		printf("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
+		printk("rcv hi_queue-lo_queue < 0\n");
+		printk("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
 			(unsigned long)tcp_conn->tc_SND_NXT,
 			(unsigned long)tcp_conn->tc_SND_UNA);
-		printf("lo_queue= 0x%lx, hi_queue= 0x%lx\n", 
+		printk("lo_queue= 0x%lx, hi_queue= 0x%lx\n", 
 			(unsigned long)lo_queue,
 			(unsigned long)hi_queue);
-		printf("size= %d\n", size);
+		printk("size= %d\n", size);
 		allright= FALSE;
 	}
 	else if (!tcp_conn->tc_rcvd_data)
 	{
 		if (size)
 		{
-			printf("RCV_NXT-RCV_LO != 0\n");
+			printk("RCV_NXT-RCV_LO != 0\n");
 			tcp_print_conn(tcp_conn);
-			printf("lo_queue= %lu, hi_queue= %lu\n",
+			printk("lo_queue= %lu, hi_queue= %lu\n",
 				lo_queue, hi_queue);
 			allright= FALSE;
 		}
 	}
 	else if (size != bf_bufsize(tcp_conn->tc_rcvd_data))
 	{
-		printf("RCV_NXT-RCV_LO != sizeof tc_rcvd_data\n");
+		printk("RCV_NXT-RCV_LO != sizeof tc_rcvd_data\n");
 		tcp_print_conn(tcp_conn);
-		printf(
+		printk(
 		"lo_queue= %lu, hi_queue= %lu, sizeof tc_rcvd_data= %d\n",
 			lo_queue, hi_queue, bf_bufsize(tcp_conn->tc_rcvd_data));
 		allright= FALSE;
@@ -392,13 +392,13 @@ tcp_conn_t *tcp_conn;
 		tcp_conn->tc_state == TCS_SYN_RECEIVED ||
 		tcp_conn->tc_state ==  TCS_SYN_SENT))
 	{
-		printf("received data but not connected\n");
+		printk("received data but not connected\n");
 		tcp_print_conn(tcp_conn);
 		allright= FALSE;
 	}
 	if (tcp_Lmod4G(tcp_conn->tc_RCV_HI, tcp_conn->tc_RCV_NXT))
 	{
-		printf("tc_RCV_HI (0x%lx) < tc_RCV_NXT (0x%lx)\n", 
+		printk("tc_RCV_HI (0x%lx) < tc_RCV_NXT (0x%lx)\n", 
 			(unsigned long)tcp_conn->tc_RCV_HI,
 			(unsigned long)tcp_conn->tc_RCV_NXT);
 		allright= FALSE;
@@ -422,12 +422,12 @@ tcp_conn_t *tcp_conn;
 	size= hi_queue-lo_queue;
 	if (size<0)
 	{
-		printf("snd hi_queue-lo_queue < 0\n");
-		printf("SND_ISS= 0x%lx, SND_UNA= 0x%lx, SND_NXT= 0x%lx\n",
+		printk("snd hi_queue-lo_queue < 0\n");
+		printk("SND_ISS= 0x%lx, SND_UNA= 0x%lx, SND_NXT= 0x%lx\n",
 			(unsigned long)tcp_conn->tc_ISS,
 			(unsigned long)tcp_conn->tc_SND_UNA,
 			(unsigned long)tcp_conn->tc_SND_NXT);
-		printf("hi_queue= 0x%lx, lo_queue= 0x%lx, size= %d\n",
+		printk("hi_queue= 0x%lx, lo_queue= 0x%lx, size= %d\n",
 			(unsigned long)hi_queue, (unsigned long)lo_queue,
 			size);
 		allright= FALSE;
@@ -436,11 +436,11 @@ tcp_conn_t *tcp_conn;
 	{
 		if (size)
 		{
-			printf("SND_NXT-SND_UNA != 0\n");
-			printf("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
+			printk("SND_NXT-SND_UNA != 0\n");
+			printk("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
 				(unsigned long)tcp_conn->tc_SND_NXT,
 				(unsigned long)tcp_conn->tc_SND_UNA);
-			printf("lo_queue= 0x%lx, hi_queue= 0x%lx\n", 
+			printk("lo_queue= 0x%lx, hi_queue= 0x%lx\n", 
 				(unsigned long)lo_queue,
 				(unsigned long)hi_queue);
 			allright= FALSE;
@@ -448,14 +448,14 @@ tcp_conn_t *tcp_conn;
 	}
 	else if (size != bf_bufsize(tcp_conn->tc_send_data))
 	{
-		printf("SND_NXT-SND_UNA != sizeof tc_send_data\n");
-		printf("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
+		printk("SND_NXT-SND_UNA != sizeof tc_send_data\n");
+		printk("SND_NXT= 0x%lx, SND_UNA= 0x%lx\n", 
 			(unsigned long)tcp_conn->tc_SND_NXT,
 			(unsigned long)tcp_conn->tc_SND_UNA);
-		printf("lo_queue= 0x%lx, lo_queue= 0x%lx\n", 
+		printk("lo_queue= 0x%lx, lo_queue= 0x%lx\n", 
 			(unsigned long)lo_queue,
 			(unsigned long)hi_queue);
-		printf("bf_bufsize(data)= %d\n", 
+		printk("bf_bufsize(data)= %d\n", 
 			bf_bufsize(tcp_conn->tc_send_data));
 		
 		allright= FALSE;
@@ -464,26 +464,26 @@ tcp_conn_t *tcp_conn;
 	/* checking counters */
 	if (!tcp_GEmod4G(tcp_conn->tc_SND_UNA, tcp_conn->tc_ISS))
 	{
-		printf("SND_UNA < ISS\n");
+		printk("SND_UNA < ISS\n");
 		allright= FALSE;
 	}
 	if (!tcp_GEmod4G(tcp_conn->tc_SND_NXT, tcp_conn->tc_SND_UNA))
 	{
-		printf("SND_NXT<SND_UNA\n");
+		printk("SND_NXT<SND_UNA\n");
 		allright= FALSE;
 	}
 	if (!tcp_GEmod4G(tcp_conn->tc_SND_TRM, tcp_conn->tc_SND_UNA))
 	{
-		printf("SND_TRM<SND_UNA\n");
+		printk("SND_TRM<SND_UNA\n");
 		allright= FALSE;
 	}
 	if (!tcp_GEmod4G(tcp_conn->tc_SND_NXT, tcp_conn->tc_SND_TRM))
 	{
-		printf("SND_NXT<SND_TRM\n");
+		printk("SND_NXT<SND_TRM\n");
 		allright= FALSE;
 	}
 
-	DIFBLOCK(1, (!allright), printf("tcp_check_conn: not allright\n"));
+	DIFBLOCK(1, (!allright), printk("tcp_check_conn: not allright\n"));
 	return allright;
 }
 
@@ -497,30 +497,30 @@ tcp_hdr_t *tcp_hdr;
 	if (ip_hdr)
 		writeIpAddr(ip_hdr->ih_src);
 	else
-		printf("???");
-	printf(",%u ", ntohs(tcp_hdr->th_srcport));
+		printk("???");
+	printk(",%u ", ntohs(tcp_hdr->th_srcport));
 	if (ip_hdr)
 		writeIpAddr(ip_hdr->ih_dst);
 	else
-		printf("???");
-	printf(",%u ", ntohs(tcp_hdr->th_dstport));
-	printf(" 0x%lx", ntohl(tcp_hdr->th_seq_nr));
+		printk("???");
+	printk(",%u ", ntohs(tcp_hdr->th_dstport));
+	printk(" 0x%lx", ntohl(tcp_hdr->th_seq_nr));
 	if (tcp_hdr->th_flags & THF_FIN)
-		printf(" <FIN>");
+		printk(" <FIN>");
 	if (tcp_hdr->th_flags & THF_SYN)
-		printf(" <SYN>");
+		printk(" <SYN>");
 	if (tcp_hdr->th_flags & THF_RST)
-		printf(" <RST>");
+		printk(" <RST>");
 	if (tcp_hdr->th_flags & THF_PSH)
-		printf(" <PSH>");
+		printk(" <PSH>");
 	if (tcp_hdr->th_flags & THF_ACK)
-		printf(" <ACK 0x%lx %u>", ntohl(tcp_hdr->th_ack_nr),
+		printk(" <ACK 0x%lx %u>", ntohl(tcp_hdr->th_ack_nr),
 			ntohs(tcp_hdr->th_window));
 	if (tcp_hdr->th_flags & THF_URG)
-		printf(" <URG %u>", tcp_hdr->th_urgptr);
+		printk(" <URG %u>", tcp_hdr->th_urgptr);
 	tcp_hdr_len= (tcp_hdr->th_data_off & TH_DO_MASK) >> 2;
 	if (tcp_hdr_len != TCP_MIN_HDR_SIZE)
-		printf(" <options %d>", tcp_hdr_len-TCP_MIN_HDR_SIZE);
+		printk(" <options %d>", tcp_hdr_len-TCP_MIN_HDR_SIZE);
 }
 
 void tcp_print_conn(tcp_conn)
@@ -533,61 +533,61 @@ tcp_conn_t *tcp_conn;
 	irs= tcp_conn->tc_IRS;
 
 	tcp_print_state (tcp_conn);
-	printf(
+	printk(
 	" ISS 0x%lx UNA +0x%lx(0x%lx) TRM +0x%lx(0x%lx) NXT +0x%lx(0x%lx)",
 		iss, tcp_conn->tc_SND_UNA-iss, tcp_conn->tc_SND_UNA, 
 		tcp_conn->tc_SND_TRM-iss, tcp_conn->tc_SND_TRM,
 		tcp_conn->tc_SND_NXT-iss, tcp_conn->tc_SND_NXT);
-	printf(
+	printk(
 	" UP +0x%lx(0x%lx) PSH +0x%lx(0x%lx) ",
 		tcp_conn->tc_SND_UP-iss, tcp_conn->tc_SND_UP,
 		tcp_conn->tc_SND_PSH-iss, tcp_conn->tc_SND_PSH);
-	printf(" snd_cwnd +0x%lx(0x%lx)",
+	printk(" snd_cwnd +0x%lx(0x%lx)",
 		tcp_conn->tc_snd_cwnd-tcp_conn->tc_SND_UNA,
 		tcp_conn->tc_snd_cwnd);
-	printf(" transmit_seq ");
+	printk(" transmit_seq ");
 	if (tcp_conn->tc_transmit_seq == 0)
-		printf("0");
+		printk("0");
 	else
 	{
-		printf("+0x%lx(0x%lx)", tcp_conn->tc_transmit_seq-iss,
+		printk("+0x%lx(0x%lx)", tcp_conn->tc_transmit_seq-iss,
 			tcp_conn->tc_transmit_seq);
 	}
-	printf(" IRS 0x%lx LO +0x%lx(0x%lx) NXT +0x%lx(0x%lx) HI +0x%lx(0x%lx)",
+	printk(" IRS 0x%lx LO +0x%lx(0x%lx) NXT +0x%lx(0x%lx) HI +0x%lx(0x%lx)",
 		irs, tcp_conn->tc_RCV_LO-irs, tcp_conn->tc_RCV_LO,
 		tcp_conn->tc_RCV_NXT-irs, tcp_conn->tc_RCV_NXT,
 		tcp_conn->tc_RCV_HI-irs, tcp_conn->tc_RCV_HI);
 	if (tcp_conn->tc_flags & TCF_INUSE)
-		printf(" TCF_INUSE");
+		printk(" TCF_INUSE");
 	if (tcp_conn->tc_flags & TCF_FIN_RECV)
-		printf(" TCF_FIN_RECV");
+		printk(" TCF_FIN_RECV");
 	if (tcp_conn->tc_flags & TCF_RCV_PUSH)
-		printf(" TCF_RCV_PUSH");
+		printk(" TCF_RCV_PUSH");
 	if (tcp_conn->tc_flags & TCF_MORE2WRITE)
-		printf(" TCF_MORE2WRITE");
+		printk(" TCF_MORE2WRITE");
 	if (tcp_conn->tc_flags & TCF_SEND_ACK)
-		printf(" TCF_SEND_ACK");
+		printk(" TCF_SEND_ACK");
 	if (tcp_conn->tc_flags & TCF_FIN_SENT)
-		printf(" TCF_FIN_SENT");
+		printk(" TCF_FIN_SENT");
 	if (tcp_conn->tc_flags & TCF_BSD_URG)
-		printf(" TCF_BSD_URG");
+		printk(" TCF_BSD_URG");
 	if (tcp_conn->tc_flags & TCF_NO_PUSH)
-		printf(" TCF_NO_PUSH");
+		printk(" TCF_NO_PUSH");
 	if (tcp_conn->tc_flags & TCF_PUSH_NOW)
-		printf(" TCF_PUSH_NOW");
+		printk(" TCF_PUSH_NOW");
 	if (tcp_conn->tc_flags & TCF_PMTU)
-		printf(" TCF_PMTU");
-	printf("\n");
+		printk(" TCF_PMTU");
+	printk("\n");
 	writeIpAddr(tcp_conn->tc_locaddr);
-	printf(", %u -> ", ntohs(tcp_conn->tc_locport));
+	printk(", %u -> ", ntohs(tcp_conn->tc_locport));
 	writeIpAddr(tcp_conn->tc_remaddr);
-	printf(", %u\n", ntohs(tcp_conn->tc_remport));
+	printk(", %u\n", ntohs(tcp_conn->tc_remport));
 	tcp_fd= tcp_conn->tc_fd;
 	if (!tcp_fd)
-		printf("tc_fd NULL");
+		printk("tc_fd NULL");
 	else
 	{
-		printf("tc_fd #%d: flags 0x%x, r %u@%u, w %u@%u",
+		printk("tc_fd #%d: flags 0x%x, r %u@%u, w %u@%u",
 			tcp_fd-tcp_fd_table, tcp_fd->tf_flags,
 			tcp_fd->tf_read_count, tcp_fd->tf_read_offset,
 			tcp_fd->tf_write_count, tcp_fd->tf_write_offset);

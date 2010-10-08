@@ -30,7 +30,7 @@ int devind;
 		CPF_WRITE);
 	if (gid == -1)
 	{
-		printf("pci_dev_name: cpf_grant_direct failed: %d\n",
+		printk("pci_dev_name: cpf_grant_direct failed: %d\n",
 			errno);
 		return NULL;
 	}

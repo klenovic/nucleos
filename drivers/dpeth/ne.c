@@ -95,13 +95,13 @@ static void ne_init(dpeth_t * dep)
 
   ns_init(dep);			/* Initialize DP controller */
 
-  printf("%s: NE%d000 (%dkB RAM) at %X:%d - ",
+  printk("%s: NE%d000 (%dkB RAM) at %X:%d - ",
          dep->de_name,
          dep->de_16bit ? 2 : 1,
          dep->de_ramsize / 1024,
          dep->de_base_port, dep->de_irq);
   for (ix = 0; ix < SA_ADDR_LEN; ix += 1)
-	printf("%02X%c", dep->de_address.ea_addr[ix], ix < SA_ADDR_LEN - 1 ? ':' : '\n');
+	printk("%02X%c", dep->de_address.ea_addr[ix], ix < SA_ADDR_LEN - 1 ? ':' : '\n');
   return;
 }
 

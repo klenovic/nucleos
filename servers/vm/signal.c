@@ -45,7 +45,7 @@ int do_push_sig(kipc_msg_t *msg)
 	ep = msg->VMPS_ENDPOINT;
 
 	if((r=vm_isokendpt(ep, &n)) != 0) {
-		printf("VM: bogus endpoint %d from %d\n", ep, msg->m_source);
+		printk("VM: bogus endpoint %d from %d\n", ep, msg->m_source);
 		return r;
 	}
 	vmp = &vmproc[n];
@@ -61,7 +61,7 @@ int do_push_sig(kipc_msg_t *msg)
                                  + 3 * sizeof(char *) + 2 * sizeof(int);
 
         if ((r=adjust(vmp, vmp->vm_arch.vm_seg[D].mem_len, sp)) != 0) {
-		printf("VM: do_push_sig: adjust() failed: %d\n", r);
+		printk("VM: do_push_sig: adjust() failed: %d\n", r);
 		return r;
 	}
 

@@ -110,18 +110,18 @@ int do_vfs_reply(kipc_msg_t *m)
 	callback_t cb;
 	ep = m->VMV_ENDPOINT;
 	if(vm_isokendpt(ep, &procno) != 0) {
-		printf("VM:do_vfs_reply: reply %d about invalid endpoint %d\n",
+		printk("VM:do_vfs_reply: reply %d about invalid endpoint %d\n",
 			m->m_type, ep);
 		vm_panic("do_vfs_reply: invalid endpoint from vfs", NO_NUM);
 	}
 	vmp = &vmproc[procno];
 	if(!vmp->vm_callback) {
-		printf("VM:do_vfs_reply: reply %d: endpoint %d not waiting\n",
+		printk("VM:do_vfs_reply: reply %d: endpoint %d not waiting\n",
 			m->m_type, ep);
 		vm_panic("do_vfs_reply: invalid endpoint from vfs", NO_NUM);
 	}
 	if(vmp->vm_callback_type != m->m_type) {
-		printf("VM:do_vfs_reply: reply %d unexpected for endpoint %d\n"
+		printk("VM:do_vfs_reply: reply %d unexpected for endpoint %d\n"
 		  " (expecting %d)\n", m->m_type, ep, vmp->vm_callback_type);
 		vm_panic("do_vfs_reply: invalid reply from vfs", NO_NUM);
 	}
@@ -130,7 +130,7 @@ int do_vfs_reply(kipc_msg_t *m)
 		 * function has to realize it shouldn't do any PM or
 		 * VFS calls for this process.
 		 */
-		printf("VM:do_vfs_reply: reply %d for EXITING endpoint %d\n",
+		printk("VM:do_vfs_reply: reply %d for EXITING endpoint %d\n",
 		  m->m_type, ep);
 	}
 

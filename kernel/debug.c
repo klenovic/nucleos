@@ -35,7 +35,7 @@ check_runqueues_f(char *file, int line)
   FIXME("check_runqueues being done");
 
 #define MYPANIC(msg) {		\
-	kprintf("check_runqueues:%s:%d: %s\n", file, line, msg); \
+	printk("check_runqueues:%s:%d: %s\n", file, line, msg); \
 	kernel_panic("check_runqueues failed", NO_NUM);	\
 	}
 
@@ -46,15 +46,15 @@ check_runqueues_f(char *file, int line)
 
   for (q=l=0; q < NR_SCHED_QUEUES; q++) {
     if (rdy_head[q] && !rdy_tail[q]) {
-	kprintf("head but no tail in %d\n", q);
+	printk("head but no tail in %d\n", q);
 		 MYPANIC("scheduling error");
     }
     if (!rdy_head[q] && rdy_tail[q]) {
-	kprintf("tail but no head in %d\n", q);
+	printk("tail but no head in %d\n", q);
 		 MYPANIC("scheduling error");
     }
     if (rdy_tail[q] && rdy_tail[q]->p_nextready != NIL_PROC) {
-	kprintf("tail and tail->next not null in %d\n", q);
+	printk("tail and tail->next not null in %d\n", q);
 		 MYPANIC("scheduling error");
     }
     for(xp = rdy_head[q]; xp != NIL_PROC; xp = xp->p_nextready) {
@@ -70,28 +70,28 @@ check_runqueues_f(char *file, int line)
   		MYPANIC("magic wrong in xp");
 	}
 	if (RTS_ISSET(xp, RTS_SLOT_FREE)) {
-		kprintf("scheduling error: dead proc q %d %d\n",
+		printk("scheduling error: dead proc q %d %d\n",
 			q, xp->p_endpoint);
   		MYPANIC("dead proc on run queue");
 	}
         if (!xp->p_ready) {
-		kprintf("scheduling error: unready on runq %d proc %d\n",
+		printk("scheduling error: unready on runq %d proc %d\n",
 			q, xp->p_nr);
   		MYPANIC("found unready process on run queue");
         }
         if (xp->p_priority != q) {
-		kprintf("scheduling error: wrong priority q %d proc %d ep %d name %s\n",
+		printk("scheduling error: wrong priority q %d proc %d ep %d name %s\n",
 			q, xp->p_nr, xp->p_endpoint, xp->p_name);
 		MYPANIC("wrong priority");
 	}
 	if (xp->p_found) {
-		kprintf("scheduling error: double sched q %d proc %d\n",
+		printk("scheduling error: double sched q %d proc %d\n",
 			q, xp->p_nr);
 		MYPANIC("proc more than once on scheduling queue");
 	}
 	xp->p_found = 1;
 	if (xp->p_nextready == NIL_PROC && rdy_tail[q] != xp) {
-		kprintf("sched err: last element not tail q %d proc %d\n",
+		printk("sched err: last element not tail q %d proc %d\n",
 			q, xp->p_nr);
 		MYPANIC("scheduling error");
 	}
@@ -106,7 +106,7 @@ check_runqueues_f(char *file, int line)
 	if (isemptyp(xp))
 		continue;
 	if(xp->p_ready && ! xp->p_found) {
-		kprintf("sched error: ready proc %d not on queue\n", xp->p_nr);
+		printk("sched error: ready proc %d not on queue\n", xp->p_nr);
 		MYPANIC("ready proc not on scheduling queue");
 		if (l++ > MAX_LOOP) { MYPANIC("loop in debug.c?"); }
 	}

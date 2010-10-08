@@ -85,7 +85,7 @@ static int hermes_issue_cmd (hermes_t * hw, u16_t cmd, u16_t param0) {
 	}
 	/* it takes too long. Bailing out */
 	if (reg & HERMES_CMD_BUSY) {
-		printf("Hermes: HERMES_CMD_BUSY timeout\n");
+		printk("Hermes: HERMES_CMD_BUSY timeout\n");
 		return -EBUSY;
 	}
 
@@ -143,7 +143,7 @@ int hermes_cor_reset (hermes_t *hw) {
 
 	/* Did we timeout ? */
 	if (reg & HERMES_CMD_BUSY) {
-		printf ("Busy timeout after resetting the COR\n");
+		printk ("Busy timeout after resetting the COR\n");
 		return -1;
 	}
 
@@ -185,7 +185,7 @@ int hermes_init (hermes_t * hw) {
 			/* Special case - the card has probably 
 			 *  been removed, so don't wait for the 
 			 *  timeout */
-			printf("Hermes: Card removed?\n");
+			printk("Hermes: Card removed?\n");
 			return -ENODEV;
 		}
 
@@ -198,7 +198,7 @@ int hermes_init (hermes_t * hw) {
 	 * out hermes_issue_cmd() will probably return -EBUSY below.
 	 * But i check to be sure :-) */
 	if (reg & HERMES_CMD_BUSY) {
-		printf("Hermes: Timeout waiting for the CMD_BUSY to unset\n");
+		printk("Hermes: Timeout waiting for the CMD_BUSY to unset\n");
 		return -EBUSY;
 	}
 
@@ -210,7 +210,7 @@ int hermes_init (hermes_t * hw) {
 
 	err = hermes_issue_cmd (hw, HERMES_CMD_INIT, 0);
 	if (err){
-		printf("Hermes: errornr: 0x%x issueing HERMES_CMD_INIT\n",
+		printk("Hermes: errornr: 0x%x issueing HERMES_CMD_INIT\n",
 			 err);
 		return err;
 	}
@@ -232,12 +232,12 @@ int hermes_init (hermes_t * hw) {
 	hermes_write_reg (hw, HERMES_SWSUPPORT0, HERMES_MAGIC);
 
 	if (!hermes_present (hw)) {
-		printf("Hermes: Card not present?: got mag. nr.0x%x\n",
+		printk("Hermes: Card not present?: got mag. nr.0x%x\n",
 			 hermes_read_reg (hw, HERMES_SWSUPPORT0));
 	}
 
 	if (!(reg & HERMES_EV_CMD)) {
-		printf("hermes @ %x: Timeout waiting for card to reset\n",
+		printk("hermes @ %x: Timeout waiting for card to reset\n",
 			hw->iobase);
 		return -ETIMEDOUT;
 	}
@@ -252,7 +252,7 @@ int hermes_init (hermes_t * hw) {
 	/* Was the status, the result of the issued command, ok? */
 	/* The expression below should be zero. Non-zero means an error */
 	if (status & HERMES_STATUS_RESULT) {
-		printf("Hermes:Result of INIT_CMD wrong.error value: 0x%x\n",
+		printk("Hermes:Result of INIT_CMD wrong.error value: 0x%x\n",
 			(status & HERMES_STATUS_RESULT) >> 8);
 		err = -EIO;
 	}
@@ -274,7 +274,7 @@ int hermes_docmd_wait (hermes_t * hw, u16_t cmd, u16_t parm0,
 
 	err = hermes_issue_cmd (hw, cmd, parm0);
 	if (err) {
-		printf("hermes @ %x: Error %d issuing command.\n",
+		printk("hermes @ %x: Error %d issuing command.\n",
 			 hw->iobase, err);
 		return err;
 	}
@@ -292,7 +292,7 @@ int hermes_docmd_wait (hermes_t * hw, u16_t cmd, u16_t parm0,
 
 	/* check for a timeout: has the command still not completed? */
 	if (!(reg & HERMES_EV_CMD)) {
-		printf("hermes @ %x: Timeout waiting for command \
+		printk("hermes @ %x: Timeout waiting for command \
 		completion.\n", hw->iobase);
 		err = -ETIMEDOUT;
 		return err;
@@ -315,7 +315,7 @@ int hermes_docmd_wait (hermes_t * hw, u16_t cmd, u16_t parm0,
 	/* check whether there has been a valid value in the Status register. 
 	 * the high order bits should have at least some value */
 	if (status & HERMES_STATUS_RESULT) {
-		printf("Hermes: -EIO\n");
+		printk("Hermes: -EIO\n");
 		err = -EIO;
 	}
 
@@ -339,7 +339,7 @@ int hermes_allocate (hermes_t * hw, u16_t size, u16_t * fid) {
 	u16_t reg;
 
 	if ((size < HERMES_ALLOC_LEN_MIN) || (size > HERMES_ALLOC_LEN_MAX))	{
-		printf("Hermes: Invalid size\n");
+		printk("Hermes: Invalid size\n");
 		return -EINVAL;
 	}
 
@@ -347,7 +347,7 @@ int hermes_allocate (hermes_t * hw, u16_t size, u16_t * fid) {
 	 * to complete */
 	err = hermes_docmd_wait (hw, HERMES_CMD_ALLOC, size, NULL);
 	if (err) {
-		printf( "Hermes: docmd_wait timeout\n");
+		printk( "Hermes: docmd_wait timeout\n");
 		return err;
 	}
 
@@ -363,7 +363,7 @@ int hermes_allocate (hermes_t * hw, u16_t size, u16_t * fid) {
 
 	/* tired of waiting to complete. Abort. */
 	if (!(reg & HERMES_EV_ALLOC)) {
-		printf("hermes @ %x:Timeout waiting for frame allocation\n",
+		printk("hermes @ %x:Timeout waiting for frame allocation\n",
 			 hw->iobase);
 		return -ETIMEDOUT;
 	}
@@ -408,7 +408,7 @@ static int hermes_bap_seek (hermes_t * hw, int bap, u16_t id, u16_t offset) {
 	/* Check whether the offset is not too large, and whether it is a
 	 * number of words. Offset can't be odd */
 	if ((offset > HERMES_BAP_OFFSET_MAX) || (offset % 2)) {
-		printf("Hermes: Offset error\n");
+		printk("Hermes: Offset error\n");
 		return -EINVAL;
 	}
 
@@ -424,7 +424,7 @@ static int hermes_bap_seek (hermes_t * hw, int bap, u16_t id, u16_t offset) {
 
 	/* For some reason, the busy flag didn't reset automatically. Return */
 	if (reg & HERMES_OFFSET_BUSY) {
-		printf("Hermes: HERMES_OFFSET_BUSY still set, oreg: 0x%x\n",
+		printk("Hermes: HERMES_OFFSET_BUSY still set, oreg: 0x%x\n",
 				 reg);
 		return -ETIMEDOUT;
 	}
@@ -448,14 +448,14 @@ static int hermes_bap_seek (hermes_t * hw, int bap, u16_t id, u16_t offset) {
 
 	/* Busy bit didn't reset automatically */
 	if (reg & HERMES_OFFSET_BUSY) {
-		printf("Hermes: Error with fid 0x%x. Err: 0x%x\n", id, reg);
+		printk("Hermes: Error with fid 0x%x. Err: 0x%x\n", id, reg);
 		return -ETIMEDOUT;
 	}
 
 	/* There has gone something wrong: offset is outside the buffer 
 	 * boundary or the fid is not correct */
 	if (reg & HERMES_OFFSET_ERR) {
-		printf("Hermes: Error with fid 0x%x. Err: 0x%x\n", id, reg);
+		printk("Hermes: Error with fid 0x%x. Err: 0x%x\n", id, reg);
 		return -EIO;
 	}
 
@@ -481,7 +481,7 @@ int hermes_bap_pread (hermes_t * hw, int bap, void *buf, unsigned len,
 
 	/* reading (and writing) data goes a word a time, so should be even */
 	if ((len < 0) || (len % 2))	{
-		printf("Hermes: Error in length to be read\n");
+		printk("Hermes: Error in length to be read\n");
 		return -EINVAL;
 	}
 
@@ -489,7 +489,7 @@ int hermes_bap_pread (hermes_t * hw, int bap, void *buf, unsigned len,
 	 * offset */
 	err = hermes_bap_seek (hw, bap, id, offset);
 	if (err) {
-		printf("Hermes: error hermes_bap_seek in hermes_bap_pread\n");
+		printk("Hermes: error hermes_bap_seek in hermes_bap_pread\n");
 		return err;
 	}
 	/* Actually do the transfer. The length is divided by 2 because
@@ -512,7 +512,7 @@ int hermes_bap_pwrite (hermes_t * hw, int bap, const void *buf, unsigned len,
 	int err = 0;
 
 	if ((len < 0) || (len % 2)) {
-		printf("Hermes: Error in length to be written\n");
+		printk("Hermes: Error in length to be written\n");
 		return -EINVAL;
 	}
 
@@ -520,7 +520,7 @@ int hermes_bap_pwrite (hermes_t * hw, int bap, const void *buf, unsigned len,
 	 * offset */
 	err = hermes_bap_seek (hw, bap, id, offset);
 	if (err) {
-		printf("Hermes: hermes_bap_seek error in hermes_bap_pwrite\n");
+		printk("Hermes: hermes_bap_seek error in hermes_bap_pwrite\n");
 		return err;
 
 	}
@@ -541,7 +541,7 @@ int hermes_bap_pwrite (hermes_t * hw, int bap, const void *buf, unsigned len,
 int hermes_present (hermes_t * hw) {
 	int i = hermes_read_reg (hw, HERMES_SWSUPPORT0) == HERMES_MAGIC;
 	if (!i)
-		printf("Hermes: Error, card not present?\n");
+		printk("Hermes: Error, card not present?\n");
 	return i;
 }
 
@@ -558,7 +558,7 @@ int hermes_set_irqmask (hermes_t * hw, u16_t events) {
 	/* Compare written value with read value to check whether things 
 	 * succeeded */
 	if (hermes_read_reg (hw, HERMES_INTEN) != events) {
-		printf("Hermes: error setting irqmask\n");
+		printk("Hermes: error setting irqmask\n");
 		return 1;
 	}
 
@@ -595,26 +595,26 @@ int hermes_read_ltv (hermes_t * hw, int bap, u16_t rid, unsigned bufsize,
 	unsigned nwords;
 
 	if ((bufsize < 0) || (bufsize % 2))	{
-		printf("Hermes: error in bufsize\n");
+		printk("Hermes: error in bufsize\n");
 		return -EINVAL;
 	}
 
 	err = hermes_docmd_wait (hw, HERMES_CMD_ACCESS, rid, NULL);
 	if (err) {
-		printf("Hermes: error hermes_docmd_wait in hermes_read_ltv\n");
+		printk("Hermes: error hermes_docmd_wait in hermes_read_ltv\n");
 		return err;
 	}
 
 	err = hermes_bap_seek (hw, bap, rid, 0);
 	if (err) {
-		printf("Hermes: error hermes_bap_seek in hermes_read_ltv\n");
+		printk("Hermes: error hermes_bap_seek in hermes_read_ltv\n");
 		return err;
 	}
 
 	rlength = hermes_read_reg (hw, dreg);
 
 	if (!rlength) {
-		printf( "Hermes: Error rlength\n");
+		printk( "Hermes: Error rlength\n");
 		return -ENOENT;
 	}
 
@@ -624,15 +624,15 @@ int hermes_read_ltv (hermes_t * hw, int bap, u16_t rid, unsigned bufsize,
 		*length = rlength;
 
 	if (rtype != rid) {
-		printf("hermes @ %lx: hermes_read_ltv(): rid  (0x%04x)",
+		printk("hermes @ %lx: hermes_read_ltv(): rid  (0x%04x)",
 			hw->iobase);
-		printf("does not match type (0x%04x)\n", rid, rtype);
+		printk("does not match type (0x%04x)\n", rid, rtype);
 	}
 
 	if (HERMES_RECLEN_TO_BYTES (rlength) > bufsize) {
-		printf("hermes @ %lx: Truncating LTV record from ",
+		printk("hermes @ %lx: Truncating LTV record from ",
 			hw->iobase);
-		printf("%d to %d bytes. (rid=0x%04x, len=0x%04x)\n",
+		printk("%d to %d bytes. (rid=0x%04x, len=0x%04x)\n",
 			HERMES_RECLEN_TO_BYTES (rlength), bufsize, rid,
 			rlength);
 	}
@@ -658,13 +658,13 @@ int hermes_write_ltv (hermes_t * hw, int bap, u16_t rid,
 	unsigned count;
 
 	if (length == 0) {
-		printf("Hermes: length==0 in hermes_write_ltv\n");
+		printk("Hermes: length==0 in hermes_write_ltv\n");
 		return -EINVAL;
 	}
 
 	err = hermes_bap_seek (hw, bap, rid, 0);
 	if (err) {
-		printf("Hermes: error hermes_bap_seek in hermes_write_ltv\n");
+		printk("Hermes: error hermes_bap_seek in hermes_write_ltv\n");
 		return err;
 	}
 
@@ -678,7 +678,7 @@ int hermes_write_ltv (hermes_t * hw, int bap, u16_t rid,
 	err = hermes_docmd_wait (hw, HERMES_CMD_ACCESS | HERMES_CMD_WRITE,
 				 rid, NULL);
 	if (err)
-		printf("Hermes: error hermes_docmd_wait in hermes_write_ltv\n");
+		printk("Hermes: error hermes_docmd_wait in hermes_write_ltv\n");
 
 	return err;
 }
@@ -699,7 +699,7 @@ int hermes_write_wordrec (hermes_t * hw, int bap, u16_t rid, u16_t word) {
 				HERMES_BYTES_TO_RECLEN (sizeof (rec)), &rec);
 
 	if (err)
-		printf("Hermes: error in write_wordrec\n");
+		printk("Hermes: error in write_wordrec\n");
 	return err;
 }
 
@@ -716,7 +716,7 @@ int hermes_read_wordrec (hermes_t * hw, int bap, u16_t rid, u16_t * word) {
 	err = hermes_read_ltv (hw, bap, rid, sizeof (rec), NULL, &rec);
 	*word = (rec);
 	if (err)
-		printf("Hermes: Error in read_wordrec\n");
+		printk("Hermes: Error in read_wordrec\n");
 	return err;
 }
 

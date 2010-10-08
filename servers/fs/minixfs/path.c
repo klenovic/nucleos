@@ -63,7 +63,7 @@ int fs_lookup()
   r = sys_safecopyfrom(VFS_PROC_NR, grant, /*offset*/ 0, 
             (vir_bytes) user_path, (phys_bytes) len, D);
   if(r != 0) {
-	printf("MFS %s:%d sys_safecopyfrom failed: %d\n", 
+	printk("MFS %s:%d sys_safecopyfrom failed: %d\n", 
 	       __FILE__, __LINE__, r);
 	return(r);
   }
@@ -80,7 +80,7 @@ int fs_lookup()
   	r = sys_safecopyfrom(VFS_PROC_NR, grant2, 0, (vir_bytes) &credentials,
   			     (phys_bytes) cred_size, D);
   	if (r != 0) {
-  		printf("MFS %s:%d sys_safecopyfrom failed: %d\n",
+  		printk("MFS %s:%d sys_safecopyfrom failed: %d\n",
   		       __FILE__, __LINE__, r);
   		return(r);
   	}
@@ -103,7 +103,7 @@ int fs_lookup()
 	r1 = sys_safecopyto(VFS_PROC_NR, grant, 0, (vir_bytes) user_path,
 			    (phys_bytes) len, D);
 	if(r1 != 0) {
-		printf("%s:%d fs_lookup: sys_safecopyto failed: %d\n",
+		printk("%s:%d fs_lookup: sys_safecopyto failed: %d\n",
 		       __FILE__, __LINE__, r1);
 		return(r1);
 	}

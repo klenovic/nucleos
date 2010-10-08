@@ -36,6 +36,6 @@ u16_t *didp;
 		panic("syslib/" __FILE__, "pci_ids: got bad reply from PCI", m.m_type);
 	*vidp= m.m_data1;
 	*didp= m.m_data2;
-	printf("pci_ids: %04x/%04x\n", *vidp, *didp);
+	printk("pci_ids: %04x/%04x\n", *vidp, *didp);
 }
 

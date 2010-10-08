@@ -137,7 +137,7 @@ int main(void)
 				break;
 			default:
 				/* No-one else should send us notifies. */
-				printf("VM: ignoring notify() from %d\n",
+				printk("VM: ignoring notify() from %d\n",
 					msg.m_source);
 				break;
 		}
@@ -147,10 +147,10 @@ int main(void)
 	c = CALLNUMBER(msg.m_type);
 	result = -ENOSYS; /* Out of range or restricted calls return this. */
 	if(c < 0 || !vm_calls[c].vmc_func) {
-		printf("VM: out of range or missing callnr %d from %d\n",
+		printk("VM: out of range or missing callnr %d from %d\n",
 			msg.m_type, who_e);
 	} else if (vm_acl_ok(who_e, c) != 0) {
-		printf("VM: unauthorized %s by %d\n",
+		printk("VM: unauthorized %s by %d\n",
 			vm_calls[c].vmc_name, who_e);
 	} else {
 	SANITYCHECK(SCL_FUNCTIONS);
@@ -165,7 +165,7 @@ int main(void)
 	SANITYCHECK(SCL_DETAIL);
 		msg.m_type = result;
 		if((r=kipc_module_call(KIPC_SEND, 0, who_e, &msg)) != 0) {
-			printf("VM: couldn't send %d to %d (err %d)\n",
+			printk("VM: couldn't send %d to %d (err %d)\n",
 				msg.m_type, who_e, r);
 			vm_panic("send() error", NO_NUM);
 		}
@@ -407,7 +407,7 @@ static int vm_acl_ok(endpoint_t caller, int call)
 		return -EPERM;
 	}
 	if (!GET_BIT(vmproc[n].vm_call_priv_mask, call)) {
-		printf("VM: no ACL for %s for %d\n",
+		printk("VM: no ACL for %s for %d\n",
 			vm_calls[call].vmc_name, caller);
 		return -EPERM;
 	}

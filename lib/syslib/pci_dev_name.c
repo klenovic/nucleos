@@ -31,7 +31,7 @@ u16_t did;
 		CPF_WRITE);
 	if (gid == -1)
 	{
-		printf("pci_dev_name: cpf_grant_direct failed: %d\n",
+		printk("pci_dev_name: cpf_grant_direct failed: %d\n",
 			errno);
 		return NULL;
 	}
@@ -50,7 +50,7 @@ u16_t did;
 	if (m.m_type == -ENOENT)
 	{
 #if DEBUG
-		printf("pci_dev_name: got no name\n");
+		printk("pci_dev_name: got no name\n");
 #endif
 		return NULL;	/* No name for this device */
 	}
@@ -62,7 +62,7 @@ u16_t did;
 					 */
 
 #if DEBUG
-	printf("pci_dev_name: got name %s\n", name);
+	printk("pci_dev_name: got name %s\n", name);
 #endif
 	return name;
 }

@@ -91,6 +91,6 @@ struct proc *p;
 
 
 
-  kprintf("arch_do_vmctl: strange param %d\n", m_ptr->SVMCTL_PARAM);
+  printk("arch_do_vmctl: strange param %d\n", m_ptr->SVMCTL_PARAM);
   return -EINVAL;
 }

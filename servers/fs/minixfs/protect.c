@@ -28,7 +28,7 @@ int fs_chmod()
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-printf("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
+printk("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
         return(-EINVAL);
   }
 
@@ -58,7 +58,7 @@ int fs_chown()
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-printf("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
+printk("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
         return(-EINVAL);
   }
 
@@ -94,7 +94,7 @@ int fs_access_o()
   
   /* Temporarily open the file. */
   if ( (rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE) {
-printf("MFS(%d) get_inode by fs_access() failed\n", SELF_E);
+printk("MFS(%d) get_inode by fs_access() failed\n", SELF_E);
         return(-EINVAL);
   }
 
@@ -122,7 +122,7 @@ int forbidden(register struct inode *rip, mode_t access_desired)
 
   if (caller_uid == (uid_t)-1 && caller_gid == (uid_t)-1)
   {
-	printf(
+	printk(
 	"forbidden: warning caller_uid and caller_gid not initialized\n");
   }
 
@@ -167,7 +167,7 @@ int forbidden(register struct inode *rip, mode_t access_desired)
 	 	r = read_only(rip);
 
 #if 0
-  if (r != 0) printf(
+  if (r != 0) printk(
   "forbidden: caller uid/gid %d/%d object uid/gid %d/%d, returning %d\n",
 	caller_uid, caller_gid, rip->i_uid, rip->i_gid, r);
 #endif

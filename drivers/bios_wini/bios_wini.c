@@ -402,7 +402,7 @@ static void w_init()
   if (bios_buf_phys+BIOSBUF > 0x100000)
   	panic(ME, "bad BIOS buffer, phys", bios_buf_phys);
 #if 0
-  printf("bios_wini: got buffer size %d, virtual 0x%x, phys 0x%x\n",
+  printk("bios_wini: got buffer size %d, virtual 0x%x, phys 0x%x\n",
   		BIOSBUF, bios_buf_v, bios_buf_phys);
 #endif
 
@@ -474,9 +474,9 @@ static void w_init()
 	}
 
 	if (wn->int13ext) {
-		printf("%s: %lu sectors\n", w_name(), capacity);
+		printk("%s: %lu sectors\n", w_name(), capacity);
 	} else {
-		printf("%s: %d cylinders, %d heads, %d sectors per track\n",
+		printk("%s: %d cylinders, %d heads, %d sectors per track\n",
 			w_name(), wn->cylinders, wn->heads, wn->sectors);
 	}
 	wn->part[0].dv_size = mul64u(capacity, SECTOR_SIZE);
