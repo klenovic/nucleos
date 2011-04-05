@@ -90,7 +90,8 @@
 #define MFS_PROC_NR	7	/* nucleos root filesystem */
 #define VM_PROC_NR	8	/* memory server */
 #define PFS_PROC_NR	9	/* pipe filesystem */
-#define INIT_PROC_NR	10	/* init -- goes multiuser */
+#define EXT2_PROC_NR	10	/* ext2 filesystem */
+#define INIT_PROC_NR	11	/* init -- goes multiuser */
 
 /* Root system process and root user process. */
 #define ROOT_SYS_PROC_NR	RS_PROC_NR

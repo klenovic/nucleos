@@ -127,6 +127,7 @@ struct boot_image image[] = {
 	{MFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "minixfs" },
 	{VM_PROC_NR,    0,     0, 32,      2, 0,     "vm"      },
 	{PFS_PROC_NR,   0, BVM_F, 32,      5, 0,     "pipefs"  },
+	{EXT2_PROC_NR,  0, BVM_F, 32,      5, 0,     "ext2"    },
 	{INIT_PROC_NR,  0, BVM_F,  8, USER_Q, 0,     "init"    },
 };
 
@@ -137,8 +138,7 @@ struct boot_image image[] = {
  * causing a compile time error. Note that no space is actually allocated 
  * because 'dummy' is declared extern.
  */
-extern int dummy[(NR_BOOT_PROCS==sizeof(image)/
-	sizeof(struct boot_image))?1:-1];
+extern int dummy[(NR_BOOT_PROCS==sizeof(image)/sizeof(struct boot_image))?1:-1];
 extern int dummy[(BITCHUNK_BITS > NR_BOOT_PROCS - 1) ? 1 : -1];
 
 #ifdef CONFIG_IDLE_TSC

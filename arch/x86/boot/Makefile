@@ -1,5 +1,5 @@
 # Create image from executables (kernel & servers)
-# Note: Keep a watch of the correct order!
+# NOTE: KEEP THE ORDER AS IN kernel/kernel-syms.c!
 bin-y := arch/$(SRCARCH)/kernel/kernel
 bin-y += servers/pm/pm
 bin-y += servers/fs/vfs/vfs
@@ -11,6 +11,7 @@ bin-y += servers/ds/ds
 bin-y += servers/fs/minixfs/minixfs
 bin-y += arch/$(SRCARCH)/servers/vm/vm
 bin-y += servers/fs/pipefs/pipefs
+bin-y += servers/fs/ext2/ext2
 bin-y += servers/init/init
 
 quiet_cmd_create_image = GEN     $@

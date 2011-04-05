@@ -11,6 +11,7 @@ bin-y := $(srctree)/drivers/at_wini \
 	 $(srctree)/drivers/floppy \
 	 $(srctree)/drivers/pci \
 	 $(srctree)/servers/fs/minixfs/minixfs \
+	 $(srctree)/servers/fs/ext2/ext2 \
 	 $(src)/sh \
 	 $(src)/simple/cdprobe \
 	 $(src)/simple/dev2name \

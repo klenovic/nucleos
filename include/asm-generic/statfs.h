@@ -33,6 +33,7 @@ struct statfs {
 	__kernel_fsid_t f_fsid;
 	__statfs_word f_namelen;
 	__statfs_word f_frsize;
+	__statfs_word f_flags;
 	__statfs_word f_spare[5];
 };
 

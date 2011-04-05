@@ -180,7 +180,8 @@ static void cch_check(void)
 		req_nr != REQ_READSUPER &&
 		req_nr != REQ_MOUNTPOINT && req_nr != REQ_UNMOUNT &&
 		req_nr != REQ_SYNC && req_nr != REQ_LOOKUP)
-printk("MFS(%d) inode(%d) cc: %d req_nr: %d\n",
+		printk("MFS(%d) inode(%d) cc: %d req_nr: %d\n",
+
 	SELF_E, inode[i].i_num, inode[i].i_count - cch[i], req_nr);
 	  
 	  cch[i] = inode[i].i_count;
