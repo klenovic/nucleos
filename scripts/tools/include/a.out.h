@@ -19,18 +19,18 @@ struct	MNX(exec) {			/* a.out header */
   unsigned char	a_hdrlen;	/* length of header */
   unsigned char	a_unused;	/* reserved for future use */
   unsigned short a_version;	/* version stamp (not used at present) */
-  long		a_text;		/* size of text segement in bytes */
-  long		a_data;		/* size of data segment in bytes */
-  long		a_bss;		/* size of bss segment in bytes */
-  long		a_entry;	/* entry point */
-  long		a_total;	/* total memory allocated */
-  long		a_syms;		/* size of symbol table */
+  int		a_text;		/* size of text segement in bytes */
+  int		a_data;		/* size of data segment in bytes */
+  int		a_bss;		/* size of bss segment in bytes */
+  int		a_entry;	/* entry point */
+  int		a_total;	/* total memory allocated */
+  int		a_syms;		/* size of symbol table */
 
   /* SHORT FORM ENDS HERE */
-  long		a_trsize;	/* text relocation size */
-  long		a_drsize;	/* data relocation size */
-  long		a_tbase;	/* text relocation base */
-  long		a_dbase;	/* data relocation base */
+  int		a_trsize;	/* text relocation size */
+  int		a_drsize;	/* data relocation size */
+  int		a_tbase;	/* text relocation base */
+  int		a_dbase;	/* data relocation base */
 };
 
 #define A_MAGIC0      (unsigned char) 0x01

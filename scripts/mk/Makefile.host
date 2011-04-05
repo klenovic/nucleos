@@ -118,7 +118,7 @@ targets += $(hobj-y)
 # Command to add objects and libraries into target library
 # ----------------------------------------------------------------------------
 quiet_cmd_host_ar_ao = HOSTAR  $@
-      cmd_host_ar_ao = $(AR) $(KBUILD_ARFLAGS) $(ARFLAGS_$(notdir $@)) $@ $(filter $($(notdir $@)-obj-y),$^)
+      cmd_host_ar_ao = $(HOSTAR) $(KBUILD_ARFLAGS) $(ARFLAGS_$(notdir $@)) $@ $(filter $($(notdir $@)-obj-y),$^)
 
 define rule_host_ar_ao
 	rm -f $@; \

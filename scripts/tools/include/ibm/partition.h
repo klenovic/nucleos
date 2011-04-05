@@ -20,8 +20,8 @@ struct MNX(part_entry) {
   unsigned char last_head;	/* head value for last sector	 */
   unsigned char last_sec;	/* sector value + cyl bits for last sector */
   unsigned char last_cyl;	/* track value for last sector	 */
-  unsigned long lowsec;		/* logical first sector		 */
-  unsigned long size;		/* size of partition in sectors	 */
+  unsigned int lowsec;		/* logical first sector		 */
+  unsigned int size;		/* size of partition in sectors	 */
 };
 
 #define ACTIVE_FLAG	0x80	/* value for active in bootind field (hd0) */

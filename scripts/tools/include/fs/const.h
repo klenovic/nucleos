@@ -16,13 +16,13 @@
 #define NR_INODES        256 /* # slots in "in core" inode table */
 
 #define INODE_HASH_LOG2   7     /* 2 based logarithm of the inode hash size */
-#define INODE_HASH_SIZE   ((unsigned long)1<<INODE_HASH_LOG2)
-#define INODE_HASH_MASK   (((unsigned long)1<<INODE_HASH_LOG2)-1)
+#define INODE_HASH_SIZE   ((unsigned int)1<<INODE_HASH_LOG2)
+#define INODE_HASH_MASK   (((unsigned int)1<<INODE_HASH_LOG2)-1)
 
 
-/* The type of sizeof may be (unsigned) long.  Use the following macro for
+/* The type of sizeof may be (unsigned) int.  Use the following macro for
  * taking the sizes of small objects so that there are no surprises like
- * (small) long constants being passed to routines expecting an int.
+ * (small) int constants being passed to routines expecting an int.
  */
 #define usizeof(t) ((unsigned) sizeof(t))
 
