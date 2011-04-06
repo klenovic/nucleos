@@ -140,24 +140,18 @@ int main(int argc, char *argv[])
   int error, ind;
   unsigned short test_endian = 1;
 
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
   /* SEF local startup. */
   env_setargs(argc, argv);
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
   le_CPU = (*(unsigned char *) &test_endian == 0 ? 0 : 1);
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
   /* Server isn't tested on big endian CPU */
   ASSERT(le_CPU == 1);
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
 	init_server();
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
   fs_m_in.m_type = KCNR_FS_READY;
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
   if (kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &fs_m_in) != 0) {
         printk("EXT2(%d): Error sending login to VFS\n", SELF_E);
         return(-1);
   }
-	printk("%d:Starting ext2(%d)...\n", __LINE__,SELF_E);
+
   while(!unmountdone || !exitsignaled) {
 	endpoint_t src;
 
@@ -183,8 +177,7 @@ int main(int argc, char *argv[])
 	ind = req_nr - VFS_BASE;
 
 	if (ind < 0 || ind >= NREQS) {
-		printk("mfs: bad request %d\n", req_nr);
-		printk("ind = %d\n", ind);
+		printk("ext2: bad request %d (table index %d)\n", req_nr, ind);
 		error = -EINVAL;
 	} else {
 		error = (*fs_call_vec[ind])();
