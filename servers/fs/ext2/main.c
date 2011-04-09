@@ -11,12 +11,6 @@
 #include "drivers.h"
 #include "optset.h"
 
-
-/* Declare some local functions. */
-static void get_work(kipc_msg_t *m_in);
-static void cch_check(void);
-static void reply(endpoint_t who, kipc_msg_t *m_out);
-
 int env_argc;
 char **env_argv;
 
@@ -107,13 +101,12 @@ static void get_work(kipc_msg_t *m_in)
 	       is_notify(fs_m_in.m_type)));
 }
 
-
 /*===========================================================================*
  *				reply					     *
  *===========================================================================*/
 static void reply(endpoint_t who, kipc_msg_t *m_out)
 {
-	if (0 != kipc_module_call(KIPC_SEND,0, who, m_out))	/* send the kipc_msg_t */
+	if (kipc_module_call(KIPC_SEND,0, who, m_out) != 0)	/* send the kipc_msg_t */
 		printk("ext2(%d) was unable to send reply\n", SELF_E);
 }
 
@@ -126,12 +119,16 @@ static void cch_check(void)
 	int i;
 
 	for (i = 0; i < NR_INODES; ++i) {
-		if (inode[i].i_count != cch[i] && req_nr != REQ_GETNODE &&
-		    req_nr != REQ_PUTNODE && req_nr != REQ_READSUPER &&
-		    req_nr != REQ_MOUNTPOINT && req_nr != REQ_UNMOUNT &&
-		    req_nr != REQ_SYNC && req_nr != REQ_LOOKUP) {
+		if (inode[i].i_count != cch[i] &&
+		    req_nr != REQ_GETNODE &&
+		    req_nr != REQ_PUTNODE &&
+		    req_nr != REQ_READSUPER &&
+		    req_nr != REQ_MOUNTPOINT &&
+		    req_nr != REQ_UNMOUNT &&
+		    req_nr != REQ_SYNC &&
+		    req_nr != REQ_LOOKUP) {
 			printk("ext2(%d) inode(%ul) cc: %d req_nr: %d\n", SELF_E,
-				inode[i].i_num, inode[i].i_count - cch[i], req_nr);
+			       inode[i].i_num, inode[i].i_count - cch[i], req_nr);
 		}
 
 		cch[i] = inode[i].i_count;
@@ -144,33 +141,43 @@ int main(int argc, char *argv[])
  * three major activities: getting new work, processing the work, and
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
-	int error, ind;
+	int error;
+	int ind;
 	unsigned short test_endian = 1;
 
-	/* SEF local startup. */
+	/* Local startup. */
 	env_setargs(argc, argv);
+
 	le_CPU = (*(unsigned char *) &test_endian == 0 ? 0 : 1);
+
 	/* Server isn't tested on big endian CPU */
 	ASSERT(le_CPU == 1);
-	
+
 	init_server();
+
 	fs_m_in.m_type = KCNR_FS_READY;
 	if (kipc_module_call(KIPC_SEND, 0, VFS_PROC_NR, &fs_m_in) != 0) {
-		printk("EXT2(%d): Error sending login to VFS\n", SELF_E);
+		printk("ext2(%d): Error sending login to VFS\n", SELF_E);
 		return(-1);
 	}
 
 	while(!unmountdone || !exitsignaled) {
 		endpoint_t src;
 
-		/* Wait for request kipc_msg_t. */
+		/* Wait for request message */
 		get_work(&fs_m_in);
+
 		src = fs_m_in.m_source;
+
+		/* Exit request? */
 		if (src == PM_PROC_NR) {
 			exitsignaled = 1;
 			fs_sync();
 			continue;
 		}
+
+		/* Must be a regular VFS request */
+		assert(src == VFS_PROC_NR && !unmountdone);
 
 		error = 0;
 		caller_uid = -1;	/* To trap errors */
@@ -183,7 +190,6 @@ int main(int argc, char *argv[])
 		}
 
 		ind = req_nr - VFS_BASE;
-
 		if (ind < 0 || ind >= NREQS) {
 			printk("ext2: bad request %d (table index %d)\n", req_nr, ind);
 			error = -EINVAL;
