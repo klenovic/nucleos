@@ -326,7 +326,7 @@ static struct inode *new_node(struct inode *ldirp,
 		return(NULL);
 	}
 
-  } else if (err_code == EENTERMOUNT || err_code == ELEAVEMOUNT) {
+  } else if (err_code == -EENTERMOUNT || err_code == -ELEAVEMOUNT) {
 	r = -EEXIST;
   } else {
 	/* Either last component exists, or there is some problem. */

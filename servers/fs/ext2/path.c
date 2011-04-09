@@ -82,7 +82,7 @@ int fs_lookup()
   rip = NULL;
   r = parse_path(dir_ino, root_ino, flags, &rip, &offset, &symlinks);
 
-  if(symlinks != 0 && (r == ELEAVEMOUNT || r == EENTERMOUNT || r == ESYMLINK)){
+  if(symlinks != 0 && (r == -ELEAVEMOUNT || r == -EENTERMOUNT || r == -ESYMLINK)){
 	len = strlen(user_path)+1;
 	if(len > path_size) return(-ENAMETOOLONG);
 
@@ -91,7 +91,7 @@ int fs_lookup()
 	if (r1 != 0) return(r1);
   }
 
-  if(r == ELEAVEMOUNT || r == ESYMLINK) {
+  if(r == -ELEAVEMOUNT || r == -ESYMLINK) {
 	  /* Report offset and the error */
 	  fs_m_out.RES_OFFSET = offset;
 	  fs_m_out.RES_SYMLOOP = symlinks;
@@ -99,7 +99,7 @@ int fs_lookup()
 	  return(r);
   }
 
-  if (r != 0 && r != EENTERMOUNT) return(r);
+  if (r != 0 && r != -EENTERMOUNT) return(r);
 
   fs_m_out.RES_INODE_NR		= rip->i_num;
   fs_m_out.RES_MODE		= rip->i_mode;
@@ -112,7 +112,7 @@ int fs_lookup()
    * cause any harm to set RES_DEV always. */
   fs_m_out.RES_DEV		= (dev_t) rip->i_block[0];
 
-  if(r == EENTERMOUNT) {
+  if(r == -EENTERMOUNT) {
 	  fs_m_out.RES_OFFSET	= offset;
 	  put_inode(rip); /* Only return a reference to the final object */
   }
@@ -160,7 +160,7 @@ int *symlinkp;
   dup_inode(rip);
 
   /* If the given start inode is a mountpoint, we must be here because the file
-   * system mounted on top returned an ELEAVEMOUNT error. In this case, we must
+   * system mounted on top returned an -ELEAVEMOUNT error. In this case, we must
    * only accept ".." as the first path component.
    */
   leaving_mount = rip->i_mountpoint; /* True iff rip is a mountpoint */
@@ -174,8 +174,8 @@ int *symlinkp;
 		*res_inop = rip;
 		*offsetp += cp - user_path;
 
-		/* Return EENTERMOUNT if we are at a mount point */
-		if (rip->i_mountpoint) return(EENTERMOUNT);
+		/* Return -EENTERMOUNT if we are at a mount point */
+		if (rip->i_mountpoint) return(-EENTERMOUNT);
 
 		return(0);
 	}
@@ -189,7 +189,7 @@ int *symlinkp;
 
 	/* Special code for '..'. A process is not allowed to leave a chrooted
 	 * environment. A lookup of '..' at the root of a mounted filesystem
-	 * has to return ELEAVEMOUNT. In both cases, the caller needs search
+	 * has to return -ELEAVEMOUNT. In both cases, the caller needs search
 	 * permission for the current inode, as it is used as directory.
 	 */
 	if(strcmp(component, "..") == 0) {
@@ -210,7 +210,7 @@ int *symlinkp;
 
 			put_inode(rip);
 			*offsetp += cp - user_path;
-			return(ELEAVEMOUNT);
+			return(-ELEAVEMOUNT);
 		}
 	}
 
@@ -220,7 +220,7 @@ int *symlinkp;
 
 		*res_inop = rip;
 		*offsetp += cp - user_path;
-		return(EENTERMOUNT);
+		return(-EENTERMOUNT);
 	}
 
 	/* There is more path.  Keep parsing.
@@ -228,7 +228,7 @@ int *symlinkp;
 	 */
 	dir_ip = rip;
 	rip = advance(dir_ip, leaving_mount ? dot2 : component, CHK_PERM);
-	if(err_code == ELEAVEMOUNT || err_code == EENTERMOUNT)
+	if(err_code == -ELEAVEMOUNT || err_code == -EENTERMOUNT)
 		err_code = 0;
 
 	if (err_code != 0) {
@@ -266,7 +266,7 @@ int *symlinkp;
 		if (next_cp[0] == '/') {
                         put_inode(dir_ip);
                         put_inode(rip);
-                        return(ESYMLINK);
+                        return(-ESYMLINK);
 		}
 
 		put_inode(rip);
@@ -414,7 +414,7 @@ int chk_perm;			/* check permissions when string is looked up*/
 		  if (string[1] == '.') {
 			  if (!rip->i_sp->s_is_root) {
 				  /* Climbing up mountpoint */
-				  err_code = ELEAVEMOUNT;
+				  err_code = -ELEAVEMOUNT;
 			  }
 		  }
 	  }
@@ -426,7 +426,7 @@ int chk_perm;			/* check permissions when string is looked up*/
    */
   if (rip->i_mountpoint) {
 	  /* Mountpoint encountered, report it */
-	  err_code = EENTERMOUNT;
+	  err_code = -EENTERMOUNT;
   }
 
   return(rip);

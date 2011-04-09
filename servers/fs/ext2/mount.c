@@ -23,7 +23,7 @@ int fs_readsuper()
 /* This function reads the superblock of the partition, gets the root inode
  * and sends back the details of them. Note, that the FS process does not
  * know the index of the vmnt object which refers to it, whenever the pathname
- * lookup leaves a partition an ELEAVEMOUNT error is transferred back
+ * lookup leaves a partition an -ELEAVEMOUNT error is transferred back
  * so that the VFS knows that it has to find the vnode on which this FS
  * process' partition is mounted on.
  */
