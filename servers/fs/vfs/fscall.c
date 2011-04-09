@@ -133,7 +133,7 @@ kipc_msg_t *m;				/* request/reply message pointer */
 
   /* Save global variables of the current call */
   if ((r = push_globals()) != 0) {
-	printk("VFS: error saving global variables in call %d from VFS_PROC_NR %d\n",
+	printk("VFS: error saving global variables in call %d from process %d\n",
 		m->m_type, m->m_source);
   } else {
 	/* Initialize global variables for the nested call */
@@ -141,9 +141,7 @@ kipc_msg_t *m;				/* request/reply message pointer */
 
 	/* Perform the nested call */
 	if (call_nr < 0 || call_nr >= NR_syscalls) {
-		printk("VFS: invalid nested call %d from VFS_PROC_NR %d\n", call_nr,
-			who_e);
-
+		printk("VFS: invalid nested call %d from process %d\n", call_nr, who_e);
 		r = -ENOSYS;
 	} else {
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS

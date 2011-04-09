@@ -23,7 +23,7 @@
 #define REQ_FLAGS		m_data8
 #define REQ_GID			m_data6
 #define REQ_GRANT		m_data2
-#define REQ_GRANT2		m_data1 
+#define REQ_GRANT2		m_data1
 #define REQ_GRANT3		m_data3
 #define REQ_INODE_NR		m_data1
 #define REQ_MEM_SIZE		m_data5
@@ -45,9 +45,8 @@
 #define REQ_TRC_END_LO		m_data5
 #define REQ_TRC_START_HI	m_data2
 #define REQ_TRC_START_LO	m_data3
-#define REQ_UCRED_SIZE		m_data9 
+#define REQ_UCRED_SIZE		m_data9
 #define REQ_UID			m_data9
-
 
 /* VFS/FS reply fields */
 #define RES_DEV			m_data4
@@ -67,11 +66,11 @@
 #define REQ_RDONLY		001
 #define REQ_ISROOT		002
 #define PATH_NOFLAGS		000
-#define PATH_RET_SYMLINK	001	/* Return a symlink object (i.e.
+#define PATH_RET_SYMLINK	010	/* Return a symlink object (i.e.
 					 * do not continue with the contents
 					 * of the symlink if it is the last
 					 * component in a path). */
-#define PATH_GET_UCRED		002	/* Request provides a grant ID in m_data1
+#define PATH_GET_UCRED		020	/* Request provides a grant ID in m_data1
 					 * and struct ucred size in m_data9 (as
 					 * opposed to a REQ_UID). */
 
@@ -118,11 +117,11 @@ typedef struct {
 #define REQ_RENAME	(VFS_BASE + 25)
 #define REQ_LOOKUP	(VFS_BASE + 26)
 #define REQ_MOUNTPOINT  (VFS_BASE + 27)
-#define REQ_READSUPER	(VFS_BASE + 28) 
+#define REQ_READSUPER	(VFS_BASE + 28)
 #define REQ_NEWNODE	(VFS_BASE + 29)
 #define REQ_RDLINK	(VFS_BASE + 30)
 #define REQ_GETDENTS	(VFS_BASE + 31)
-
-#define NREQS		32 
+#define REQ_STATVFS	(VFS_BASE + 32)
+#define NREQS		33
 
 #endif /* __NUCLEOS_VFSIF_H */
