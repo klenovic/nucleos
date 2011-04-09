@@ -1,5 +1,5 @@
 ##############################################################################
-#  Copyright (C) 2010  Ladislav Klenovic <klenovic@nucleonsoft.com>
+#  Copyright (C) 2011  Ladislav Klenovic <klenovic@nucleonsoft.com>
 #
 #  This file is part of Nucleos kernel.
 #
