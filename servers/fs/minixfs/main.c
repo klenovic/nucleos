@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
 	int error, ind;
-	kipc_msg_t m;
 
 	/* Initialize the server, then go to work. */
 	init_server();
