@@ -2,9 +2,9 @@
 #include <nucleos/kipc.h>
 #include <nucleos/queue.h>
 #include <nucleos/dmap.h>
-#include "const.h"
-#include "type.h"
-#include "inode.h"
+#include <servers/ext2/const.h>
+#include <servers/ext2/type.h>
+#include <servers/ext2/inode.h>
 #include "drivers.h"
 
 /* The following variables are used for returning results to the caller. */
@@ -61,8 +61,8 @@ unsigned int inode_cache_hit;
 unsigned int inode_cache_miss;
 struct inode inode[NR_INODES];
 
-struct super_block *superblock;
-struct super_block *ondisk_superblock;
+struct ext2_super_block *superblock;
+struct ext2_super_block *ondisk_superblock;
 
 struct driver_endpoints driver_endpoints[NR_DEVICES];
 

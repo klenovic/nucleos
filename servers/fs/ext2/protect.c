@@ -3,8 +3,8 @@
  */
 
 #include "fs.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 static int in_group(gid_t grp);
@@ -147,7 +147,7 @@ struct inode *ip;		/* ptr to inode whose file sys is to be cked */
  * read only.  If so, return -EROFS, else return 0.
  */
 
-  register struct super_block *sp;
+  register struct ext2_super_block *sp;
 
   sp = ip->i_sp;
   return(sp->s_rd_only ? -EROFS : 0);

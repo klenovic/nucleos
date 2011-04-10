@@ -18,9 +18,9 @@
 #include "fs.h"
 #include <nucleos/u64.h>
 #include <stdlib.h>
-#include "buf.h"
-#include "super.h"
-#include "inode.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/super.h>
+#include <servers/ext2/inode.h>
 
 static void rm_lru(struct buf *bp);
 static void rw_block(struct buf *, int);

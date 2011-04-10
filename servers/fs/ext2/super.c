@@ -12,32 +12,33 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
-#include "const.h"
+#include <nucleos/magic.h>
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
+#include <servers/ext2/const.h>
 
 static off_t ext2_max_size(int block_size);
-static u32_t ext2_count_dirs(struct super_block *sp);
+static u32_t ext2_count_dirs(struct ext2_super_block *sp);
 
-static void super_copy(register struct super_block *dest,
-		register struct super_block *source);
+static void super_copy(register struct ext2_super_block *dest,
+		register struct ext2_super_block *source);
 static void copy_group_descriptors(register struct group_desc *dest_array,
 			    register struct group_desc *source_array,
 			    unsigned int ngroups);
 
-static off_t super_block_offset;
+static off_t ext2_super_block_offset;
 
 
 /*===========================================================================*
  *                              get_super                                    *
  *===========================================================================*/
-struct super_block *get_super(
-  dev_t dev           /* device number whose super_block is sought */
+struct ext2_super_block *get_super(
+  dev_t dev           /* device number whose ext2_super_block is sought */
 )
 {
   if (dev == NO_DEV)
-	panic("EXT2","request for super_block of NO_DEV",NO_NUM);
+	panic("EXT2","request for ext2_super_block of NO_DEV",NO_NUM);
   if (superblock->s_dev != dev)
 	panic("EXT2","wrong superblock", (int) dev);
 
@@ -61,7 +62,7 @@ static struct group_desc *ondisk_group_descs;
  *                              read_super                                   *
  *===========================================================================*/
 int read_super(sp)
-register struct super_block *sp; /* pointer to a superblock */
+register struct ext2_super_block *sp; /* pointer to a superblock */
 {
   /* Read a superblock. */
   dev_t dev;
@@ -74,22 +75,22 @@ register struct super_block *sp; /* pointer to a superblock */
 
   dev = sp->s_dev;              /* save device (will be overwritten by copy) */
   if (dev == NO_DEV)
-	panic("EXT2","request for super_block of NO_DEV",NO_NUM);
+	panic("EXT2","request for ext2_super_block of NO_DEV",NO_NUM);
 
   if (opt.block_with_super == 0) {
-	super_block_offset = SUPER_BLOCK_BYTES;
+	ext2_super_block_offset = SUPER_BLOCK_BYTES;
   } else {
 	/* The block number here uses 1k units */
-	super_block_offset = opt.block_with_super * 1024;
+	ext2_super_block_offset = opt.block_with_super * 1024;
   }
 
-  STATICINIT(ondisk_superblock, sizeof(struct super_block));
+  STATICINIT(ondisk_superblock, sizeof(struct ext2_super_block));
 
   if (!sp || !ondisk_superblock)
-	panic("EXT2","can't allocate memory for super_block buffers",NO_NUM);
+	panic("EXT2","can't allocate memory for ext2_super_block buffers",NO_NUM);
 
   r = block_dev_io(MFS_DEV_READ, dev, SELF_E,
-		   (char*) ondisk_superblock, cvu64(super_block_offset),
+		   (char*) ondisk_superblock, cvu64(ext2_super_block_offset),
 		   _MIN_BLOCK_SIZE);
   if (r != _MIN_BLOCK_SIZE)
 	return(-EINVAL);
@@ -98,7 +99,7 @@ register struct super_block *sp; /* pointer to a superblock */
 
   sp->s_dev = NO_DEV;           /* restore later */
 
-  if (sp->s_magic != SUPER_MAGIC)
+  if (sp->s_magic != EXT2_SUPER_MAGIC)
 	return(-EINVAL);
 
   sp->s_block_size = 1024*(1<<sp->s_log_block_size);
@@ -212,7 +213,7 @@ register struct super_block *sp; /* pointer to a superblock */
  *                              write_super				     *
  *===========================================================================*/
 void write_super(sp)
-struct super_block *sp; /* pointer to a superblock */
+struct ext2_super_block *sp; /* pointer to a superblock */
 {
 /* Write a superblock and gdt. */
   int r;
@@ -223,17 +224,17 @@ struct super_block *sp; /* pointer to a superblock */
 	panic("EXT2","can't write superblock on read-only filesys.",NO_NUM);
 
   if (sp->s_dev == NO_DEV)
-	panic("EXT2","request to write super_block, but NO_DEV",NO_NUM);
+	panic("EXT2","request to write ext2_super_block, but NO_DEV",NO_NUM);
 
   super_copy(ondisk_superblock, sp);
 
   r = block_dev_io(MFS_DEV_WRITE, sp->s_dev, SELF_E,
-                   sp, cvu64(super_block_offset), SUPER_SIZE_D);
+                   sp, cvu64(ext2_super_block_offset), SUPER_SIZE_D);
   if (r != SUPER_SIZE_D)
 	printk("ext2: Warning, failed to write superblock to the disk!\n");
 
   if (group_descriptors_dirty == DIRTY) {
-	/* Locate the appropriate super_block. */
+	/* Locate the appropriate ext2_super_block. */
 	gd_size = sp->s_gdb_count * sp->s_block_size;
 
 	if (opt.block_with_super == 0) {
@@ -269,7 +270,7 @@ struct group_desc* get_group_desc(unsigned int bnum)
 }
 
 
-static u32_t ext2_count_dirs(struct super_block *sp)
+static u32_t ext2_count_dirs(struct ext2_super_block *sp)
 {
   u32_t count = 0;
   int i;
@@ -351,12 +352,12 @@ static off_t ext2_max_size(int block_size)
  *				super_copy				     *
  *===========================================================================*/
 static void super_copy(
-  register struct super_block *dest,
-  register struct super_block *source
+  register struct ext2_super_block *dest,
+  register struct ext2_super_block *source
 )
 /* Note: we don't convert stuff, used in ext3. */
 {
-/* Copy super_block to the in-core table, swapping bytes if need be. */
+/* Copy ext2_super_block to the in-core table, swapping bytes if need be. */
   if (le_CPU) {
 	/* Just use memcpy */
 	memcpy(dest, source, SUPER_SIZE_D);
@@ -414,7 +415,7 @@ static void gd_copy(
   register struct group_desc *source
 )
 {
-  /* Copy super_block to the in-core table, swapping bytes if need be. */
+  /* Copy ext2_super_block to the in-core table, swapping bytes if need be. */
   if (le_CPU) {
 	/* Just use memcpy */
 	memcpy(dest, source, sizeof(struct group_desc));

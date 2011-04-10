@@ -7,9 +7,9 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/stat.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include "drivers.h"
 #include <servers/ds/ds.h>
 #include <nucleos/vfsif.h>
@@ -70,7 +70,7 @@ int fs_readsuper()
   }
 
   /* Fill in the super block. */
-  STATICINIT(superblock, sizeof(struct super_block));
+  STATICINIT(superblock, sizeof(struct ext2_super_block));
   if (!superblock)
 	panic("EXT2","Can't allocate memory for superblock.",NO_NUM);
   superblock->s_dev = fs_dev;	/* read_super() needs to know which dev */
@@ -84,7 +84,7 @@ int fs_readsuper()
   }
 
   if (superblock->s_rev_level != EXT2_GOOD_OLD_REV) {
-	struct super_block *sp = superblock; /* just shorter name */
+	struct ext2_super_block *sp = superblock; /* just shorter name */
 	mask = ~SUPPORTED_INCOMPAT_FEATURES;
 	if (HAS_INCOMPAT_FEATURE(sp, mask)) {
 		if (HAS_INCOMPAT_FEATURE(sp, INCOMPAT_COMPRESSION & mask))

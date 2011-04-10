@@ -17,9 +17,9 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/stat.h>
 #include <nucleos/types.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 char dot1[2] = ".";	/* used for search_dir to bypass the access */
@@ -118,6 +118,71 @@ int fs_lookup()
   }
 
   return(r);
+}
+
+struct inode *advance(dirp, string, chk_perm)
+struct inode *dirp;		/* inode for directory to be searched */
+char string[NAME_MAX + 1];	/* component name to look for */
+int chk_perm;			/* check permissions when string is looked up*/
+{
+/* Given a directory and a component of a path, look up the component in
+ * the directory, find the inode, open it, and return a pointer to its inode
+ * slot.
+ */
+  ino_t numb;
+  struct inode *rip;
+
+  /* If 'string' is empty, return an error. */
+  if (string[0] == '\0') {
+	err_code = -ENOENT;
+	return(NULL);
+  }
+
+  /* Check for NULL. */
+  if (dirp == NULL) return(NULL);
+
+  /* If 'string' is not present in the directory, signal error. */
+  if ( (err_code = search_dir(dirp, string, &numb, LOOK_UP,
+			      chk_perm, 0)) != 0) {
+	return(NULL);
+  }
+
+  /* The component has been found in the directory.  Get inode. */
+  if ( (rip = get_inode(dirp->i_dev, (int) numb)) == NULL)  {
+	return(NULL);
+  }
+
+  /* The following test is for "mountpoint/.." where mountpoint is a
+   * mountpoint. ".." will refer to the root of the mounted filesystem,
+   * but has to become a reference to the parent of the 'mountpoint'
+   * directory.
+   *
+   * This case is recognized by the looked up name pointing to a
+   * root inode, and the directory in which it is held being a
+   * root inode, _and_ the name[1] being '.'. (This is a test for '..'
+   * and excludes '.'.)
+   */
+  if (rip->i_num == ROOT_INODE) {
+	  if (dirp->i_num == ROOT_INODE) {
+		  if (string[1] == '.') {
+			  if (!rip->i_sp->s_is_root) {
+				  /* Climbing up mountpoint */
+				  err_code = -ELEAVEMOUNT;
+			  }
+		  }
+	  }
+  }
+
+  /* See if the inode is mounted on.  If so, switch to root directory of the
+   * mounted file system.  The ext2_super_block provides the linkage between the
+   * inode mounted on and the root directory of the mounted file system.
+   */
+  if (rip->i_mountpoint) {
+	  /* Mountpoint encountered, report it */
+	  err_code = -EENTERMOUNT;
+  }
+
+  return(rip);
 }
 
 
@@ -280,7 +345,6 @@ int *symlinkp;
 
 }
 
-
 /*===========================================================================*
  *                             ltraverse				     *
  *===========================================================================*/
@@ -361,75 +425,6 @@ char *suffix;			/* current remaining path. Has to point in the
 	put_block(bp, DIRECTORY_BLOCK);
 
   return(0);
-}
-
-
-/*===========================================================================*
- *				advance					     *
- *===========================================================================*/
-struct inode *advance(dirp, string, chk_perm)
-struct inode *dirp;		/* inode for directory to be searched */
-char string[NAME_MAX + 1];	/* component name to look for */
-int chk_perm;			/* check permissions when string is looked up*/
-{
-/* Given a directory and a component of a path, look up the component in
- * the directory, find the inode, open it, and return a pointer to its inode
- * slot.
- */
-  ino_t numb;
-  struct inode *rip;
-
-  /* If 'string' is empty, return an error. */
-  if (string[0] == '\0') {
-	err_code = -ENOENT;
-	return(NULL);
-  }
-
-  /* Check for NULL. */
-  if (dirp == NULL) return(NULL);
-
-  /* If 'string' is not present in the directory, signal error. */
-  if ( (err_code = search_dir(dirp, string, &numb, LOOK_UP,
-			      chk_perm, 0)) != 0) {
-	return(NULL);
-  }
-
-  /* The component has been found in the directory.  Get inode. */
-  if ( (rip = get_inode(dirp->i_dev, (int) numb)) == NULL)  {
-	return(NULL);
-  }
-
-  /* The following test is for "mountpoint/.." where mountpoint is a
-   * mountpoint. ".." will refer to the root of the mounted filesystem,
-   * but has to become a reference to the parent of the 'mountpoint'
-   * directory.
-   *
-   * This case is recognized by the looked up name pointing to a
-   * root inode, and the directory in which it is held being a
-   * root inode, _and_ the name[1] being '.'. (This is a test for '..'
-   * and excludes '.'.)
-   */
-  if (rip->i_num == ROOT_INODE) {
-	  if (dirp->i_num == ROOT_INODE) {
-		  if (string[1] == '.') {
-			  if (!rip->i_sp->s_is_root) {
-				  /* Climbing up mountpoint */
-				  err_code = -ELEAVEMOUNT;
-			  }
-		  }
-	  }
-  }
-
-  /* See if the inode is mounted on.  If so, switch to root directory of the
-   * mounted file system.  The super_block provides the linkage between the
-   * inode mounted on and the root directory of the mounted file system.
-   */
-  if (rip->i_mountpoint) {
-	  /* Mountpoint encountered, report it */
-	  err_code = -EENTERMOUNT;
-  }
-
-  return(rip);
 }
 
 

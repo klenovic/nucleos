@@ -5,8 +5,8 @@
 #include "fs.h"
 #include <assert.h>
 #include <nucleos/vfsif.h>
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 
 /*===========================================================================*
  *				fs_sync					     *

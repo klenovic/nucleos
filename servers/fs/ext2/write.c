@@ -12,12 +12,12 @@
 
 #include "fs.h"
 #include <nucleos/string.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 
 static void wr_indir(struct buf *bp, int index, block_t block);
-static int empty_indir(struct buf *, struct super_block *);
+static int empty_indir(struct buf *, struct ext2_super_block *);
 
 /*===========================================================================*
  *				write_map				     *
@@ -287,7 +287,7 @@ block_t block;			/* block to write */
  *===========================================================================*/
 static int empty_indir(bp, sb)
 struct buf *bp;			/* pointer to indirect block */
-struct super_block *sb;		/* superblock of device block resides on */
+struct ext2_super_block *sb;		/* superblock of device block resides on */
 {
 /* Return nonzero if the indirect block pointed to by bp contains
  * only NO_BLOCK entries.

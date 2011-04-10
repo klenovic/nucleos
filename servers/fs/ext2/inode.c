@@ -17,14 +17,81 @@
 
 #include "fs.h"
 #include <nucleos/string.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 static void icopy(struct inode *rip, d_inode *dip, int direction, int norm);
 static void addhash_inode(struct inode *node);
 static void unhash_inode(struct inode *node);
+
+struct inode *find_inode(
+  dev_t dev,          /* device on which inode resides */
+  ino_t numb            /* inode number (ANSI: may not be unshort) */
+)
+{
+/* Find the inode specified by the inode and device number. */
+  struct inode *rip;
+  int hashi;
+
+  hashi = (int) numb & INODE_HASH_MASK;
+
+  /* Search inode in the hash table */
+  LIST_FOREACH(rip, &hash_inodes[hashi], i_hash) {
+	if (rip->i_count > 0 && rip->i_num == numb && rip->i_dev == dev) {
+		return(rip);
+	}
+  }
+
+  return(NULL);
+}
+
+void put_inode(
+  register struct inode *rip     /* pointer to inode to be released */
+)
+{
+/* The caller is no longer using this inode. If no one else is using it either
+ * write it back to the disk immediately. If it has no links, truncate it and
+ * return it to the pool of available inodes.
+ */
+
+  if (rip == NULL)
+	return;    /* checking here is easier than in caller */
+
+  if (rip->i_count < 1)
+	panic("EXT2","put_inode: i_count already below 1", rip->i_count);
+
+  if (--rip->i_count == 0) {    /* i_count == 0 means no one is using it now */
+	if (rip->i_links_count == 0) {
+		/* i_nlinks == NO_LINK means free the inode. */
+		/* return all the disk blocks */
+
+		/* Ignore errors by truncate_inode in case inode is a block
+		 * special or character special file.
+		 */
+		(void) truncate_inode(rip, (off_t) 0);
+		/* free inode clears I_TYPE field, since it's used there */
+		rip->i_dirt = DIRTY;
+		free_inode(rip);
+	}
+
+	rip->i_mountpoint = FALSE;
+	if (rip->i_dirt == DIRTY) rw_inode(rip, WRITING);
+
+	discard_preallocated_blocks(rip); /* Return blocks to the filesystem */
+
+	if (rip->i_links_count == 0) {
+		/* free, put at the front of the LRU list */
+		unhash_inode(rip);
+		rip->i_num = NO_ENTRY;
+		TAILQ_INSERT_HEAD(&unused_inodes, rip, i_unused);
+	} else {
+		/* unused, put at the back of the LRU (cache it) */
+		TAILQ_INSERT_TAIL(&unused_inodes, rip, i_unused);
+	}
+  }
+}
 
 /*===========================================================================*
  *                fs_putnode                                                 *
@@ -63,7 +130,6 @@ int fs_putnode(void)
 
   return(0);
 }
-
 
 /*===========================================================================*
  *                init_inode_cache                                           *
@@ -192,81 +258,6 @@ struct inode *get_inode(
 
 
 /*===========================================================================*
- *                find_inode                                                 *
- *===========================================================================*/
-struct inode *find_inode(
-  dev_t dev,          /* device on which inode resides */
-  ino_t numb            /* inode number (ANSI: may not be unshort) */
-)
-{
-/* Find the inode specified by the inode and device number. */
-  struct inode *rip;
-  int hashi;
-
-  hashi = (int) numb & INODE_HASH_MASK;
-
-  /* Search inode in the hash table */
-  LIST_FOREACH(rip, &hash_inodes[hashi], i_hash) {
-	if (rip->i_count > 0 && rip->i_num == numb && rip->i_dev == dev) {
-		return(rip);
-	}
-  }
-
-  return(NULL);
-}
-
-
-/*===========================================================================*
- *                put_inode                                                  *
- *===========================================================================*/
-void put_inode(
-  register struct inode *rip     /* pointer to inode to be released */
-)
-{
-/* The caller is no longer using this inode. If no one else is using it either
- * write it back to the disk immediately. If it has no links, truncate it and
- * return it to the pool of available inodes.
- */
-
-  if (rip == NULL)
-	return;    /* checking here is easier than in caller */
-
-  if (rip->i_count < 1)
-	panic("EXT2","put_inode: i_count already below 1", rip->i_count);
-
-  if (--rip->i_count == 0) {    /* i_count == 0 means no one is using it now */
-	if (rip->i_links_count == 0) {
-		/* i_nlinks == NO_LINK means free the inode. */
-		/* return all the disk blocks */
-
-		/* Ignore errors by truncate_inode in case inode is a block
-		 * special or character special file.
-		 */
-		(void) truncate_inode(rip, (off_t) 0);
-		/* free inode clears I_TYPE field, since it's used there */
-		rip->i_dirt = DIRTY;
-		free_inode(rip);
-	}
-
-	rip->i_mountpoint = FALSE;
-	if (rip->i_dirt == DIRTY) rw_inode(rip, WRITING);
-
-	discard_preallocated_blocks(rip); /* Return blocks to the filesystem */
-
-	if (rip->i_links_count == 0) {
-		/* free, put at the front of the LRU list */
-		unhash_inode(rip);
-		rip->i_num = NO_ENTRY;
-		TAILQ_INSERT_HEAD(&unused_inodes, rip, i_unused);
-	} else {
-		/* unused, put at the back of the LRU (cache it) */
-		TAILQ_INSERT_TAIL(&unused_inodes, rip, i_unused);
-	}
-  }
-}
-
-
-/*===========================================================================*
  *                update_times                                               *
  *===========================================================================*/
 void update_times(
@@ -281,7 +272,7 @@ void update_times(
  */
 
   time_t cur_time;
-  struct super_block *sp;
+  struct ext2_super_block *sp;
 
   sp = rip->i_sp;         /* get pointer to super block. */
   if (sp->s_rd_only)
@@ -308,7 +299,7 @@ void rw_inode(
 /* An entry in the inode table is to be copied to or from the disk. */
 
   register struct buf *bp;
-  register struct super_block *sp;
+  register struct ext2_super_block *sp;
   register struct group_desc *gd;
   register d_inode *dip;
   u32_t block_group_number;

@@ -4,9 +4,9 @@
 #include <nucleos/safecopies.h>
 #include <nucleos/u64.h>
 #include <nucleos/string.h>
-#include "inode.h"
-#include "super.h"
-#include "const.h"
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
+#include <servers/ext2/const.h>
 #include "drivers.h"
 
 #include <nucleos/vfsif.h>

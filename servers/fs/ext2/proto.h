@@ -7,12 +7,12 @@
 struct buf;
 struct filp;
 struct inode;
-struct super_block;
+struct ext2_super_block;
 
 /* balloc.c */
 void discard_preallocated_blocks(struct inode *rip);
 block_t alloc_block(struct inode *rip, block_t goal);
-void free_block(struct super_block *sp, u32 bit);
+void free_block(struct ext2_super_block *sp, u32 bit);
 
 /* cache.c */
 void buf_pool(int bufs);
@@ -95,9 +95,9 @@ int fs_statvfs(void);
 
 /* super.c */
 unsigned int get_block_size(dev_t dev);
-struct super_block *get_super(dev_t dev);
-int read_super(struct super_block *sp);
-void write_super(struct super_block *sp);
+struct ext2_super_block *get_super(dev_t dev);
+int read_super(struct ext2_super_block *sp);
+void write_super(struct ext2_super_block *sp);
 struct group_desc* get_group_desc(unsigned int bnum);
 
 /* time.c */

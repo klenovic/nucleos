@@ -6,9 +6,9 @@
 #include <nucleos/stat.h>
 #include <nucleos/string.h>
 #include <nucleos/com.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 #define SAME 1000

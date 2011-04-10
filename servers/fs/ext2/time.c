@@ -5,7 +5,7 @@
 #include "fs.h"
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
-#include "inode.h"
+#include <servers/ext2/inode.h>
 #include <nucleos/vfsif.h>
 
 

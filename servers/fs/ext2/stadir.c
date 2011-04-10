@@ -5,8 +5,8 @@
 #include "fs.h"
 #include <nucleos/stat.h>
 #include <nucleos/statfs.h>
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 
@@ -104,7 +104,7 @@ int fs_stat()
 int fs_statvfs()
 {
   struct statfs st;
-  struct super_block *sp;
+  struct ext2_super_block *sp;
   int r;
 
   sp = get_super(fs_dev);

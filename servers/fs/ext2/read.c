@@ -7,9 +7,9 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include "buf.h"
-#include "inode.h"
-#include "super.h"
+#include <servers/ext2/buf.h>
+#include <servers/ext2/inode.h>
+#include <servers/ext2/super.h>
 #include <nucleos/vfsif.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -195,6 +195,98 @@ int fs_breadwrite(void)
   return(r);
 }
 
+/*===========================================================================*
+ *				rd_indir				     *
+ *===========================================================================*/
+block_t rd_indir(bp, index)
+struct buf *bp;                 /* pointer to indirect block */
+int index;                      /* index into *bp */
+{
+  if (bp == NULL)
+	panic("EXT2","rd_indir() on NULL",NO_NUM);
+  /* TODO: use conv call */
+  return conv4(le_CPU, bp->b_ind[index]);
+}
+
+/*===========================================================================*
+ *				read_map				     *
+ *===========================================================================*/
+block_t read_map(rip, position)
+register struct inode *rip;     /* ptr to inode to map from */
+off_t position;                 /* position in file whose blk wanted */
+{
+/* Given an inode and a position within the corresponding file, locate the
+ * block number in which that position is to be found and return it.
+ */
+
+  struct buf *bp;
+  int index;
+  block_t b;
+  unsigned long excess, block_pos;
+  static char first_time = TRUE;
+  static long addr_in_block;
+  static long addr_in_block2;
+  static long doub_ind_s;
+  static long triple_ind_s;
+  static long out_range_s;
+
+  if (first_time) {
+	addr_in_block = rip->i_sp->s_block_size / BLOCK_ADDRESS_BYTES;
+	addr_in_block2 = addr_in_block * addr_in_block;
+	doub_ind_s = EXT2_NDIR_BLOCKS + addr_in_block;
+	triple_ind_s = doub_ind_s + addr_in_block2;
+	out_range_s = triple_ind_s + addr_in_block2 * addr_in_block;
+	first_time = FALSE;
+  }
+
+  block_pos = position / rip->i_sp->s_block_size; /* relative blk # in file */
+
+  /* Is 'position' to be found in the inode itself? */
+  if (block_pos < EXT2_NDIR_BLOCKS)
+	return(rip->i_block[block_pos]);
+
+  /* It is not in the inode, so it must be single, double or triple indirect */
+  if (block_pos < doub_ind_s) {
+	b = rip->i_block[EXT2_NDIR_BLOCKS]; /* address of single indirect block */
+	index = block_pos - EXT2_NDIR_BLOCKS;
+  } else if (block_pos >= out_range_s) { /* TODO: do we need it? */
+	return(NO_BLOCK);
+  } else {
+	/* double or triple indirect block. At first if it's triple,
+	 * find double indirect block.
+	 */
+	excess = block_pos - doub_ind_s;
+	b = rip->i_block[EXT2_DIND_BLOCK];
+	if (block_pos >= triple_ind_s) {
+		b = rip->i_block[EXT2_TIND_BLOCK];
+		if (b == NO_BLOCK) return(NO_BLOCK);
+		bp = get_block(rip->i_dev, b, NORMAL); /* get triple ind block */
+		ASSERT(bp->b_dev != NO_DEV);
+		ASSERT(bp->b_dev == rip->i_dev);
+		excess = block_pos - triple_ind_s;
+		index = excess / addr_in_block2;
+		b = rd_indir(bp, index);	/* num of double ind block */
+		put_block(bp, INDIRECT_BLOCK);	/* release triple ind block */
+		excess = excess % addr_in_block2;
+	}
+	if (b == NO_BLOCK) return(NO_BLOCK);
+	bp = get_block(rip->i_dev, b, NORMAL);	/* get double indirect block */
+	ASSERT(bp->b_dev != NO_DEV);
+	ASSERT(bp->b_dev == rip->i_dev);
+	index = excess / addr_in_block;
+	b = rd_indir(bp, index);	/* num of single ind block */
+	put_block(bp, INDIRECT_BLOCK);	/* release double ind block */
+	index = excess % addr_in_block;	/* index into single ind blk */
+  }
+  if (b == NO_BLOCK) return(NO_BLOCK);
+  bp = get_block(rip->i_dev, b, NORMAL);
+  ASSERT(bp->b_dev != NO_DEV);
+  ASSERT(bp->b_dev == rip->i_dev);
+  b = rd_indir(bp, index);
+  put_block(bp, INDIRECT_BLOCK);	/* release single ind block */
+
+  return(b);
+}
 
 /*===========================================================================*
  *				rw_chunk				     *
@@ -282,101 +374,6 @@ int *completed;                 /* number of bytes copied */
   put_block(bp, n);
 
   return(r);
-}
-
-
-/*===========================================================================*
- *				read_map				     *
- *===========================================================================*/
-block_t read_map(rip, position)
-register struct inode *rip;     /* ptr to inode to map from */
-off_t position;                 /* position in file whose blk wanted */
-{
-/* Given an inode and a position within the corresponding file, locate the
- * block number in which that position is to be found and return it.
- */
-
-  struct buf *bp;
-  int index;
-  block_t b;
-  unsigned long excess, block_pos;
-  static char first_time = TRUE;
-  static long addr_in_block;
-  static long addr_in_block2;
-  static long doub_ind_s;
-  static long triple_ind_s;
-  static long out_range_s;
-
-  if (first_time) {
-	addr_in_block = rip->i_sp->s_block_size / BLOCK_ADDRESS_BYTES;
-	addr_in_block2 = addr_in_block * addr_in_block;
-	doub_ind_s = EXT2_NDIR_BLOCKS + addr_in_block;
-	triple_ind_s = doub_ind_s + addr_in_block2;
-	out_range_s = triple_ind_s + addr_in_block2 * addr_in_block;
-	first_time = FALSE;
-  }
-
-  block_pos = position / rip->i_sp->s_block_size; /* relative blk # in file */
-
-  /* Is 'position' to be found in the inode itself? */
-  if (block_pos < EXT2_NDIR_BLOCKS)
-	return(rip->i_block[block_pos]);
-
-  /* It is not in the inode, so it must be single, double or triple indirect */
-  if (block_pos < doub_ind_s) {
-	b = rip->i_block[EXT2_NDIR_BLOCKS]; /* address of single indirect block */
-	index = block_pos - EXT2_NDIR_BLOCKS;
-  } else if (block_pos >= out_range_s) { /* TODO: do we need it? */
-	return(NO_BLOCK);
-  } else {
-	/* double or triple indirect block. At first if it's triple,
-	 * find double indirect block.
-	 */
-	excess = block_pos - doub_ind_s;
-	b = rip->i_block[EXT2_DIND_BLOCK];
-	if (block_pos >= triple_ind_s) {
-		b = rip->i_block[EXT2_TIND_BLOCK];
-		if (b == NO_BLOCK) return(NO_BLOCK);
-		bp = get_block(rip->i_dev, b, NORMAL); /* get triple ind block */
-		ASSERT(bp->b_dev != NO_DEV);
-		ASSERT(bp->b_dev == rip->i_dev);
-		excess = block_pos - triple_ind_s;
-		index = excess / addr_in_block2;
-		b = rd_indir(bp, index);	/* num of double ind block */
-		put_block(bp, INDIRECT_BLOCK);	/* release triple ind block */
-		excess = excess % addr_in_block2;
-	}
-	if (b == NO_BLOCK) return(NO_BLOCK);
-	bp = get_block(rip->i_dev, b, NORMAL);	/* get double indirect block */
-	ASSERT(bp->b_dev != NO_DEV);
-	ASSERT(bp->b_dev == rip->i_dev);
-	index = excess / addr_in_block;
-	b = rd_indir(bp, index);	/* num of single ind block */
-	put_block(bp, INDIRECT_BLOCK);	/* release double ind block */
-	index = excess % addr_in_block;	/* index into single ind blk */
-  }
-  if (b == NO_BLOCK) return(NO_BLOCK);
-  bp = get_block(rip->i_dev, b, NORMAL);
-  ASSERT(bp->b_dev != NO_DEV);
-  ASSERT(bp->b_dev == rip->i_dev);
-  b = rd_indir(bp, index);
-  put_block(bp, INDIRECT_BLOCK);	/* release single ind block */
-
-  return(b);
-}
-
-
-/*===========================================================================*
- *				rd_indir				     *
- *===========================================================================*/
-block_t rd_indir(bp, index)
-struct buf *bp;                 /* pointer to indirect block */
-int index;                      /* index into *bp */
-{
-  if (bp == NULL)
-	panic("EXT2","rd_indir() on NULL",NO_NUM);
-  /* TODO: use conv call */
-  return conv4(le_CPU, bp->b_ind[index]);
 }
 
 

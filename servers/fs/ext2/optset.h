@@ -2,9 +2,9 @@
 #define _OPTSET_H
 
 enum {
-  OPT_BOOL,
-  OPT_STRING,
-  OPT_INT
+	OPT_BOOL,
+	OPT_STRING,
+	OPT_INT
 };
 
 /* An entry for the parser of an options set. The 'os_name' field must point
@@ -19,10 +19,10 @@ enum {
  * 'os_val' is then a base passed to strtol().
  */
 struct optset {
-  char *os_name;
-  int os_type;
-  void *os_ptr;
-  int os_val;
+	char *os_name;
+	int os_type;
+	void *os_ptr;
+	int os_val;
 };
 
 void optset_parse(struct optset *table, char *string);
