@@ -11,8 +11,8 @@
 #include "fs.h"
 #include <nucleos/fcntl.h>
 #include <nucleos/vfsif.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
 
 
 /*===========================================================================*

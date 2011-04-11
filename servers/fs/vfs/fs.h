@@ -63,8 +63,8 @@
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
-#include <servers/vfs/const.h>
-#include <servers/vfs/dmap.h>
+#include <servers/fs/vfs/const.h>
+#include <servers/fs/vfs/dmap.h>
 #include "proto.h"
 #include "glo.h"
 

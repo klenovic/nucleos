@@ -6,10 +6,11 @@
  *
  */
 
-#ifndef __SERVERS_EXT2_SUPER_H
-#define __SERVERS_EXT2_SUPER_H
+#ifndef __SERVERS_FS_EXT2_SUPER_H
+#define __SERVERS_FS_EXT2_SUPER_H
 
-#include <servers/ext2/type.h>
+#include <nucleos/types.h>
+#include <servers/fs/ext2/type.h>
 
 /* super_block (on-disk part) was taken from linux/include/linux/ext2_fs.h */
 struct ext2_super_block {
@@ -134,4 +135,4 @@ struct group_desc
 #define IMAPD	2	/* operating on the inode bit map, inode is dir */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __SERVERS_EXT2_SUPER_H */
+#endif /* __SERVERS_FS_EXT2_SUPER_H */

@@ -27,7 +27,7 @@
 #include <nucleos/unistd.h>
 #include <nucleos/dirent.h>
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 
 #include <nucleos/vfsif.h>

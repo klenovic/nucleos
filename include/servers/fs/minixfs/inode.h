@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_MFS_INODE_H
-#define __SERVERS_MFS_INODE_H
+#ifndef __SERVERS_FS_MINIXFS_INODE_H
+#define __SERVERS_FS_MINIXFS_INODE_H
 
 /* Inode table.  This table holds inodes that are currently in use.  In some
  * cases they have been opened by an open() or creat() system call, in other
@@ -23,7 +23,7 @@
  * 2007-01-06: jfdsmit@gmail.com added i_zsearch
  */
 #include <nucleos/queue.h>
-#include <servers/mfs/type.h>
+#include <servers/fs/minixfs/type.h>
 
 struct inode {
 	mode_t i_mode;		/* file type, protection, etc. */
@@ -72,4 +72,4 @@ extern unsigned int inode_cache_miss;
 #define NO_SEEK		0	/* i_seek = NO_SEEK if last op was not SEEK */
 #define ISEEK		1	/* i_seek = ISEEK if last op was SEEK */
 
-#endif /* __SERVERS_MFS_INODE_H */
+#endif /* __SERVERS_FS_MINIXFS_INODE_H */

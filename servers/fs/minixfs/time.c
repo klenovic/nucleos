@@ -13,7 +13,7 @@
 #include "fs.h"
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
-#include <servers/mfs/inode.h>
+#include <servers/fs/minixfs/inode.h>
 
 #include <nucleos/vfsif.h>
 

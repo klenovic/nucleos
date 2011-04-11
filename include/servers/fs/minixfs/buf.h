@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_MFS_BUF_H
-#define __SERVERS_MFS_BUF_H
+#ifndef __SERVERS_FS_MINIXFS_BUF_H
+#define __SERVERS_FS_MINIXFS_BUF_H
 
 /* Buffer (block) cache.  To acquire a block, a routine calls get_block(),
  * telling which block it wants.  The block is then regarded as "in use"
@@ -72,4 +72,4 @@ extern int bufs_in_use;		/* # bufs currently in use (not on free list)*/
 #define FULL_DATA_BLOCK		5	/* data, fully used */
 #define PARTIAL_DATA_BLOCK	6	/* data, partly used*/
 
-#endif /* __SERVERS_MFS_BUF_H */
+#endif /* __SERVERS_FS_MINIXFS_BUF_H */

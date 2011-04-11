@@ -17,9 +17,9 @@
 #include <nucleos/safecopies.h>
 #include <nucleos/u64.h>
 #include <nucleos/string.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
-#include <servers/mfs/const.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
+#include <servers/fs/minixfs/const.h>
 #include "drivers.h"
 
 #include <nucleos/vfsif.h>

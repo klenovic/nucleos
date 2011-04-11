@@ -15,9 +15,9 @@
 #include <nucleos/com.h>
 #include <nucleos/unistd.h>
 
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 
 #include <nucleos/vfsif.h>
 
@@ -62,7 +62,7 @@ int fs_link()
   
   /* Check to see if the file has maximum number of links already. */
   r = 0;
-  if(rip->i_nlinks >= (rip->i_sp->s_version == V1 ? CHAR_MAX : LINK_MAX))
+  if(rip->i_nlinks >= (rip->i_sp->s_version == 1 ? CHAR_MAX : LINK_MAX))
 	  r = -EMLINK;
 
   /* Only super_user may link to directories. */
@@ -391,7 +391,7 @@ int fs_rename()
 		/* don't rename a file with a file system mounted on it. 
 		if (old_ip->i_dev != old_dirp->i_dev) r = -EXDEV;*/
 		if(odir && new_dirp->i_nlinks >=
-		   (new_dirp->i_sp->s_version == V1 ? CHAR_MAX : LINK_MAX) &&
+		   (new_dirp->i_sp->s_version == 1 ? CHAR_MAX : LINK_MAX) &&
 		   !same_pdir && r == 0) { 
 			r = -EMLINK;
 		}

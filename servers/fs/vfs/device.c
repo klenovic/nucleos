@@ -37,7 +37,7 @@
 #include <nucleos/time.h>
 #include <nucleos/types.h>
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 
 #include <nucleos/vfsif.h>
 #include "vnode.h"

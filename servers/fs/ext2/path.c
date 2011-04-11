@@ -17,9 +17,9 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/stat.h>
 #include <nucleos/types.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 char dot1[2] = ".";	/* used for search_dir to bypass the access */

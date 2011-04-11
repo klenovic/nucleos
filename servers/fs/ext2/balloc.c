@@ -13,10 +13,10 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
-#include <servers/ext2/const.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
+#include <servers/fs/ext2/const.h>
 
 static void check_block_number(block_t block, struct ext2_super_block *sp,
 			       struct group_desc *gd)

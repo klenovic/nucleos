@@ -12,9 +12,9 @@
 
 #include "fs.h"
 #include <nucleos/string.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
 
 static void wr_indir(struct buf *bp, int index, block_t block);
 static int empty_indir(struct buf *, struct ext2_super_block *);

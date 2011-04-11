@@ -13,7 +13,7 @@
  */
 
 #include "fs.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include <nucleos/string.h>
 #include <stdlib.h>
 #include <nucleos/ctype.h>

@@ -1,9 +1,7 @@
-#ifndef __SERVERS_EXT2_TYPE_H
-#define __SERVERS_EXT2_TYPE_H
+#ifndef __SERVERS_FS_EXT2_TYPE_H
+#define __SERVERS_FS_EXT2_TYPE_H
 
 #include <nucleos/types.h>
-
-typedef __u32 __kernel_block_t;	/* block number */
 
 /* On the disk all attributes are stored in little endian format.
  * Inode structure was taken from linux/include/linux/ext2_fs.h.
@@ -92,7 +90,7 @@ struct ext2_disk_dir_desc {
 	(cur_desc->d_rec_len + CUR_DISC_DIR_POS(cur_desc, base))
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
-typedef __kernel_block_t block_t;	/* block number */
+typedef u32 block_t;	/* block number */
 
 struct buf {
 	/* Data portion of the buffer. */
@@ -127,4 +125,4 @@ struct opt {
 };
 #endif /* defined (__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __SERVERS_EXT2_TYPE_H */
+#endif /* __SERVERS_FS_EXT2_TYPE_H */

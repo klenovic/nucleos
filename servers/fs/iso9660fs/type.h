@@ -1,12 +1,10 @@
-#ifndef __TYPE_H
-#define __TYPE_H
+#ifndef __SERVERS_FS_ISO9660FS_TYPE_H
+#define __SERVERS_FS_ISO9660FS_TYPE_H
 
 #include <nucleos/types.h>
 
-typedef __u32 __kernel_block_t;	/* block number of its (minor) device */
-
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-typedef __kernel_block_t block_t;	/* block number of its (minor) device */
+typedef u32 block_t;	/* block number of its (minor) device */
 #endif
 
-#endif /* __TYPE_H */
+#endif /* __SERVERS_FS_ISO9660FS_TYPE_H */

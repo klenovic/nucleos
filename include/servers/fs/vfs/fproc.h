@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_VFS_FPROC_H
-#define __SERVERS_VFS_FPROC_H
+#ifndef __SERVERS_FS_VFS_FPROC_H
+#define __SERVERS_FS_VFS_FPROC_H
 
 #include <nucleos/safecopies.h>
 #include <nucleos/com.h>
@@ -66,4 +66,4 @@ extern struct fproc fproc[];
 #define REVIVING           0xDEEAD	/* process is being revived from suspension */
 #define PID_FREE	   0	/* process slot free */
 
-#endif /* __SERVERS_VFS_FPROC_H */
+#endif /* __SERVERS_FS_VFS_FPROC_H */

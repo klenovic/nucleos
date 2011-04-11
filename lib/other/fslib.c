@@ -14,11 +14,11 @@
 #include <nucleos/types.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>		/* for unshort :-( */
-#include <servers/mfs/const.h>		/* depends of -I flag in Makefile */
-#include <servers/mfs/type.h>		/* ditto */
-#include <servers/mfs/inode.h>		/* ditto */
-#include <servers/mfs/super.h>
-#include <nucleos/fslib.h>
+#include <nucleos/magic.h>
+#include <servers/fs/minixfs/const.h>		/* depends of -I flag in Makefile */
+#include <servers/fs/minixfs/type.h>		/* ditto */
+#include <servers/fs/minixfs/inode.h>		/* ditto */
+#include <servers/fs/minixfs/super.h>
 
 /* The next routine is copied from fsck.c and mkfs.c...  (Re)define some
  * things for consistency.  Some things should be done better.
@@ -38,9 +38,7 @@
  * unlikely, but negative bit counts are now possible (though unlikely)
  * and give silly results.
  */ 
-int bitmapsize(nr_bits, block_size)
-u32 nr_bits;
-int block_size;
+int bitmapsize(u32 nr_bits, int block_size)
 {
   int nr_blocks;
 
@@ -49,10 +47,6 @@ int block_size;
   return(nr_blocks);
 }
 
-
-/*===========================================================================*
- *				conv2					     *
- *===========================================================================*/
 unsigned conv2(norm, w)
 int norm;			/* TRUE if no swap, FALSE for byte swap */
 int w;				/* promotion of 16-bit word to be swapped */
@@ -63,10 +57,6 @@ int w;				/* promotion of 16-bit word to be swapped */
   return( ((w&BYTE) << 8) | ( (w>>8) & BYTE));
 }
 
-
-/*===========================================================================*
- *				conv4					     *
- *===========================================================================*/
 long conv4(norm, x)
 int norm;			/* TRUE if no swap, FALSE for byte swap */
 long x;				/* 32-bit long to be byte swapped */
@@ -83,33 +73,6 @@ long x;				/* 32-bit long to be byte swapped */
   return(l);
 }
 
-
-/*===========================================================================*
- *				conv_inode				     *
- *===========================================================================*/
-void conv_inode(rip, dip, dip2, rw_flag, magic)
-register struct inode *rip;	/* pointer to the in-core inode struct */
-register d1_inode *dip;		/* pointer to the V1 on-disk inode struct */
-register d2_inode *dip2;	/* pointer to the V2 on-disk inode struct */
-int rw_flag;			/* READING or WRITING */
-int magic;			/* magic number of file system */
-{ 
-/* Copy the inode from the disk block to the in-core table or vice versa.
- * If the fourth parameter below is FALSE, the bytes are swapped.
- */
-  switch (magic) {
-	case SUPER_MAGIC:	old_icopy(rip, dip,  rw_flag, TRUE);	break;
-	case SUPER_REV:		old_icopy(rip, dip,  rw_flag, FALSE);	break;
-	case SUPER_V3:
-	case SUPER_V2:		new_icopy(rip, dip2, rw_flag, TRUE);	break;
-	case SUPER_V2_REV:	new_icopy(rip, dip2, rw_flag, FALSE);	break;
-  } 
-}
-
-
-/*===========================================================================*
- *				old_icopy				     *
- *===========================================================================*/
 void old_icopy(rip, dip, direction, norm)
 register struct inode *rip;	/* pointer to the in-core inode struct */
 register d1_inode *dip;		/* pointer to the d1_inode inode struct */
@@ -153,10 +116,6 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
   }
 }
 
-
-/*===========================================================================*
- *				new_icopy				     *
- *===========================================================================*/
 void new_icopy(rip, dip, direction, norm)
 register struct inode *rip;	/* pointer to the in-core inode struct */
 register d2_inode *dip;	/* pointer to the d2_inode struct */
@@ -195,4 +154,25 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
 	for (i = 0; i < V2_NR_TZONES; i++)
 		dip->d2_zone[i] = conv4(norm, (long) rip->i_zone[i]);
   }
+}
+
+void conv_inode(rip, dip, dip2, rw_flag, magic)
+register struct inode *rip;	/* pointer to the in-core inode struct */
+register d1_inode *dip;		/* pointer to the V1 on-disk inode struct */
+register d2_inode *dip2;	/* pointer to the V2 on-disk inode struct */
+int rw_flag;			/* READING or WRITING */
+int magic;			/* magic number of file system */
+{ 
+/* Copy the inode from the disk block to the in-core table or vice versa.
+ * If the fourth parameter below is FALSE, the bytes are swapped.
+ */
+  switch (magic) {
+	case MINIX_SUPER_MAGIC:
+		old_icopy(rip, dip,  rw_flag, TRUE);
+		break;
+	case MINIX3_SUPER_MAGIC:
+	case MINIX2_SUPER_MAGIC:
+		new_icopy(rip, dip2, rw_flag, TRUE);
+		break;
+  } 
 }

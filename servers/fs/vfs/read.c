@@ -25,7 +25,7 @@
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include <nucleos/dirent.h>
 #include <assert.h>

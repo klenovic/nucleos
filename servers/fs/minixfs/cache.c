@@ -27,9 +27,9 @@
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <nucleos/string.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/super.h>
-#include <servers/mfs/inode.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/super.h>
+#include <servers/fs/minixfs/inode.h>
 
 struct buf *front;       /* points to least recently used free block */
 struct buf *rear;        /* points to most recently used free block */

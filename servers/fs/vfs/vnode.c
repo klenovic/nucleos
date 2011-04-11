@@ -22,7 +22,7 @@
 #include "vnode.h"
 #include "vmnt.h"
 
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "file.h"
 
 #include <nucleos/vfsif.h>

@@ -12,10 +12,10 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
-#include <servers/ext2/const.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
+#include <servers/fs/ext2/const.h>
 
 static u32 alloc_inode_bit(struct ext2_super_block *sp, struct inode *parent, int is_dir);
 static void free_inode_bit(struct ext2_super_block *sp, u32 bit_returned, int is_dir);

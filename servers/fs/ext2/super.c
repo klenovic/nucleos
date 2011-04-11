@@ -13,10 +13,10 @@
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
 #include <nucleos/magic.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
-#include <servers/ext2/const.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
+#include <servers/fs/ext2/const.h>
 
 static off_t ext2_max_size(int block_size);
 static u32_t ext2_count_dirs(struct ext2_super_block *sp);

@@ -34,7 +34,7 @@
 #include <nucleos/u64.h>
 #include <nucleos/time.h>
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include "select.h"
 

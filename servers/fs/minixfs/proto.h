@@ -8,7 +8,7 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Function prototypes. */
-#include <servers/mfs/type.h>
+#include <servers/fs/minixfs/type.h>
 
 /* Structs used in prototypes must be declared as such first. */
 struct buf;

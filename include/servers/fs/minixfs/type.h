@@ -7,15 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_MFS_TYPE_H
-#define __SERVERS_MFS_TYPE_H
+#ifndef __SERVERS_FS_MINIXFS_TYPE_H
+#define __SERVERS_FS_MINIXFS_TYPE_H
 
 #include <nucleos/types.h>
-#include <servers/mfs/const.h>
-
-typedef __u32 __kernel_zone_t;	/* zone number */
-typedef __u32 __kernel_block_t;	/* block number */
-typedef __u16 __kernel_zone1_t;	/* zone number for V1 file systems */
+#include <servers/fs/minixfs/const.h>
 
 /* Declaration of the V1 inode as it is on the disk (not in core). */
 typedef struct {		/* V1.x disk inode */
@@ -42,9 +38,9 @@ typedef struct {		/* V2.x disk inode */
 } d2_inode;
 
 #if defined (__KERNEL__) || defined(__UKERNEL__)
-typedef __kernel_zone_t zone_t;		/* zone number */
-typedef __kernel_block_t block_t;	/* block number */
-typedef __kernel_zone1_t zone1_t;	/* zone number for V1 file systems */
+typedef u32 zone_t;	/* zone number */
+typedef u32 block_t;	/* block number */
+typedef u16 zone1_t;	/* zone number for V1 file systems */
 
 struct buf {
 	/* Data portion of the buffer. */
@@ -62,4 +58,4 @@ struct buf {
 };
 #endif /* defined (__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __SERVERS_MFS_TYPE_H */
+#endif /* __SERVERS_FS_MINIXFS_TYPE_H */

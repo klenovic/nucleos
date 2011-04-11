@@ -11,12 +11,12 @@
  * will eventually be rewritten to the disk.
  */
 
-#ifndef __SERVERS_EXT2_BUF_H
-#define __SERVERS_EXT2_BUF_H
+#ifndef __SERVERS_FS_EXT2_BUF_H
+#define __SERVERS_FS_EXT2_BUF_H
 
 #include <nucleos/dir.h>            /* need struct direct */
 #include <nucleos/dirent.h>
-#include <servers/ext2/type.h>
+#include <servers/fs/ext2/type.h>
 
 union fsdata_u {
 	char b__data[_MAX_BLOCK_SIZE];             /* ordinary user data */
@@ -51,4 +51,4 @@ extern unsigned int bufs_in_use;	/* # bufs currently in use (not on free list)*/
 #define FULL_DATA_BLOCK		5	/* data, fully used */
 #define PARTIAL_DATA_BLOCK	6	/* data, partly used*/
 
-#endif /* __SERVERS_EXT2_BUF_H */
+#endif /* __SERVERS_FS_EXT2_BUF_H */

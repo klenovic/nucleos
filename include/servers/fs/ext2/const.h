@@ -1,5 +1,5 @@
-#ifndef __SERVERS_EXT2_CONST_H
-#define __SERVERS_EXT2_CONST_H
+#ifndef __SERVERS_FS_EXT2_CONST_H
+#define __SERVERS_FS_EXT2_CONST_H
 
 /* Tables sizes */
 
@@ -180,4 +180,4 @@
 #define EXT2_PREALLOC_BLOCKS		8
 
 
-#endif /* __SERVERS_EXT2_CONST_H */
+#endif /* __SERVERS_FS_EXT2_CONST_H */

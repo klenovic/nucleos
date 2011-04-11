@@ -13,8 +13,8 @@
 #include <nucleos/endpoint.h>
 #include <nucleos/vfsif.h>
 #include "fs.h"
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
 #include "drivers.h"
 
 static void init_server(void)

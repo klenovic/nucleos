@@ -22,7 +22,7 @@
 #include <nucleos/signal.h>
 #include <nucleos/string.h>
 #include <nucleos/dirent.h>
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include <asm/page.h>
 
 #include "param.h"

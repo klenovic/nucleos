@@ -22,7 +22,7 @@
 #include <nucleos/string.h>
 #include <nucleos/dirent.h>
 
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include "vnode.h"
 #include "vmnt.h"

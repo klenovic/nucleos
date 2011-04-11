@@ -21,9 +21,9 @@
 
 #include "fs.h"
 #include <nucleos/string.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 
 
 static void wr_indir(struct buf *bp, int index, zone_t zone);
@@ -207,7 +207,7 @@ zone_t zone;			/* zone to write */
   sp = get_super(bp->b_dev);	/* need super block to find file sys type */
 
   /* write a zone into an indirect block */
-  if (sp->s_version == V1)
+  if (sp->s_version == 1)
 	bp->b_v1_ind[index] = (zone1_t) conv2(sp->s_native, (int)  zone);
   else
 	bp->b_v2_ind[index] = (zone_t)  conv4(sp->s_native, (long) zone);
@@ -224,7 +224,7 @@ struct minix3_super_block *sb;		/* superblock of device block resides on */
  * only NO_ZONE entries.
  */
 	int i;
-	if(sb->s_version == V1) {
+	if(sb->s_version == 1) {
 		for(i = 0; i < V1_INDIRECTS; i++)
 			if(bp->b_v1_ind[i] != NO_ZONE)
 			return(0);

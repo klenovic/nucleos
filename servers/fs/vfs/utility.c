@@ -25,7 +25,7 @@
 #include <nucleos/string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include <asm/servers/vm/memory.h>
 
 #include "file.h"

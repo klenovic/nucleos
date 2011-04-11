@@ -4,7 +4,7 @@
 #define EXT2_GLO_H
 
 #include <nucleos/vfsif.h>
-#include <servers/ext2/const.h>
+#include <servers/fs/ext2/const.h>
 
 /* The following variables are used for returning results to the caller. */
 extern int err_code;        /* temporary storage for error number */

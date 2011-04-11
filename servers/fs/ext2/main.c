@@ -6,8 +6,8 @@
 #include <nucleos/dmap.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/vfsif.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
 #include "drivers.h"
 #include "optset.h"
 

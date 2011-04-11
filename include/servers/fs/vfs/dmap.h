@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_VFS_DMAP_H
-#define __SERVERS_VFS_DMAP_H
+#ifndef __SERVERS_FS_VFS_DMAP_H
+#define __SERVERS_FS_VFS_DMAP_H
 
 /*===========================================================================*
  *               	 Device <-> Driver Table  			     *
@@ -35,4 +35,4 @@ struct dmap {
 
 extern struct dmap dmap[];
 
-#endif /* __SERVERS_VFS_DMAP_H */
+#endif /* __SERVERS_FS_VFS_DMAP_H */

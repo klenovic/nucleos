@@ -17,9 +17,9 @@
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
 static int rw_chunk(struct inode *rip, u64_t position,
@@ -381,7 +381,7 @@ int index;			/* index into *bp */
   sp = get_super(bp->b_dev);	/* need super block to find file sys type */
 
   /* read a zone from an indirect block */
-  if (sp->s_version == V1)
+  if (sp->s_version == 1)
 	zone = (zone_t) conv2(sp->s_native, (int)  bp->b_v1_ind[index]);
   else
 	zone = (zone_t) conv4(sp->s_native, (long) bp->b_v2_ind[index]);

@@ -26,9 +26,9 @@
  */
 
 #include "fs.h"
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
 static int addhash_inode(struct inode *node); 
@@ -409,7 +409,7 @@ int rw_flag;			/* READING or WRITING */
   /* Copy the inode from the disk block to the in-core table or vice versa.
    * If the fourth parameter below is FALSE, the bytes are swapped.
    */
-  if (sp->s_version == V1)
+  if (sp->s_version == 1)
 	old_icopy(rip, dip,  rw_flag, sp->s_native);
   else
 	new_icopy(rip, dip2, rw_flag, sp->s_native);

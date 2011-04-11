@@ -7,9 +7,9 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
 #include <nucleos/vfsif.h>
 #include <assert.h>
 #include <stdlib.h>

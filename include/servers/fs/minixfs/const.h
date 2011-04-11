@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __SERVERS_MFS_CONST_H
-#define __SERVERS_MFS_CONST_H
+#ifndef __SERVERS_FS_MINIXFS_CONST_H
+#define __SERVERS_FS_MINIXFS_CONST_H
 
 /* Tables sizes */
 #define V1_NR_DZONES	7	/* # direct zone numbers in a V1 inode */
@@ -29,17 +29,6 @@
  * (small) long constants being passed to routines expecting an int.
  */
 #define usizeof(t)	((unsigned) sizeof(t))
-
-/* File system types. */
-#define SUPER_MAGIC	0x137F	/* magic number contained in super-block */
-#define SUPER_REV	0x7F13	/* magic # when 68000 disk read on PC or vv */
-#define SUPER_V2	0x2468	/* magic # for V2 file systems */
-#define SUPER_V2_REV	0x6824	/* V2 magic written on PC, read on 68K or vv */
-#define SUPER_V3	0x4d5a	/* magic # for V3 file systems */
-
-#define V1		1	/* version number of V1 file systems */
-#define V2		2	/* version number of V2 file systems */
-#define V3		3	/* version number of V3 file systems */
 
 /* Miscellaneous constants */
 #define SU_UID		((uid_t) 0)	/* super_user's uid_t */
@@ -122,4 +111,4 @@
 #define MFS_DEV_SCATTER		10003
 #define MFS_DEV_GATHER		10004
 
-#endif /* __SERVERS_MFS_CONST_H */
+#endif /* __SERVERS_FS_MINIXFS_CONST_H */

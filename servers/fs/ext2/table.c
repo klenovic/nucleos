@@ -5,9 +5,9 @@
  *   February 2010 (Evgeniy Ivanov)
  */
 #include "fs.h"
-#include <servers/ext2/inode.h>
-#include <servers/ext2/buf.h>
-#include <servers/ext2/super.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/buf.h>
+#include <servers/fs/ext2/super.h>
 #include "proto.h"
 #include "drivers.h"
 

@@ -18,7 +18,7 @@
 #include <nucleos/com.h>
 #include <nucleos/utime.h>
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include "vnode.h"
 

@@ -18,10 +18,10 @@
  */
 
 #include "inc.h"
-#include <servers/mfs/const.h>
-#include <servers/vfs/const.h>
-#include <servers/vfs/fproc.h>
-#include <servers/vfs/dmap.h>
+#include <servers/fs/minixfs/const.h>
+#include <servers/fs/vfs/const.h>
+#include <servers/fs/vfs/fproc.h>
+#include <servers/fs/vfs/dmap.h>
 #include <nucleos/dmap.h>
 
 struct fproc fproc[NR_PROCS];

@@ -21,7 +21,7 @@
 #include <nucleos/const.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/vfsif.h>
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "vmnt.h"
 #include "vnode.h"
 #include "param.h"

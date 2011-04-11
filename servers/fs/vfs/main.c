@@ -41,7 +41,7 @@
 #include <asm/ioctls.h>
 
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include "vmnt.h"
 #include "vnode.h"

@@ -20,11 +20,12 @@
 #include <nucleos/unistd.h>
 #include <nucleos/const.h>
 #include <nucleos/type.h>
-#include <servers/mfs/const.h>
-#include <servers/mfs/type.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/super.h>
-#include <servers/mfs/inode.h>
+#include <nucleos/magic.h>
+#include <servers/fs/minixfs/const.h>
+#include <servers/fs/minixfs/type.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/super.h>
+#include <servers/fs/minixfs/inode.h>
 #include "rawfs.h"
 
 #define TRACE(msg) \
@@ -55,8 +56,6 @@ static int block_size;
 #endif
 
 static struct minix3_super_block super; /* Superblock of file system */
-#define SUPER_V1 SUPER_MAGIC          /* V1 magic has a weird name. */
-
 static struct inode curfil;      /* Inode of file under examination */
 static char indir[_MAX_BLOCK_SIZE];   /* Single indirect block. */
 static char dindir[_MAX_BLOCK_SIZE];  /* Double indirect block. */
@@ -85,8 +84,8 @@ off_t r_super(int *bs)
   memcpy(&super, scratch, sizeof(super));
 
   /* Is it really a MINIX file system ? */
-  if (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3) {
-    if(super.s_magic == SUPER_V2)
+  if (super.s_magic == MINIX2_SUPER_MAGIC || super.s_magic == MINIX3_SUPER_MAGIC) {
+    if(super.s_magic == MINIX2_SUPER_MAGIC)
       super.s_block_size = 1024;
 
     *bs = block_size = super.s_block_size;
@@ -99,7 +98,7 @@ off_t r_super(int *bs)
     inodes_per_block= V2_INODES_PER_BLOCK(block_size);
     return (off_t) super.s_zones << zone_shift;
   } else
-  if (super.s_magic == SUPER_V1) {
+  if (super.s_magic == MINIX_SUPER_MAGIC) {
     *bs = block_size = 1024;
     nr_dzones= V1_NR_DZONES;
     nr_indirects= V1_INDIRECTS;
@@ -132,7 +131,7 @@ void r_stat(ino_t inum, struct stat *stp)
   blockbuf = (union fsdata_u *) scratch;
   readblock(block, (char*)blockbuf, block_size);
 
-  if (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3) {
+  if (super.s_magic == MINIX2_SUPER_MAGIC || super.s_magic == MINIX3_SUPER_MAGIC) {
     d2_inode *dip;
     int i;
 
@@ -272,7 +271,7 @@ off_t r_vir2abs(off_t virblk)
     zone -= (zone_t) nr_indirects;
 
     i = zone / (zone_t) nr_indirects;
-    ind_zone = (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3)
+    ind_zone = (super.s_magic == MINIX2_SUPER_MAGIC || super.s_magic == MINIX3_SUPER_MAGIC)
         ? fsbuf(dindir).b__v2_ind[i]
         : fsbuf(dindir).b__v1_ind[i];
     zone %= (zone_t) nr_indirects;
@@ -285,7 +284,7 @@ off_t r_vir2abs(off_t virblk)
     readblock(z, indir, block_size);
     a_indir= z;
   }
-  zone = (super.s_magic == SUPER_V2 || super.s_magic == SUPER_V3)
+  zone = (super.s_magic == MINIX2_SUPER_MAGIC || super.s_magic == MINIX3_SUPER_MAGIC)
     ? fsbuf(indir).b__v2_ind[(int) zone]
     : fsbuf(indir).b__v1_ind[(int) zone];
 

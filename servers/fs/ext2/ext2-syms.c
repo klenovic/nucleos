@@ -2,9 +2,9 @@
 #include <nucleos/kipc.h>
 #include <nucleos/queue.h>
 #include <nucleos/dmap.h>
-#include <servers/ext2/const.h>
-#include <servers/ext2/type.h>
-#include <servers/ext2/inode.h>
+#include <servers/fs/ext2/const.h>
+#include <servers/fs/ext2/type.h>
+#include <servers/fs/ext2/inode.h>
 #include "drivers.h"
 
 /* The following variables are used for returning results to the caller. */

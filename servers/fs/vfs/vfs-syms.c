@@ -11,7 +11,7 @@
 #include <nucleos/com.h>
 #include "fs.h"
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 #include "lock.h"
 #include "vnode.h"
 #include "vmnt.h"

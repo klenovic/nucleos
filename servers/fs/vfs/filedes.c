@@ -24,7 +24,7 @@
 
 #include "fs.h"
 #include "file.h"
-#include <servers/vfs/fproc.h>
+#include <servers/fs/vfs/fproc.h>
 
 #include "vnode.h"
 

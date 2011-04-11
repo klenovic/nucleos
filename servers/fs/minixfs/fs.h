@@ -24,7 +24,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
 
-#include <servers/mfs/const.h>
-#include <servers/mfs/type.h>
+#include <servers/fs/minixfs/const.h>
+#include <servers/fs/minixfs/type.h>
 #include "proto.h"
 #include "glo.h"

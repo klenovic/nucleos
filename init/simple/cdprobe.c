@@ -30,8 +30,8 @@
 #include <stdlib.h>
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
-
-#include <servers/mfs/const.h>
+#include <nucleos/magic.h>
+#include <servers/fs/minixfs/const.h>
 
 char pvd[CD_SECTOR];
 
@@ -125,7 +125,7 @@ int main(void)
 			close(fd);
 
 			magicp= (u16_t *)&pvd[SUPER_OFF+MAGIC_OFF];
-			if (*magicp != SUPER_V3)
+			if (*magicp != MINIX3_SUPER_MAGIC)
 			{
 				fprintf(stderr, "bad super block on %s\n",
 					name2);

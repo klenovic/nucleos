@@ -14,9 +14,9 @@
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
 static char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
@@ -316,7 +316,7 @@ static struct inode *new_node(struct inode *ldirp,
   rip = advance(ldirp, string, IGN_PERM);
 
   if (S_ISDIR(bits) && 
-      (ldirp)->i_nlinks >= ((ldirp)->i_sp->s_version == V1 ?
+      (ldirp)->i_nlinks >= ((ldirp)->i_sp->s_version == 1 ?
       CHAR_MAX : LINK_MAX)) {
         /* New entry is a directory, alas we can't give it a ".." */
         put_inode(rip);

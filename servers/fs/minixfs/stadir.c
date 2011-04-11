@@ -14,9 +14,9 @@
 #include <nucleos/statfs.h>
 #include <nucleos/com.h>
 #include <nucleos/string.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
 static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);

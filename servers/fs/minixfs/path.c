@@ -22,9 +22,9 @@
 #include <nucleos/unistd.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/stat.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
 char dot1[2] = ".";	/* used for search_dir to bypass the access */

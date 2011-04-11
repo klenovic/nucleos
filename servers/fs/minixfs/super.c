@@ -24,10 +24,11 @@
 #include <nucleos/string.h>
 #include <nucleos/com.h>
 #include <nucleos/u64.h>
-#include <servers/mfs/buf.h>
-#include <servers/mfs/inode.h>
-#include <servers/mfs/super.h>
-#include <servers/mfs/const.h>
+#include <nucleos/magic.h>
+#include <servers/fs/minixfs/buf.h>
+#include <servers/fs/minixfs/inode.h>
+#include <servers/fs/minixfs/super.h>
+#include <servers/fs/minixfs/const.h>
 
 
 /*===========================================================================*
@@ -208,14 +209,14 @@ register struct minix3_super_block *sp; /* pointer to a superblock */
   magic = sp->s_magic;		/* determines file system type */
 
   /* Get file system version and type. */
-  if (magic == SUPER_MAGIC || magic == conv2(BYTE_SWAP, SUPER_MAGIC)) {
-	version = V1;
-	native  = (magic == SUPER_MAGIC);
-  } else if (magic == SUPER_V2 || magic == conv2(BYTE_SWAP, SUPER_V2)) {
-	version = V2;
-	native  = (magic == SUPER_V2);
-  } else if (magic == SUPER_V3) {
-	version = V3;
+  if (magic == MINIX_SUPER_MAGIC || magic == conv2(BYTE_SWAP, MINIX_SUPER_MAGIC)) {
+	version = 1;
+	native  = (magic == MINIX_SUPER_MAGIC);
+  } else if (magic == MINIX2_SUPER_MAGIC || magic == conv2(BYTE_SWAP, MINIX2_SUPER_MAGIC)) {
+	version = 2;
+	native  = (magic == MINIX2_SUPER_MAGIC);
+  } else if (magic == MINIX3_SUPER_MAGIC) {
+	version = 3;
   	native = 1;
   } else {
 	return(-EINVAL);
@@ -243,14 +244,14 @@ register struct minix3_super_block *sp; /* pointer to a superblock */
    * Calculate some other numbers that depend on the version here too, to
    * hide some of the differences.
    */
-  if (version == V1) {
+  if (version == 1) {
   	sp->s_block_size = _STATIC_BLOCK_SIZE;
 	sp->s_zones = sp->s_nzones;	/* only V1 needs this copy */
 	sp->s_inodes_per_block = V1_INODES_PER_BLOCK;
 	sp->s_ndzones = V1_NR_DZONES;
 	sp->s_nindirs = V1_INDIRECTS;
   } else {
-  	if (version == V2)
+  	if (version == 2)
   		sp->s_block_size = _STATIC_BLOCK_SIZE;
   	if (sp->s_block_size < _MIN_BLOCK_SIZE) {
   		return -EINVAL;

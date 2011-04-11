@@ -3,8 +3,8 @@
  */
 
 #include "fs.h"
-#include <servers/ext2/inode.h>
-#include <servers/ext2/super.h>
+#include <servers/fs/ext2/inode.h>
+#include <servers/fs/ext2/super.h>
 #include <nucleos/vfsif.h>
 
 static int in_group(gid_t grp);

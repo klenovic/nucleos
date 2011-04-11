@@ -918,7 +918,7 @@ int load_initrd(char* initrd, unsigned long loadaddr)
 		raw_copy(mon2abs(&super_v3_magic), initrd_base + SUPER_V3_MAGIC_OFFSET, 2);
 
 		if (super_v3_magic != SUPER_V3_MAGIC) {
-			printf("error: Can't find SUPER_V3 magic (%s)\n", initrd);
+			printf("error: Can't find MINIX3 super magic (%s)\n", initrd);
 			return -1;
 		}
 

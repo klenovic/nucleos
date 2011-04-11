@@ -8,11 +8,11 @@
  *
  */
 
-#ifndef __SERVERS_EXT2_INODE_H
-#define __SERVERS_EXT2_INODE_H
+#ifndef __SERVERS_FS_EXT2_INODE_H
+#define __SERVERS_FS_EXT2_INODE_H
 
 #include <nucleos/queue.h>
-#include <servers/ext2/type.h>
+#include <servers/fs/ext2/type.h>
 
 /* Disk part of inode structure was taken from
  * linux/include/linux/ext2_fs.h.
@@ -127,4 +127,4 @@ extern unsigned int inode_cache_miss;
 #define ISEEK		1	/* i_seek = ISEEK if last op was SEEK */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __SERVER_EXT2_INODE_H */
+#endif /* __SERVER_FS_EXT2_INODE_H */

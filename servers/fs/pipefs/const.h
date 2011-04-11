@@ -19,17 +19,6 @@
  */
 #define usizeof(t) ((unsigned) sizeof(t))
 
-/* File system types. */
-#define SUPER_MAGIC   0x137F	/* magic number contained in super-block */
-#define SUPER_REV     0x7F13	/* magic # when 68000 disk read on PC or vv */
-#define SUPER_V2      0x2468	/* magic # for V2 file systems */
-#define SUPER_V2_REV  0x6824	/* V2 magic written on PC, read on 68K or vv */
-#define SUPER_V3      0x4d5a	/* magic # for V3 file systems */
-
-#define V1		   1	/* version number of V1 file systems */ 
-#define V2		   2	/* version number of V2 file systems */ 
-#define V3		   3	/* version number of V3 file systems */ 
-
 /* Miscellaneous constants */
 #define SU_UID 	 ((uid_t) 0)	/* super_user's uid_t */
 #define SERVERS_UID ((uid_t) 11) /* who may do FSSIGNON */

@@ -11,9 +11,9 @@
 #include <nucleos/limits.h>
 #include <nucleos/kipc.h>
 #include <nucleos/vfsif.h>
-#include <servers/mfs/const.h>
-#include <servers/mfs/type.h>
-#include <servers/mfs/inode.h>
+#include <servers/fs/minixfs/const.h>
+#include <servers/fs/minixfs/type.h>
+#include <servers/fs/minixfs/inode.h>
 
 /* Definition of minixfs symbols. */
 struct inode inode[NR_INODES];
