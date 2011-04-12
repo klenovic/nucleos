@@ -31,9 +31,9 @@ char dot1[2] = ".";	/* used for search_dir to bypass the access */
 char dot2[3] = "..";	/* permissions for . and ..		    */
 
 static char *get_name(char *name, char string[NAME_MAX+1]);
-static int ltraverse(struct inode *rip, char *suffix);
+static int ltraverse(struct minix_inode *rip, char *suffix);
 static int parse_path(ino_t dir_ino, ino_t root_ino,
-					int flags, struct inode **res_inop,
+					int flags, struct minix_inode **res_inop,
 					size_t *offsetp, int *symlinkp);
 
 
@@ -46,7 +46,7 @@ int fs_lookup()
   int r, r1, len, flags, symlinks;
   size_t offset = 0, path_size, cred_size;
   ino_t dir_ino, root_ino;
-  struct inode *rip;
+  struct minix_inode *rip;
 
   grant		= fs_m_in.REQ_GRANT;
   path_size	= fs_m_in.REQ_PATH_SIZE;	/* Size of the buffer */
@@ -146,7 +146,7 @@ static int parse_path(dir_ino, root_ino, flags, res_inop, offsetp, symlinkp)
 ino_t dir_ino;
 ino_t root_ino;
 int flags;
-struct inode **res_inop;
+struct minix_inode **res_inop;
 size_t *offsetp;
 int *symlinkp;
 {
@@ -158,7 +158,7 @@ int *symlinkp;
    * leading slashes. 
    */
   int r, leaving_mount;
-  struct inode *rip, *dir_ip;
+  struct minix_inode *rip, *dir_ip;
   char *cp, *next_cp; /* component and next component */
   char component[NAME_MAX+1];
 
@@ -299,7 +299,7 @@ int *symlinkp;
  *                             ltraverse				     *
  *===========================================================================*/
 static int ltraverse(rip, suffix)
-register struct inode *rip;	/* symbolic link */
+register struct minix_inode *rip;	/* symbolic link */
 char *suffix;			/* current remaining path. Has to point in the
 				 * user_path buffer
 				 */
@@ -372,8 +372,8 @@ char *suffix;			/* current remaining path. Has to point in the
 /*===========================================================================*
  *				advance					     *
  *===========================================================================*/
-struct inode *advance(dirp, string, chk_perm)
-struct inode *dirp;		/* inode for directory to be searched */
+struct minix_inode *advance(dirp, string, chk_perm)
+struct minix_inode *dirp;		/* inode for directory to be searched */
 char string[NAME_MAX];		/* component name to look for */
 int chk_perm;			/* check permissions when string is looked up*/
 {
@@ -382,7 +382,7 @@ int chk_perm;			/* check permissions when string is looked up*/
  * slot.
  */
   ino_t numb;
-  struct inode *rip;
+  struct minix_inode *rip;
 
   /* If 'string' is empty, return an error. */
   if (string[0] == '\0') {
@@ -425,7 +425,7 @@ int chk_perm;			/* check permissions when string is looked up*/
   }
 
   /* See if the inode is mounted on.  If so, switch to root directory of the
-   * mounted file system.  The minix3_super_block provides the linkage between the
+   * mounted file system.  The minix_super_block provides the linkage between the
    * inode mounted on and the root directory of the mounted file system.
    */
   if (rip != NIL_INODE && rip->i_mountpoint) {
@@ -488,7 +488,7 @@ char string[NAME_MAX+1];	/* component extracted from 'old_name' */
  *				search_dir				     *
  *===========================================================================*/
 int search_dir(ldir_ptr, string, numb, flag, check_permissions)
-register struct inode *ldir_ptr; /* ptr to inode for dir to search */
+register struct minix_inode *ldir_ptr; /* ptr to inode for dir to search */
 char string[NAME_MAX];		 /* component to search for */
 ino_t *numb;			 /* pointer to inode number */
 int flag;			 /* LOOK_UP, ENTER, DELETE or IS_EMPTY */
@@ -510,7 +510,7 @@ int check_permissions;		 /* check permissions when flag is !IS_EMPTY */
   off_t pos;
   unsigned new_slots, old_slots;
   block_t b;
-  struct minix3_super_block *sp;
+  struct minix_super_block *sp;
   int extended = 0;
 
   /* If 'ldir_ptr' is not a pointer to a dir inode, error. */

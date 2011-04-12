@@ -20,7 +20,7 @@
 #include <nucleos/vfsif.h>
 
 static char mode_map[] = {R_BIT, W_BIT, R_BIT|W_BIT, 0};
-static struct inode *new_node(struct inode *ldirp, 
+static struct minix_inode *new_node(struct minix_inode *ldirp, 
 	char *string, mode_t bits, zone_t z0);
 
 
@@ -31,8 +31,8 @@ int fs_create()
 {
   phys_bytes len;
   int r, b;
-  struct inode *ldirp;
-  struct inode *rip;
+  struct minix_inode *ldirp;
+  struct minix_inode *rip;
   mode_t omode;
   char lastc[NAME_MAX];
   
@@ -87,7 +87,7 @@ int fs_create()
  *===========================================================================*/
 int fs_mknod()
 {
-  struct inode *ip, *ldirp;
+  struct minix_inode *ip, *ldirp;
   char lastc[NAME_MAX];
   phys_bytes len;
 
@@ -121,7 +121,7 @@ int fs_mkdir()
 {
   int r1, r2;			/* status codes */
   ino_t dot, dotdot;		/* inode numbers for . and .. */
-  struct inode *rip, *ldirp;
+  struct minix_inode *rip, *ldirp;
   char lastc[NAME_MAX];         /* last component */
   phys_bytes len;
 
@@ -186,8 +186,8 @@ int fs_mkdir()
 int fs_slink()
 {
   phys_bytes len;
-  struct inode *sip;           /* inode containing symbolic link */
-  struct inode *ldirp;         /* directory containing link */
+  struct minix_inode *sip;           /* inode containing symbolic link */
+  struct minix_inode *ldirp;         /* directory containing link */
   register int r;              /* error code */
   char string[NAME_MAX];       /* last component of the new dir's path name */
   struct buf *bp;              /* disk buffer for link */
@@ -260,7 +260,7 @@ int fs_newnode()
 {
   register int r;
   mode_t bits;
-  struct inode *rip;
+  struct minix_inode *rip;
 
   caller_uid = fs_m_in.REQ_UID;
   caller_gid = fs_m_in.REQ_GID;
@@ -295,7 +295,7 @@ int fs_newnode()
 /*===========================================================================*
  *				new_node				     *
  *===========================================================================*/
-static struct inode *new_node(struct inode *ldirp,
+static struct minix_inode *new_node(struct minix_inode *ldirp,
 	char *string, mode_t bits, zone_t z0)
 {
 /* New_node() is called by fs_open(), fs_mknod(), and fs_mkdir().  
@@ -309,7 +309,7 @@ static struct inode *new_node(struct inode *ldirp,
  * has to hold at least NAME_MAX bytes.
  */
 
-  register struct inode *rip;
+  register struct minix_inode *rip;
   register int r;
 
   /* Get final component of the path. */
@@ -369,7 +369,7 @@ static struct inode *new_node(struct inode *ldirp,
  *===========================================================================*/
 int fs_inhibread()
 {
-  struct inode *rip;
+  struct minix_inode *rip;
   
   if((rip = find_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE)
 	  return(-EINVAL);

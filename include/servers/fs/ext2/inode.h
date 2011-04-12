@@ -17,7 +17,7 @@
 /* Disk part of inode structure was taken from
  * linux/include/linux/ext2_fs.h.
  */
-struct inode {
+struct ext2_inode {
 	__u16 i_mode;	/* File mode */
 	__u16 i_uid;	/* Low 16 bits of Owner Uid */
 	__u32 i_size;	/* Size in bytes */
@@ -104,20 +104,19 @@ struct inode {
 				 * happens.
 				 */
 
-	LIST_ENTRY(inode) i_hash;	/* hash list */
-	TAILQ_ENTRY(inode) i_unused;	/* free and unused list */
+	LIST_ENTRY(ext2_inode) i_hash;	/* hash list */
+	TAILQ_ENTRY(ext2_inode) i_unused;	/* free and unused list */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL_) */
-
 };
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-extern struct inode inode[];
+extern struct ext2_inode inode[];
 
 /* list of unused/free inodes */
-extern TAILQ_HEAD(unused_inodes_t, inode) unused_inodes;
+extern TAILQ_HEAD(unused_inodes_t, ext2_inode) unused_inodes;
 
 /* inode hashtable */
-extern LIST_HEAD(inodelist, inode) hash_inodes[INODE_HASH_SIZE];
+extern LIST_HEAD(inodelist, ext2_inode) hash_inodes[INODE_HASH_SIZE];
 
 extern unsigned int inode_cache_hit;
 extern unsigned int inode_cache_miss;

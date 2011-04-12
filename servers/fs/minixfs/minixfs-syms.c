@@ -16,7 +16,7 @@
 #include <servers/fs/minixfs/inode.h>
 
 /* Definition of minixfs symbols. */
-struct inode inode[NR_INODES];
+struct minix_inode inode[NR_INODES];
 
 /* list of unused/free inodes */
 struct unused_inodes_t unused_inodes;
@@ -28,7 +28,7 @@ unsigned int inode_cache_hit;
 unsigned int inode_cache_miss;
 
 off_t rdahedpos;		/* position to read ahead */
-struct inode *rdahed_inode;	/* pointer to inode to read ahead */
+struct minix_inode *rdahed_inode;	/* pointer to inode to read ahead */
 
 /* The following variables are used for returning results to the caller. */
 int err_code;	/* temporary storage for error number */
@@ -51,7 +51,7 @@ int req_nr;
 
 int SELF_E;
 
-struct inode *chroot_dir;
+struct minix_inode *chroot_dir;
 
 short path_processed;		/* number of characters processed */
 char user_path[PATH_MAX+1];	/* pathname to be processed */

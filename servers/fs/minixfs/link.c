@@ -23,13 +23,13 @@
 
 #define SAME 1000
 
-static int remove_dir(struct inode *rldirp,
-                      struct inode *rip, char dir_name[NAME_MAX]);
-static int unlink_file(struct inode *dirp,
-                       struct inode *rip, char file_name[NAME_MAX]);
+static int remove_dir(struct minix_inode *rldirp,
+                      struct minix_inode *rip, char dir_name[NAME_MAX]);
+static int unlink_file(struct minix_inode *dirp,
+                       struct minix_inode *rip, char file_name[NAME_MAX]);
 static off_t nextblock(off_t pos, int zonesize);
-static void zeroblock_half(struct inode *i, off_t p, int l);
-static void zeroblock_range(struct inode *i, off_t p, off_t h);
+static void zeroblock_half(struct minix_inode *i, off_t p, int l);
+static void zeroblock_range(struct minix_inode *i, off_t p, off_t h);
 
 /* Args to zeroblock_half() */
 #define FIRST_HALF      0
@@ -43,10 +43,10 @@ int fs_link()
 {
 /* Perform the link(name1, name2) system call. */
 
-  struct inode *ip, *rip;
+  struct minix_inode *ip, *rip;
   register int r;
   char string[NAME_MAX];
-  struct inode *new_ip;
+  struct minix_inode *new_ip;
   phys_bytes len;
 
   len = MFS_MIN(fs_m_in.REQ_PATH_LEN, sizeof(string));
@@ -119,8 +119,8 @@ int fs_unlink()
  * is almost the same.  They differ only in some condition testing.  Unlink()
  * may be used by the superuser to do dangerous things; rmdir() may not.
  */
-  register struct inode *rip;
-  struct inode *rldirp;
+  register struct minix_inode *rip;
+  struct minix_inode *rldirp;
   int r;
   char string[NAME_MAX];
   phys_bytes len;
@@ -178,7 +178,7 @@ int fs_rdlink()
 {
   block_t b;                   /* block containing link text */
   struct buf *bp;              /* buffer containing link text */
-  register struct inode *rip;  /* target inode */
+  register struct minix_inode *rip;  /* target inode */
   register int r;              /* return value */
   int copylen;
   
@@ -214,8 +214,8 @@ int fs_rdlink()
  *				remove_dir				     *
  *===========================================================================*/
 static int remove_dir(rldirp, rip, dir_name)
-struct inode *rldirp;		 	/* parent directory */
-struct inode *rip;			/* directory to be removed */
+struct minix_inode *rldirp;		 	/* parent directory */
+struct minix_inode *rip;			/* directory to be removed */
 char dir_name[NAME_MAX];		/* name of directory to be removed */
 {
   /* A directory file has to be removed. Five conditions have to met:
@@ -250,8 +250,8 @@ char dir_name[NAME_MAX];		/* name of directory to be removed */
  *				unlink_file				     *
  *===========================================================================*/
 static int unlink_file(dirp, rip, file_name)
-struct inode *dirp;		/* parent directory of file */
-struct inode *rip;		/* inode of file, may be NIL_INODE too. */
+struct minix_inode *dirp;		/* parent directory of file */
+struct minix_inode *rip;		/* inode of file, may be NIL_INODE too. */
 char file_name[NAME_MAX];	/* name of file to be removed */
 {
 /* Unlink 'file_name'; rip must be the inode of 'file_name' or NIL_INODE. */
@@ -288,9 +288,9 @@ char file_name[NAME_MAX];	/* name of file to be removed */
 int fs_rename()
 {
 /* Perform the rename(name1, name2) system call. */
-  struct inode *old_dirp, *old_ip;	/* ptrs to old dir, file inodes */
-  struct inode *new_dirp, *new_ip;	/* ptrs to new dir, file inodes */
-  struct inode *new_superdirp, *next_new_superdirp;
+  struct minix_inode *old_dirp, *old_ip;	/* ptrs to old dir, file inodes */
+  struct minix_inode *new_dirp, *new_ip;	/* ptrs to new dir, file inodes */
+  struct minix_inode *new_superdirp, *next_new_superdirp;
   int r = 0;				/* error flag; initially no error */
   int odir, ndir;			/* TRUE iff {old|new} file is dir */
   int same_pdir;			/* TRUE iff parent dirs are the same */
@@ -476,7 +476,7 @@ int fs_rename()
  *===========================================================================*/
 int fs_ftrunc(void)
 {
-  struct inode *rip;
+  struct minix_inode *rip;
   off_t start, end;
   int r;
   
@@ -499,7 +499,7 @@ int fs_ftrunc(void)
  *				truncate_inode				     *
  *===========================================================================*/
 int truncate_inode(rip, newsize)
-register struct inode *rip;	/* pointer to inode to be truncated */
+register struct minix_inode *rip;	/* pointer to inode to be truncated */
 off_t newsize;			/* inode must become this size */
 {
 /* Set inode to a certain size, freeing any zones no longer referenced
@@ -540,7 +540,7 @@ off_t newsize;			/* inode must become this size */
  *				freesp_inode				     *
  *===========================================================================*/
 int freesp_inode(rip, start, end)
-register struct inode *rip;	/* pointer to inode to be partly freed */
+register struct minix_inode *rip;	/* pointer to inode to be partly freed */
 off_t start, end;		/* range of bytes to free (end uninclusive) */
 {
 /* Cut an arbitrary hole in an inode. The caller is responsible for checking
@@ -617,7 +617,7 @@ int zone_size;
  *				zeroblock_half				     *
  *===========================================================================*/
 static void zeroblock_half(rip, pos, half)
-struct inode *rip;
+struct minix_inode *rip;
 off_t pos;
 int half;
 {
@@ -648,7 +648,7 @@ int half;
  *				zeroblock_range				     *
  *===========================================================================*/
 static void zeroblock_range(rip, pos, len)
-struct inode *rip;
+struct minix_inode *rip;
 off_t pos;
 off_t len;
 {

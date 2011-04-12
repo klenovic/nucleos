@@ -14,7 +14,7 @@
  *===========================================================================*/
 int fs_utime()
 {
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   register int r;
 
   /* Temporarily open the file. */

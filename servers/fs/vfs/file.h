@@ -19,7 +19,7 @@ struct filp {
   int filp_flags;		/* flags from open and fcntl */
   int filp_state;		/* state for crash recovery */
   int filp_count;		/* how many file descriptors share this slot?*/
-/*  struct inode *filp_ino;*/	/* pointer to the inode */
+/*  struct minix_inode *filp_ino;*/	/* pointer to the inode */
 
   struct vnode *filp_vno;
   

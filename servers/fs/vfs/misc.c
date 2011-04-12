@@ -57,15 +57,8 @@ unsigned long calls_stats[NR_syscalls];
 
 static void free_proc(struct fproc *freed, int flags);
 static void unmount_all(void);
-/*
-static int dumpcore(int proc_e, struct mem_map *seg_ptr);
-static int write_bytes(struct inode *rip, off_t off, char *buf, size_t bytes);
-static int write_seg(struct inode *rip, off_t off, int proc_e,
-		     int seg, off_t seg_off, phys_bytes seg_bytes));
-*/
 
 #define FP_EXITING	1
-
 
 /*===========================================================================*
  *				do_getsysinfo				     *

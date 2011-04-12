@@ -27,14 +27,14 @@
 
 
 static void wr_indir(struct buf *bp, int index, zone_t zone);
-static int empty_indir(struct buf *, struct minix3_super_block *);
+static int empty_indir(struct buf *, struct minix_super_block *);
 
 
 /*===========================================================================*
  *				write_map				     *
  *===========================================================================*/
 int write_map(rip, position, new_zone, op)
-struct inode *rip;		/* pointer to inode to be changed */
+struct minix_inode *rip;		/* pointer to inode to be changed */
 off_t position;			/* file address to be mapped */
 zone_t new_zone;		/* zone # to be inserted */
 int op;				/* special actions */
@@ -199,7 +199,7 @@ zone_t zone;			/* zone to write */
 {
 /* Given a pointer to an indirect block, write one entry. */
 
-  struct minix3_super_block *sp;
+  struct minix_super_block *sp;
 
   if(bp == NIL_BUF)
 	panic(__FILE__, "wr_indir() on NIL_BUF", NO_NUM);
@@ -218,7 +218,7 @@ zone_t zone;			/* zone to write */
  *===========================================================================*/
 static int empty_indir(bp, sb)
 struct buf *bp;			/* pointer to indirect block */
-struct minix3_super_block *sb;		/* superblock of device block resides on */
+struct minix_super_block *sb;		/* superblock of device block resides on */
 {
 /* Return nonzero if the indirect block pointed to by bp contains
  * only NO_ZONE entries.
@@ -242,7 +242,7 @@ struct minix3_super_block *sb;		/* superblock of device block resides on */
  *				clear_zone				     *
  *===========================================================================*/
 void clear_zone(rip, pos, flag)
-register struct inode *rip;	/* inode to clear */
+register struct minix_inode *rip;	/* inode to clear */
 off_t pos;			/* points to block to clear */
 int flag;			/* 0 if called by read_write, 1 by new_block */
 {
@@ -282,7 +282,7 @@ int flag;			/* 0 if called by read_write, 1 by new_block */
  *				new_block				     *
  *===========================================================================*/
 struct buf *new_block(rip, position)
-register struct inode *rip;	/* pointer to inode */
+register struct minix_inode *rip;	/* pointer to inode */
 off_t position;			/* file pointer */
 {
 /* Acquire a new block and return a pointer to it.  Doing so may require
@@ -295,7 +295,7 @@ off_t position;			/* file pointer */
   zone_t z;
   zone_t zone_size;
   int scale, r;
-  struct minix3_super_block *sp;
+  struct minix_super_block *sp;
 
   /* Is another block available in the current zone? */
   if ( (b = read_map(rip, position)) == NO_BLOCK) {

@@ -14,7 +14,7 @@ int fs_newnode()
 {
   register int r = 0;
   mode_t bits;
-  struct inode *rip;
+  struct pipe_inode *rip;
   dev_t dev;
 
   caller_uid = fs_m_in.REQ_UID;

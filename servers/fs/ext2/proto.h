@@ -6,12 +6,12 @@
 /* Structs used in prototypes must be declared as such first. */
 struct buf;
 struct filp;
-struct inode;
+struct ext2_inode;
 struct ext2_super_block;
 
 /* balloc.c */
-void discard_preallocated_blocks(struct inode *rip);
-block_t alloc_block(struct inode *rip, block_t goal);
+void discard_preallocated_blocks(struct ext2_inode *rip);
+block_t alloc_block(struct ext2_inode *rip, block_t goal);
 void free_block(struct ext2_super_block *sp, u32 bit);
 
 /* cache.c */
@@ -31,18 +31,18 @@ void dev_close(endpoint_t driver_e, dev_t dev);
 int fs_new_driver(void);
 
 /* ialloc.c */
-struct inode *alloc_inode(struct inode *parent, mode_t bits);
-void free_inode(struct inode *rip);
+struct ext2_inode *alloc_inode(struct ext2_inode *parent, mode_t bits);
+void free_inode(struct ext2_inode *rip);
 
 /* inode.c */
-void dup_inode(struct inode *ip);
-struct inode *find_inode(dev_t dev, ino_t numb);
+void dup_inode(struct ext2_inode *ip);
+struct ext2_inode *find_inode(dev_t dev, ino_t numb);
 int fs_putnode(void);
 void init_inode_cache(void);
-struct inode *get_inode(dev_t dev, ino_t numb);
-void put_inode(struct inode *rip);
-void update_times(struct inode *rip);
-void rw_inode(struct inode *rip, int rw_flag);
+struct ext2_inode *get_inode(dev_t dev, ino_t numb);
+void put_inode(struct ext2_inode *rip);
+void update_times(struct ext2_inode *rip);
+void rw_inode(struct ext2_inode *rip, int rw_flag);
 
 /* link.c */
 int fs_ftrunc(void);
@@ -50,7 +50,7 @@ int fs_link(void);
 int fs_rdlink(void);
 int fs_rename(void);
 int fs_unlink(void);
-int truncate_inode(struct inode *rip, off_t len);
+int truncate_inode(struct ext2_inode *rip, off_t len);
 
 /* misc.c */
 int fs_flush(void);
@@ -70,22 +70,22 @@ int fs_slink(void);
 
 /* path.c */
 int fs_lookup(void);
-struct inode *advance(struct inode *dirp, char string[NAME_MAX + 1], int chk_perm);
-int search_dir(struct inode *ldir_ptr, char string [NAME_MAX + 1], ino_t *numb, int flag,
+struct ext2_inode *advance(struct ext2_inode *dirp, char string[NAME_MAX + 1], int chk_perm);
+int search_dir(struct ext2_inode *ldir_ptr, char string [NAME_MAX + 1], ino_t *numb, int flag,
 	       int check_permissions, int ftype);
 
 /* protect.c */
 int fs_chmod(void);
 int fs_chown(void);
 int fs_getdents(void);
-int forbidden(struct inode *rip, mode_t access_desired);
-int read_only(struct inode *ip);
+int forbidden(struct ext2_inode *rip, mode_t access_desired);
+int read_only(struct ext2_inode *ip);
 
 /* read.c */
 int fs_breadwrite(void);
 int fs_readwrite(void);
 void read_ahead(void);
-block_t read_map(struct inode *rip, off_t pos);
+block_t read_map(struct ext2_inode *rip, off_t pos);
 block_t rd_indir(struct buf *bp, int index);
 
 /* stadir.c */
@@ -121,8 +121,8 @@ u32 setbyte(bitchunk_t *bitmap, u32 max_bits,
 int unsetbit(bitchunk_t *bitmap, u32 bit);
 
 /* write.c */
-struct buf *new_block(struct inode *rip, off_t position);
+struct buf *new_block(struct ext2_inode *rip, off_t position);
 void zero_block(struct buf *bp);
-int write_map(struct inode *, off_t, block_t, int);
+int write_map(struct ext2_inode *, off_t, block_t, int);
 
 #endif /* EXT2_PROTO_H */

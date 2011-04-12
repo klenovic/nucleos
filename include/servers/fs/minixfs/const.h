@@ -80,7 +80,7 @@
 
 #define DIR_ENTRY_SIZE		usizeof (struct direct)	/* # bytes/dir entry   */
 #define NR_DIR_ENTRIES(b)	((b)/DIR_ENTRY_SIZE)	/* # dir entries/blk   */
-#define SUPER_SIZE		usizeof (struct minix3_super_block)	/* minix3_super_block size */
+#define SUPER_SIZE		usizeof (struct minix_super_block)	/* minix_super_block size */
 
 #define FS_BITMAP_CHUNKS(b)	((b)/usizeof (bitchunk_t))	/* # map chunks/blk   */
 #define FS_BITCHUNK_BITS	(usizeof(bitchunk_t) * CHAR_BIT)

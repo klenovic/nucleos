@@ -55,8 +55,8 @@ static int block_size;
 #include <nucleos/dir.h>
 #endif
 
-static struct minix3_super_block super; /* Superblock of file system */
-static struct inode curfil;      /* Inode of file under examination */
+static struct minix_super_block super; /* Superblock of file system */
+static struct minix_inode curfil;      /* Inode of file under examination */
 static char indir[_MAX_BLOCK_SIZE];   /* Single indirect block. */
 static char dindir[_MAX_BLOCK_SIZE];  /* Double indirect block. */
 static char dirbuf[_MAX_BLOCK_SIZE];  /* Scratch/Directory block. */

@@ -22,17 +22,17 @@
 #include <servers/fs/ext2/super.h>
 #include <nucleos/vfsif.h>
 
-static void icopy(struct inode *rip, d_inode *dip, int direction, int norm);
-static void addhash_inode(struct inode *node);
-static void unhash_inode(struct inode *node);
+static void icopy(struct ext2_inode *rip, d_inode *dip, int direction, int norm);
+static void addhash_inode(struct ext2_inode *node);
+static void unhash_inode(struct ext2_inode *node);
 
-struct inode *find_inode(
+struct ext2_inode *find_inode(
   dev_t dev,          /* device on which inode resides */
   ino_t numb            /* inode number (ANSI: may not be unshort) */
 )
 {
 /* Find the inode specified by the inode and device number. */
-  struct inode *rip;
+  struct ext2_inode *rip;
   int hashi;
 
   hashi = (int) numb & INODE_HASH_MASK;
@@ -48,7 +48,7 @@ struct inode *find_inode(
 }
 
 void put_inode(
-  register struct inode *rip     /* pointer to inode to be released */
+  register struct ext2_inode *rip     /* pointer to inode to be released */
 )
 {
 /* The caller is no longer using this inode. If no one else is using it either
@@ -100,7 +100,7 @@ int fs_putnode(void)
 {
 /* Find the inode specified by the request message and decrease its counter.*/
 
-  struct inode *rip;
+  struct ext2_inode *rip;
   int count;
 
   rip = find_inode(fs_dev, (ino_t) fs_m_in.REQ_INODE_NR);
@@ -136,7 +136,7 @@ int fs_putnode(void)
  *===========================================================================*/
 void init_inode_cache()
 {
-  struct inode *rip;
+  struct ext2_inode *rip;
   struct inodelist *rlp;
 
   inode_cache_hit = 0;
@@ -160,7 +160,7 @@ void init_inode_cache()
 /*===========================================================================*
  *                addhash_inode                                              *
  *===========================================================================*/
-static void addhash_inode(struct inode *node)
+static void addhash_inode(struct ext2_inode *node)
 {
   int hashi = node->i_num & INODE_HASH_MASK;
 
@@ -172,7 +172,7 @@ static void addhash_inode(struct inode *node)
 /*===========================================================================*
  *                unhash_inode                                               *
  *===========================================================================*/
-static void unhash_inode(struct inode *node)
+static void unhash_inode(struct ext2_inode *node)
 {
   /* remove from hash table */
   LIST_REMOVE(node, i_hash);
@@ -182,7 +182,7 @@ static void unhash_inode(struct inode *node)
 /*===========================================================================*
  *                get_inode                                                  *
  *===========================================================================*/
-struct inode *get_inode(
+struct ext2_inode *get_inode(
   dev_t dev,          /* device on which inode resides */
   ino_t numb            /* inode number (ANSI: may not be unshort) */
 )
@@ -190,7 +190,7 @@ struct inode *get_inode(
 /* Find the inode in the hash table. If it is not there, get a free inode
  * load it from the disk if it's necessary and put on the hash list
  */
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   int hashi;
   int i;
 
@@ -261,7 +261,7 @@ struct inode *get_inode(
  *                update_times                                               *
  *===========================================================================*/
 void update_times(
-  register struct inode *rip     /* pointer to inode to be read/written */
+  register struct ext2_inode *rip     /* pointer to inode to be read/written */
 )
 {
 /* Various system calls are required by the standard to update atime, ctime,
@@ -292,7 +292,7 @@ void update_times(
  *                rw_inode                                                   *
  *===========================================================================*/
 void rw_inode(
-  register struct inode *rip,         /* pointer to inode to be read/written */
+  register struct ext2_inode *rip,         /* pointer to inode to be read/written */
   int rw_flag                         /* READING or WRITING */
 )
 {
@@ -345,7 +345,7 @@ void rw_inode(
  *				icopy					     *
  *===========================================================================*/
 static void icopy(
-  register struct inode *rip,	/* pointer to the in-core inode struct */
+  register struct ext2_inode *rip,	/* pointer to the in-core inode struct */
   register d_inode *dip,	/* pointer to the on-disk struct */
   int direction,		/* READING (from disk) or WRITING (to disk) */
   int norm			/* TRUE = do not swap bytes; FALSE = swap */
@@ -405,7 +405,7 @@ static void icopy(
  *                dup_inode                                                  *
  *===========================================================================*/
 void dup_inode(
-  struct inode *ip         /* The inode to be duplicated. */
+  struct ext2_inode *ip         /* The inode to be duplicated. */
 )
 {
 /* This routine is a simplified form of get_inode() for the case where

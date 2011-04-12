@@ -24,7 +24,7 @@ int busy;
 /* Inode map. */
 bitchunk_t inodemap[FS_BITMAP_CHUNKS(NR_INODES)]; 
 
-struct inode inode[NR_INODES];
+struct pipe_inode inode[NR_INODES];
 
 /* list of unused/free inodes */
 struct unused_inodes_t unused_inodes;

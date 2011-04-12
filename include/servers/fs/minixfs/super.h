@@ -30,10 +30,10 @@
  *    unused        whatever is needed to fill out the current zone
  *    data zones    (s_zones - s_firstdatazone) << s_log_zone_size
  *
- * A minix3_super_block slot is free if s_dev == NO_DEV. 
+ * A minix_super_block slot is free if s_dev == NO_DEV. 
  */
 
-struct minix3_super_block {
+struct minix_super_block {
 	__u32 s_ninodes;	/* # usable inodes on the minor device */
 	__u16 s_nzones;		/* total device size, including bit maps etc */
 	__s16 s_imap_blocks;	/* # of blocks used by inode bit map */
@@ -55,9 +55,7 @@ struct minix3_super_block {
 	__u16 s_block_size;	/* block size in bytes. */
 	__s8 s_disk_version;	/* filesystem format sub-version */
 
-	/* The following items are only used when the minix3_super_block is in memory. */
-	/*struct inode *s_isup;*/	/* inode for root dir of mounted file sys */
-	/*struct inode *s_imount;*/	/* inode mounted on */
+	/* The following items are only used when the minix_super_block is in memory. */
 	__u32 s_inodes_per_block;	/* precalculated from magic number */
 	__s16 s_dev;			/* whose super block is this? */
 	__s32 s_rd_only;		/* set to 1 iff file sys mounted read only */
@@ -71,9 +69,9 @@ struct minix3_super_block {
 };
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-extern struct minix3_super_block superblock;
+extern struct minix_super_block superblock;
 
-#define NIL_SUPER	(struct minix3_super_block *) 0
+#define NIL_SUPER	(struct minix_super_block *) 0
 #define IMAP		0	/* operating on the inode bit map */
 #define ZMAP		1	/* operating on the zone bit map */
 

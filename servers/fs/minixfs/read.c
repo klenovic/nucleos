@@ -22,7 +22,7 @@
 #include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
-static int rw_chunk(struct inode *rip, u64_t position,
+static int rw_chunk(struct minix_inode *rip, u64_t position,
 	unsigned off, int chunk, unsigned left, int rw_flag,
 	cp_grant_id_t gid, unsigned buf_off, int block_size, int *completed);
 
@@ -40,7 +40,7 @@ int fs_readwrite(void)
   unsigned int off, cum_io;
   mode_t mode_word;
   int completed, r2 = 0;
-  struct inode *rip;
+  struct minix_inode *rip;
   
   r = 0;
   
@@ -155,7 +155,7 @@ int fs_breadwrite(void)
   int completed, r2 = 0;
 
   /* Pseudo inode for rw_chunk */
-  struct inode rip;
+  struct minix_inode rip;
   
   r = 0;
   
@@ -211,7 +211,7 @@ int fs_breadwrite(void)
  *===========================================================================*/
 static int rw_chunk(rip, position, off, chunk, left, rw_flag, gid,
  buf_off, block_size, completed)
-register struct inode *rip;	/* pointer to inode for file to be rd/wr */
+register struct minix_inode *rip;	/* pointer to inode for file to be rd/wr */
 u64_t position;			/* position within file to read or write */
 unsigned off;			/* off within the current block */
 int chunk;			/* number of bytes to read or write */
@@ -298,7 +298,7 @@ int *completed;			/* number of bytes copied */
  *				read_map				     *
  *===========================================================================*/
 block_t read_map(rip, position)
-register struct inode *rip;	/* ptr to inode to map from */
+register struct minix_inode *rip;	/* ptr to inode to map from */
 off_t position;			/* position in file whose blk wanted */
 {
 /* Given an inode and a position within the corresponding file, locate the
@@ -372,7 +372,7 @@ int index;			/* index into *bp */
  * V1 (IBM and 68000), and V2 (IBM and 68000).
  */
 
-  struct minix3_super_block *sp;
+  struct minix_super_block *sp;
   zone_t zone;			/* V2 zones are longs (shorts in V1) */
 
   if(bp == NIL_BUF)
@@ -402,7 +402,7 @@ void read_ahead()
 {
 /* Read a block into the cache before it is needed. */
   int block_size;
-  register struct inode *rip;
+  register struct minix_inode *rip;
   struct buf *bp;
   block_t b;
 
@@ -418,7 +418,7 @@ void read_ahead()
  *				rahead					     *
  *===========================================================================*/
 struct buf *rahead(rip, baseblock, position, bytes_ahead)
-register struct inode *rip;	/* pointer to inode for file to be read */
+register struct minix_inode *rip;	/* pointer to inode for file to be read */
 block_t baseblock;		/* block at current position */
 u64_t position;			/* position within file */
 unsigned bytes_ahead;		/* bytes beyond position for immediate use */
@@ -538,7 +538,7 @@ unsigned bytes_ahead;		/* bytes beyond position for immediate use */
  *===========================================================================*/
 int fs_getdents(void)
 {
-  register struct inode *rip;
+  register struct minix_inode *rip;
   int o, r, block_size, len, reclen, done;
   ino_t ino;
   block_t b;

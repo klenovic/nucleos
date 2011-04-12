@@ -25,7 +25,7 @@
 #include <nucleos/queue.h>
 #include <servers/fs/minixfs/type.h>
 
-struct inode {
+struct minix_inode {
 	mode_t i_mode;		/* file type, protection, etc. */
 	nlink_t i_nlinks;		/* how many links to this file */
 	uid_t i_uid;			/* user id of the file's owner */
@@ -36,13 +36,14 @@ struct inode {
 	time_t i_ctime;		/* when was inode itself changed (V2 only)*/
 	zone_t i_zone[V2_NR_TZONES]; /* zone numbers for direct, ind, and dbl ind */
 
+#if defined(__KERNEL__) || defined(__UKERNEL__)
 	/* The following items are not present on the disk. */
 	dev_t i_dev;			/* which device is the inode on */
 	ino_t i_num;			/* inode number on its (minor) device */
 	int i_count;			/* # times inode used; 0 means slot is free */
 	int i_ndzones;		/* # direct zones (Vx_NR_DZONES) */
 	int i_nindirs;		/* # indirect zones per indirect block */
-	struct minix3_super_block *i_sp;	/* pointer to super block for inode's device */
+	struct minix_super_block *i_sp;	/* pointer to super block for inode's device */
 	char i_dirt;			/* CLEAN or DIRTY */
 	u32 i_zsearch;		/* where to start search for new zones */
 
@@ -51,25 +52,28 @@ struct inode {
 	char i_seek;			/* set on LSEEK, cleared on READ/WRITE */
 	char i_update;		/* the ATIME, CTIME, and MTIME bits are here */
 
-	LIST_ENTRY(inode) i_hash;     /* hash list */
-	TAILQ_ENTRY(inode) i_unused;  /* free and unused list */
+	LIST_ENTRY(minix_inode) i_hash;     /* hash list */
+	TAILQ_ENTRY(minix_inode) i_unused;  /* free and unused list */
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 };
 
-extern struct inode inode[];
+#if defined(__KERNEL__) || defined(__UKERNEL__)
+extern struct minix_inode inode[];
 
 /* list of unused/free inodes */ 
-extern TAILQ_HEAD(unused_inodes_t, inode)  unused_inodes;
+extern TAILQ_HEAD(unused_inodes_t, minix_inode)  unused_inodes;
 
 /* inode hashtable */
-extern LIST_HEAD(inodelist, inode) hash_inodes[INODE_HASH_SIZE];
+extern LIST_HEAD(inodelist, minix_inode) hash_inodes[INODE_HASH_SIZE];
 
 extern unsigned int inode_cache_hit;
 extern unsigned int inode_cache_miss;
 
-#define NIL_INODE	(struct inode *)0	/* indicates absence of inode slot */
+#define NIL_INODE	(struct minix_inode *)0	/* indicates absence of inode slot */
 
 /* Field values.  Note that CLEAN and DIRTY are defined in "const.h" */
 #define NO_SEEK		0	/* i_seek = NO_SEEK if last op was not SEEK */
 #define ISEEK		1	/* i_seek = ISEEK if last op was SEEK */
+#endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* __SERVERS_FS_MINIXFS_INODE_H */

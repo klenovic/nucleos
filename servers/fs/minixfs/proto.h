@@ -13,8 +13,8 @@
 /* Structs used in prototypes must be declared as such first. */
 struct buf;
 struct filp;		
-struct inode;
-struct minix3_super_block;
+struct minix_inode;
+struct minix_super_block;
 
 
 /* cache.c */
@@ -39,27 +39,27 @@ int fs_clone_opcl(void);
 int fs_new_driver(void);
 
 /* inode.c */
-struct inode *alloc_inode(dev_t dev, mode_t bits);
-void dup_inode(struct inode *ip);
-struct inode *find_inode(dev_t dev, int numb);
+struct minix_inode *alloc_inode(dev_t dev, mode_t bits);
+void dup_inode(struct minix_inode *ip);
+struct minix_inode *find_inode(dev_t dev, int numb);
 void free_inode(dev_t dev, ino_t numb);
 int fs_getnode(void);
 int fs_putnode(void);
 void init_inode_cache(void);
-struct inode *get_inode(dev_t dev, int numb);
-void put_inode(struct inode *rip);
-void update_times(struct inode *rip);
-void rw_inode(struct inode *rip, int rw_flag);
-void wipe_inode(struct inode *rip);
+struct minix_inode *get_inode(dev_t dev, int numb);
+void put_inode(struct minix_inode *rip);
+void update_times(struct minix_inode *rip);
+void rw_inode(struct minix_inode *rip, int rw_flag);
+void wipe_inode(struct minix_inode *rip);
 
 /* link.c */
-int freesp_inode(struct inode *rip, off_t st, off_t end);
+int freesp_inode(struct minix_inode *rip, off_t st, off_t end);
 int fs_ftrunc(void);
 int fs_link(void);
 int fs_rdlink(void);
 int fs_rename(void);
 int fs_unlink(void);
-int truncate_inode(struct inode *rip, off_t len);
+int truncate_inode(struct minix_inode *rip, off_t len);
 
 /* main.c */
 void reply(int who, kipc_msg_t *m_out);
@@ -83,9 +83,9 @@ int fs_slink(void);
 
 /* path.c */
 int fs_lookup(void);
-struct inode *advance(struct inode *dirp,
+struct minix_inode *advance(struct minix_inode *dirp,
 				char string[NAME_MAX], int chk_perm);
-int search_dir(struct inode *ldir_ptr,
+int search_dir(struct minix_inode *ldir_ptr,
 			char string [NAME_MAX], ino_t *numb, int flag,
 			int check_permissions);
 
@@ -93,16 +93,16 @@ int search_dir(struct inode *ldir_ptr,
 int fs_chmod(void);
 int fs_chown(void);
 int fs_getdents(void);
-int forbidden(struct inode *rip, mode_t access_desired);
-int read_only(struct inode *ip);
+int forbidden(struct minix_inode *rip, mode_t access_desired);
+int read_only(struct minix_inode *ip);
 
 /* read.c */
 int fs_breadwrite(void);
 int fs_readwrite(void);
-struct buf *rahead(struct inode *rip, block_t baseblock,
+struct buf *rahead(struct minix_inode *rip, block_t baseblock,
  u64_t position, unsigned bytes_ahead);
 void read_ahead(void);
-block_t read_map(struct inode *rip, off_t pos);
+block_t read_map(struct minix_inode *rip, off_t pos);
 int read_write(int rw_flag);
 zone_t rd_indir(struct buf *bp, int index);
 
@@ -111,13 +111,13 @@ int fs_fstatfs(void);
 int fs_stat(void);
 
 /* super.c */
-u32 alloc_bit(struct minix3_super_block *sp, int map, u32 origin);
-void free_bit(struct minix3_super_block *sp, int map,
+u32 alloc_bit(struct minix_super_block *sp, int map, u32 origin);
+void free_bit(struct minix_super_block *sp, int map,
  u32 bit_returned);
 int get_block_size(dev_t dev);
-struct minix3_super_block *get_super(dev_t dev);
-int mounted(struct inode *rip);
-int read_super(struct minix3_super_block *sp);
+struct minix_super_block *get_super(dev_t dev);
+int mounted(struct minix_inode *rip);
+int read_super(struct minix_super_block *sp);
 
 /* time.c */
 int fs_utime(void);
@@ -136,7 +136,7 @@ void sanitycheck(char *file, int line);
 #define SANITYCHECK sanitycheck(__FILE__, __LINE__)
 
 /* write.c */
-void clear_zone(struct inode *rip, off_t pos, int flag);
-struct buf *new_block(struct inode *rip, off_t position);
+void clear_zone(struct minix_inode *rip, off_t pos, int flag);
+struct buf *new_block(struct minix_inode *rip, off_t position);
 void zero_block(struct buf *bp);
-int write_map(struct inode *, off_t, zone_t, int);
+int write_map(struct minix_inode *, off_t, zone_t, int);

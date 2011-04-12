@@ -14,7 +14,7 @@
  *				stat_inode				     *
  *===========================================================================*/
 static int stat_inode(
-  register struct inode *rip,	/* pointer to inode to stat */
+  register struct ext2_inode *rip,	/* pointer to inode to stat */
   endpoint_t who_e,		/* Caller endpoint */
   cp_grant_id_t gid		/* grant for the stat buf */
 )
@@ -66,7 +66,7 @@ static int stat_inode(
 int fs_fstatfs()
 {
   struct statfs st;
-  struct inode *rip;
+  struct ext2_inode *rip;
   int r;
 
   if((rip = find_inode(fs_dev, ROOT_INODE)) == NULL)
@@ -88,7 +88,7 @@ int fs_fstatfs()
 int fs_stat()
 {
   register int r;              /* return value */
-  register struct inode *rip;  /* target inode */
+  register struct ext2_inode *rip;  /* target inode */
 
   if ((rip = get_inode(fs_dev, (ino_t) fs_m_in.REQ_INODE_NR)) == NULL)
 	return(-EINVAL);

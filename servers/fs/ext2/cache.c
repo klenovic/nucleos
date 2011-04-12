@@ -514,7 +514,7 @@ static void rm_lru(
 void set_blocksize(unsigned int blocksize)
 {
   struct buf *bp;
-  struct inode *rip;
+  struct ext2_inode *rip;
 
   ASSERT(blocksize > 0);
 

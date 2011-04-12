@@ -183,7 +183,7 @@ int forbidden(struct vnode *vp, mode_t access_desired)
  * if it is forbidden, -EACCES is returned.
  */
 
-  register struct minix3_super_block *sp;
+  register struct minix_super_block *sp;
   register mode_t bits, perm_bits;
   uid_t uid;
   gid_t gid;

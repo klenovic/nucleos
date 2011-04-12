@@ -23,7 +23,7 @@ static int empty_indir(struct buf *, struct ext2_super_block *);
  *				write_map				     *
  *===========================================================================*/
 int write_map(rip, position, new_block, op)
-struct inode *rip;		/* pointer to inode to be changed */
+struct ext2_inode *rip;		/* pointer to inode to be changed */
 off_t position;			/* file address to be mapped */
 block_t new_block;		/* block # to be inserted */
 int op;				/* special actions */
@@ -304,7 +304,7 @@ struct ext2_super_block *sb;		/* superblock of device block resides on */
  *				new_block				     *
  *===========================================================================*/
 struct buf *new_block(rip, position)
-register struct inode *rip;	/* pointer to inode */
+register struct ext2_inode *rip;	/* pointer to inode */
 off_t position;			/* file pointer */
 {
 /* Acquire a new block and return a pointer to it. */

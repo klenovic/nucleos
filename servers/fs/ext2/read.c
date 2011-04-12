@@ -15,15 +15,15 @@
 #include <stdlib.h>
 #include <nucleos/param.h>
 
-static struct buf *rahead(struct inode *rip, block_t baseblock, u64 position, unsigned bytes_ahead);
-static int rw_chunk(struct inode *rip, u64 position, unsigned off, size_t chunk, unsigned left, int rw_flag,
+static struct buf *rahead(struct ext2_inode *rip, block_t baseblock, u64 position, unsigned bytes_ahead);
+static int rw_chunk(struct ext2_inode *rip, u64 position, unsigned off, size_t chunk, unsigned left, int rw_flag,
 		    cp_grant_id_t gid, unsigned buf_off, unsigned int block_size,
 		    int *completed);
 
 static char getdents_buf[GETDENTS_BUFSIZ];
 
 static off_t rdahedpos;         /* position to read ahead */
-static struct inode *rdahed_inode;      /* pointer to inode to read ahead */
+static struct ext2_inode *rdahed_inode;      /* pointer to inode to read ahead */
 
 /*===========================================================================*
  *				fs_readwrite				     *
@@ -37,7 +37,7 @@ int fs_readwrite(void)
   unsigned int off, cum_io, block_size, chunk;
   mode_t mode_word;
   int completed;
-  struct inode *rip;
+  struct ext2_inode *rip;
   size_t nrbytes;
 
   r = 0;
@@ -146,7 +146,7 @@ int fs_breadwrite(void)
   size_t nrbytes;
 
   /* Pseudo inode for rw_chunk */
-  struct inode rip;
+  struct ext2_inode rip;
 
   r = 0;
 
@@ -212,7 +212,7 @@ int index;                      /* index into *bp */
  *				read_map				     *
  *===========================================================================*/
 block_t read_map(rip, position)
-register struct inode *rip;     /* ptr to inode to map from */
+register struct ext2_inode *rip;     /* ptr to inode to map from */
 off_t position;                 /* position in file whose blk wanted */
 {
 /* Given an inode and a position within the corresponding file, locate the
@@ -293,7 +293,7 @@ off_t position;                 /* position in file whose blk wanted */
  *===========================================================================*/
 static int rw_chunk(rip, position, off, chunk, left, rw_flag, gid,
  buf_off, block_size, completed)
-register struct inode *rip;     /* pointer to inode for file to be rd/wr */
+register struct ext2_inode *rip;     /* pointer to inode for file to be rd/wr */
 u64_t position;                 /* position within file to read or write */
 unsigned off;                   /* off within the current block */
 unsigned int chunk;             /* number of bytes to read or write */
@@ -384,7 +384,7 @@ void read_ahead()
 {
 /* Read a block into the cache before it is needed. */
   unsigned int block_size;
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   struct buf *bp;
   block_t b;
 
@@ -407,7 +407,7 @@ void read_ahead()
  *				rahead					     *
  *===========================================================================*/
 static struct buf *rahead(rip, baseblock, position, bytes_ahead)
-register struct inode *rip;     /* pointer to inode for file to be read */
+register struct ext2_inode *rip;     /* pointer to inode for file to be read */
 block_t baseblock;              /* block at current position */
 u64_t position;                 /* position within file */
 unsigned bytes_ahead;           /* bytes beyond position for immediate use */
@@ -534,7 +534,7 @@ unsigned bytes_ahead;           /* bytes beyond position for immediate use */
  *===========================================================================*/
 int fs_getdents(void)
 {
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   int o, r, done;
   unsigned int block_size, len, reclen;
   ino_t ino;

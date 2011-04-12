@@ -12,7 +12,7 @@
  *===========================================================================*/
 int fs_ftrunc(void)
 {
-  struct inode *rip;
+  struct pipe_inode *rip;
   off_t start, end;
   int r;
   ino_t inumb;
@@ -32,7 +32,7 @@ int fs_ftrunc(void)
  *				truncate_inode				     *
  *===========================================================================*/
 int truncate_inode(rip, newsize)
-register struct inode *rip;	/* pointer to inode to be truncated */
+register struct pipe_inode *rip;	/* pointer to inode to be truncated */
 off_t newsize;			/* inode must become this size */
 {
 /* Set inode to a certain size, freeing any zones no longer referenced

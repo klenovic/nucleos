@@ -59,7 +59,7 @@ struct inodelist hash_inodes[INODE_HASH_SIZE];
 
 unsigned int inode_cache_hit;
 unsigned int inode_cache_miss;
-struct inode inode[NR_INODES];
+struct ext2_inode inode[NR_INODES];
 
 struct ext2_super_block *superblock;
 struct ext2_super_block *ondisk_superblock;

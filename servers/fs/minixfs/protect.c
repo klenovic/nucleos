@@ -23,7 +23,7 @@ int fs_chmod()
 {
 /* Perform the chmod(name, mode) system call. */
 
-  register struct inode *rip;
+  register struct minix_inode *rip;
   register int r;
   
   /* Temporarily open the file. */
@@ -50,7 +50,7 @@ printk("MFS(%d) get_inode by fs_chmod() failed\n", SELF_E);
  *===========================================================================*/
 int fs_chown()
 {
-  register struct inode *rip;
+  register struct minix_inode *rip;
   register int r;
   /* Temporarily open the file. */
   caller_uid = fs_m_in.REQ_UID;
@@ -85,7 +85,7 @@ printk("MFS(%d) get_inode by fs_chown() failed\n", SELF_E);
  *===========================================================================*/
 int fs_access_o()
 {
-  struct inode *rip;
+  struct minix_inode *rip;
   register int r;
   
   /* Temporarily open the file whose access is to be checked. */
@@ -107,7 +107,7 @@ printk("MFS(%d) get_inode by fs_access() failed\n", SELF_E);
 /*===========================================================================*
  *				forbidden				     *
  *===========================================================================*/
-int forbidden(register struct inode *rip, mode_t access_desired)
+int forbidden(register struct minix_inode *rip, mode_t access_desired)
 {
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
@@ -115,8 +115,8 @@ int forbidden(register struct inode *rip, mode_t access_desired)
  * if it is forbidden, -EACCES is returned.
  */
 
-  register struct inode *old_rip = rip;
-  register struct minix3_super_block *sp;
+  register struct minix_inode *old_rip = rip;
+  register struct minix_super_block *sp;
   register mode_t bits, perm_bits;
   int r, shift, type;
 
@@ -125,15 +125,6 @@ int forbidden(register struct inode *rip, mode_t access_desired)
 	printk(
 	"forbidden: warning caller_uid and caller_gid not initialized\n");
   }
-
-  /*
-  if (rip->i_mount == I_MOUNT)	
-	for (sp = &super_block[1]; sp < &super_block[NR_SUPERS]; sp++)
-		if (sp->s_imount == rip) {
-			rip = get_inode(sp->s_dev, ROOT_INODE);
-			break;
-		} 
-  */
 
   /* Isolate the relevant rwx bits from the mode. */
   bits = rip->i_mode;
@@ -181,13 +172,13 @@ int forbidden(register struct inode *rip, mode_t access_desired)
  *				read_only				     *
  *===========================================================================*/
 int read_only(ip)
-struct inode *ip;		/* ptr to inode whose file sys is to be cked */
+struct minix_inode *ip;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted
  * read only.  If so, return -EROFS, else return OK.
  */
 
-  register struct minix3_super_block *sp;
+  register struct minix_super_block *sp;
 
   sp = ip->i_sp;
   return(sp->s_rd_only ? -EROFS : 0);

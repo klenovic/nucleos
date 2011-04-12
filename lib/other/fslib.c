@@ -74,7 +74,7 @@ long x;				/* 32-bit long to be byte swapped */
 }
 
 void old_icopy(rip, dip, direction, norm)
-register struct inode *rip;	/* pointer to the in-core inode struct */
+register struct minix_inode *rip;	/* pointer to the in-core inode struct */
 register d1_inode *dip;		/* pointer to the d1_inode inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
@@ -117,7 +117,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
 }
 
 void new_icopy(rip, dip, direction, norm)
-register struct inode *rip;	/* pointer to the in-core inode struct */
+register struct minix_inode *rip;	/* pointer to the in-core inode struct */
 register d2_inode *dip;	/* pointer to the d2_inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
@@ -157,7 +157,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
 }
 
 void conv_inode(rip, dip, dip2, rw_flag, magic)
-register struct inode *rip;	/* pointer to the in-core inode struct */
+register struct minix_inode *rip;	/* pointer to the in-core inode struct */
 register d1_inode *dip;		/* pointer to the V1 on-disk inode struct */
 register d2_inode *dip2;	/* pointer to the V2 on-disk inode struct */
 int rw_flag;			/* READING or WRITING */

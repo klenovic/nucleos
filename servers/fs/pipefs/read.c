@@ -18,7 +18,7 @@ int fs_readwrite(void)
   off_t position, f_size;
   unsigned int nrbytes, cum_io;
   mode_t mode_word;
-  struct inode *rip;
+  struct pipe_inode *rip;
   ino_t inumb;
 
   r = 0;

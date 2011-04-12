@@ -31,12 +31,12 @@
 #include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
-static int addhash_inode(struct inode *node); 
-static void new_icopy(struct inode *rip, d2_inode *dip,
+static int addhash_inode(struct minix_inode *node); 
+static void new_icopy(struct minix_inode *rip, d2_inode *dip,
 		 int direction, int norm);
-static void old_icopy(struct inode *rip, d1_inode *dip,
+static void old_icopy(struct minix_inode *rip, d1_inode *dip,
 						int direction, int norm);
-static int unhash_inode(struct inode *node);
+static int unhash_inode(struct minix_inode *node);
 
 /*===========================================================================*
  *				fs_putnode				     *
@@ -45,7 +45,7 @@ int fs_putnode()
 {
 /* Find the inode specified by the request message and decrease its counter.*/
 
-  struct inode *rip;
+  struct minix_inode *rip;
   int count;
   
   rip = find_inode(fs_dev, fs_m_in.REQ_INODE_NR);
@@ -81,7 +81,7 @@ int fs_putnode()
  *===========================================================================*/
 void init_inode_cache()
 {
-  struct inode *rip;
+  struct minix_inode *rip;
   struct inodelist *rlp;
 
   inode_cache_hit = 0;
@@ -105,7 +105,7 @@ void init_inode_cache()
 /*===========================================================================*
  *				addhash_inode   			     *
  *===========================================================================*/
-static int addhash_inode(struct inode *node) 
+static int addhash_inode(struct minix_inode *node) 
 {
   int hashi = node->i_num & INODE_HASH_MASK;
   
@@ -118,7 +118,7 @@ static int addhash_inode(struct inode *node)
 /*===========================================================================*
  *				unhash_inode      			     *
  *===========================================================================*/
-static int unhash_inode(struct inode *node) 
+static int unhash_inode(struct minix_inode *node) 
 {
   /* remove from hash table */
   LIST_REMOVE(node, i_hash);
@@ -129,14 +129,14 @@ static int unhash_inode(struct inode *node)
 /*===========================================================================*
  *				get_inode				     *
  *===========================================================================*/
-struct inode *get_inode(dev, numb)
+struct minix_inode *get_inode(dev, numb)
 dev_t dev;			/* device on which inode resides */
 int numb;			/* inode number (ANSI: may not be unshort) */
 {
 /* Find the inode in the hash table. If it is not there, get a free inode
  * load it from the disk if it's necessary and put on the hash list 
  */
-  register struct inode *rip, *xp;
+  register struct minix_inode *rip, *xp;
   int hashi;
 
   hashi = numb & INODE_HASH_MASK;
@@ -189,13 +189,13 @@ int numb;			/* inode number (ANSI: may not be unshort) */
 /*===========================================================================*
  *				find_inode        			     *
  *===========================================================================*/
-struct inode *find_inode(dev, numb)
+struct minix_inode *find_inode(dev, numb)
 dev_t dev;			/* device on which inode resides */
 int numb;			/* inode number (ANSI: may not be unshort) */
 {
 /* Find the inode specified by the inode and device number.
  */
-  struct inode *rip;
+  struct minix_inode *rip;
   int hashi;
 
   hashi = numb & INODE_HASH_MASK;
@@ -215,7 +215,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
  *				put_inode				     *
  *===========================================================================*/
 void put_inode(rip)
-register struct inode *rip;	/* pointer to inode to be released */
+register struct minix_inode *rip;	/* pointer to inode to be released */
 {
 /* The caller is no longer using this inode.  If no one else is using it either
  * write it back to the disk immediately.  If it has no links, truncate it and
@@ -255,12 +255,12 @@ register struct inode *rip;	/* pointer to inode to be released */
 /*===========================================================================*
  *				alloc_inode				     *
  *===========================================================================*/
-struct inode *alloc_inode(dev_t dev, mode_t bits)
+struct minix_inode *alloc_inode(dev_t dev, mode_t bits)
 {
 /* Allocate a free inode on 'dev', and return a pointer to it. */
 
-  register struct inode *rip;
-  register struct minix3_super_block *sp;
+  register struct minix_inode *rip;
+  register struct minix_super_block *sp;
   int major, minor, inumb;
   u32 b;
 
@@ -313,7 +313,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
  *				wipe_inode				     *
  *===========================================================================*/
 void wipe_inode(rip)
-register struct inode *rip;	/* the inode to be erased */
+register struct minix_inode *rip;	/* the inode to be erased */
 {
 /* Erase some fields in the inode.  This function is called from alloc_inode()
  * when a new inode is to be allocated, and from truncate(), when an existing
@@ -337,7 +337,7 @@ ino_t inumb;			/* number of inode to be freed */
 {
 /* Return an inode to the pool of unallocated inodes. */
 
-  register struct minix3_super_block *sp;
+  register struct minix_super_block *sp;
   u32 b;
 
   /* Locate the appropriate super_block. */
@@ -353,7 +353,7 @@ ino_t inumb;			/* number of inode to be freed */
  *				update_times				     *
  *===========================================================================*/
 void update_times(rip)
-register struct inode *rip;	/* pointer to inode to be read/written */
+register struct minix_inode *rip;	/* pointer to inode to be read/written */
 {
 /* Various system calls are required by the standard to update atime, ctime,
  * or mtime.  Since updating a time requires sending a message to the clock
@@ -363,7 +363,7 @@ register struct inode *rip;	/* pointer to inode to be read/written */
  */
 
   time_t cur_time;
-  struct minix3_super_block *sp;
+  struct minix_super_block *sp;
 
   sp = rip->i_sp;		/* get pointer to super block. */
   if (sp->s_rd_only) return;	/* no updates for read-only file systems */
@@ -379,13 +379,13 @@ register struct inode *rip;	/* pointer to inode to be read/written */
  *				rw_inode				     *
  *===========================================================================*/
 void rw_inode(rip, rw_flag)
-register struct inode *rip;	/* pointer to inode to be read/written */
+register struct minix_inode *rip;	/* pointer to inode to be read/written */
 int rw_flag;			/* READING or WRITING */
 {
 /* An entry in the inode table is to be copied to or from the disk. */
 
   register struct buf *bp;
-  register struct minix3_super_block *sp;
+  register struct minix_super_block *sp;
   d1_inode *dip;
   d2_inode *dip2;
   block_t b, offset;
@@ -423,7 +423,7 @@ int rw_flag;			/* READING or WRITING */
  *				old_icopy				     *
  *===========================================================================*/
 static void old_icopy(rip, dip, direction, norm)
-register struct inode *rip;	/* pointer to the in-core inode struct */
+register struct minix_inode *rip;	/* pointer to the in-core inode struct */
 register d1_inode *dip;		/* pointer to the d1_inode inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
@@ -469,7 +469,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
  *				new_icopy				     *
  *===========================================================================*/
 static void new_icopy(rip, dip, direction, norm)
-register struct inode *rip;	/* pointer to the in-core inode struct */
+register struct minix_inode *rip;	/* pointer to the in-core inode struct */
 register d2_inode *dip;	/* pointer to the d2_inode struct */
 int direction;			/* READING (from disk) or WRITING (to disk) */
 int norm;			/* TRUE = do not swap bytes; FALSE = swap */
@@ -512,7 +512,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
  *				dup_inode				     *
  *===========================================================================*/
 void dup_inode(ip)
-struct inode *ip;		/* The inode to be duplicated. */
+struct minix_inode *ip;		/* The inode to be duplicated. */
 {
 /* This routine is a simplified form of get_inode() for the case where
  * the inode pointer is already known.

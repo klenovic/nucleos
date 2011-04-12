@@ -25,7 +25,7 @@ int fs_sync()
  * blocks must be flushed last, since rw_inode() leaves its results in
  * the block cache.
  */
-  struct inode *rip;
+  struct minix_inode *rip;
   struct buf *bp;
 
   /* Write all the dirty inodes to the disk. */

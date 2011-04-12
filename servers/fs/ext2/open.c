@@ -11,7 +11,7 @@
 #include <servers/fs/ext2/super.h>
 #include <nucleos/vfsif.h>
 
-static struct inode *new_node(struct inode *ldirp, char *string, mode_t bits, block_t z0);
+static struct ext2_inode *new_node(struct ext2_inode *ldirp, char *string, mode_t bits, block_t z0);
 
 
 /*===========================================================================*
@@ -21,8 +21,8 @@ int fs_create()
 {
   phys_bytes len;
   int r;
-  struct inode *ldirp;
-  struct inode *rip;
+  struct ext2_inode *ldirp;
+  struct ext2_inode *rip;
   mode_t omode;
   char lastc[NAME_MAX + 1];
 
@@ -79,7 +79,7 @@ int fs_create()
  *===========================================================================*/
 int fs_mknod()
 {
-  struct inode *ip, *ldirp;
+  struct ext2_inode *ip, *ldirp;
   char lastc[NAME_MAX + 1];
   phys_bytes len;
 
@@ -117,7 +117,7 @@ int fs_mkdir()
 {
   int r1, r2;			/* status codes */
   ino_t dot, dotdot;		/* inode numbers for . and .. */
-  struct inode *rip, *ldirp;
+  struct ext2_inode *rip, *ldirp;
   char lastc[NAME_MAX + 1];         /* last component */
   phys_bytes len;
 
@@ -186,8 +186,8 @@ int fs_mkdir()
 int fs_slink()
 {
   phys_bytes len;
-  struct inode *sip;           /* inode containing symbolic link */
-  struct inode *ldirp;         /* directory containing link */
+  struct ext2_inode *sip;           /* inode containing symbolic link */
+  struct ext2_inode *ldirp;         /* directory containing link */
   register int r;              /* error code */
   char string[NAME_MAX];       /* last component of the new dir's path name */
   char* link_target_buf;       /* either sip->i_block or bp->b_data */
@@ -271,7 +271,7 @@ int fs_slink()
 /*===========================================================================*
  *				new_node				     *
  *===========================================================================*/
-static struct inode *new_node(struct inode *ldirp,
+static struct ext2_inode *new_node(struct ext2_inode *ldirp,
 	char *string, mode_t bits, block_t b0)
 {
 /* New_node() is called by fs_open(), fs_mknod(), and fs_mkdir().
@@ -282,7 +282,7 @@ static struct inode *new_node(struct inode *ldirp,
  * to an appropriate value (0 or an error code).
  */
 
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   register int r;
 
   if (ldirp->i_links_count == 0) { /* Dir does not actually exist */
@@ -347,7 +347,7 @@ static struct inode *new_node(struct inode *ldirp,
  *===========================================================================*/
 int fs_inhibread()
 {
-  struct inode *rip;
+  struct ext2_inode *rip;
 
   if((rip = find_inode(fs_dev, (ino_t) fs_m_in.REQ_INODE_NR)) == NULL)
 	  return(-EINVAL);

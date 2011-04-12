@@ -19,7 +19,7 @@
 #include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
-static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);
+static int stat_inode(struct minix_inode *rip, int who_e, cp_grant_id_t gid);
 
 /**
  * Common code for stat and fstat system calls.
@@ -28,7 +28,7 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);
  * @param gid  grant for the stat buf
  * @return 0 on success
  */
-static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
+static int stat_inode(struct minix_inode *rip, int who_e, cp_grant_id_t gid)
 {
 	struct kstat ksb;
 	mode_t mo;
@@ -77,7 +77,7 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
 int fs_fstatfs(void)
 {
 	struct statfs st;
-	struct inode *rip;
+	struct minix_inode *rip;
 	int r;
 
 	if((rip = find_inode(fs_dev, ROOT_INODE)) == NIL_INODE)
@@ -98,7 +98,7 @@ int fs_fstatfs(void)
 int fs_stat(void)
 {
 	register int r;			/* return value */
-	register struct inode *rip;	/* target inode */
+	register struct minix_inode *rip;	/* target inode */
 
 	if ((rip = get_inode(fs_dev, fs_m_in.REQ_INODE_NR)) == NIL_INODE)
 		return(-EINVAL);

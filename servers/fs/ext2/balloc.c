@@ -92,7 +92,7 @@ void free_block(struct ext2_super_block *sp, u32 bit_returned)
 	sp->s_bsearch = bit_returned;
 }
 
-void discard_preallocated_blocks(struct inode *rip)
+void discard_preallocated_blocks(struct ext2_inode *rip)
 {
 /* When called for rip, discard (free) blocks preallocated for rip,
  * otherwise discard all preallocated blocks.
@@ -133,7 +133,7 @@ void discard_preallocated_blocks(struct inode *rip)
 static block_t alloc_block_bit(sp, goal, rip)
 struct ext2_super_block *sp;		/* the filesystem to allocate from */
 block_t goal;			/* try to allocate near this block */
-struct inode *rip;		/* used for preallocation */
+struct ext2_inode *rip;		/* used for preallocation */
 {
   block_t block = NO_BLOCK;	/* allocated block */
   int word;			/* word in block bitmap */
@@ -251,7 +251,7 @@ struct inode *rip;		/* used for preallocation */
   return block;
 }
 
-block_t alloc_block(struct inode *rip, block_t block)
+block_t alloc_block(struct ext2_inode *rip, block_t block)
 {
 /* Allocate a block for inode. If block is provided, then use it as a goal:
  * try to allocate this block or his neghbors.

@@ -2,7 +2,7 @@
 #include "inode.h"
 #include <nucleos/stat.h>
 
-static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);
+static int stat_inode(struct pipe_inode *rip, int who_e, cp_grant_id_t gid);
 
 /**
  * Common code for stat and fstat system calls.
@@ -11,7 +11,7 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid);
  * @param gid  grant for the stat buf
  * @return 0 on success
  */
-static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
+static int stat_inode(struct pipe_inode *rip, int who_e, cp_grant_id_t gid)
 {
 	struct kstat ksb;
 	int r, s;
@@ -49,7 +49,7 @@ static int stat_inode(struct inode *rip, int who_e, cp_grant_id_t gid)
 int fs_stat(void)
 {
 	register int r;			/* return value */
-	register struct inode *rip;	/* target inode */
+	register struct pipe_inode *rip;	/* target inode */
 
 	if((rip = find_inode(fs_m_in.REQ_INODE_NR)) == NIL_INODE)
 		return(-EINVAL);

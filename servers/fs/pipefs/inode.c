@@ -20,8 +20,8 @@
 #include "inode.h"
 #include <nucleos/vfsif.h>
 
-static int addhash_inode(struct inode *node); 
-static int unhash_inode(struct inode *node);
+static int addhash_inode(struct pipe_inode *node); 
+static int unhash_inode(struct pipe_inode *node);
 
 
 /*===========================================================================*
@@ -31,7 +31,7 @@ int fs_putnode()
 {
 /* Find the inode specified by the request message and decrease its counter.*/
 
-  struct inode *rip;
+  struct pipe_inode *rip;
   int count;
   dev_t dev;
   ino_t inum;
@@ -71,7 +71,7 @@ int fs_putnode()
  *===========================================================================*/
 void init_inode_cache()
 {
-  struct inode *rip;
+  struct pipe_inode *rip;
   struct inodelist *rlp;
 
   /* init free/unused list */
@@ -96,7 +96,7 @@ void init_inode_cache()
 /*===========================================================================*
  *				addhash_inode   			     *
  *===========================================================================*/
-static int addhash_inode(struct inode *node) 
+static int addhash_inode(struct pipe_inode *node) 
 {
   int hashi = node->i_num & INODE_HASH_MASK;
   
@@ -109,7 +109,7 @@ static int addhash_inode(struct inode *node)
 /*===========================================================================*
  *				unhash_inode      			     *
  *===========================================================================*/
-static int unhash_inode(struct inode *node) 
+static int unhash_inode(struct pipe_inode *node) 
 {
   /* remove from hash table */
   LIST_REMOVE(node, i_hash);
@@ -120,14 +120,14 @@ static int unhash_inode(struct inode *node)
 /*===========================================================================*
  *				get_inode				     *
  *===========================================================================*/
-struct inode *get_inode(dev, numb)
+struct pipe_inode *get_inode(dev, numb)
 dev_t dev;			/* device on which inode resides */
 int numb;			/* inode number (ANSI: may not be unshort) */
 {
 /* Find the inode in the hash table. If it is not there, get a free inode
  * load it from the disk if it's necessary and put on the hash list 
  */
-  register struct inode *rip, *xp;
+  register struct pipe_inode *rip, *xp;
   int hashi;
 
   hashi = numb & INODE_HASH_MASK;
@@ -175,12 +175,12 @@ int numb;			/* inode number (ANSI: may not be unshort) */
 /*===========================================================================*
  *				find_inode        			     *
  *===========================================================================*/
-struct inode *find_inode(numb)
+struct pipe_inode *find_inode(numb)
 int numb;			/* inode number (ANSI: may not be unshort) */
 {
 /* Find the inode specified by the inode and device number.
  */
-  struct inode *rip;
+  struct pipe_inode *rip;
   int hashi;
 
   hashi = numb & INODE_HASH_MASK;
@@ -200,7 +200,7 @@ int numb;			/* inode number (ANSI: may not be unshort) */
  *				put_inode				     *
  *===========================================================================*/
 void put_inode(rip)
-register struct inode *rip;	/* pointer to inode to be released */
+register struct pipe_inode *rip;	/* pointer to inode to be released */
 {
 /* The caller is no longer using this inode.  If no one else is using it either
  * write it back to the disk immediately.  If it has no links, truncate it and
@@ -238,11 +238,11 @@ register struct inode *rip;	/* pointer to inode to be released */
 /*===========================================================================*
  *				alloc_inode				     *
  *===========================================================================*/
-struct inode *alloc_inode(dev_t dev, mode_t bits)
+struct pipe_inode *alloc_inode(dev_t dev, mode_t bits)
 {
 /* Allocate a free inode on 'dev', and return a pointer to it. */
 
-  register struct inode *rip;
+  register struct pipe_inode *rip;
   int major, minor;
   u32 b;
   ino_t i_num;
@@ -284,7 +284,7 @@ struct inode *alloc_inode(dev_t dev, mode_t bits)
  *				wipe_inode				     *
  *===========================================================================*/
 void wipe_inode(rip)
-register struct inode *rip;	/* the inode to be erased */
+register struct pipe_inode *rip;	/* the inode to be erased */
 {
 /* Erase some fields in the inode.  This function is called from alloc_inode()
  * when a new inode is to be allocated, and from truncate(), when an existing
@@ -302,7 +302,7 @@ register struct inode *rip;	/* the inode to be erased */
  *				free_inode				     *
  *===========================================================================*/
 void free_inode(rip)
-struct inode *rip;
+struct pipe_inode *rip;
 {
 /* Return an inode to the pool of unallocated inodes. */
 
@@ -318,7 +318,7 @@ struct inode *rip;
  *				dup_inode				     *
  *===========================================================================*/
 void dup_inode(ip)
-struct inode *ip;		/* The inode to be duplicated. */
+struct pipe_inode *ip;		/* The inode to be duplicated. */
 {
 /* This routine is a simplified form of get_inode() for the case where
  * the inode pointer is already known.
@@ -332,7 +332,7 @@ struct inode *ip;		/* The inode to be duplicated. */
  *				update_times				     *
  *===========================================================================*/
 void update_times(rip)
-register struct inode *rip;	/* pointer to inode to be read/written */
+register struct pipe_inode *rip;	/* pointer to inode to be read/written */
 {
 /* Various system calls are required by the standard to update atime, ctime,
  * or mtime.  Since updating a time requires sending a message to the clock

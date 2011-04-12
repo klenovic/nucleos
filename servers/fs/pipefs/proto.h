@@ -5,7 +5,7 @@
 /* Structs used in prototypes must be declared as such first. */
 struct buf;
 struct filp;
-struct inode;
+struct pipe_inode;
 
 /* buffer.c */
 struct buf *get_block(dev_t dev, ino_t inum);
@@ -16,20 +16,20 @@ void put_block(dev_t dev, ino_t inum);
 void buf_pool(void);
 
 /* inode.c */
-struct inode *alloc_inode(dev_t dev, mode_t mode);
-void dup_inode(struct inode *ip);
-struct inode *find_inode(int numb);
-void free_inode(struct inode *rip);
+struct pipe_inode *alloc_inode(dev_t dev, mode_t mode);
+void dup_inode(struct pipe_inode *ip);
+struct pipe_inode *find_inode(int numb);
+void free_inode(struct pipe_inode *rip);
 int fs_putnode(void);
 void init_inode_cache(void);
-struct inode *get_inode(dev_t dev, int numb);
-void put_inode(struct inode *rip);
-void update_times(struct inode *rip);
-void wipe_inode(struct inode *rip);
+struct pipe_inode *get_inode(dev_t dev, int numb);
+void put_inode(struct pipe_inode *rip);
+void update_times(struct pipe_inode *rip);
+void wipe_inode(struct pipe_inode *rip);
 
 /* link.c */
 int fs_ftrunc(void);
-int truncate_inode(struct inode *rip, off_t newsize);
+int truncate_inode(struct pipe_inode *rip, off_t newsize);
 
 
 /* main.c */
@@ -43,7 +43,7 @@ int fs_newnode(void);
 
 /* read.c */
 int fs_readwrite(void);
-block_t read_map(struct inode *rip, off_t pos);
+block_t read_map(struct pipe_inode *rip, off_t pos);
 int read_write(int rw_flag);
 
 /* utility.c */

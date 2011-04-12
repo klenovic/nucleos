@@ -19,7 +19,7 @@
 #include <servers/ds/ds.h>
 #include <nucleos/vfsif.h>
 
-struct minix3_super_block superblock;
+struct minix_super_block superblock;
 
 /*===========================================================================*
  *				fs_readsuper				     *
@@ -33,8 +33,8 @@ int fs_readsuper()
  * so that the VFS knows that it has to find the vnode on which this FS 
  * process' partition is mounted on.
  */
-  struct minix3_super_block *xp;
-  struct inode *root_ip;
+  struct minix_super_block *xp;
+  struct minix_inode *root_ip;
   cp_grant_id_t label_gid;
   size_t label_len;
   int r = 0;
@@ -132,7 +132,7 @@ int fs_mountpoint()
 /* This function looks up the mount point, it checks the condition whether
  * the partition can be mounted on the inode or not. 
  */
-  register struct inode *rip;
+  register struct minix_inode *rip;
   int r = 0;
   mode_t bits;
   
@@ -161,9 +161,9 @@ int fs_mountpoint()
 int fs_unmount()
 {
 /* Unmount a file system by device number. */
-  struct minix3_super_block *sp1;
+  struct minix_super_block *sp1;
   int count;
-  struct inode *rip, *root_ip;
+  struct minix_inode *rip, *root_ip;
 
   if(superblock.s_dev != fs_dev) return(-EINVAL);
   

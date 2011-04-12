@@ -17,7 +17,7 @@ int fs_chmod()
 {
 /* Perform the chmod(name, mode) system call. */
 
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   mode_t mode;
 
   mode = (mode_t) fs_m_in.REQ_MODE;
@@ -44,7 +44,7 @@ int fs_chmod()
  *===========================================================================*/
 int fs_chown()
 {
-  register struct inode *rip;
+  register struct ext2_inode *rip;
   register int r;
 
   /* Temporarily open the file. */
@@ -72,7 +72,7 @@ int fs_chown()
 /*===========================================================================*
  *				forbidden				     *
  *===========================================================================*/
-int forbidden(register struct inode *rip, mode_t access_desired)
+int forbidden(register struct ext2_inode *rip, mode_t access_desired)
 {
 /* Given a pointer to an inode, 'rip', and the access desired, determine
  * if the access is allowed, and if not why not.  The routine looks up the
@@ -80,7 +80,7 @@ int forbidden(register struct inode *rip, mode_t access_desired)
  * if it is forbidden, -EACCES is returned.
  */
 
-  register struct inode *old_rip = rip;
+  register struct ext2_inode *old_rip = rip;
   register mode_t bits, perm_bits;
   int r, shift;
 
@@ -141,7 +141,7 @@ static int in_group(gid_t grp)
  *				read_only				     *
  *===========================================================================*/
 int read_only(ip)
-struct inode *ip;		/* ptr to inode whose file sys is to be cked */
+struct ext2_inode *ip;		/* ptr to inode whose file sys is to be cked */
 {
 /* Check to see if the file system on which the inode 'ip' resides is mounted
  * read only.  If so, return -EROFS, else return 0.
