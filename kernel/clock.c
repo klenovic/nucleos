@@ -35,88 +35,102 @@
  * (+) The CLOCK task keeps tracks of watchdog timers for the entire kernel.
  * It is crucial that watchdog functions not block, or the CLOCK task may
  * be blocked. Do not send() a message when the receiver is not expecting it.
- * Instead, notify(), which always returns, should be used. 
+ * Instead, notify(), which always returns, should be used.
  */
-
-#include <kernel/kernel.h>
-#include <kernel/proc.h>
 #include <nucleos/signal.h>
 #include <nucleos/com.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/portio.h>
-
 #include <kernel/clock.h>
+#include <kernel/kernel.h>
+#include <kernel/proc.h>
 
-/* Function prototype for static functions.
- */ 
-static void init_clock(void);
-static void load_update(void);
-
-/* The CLOCK's timers queue. The functions in <nucleos/timer.h> operate on this. 
- * Each system process possesses a single synchronous alarm timer. If other 
- * kernel parts want to use additional timers, they must declare their own 
+/* The CLOCK's timers queue. The functions in <nucleos/timer.h> operate on this.
+ * Each system process possesses a single synchronous alarm timer. If other
+ * kernel parts want to use additional timers, they must declare their own
  * persistent (static) timer structure, which can be passed to the clock
  * via (re)set_timer().
- * When a timer expires its watchdog function is run by the CLOCK task. 
+ * When a timer expires its watchdog function is run by the CLOCK task.
  */
 static timer_t *clock_timers;	/* queue of CLOCK timers */
 static clock_t next_timeout;	/* realtime that next timer expires */
 
-/* The time is incremented by the interrupt handler on each clock tick.
- */
-static clock_t realtime = 0;		      /* real time clock */
+/* The time is incremented by the interrupt handler on each clock tick. */
+static clock_t realtime = 0;		/* real time clock */
+
+static void init_clock(void)
+{
+	/* Set a watchdog timer to periodically balance the scheduling queues.
+	   Side-effect sets new timer */
+
+	balance_queues(NULL);
+}
+
+static void load_update(void)
+{
+	u16_t slot;
+	int enqueued = 0, q;
+	struct proc *p;
+
+	/* Load average data is stored as a list of numbers in a circular
+	 * buffer. Each slot accumulates _LOAD_UNIT_SECS of samples of
+	 * the number of runnable processes. Computations can then
+	 * be made of the load average over variable periods, in the
+	 * user library (see getloadavg(3)).
+	 */
+	slot = (realtime / system_hz / _LOAD_UNIT_SECS) % _LOAD_HISTORY;
+	if(slot != kloadinfo.proc_last_slot) {
+		kloadinfo.proc_load_history[slot] = 0;
+		kloadinfo.proc_last_slot = slot;
+	}
+
+	/* Cumulation. How many processes are ready now? */
+	for(q = 0; q < NR_SCHED_QUEUES; q++)
+		for(p = rdy_head[q]; p != NIL_PROC; p = p->p_nextready)
+			enqueued++;
+
+	kloadinfo.proc_load_history[slot] += enqueued;
+
+	/* Up-to-dateness. */
+	kloadinfo.last_clock = realtime;
+}
 
 /*===========================================================================*
  *				clock_task				     *
  *===========================================================================*/
 void clock_task()
 {
-/* Main program of clock task. If the call is not HARD_INT it is an error.
- */
-  kipc_msg_t m;       /* message buffer for both input and output */
-  int result;      /* result returned by the handler */
+/* Main program of clock task. If the call is not HARD_INT it is an error. */
+	kipc_msg_t m;	/* message buffer for both input and output */
+	int result;	/* result returned by the handler */
 
-  init_clock();    /* initialize clock task */
-    
-  /* Main loop of the clock task.  Get work, process it. Never reply. */
-  while(TRUE) {
-	/* Go get a message. */
-	result = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
+	init_clock();    /* initialize clock task */
 
-	if(result != 0)
-		kernel_panic("kipc_module_call type KIPC_RECEIVE failed", result);
+	/* Main loop of the clock task.  Get work, process it. Never reply. */
+	while(1) {
+		/* Go get a message. */
+		result = kipc_module_call(KIPC_RECEIVE, 0, ENDPT_ANY, &m);
 
-	/* Handle the request. Only clock ticks are expected. */
-	if (is_notify(m.m_type)) {
-		switch (_ENDPOINT_P(m.m_source)) {
+		if(result != 0)
+			kernel_panic("kipc_module_call type KIPC_RECEIVE failed", result);
+
+		/* Handle the request. Only clock ticks are expected. */
+		if (is_notify(m.m_type)) {
+			switch (_ENDPOINT_P(m.m_source)) {
 			case HARDWARE:
 				tmrs_exptimers(&clock_timers, realtime, NULL);
 				next_timeout = (clock_timers == NULL) ?
-					TMR_NEVER : clock_timers->tmr_exp_time;
+				TMR_NEVER : clock_timers->tmr_exp_time;
 				break;
 			default:	/* illegal request type */
-				printk("CLOCK: illegal notify %d from %d.\n",
-					m.m_type, m.m_source);
+				printk("CLOCK: illegal notify %d from %d.\n", m.m_type, m.m_source);
+			}
+		}
+		else {
+			/* illegal request type */
+			printk("CLOCK: illegal request %d from %d.\n", m.m_type, m.m_source);
 		}
 	}
-	else {
-		/* illegal request type */
-		printk("CLOCK: illegal request %d from %d.\n",
-			m.m_type, m.m_source);
-	}
-  }
-}
-
-/*===========================================================================*
- *				init_clock				     *
- *===========================================================================*/
-static void init_clock()
-{
-   
-	/* Set a watchdog timer to periodically balance the scheduling queues.
-	   Side-effect sets new timer */
-
-	balance_queues(NULL);
 }
 
 /*
@@ -150,75 +164,33 @@ int bsp_timer_int_handler(void)
 	return(1);					/* reenable interrupts */
 }
 
-/*===========================================================================*
- *				get_uptime				     *
- *===========================================================================*/
 clock_t get_uptime(void)
 {
-  /* Get and return the current clock uptime in ticks. */
-  return(realtime);
+	/* Get and return the current clock uptime in ticks. */
+	return(realtime);
 }
 
-/*===========================================================================*
- *				set_timer				     *
- *===========================================================================*/
 void set_timer(tp, exp_time, watchdog)
 struct timer *tp;		/* pointer to timer structure */
 clock_t exp_time;		/* expiration realtime */
 tmr_func_t watchdog;		/* watchdog to be called */
 {
-/* Insert the new timer in the active timers list. Always update the 
- * next timeout time by setting it to the front of the active list.
- */
-  tmrs_settimer(&clock_timers, tp, exp_time, watchdog, NULL);
-  next_timeout = clock_timers->tmr_exp_time;
-}
-
-/*===========================================================================*
- *				reset_timer				     *
- *===========================================================================*/
-void reset_timer(tp)
-struct timer *tp;		/* pointer to timer structure */
-{
-/* The timer pointed to by 'tp' is no longer needed. Remove it from both the
- * active and expired lists. Always update the next timeout time by setting
- * it to the front of the active list.
- */
-  tmrs_clrtimer(&clock_timers, tp, NULL);
-  next_timeout = (clock_timers == NULL) ? 
-	TMR_NEVER : clock_timers->tmr_exp_time;
-}
-
-/*===========================================================================*
- *				load_update				     * 
- *===========================================================================*/
-static void load_update(void)
-{
-	u16_t slot;
-	int enqueued = 0, q;
-	struct proc *p;
-
-	/* Load average data is stored as a list of numbers in a circular
-	 * buffer. Each slot accumulates _LOAD_UNIT_SECS of samples of
-	 * the number of runnable processes. Computations can then
-	 * be made of the load average over variable periods, in the
-	 * user library (see getloadavg(3)).
+	/* Insert the new timer in the active timers list. Always update the 
+	 * next timeout time by setting it to the front of the active list.
 	 */
-	slot = (realtime / system_hz / _LOAD_UNIT_SECS) % _LOAD_HISTORY;
-	if(slot != kloadinfo.proc_last_slot) {
-		kloadinfo.proc_load_history[slot] = 0;
-		kloadinfo.proc_last_slot = slot;
-	}
+	tmrs_settimer(&clock_timers, tp, exp_time, watchdog, NULL);
+	next_timeout = clock_timers->tmr_exp_time;
+}
 
-	/* Cumulation. How many processes are ready now? */
-	for(q = 0; q < NR_SCHED_QUEUES; q++)
-		for(p = rdy_head[q]; p != NIL_PROC; p = p->p_nextready)
-			enqueued++;
-
-	kloadinfo.proc_load_history[slot] += enqueued;
-
-	/* Up-to-dateness. */
-	kloadinfo.last_clock = realtime;
+void reset_timer(struct timer *tp)
+{
+	/* The timer pointed to by 'tp' is no longer needed. Remove it from both the
+	 * active and expired lists. Always update the next timeout time by setting
+	 * it to the front of the active list.
+	 */
+	tmrs_clrtimer(&clock_timers, tp, NULL);
+	next_timeout = (clock_timers == NULL) ? 
+	TMR_NEVER : clock_timers->tmr_exp_time;
 }
 
 /*
@@ -267,13 +239,15 @@ int ap_timer_int_handler(void)
 	 * well.  If any of the timers expire, do_clocktick() will send out
 	 * signals.
 	 */
-	if ((p->p_misc_flags & MF_VIRT_TIMER) &&
-			(p->p_virt_left -= ticks) <= 0) expired = 1;
-	if ((p->p_misc_flags & MF_PROF_TIMER) &&
-			(p->p_prof_left -= ticks) <= 0) expired = 1;
-	if (! (priv(p)->s_flags & BILLABLE) &&
-			(billp->p_misc_flags & MF_PROF_TIMER) &&
-			(billp->p_prof_left -= ticks) <= 0) expired = 1;
+	if ((p->p_misc_flags & MF_VIRT_TIMER) && (p->p_virt_left -= ticks) <= 0)
+		expired = 1;
+
+	if ((p->p_misc_flags & MF_PROF_TIMER) && (p->p_prof_left -= ticks) <= 0)
+		expired = 1;
+
+	if (!(priv(p)->s_flags & BILLABLE) && (billp->p_misc_flags & MF_PROF_TIMER) &&
+	    (billp->p_prof_left -= ticks) <= 0)
+		expired = 1;
 
 	/*
 	 * Check if a process-virtual timer expired. Check current process, but
@@ -303,8 +277,7 @@ int boot_cpu_init_timer(unsigned freq)
 	if (arch_init_local_timer(freq))
 		return -1;
 
-	if (arch_register_local_timer_handler(
-				(irq_handler_t) bsp_timer_int_handler))
+	if (arch_register_local_timer_handler((irq_handler_t) bsp_timer_int_handler))
 		return -1;
 
 	return 0;

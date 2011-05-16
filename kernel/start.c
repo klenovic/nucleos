@@ -7,22 +7,44 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
 /* First C file used by the kernel. */
-
-#include <kernel/kernel.h>
-#include <kernel/proc.h>
 #include <stdlib.h>
 #include <nucleos/string.h>
-#include <asm/bootparam.h>
-#include <asm/kernel/const.h>
 #include <nucleos/utsrelease.h>
 #include <nucleos/version.h>
 #include <nucleos/compile.h>
 #include <nucleos/param.h>
 #include <kernel/proto.h>
+#include <kernel/kernel.h>
+#include <kernel/proc.h>
+#include <asm/bootparam.h>
+#include <asm/kernel/const.h>
 
-static char *get_value(const char *params, const char *key);
+/**
+ * @brief Get environment value
+ * @param params  pointer to boot monitor parameters
+ * @param name  key to look up (string)
+ * @return pointer to value (constant string) on succes otherwise 0
+ */
+static char *get_value(const char *params, const char *name)
+{
+/* Get environment value - kernel version of getenv to avoid setting up the
+ * usual environment array.
+ */
+	register const char *namep;
+	register char *envp;
+
+	for (envp = (char *) params; *envp != 0;) {
+		for (namep = name; *namep != 0 && *namep == *envp; namep++, envp++);
+
+		if (*namep == '\0' && *envp == '=')
+			return(envp + 1);
+
+		while (*envp++ != 0);
+	}
+
+	return 0;
+}
 
 /**
  * @brief Perform system initializations prior to calling main().
@@ -32,10 +54,10 @@ static char *get_value(const char *params, const char *key);
  * @param parmoff  boot parameters offset
  * @param parmsize  boot parameters length
  */
-void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
+void prepare_kernel(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 {
 /* Perform system initializations prior to calling main(). Most settings are
- * determined with help of the environment strings passed by MINIX' loader.
+ * determined with help of the environment strings passed by loader.
  */
 	register char *value;				/* value in key=value pair */
 	int h;
@@ -133,31 +155,5 @@ void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 	/* Return to assembler code to switch to protected mode (if 286), 
 	 * reload selectors and call main().
 	 */
-	intr_init(INTS_MINIX, 0);
-}
-
-/**
- * @brief Get environment value
- * @param params  pointer to boot monitor parameters
- * @param name  key to look up (string)
- * @return pointer to value (constant string) on succes otherwise 0
- */
-static char *get_value(const char *params, const char *name)
-{
-/* Get environment value - kernel version of getenv to avoid setting up the
- * usual environment array.
- */
-	register const char *namep;
-	register char *envp;
-
-	for (envp = (char *) params; *envp != 0;) {
-		for (namep = name; *namep != 0 && *namep == *envp; namep++, envp++);
-
-		if (*namep == '\0' && *envp == '=')
-			return(envp + 1);
-
-		while (*envp++ != 0);
-	}
-
-	return 0;
+	intr_init(INTS_NUCLEOS, 0);
 }

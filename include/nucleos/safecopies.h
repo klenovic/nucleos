@@ -12,6 +12,7 @@
 #define __NUCLEOS_SAFECOPIES_H
 
 #include <nucleos/types.h>
+#include <nucleos/type.h>
 
 typedef int32_t cp_grant_id_t;
 
