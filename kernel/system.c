@@ -85,7 +85,6 @@ void sys_task()
   register struct proc *caller_ptr;
   int s;
   int call_nr;
-  int n = 0;
 
   /* Initialize the system task. */
   initialize();
@@ -337,7 +336,6 @@ void send_sig(int proc_nr, int sig_nr)
  * send a notification with source SYSTEM.
  */ 
   register struct proc *rp;
-  static int n;
 
   if(!isokprocn(proc_nr) || isemptyn(proc_nr))
 	kernel_panic("send_sig to empty process", proc_nr);
@@ -476,7 +474,6 @@ register struct proc *rc;		/* slot of process to clean up */
 {
   register struct proc *rp;		/* iterate over process table */
   register struct proc **xpp;		/* iterate over caller queue */
-  struct proc *np;
 
   if(isemptyp(rc)) kernel_panic("clear_proc: empty process", rc->p_endpoint);
 
@@ -563,7 +560,7 @@ register struct proc *rc;		/* slot of process to clean up */
  *===========================================================================*/
 static struct proc *vmrestart_check(kipc_msg_t *m)
 {
-	int type, r;
+	int type;
 	struct proc *restarting;
 
       /* Anyone waiting to be vm-restarted? */
