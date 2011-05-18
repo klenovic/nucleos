@@ -128,7 +128,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 {
 	int i;
 	int s;
-	int found = 0;
+	static int found = 0;
 	struct boot_param bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
