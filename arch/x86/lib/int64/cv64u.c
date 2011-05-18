@@ -15,10 +15,10 @@
  * @note If \a i is bigger then 0xffffffff then 
  *       ULONG_MAX is returned.
  */
-unsigned cv64u(uint64_t i)
+unsigned cv64u(u64 i)
 {
-  // return ULONG_MAX if really big
-  return ((i>>32) ? ULONG_MAX : (unsigned)i);
+	/* return ULONG_MAX if really big */
+	return ((i>>32) ? ULONG_MAX : (unsigned)i);
 }
 
 /**
@@ -26,8 +26,8 @@ unsigned cv64u(uint64_t i)
  * @note If \a i is bigger then 0xffffffff then 
  *       ULONG_MAX is returned.
  */
-unsigned long cv64ul(uint64_t i)
+unsigned long cv64ul(u64 i)
 {
-  // return ULONG_MAX if really big
-  return ((i>>32) ? ULONG_MAX : (unsigned long)i);
+	/* return ULONG_MAX if really big */
+	return ((i>>32) ? ULONG_MAX : (unsigned long)i);
 }

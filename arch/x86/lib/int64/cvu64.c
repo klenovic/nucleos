@@ -12,15 +12,15 @@
 /**
  * @brief Unsigned converted to 64 bit
  */
-uint64_t cvu64(unsigned i)
+u64 cvu64(unsigned i)
 {
-  return (uint64_t)i;
+	return (u64)i;
 }
 
 /**
  * @brief Unsigned long converted to 64 bit
  */
-uint64_t cvul64(unsigned long i)
+u64 cvul64(unsigned long i)
 {
-  return (uint64_t)i;
+	return (u64)i;
 }

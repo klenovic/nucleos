@@ -12,15 +12,15 @@
 /**
  * @brief Unsigned to 64 bit addition
  */
-uint64_t add64u(uint64_t i, unsigned j)
+u64 add64u(u64 i, unsigned j)
 {
-  return (uint64_t)(i+j);
+	return (u64)(i+j);
 }
 
 /**
  * @brief Unsigned long to 64 bit addition
  */
-uint64_t add64ul(uint64_t i, unsigned long j)
+u64 add64ul(u64 i, unsigned long j)
 {
-  return (uint64_t)(i+j);
+	return (u64)(i+j);
 }

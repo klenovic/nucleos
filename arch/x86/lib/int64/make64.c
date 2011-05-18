@@ -12,9 +12,9 @@
 /**
  * @brief Make a 64 bit number from two 32 bit halves
  */
-uint64_t make64(unsigned long lo, unsigned long hi)
+u64 make64(unsigned long lo, unsigned long hi)
 {
-  uint64_t tmp_hi = hi;
+	u64 tmp_hi = hi;
 
-  return (uint64_t)((tmp_hi<<32)|lo);
+	return (u64)((tmp_hi<<32)|lo);
 }

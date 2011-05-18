@@ -12,15 +12,15 @@
 /**
  * @brief Extract low 32 bits of a 64 bit number
  */
-unsigned long ex64lo(uint64_t i)
+unsigned long ex64lo(u64 i)
 {
-  return (unsigned long)i;
+	return (unsigned long)i;
 }
 
 /**
  * @brief Extract high 32 bits of a 64 bit number
  */
-unsigned long ex64hi(uint64_t i)
+unsigned long ex64hi(u64 i)
 {
-  return (unsigned long)(i>>32);
+	return (unsigned long)(i>>32);
 }

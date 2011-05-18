@@ -13,7 +13,7 @@
 /**
  * @brief 64 bit divided by unsigned giving unsigned long.
  */
-unsigned long div64u(uint64_t i, unsigned j)
+unsigned long div64u(u64 i, unsigned j)
 {
 	return (unsigned long)div_u64(i, j);
 }
@@ -21,7 +21,7 @@ unsigned long div64u(uint64_t i, unsigned j)
 /**
  * @brief 64 bit divided by unsigned giving unsigned reminder.
  */
-unsigned rem64u(uint64_t i, unsigned j)
+unsigned rem64u(u64 i, unsigned j)
 {
 	u32 rem;
 

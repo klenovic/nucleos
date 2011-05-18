@@ -12,23 +12,23 @@
 /**
  * @brief 64 bit compare
  */
-int cmp64(uint64_t i, uint64_t j)
+int cmp64(u64 i, u64 j)
 {
-  return ((i>j) - (i<j));
+	return ((i>j) - (i<j));
 }
 
 /**
  * @brief Compare 64 bit value with unsigned
  */
-int cmp64u(uint64_t i, unsigned j)
+int cmp64u(u64 i, unsigned j)
 {
-  return ((i>j) - (i<j));
+	return ((i>j) - (i<j));
 }
 
 /**
  * @brief Compare 64 bit value with unsigned long
  */
-int cmp64ul(uint64_t i, unsigned long j)
+int cmp64ul(u64 i, unsigned long j)
 {
-  return ((i>j) - (i<j));
+	return ((i>j) - (i<j));
 }
