@@ -7,28 +7,11 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/unistd.h>
-#include <nucleos/com.h>
-#include <nucleos/const.h>
-#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
-#include <nucleos/keymap.h>
-#include <nucleos/minlib.h>
 #include <nucleos/type.h>
-#include <nucleos/kipc.h>
-#include <nucleos/sysutil.h>
-#include <nucleos/syslib.h>
-#include <nucleos/bitmap.h>
-
-#include <nucleos/mman.h>
-
-#include <nucleos/errno.h>
-#include <env.h>
-
 #include <servers/vm/proto.h>
 #include <servers/vm/vm.h>
 #include <servers/vm/util.h>
-
 #include <asm/servers/vm/memory.h>
 
 vir_bytes arch_map2vir(struct vmproc *vmp, vir_bytes addr)
