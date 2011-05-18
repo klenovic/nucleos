@@ -7,8 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#define VERBOSE 0
-
+#include <stdio.h>
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
@@ -22,12 +21,9 @@
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/bitmap.h>
-
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
-#include <env.h>
-#include <stdio.h>
-
+#include <nucleos/sysutil.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/proto.h>
 #include <servers/vm/util.h>

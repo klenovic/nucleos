@@ -27,7 +27,7 @@
 #include <nucleos/drivers.h>
 #include <nucleos/driver.h>
 #include <asm/ioctls.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <servers/ds/ds.h>
 #include <nucleos/vm.h>
 #include <nucleos/mman.h>

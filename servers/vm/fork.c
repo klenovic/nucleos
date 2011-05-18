@@ -20,11 +20,9 @@
 #include <nucleos/syslib.h>
 #include <nucleos/debug.h>
 #include <nucleos/bitmap.h>
-
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
-#include <env.h>
-
+#include <nucleos/sysutil.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/vm.h>
 #include <servers/vm/proto.h>

@@ -35,10 +35,8 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/bitmap.h>
-
 #include <nucleos/errno.h>
-#include <env.h>
-
+#include <nucleos/sysutil.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/vm.h>
 #include <servers/vm/proto.h>

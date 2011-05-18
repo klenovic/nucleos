@@ -37,12 +37,12 @@
 #include <nucleos/string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <servers/pm/mproc.h>
-#include "param.h"
-
 #include <kernel/const.h>
 #include <kernel/proc.h>
+
+#include "param.h"
 
 struct mproc mproc[NR_PROCS];
 

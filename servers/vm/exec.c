@@ -7,6 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#include <assert.h>
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
@@ -20,9 +21,7 @@
 #include <nucleos/syslib.h>
 #include <nucleos/bitmap.h>
 #include <nucleos/errno.h>
-#include <assert.h>
-#include <env.h>
-
+#include <nucleos/sysutil.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/proto.h>
 #include <servers/vm/util.h>
@@ -31,7 +30,6 @@
 #include <servers/vm/sanitycheck.h>
 #include <asm/pagetable.h>
 #include <asm/servers/vm/memory.h>
-
 
 static int new_mem(struct vmproc *vmp, struct vmproc *sh_vmp, vir_bytes text_bytes,
 		   vir_bytes data_bytes, vir_bytes bss_bytes, vir_bytes stk_bytes,

@@ -9,7 +9,7 @@
  */
 #include "sysutil.h"
 #include <stdlib.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <nucleos/string.h>
 
 

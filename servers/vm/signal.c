@@ -19,15 +19,13 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/bitmap.h>
-#include <asm/sigcontext.h>
-
 #include <nucleos/errno.h>
-#include <env.h>
-
+#include <nucleos/sysutil.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/vm.h>
 #include <servers/vm/proto.h>
 #include <servers/vm/util.h>
+#include <asm/sigcontext.h>
 
 #define DATA_CHANGED       1    /* flag value when data segment size changed */
 #define STACK_CHANGED      2    /* flag value when stack size changed */
