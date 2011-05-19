@@ -1,24 +1,7 @@
-##############################################################################
-#  Copyright (C) 2011  Ladislav Klenovic <klenovic@nucleonsoft.com>
-#
-#  This file is part of Nucleos kernel.
-#
-#  Nucleos kernel is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, version 2 of the License.
-##############################################################################
-
-# Master Makefile
-# increments in case of significant changes like architecture 
-# (e.g. new architecture was added ...)
 VERSION = 1
-# grows in case of new functionalities (current VERSION )
 PATCHLEVEL = 1
-# grows if in case of bug fixes (current VERSION and PATCHLEVEL)
 SUBLEVEL = 0
-# extraversion string e.g. alpha, beta, -rc1, ...
 EXTRAVERSION = -alpha5
-# name/motto/quote for release
 NAME = Get the ball rolling!
 
 # default goal

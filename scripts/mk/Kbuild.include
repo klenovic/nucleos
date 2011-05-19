@@ -271,11 +271,4 @@ get_libs = $(wildcard $(foreach d,$(call get_ldirs,$(1)), \
 	           $(addprefix $(d)/,$(addsuffix .a, \
 	             $(addprefix lib,$(patsubst -l%,%,$(filter -l%,$(1))))))))
 
-### Mark to delete/undelete
-mark2del = $(addsuffix =del,$(strip $(1)))
-mark2undel = $(patsubst %=del,%,$(strip $(1)))
-grep2del = $(filter %=del,$(strip $(1)))
-###! Mark to delete
-####
-
 endif # __KBUILD_INCLUDE
