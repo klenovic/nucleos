@@ -4,10 +4,6 @@ SUBLEVEL = 0
 EXTRAVERSION = -alpha5
 NAME = Get the ball rolling!
 
-# default goal
-PHONY := __all
-__all:
-
 # put scripts' path into searchpath and don't print "Entering directory"
 # be or not to be verbose (V=1 be)
 ifdef V
@@ -21,13 +17,18 @@ ifndef KBUILD_VERBOSE
 endif
 
 # Build external stuff
-ifdef M
-  ifeq ("$(origin M)", "command line")
-    KBUILD_EXTMOD := $(M)
-  endif
+ifeq ("$(origin M)", "command line")
+  KBUILD_EXTMOD := $(M)
 endif
 
 export KBUILD_EXTMOD
+
+# default goal when none is given on the command line
+PHONY := __all
+__all:
+
+# Cancel implicit rules on top Makefile
+$(CURDIR)/Makefile Makefile: ;
 
 # prepare build environment
 srctree	:= $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
@@ -137,7 +138,7 @@ KBUILD_ARFLAGS := rcs
 # includes only common headers files for all architectures,
 #  specific architecture headers are done by macros
 NUCLEOSINCLUDE := -Iinclude \
-		  -Iarch/$(SRCARCH)/include \
+		  -Iarch/$(hdr-arch)/include \
 		  -include include/nucleos/autoconf.h
 
 # shell used by build system
@@ -194,7 +195,7 @@ export quiet Q KBUILD_VERBOSE
 # Makefiles relative to root
 MAKEFLAGS += --include-dir=$(srctree)
 
-# Include some helper functions
+# Include some helper functions (dont try to remake the file)
 $(srctree)/scripts/mk/Kbuild.include: ;
 include $(srctree)/scripts/mk/Kbuild.include
 
@@ -403,9 +404,6 @@ endif
 
 # default goal (build everything)
 __all: __build
-
-# Cancel implicit rules on top Makefile
-$(CURDIR)/Makefile Makefile: ;
 
 # include architecture goals, vars,...
 # expand others if needed
