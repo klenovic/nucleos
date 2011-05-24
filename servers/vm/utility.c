@@ -120,7 +120,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	int i;
 	int s;
 	static int found = 0;
-	struct boot_param bootparam;
+	struct boot_params bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
 
@@ -133,7 +133,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 		panic("VM","Couldn't get boot parameters!",s);
 	}
 
-	initrd_base_clicks = (bootparam.initrd_base >> CLICK_SHIFT);
+	initrd_base_clicks = (bootparam.hdr.ramdisk_image >> CLICK_SHIFT);
 
 	/* Find initial ramdisk */
 	for (i=0; i<NR_MEMS; i++) {
@@ -149,7 +149,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	}
 
 	/* Round up the reserved memory */
-	initrd_size_clicks = ((bootparam.initrd_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
+	initrd_size_clicks = ((bootparam.hdr.ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
 
 	mem_chunks[i].base += initrd_size_clicks;
 	mem_chunks[i].size -= initrd_size_clicks;

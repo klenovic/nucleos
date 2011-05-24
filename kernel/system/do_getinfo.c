@@ -168,8 +168,8 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 #endif
 
 	case GET_BOOTPARAM:
-		length = sizeof(struct boot_param);
-		src_vir = (vir_bytes) &boot_param;
+		length = sizeof(struct boot_params);
+		src_vir = (vir_bytes) &boot_params;
 		break;
 
 	case GET_AOUTHEADER: {

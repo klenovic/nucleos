@@ -145,12 +145,12 @@ void prepare_kernel(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
 	value = get_value(params_buffer, "initrdbase");
 
 	if(value)
-		boot_param.initrd_base = atoi(value);
+		boot_params.hdr.ramdisk_image = atoi(value);
 
 	value = get_value(params_buffer, "initrdsize");
 
 	if(value)
-		boot_param.initrd_size = atoi(value);
+		boot_params.hdr.ramdisk_size = atoi(value);
 #endif
 	/* Return to assembler code to switch to protected mode (if 286), 
 	 * reload selectors and call main().

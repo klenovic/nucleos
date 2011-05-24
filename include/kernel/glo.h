@@ -29,7 +29,7 @@ extern struct machine machine;		/* machine information for users */
 extern struct kmessages kmess;  	/* diagnostic messages in kernel */
 extern struct k_randomness krandom;	/* gather kernel random information */
 extern struct loadinfo kloadinfo;	/* status of load average */
-extern struct boot_param boot_param;	/* boot parameters */
+extern struct boot_params boot_params;	/* boot parameters */
 
 /* Process scheduling information and the kernel reentry count. */
 extern struct proc *proc_ptr;	/* pointer to currently running process */
