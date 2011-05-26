@@ -134,14 +134,6 @@
 #define IF_MASK		0x00000200
 #define IOPL_MASK	0x003000
 
-#define INTEL_CPUID_GEN_EBX	0x756e6547	/* ASCII value of "Genu" */
-#define INTEL_CPUID_GEN_EDX	0x49656e69	/* ASCII value of "ineI" */
-#define INTEL_CPUID_GEN_ECX	0x6c65746e	/* ASCII value of "ntel" */
-
-#define AMD_CPUID_GEN_EBX	0x68747541	/* ASCII value of "Auth" */
-#define AMD_CPUID_GEN_EDX	0x69746e65	/* ASCII value of "enti" */
-#define AMD_CPUID_GEN_ECX	0x444d4163	/* ASCII value of "cAMD" */
-
 /* fpu context should be saved in 16-byte aligned memory */
 #define FPUALIGN	16
 
