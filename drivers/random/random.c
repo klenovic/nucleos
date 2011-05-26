@@ -19,7 +19,6 @@ that data into a seed for a psuedo random number generator.
 #include <nucleos/drivers.h>
 #include <kernel/const.h>
 #include "assert.h"
-
 #include "random.h"
 #include "sha2.h"
 #include "aes/rijndael.h"
