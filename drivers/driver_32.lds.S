@@ -16,7 +16,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-#ifdef CONFIG_DRIVERS_LINKAGE_SEPID
+#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
 /* For drivers linked with separated I&D */
 	.text 0 : AT (ADDR(.text)) {
 		__text = .;

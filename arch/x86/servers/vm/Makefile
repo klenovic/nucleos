@@ -16,7 +16,7 @@ LDFLAGS_vm.elf32 := -L$(lib-arch) -Llib \
 $(src)/vm.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-vm_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
+vm_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 vm_a_hdrlen  := 0x20
 vm_a_cpu     := i386
 vm_stackheap := 128k

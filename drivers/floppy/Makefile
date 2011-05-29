@@ -9,7 +9,7 @@ LDFLAGS_floppy.elf32 := -L$(lib-arch) -Llib \
 $(src)/floppy.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-floppy_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+floppy_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 floppy_a_hdrlen  := 0x20
 floppy_a_cpu     := i386
 floppy_stackheap := 16k

@@ -101,12 +101,8 @@ endmenu
 config ARCH_KERNEL_LINKAGE_SEPID
 	def_bool y
 
-# Link servers with separate I&D
-config ARCH_SERVERS_LINKAGE_SEPID
-	def_bool y
-
-# Link drivers with separate I&D
-config ARCH_DRIVERS_LINKAGE_SEPID
+# Link servers/drivers with separate I&D
+config ARCH_UKERNEL_LINKAGE_SEPID
 	def_bool y
 
 # Servers (includes also debug options if any)

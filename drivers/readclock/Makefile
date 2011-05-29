@@ -12,7 +12,7 @@ LDFLAGS_readclock.drv.elf32 := -L$(lib-arch) -Llib \
 $(src)/readclock.drv.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-readclock.drv_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+readclock.drv_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 readclock.drv_a_hdrlen  := 0x20
 readclock.drv_a_cpu     := i386
 readclock.drv_stackheap := 16k

@@ -12,7 +12,7 @@ LDFLAGS_rs.elf32 := -L$(lib-arch) -Llib \
 $(src)/rs.elf32: servers/server_32.lds 
 
 # Create in minix3's aout format
-rs_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
+rs_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 rs_a_hdrlen  := 0x20
 rs_a_cpu     := i386
 rs_stackheap := 350k

@@ -10,7 +10,7 @@ LDFLAGS_log.elf32 := -L$(lib-arch) -Llib \
 $(src)/log.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-log_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+log_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 log_a_hdrlen  := 0x20
 log_a_cpu     := i386
 log_stackheap := 32k

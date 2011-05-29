@@ -12,7 +12,7 @@ LDFLAGS_random.elf32 := -L$(lib-arch) -Llib \
 $(src)/random.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-random_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+random_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 random_a_hdrlen  := 0x20
 random_a_cpu     := i386
 random_stackheap := 8k

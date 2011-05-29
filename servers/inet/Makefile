@@ -16,7 +16,7 @@ LDFLAGS_inet.elf32 := -L$(lib-arch) -Llib \
 $(src)/inet.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-inet_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
+inet_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 inet_a_hdrlen  := 0x20
 inet_a_cpu     := i386
 inet_stackheap := 32k

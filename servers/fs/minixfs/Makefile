@@ -19,7 +19,7 @@ LDFLAGS_minixfs.elf32 := -L$(lib-arch) -Llib \
 $(src)/minixfs.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-minixfs_a_flags := $(CONFIG_SERVERS_LINKAGE_TYPE)
+minixfs_a_flags := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 minixfs_a_hdrlen := 0x20
 minixfs_a_cpu := i386
 minixfs_stackheap := 32kb

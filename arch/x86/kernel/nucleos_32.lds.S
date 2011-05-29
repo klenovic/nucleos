@@ -57,9 +57,8 @@ SECTIONS
 #define LOAD_PHYSICAL_ADDR  __LOAD_PHYSICAL_ADDR__
 
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-
+	__text = .;
 	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
-		__text = .;
 		*(.text.head)
 		. = ALIGN(PAGE_SIZE);
 	}
@@ -68,14 +67,14 @@ SECTIONS
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
-		__etext = .;
 	}
+	__etext = .;
 
+	__data = .;
 	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-		__data = .;
+		__rodata = .;
 		/* kernel data starts with this magic number */
 		SHORT(0x526f);
-		__rodata = .;
 		*(.rodata)
 		*(.rodata.*)
 		. = ALIGN(PAGE_SIZE);
@@ -86,21 +85,20 @@ SECTIONS
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-		__edata = .;
 	}
+	__edata = .;
 
+	__bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-		__bss = .;
+
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
-		__ebss = .;
 	}
-
+	__ebss = .;
 	__end = .;
 #endif
-
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)

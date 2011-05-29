@@ -11,7 +11,7 @@ LDFLAGS_es1370.elf32 := -L$(lib-arch) -Llib \
 $(src)/es1370.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-es1370_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+es1370_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 es1370_a_hdrlen  := 0x20
 es1370_a_cpu     := i386
 es1370_stackheap := 1024k
