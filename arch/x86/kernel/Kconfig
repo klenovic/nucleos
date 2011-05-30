@@ -9,7 +9,6 @@ choice
 	  Choose the type of linkage for kernel.
 
 config KERNEL_LINKAGE_COMID
-	depends on !NULL_DEREFER
 	bool "Common I&D"
 	---help---
 	  This will link kernel with common I&D.
@@ -27,7 +26,6 @@ choice
 	  Choose the type of linkage for kernel.
 
 config UKERNEL_LINKAGE_COMID
-	depends on !NULL_DEREFER
 	bool "Common I&D"
 	---help---
 	  This will link servers with common I&D.

@@ -34,19 +34,6 @@ config FRAME_POINTER
 	---help---
 	  Enabling this will compile code with frame pointers (larger and slower code).
 
-config NULL_DEREFER
-	bool "Null pointer dereferencing"
-	default y
-	---help---
-	  Enable null pointer dereferencing (*NULL) in user-space code.
-
-	  NOTE: This hack is neccessary because of legacy code which does null
-	        pointer dereferencing an expects that *NULL==0. Should be removed
-	        since it makes at least debugging more difficult.
-	        Note that this option works only for separate I&D linkage type (for
-	        servers or drivers). Null dereferncing in case of common I&D linkage
-	        type can result in unpredictable behaviour.
-
 config NR_PROCS
 	int "Number of slots in the table for non-kernel processes"
 	default 100
