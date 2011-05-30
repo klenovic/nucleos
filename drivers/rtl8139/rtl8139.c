@@ -93,7 +93,6 @@
 #include <nucleos/unistd.h>
 #include <kernel/const.h>
 #include <kernel/types.h>
-
 #include <asm/ioctls.h>
 
 #define tmra_ut			timer_t

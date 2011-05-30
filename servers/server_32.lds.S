@@ -16,7 +16,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-#ifdef CONFIG_SERVERS_LINKAGE_SEPID
+#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
 /* For servers linked with separated I&D */
 	.text 0 : AT (ADDR(.text)) {
 		__text = .;
@@ -47,28 +47,25 @@ SECTIONS
 		. = ALIGN(PAGE_SIZE);
 		__ebss = SIZEOF(.data) + SIZEOF(.bss);
 	}
-
 	__end = __ebss;
 
 #else /* Common I&D */
-
 #define LOAD_OFFSET		__PAGE_OFFSET__
 #define LOAD_PHYSICAL_ADDR	__LOAD_PHYSICAL_ADDR__
 
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-
+	__text = .;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
-		__text = .;
 		*(.text.head)
 		KEEP(*(.text.init))
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
-		__etext = .;
 	}
+	__etext = .;
 
+	__data = .;
 	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-		__data = .;
 		__rodata = .;
 		*(.rodata)
 		*(.rodata.*)
@@ -80,20 +77,20 @@ SECTIONS
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-		__edata = .;
 	}
+	__edata = .;
 
+	__bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-		__bss = .;
+
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
-		__ebss = .;
 	}
-	__end = .;
+	__ebss = .;
+	__end = __ebss;
 #endif
-
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)

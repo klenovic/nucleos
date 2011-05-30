@@ -27,13 +27,12 @@ SECTIONS
 
   .data 0 : AT (SIZEOF(.text)) {
     __data = .;
-#ifdef CONFIG_NULL_DEREFER
+
     /* Since plenty of legacy code does null pointer
        dereferencing (*NULL). This hack ensures that
-       *NULL==0. Should be removed because it makes
-       debugging harder. */
+       *NULL==0. */
     LONG(0);
-#endif
+
     *(.rodata)
     *(.rodata.*)
     *(.data)

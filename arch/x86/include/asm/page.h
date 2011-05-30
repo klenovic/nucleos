@@ -12,14 +12,14 @@
  * @brief
  * @details
  */
-#ifndef __ASM_X86_PAGE_H
-#define __ASM_X86_PAGE_H
+#ifndef _ASM_X86_PAGE_H
+#define _ASM_X86_PAGE_H
 
-#include <kernel/const.h>
+#include <nucleos/const.h>
 
-#define PAGE_SHIFT  12
-#define PAGE_SIZE   (_AC(1,UL) << PAGE_SHIFT)
-#define PAGE_MASK   (~(PAGE_SIZE-1))
+#define PAGE_SHIFT	12
+#define PAGE_SIZE	(_AC(1,UL) << PAGE_SHIFT)
+#define PAGE_MASK	(~(PAGE_SIZE-1))
 
 #ifdef CONFIG_X86_32
 #include <asm/page_32.h>
@@ -27,4 +27,4 @@
 // maybe 64-bit one day :)
 #endif 
 
-#endif /* __ASM_X86_PAGE_32_H */
+#endif /* _ASM_X86_PAGE_32_H */

@@ -8,30 +8,13 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* General macros and constants used by the kernel. */
-#ifndef __KERNEL_CONST_H
-#define __KERNEL_CONST_H
+#ifndef _KERNEL_CONST_H
+#define _KERNEL_CONST_H
 
 #include <nucleos/bitmap.h>
 #include <asm/kernel/const.h>
 
 #if defined (__KERNEL__) || defined (__UKERNEL__)
-
-/* Some constant macros are used in both assembler and
- * C code.  Therefore we cannot annotate them always with
- * 'UL' and other type specifiers unilaterally.  We
- * use the following macros to deal with this.
- *
- * Similarly, _AT() will cast an expression with a type in C, but
- * leave it unchanged in asm.
- */
-#ifdef __ASSEMBLY__
-#define _AC(X,Y)  X
-#define _AT(T,X)  X
-#else
-#define __AC(X,Y)  (X##Y)
-#define _AC(X,Y)   __AC(X,Y)
-#define _AT(T,X)   ((T)(X))
-#endif
 
 /* Translate a pointer to a field in a structure to a pointer to the structure
  * itself. So it translates '&struct_ptr->field' back to 'struct_ptr'.
@@ -159,4 +142,4 @@
 #define USE_RUNCTL		1	/* control stop flags of process */
 #endif /* !(__KERNEL__ || __UKERNEL__) */
 
-#endif /* __KERNEL_CONST_H */
+#endif /* _KERNEL_CONST_H */

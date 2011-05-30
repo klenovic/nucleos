@@ -10,7 +10,7 @@ LDFLAGS_pci.elf32 := -L$(lib-arch) -Llib \
 $(src)/pci.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-pci_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+pci_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 pci_a_hdrlen  := 0x20
 pci_a_cpu     := i386
 pci_stackheap := 32k

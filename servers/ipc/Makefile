@@ -12,7 +12,7 @@ LDFLAGS_ipc.elf32 := -L$(lib-arch) -Llib \
 $(src)/ipc.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-ipc_a_flags   := $(CONFIG_SERVERS_LINKAGE_TYPE)
+ipc_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 ipc_a_hdrlen  := 0x20
 ipc_a_cpu     := i386
 ipc_stackheap := 32k

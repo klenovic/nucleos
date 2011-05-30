@@ -70,15 +70,17 @@ __mainjump:
 unmap_page_zero:
 	// unmap 0-page code
 	push	$I386_PAGE_SIZE
-	push	_start
-	call	munmap_text	// munmap_text(crtso, I386_PAGE_SIZE)
+	push	$0
+	call	munmap_text	// munmap_text(0, I386_PAGE_SIZE)
 	add	$8, %esp
 
+#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
 	// unmap 0-page data
 	push	$I386_PAGE_SIZE
-	push	__data		// __data defined in linker script
-	call	munmap		// munmap(__data, I386_PAGE_SIZE)
+	push	$0
+	call	munmap		// munmap(0, I386_PAGE_SIZE)
 	add	$8, %esp
+#endif
 	ret
 
 .section .data

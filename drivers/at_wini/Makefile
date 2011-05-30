@@ -11,7 +11,7 @@ LDFLAGS_at_wini.elf32 := -L$(lib-arch) -Llib/ \
 $(src)/at_wini.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-at_wini_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+at_wini_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 at_wini_a_hdrlen  := 0x20
 at_wini_a_cpu     := i386
 at_wini_stackheap := 16k

@@ -10,7 +10,7 @@ LDFLAGS_dpeth.elf32 := -L$(lib-arch) -Llib \
 $(src)/dpeth.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-dpeth_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+dpeth_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 dpeth_a_hdrlen  := 0x20
 dpeth_a_cpu     := i386
 dpeth_stackheap := 16k
