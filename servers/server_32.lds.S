@@ -47,7 +47,6 @@ SECTIONS
 		. = ALIGN(PAGE_SIZE);
 		__ebss = SIZEOF(.data) + SIZEOF(.bss);
 	}
-
 	__end = __ebss;
 
 #else /* Common I&D */
@@ -57,7 +56,6 @@ SECTIONS
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 	__text = .;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
-
 		*(.text.head)
 		KEEP(*(.text.init))
 		*(.text)
@@ -79,7 +77,6 @@ SECTIONS
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-
 	}
 	__edata = .;
 
@@ -91,9 +88,8 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
 	}
-
 	__ebss = .;
-	__end = .;
+	__end = __ebss;
 #endif
 	/DISCARD/ : {
 		*(.eh_frame)
