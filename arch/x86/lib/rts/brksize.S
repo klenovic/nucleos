@@ -10,4 +10,4 @@
 .section .data /* place it into .data section */
 
 .globl __curbrk
-__curbrk: .long __ebss
+__curbrk: .long _ebss

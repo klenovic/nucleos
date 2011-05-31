@@ -16,81 +16,77 @@ SECTIONS
 {
 #ifdef CONFIG_BOOTMONITOR_LINKAGE_SEPID
 /* For linkage type with separated I&D */
-  .text 0 : AT (ADDR(.text)) {
-    __text = .;
-    *(.text.head)
-    *(.text)
-    *(.text.*)
-    . = ALIGN(0x10);
-    __etext = SIZEOF(.text);
-  }
+	_text = .;
+	.text 0 : AT (ADDR(.text)) {
+		*(.text.head)
+		*(.text)
+		*(.text.*)
+		. = ALIGN(0x10);
+	}
+	_etext = SIZEOF(.text);
 
-  .data 0 : AT (SIZEOF(.text)) {
-    __data = .;
+	_data = .;
+	.data 0 : AT (SIZEOF(.text)) {
+	/* Since plenty of legacy code does null pointer
+	   dereferencing (*NULL). This hack ensures that
+	   *NULL==0. */
+		LONG(0);
+		*(.rodata)
+		*(.rodata.*)
+		*(.data)
+		*(.data.*)
+		. = ALIGN(0x10);
+	}
+	_edata = SIZEOF(.data);
 
-    /* Since plenty of legacy code does null pointer
-       dereferencing (*NULL). This hack ensures that
-       *NULL==0. */
-    LONG(0);
-
-    *(.rodata)
-    *(.rodata.*)
-    *(.data)
-    *(.data.*)
-    . = ALIGN(0x10);
-    __edata = SIZEOF(.data);
-  }
-
-  .bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-    __bss = .;
-    *(.bss)
-    *(.bss.*)
-    *(COMMON)
-    . = ALIGN(0x10);
-    __ebss = SIZEOF(.data) + SIZEOF(.bss);
-  }
-  __end = __ebss;
+	_bss = .;
+	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
+		*(.bss)
+		*(.bss.*)
+		*(COMMON)
+		. = ALIGN(0x10);
+	}
+	_ebss = SIZEOF(.data) + SIZEOF(.bss);
+	_end = _ebss;
 
 #else /* Common I&D */
-  .text ORIGIN : AT (ADDR(.text) - ORIGIN) { /* Text */
-    __text = . ;
-    *(.text.head)
-    *(.text)
-    *(.text.*)
-    . = ALIGN(0x10) ; /* round up the size of segment */
-    __etext = . ;
-  }
+	_text = . ;
+	.text ORIGIN : AT (ADDR(.text) - ORIGIN) { /* Text */
+		*(.text.head)
+		*(.text)
+		*(.text.*)
+		. = ALIGN(0x10) ; /* round up the size of segment */
+	}
+	_etext = . ;
 
-  .data . : AT (ADDR(.data) - ORIGIN) {
-    __data = . ;
-    *(.data)
-    *(.data.*)
-    *(.rodata) /* read-only data */
-    *(.rodata.*)
-    *(.rom)
-    . = ALIGN(0x10) ;
-    __edata = . ;
-  }
+	_data = . ;
+	.data . : AT (ADDR(.data) - ORIGIN) {
+		*(.data)
+		*(.data.*)
+		*(.rodata) /* read-only data */
+		*(.rodata.*)
+		*(.rom)
+		. = ALIGN(0x10) ;
+	}
+	_edata = . ;
 
-  .bss . : AT (ADDR(.bss) - ORIGIN) {
-    __bss = . ;
-    *(.bss)
-    *(.bss.*)
-    *(COMMON)
-    . = ALIGN(0x10) ;
-    __ebss = . ;
-  }
+	_bss = . ;
+	.bss . : AT (ADDR(.bss) - ORIGIN) {
+		*(.bss)
+		*(.bss.*)
+		*(COMMON)
+		. = ALIGN(0x10) ;
+	}
+	_ebss = . ;
 
-  /* start of heap + stack */
-  __end = . ;
+	/* start of heap + stack */
+	_end = _ebss ;
 #endif
-
-  /DISCARD/ :
-  {
-    *(*)
-    *(.comment)
-    *(.comment.*)
-    *(.note)
-    *(.note.*)
-  }
+	/DISCARD/ : {
+		*(*)
+		*(.comment)
+		*(.comment.*)
+		*(.note)
+		*(.note.*)
+	}
 }

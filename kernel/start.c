@@ -61,14 +61,14 @@ void prepare_kernel(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
  */
 	register char *value;				/* value in key=value pair */
 	int h;
-	extern char __text, __etext;
-	extern char __data, __end;
+	extern char _text, _etext;
+	extern char _data, _end;
 
 	/* Record where the kernel and the monitor are. */
 	kinfo.code_base = seg2phys(cs);
-	kinfo.code_size = (phys_bytes)((char*)&__etext - (char*)&__text); /* size of code segment */
+	kinfo.code_size = (phys_bytes)((char*)&_etext - (char*)&_text); /* size of code segment */
 	kinfo.data_base = seg2phys(ds);
-	kinfo.data_size = (phys_bytes)((char*)&__end - (char*)&__data); /* size of data segment */
+	kinfo.data_size = (phys_bytes)((char*)&_end - (char*)&_data); /* size of data segment */
 
 	/* protection initialization. */
 	prot_init();

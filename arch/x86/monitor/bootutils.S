@@ -1531,7 +1531,7 @@ memwarn:	.ascii  "\nLow on"
 chmem:		.ascii  " memory, use chmem to increase the heap\n\0"
 
 	.p2align  1
-break:		.word  __end       // A fake heap pointer
+break:		.word  _end       // A fake heap pointer
 
 any_key:	.ascii  "\nHit any key to reboot\n\0"
 seclist:	.byte 18, 15, 9       // 1.44M, 1.2M, and 360K/720K floppy sec/track

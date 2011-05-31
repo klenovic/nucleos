@@ -18,43 +18,43 @@ SECTIONS
 {
 #ifdef CONFIG_UKERNEL_LINKAGE_SEPID
 /* For servers linked with separated I&D */
+	_text = .;
 	.text 0 : AT (ADDR(.text)) {
-		__text = .;
 		*(.text.head)
 		KEEP(*(.text.init))
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
-		__etext = SIZEOF(.text);
 	}
+	_etext = SIZEOF(.text);
 
+	_data = .;
 	.data 0 : AT (SIZEOF(.text)) {
-		__data = .;
 		. = (. == 0) ? (PAGE_SIZE) : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
 		*(.rodata)
 		*(.rodata.*)
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-		__edata = SIZEOF(.data);
 	}
+	_edata = SIZEOF(.data);
 
+	_bss = .;
 	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		__bss = .;
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
-		__ebss = SIZEOF(.data) + SIZEOF(.bss);
 	}
-	__end = __ebss;
+	_ebss = SIZEOF(.data) + SIZEOF(.bss);
+	_end = _ebss;
 
 #else /* Common I&D */
 #define LOAD_OFFSET		__PAGE_OFFSET__
 #define LOAD_PHYSICAL_ADDR	__LOAD_PHYSICAL_ADDR__
 
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-	__text = .;
+	_text = .;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
 		*(.text.head)
 		KEEP(*(.text.init))
@@ -62,15 +62,15 @@ SECTIONS
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__etext = .;
+	_etext = .;
 
-	__data = .;
+	_data = .;
 	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-		__rodata = .;
+		_rodata = .;
 		*(.rodata)
 		*(.rodata.*)
 		. = ALIGN(PAGE_SIZE);
-		__erodata = .;
+		_erodata = .;
 	}
 
 	.data . : AT (ADDR(.data) - LOAD_OFFSET) {
@@ -78,18 +78,17 @@ SECTIONS
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__edata = .;
+	_edata = .;
 
-	__bss = .;
+	_bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__ebss = .;
-	__end = __ebss;
+	_ebss = .;
+	_end = _ebss;
 #endif
 	/DISCARD/ : {
 		*(.eh_frame)

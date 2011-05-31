@@ -34,7 +34,7 @@ _start:
 	 * magic number. If so then it is not redefined by the user.
 	 */
 	mov	$environ, %ebx
-	cmp	$__edata, %ebx		// within initialized data?
+	cmp	$_edata, %ebx		// within initialized data?
 	jae	0f
 	testb	$3, %bl			// aligned?
 	jnz	0f

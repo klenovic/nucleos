@@ -18,16 +18,16 @@ OUTPUT_ARCH("i386")
 SECTIONS
 {
 #ifdef CONFIG_KERNEL_LINKAGE_SEPID
-	__text = .;
+	_text = .;
 	.text 0 : AT (ADDR(.text)) {
 		*(.text.head)
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__etext = SIZEOF(.text);
+	_etext = SIZEOF(.text);
 
-	__data = .;
+	_data = .;
 	.data 0 : AT (SIZEOF(.text)) {
 
 		SHORT(0x526f);					/* kernel data starts
@@ -39,17 +39,17 @@ SECTIONS
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__edata = SIZEOF(.data);
+	_edata = SIZEOF(.data);
 
-	__bss = .;
+	_bss = .;
 	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__ebss = SIZEOF(.data) + SIZEOF(.bss);
-	__end = __ebss;
+	_ebss = SIZEOF(.data) + SIZEOF(.bss);
+	_end = _ebss;
 
 #else /* Common I&D */
 
@@ -57,7 +57,7 @@ SECTIONS
 #define LOAD_PHYSICAL_ADDR  __LOAD_PHYSICAL_ADDR__
 
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-	__text = .;
+	_text = .;
 	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
 		*(.text.head)
 		. = ALIGN(PAGE_SIZE);
@@ -68,17 +68,17 @@ SECTIONS
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__etext = .;
+	_etext = .;
 
-	__data = .;
+	_data = .;
 	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-		__rodata = .;
+		_rodata = .;
 		/* kernel data starts with this magic number */
 		SHORT(0x526f);
 		*(.rodata)
 		*(.rodata.*)
 		. = ALIGN(PAGE_SIZE);
-		__erodata = .;
+		_erodata = .;
 	}
 
 	.data . : AT (ADDR(.data) - LOAD_OFFSET) {
@@ -86,9 +86,9 @@ SECTIONS
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__edata = .;
+	_edata = .;
 
-	__bss = .;
+	_bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
 
 		*(.bss)
@@ -96,8 +96,8 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
 	}
-	__ebss = .;
-	__end = __ebss;
+	_ebss = .;
+	_end = _ebss;
 #endif
 	/DISCARD/ : {
 		*(.eh_frame)
