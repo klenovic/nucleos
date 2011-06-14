@@ -10,8 +10,8 @@
 #include <nucleos/types.h>
 #include <nucleos/minlib.h>
 #include <asm/cpufeature.h>
-#include <asm/servers/vm/vm.h>
 
+/* FIXME: Don't use obsolete CPUID1_* macros */
 int cpufeature(int featureno)
 {
 	u32_t cpuid_feature_edx = 0;

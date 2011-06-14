@@ -1,7 +1,6 @@
 # Kernel options
 menu "Kernel options"
 
-comment "Only separated I&D linkage type is supported for now."
 choice
 	prompt "Type of linkage of kernel"
 	default KERNEL_LINKAGE_SEPID if ARCH_KERNEL_LINKAGE_SEPID

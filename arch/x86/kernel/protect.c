@@ -33,7 +33,7 @@ struct gatedesc_s {
 	u16 offset_high;
 };
 
-struct segdesc_s gdt[GDT_SIZE];		/* used in klib.s and mpx.s */
+struct segdesc_s gdt[GDT_SIZE];
 static struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
 struct tss_s tss;			/* zero init */
 

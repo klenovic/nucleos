@@ -13,7 +13,12 @@
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
-#include <asm/page.h>
+#include <asm/boot.h>
+#include <asm/page_types.h>
+
+#ifdef CONFIG_X86_32
+#define LOAD_OFFSET	__PAGE_OFFSET
+#endif
 
 SECTIONS
 {
@@ -53,10 +58,8 @@ SECTIONS
 
 #else /* Common I&D */
 
-#define LOAD_OFFSET         __PAGE_OFFSET__
-#define LOAD_PHYSICAL_ADDR  __LOAD_PHYSICAL_ADDR__
-
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
+
 	_text = .;
 	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
 		*(.text.head)

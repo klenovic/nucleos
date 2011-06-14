@@ -12,10 +12,12 @@
  * @file include/nucleos/types.h
  * @brief Data types (architecturally independent)
  */
-#ifndef __NUCLEOS_TYPES_H
-#define __NUCLEOS_TYPES_H
+#ifndef _NUCLEOS_TYPES_H
+#define _NUCLEOS_TYPES_H
 
 #include <asm/types.h>
+
+#ifndef __ASSEMBLY__
 #include <nucleos/posix_types.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
@@ -150,4 +152,5 @@ typedef s32 i32_t;	/* 32 bit signed type */
 typedef u64 u64_t;
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
-#endif /* __NUCLEOS_TYPES_H */
+#endif /*  __ASSEMBLY__ */
+#endif /* _NUCLEOS_TYPES_H */

@@ -15,16 +15,12 @@
 #ifndef _ASM_X86_PAGE_H
 #define _ASM_X86_PAGE_H
 
-#include <nucleos/const.h>
-
-#define PAGE_SHIFT	12
-#define PAGE_SIZE	(_AC(1,UL) << PAGE_SHIFT)
-#define PAGE_MASK	(~(PAGE_SIZE-1))
+#include <asm/page_types.h>
 
 #ifdef CONFIG_X86_32
 #include <asm/page_32.h>
 #else
-// maybe 64-bit one day :)
+/* n/a */
 #endif 
 
 #endif /* _ASM_X86_PAGE_32_H */

@@ -41,7 +41,7 @@ void arch_monitor(void)
 	level0(monitor);
 }
 
-int cpu_has_tsc;
+int obsolete_check_cpu_has_tsc;
 
 void arch_shutdown(int how)
 {

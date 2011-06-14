@@ -17,7 +17,7 @@
  * way.
  */
 #include <asm/servers/vm/vm.h>
-#include <asm/page.h> /* definition of PAGE_SHIFT */
+#include <asm/page_types.h> /* definition of PAGE_SHIFT */
 
 .section .text.init
 

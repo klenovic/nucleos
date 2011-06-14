@@ -147,7 +147,7 @@ static int calib_clk_handler(irq_hook_t * hook)
 	u64_t tsc;
 
 	probe_ticks++;
-	if (cpu_has_tsc) {
+	if (obsolete_check_cpu_has_tsc) {
 		read_tsc_64(&tsc);
 	}
 	tcrt = lapic_read(LAPIC_TIMER_CCR);
@@ -436,8 +436,8 @@ int lapic_enable(void)
 	*((u32_t *)lapic_eoi_addr) = 0;
 
 
-	cpu_has_tsc = cpufeature(_CPUF_I386_TSC);
-	BOOT_VERBOSE(if (cpu_has_tsc) printk("CPU has Timestamp counter\n"));
+	obsolete_check_cpu_has_tsc = cpufeature(_CPUF_I386_TSC);
+	BOOT_VERBOSE(if (obsolete_check_cpu_has_tsc) printk("CPU has Timestamp counter\n"));
 
 	apic_calibrate_clocks();
 	BOOT_VERBOSE(printk("APIC timer calibrated\n"));

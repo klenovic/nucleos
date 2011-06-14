@@ -1,0 +1,4 @@
+#ifndef _ASM_X86_PAGE_64_TYPES_H
+#define _ASM_X86_PAGE_64_TYPES_H
+
+#endif /* _ASM_X86_PAGE_64_TYPES_H */
