@@ -10,31 +10,27 @@
 /*      boot.c - Load and start Minix.      Author: Kees J. Bot
  *                    27 Dec 1991
  */
-
-char version[]=   "2.20";
-
-#define nil 0
+#include <stdio.h>
+#include <stdlib.h>
 #include <nucleos/kernel.h>
 #include <nucleos/stringify.h>
 #include <nucleos/stddef.h>
-#include <stdio.h>
 #include <nucleos/types.h>
 #include <nucleos/stat.h>
-#include <stdlib.h>
 #include <nucleos/limits.h>
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
-#include <ibm/partition.h>
-#include <ibm/bios.h>
 #include <nucleos/type.h>
 #include <nucleos/com.h>
 #include <nucleos/dmap.h>
 #include <nucleos/const.h>
 #include <nucleos/minlib.h>
 #include <nucleos/syslib.h>
+#include <nucleos/video.h>
 #include <kernel/const.h>
 #include <kernel/types.h>
-#include <nucleos/video.h>
+#include <ibm/partition.h>
+#include <ibm/bios.h>
 #include "rawfs.h"
 #include "boot.h"
 
@@ -47,9 +43,6 @@ int serial_line = -1;
 u16_t vid_port;                /* Video i/o port. */
 u32_t vid_mem_base;    /* Video memory base address. */
 u32_t vid_mem_size;    /* Video memory size. */
-
-#define TRACE(msg) \
-  printf("%s:%d:%s",__FUNCTION__,__LINE__,msg);
 
 int fsok= -1;     /* File system state.  Initially unknown. */
 
@@ -157,7 +150,7 @@ char *readline(void)
   do {
     c = getch();
 
-    if (strchr("\b\177\25\30", c) != nil) {
+    if (strchr("\b\177\25\30", c) != 0) {
       /* Backspace, DEL, ctrl-U, or ctrl-X. */
       do {
         if (i == 0) 
@@ -187,7 +180,7 @@ char *readline(void)
 int sugar(char *tok)
 /* Recognize special tokens. */
 {
-  return strchr("=(){};\n", tok[0]) != nil;
+  return strchr("=(){};\n", tok[0]) != 0;
 }
 
 char *onetoken(char **aline)
@@ -205,7 +198,7 @@ char *onetoken(char **aline)
 
   /* Don't do odd junk (nor the terminating 0!). */
   if ((unsigned) *line < ' ' && *line != '\n') 
-    return nil;
+    return 0;
 
   if (*line == '(') {
     /* Function argument, anything goes but () must match. */
@@ -257,7 +250,7 @@ token **tokenize(token **acmds, char *line)
   char *tok;
   token *newcmd;
 
-  while ((tok= onetoken(&line)) != nil) {
+  while ((tok= onetoken(&line)) != 0) {
     newcmd= malloc(sizeof(*newcmd));
     newcmd->token= tok;
     newcmd->next= *acmds;
@@ -294,7 +287,7 @@ void parse_code(char *code)
  * to be executed next.  (Prepended to the current input.)
  */
 {
-  if (cmds != nil && cmds->token[0] != ';') (void) tokenize(&cmds, ";");
+  if (cmds != 0 && cmds->token[0] != ';') (void) tokenize(&cmds, ";");
   (void) tokenize(&cmds, code);
 }
 
@@ -468,13 +461,11 @@ void initialize(void)
 
 /* Reserved names: */
 enum resnames {
-  R_NULL, R_BOOT, R_CTTY, R_DELAY, R_ECHO, R_EXIT, R_HELP,
-  R_LS, R_MENU, R_OFF, R_SAVE, R_SET, R_TRAP, R_UNSET
+  R_NULL, R_BOOT, R_CTTY, R_MENU, R_OFF, R_TRAP, R_UNSET
 };
 
 char resnames[][6] = {
-  "", "boot", "ctty", "delay", "echo", "exit", "help",
-  "ls", "menu", "off", "save", "set", "trap", "unset",
+  "", "boot", "ctty", "menu", "off", "trap", "unset",
 };
 
 /* Using this for all null strings saves a lot of memory. */
@@ -496,7 +487,7 @@ int reserved(char *s)
 void sfree(char *s)
 /* Free a non-null string. */
 {
-  if (s != nil && s != null) free(s);
+  if (s != 0 && s != null) free(s);
 }
 
 char *copystr(char *s)
@@ -515,14 +506,14 @@ char *copystr(char *s)
 
 int is_default(environment *e)
 {
-  return (e->flags & E_SPECIAL) && e->defval == nil;
+  return (e->flags & E_SPECIAL) && e->defval == 0;
 }
 
 environment** searchenv(char *name)
 {
   environment **aenv= &env;
 
-  while (*aenv != nil && strcmp((*aenv)->name, name) != 0) {
+  while (*aenv != 0 && strcmp((*aenv)->name, name) != 0) {
     aenv= &(*aenv)->next;
   }
 
@@ -530,14 +521,14 @@ environment** searchenv(char *name)
 }
 
 #define b_getenv(name)  (*searchenv(name))
-/* Return the environment *structure* belonging to name, or nil if not found. */
+/* Return the environment *structure* belonging to name, or 0 if not found. */
 
 char *b_value(char *name)
 /* The value of a variable. */
 {
   environment *e= b_getenv(name);
 
-  return e == nil || !(e->flags & E_VAR) ? nil : e->value;
+  return e == 0 || !(e->flags & E_VAR) ? 0 : e->value;
 }
 
 char *b_body(char *name)
@@ -545,7 +536,7 @@ char *b_body(char *name)
 {
   environment *e= b_getenv(name);
 
-  return e == nil || !(e->flags & E_FUNCTION) ? nil : e->value;
+  return e == 0 || !(e->flags & E_FUNCTION) ? 0 : e->value;
 }
 
 int b_setenv(int flags, char *name, char *arg, char *value)
@@ -555,15 +546,15 @@ int b_setenv(int flags, char *name, char *arg, char *value)
 {
   environment **aenv, *e;
 
-  if (*(aenv= searchenv(name)) == nil) {
+  if (*(aenv= searchenv(name)) == 0) {
     if (reserved(name)) {
       return E_RESERVED;
     }
     e = malloc(sizeof(*e));
     e->name = copystr(name);
     e->flags = flags;
-    e->defval = nil;
-    e->next = nil;
+    e->defval = 0;
+    e->next = 0;
     *aenv = e;
   } else {
     e= *aenv;
@@ -607,15 +598,15 @@ void b_unset(char *name)
 {
   environment **aenv, *e;
 
-  if ((e= *(aenv= searchenv(name))) == nil) return;
+  if ((e= *(aenv= searchenv(name))) == 0) return;
 
   if (e->flags & E_SPECIAL) {
-    if (e->defval != nil) {
+    if (e->defval != 0) {
       sfree(e->arg);
       e->arg= null;
       sfree(e->value);
       e->value= e->defval;
-      e->defval= nil;
+      e->defval= 0;
     }
   } else {
     sfree(e->name);
@@ -681,7 +672,7 @@ void get_parameters(void)
 {
   char params[SECTOR_SIZE + 1];
   token **acmds;
-  int r, processor; // bus,
+  int processor;
   memory *mp;
   static char bus_type[][4] = {
     "xt", "at", "mca"
@@ -693,11 +684,11 @@ void get_parameters(void)
     "mono", "color"
   };
 
-  memset(params,0,sizeof(params));
+  memset(params,'\n',sizeof(params));
 
   /* Variables that Minix needs: */
-  b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "ram");
-  b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "bootdev");
+  b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
+  b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
   b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
   b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(HZ));
 
@@ -729,24 +720,16 @@ void get_parameters(void)
 
   /* Variables boot needs: */
   b_setvar(E_SPECIAL|E_VAR, "image", "boot/image");
-  b_setvar(E_SPECIAL|E_FUNCTION, "leader",
-    "echo --- This is the boot monitor ---\\n");
   b_setvar(E_SPECIAL|E_FUNCTION, "main", "menu");
   b_setvar(E_SPECIAL|E_FUNCTION, "trailer", "");
 
   /* Default hidden menu function: */
   b_setenv(E_RESERVED|E_FUNCTION, null, "1,Start Nucleos", "boot");
 
-  /* Tokenize bootparams sector. */
-  if ((r = readsectors(mon2abs(params), lowsec+PARAMSEC, 1)) != 0) {
-    readerr(lowsec+PARAMSEC, r);
-    exit(1);
-  }
-  params[SECTOR_SIZE]= 0;
+  acmds = tokenize(&cmds, "rootdev=c0d0p0\nramimagedev=c0d0p0\nhz=60\n");
 
-  acmds = tokenize(&cmds, params);
   /* Stuff the default action into the command chain. */
-  tokenize(acmds, ":;leader;main");
+  tokenize(acmds, ":;main");
 
   return;
 }
@@ -758,84 +741,9 @@ void addparm(char *n)
   while (*n != 0 && *addptr != 0) *addptr++ = *n++;
 }
 
-void save_parameters(void)
-/* Save nondefault environment variables to the bootparams sector. */
-{
-  environment *e;
-  char params[SECTOR_SIZE + 1];
-  int r;
-
-  /* Default filling: */
-  memset(params, '\n', SECTOR_SIZE);
-
-  /* Don't touch the 0! */
-  params[SECTOR_SIZE]= 0;
-  addptr= params;
-
-  for (e= env; e != nil; e= e->next) {
-    if (e->flags & E_RESERVED || is_default(e)) continue;
-
-    addparm(e->name);
-    if (e->flags & E_FUNCTION) {
-      addparm("(");
-      addparm(e->arg);
-      addparm(")");
-    } else {
-      addparm((e->flags & (E_DEV|E_SPECIAL)) != E_DEV
-              ? "=" : "=d ");
-    }
-    addparm(e->value);
-    if (*addptr == 0) {
-      printf("The environment is too big\n");
-      return;
-    }
-    *addptr++= '\n';
-  }
-
-  /* Save the parameters on disk. */
-  if ((r= writesectors(mon2abs(params), lowsec+PARAMSEC, 1)) != 0) {
-    writerr(lowsec+PARAMSEC, r);
-    printf("Can't save environment\n");
-  }
-}
-
-void show_env(void)
-/* Show the environment settings. */
-{
-  environment *e;
-  unsigned more= 0;
-  int c;
-
-  for (e= env; e != nil; e= e->next) {
-    if (e->flags & E_RESERVED) continue;
-    if (!istty && is_default(e)) continue;
-
-    if (e->flags & E_FUNCTION) {
-      printf("%s(%s) %s\n", e->name, e->arg, e->value);
-    } else {
-      printf(is_default(e) ? "%s = (%s)\n" : "%s = %s\n",
-        e->name, e->value);
-    }
-
-    if (e->next != nil && istty && ++more % 20 == 0) {
-      printf("More? ");
-      c= getch();
-      if (c == ESC || c > ' ') {
-        putch('\n');
-
-        if (c > ' ')
-          ungetch(c);
-
-        break;
-      }
-      printf("\b\b\b\b\b\b");
-    }
-  }
-}
-
 int numprefix(char *s, char **ps)
 /* True iff s is a string of digits.  *ps will be set to the first nondigit
- * if non-nil, otherwise the string should end.
+ * if non zero, otherwise the string should end.
  */
 {
   char *n= s;
@@ -844,7 +752,7 @@ int numprefix(char *s, char **ps)
 
   if (n == s) return 0;
 
-  if (ps == nil) return *n == 0;
+  if (ps == 0) return *n == 0;
 
   *ps= n;
   return 1;
@@ -852,7 +760,7 @@ int numprefix(char *s, char **ps)
 
 int numeric(char *s)
 {
-  return numprefix(s, (char **) nil);
+  return numprefix(s, (char **) 0);
 }
 
 /* Device numbers of standard MINIX devices. */
@@ -1204,7 +1112,7 @@ void boot_device(char *devname)
 
 void ctty(char *line)
 {
-  if (line == nil) {
+  if (line == 0) {
     serial_line = -1;
   } else if (between('0', line[0], '3') && line[1] == 0) {
     serial_line = line[0] - '0';
@@ -1214,28 +1122,6 @@ void ctty(char *line)
   }
 
   serial_init(serial_line);
-}
-
-void ls(char *dir)
-/* List the contents of a directory. */
-{
-  ino_t ino;
-  struct stat st;
-  char name[NAME_MAX+1];
-
-  if (fsok == -1) fsok= r_super(&block_size) != 0;
-  if (!fsok) return;
-
-  /* (,) construct because r_stat returns void */
-  if ((ino= r_lookup(ROOT_INO, dir)) == 0 ||
-      (r_stat(ino, &st), r_readdir(name)) == -1)
-  {
-    printf("ls: %s: %s\n", dir, unix_err(errno));
-    return;
-  }
-  (void) r_readdir(name); /* Skip ".." too. */
-
-  while ((ino= r_readdir(name)) != 0) printf("%s/%s\n", dir, name);
 }
 
 u32_t milli_time(void)
@@ -1255,9 +1141,9 @@ static u32_t Tbase, Tcount;
 void unschedule(void)
 /* Invalidate a waiting command. */
 {
-  if (Thandler != nil) {
+  if (Thandler != 0) {
     free(Thandler);
-    Thandler= nil;
+    Thandler= 0;
   }
 }
 
@@ -1273,20 +1159,7 @@ void schedule(long msec, char *cmd)
 int expired(void)
 /* Check if the timer expired for getch(). */
 {
-  return (Thandler != nil && milli_since(Tbase) >= Tcount);
-}
-
-void delay(char *msec)
-/* Delay for a given time. */
-{
-  u32_t base, count;
-
-  if ((count= a2l(msec)) == 0) return;
-  base= milli_time();
-
-  do {
-    monitor_pause();
-  } while (!interrupt() && !expired() && milli_since(base) < count);
+  return (Thandler != 0 && milli_since(Tbase) >= Tcount);
 }
 
 enum whatfun { NOFUN, SELECT, DEFFUN, USERFUN } menufun(environment *e)
@@ -1304,18 +1177,18 @@ void menu(void)
  */
 {
   int c, def= 1;
-  char *choice= nil;
+  char *choice= 0;
   environment *e;
 
   /* Just a default menu? */
-  for (e= env; e != nil; e= e->next)
+  for (e= env; e != 0; e= e->next)
     if (menufun(e) == USERFUN)
       def= 0;
 
   printf("\nHit a key as follows:\n\n");
 
   /* Show the choices. */
-  for (e= env; e != nil; e= e->next) {
+  for (e= env; e != 0; e= e->next) {
     switch (menufun(e)) {
     case DEFFUN:
       if (!def) break;
@@ -1338,7 +1211,7 @@ void menu(void)
 
     unschedule();
 
-    for (e= env; e != nil; e= e->next) {
+    for (e= env; e != 0; e= e->next) {
       switch (menufun(e)) {
       case DEFFUN:
         if (!def) break;
@@ -1350,7 +1223,7 @@ void menu(void)
 	break;
       }
     }
-  } while (choice == nil);
+  } while (choice == 0);
 
   /* Execute the chosen function. */
   printf("%c\n", c);
@@ -1358,52 +1231,6 @@ void menu(void)
   (void) tokenize(&cmds, choice);
 
   return;
-}
-
-void help(void)
-/* Not everyone is a rocket scientist. */
-{
-  struct help {
-    char    *thing;
-    char    *help;
-  } *pi;
-  static struct help info[] = {
-    { nil,  "Names:" },
-    { "rootdev",      "Root device" },
-    { "ramimagedev",  "Device to use as RAM disk image " },
-    { "ramsize",      "RAM disk size (if no image device) " },
-    { "bootdev",      "Special name for the boot device" },
-    { "fd0, d0p2, c0d0p1s0",  "Devices (as in /dev)" },
-    { "image",        "Name of the boot image to use" },
-    { "main",         "Startup function" },
-    { "bootdelay",    "Delay in msec after loading image" },
-    { nil,  "Commands:" },
-    { "name = [device] value",  "Set environment variable" },
-    { "name() { ... }",   "Define function" },
-    { "name(key,text) { ... }",
-      "A menu option like: minix(=,Start MINIX) {boot}" },
-    { "name",         "Call function" },
-    { "boot [device]",      "Boot Minix or another O.S." },
-    { "ctty [line]",  "Duplicate to serial line" },
-    { "delay [msec]",       "Delay (500 msec default)" },
-    { "echo word ...",      "Display the words" },
-    { "ls [directory]",     "List contents of directory" },
-    { "menu",         "Show menu and choose menu option" },
-    { "save / set",   "Save or show environment" },
-    { "trap msec command",  "Schedule command " },
-    { "unset name ...",     "Unset variable or set to default" },
-    { "exit / off",   "Exit the Monitor / Power off" },
-  };
-
-  for (pi= info; pi < arraylimit(info); pi++) {
-#if 1
-    if (pi->thing != nil) 
-      printf("    %s- ", pi->thing);
-#else
-    if (pi->thing != nil) printf("    %-24s- ", pi->thing);
-#endif
-    printf("%s\n", pi->help);
-  }
 }
 
 void execute(void)
@@ -1416,7 +1243,7 @@ void execute(void)
 
   if (err) {
     /* An error occured, stop interpreting. */
-    while (cmds != nil) 
+    while (cmds != 0) 
       voidtoken();
 
     return;
@@ -1428,14 +1255,14 @@ void execute(void)
   }
 
   /* There must be a separator lurking somewhere. */
-  for (sep= cmds; sep != nil && sep->token[0] != ';'; sep= sep->next)
+  for (sep= cmds; sep != 0 && sep->token[0] != ';'; sep= sep->next)
     n++;
 
 
   name= cmds->token;
   res= reserved(name);
 
-  if ((second= cmds->next) != nil && (third= second->next) != nil)
+  if ((second= cmds->next) != 0 && (third= second->next) != 0)
     fourth= third->next;
 
     /* Null command? */
@@ -1474,7 +1301,7 @@ void execute(void)
     depth= 0;
     len= 1;
 
-    while (sep != nil) {
+    while (sep != 0) {
       if ((c= sep->token[0]) == ';' && depth == 0) 
         break;
       len+= strlen(sep->token) + 1;
@@ -1522,7 +1349,7 @@ void execute(void)
     int depth= 1;
     /* Find and remove matching '}' */
     depth= 1;
-    while (*acmds != nil) {
+    while (*acmds != 0) {
       t= (*acmds)->token;
       if (t[0] == '{') depth++;
       if (t[0] == '}' && --depth == 0) { t[0]= ';'; break; }
@@ -1536,7 +1363,7 @@ void execute(void)
     return;
   } else
     /* unset name ..., echo word ...? */
-    if (n >= 1 && (res == R_UNSET || res == R_ECHO)) {
+    if (n >= 1 && (res == R_UNSET)) {
       char* arg = poptoken();
       char* p;
 
@@ -1558,9 +1385,6 @@ void execute(void)
                   continue;
               case 'n':
                 putch('\n');
-                break;
-              case 'v':
-                printf(version);
                 break;
               case 'c':
                 clear_screen();
@@ -1596,13 +1420,10 @@ void execute(void)
     return;
   } else
     /* boot device, ls dir, delay msec? */
-  if (n == 2 && (res == R_BOOT || res == R_CTTY
-      || res == R_DELAY || res == R_LS)
+  if (n == 2 && (res == R_BOOT || res == R_CTTY)
   ) {
     if (res == R_BOOT) boot_device(second->token);
     if (res == R_CTTY) ctty(second->token);
-    if (res == R_DELAY) delay(second->token);
-    if (res == R_LS) ls(second->token);
     voidtoken();
     voidtoken();
     return;
@@ -1626,38 +1447,10 @@ void execute(void)
         ok= 1;
         break;
 
-      case R_DELAY:
-        delay("500");
-        ok= 1;
-        break;
-
-      case R_LS:
-        ls(null);
-        ok= 1;
-        break;
-
       case R_MENU:
         menu();
         ok= 1;
         break;
-
-      case R_SAVE:
-        save_parameters(); 
-        ok= 1;
-        break;
-
-      case R_SET:
-        show_env();
-        ok= 1;
-        break;
-
-      case R_HELP:
-        help();
-        ok= 1;
-        break;
-
-      case R_EXIT:
-        exit(0);
 
       case R_OFF:
         off();
@@ -1674,7 +1467,7 @@ void execute(void)
     if (strcmp(name, ":") == 0)
       ok= 1;
     /* User defined function. */
-    if (!ok && (body= b_body(name)) != nil) {
+    if (!ok && (body= b_body(name)) != 0) {
       (void) tokenize(&cmds, body);
       ok= 1;
     }
@@ -1704,32 +1497,14 @@ int run_trailer(void)
 {
   token *save_cmds= cmds;
 
-  cmds= nil;
+  cmds= 0;
   (void) tokenize(&cmds, "trailer");
 
-  while (cmds != nil) 
+  while (cmds != 0) 
     execute();
 
   cmds = save_cmds;
   return !err;
-}
-
-void monitor(void)
-/* Read a line and tokenize it. */
-{
-  char *line;
-
-  unschedule(); /* Kill a trap. */
-  err= 0;       /* Clear error state. */
-
-  if (istty)
-    printf("%s>", bootdev.name);
-
-  line = readline();
-
-  tokenize(&cmds, line);
-  free(line);
-  escape();  /* Forget if ESC typed. */
 }
 
 void boot(void)
@@ -1741,7 +1516,7 @@ void boot(void)
 	get_parameters();
 
 	/* While there are commands, execute them! */
-	while (cmds != nil)
+	while (cmds != 0)
 		execute();
 
 	off();
