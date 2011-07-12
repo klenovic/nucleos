@@ -1,12 +1,9 @@
-hostprogs-y := bintoc ehdr2ahdr edparams installboot mkfs \
+hostprogs-y := bintoc ehdr2ahdr installboot mkfs \
 	       mkinitrd partition mkimage
 
 HOST_PPFLAGS += -include scripts/tools/include/nucleos/macros.h
 
 bintoc-obj-y := bintoc.o
-
-edparams-obj-y := edparams.o
-HOST_LDFLAGS_edparams := -L$(src)/ -lutils
 
 ehdr2ahdr-obj-y := ehdr2ahdr.o
 HOST_LDFLAGS_ehdr2ahdr := -L$(src)/ -lutils

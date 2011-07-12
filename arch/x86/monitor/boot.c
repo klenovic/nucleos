@@ -301,12 +301,6 @@ void parse_code(char *code)
 int interrupt(void)
 /* Clean up after an ESC has been typed. */
 {
-  if (escape()) {
-    printf("[ESC]\n");
-    err= 1;
-    return 1;
-  }
-
   return 0;
 }
 
@@ -741,7 +735,7 @@ void get_parameters(void)
   b_setvar(E_SPECIAL|E_FUNCTION, "trailer", "");
 
   /* Default hidden menu function: */
-  b_setenv(E_RESERVED|E_FUNCTION, null, "=,Start Nucleos", "boot");
+  b_setenv(E_RESERVED|E_FUNCTION, null, "1,Start Nucleos", "boot");
 
   /* Tokenize bootparams sector. */
   if ((r = readsectors(mon2abs(params), lowsec+PARAMSEC, 1)) != 0) {
@@ -1739,23 +1733,16 @@ void monitor(void)
 }
 
 void boot(void)
-/* Load Minix and start it, among other things. */
 {
-  printf("Starting boot monitor...\n");
+	/* Initialize tables. */
+	initialize();
 
-  /* Initialize tables. */
-  initialize();
+	/* Get environment variables from the parameter sector. */
+	get_parameters();
 
-  /* Get environment variables from the parameter sector. */
-  get_parameters();
+	/* While there are commands, execute them! */
+	while (cmds != nil)
+		execute();
 
-  while (1) {
-    /* While there are commands, execute them! */
-    while (cmds != nil) {
-      execute();
-    }
-
-    /* The "monitor" is just a "read one command" thing. */
-    monitor();
-  }
+	off();
 }
