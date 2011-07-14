@@ -36,17 +36,12 @@
 
 static void ser_debug(int c);
 
-void arch_monitor(void)
-{
-	level0(monitor);
-}
-
 int obsolete_check_cpu_has_tsc;
 
 void arch_shutdown(int how)
 {
 	/* Mask all interrupts, including the clock. */
-	outb( INT_CTLMASK, ~0);
+	outb(INT_CTLMASK, ~0);
 
 	if (kernel_in_panic) {
 		/* We're panicing? Then retrieve and decode currently
@@ -54,55 +49,11 @@ void arch_shutdown(int how)
 		 */
 		printseg("cs: ", 1, proc_ptr, read_cs());
 		printseg("ds: ", 0, proc_ptr, read_ds());
-		if(read_ds() != read_ss()) {
+		if (read_ds() != read_ss())
 			printseg("ss: ", 0, NULL, read_ss());
-		}
 	}
 
-	if(how != RBT_RESET) {
-		/* return to boot monitor */
-
-		outb( INT_CTLMASK, 0);
-		outb( INT2_CTLMASK, 0);
-
-		/* Return to the boot monitor. Set
-		 * the program if not already done.
-		 */
-		if (how != RBT_MONITOR)
-			arch_set_params("", 1);
-
-		if(kernel_in_panic) {
-			int source, dest;
-			static char mybuffer[sizeof(params_buffer)];
-			char *lead = "echo \\n*** kernel messages:\\n";
-			int leadlen = strlen(lead);
-			strcpy(mybuffer, lead);
-
-			dest = sizeof(mybuffer)-1;
-			mybuffer[dest--] = '\0';
-
-			source = kmess.km_next;
-			source = ((source - 1 + KMESS_BUF_SIZE) % KMESS_BUF_SIZE); 
-
-			while(dest >= leadlen) {
-				char c = kmess.km_buf[source];
-				if(c == '\n') {
-					mybuffer[dest--] = 'n';
-					mybuffer[dest] = '\\';
-				} else if(isprint(c) &&
-					c != '\'' && c != '"' &&
-					c != '\\' && c != ';') {
-					mybuffer[dest] = c;
-				} else	mybuffer[dest] = ' ';
-
-				source = ((source - 1 + KMESS_BUF_SIZE) % KMESS_BUF_SIZE);
-				dest--;
-			}
-
-			arch_set_params(mybuffer, strlen(mybuffer)+1);
-		}
-		arch_monitor();
-	} else {
+	if (how == RBT_RESET) {
 		/* Reset the system by forcing a processor shutdown. First stop
 		 * the BIOS memory test by setting a soft reset flag.
 		 */
@@ -110,6 +61,9 @@ void arch_shutdown(int how)
 		phys_copy(SOFT_RESET_FLAG_ADDR, vir2phys(&magic), SOFT_RESET_FLAG_SIZE);
 		level0(reset);
 	}
+
+	/* halt in case of RBT_HALT and RBT_PANIC */
+	while(1) level0(halt_cpu);
 }
 
 /* address of a.out headers, set in mpx386.s */

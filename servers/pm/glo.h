@@ -30,6 +30,4 @@ extern sigset_t ign_sset;	/* which signals are by default ignored */
 
 extern u32_t system_hz;		/* System clock frequency. */
 extern int abort_flag;
-extern char monitor_code[256];
-		
 #endif /* __PM_GLO_H */

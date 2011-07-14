@@ -482,10 +482,7 @@
 #define VID_CP_COUNT	m_data5	/* number of words to be copied */
 
 /* Field names for SYS_ABORT. */
-#define ABRT_HOW	m_data1	/* RBT_REBOOT, RBT_HALT, etc. */
-#define ABRT_MON_ENDPT  m_data2	/* process where monitor params are */
-#define ABRT_MON_LEN	m_data3	/* length of monitor params */
-#define ABRT_MON_ADDR   m_data4	/* virtual address of monitor params */
+#define ABRT_HOW	m_data1	/* RBT_HALT, etc. */
 
 /* Field names for _UMAP, _VIRCOPY, _PHYSCOPY. */
 #define CP_SRC_SPACE 	m_data1	/* T or D space (stack is also D) */

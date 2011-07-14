@@ -166,10 +166,8 @@
 #define STDERR_FILENO	2	/* file descriptor for stderr */
 
 /* How to exit the system or stop a server process. */
-#define RBT_HALT	0	/* shutdown and return to monitor */
-#define RBT_REBOOT	1	/* reboot the system through the monitor */
+#define RBT_HALT	0	/* shutdown */
 #define RBT_PANIC	2	/* a server panics */
-#define RBT_MONITOR	3	/* let the monitor do this */
 #define RBT_RESET	4	/* hard reset the system */
 #define RBT_INVALID	5	/* first invalid reboot flag */
 #define _PM_SEG_FLAG (1L << 30)	/* for read() and write() to VFS_PROC_NR by PM */
@@ -306,7 +304,7 @@ long ptrace(int request, ...);
 char *sbrk(int _incr);
 int sync(void);
 int fsync(int fd);
-int reboot(int _how, ...);
+int reboot(int how);
 int gethostname(char *_hostname, size_t _len);
 int getdomainname(char *_domain, size_t _len);
 int ttyslot(void);

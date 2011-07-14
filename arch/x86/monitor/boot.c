@@ -1033,8 +1033,6 @@ disco:
   }
 }
 
-#define B_NOSIG   -1      /* "No signature" error code. */
-
 int exec_bootstrap(void)
 /* Load boot sector from the disk or floppy described by tmpdev and execute it.
  */
@@ -1055,7 +1053,7 @@ int exec_bootstrap(void)
     active= table[tmpdev.primary];
 
     /* How does one check a partition table entry? */
-    if (active->sysind == NO_PART) return B_NOSIG;
+    if (active->sysind == NO_PART) return -1;
 
     tmpdev.primary= tmpdev.secondary;
     tmpdev.secondary= -1;
@@ -1071,7 +1069,7 @@ int exec_bootstrap(void)
   if ((r= readsectors(BOOTPOS, active->lowsec, 1)) != 0) return r;
 
   /* Check signature word. */
-  if (get_word(BOOTPOS+SIGNATOFF) != SIGNATURE) return B_NOSIG;
+  if (get_word(BOOTPOS+SIGNATOFF) != SIGNATURE) return -1;
 
   /* Write the partition table if a member must be made active. */
   if (dirty && (r= writesectors(mon2abs(master), masterpos, 1)) != 0)
@@ -1102,7 +1100,7 @@ void boot_device(char *devname)
 
   if ((r= dev_open()) == 0) r= exec_bootstrap();
 
-  err= r == B_NOSIG ? "Not bootable" : bios_err(r);
+  err = (r == -1) ? "Not bootable" : bios_err(r);
   printf("Can't boot %s: %s\n", devname, err);
 
   /* Restore boot device setting. */
@@ -1170,65 +1168,8 @@ enum whatfun { NOFUN, SELECT, DEFFUN, USERFUN } menufun(environment *e)
 }
 
 void menu(void)
-/* By default:  Show a simple menu.
- * Multiple kernels/images:  Show extra selection options.
- * User defined function:  Kill the defaults and show these.
- * Wait for a keypress and execute the given function.
- */
 {
-  int c, def= 1;
-  char *choice= 0;
-  environment *e;
-
-  /* Just a default menu? */
-  for (e= env; e != 0; e= e->next)
-    if (menufun(e) == USERFUN)
-      def= 0;
-
-  printf("\nHit a key as follows:\n\n");
-
-  /* Show the choices. */
-  for (e= env; e != 0; e= e->next) {
-    switch (menufun(e)) {
-    case DEFFUN:
-      if (!def) break;
-      /*FALL THROUGH*/
-    case USERFUN:
-      printf("    %c  %s\n", e->arg[0], e->arg+2);
-      break;
-    case SELECT:
-      printf("    %c  Select %s kernel\n", e->arg[0],e->name);
-      break;
-    default:;
-    }
-  }
-
-  /* Wait for a keypress. */
-  do {
-    c = getch();
-    if (interrupt() || expired()) 
-      return;
-
-    unschedule();
-
-    for (e= env; e != 0; e= e->next) {
-      switch (menufun(e)) {
-      case DEFFUN:
-        if (!def) break;
-      case USERFUN:
-      case SELECT:
-        if (c == e->arg[0]) choice= e->value;
-	break;
-      case NOFUN:
-	break;
-      }
-    }
-  } while (choice == 0);
-
-  /* Execute the chosen function. */
-  printf("%c\n", c);
-
-  (void) tokenize(&cmds, choice);
+  (void) tokenize(&cmds, "boot");
 
   return;
 }
@@ -1488,23 +1429,6 @@ void execute(void)
   /* Getting here means that the command is not understood. */
   printf("\nTry 'help'\n");
   err= 1;
-}
-
-int run_trailer(void)
-/* Run the trailer function between loading Minix and handing control to it.
- * Return true iff there was no error.
- */
-{
-  token *save_cmds= cmds;
-
-  cmds= 0;
-  (void) tokenize(&cmds, "trailer");
-
-  while (cmds != 0) 
-    execute();
-
-  cmds = save_cmds;
-  return !err;
 }
 
 void boot(void)

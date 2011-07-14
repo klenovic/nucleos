@@ -216,9 +216,6 @@ int numeric(char *s);
 /* Give a descriptive text for some UNIX errors. */
 char *unix_err(int err);
 
-/* Run the trailer function. */
-int run_trailer(void); 
-
 void readblock(off_t, char *, int);
 void delay(char *);
 #endif /* __ARCH_X86_BOOT_BOOT_H */

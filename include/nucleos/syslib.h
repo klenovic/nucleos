@@ -30,7 +30,7 @@ struct rs_pci;
 /*==========================================================================* 
  * Minix system library. 						    *
  *==========================================================================*/ 
-int sys_abort(int how, ...);
+int sys_abort(int how);
 int sys_enable_iop(endpoint_t proc_ep);
 int sys_exec(endpoint_t proc_ep, char *ptr, char *aout, vir_bytes initpc);
 int sys_fork(endpoint_t parent, endpoint_t child, endpoint_t *, struct mem_map *ptr, u32_t vm, vir_bytes *);

@@ -151,7 +151,6 @@ void halt_cpu(void);
 void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
-void arch_monitor(void);
 void arch_get_aout_headers(int i, struct exec *h);
 void restart(void);
 void read_tsc(u32_t *high, u32_t *low);

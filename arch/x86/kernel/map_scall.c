@@ -38,6 +38,11 @@
  *                 be handled differently for C library.
  *               - the current implementation to be less affected.
  */
+#define SCALL_TO_SRV(syscall, server) \
+	[ __NR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
+
+#define SCALL_TO_ANY(syscall, server) \
+	[ __NR_ ## syscall ] = { server, msg_ ## syscall }
 
 struct endpt_args {
 	endpoint_t endpt;
@@ -45,12 +50,6 @@ struct endpt_args {
 };
 
 static struct endpt_args scall_to_srv[NR_syscalls];
-
-#define SCALL_TO_SRV(syscall, server) \
-	[ __NR_ ## syscall ] = { server ## _PROC_NR, msg_ ## syscall }
-
-#define SCALL_TO_ANY(syscall, server) \
-	[ __NR_ ## syscall ] = { server, msg_ ## syscall }
 
 endpoint_t map_scall_endpt(struct pt_regs *r)
 {
@@ -587,9 +586,7 @@ static int msg_readlink(kipc_msg_t *msg, const struct pt_regs *r)
 
 static int msg_reboot(kipc_msg_t *msg, const struct pt_regs *r)
 {
-	msg->m_data1 = r->bx;		/* how */
-	msg->m_data4 = r->cx;		/* code */
-	msg->m_data2 = (size_t)r->dx	/* size of code */;
+	msg->m_data1 = r->bx;	/* how */
 
 	return 0;
 }

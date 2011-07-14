@@ -64,7 +64,7 @@ int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
 char params_buffer[512];         /* boot monitor parameters */
-int kernel_in_panic;
+int kernel_in_panic = 0;
 int locklevel;
 u32_t magictest;
 

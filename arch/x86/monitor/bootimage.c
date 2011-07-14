@@ -730,12 +730,6 @@ void exec_image(char *image)
 		printf("builtin.\n");
 	}
 
-	/* Run the trailer function just before starting Minix. */
-	if (!run_trailer()) {
-		errno = 0;
-		return;
-	}
-
 	/* Translate the boot parameters to what Minix likes best. */
 	if (!params2params(params, sizeof(params))) {
 		errno = 0;
@@ -752,7 +746,6 @@ void exec_image(char *image)
 	/* Close the disk. */
 	(void) dev_close();
 
-	/* Minix. */
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
 	      sizeof(params), aout);
 
@@ -763,7 +756,7 @@ void exec_image(char *image)
 
 	parse_code(params);
 
-	/* Return from Minix.  Things may have changed, so assume nothing. */
+	/* Return from Nucleos.  Things may have changed, so assume nothing. */
 	fsok= -1;
 	errno= 0;
 
