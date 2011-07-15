@@ -61,7 +61,6 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 #define K_CLAIM		0x0002 /* I will acquire my own bss pages, thank you. */
 #define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
 #define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
-#define K_HDR		0x0010 /* No need to patch sizes, kernel uses the headers. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
 #define K_BRET		0x0100 /* New monitor code on shutdown in boot parameters. */
 #define K_ALL		0x01FF /* All feature bits this monitor supports. */
@@ -193,40 +192,6 @@ int params2params(char *params, size_t psize)
 
 	params[i]= 0;   /* End marked with empty string. */
 	return 1;
-}
-
-void patch_sizes(void)
-/* Patch sizes of each process into kernel data space, kernel ds into kernel
- * text space, and sizes of init into data space of fs.  All the patched
- * numbers are based on the kernel click size, not hardware segments.
- */
-{
-	u16_t text_size=0;
-	u16_t data_size=0;
-	int i;
-	struct process *procp=0;
-	struct process *initp=0;
-	u32_t doff;
-
-	if (k_flags & K_HDR)
-		return;    /* Uses the headers. */
-
-	/* Patch text and data sizes of the processes into kernel data space.*/
-	doff= process[KERNEL_IDX].data + P_SIZ_OFF;
-
-	for (i= 0; i < n_procs; i++) {
-		procp= &process[i];
-		text_size= (procp->ds - procp->cs) >> click_shift;
-		data_size= (procp->end - procp->ds) >> click_shift;
-
-		/* Two words per process, the text and data size: */
-		put_word(doff, text_size); doff+= 2;
-		put_word(doff, data_size); doff+= 2;
-
-		initp= procp;   /* The last process must be init. */
-	}
-
-	return;
 }
 
 int selected(char *name)
@@ -643,9 +608,6 @@ void exec_image(char *image)
 		errno= 0;
 		return;
 	}
-
-	/* Patch sizes, etc. into kernel data. */
-	patch_sizes();
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
 	printf("Initial ramdisk...");
