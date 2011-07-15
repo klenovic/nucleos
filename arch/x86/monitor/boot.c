@@ -546,7 +546,6 @@ dev_t name2dev(char *name)
 {
   dev_t dev;
   ino_t ino;
-//  int drive;
   struct stat st;
   char *n, *s;
 

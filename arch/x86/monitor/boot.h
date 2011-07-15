@@ -74,9 +74,6 @@ typedef struct bios_env
 
 /* Functions defined by boothead.s: */
 
-/* Exit the monitor. */
-void exit(int code);
-
 /* Local monitor address to absolute address. */
 u32_t mon2abs(void *ptr);
 
@@ -106,26 +103,8 @@ int dev_boundary(u32_t sector);
 /* Read 1 or more sectors from "device". */
 int readsectors(u32_t bufaddr, u32_t sector, u8 count);
 
-/* Write 1 or more sectors to "device". */
-int writesectors(u32_t bufaddr, u32_t sector, u8 count);
-
-/* Read a keypress. */
-int getch(void);
-
-/* Read keypress directly from kb controller. */
-void scan_keyboard(void);
-
-/* Undo a keypress. */
-void ungetch(int c);
-
-/* True if escape typed. */
-int escape(void);
-
 /* Send a character to the screen. */
 void putch(int c);
-
-/* Wait for an interrupt. */
-void monitor_pause(void);
 
 /* Enable copying console I/O to a serial line. */
 void serial_init(int line);

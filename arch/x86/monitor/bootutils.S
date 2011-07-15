@@ -503,8 +503,7 @@ dev_boundary:
 	ret
 
 // int readsectors(u32_t bufaddr, u32_t sector, u8_t count)
-// int writesectors(u32_t bufaddr, u32_t sector, u8_t count)
-//       Read/write several sectors from/to disk or floppy.  The buffer must
+//       Read several sectors fromo disk or floppy.  The buffer must
 //       be between 64K boundaries//  Count must fit in a byte.  The external
 //       variables device, sectors and secspcyl describe the disk and its
 //       geometry.  Returns 0 for success, otherwise the BIOS error code.
@@ -529,13 +528,6 @@ dev_boundary:
 #define SECTH	12	// 10
 #define COUNT	14	// 12
 #define DSKRW	15	// 13
-
-.globl writesectors
-writesectors:
-	push	%bp
-	mov	%sp, %bp
-	movb	$0x03, DSKRW(%bp) // Code for a disk write
-	jmp	rwsec
 
 .globl readsectors
 readsectors:
