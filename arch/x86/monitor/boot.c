@@ -684,7 +684,7 @@ void get_parameters(void)
     "mono", "color"
   };
 
-  memset(params,'\n',sizeof(params));
+  memset(params,0,sizeof(params));
 
   /* Variables that Minix needs: */
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
@@ -721,10 +721,6 @@ void get_parameters(void)
   /* Variables boot needs: */
   b_setvar(E_SPECIAL|E_VAR, "image", "boot/image");
   b_setvar(E_SPECIAL|E_FUNCTION, "main", "menu");
-  b_setvar(E_SPECIAL|E_FUNCTION, "trailer", "");
-
-  /* Default hidden menu function: */
-  b_setenv(E_RESERVED|E_FUNCTION, null, "1,Start Nucleos", "boot");
 
   acmds = tokenize(&cmds, "rootdev=c0d0p0\nramimagedev=c0d0p0\nhz=60\n");
 

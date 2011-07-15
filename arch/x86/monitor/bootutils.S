@@ -21,8 +21,6 @@
 	.set BOOTOFF,		0x7C00	// 0x0000:BOOTOFF load a bootstrap here
 	.set BUFFER,		0x0600	// First free memory
 	.set PENTRYSIZE,	16	// Partition table entry size.
-	.set K_I386,		0x0001	// Call Minix in 386 mode
-	.set K_RET,		0x0020	// Returns to the monitor on reboot
 	.set K_INT86,		0x0040	// Requires generic INT support
 	.set K_MEML,		0x0080	// Pass a list of free memory
 
@@ -1111,7 +1109,6 @@ bootstrap:
 ebxval:	.long 0
 
 minix:
-
 	push	%bx
 	push	%bp
 	mov	%sp, %bp          // Pointer to arguments
@@ -1124,46 +1121,6 @@ minix:
 	andb	$0xF0,0x043F      // Clear diskette motor status bits of BIOS
 	pop	%ds
 	cli                       // No more interruptions
-
-	testw	$K_I386, k_flags // Switch to 386 mode?
-	jnz	minix386
-
-// Call Minix in real mode.
-minix86:
-	testw	$K_MEML, k_flags  // New memory arrangements?
-	jz	0f
-	push	22(%bp)          // Address of a.out headers
-	push	20(%bp)
-0:
-	push	18(%bp)          // # bytes of boot parameters
-	push	16(%bp)          // Address of boot parameters
-
-	testw	$K_RET, k_flags  // Can the kernel return?
-	jz	noret86
-	xor	%dx, %dx          // If little ext mem then monitor not preserved
-	xor	%ax, %ax 
-	cmp	%ax, mon_return  // Minix can return to the monitor?
-	jz	0f
-	mov	%cs, %dx           // Monitor far return address
-	mov	$ret86, %ax
-0:
-	push	%dx              // Push monitor far return address or zero
-	push	%ax
-noret86:
-	mov	8(%bp), %ax
-	mov	10(%bp), %dx
-	call	abs2seg
-	push	%dx           // Kernel code segment
-	push	4(%bp)        // Kernel code offset
-	mov	12(%bp), %ax
-	mov	14(%bp), %dx
-	call	abs2seg
-	mov	%dx, %ds      // Kernel data segment
-	mov	%dx, %es      // Set %es to kernel data too
-	lretw                 // Make a far call to the kernel
-
-// Call Minix in 386 mode.
-minix386:
 	mov	%cs, %cs:cs_real-2     // Patch CS and DS into the instructions that
 	mov	%ds, %cs:ds_real-2     // reload them when switching back to real mode
 	mov	%cr0, %eax
@@ -1214,13 +1171,9 @@ minix386:
 	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
 	pushw	$0
 	pushw	BOOTP(%bp)   // 32 bit address of parameters (%ss relative)
-
-	testw	$K_RET, k_flags // Can the kernel return?
-	jz	noret386
-	pushw	$MCS_SELECTOR
-	pushw	$ret386         // Monitor far return address
-noret386:
 	pushw	$0
+	pushw	$0		// monitor far return address "Monitor CS_SEGMENT:ret386"
+	pushw	$0		// @nucleos: monitor never entered on reboot/halt
 	pushw	$CS_SELECTOR
 	pushw	KOFFH(%bp)
 	pushw	KOFFL(%bp)       // 32 bit far address to kernel entry point
@@ -1231,13 +1184,6 @@ noret386:
 	mov	$ES_SELECTOR, %ax // Flat 4 Gb
 	mov	%ax, %es
 	lretl                     // Make a far call to the kernel
-
-// Minix-86 returns here on a halt or reboot.
-ret86:
-	mov	%ax, reboot_code+0
-	mov	%dx, reboot_code+2 // Return value (obsolete method)
-	jmp	return
-
 // Minix-386 returns here on a halt or reboot.
 ret386:
 	movl	%eax, reboot_code // Return value (obsolete method)

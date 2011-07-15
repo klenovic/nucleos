@@ -58,12 +58,10 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 #define click_shift	clck_shft       /* 7 char clash with click_size. */
 
 /* Some kernels have extra features: */
-#define K_I386		0x0001 /* Make the 386 transition before you call me. */
 #define K_CLAIM		0x0002 /* I will acquire my own bss pages, thank you. */
 #define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
 #define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
 #define K_HDR		0x0010 /* No need to patch sizes, kernel uses the headers. */
-#define K_RET		0x0020 /* Returns to the monitor on reboot. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
 #define K_MEML		0x0080 /* Pass a list of free memory. */
 #define K_BRET		0x0100 /* New monitor code on shutdown in boot parameters. */
@@ -481,7 +479,7 @@ static void restore_screen(void)
 }
 
 void exec_image(char *image)
-/* Get a Minix image into core, patch it up and execute. */
+/* Get a Nucleos image into core, patch it up and execute. */
 {
 	int i;
 	struct image_header hdr;
@@ -744,7 +742,7 @@ void exec_image(char *image)
 	set_mode(mode);
 
 	/* Close the disk. */
-	(void) dev_close();
+	dev_close();
 
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
 	      sizeof(params), aout);
