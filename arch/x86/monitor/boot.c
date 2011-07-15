@@ -659,119 +659,6 @@ dev_t name2dev(char *name)
   return dev;
 }
 
-static void off(void)
-{
-  bios_env_t be;
-  unsigned al, ah;
-
-  /* Try to switch off the system. Print diagnostic information
-   * that can be useful if the operation fails.
-   */
-
-  be.ax= 0x5300;  /* APM, Installation check */
-  be.bx= 0;       /* Device, APM BIOS */
-
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("APM installation check failed", be.ax);
-    return;
-  }
-  if (be.bx != (('P' << 8) | 'M'))
-  {
-    printf("APM signature not found (got 0x%04x)\n", be.bx);
-    return;
-  }
-
-  ah= be.ax >> 8;
-  if (ah > 9)
-    ah= (ah >> 4)*10 + (ah & 0xf);
-  al= be.ax & 0xff;
-  if (al > 9)
-    al= (al >> 4)*10 + (al & 0xf);
-  printf("APM version %u.%u%s%s%s%s%s\n",
-    ah, al,
-    (be.cx & 0x1) ? ", 16-bit PM" : "",
-    (be.cx & 0x2) ? ", 32-bit PM" : "",
-    (be.cx & 0x4) ? ", CPU-Idle" : "",
-    (be.cx & 0x8) ? ", APM-disabled" : "",
-    (be.cx & 0x10) ? ", APM-disengaged" : "");
-
-  /* Connect */
-  be.ax= 0x5301;  /* APM, Real mode interface connect */
-  be.bx= 0x0000;  /* APM BIOS */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("APM real mode connect failed", be.ax);
-    return;
-  }
-
-  /* Ask for a seat upgrade */
-  be.ax= 0x530e;  /* APM, Driver Version */
-  be.bx= 0x0000;  /* BIOS */
-  be.cx= 0x0102;  /* version 1.2 */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("Set driver version failed", be.ax);
-    goto disco;
-  }
-
-  /* Is this version really worth reporting. Well, if the system
-   * does switch off, you won't see it anyway.
-   */
-  ah= be.ax >> 8;
-  if (ah > 9)
-    ah= (ah >> 4)*10 + (ah & 0xf);
-  al= be.ax & 0xff;
-  if (al > 9)
-    al= (al >> 4)*10 + (al & 0xf);
-  printf("Got APM connection version %u.%u\n", ah, al);
-
-  /* Enable */
-  be.ax= 0x5308;  /* APM, Enable/disable power management */
-  be.bx= 0x0001;  /* All device managed by APM BIOS */
-#if 0
-  /* For old APM 1.0 systems, we need 0xffff. Assume that those
-   * systems do not exist.
-   */
-  be.bx= 0xffff;  /* All device managed by APM BIOS (compat) */
-#endif
-  be.cx= 0x0001;  /* Enable power management */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("Enable power management failed", be.ax);
-    goto disco;
-  }
-
-  /* Off */
-  be.ax= 0x5307;  /* APM, Set Power State */
-  be.bx= 0x0001;  /* All devices managed by APM */
-  be.cx= 0x0003;  /* Off */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("Set power state failed", be.ax);
-    goto disco;
-  }
-
-  printf("Power off sequence successfully completed.\n\n");
-  printf("Ha, ha, just kidding!\n");
-
-disco:
-  /* Disconnect */
-  be.ax= 0x5304;  /* APM, interface disconnect */
-  be.bx= 0x0000;  /* APM BIOS */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    printf("APM interface disconnect failed", be.ax);
-    return;
-  }
-}
-
 void boot(void)
 {
 	/* Initialize tables. */
@@ -782,5 +669,6 @@ void boot(void)
 
 	bootminix();
 
-	off();
+	/* @nucleos: only in case of error */
+	while (1) halt_cpu();
 }

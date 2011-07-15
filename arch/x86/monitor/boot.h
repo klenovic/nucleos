@@ -72,7 +72,8 @@ typedef struct bios_env
 
 #define FL_CARRY	0x0001	/* carry flag */
 
-/* Functions defined by boothead.s: */
+/* halt cpu */
+void halt_cpu(void);
 
 /* Local monitor address to absolute address. */
 u32_t mon2abs(void *ptr);
@@ -161,8 +162,6 @@ environment *env;/* Lists the environment. */
 char *b_value(char *name);
 int b_setvar(int flags, char *name, char *value);
 void b_unset(char *name);
-
-void parse_code(char *code);	/* Parse boot monitor commands. */
 
 extern int fsok;	/* True if the boot device contains an VFS_PROC_NR. */
 u32_t lowsec;	/* Offset to the file system on the boot device. */

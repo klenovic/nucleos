@@ -710,7 +710,9 @@ void exec_image(char *image)
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
 	      sizeof(params), aout);
 
-	/* @nucleos: should never get here */
+	printf("Error while booting kernel!\n");
+
+	return;
 }
 
 ino_t latest_version(char *version, struct stat *stp)

@@ -33,6 +33,14 @@
 	.set ESC,		0x1B	// Escape character
 
 .section .text
+
+.globl halt_cpu
+halt_cpu:
+	sti
+	hlt
+	cli
+	ret
+
 // void exit(int status)
 // Exit the monitor by rebooting the system.
 .globl exit   // Make various compilers happy
