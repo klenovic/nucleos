@@ -461,11 +461,11 @@ void initialize(void)
 
 /* Reserved names: */
 enum resnames {
-  R_NULL, R_BOOT, R_CTTY, R_MENU, R_OFF, R_TRAP, R_UNSET
+  R_NULL, R_BOOT, R_MENU, R_OFF, R_TRAP, R_UNSET
 };
 
 char resnames[][6] = {
-  "", "boot", "ctty", "menu", "off", "trap", "unset",
+  "", "boot", "menu", "off", "trap", "unset",
 };
 
 /* Using this for all null strings saves a lot of memory. */
@@ -1104,20 +1104,6 @@ void boot_device(char *devname)
   (void) dev_open();
 }
 
-void ctty(char *line)
-{
-  if (line == 0) {
-    serial_line = -1;
-  } else if (between('0', line[0], '3') && line[1] == 0) {
-    serial_line = line[0] - '0';
-  } else {
-    printf("Bad serial line number: %s\n", line);
-    return;
-  }
-
-  serial_init(serial_line);
-}
-
 u32_t milli_time(void)
 {
   return get_tick() * MSEC_PER_TICK;
@@ -1357,10 +1343,9 @@ void execute(void)
     return;
   } else
     /* boot device, ls dir, delay msec? */
-  if (n == 2 && (res == R_BOOT || res == R_CTTY)
+  if (n == 2 && (res == R_BOOT)
   ) {
     if (res == R_BOOT) boot_device(second->token);
-    if (res == R_CTTY) ctty(second->token);
     voidtoken();
     voidtoken();
     return;
@@ -1393,11 +1378,6 @@ void execute(void)
         off();
         ok= 1;
         break;
-
-      case R_CTTY:
-       ctty(0);
-       ok = 1;
-       break;
     }
 
     /* Command to check bootparams: */
