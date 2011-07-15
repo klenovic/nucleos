@@ -644,98 +644,6 @@ badopen:
 	pop	%bp
 	ret
 
-// int getch(void);
-//       Read a character from the keyboard, and check for an expired timer.
-//       A carriage return is changed into a linefeed for UNIX compatibility.
-.globl getch
-getch:
-	xor	%ax, %ax
-	xchg	unchar, %ax   // Ungotten character?
-	test	%ax, %ax
-	jnz	gotch
-.Lgetch:
-//  hlt                   // Play dead until interrupted (see monitor_pause())
-	movb	$0x01, %ah    // Keyboard status
-	int	$0x16
-	jz	0f            // Nothing typed
-	xorb	%ah, %ah      // Read character from keyboard
-	int	$0x16
-	jmp	press         // Keypress
-0:
-	mov	line, %dx     // Serial line?
-	test	%dx, %dx
-	jz	0f
-	add	$5, %dx       // Line Status Register
-	inb	%dx
-	testb	$0x01, %al    // Data Ready?
-	jz	0f
-	mov	line, %dx
-	//add	0, %dx        // Receive Buffer Register
-	inb	%dx           // Get character
-	jmp	press
-0:
-	call	expired       // Timer expired?
-	test	%ax, %ax
-	jz	.Lgetch
-	mov	$ESC, %ax     // Return ESC
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-press:
-	cmpb	$0x0D, %al    // Carriage return?
-	jnz	nocr
-	movb	$0x0A, %al    // Change to linefeed
-nocr:
-	cmpb	$ESC, %al     // Escape typed?
-	jne	noesc
-	incw	varescape     // Set flag
-noesc:
-	xorb	%ah, %ah      // %ax = al
-gotch:
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-
-// int ungetch(c);
-//       Return a character to undo a getch().
-.globl ungetch
-ungetch:
-	push	%bx
-	mov	%sp, %bx
-	mov	6(%bx), %ax
-	mov	%ax, unchar
-	pop	%bx
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-
-// int escape(void);
-//       True if ESC has been typed.
-.globl escape
-escape:
-	movb	$0x01, %ah   // Keyboard status
-	int	$0x16
-	jz	escflg       // Keypress?
-	cmpb	$ESC, %al    // Escape typed?
-	jne	escflg
-	xorb	%ah, %ah     // Discard the escape
-	int	$0x16
-	incw	varescape    // Set flag
-escflg:
-	xor	%ax, %ax
-	xchg	varescape, %ax  // Escape typed flag
-	and	$0xffff, %eax   // Since function (or mon2abs) can be called
-	                        // from C source compiled by .code16gcc
-	                        // which checks %eax not just %ax. This will
-	                        // cleanup the garbage from higher bits.
-	ret
-
 // int putch(int c);
 //       Write a character in teletype mode.  The putk synonym is
 //       for the kernel printf function that uses it.
@@ -787,14 +695,6 @@ nulch:
 	                      // from C source compiled by .code16gcc
 	                      // which checks %eax not just %ax. This will
 	                      // cleanup the garbage from higher bits.
-	ret
-
-// void monitor_pause(void);
-//       Wait for an interrupt using the HLT instruction.  This either saves
-//       power, or tells an x86 emulator that nothing is happening right now.
-.globl monitor_pause
-monitor_pause:
-//  hlt
 	ret
 
 // void set_mode(unsigned mode);

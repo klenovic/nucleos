@@ -441,43 +441,6 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 	return 1;
 }
 
-static void restore_screen(void)
-{
-	struct boot_tty_info boot_tty_info;
-	u32_t info_location;
-#define LINES 25
-#define CHARS 80
-	static u16_t consolescreen[LINES][CHARS];
-
-	/* Try and find out what the main console was displaying
-	 * by looking into video memory.
-	 */
-
-	info_location = vid_mem_base+vid_mem_size-sizeof(boot_tty_info);
-	raw_copy(mon2abs(&boot_tty_info), info_location,
-	sizeof(boot_tty_info));
-
-	if(boot_tty_info.magic == TTYMAGIC) {
-		if((boot_tty_info.flags & (BTIF_CONSORIGIN|BTIF_CONSCURSOR)) ==
-			(BTIF_CONSORIGIN|BTIF_CONSCURSOR)) {
-			int line;
-			raw_copy(mon2abs(consolescreen), vid_mem_base + boot_tty_info.consorigin,
-					sizeof(consolescreen));
-			clear_screen();
-
-			for(line = 0; line < LINES; line++) {
-				int ch;
-				for(ch = 0; ch < CHARS; ch++) {
-					u16_t newch = consolescreen[line][ch] & BYTE;
-
-					if(newch < ' ') newch = ' ';
-						putch(newch);
-				}
-			}
-		}
-	}
-}
-
 void exec_image(char *image)
 /* Get a Nucleos image into core, patch it up and execute. */
 {
@@ -747,22 +710,7 @@ void exec_image(char *image)
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
 	      sizeof(params), aout);
 
-	if (!(k_flags & K_BRET)) {
-		extern u32_t reboot_code;
-		raw_copy(mon2abs(params), reboot_code, sizeof(params));
-	}
-
-	parse_code(params);
-
-	/* Return from Nucleos.  Things may have changed, so assume nothing. */
-	fsok= -1;
-	errno= 0;
-
-	/* Read leftover character, if any. */
-	scan_keyboard();
-
-	/* Restore screen contents. */
-	restore_screen();
+	/* @nucleos: should never get here */
 }
 
 ino_t latest_version(char *version, struct stat *stp)
