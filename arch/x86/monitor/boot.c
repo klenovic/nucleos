@@ -1339,9 +1339,7 @@ void boot(void)
 	/* Get environment variables from the parameter sector. */
 	get_parameters();
 
-	/* While there are commands, execute them! */
-	while (cmds != 0)
-		execute();
+	bootminix();
 
 	off();
 }
