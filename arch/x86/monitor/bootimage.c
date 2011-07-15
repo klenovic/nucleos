@@ -58,15 +58,10 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 #define click_shift	clck_shft       /* 7 char clash with click_size. */
 
 /* Some kernels have extra features: */
-#define K_I386		0x0001 /* Make the 386 transition before you call me. */
 #define K_CLAIM		0x0002 /* I will acquire my own bss pages, thank you. */
 #define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
 #define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
-#define K_HDR		0x0010 /* No need to patch sizes, kernel uses the headers. */
-#define K_RET		0x0020 /* Returns to the monitor on reboot. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
-#define K_MEML		0x0080 /* Pass a list of free memory. */
-#define K_BRET		0x0100 /* New monitor code on shutdown in boot parameters. */
 #define K_ALL		0x01FF /* All feature bits this monitor supports. */
 
 /* Some new features */
@@ -189,28 +184,6 @@ int params2params(char *params, size_t psize)
 		i= n;
 	}
 
-	if (!(k_flags & K_MEML)) {
-		/* Require old memory size variables. */
-		value= ul2a10((mem[0].base + mem[0].size) / 1024);
-		n= i + 7 + 1 + strlen(value) + 1;
-
-		if (n < psize) {
-			strcpy(params + i, "memsize=");
-			strcat(params + i, value);
-		}
-
-		i= n;
-		value= ul2a10(mem[1].size / 1024);
-		n= i + 7 + 1 + strlen(value) + 1;
-
-		if (n < psize) {
-			strcpy(params + i, "emssize=");
-			strcat(params + i, value);
-		}
-
-		i= n;
-	}
-
 	if (i >= psize) {
 		printf("Too many boot parameters\n");
 		return 0;
@@ -218,46 +191,6 @@ int params2params(char *params, size_t psize)
 
 	params[i]= 0;   /* End marked with empty string. */
 	return 1;
-}
-
-void patch_sizes(void)
-/* Patch sizes of each process into kernel data space, kernel ds into kernel
- * text space, and sizes of init into data space of fs.  All the patched
- * numbers are based on the kernel click size, not hardware segments.
- */
-{
-	u16_t text_size=0;
-	u16_t data_size=0;
-	int i;
-	struct process *procp=0;
-	struct process *initp=0;
-	u32_t doff;
-
-	if (k_flags & K_HDR)
-		return;    /* Uses the headers. */
-
-	/* Patch text and data sizes of the processes into kernel data space.*/
-	doff= process[KERNEL_IDX].data + P_SIZ_OFF;
-
-	for (i= 0; i < n_procs; i++) {
-		procp= &process[i];
-		text_size= (procp->ds - procp->cs) >> click_shift;
-		data_size= (procp->end - procp->ds) >> click_shift;
-
-		/* Two words per process, the text and data size: */
-		put_word(doff, text_size); doff+= 2;
-		put_word(doff, data_size); doff+= 2;
-
-		initp= procp;   /* The last process must be init. */
-	}
-
-	if (k_flags & (K_HIGH|K_MEML))
-		return;  /* Doesn't need VFS_PROC_NR patching. */
-
-	/* Patch cs and sizes of init into fs data. */
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+0, initp->cs >> click_shift);
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+2, text_size);
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+4, data_size);
 }
 
 int selected(char *name)
@@ -443,45 +376,8 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 	return 1;
 }
 
-static void restore_screen(void)
-{
-	struct boot_tty_info boot_tty_info;
-	u32_t info_location;
-#define LINES 25
-#define CHARS 80
-	static u16_t consolescreen[LINES][CHARS];
-
-	/* Try and find out what the main console was displaying
-	 * by looking into video memory.
-	 */
-
-	info_location = vid_mem_base+vid_mem_size-sizeof(boot_tty_info);
-	raw_copy(mon2abs(&boot_tty_info), info_location,
-	sizeof(boot_tty_info));
-
-	if(boot_tty_info.magic == TTYMAGIC) {
-		if((boot_tty_info.flags & (BTIF_CONSORIGIN|BTIF_CONSCURSOR)) ==
-			(BTIF_CONSORIGIN|BTIF_CONSCURSOR)) {
-			int line;
-			raw_copy(mon2abs(consolescreen), vid_mem_base + boot_tty_info.consorigin,
-					sizeof(consolescreen));
-			clear_screen();
-
-			for(line = 0; line < LINES; line++) {
-				int ch;
-				for(ch = 0; ch < CHARS; ch++) {
-					u16_t newch = consolescreen[line][ch] & BYTE;
-
-					if(newch < ' ') newch = ' ';
-						putch(newch);
-				}
-			}
-		}
-	}
-}
-
 void exec_image(char *image)
-/* Get a Minix image into core, patch it up and execute. */
+/* Get a Nucleos image into core, patch it up and execute. */
 {
 	int i;
 	struct image_header hdr;
@@ -689,7 +585,7 @@ void exec_image(char *image)
 			totalmem += mem;
 		}
 
-		if (i == 0 && (k_flags & K_HIGH)) {
+		if (i == KERNEL_IDX && (k_flags & K_HIGH)) {
 			/* Load the rest in extended memory. */
 			addr = mem[1].base;
 			limit = mem[1].base + mem[1].size;
@@ -710,14 +606,6 @@ void exec_image(char *image)
 		printf("Kernel magic number is incorrect (0x%x)\n", get_word(process[KERNEL_IDX].data + MAGIC_OFF));
 		errno= 0;
 		return;
-	}
-
-	/* Patch sizes, etc. into kernel data. */
-	patch_sizes();
-
-	if (!(k_flags & K_MEML)) {
-		/* Copy the a.out headers to the old place. */
-		raw_copy(HEADERPOS, aout, PROCESS_MAX * A_MINHDR);
 	}
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
@@ -744,27 +632,14 @@ void exec_image(char *image)
 	set_mode(mode);
 
 	/* Close the disk. */
-	(void) dev_close();
+	dev_close();
 
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
 	      sizeof(params), aout);
 
-	if (!(k_flags & K_BRET)) {
-		extern u32_t reboot_code;
-		raw_copy(mon2abs(params), reboot_code, sizeof(params));
-	}
+	printf("Error while booting kernel!\n");
 
-	parse_code(params);
-
-	/* Return from Nucleos.  Things may have changed, so assume nothing. */
-	fsok= -1;
-	errno= 0;
-
-	/* Read leftover character, if any. */
-	scan_keyboard();
-
-	/* Restore screen contents. */
-	restore_screen();
+	return;
 }
 
 ino_t latest_version(char *version, struct stat *stp)
@@ -985,7 +860,4 @@ void bootminix(void)
 	}
 
 	free(image);
-
-	if (serial_line >= 0)
-		b_unset(SERVARNAME);
 }

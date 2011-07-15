@@ -72,10 +72,8 @@ typedef struct bios_env
 
 #define FL_CARRY	0x0001	/* carry flag */
 
-/* Functions defined by boothead.s: */
-
-/* Exit the monitor. */
-void exit(int code);
+/* halt cpu */
+void halt_cpu(void);
 
 /* Local monitor address to absolute address. */
 u32_t mon2abs(void *ptr);
@@ -106,26 +104,8 @@ int dev_boundary(u32_t sector);
 /* Read 1 or more sectors from "device". */
 int readsectors(u32_t bufaddr, u32_t sector, u8 count);
 
-/* Write 1 or more sectors to "device". */
-int writesectors(u32_t bufaddr, u32_t sector, u8 count);
-
-/* Read a keypress. */
-int getch(void);
-
-/* Read keypress directly from kb controller. */
-void scan_keyboard(void);
-
-/* Undo a keypress. */
-void ungetch(int c);
-
-/* True if escape typed. */
-int escape(void);
-
 /* Send a character to the screen. */
 void putch(int c);
-
-/* Wait for an interrupt. */
-void monitor_pause(void);
 
 /* Enable copying console I/O to a serial line. */
 void serial_init(int line);
@@ -182,8 +162,6 @@ environment *env;/* Lists the environment. */
 char *b_value(char *name);
 int b_setvar(int flags, char *name, char *value);
 void b_unset(char *name);
-
-void parse_code(char *code);	/* Parse boot monitor commands. */
 
 extern int fsok;	/* True if the boot device contains an VFS_PROC_NR. */
 u32_t lowsec;	/* Offset to the file system on the boot device. */

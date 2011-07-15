@@ -135,167 +135,6 @@ void readblock(off_t blk, char *buf, int block_size)
   }
 }
 
-#define istty     (1)
-
-char *readline(void)
-/* Read a line including a newline with echoing. */
-{
-  char *line;
-  size_t i, z;
-  int c;
-
-  i= 0;
-  z= 20;
-  line = malloc(z * sizeof(char));
-  do {
-    c = getch();
-
-    if (strchr("\b\177\25\30", c) != 0) {
-      /* Backspace, DEL, ctrl-U, or ctrl-X. */
-      do {
-        if (i == 0) 
-          break;
-
-        printf("\b \b");
-        i--;
-      } while (c == '\25' || c == '\30');
-    } else if (c < ' ' && c != '\n') {
-        putch('\7');
-    } else {
-      putch(c);
-      line[i++]= c;
-
-      if (i == z) {
-        z*= 2;
-        line= realloc(line, z * sizeof(char));
-      }
-    }
-  } while (c != '\n');
-
-  line[i] = 0;
-
-  return line;
-}
-
-int sugar(char *tok)
-/* Recognize special tokens. */
-{
-  return strchr("=(){};\n", tok[0]) != 0;
-}
-
-char *onetoken(char **aline)
-/* Returns a string with one token for tokenize. */
-{
-  char *line= *aline;
-  size_t n;
-  char *tok;
-
-  /* Skip spaces and runs of newlines. */
-  while (*line == ' ' || (*line == '\n' && line[1] == '\n')) 
-    line++;
-
-  *aline= line;
-
-  /* Don't do odd junk (nor the terminating 0!). */
-  if ((unsigned) *line < ' ' && *line != '\n') 
-    return 0;
-
-  if (*line == '(') {
-    /* Function argument, anything goes but () must match. */
-    int depth= 0;
-
-    while ((unsigned) *line >= ' ') {
-      if (*line == '(') depth++;
-      if (*line++ == ')' && --depth == 0) break;
-    }
-
-  } else if (sugar(line)) {
-    /* Single character token. */
-    line++;
-  } else {
-    /* Multicharacter token. */
-    do {
-      line++; 
-    } while ((unsigned) *line > ' ' && !sugar(line));
-  }
-
-  n= line - *aline;
-  tok= malloc((n + 1) * sizeof(char));
-  memcpy(tok, *aline, n);
-  tok[n]= 0;
-
-  if (tok[0] == '\n') 
-    tok[0]= ';';  /* ';' same as '\n' */
-
-  *aline= line;
-
-  return tok;
-}
-
-/* Typed commands form strings of tokens. */
-
-typedef struct token {
-  struct token* next;  /* Next in a command chain. */
-  char* token;
-} token;
-
-token **tokenize(token **acmds, char *line)
-/* Takes a line apart to form tokens.  The tokens are inserted into a command
- * chain at *acmds.  Tokenize returns a reference to where another line could
- * be added.  Tokenize looks at spaces as token separators, and recognizes only
- * ';', '=', '{', '}', and '\n' as single character tokens.  One token is
- * formed from '(' and ')' with anything in between as long as more () match.
- */
-{
-  char *tok;
-  token *newcmd;
-
-  while ((tok= onetoken(&line)) != 0) {
-    newcmd= malloc(sizeof(*newcmd));
-    newcmd->token= tok;
-    newcmd->next= *acmds;
-    *acmds= newcmd;
-    acmds= &newcmd->next;
-  }
-
-  return acmds;
-}
-
-static token *cmds;       /* String of commands to execute. */
-static int err;   /* Set on an error. */
-
-char *poptoken(void)
-/* Pop one token off the command chain. */
-{
-  token *cmd= cmds;
-  char *tok= cmd->token;
-
-  cmds= cmd->next;
-  free(cmd);
-
-  return tok;
-}
-
-void voidtoken(void)
-/* Remove one token from the command chain. */
-{
-  free(poptoken());
-}
-
-void parse_code(char *code)
-/* Tokenize a string of monitor code, making sure there is a delimiter.  It is
- * to be executed next.  (Prepended to the current input.)
- */
-{
-  if (cmds != 0 && cmds->token[0] != ';') (void) tokenize(&cmds, ";");
-  (void) tokenize(&cmds, code);
-}
-
-int interrupt(void)
-/* Clean up after an ESC has been typed. */
-{
-  return 0;
-}
 
 int activate;
 
@@ -459,35 +298,10 @@ void initialize(void)
     vid_mem_size = EGA_SIZE;
 }
 
-/* Reserved names: */
-enum resnames {
-  R_NULL, R_BOOT, R_CTTY, R_MENU, R_OFF, R_TRAP, R_UNSET
-};
-
-char resnames[][6] = {
-  "", "boot", "ctty", "menu", "off", "trap", "unset",
-};
-
-/* Using this for all null strings saves a lot of memory. */
-#define null (resnames[0])
-
-int reserved(char *s)
-/* Recognize reserved strings. */
-{
-  int r;
-
-  for (r= R_BOOT; r <= R_UNSET; r++) {
-    if (strcmp(s, resnames[r]) == 0) 
-      return r;
-  }
-
-  return R_NULL;
-}
-
 void sfree(char *s)
 /* Free a non-null string. */
 {
-  if (s != 0 && s != null) free(s);
+  if (s != 0) free(s);
 }
 
 char *copystr(char *s)
@@ -496,7 +310,7 @@ char *copystr(char *s)
   char *c;
 
   if (*s == 0)
-     return null;
+     return "";
 
   c = malloc((strlen(s) + 1) * sizeof(char));
   strcpy(c, s);
@@ -547,9 +361,6 @@ int b_setenv(int flags, char *name, char *arg, char *value)
   environment **aenv, *e;
 
   if (*(aenv= searchenv(name)) == 0) {
-    if (reserved(name)) {
-      return E_RESERVED;
-    }
     e = malloc(sizeof(*e));
     e->name = copystr(name);
     e->flags = flags;
@@ -584,37 +395,11 @@ int b_setvar(int flags, char *name, char *value)
 {
   int r;
 
-  if((r=b_setenv(flags, name, null, value))) {
+  if((r=b_setenv(flags, name, "", value))) {
     return r;
   }
 
   return r;
-}
-
-void b_unset(char *name)
-/* Remove a variable from the environment.  A special variable is reset to
- * its default value.
- */
-{
-  environment **aenv, *e;
-
-  if ((e= *(aenv= searchenv(name))) == 0) return;
-
-  if (e->flags & E_SPECIAL) {
-    if (e->defval != 0) {
-      sfree(e->arg);
-      e->arg= null;
-      sfree(e->value);
-      e->value= e->defval;
-      e->defval= 0;
-    }
-  } else {
-    sfree(e->name);
-    sfree(e->arg);
-    sfree(e->value);
-    *aenv= e->next;
-    free(e);
-  }
 }
 
 long a2l(char *a)
@@ -671,7 +456,6 @@ unsigned a2x(char *a)
 void get_parameters(void)
 {
   char params[SECTOR_SIZE + 1];
-  token **acmds;
   int processor;
   memory *mp;
   static char bus_type[][4] = {
@@ -684,7 +468,7 @@ void get_parameters(void)
     "mono", "color"
   };
 
-  memset(params,'\n',sizeof(params));
+  memset(params,0,sizeof(params));
 
   /* Variables that Minix needs: */
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
@@ -720,25 +504,8 @@ void get_parameters(void)
 
   /* Variables boot needs: */
   b_setvar(E_SPECIAL|E_VAR, "image", "boot/image");
-  b_setvar(E_SPECIAL|E_FUNCTION, "main", "menu");
-  b_setvar(E_SPECIAL|E_FUNCTION, "trailer", "");
-
-  /* Default hidden menu function: */
-  b_setenv(E_RESERVED|E_FUNCTION, null, "1,Start Nucleos", "boot");
-
-  acmds = tokenize(&cmds, "rootdev=c0d0p0\nramimagedev=c0d0p0\nhz=60\n");
-
-  /* Stuff the default action into the command chain. */
-  tokenize(acmds, ":;main");
 
   return;
-}
-
-static char *addptr;
-
-void addparm(char *n)
-{
-  while (*n != 0 && *addptr != 0) *addptr++ = *n++;
 }
 
 int numprefix(char *s, char **ps)
@@ -779,7 +546,6 @@ dev_t name2dev(char *name)
 {
   dev_t dev;
   ino_t ino;
-//  int drive;
   struct stat st;
   char *n, *s;
 
@@ -893,544 +659,6 @@ dev_t name2dev(char *name)
   return dev;
 }
 
-#if DEBUG
-static void apm_perror(char *label, u16_t ax)
-{
-  unsigned ah;
-  char *str;
-
-  ah= (ax >> 8);
-  switch(ah)
-  {
-  case 0x01: str= "APM functionality disabled"; break;
-  case 0x03: str= "interface not connected"; break;
-  case 0x09: str= "unrecognized device ID"; break;
-  case 0x0A: str= "parameter value out of range"; break;
-  case 0x0B: str= "interface not engaged"; break;
-  case 0x60: str= "unable to enter requested state"; break;
-  case 0x86: str= "APM not present"; break;
-  default: printf("%s: error 0x%02x\n", label, ah); return;
-  }
-  printf("%s: %s\n", label, str);
-}
-
-#define apm_printf(args...) printf(args)
-#else
-#define apm_perror(label, ax) ((void)0)
-#define apm_printf(args...)
-#endif
-
-static void off(void)
-{
-  bios_env_t be;
-  unsigned al, ah;
-
-  /* Try to switch off the system. Print diagnostic information
-   * that can be useful if the operation fails.
-   */
-
-  be.ax= 0x5300;  /* APM, Installation check */
-  be.bx= 0;       /* Device, APM BIOS */
-
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("APM installation check failed", be.ax);
-    return;
-  }
-  if (be.bx != (('P' << 8) | 'M'))
-  {
-    apm_printf("APM signature not found (got 0x%04x)\n", be.bx);
-    return;
-  }
-
-  ah= be.ax >> 8;
-  if (ah > 9)
-    ah= (ah >> 4)*10 + (ah & 0xf);
-  al= be.ax & 0xff;
-  if (al > 9)
-    al= (al >> 4)*10 + (al & 0xf);
-  apm_printf("APM version %u.%u%s%s%s%s%s\n",
-    ah, al,
-    (be.cx & 0x1) ? ", 16-bit PM" : "",
-    (be.cx & 0x2) ? ", 32-bit PM" : "",
-    (be.cx & 0x4) ? ", CPU-Idle" : "",
-    (be.cx & 0x8) ? ", APM-disabled" : "",
-    (be.cx & 0x10) ? ", APM-disengaged" : "");
-
-  /* Connect */
-  be.ax= 0x5301;  /* APM, Real mode interface connect */
-  be.bx= 0x0000;  /* APM BIOS */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("APM real mode connect failed", be.ax);
-    return;
-  }
-
-  /* Ask for a seat upgrade */
-  be.ax= 0x530e;  /* APM, Driver Version */
-  be.bx= 0x0000;  /* BIOS */
-  be.cx= 0x0102;  /* version 1.2 */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("Set driver version failed", be.ax);
-    goto disco;
-  }
-
-  /* Is this version really worth reporting. Well, if the system
-   * does switch off, you won't see it anyway.
-   */
-  ah= be.ax >> 8;
-  if (ah > 9)
-    ah= (ah >> 4)*10 + (ah & 0xf);
-  al= be.ax & 0xff;
-  if (al > 9)
-    al= (al >> 4)*10 + (al & 0xf);
-  apm_printf("Got APM connection version %u.%u\n", ah, al);
-
-  /* Enable */
-  be.ax= 0x5308;  /* APM, Enable/disable power management */
-  be.bx= 0x0001;  /* All device managed by APM BIOS */
-#if 0
-  /* For old APM 1.0 systems, we need 0xffff. Assume that those
-   * systems do not exist.
-   */
-  be.bx= 0xffff;  /* All device managed by APM BIOS (compat) */
-#endif
-  be.cx= 0x0001;  /* Enable power management */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("Enable power management failed", be.ax);
-    goto disco;
-  }
-
-  /* Off */
-  be.ax= 0x5307;  /* APM, Set Power State */
-  be.bx= 0x0001;  /* All devices managed by APM */
-  be.cx= 0x0003;  /* Off */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("Set power state failed", be.ax);
-    goto disco;
-  }
-
-  apm_printf("Power off sequence successfully completed.\n\n");
-  apm_printf("Ha, ha, just kidding!\n");
-
-disco:
-  /* Disconnect */
-  be.ax= 0x5304;  /* APM, interface disconnect */
-  be.bx= 0x0000;  /* APM BIOS */
-  int15(&be);
-  if (be.flags & FL_CARRY)
-  {
-    apm_perror("APM interface disconnect failed", be.ax);
-    return;
-  }
-}
-
-int exec_bootstrap(void)
-/* Load boot sector from the disk or floppy described by tmpdev and execute it.
- */
-{
-  int r=0, n, dirty= 0;
-  char master[SECTOR_SIZE];
-  struct part_entry *table[NR_PARTITIONS], dummy, *active= &dummy;
-  u32_t masterpos=0;
-
-  active->lowsec= 0;
-
-  /* Select a partition table entry. */
-  while (tmpdev.primary >= 0) {
-    masterpos= active->lowsec;
-
-    if ((r= get_master(master, table, masterpos)) != 0) return r;
-
-    active= table[tmpdev.primary];
-
-    /* How does one check a partition table entry? */
-    if (active->sysind == NO_PART) return -1;
-
-    tmpdev.primary= tmpdev.secondary;
-    tmpdev.secondary= -1;
-  }
-
-  if (activate && !active->bootind) {
-    for (n= 0; n < NR_PARTITIONS; n++) table[n]->bootind= 0;
-    active->bootind= ACTIVE_FLAG;
-    dirty= 1;
-  }
-
-  /* Read the boot sector. */
-  if ((r= readsectors(BOOTPOS, active->lowsec, 1)) != 0) return r;
-
-  /* Check signature word. */
-  if (get_word(BOOTPOS+SIGNATOFF) != SIGNATURE) return -1;
-
-  /* Write the partition table if a member must be made active. */
-  if (dirty && (r= writesectors(mon2abs(master), masterpos, 1)) != 0)
-    return r;
-
-  bootstrap(device, active);
-
-  /* just to shutup compiler */
-  return r;
-}
-
-void boot_device(char *devname)
-/* Boot the device named by devname. */
-{
-  dev_t dev= name2dev(devname);
-  int save_dev= device;
-  int r;
-  char *err;
-
-  if (tmpdev.device < 0) {
-    if (dev != -1) 
-      printf("Can't boot from %s\n", devname);
-    return;
-  }
-
-  /* Change current device and try to load and execute its bootstrap. */
-  device= tmpdev.device;
-
-  if ((r= dev_open()) == 0) r= exec_bootstrap();
-
-  err = (r == -1) ? "Not bootable" : bios_err(r);
-  printf("Can't boot %s: %s\n", devname, err);
-
-  /* Restore boot device setting. */
-  device= save_dev;
-  (void) dev_open();
-}
-
-void ctty(char *line)
-{
-  if (line == 0) {
-    serial_line = -1;
-  } else if (between('0', line[0], '3') && line[1] == 0) {
-    serial_line = line[0] - '0';
-  } else {
-    printf("Bad serial line number: %s\n", line);
-    return;
-  }
-
-  serial_init(serial_line);
-}
-
-u32_t milli_time(void)
-{
-  return get_tick() * MSEC_PER_TICK;
-}
-
-u32_t milli_since(u32_t base)
-{
-  return (milli_time() + (TICKS_PER_DAY*MSEC_PER_TICK) - base)
-      % (TICKS_PER_DAY*MSEC_PER_TICK);
-}
-
-static char *Thandler;
-static u32_t Tbase, Tcount;
-
-void unschedule(void)
-/* Invalidate a waiting command. */
-{
-  if (Thandler != 0) {
-    free(Thandler);
-    Thandler= 0;
-  }
-}
-
-void schedule(long msec, char *cmd)
-/* Schedule command at a certain time from now. */
-{
-  unschedule();
-  Thandler= cmd;
-  Tbase= milli_time();
-  Tcount= msec;
-}
-
-int expired(void)
-/* Check if the timer expired for getch(). */
-{
-  return (Thandler != 0 && milli_since(Tbase) >= Tcount);
-}
-
-enum whatfun { NOFUN, SELECT, DEFFUN, USERFUN } menufun(environment *e)
-{
-  if (!(e->flags & E_FUNCTION) || e->arg[0] == 0) return NOFUN;
-  if (e->arg[1] != ',') return SELECT;
-  return e->flags & E_RESERVED ? DEFFUN : USERFUN;
-}
-
-void menu(void)
-{
-  (void) tokenize(&cmds, "boot");
-
-  return;
-}
-
-void execute(void)
-/* Get one command from the command chain and execute it. */
-{
-  token *second=0, *third=0, *fourth=0, *sep;
-  char *name;
-  int res;
-  size_t n= 0;
-
-  if (err) {
-    /* An error occured, stop interpreting. */
-    while (cmds != 0) 
-      voidtoken();
-
-    return;
-  }
-
-  if (expired()) {  /* Timer expired? */
-    parse_code(Thandler);
-    unschedule();
-  }
-
-  /* There must be a separator lurking somewhere. */
-  for (sep= cmds; sep != 0 && sep->token[0] != ';'; sep= sep->next)
-    n++;
-
-
-  name= cmds->token;
-  res= reserved(name);
-
-  if ((second= cmds->next) != 0 && (third= second->next) != 0)
-    fourth= third->next;
-
-    /* Null command? */
-  if (n == 0) {
-    voidtoken();
-    return;
-  } else if ((n == 3 || n == 4) &&
-      !sugar(name) &&
-      second->token[0] == '=' &&
-      !sugar(third->token) && 
-      (n == 3 || (n == 4 && third->token[0] == 'd' &&
-      !sugar(fourth->token)))) {    /* name = [device] value? */
-    char *value= third->token;
-    int flags= E_VAR;
-
-    if (n == 4) { 
-      value= fourth->token; flags|= E_DEV; 
-    }
-
-    if ((flags= b_setvar(flags, name, value)) != 0) {
-      printf("%s is a %s\n", name,
-        flags & E_RESERVED ? "reserved word" :
-            "special function");
-      err= 1;
-    }
-
-    while (cmds != sep) voidtoken();
-    return;
-  } else if (n >= 3 && !sugar(name) && second->token[0] == '(') {  /* name '(arg)' ... ? */
-    token *fun;
-    int c, flags, depth;
-    char *body;
-    size_t len;
-
-    sep= fun= third;
-    depth= 0;
-    len= 1;
-
-    while (sep != 0) {
-      if ((c= sep->token[0]) == ';' && depth == 0) 
-        break;
-      len+= strlen(sep->token) + 1;
-      sep= sep->next;
-      if (c == '{') depth++;
-      if (c == '}' && --depth == 0) break;
-    }
-
-    body= malloc(len * sizeof(char));
-    *body= 0;
-
-    while (fun != sep) {
-      strcat(body, fun->token);
-      if (!sugar(fun->token)
-        && !sugar(fun->next->token)
-      ) strcat(body, " ");
-      fun= fun->next;
-    }
-
-    second->token[strlen(second->token)-1]= 0;
-
-    if (depth != 0) {
-      printf("Missing '}'\n");
-      err= 1;
-    } else
-
-    if ((flags= b_setenv(E_FUNCTION, name,
-          second->token+1, body)) != 0) {
-      printf("%s is a %s\n", name,
-        flags & E_RESERVED ? "reserved word" :
-            "special variable");
-      err= 1;
-    }
-
-    while (cmds != sep)
-      voidtoken();
-
-    free(body);
-    return;
-  } else
-    /* Grouping? */
-  if (name[0] == '{') {
-    token **acmds= &cmds->next;
-    char *t;
-    int depth= 1;
-    /* Find and remove matching '}' */
-    depth= 1;
-    while (*acmds != 0) {
-      t= (*acmds)->token;
-      if (t[0] == '{') depth++;
-      if (t[0] == '}' && --depth == 0) { t[0]= ';'; break; }
-      acmds= &(*acmds)->next;
-    }
-    voidtoken();
-    return;
-  } else
-    /* Command coming up, check if ESC typed. */
-  if (interrupt()) {
-    return;
-  } else
-    /* unset name ..., echo word ...? */
-    if (n >= 1 && (res == R_UNSET)) {
-      char* arg = poptoken();
-      char* p;
-
-    for (;;) {
-      free(arg);
-      if (cmds == sep) break;
-      arg= poptoken();
-      if (res == R_UNSET) {   /* unset arg */
-        b_unset(arg);
-      } else {    /* echo arg */
-        p= arg;
-        while (*p != 0) {
-          if (*p != '\\') {
-            putch(*p);
-          } else
-            switch (*++p) {
-              case 0:
-                if (cmds == sep) return;
-                  continue;
-              case 'n':
-                putch('\n');
-                break;
-              case 'c':
-                clear_screen();
-                break;
-              case 'w':
-                for (;;) {
-                  if (interrupt())
-                    return;
-
-                  if (getch() == '\n')
-                    break;
-              }
-            break;
-          default:
-            putch(*p);
-          }
-          p++;
-        }
-        putch(cmds != sep ? ' ' : '\n');
-
-      }
-    }
-    return;
-  } else
-    /* boot -opts? */
-  if (n == 2 && res == R_BOOT && second->token[0] == '-') {
-    static char optsvar[]= "bootopts";
-    (void) b_setvar(E_VAR, optsvar, second->token);
-    voidtoken();
-    voidtoken();
-    bootminix();
-    b_unset(optsvar);
-    return;
-  } else
-    /* boot device, ls dir, delay msec? */
-  if (n == 2 && (res == R_BOOT || res == R_CTTY)
-  ) {
-    if (res == R_BOOT) boot_device(second->token);
-    if (res == R_CTTY) ctty(second->token);
-    voidtoken();
-    voidtoken();
-    return;
-  } else
-    /* trap msec command? */
-  if (n == 3 && res == R_TRAP && numeric(second->token)) {
-    long msec= a2l(second->token);
-
-    voidtoken();
-    voidtoken();
-    schedule(msec, poptoken());
-    return;
-  } else if (n == 1) {    /* Simple command. */
-    char *body;
-    int ok= 0;
-    name= poptoken();
-
-    switch (res) {
-      case R_BOOT:
-        bootminix();
-        ok= 1;
-        break;
-
-      case R_MENU:
-        menu();
-        ok= 1;
-        break;
-
-      case R_OFF:
-        off();
-        ok= 1;
-        break;
-
-      case R_CTTY:
-       ctty(0);
-       ok = 1;
-       break;
-    }
-
-    /* Command to check bootparams: */
-    if (strcmp(name, ":") == 0)
-      ok= 1;
-    /* User defined function. */
-    if (!ok && (body= b_body(name)) != 0) {
-      (void) tokenize(&cmds, body);
-      ok= 1;
-    }
-    if (!ok)
-      printf("%s: unknown function", name);
-    free(name);
-    if (ok) {
-       return;
-    }
-  } else {
-    /* Syntax error. */
-    printf("Can't parse:");
-    while (cmds != sep) {
-      printf(" %s", cmds->token); voidtoken();
-    }
-  }
-
-  /* Getting here means that the command is not understood. */
-  printf("\nTry 'help'\n");
-  err= 1;
-}
-
 void boot(void)
 {
 	/* Initialize tables. */
@@ -1439,9 +667,8 @@ void boot(void)
 	/* Get environment variables from the parameter sector. */
 	get_parameters();
 
-	/* While there are commands, execute them! */
-	while (cmds != 0)
-		execute();
+	bootminix();
 
-	off();
+	/* @nucleos: only in case of error */
+	while (1) halt_cpu();
 }
