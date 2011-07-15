@@ -461,11 +461,11 @@ void initialize(void)
 
 /* Reserved names: */
 enum resnames {
-  R_NULL, R_BOOT, R_MENU, R_OFF, R_TRAP, R_UNSET
+  R_NULL, R_BOOT, R_MENU, R_OFF, R_TRAP,
 };
 
 char resnames[][6] = {
-  "", "boot", "menu", "off", "trap", "unset",
+  "", "boot", "menu", "off", "trap",
 };
 
 /* Using this for all null strings saves a lot of memory. */
@@ -476,7 +476,7 @@ int reserved(char *s)
 {
   int r;
 
-  for (r= R_BOOT; r <= R_UNSET; r++) {
+  for (r= R_BOOT; r <= R_TRAP; r++) {
     if (strcmp(s, resnames[r]) == 0) 
       return r;
   }
@@ -589,32 +589,6 @@ int b_setvar(int flags, char *name, char *value)
   }
 
   return r;
-}
-
-void b_unset(char *name)
-/* Remove a variable from the environment.  A special variable is reset to
- * its default value.
- */
-{
-  environment **aenv, *e;
-
-  if ((e= *(aenv= searchenv(name))) == 0) return;
-
-  if (e->flags & E_SPECIAL) {
-    if (e->defval != 0) {
-      sfree(e->arg);
-      e->arg= null;
-      sfree(e->value);
-      e->value= e->defval;
-      e->defval= 0;
-    }
-  } else {
-    sfree(e->name);
-    sfree(e->arg);
-    sfree(e->value);
-    *aenv= e->next;
-    free(e);
-  }
 }
 
 long a2l(char *a)
@@ -1284,62 +1258,12 @@ void execute(void)
     /* Command coming up, check if ESC typed. */
   if (interrupt()) {
     return;
-  } else
-    /* unset name ..., echo word ...? */
-    if (n >= 1 && (res == R_UNSET)) {
-      char* arg = poptoken();
-      char* p;
-
-    for (;;) {
-      free(arg);
-      if (cmds == sep) break;
-      arg= poptoken();
-      if (res == R_UNSET) {   /* unset arg */
-        b_unset(arg);
-      } else {    /* echo arg */
-        p= arg;
-        while (*p != 0) {
-          if (*p != '\\') {
-            putch(*p);
-          } else
-            switch (*++p) {
-              case 0:
-                if (cmds == sep) return;
-                  continue;
-              case 'n':
-                putch('\n');
-                break;
-              case 'c':
-                clear_screen();
-                break;
-              case 'w':
-                for (;;) {
-                  if (interrupt())
-                    return;
-
-                  if (getch() == '\n')
-                    break;
-              }
-            break;
-          default:
-            putch(*p);
-          }
-          p++;
-        }
-        putch(cmds != sep ? ' ' : '\n');
-
-      }
-    }
-    return;
-  } else
-    /* boot -opts? */
-  if (n == 2 && res == R_BOOT && second->token[0] == '-') {
+  } else /* boot -opts? */ if (n == 2 && res == R_BOOT && second->token[0] == '-') {
     static char optsvar[]= "bootopts";
     (void) b_setvar(E_VAR, optsvar, second->token);
     voidtoken();
     voidtoken();
     bootminix();
-    b_unset(optsvar);
     return;
   } else
     /* boot device, ls dir, delay msec? */

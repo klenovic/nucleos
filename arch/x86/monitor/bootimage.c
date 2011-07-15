@@ -983,7 +983,4 @@ void bootminix(void)
 	}
 
 	free(image);
-
-	if (serial_line >= 0)
-		b_unset(SERVARNAME);
 }
