@@ -63,7 +63,6 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 #define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
 #define K_HDR		0x0010 /* No need to patch sizes, kernel uses the headers. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
-#define K_MEML		0x0080 /* Pass a list of free memory. */
 #define K_BRET		0x0100 /* New monitor code on shutdown in boot parameters. */
 #define K_ALL		0x01FF /* All feature bits this monitor supports. */
 
@@ -187,28 +186,6 @@ int params2params(char *params, size_t psize)
 		i= n;
 	}
 
-	if (!(k_flags & K_MEML)) {
-		/* Require old memory size variables. */
-		value= ul2a10((mem[0].base + mem[0].size) / 1024);
-		n= i + 7 + 1 + strlen(value) + 1;
-
-		if (n < psize) {
-			strcpy(params + i, "memsize=");
-			strcat(params + i, value);
-		}
-
-		i= n;
-		value= ul2a10(mem[1].size / 1024);
-		n= i + 7 + 1 + strlen(value) + 1;
-
-		if (n < psize) {
-			strcpy(params + i, "emssize=");
-			strcat(params + i, value);
-		}
-
-		i= n;
-	}
-
 	if (i >= psize) {
 		printf("Too many boot parameters\n");
 		return 0;
@@ -249,13 +226,7 @@ void patch_sizes(void)
 		initp= procp;   /* The last process must be init. */
 	}
 
-	if (k_flags & (K_HIGH|K_MEML))
-		return;  /* Doesn't need VFS_PROC_NR patching. */
-
-	/* Patch cs and sizes of init into fs data. */
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+0, initp->cs >> click_shift);
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+2, text_size);
-	put_word(process[VFS_PROC_NR].data + P_INIT_OFF+4, data_size);
+	return;
 }
 
 int selected(char *name)
@@ -675,11 +646,6 @@ void exec_image(char *image)
 
 	/* Patch sizes, etc. into kernel data. */
 	patch_sizes();
-
-	if (!(k_flags & K_MEML)) {
-		/* Copy the a.out headers to the old place. */
-		raw_copy(HEADERPOS, aout, PROCESS_MAX * A_MINHDR);
-	}
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
 	printf("Initial ramdisk...");

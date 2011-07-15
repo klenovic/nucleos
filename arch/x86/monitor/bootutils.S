@@ -22,7 +22,6 @@
 	.set BUFFER,		0x0600	// First free memory
 	.set PENTRYSIZE,	16	// Partition table entry size.
 	.set K_INT86,		0x0040	// Requires generic INT support
-	.set K_MEML,		0x0080	// Pass a list of free memory
 
 	.set DS_SELECTOR,	3*8	// Kernel data selector
 	.set ES_SELECTOR,	4*8	// Flat 4 Gb
@@ -1063,10 +1062,7 @@ minix:
 0:
 	pushw	$bios13            // Far address to BIOS int 13 support
 1:
-	testw	$K_MEML, k_flags   // New memory arrangements?
-	jz	0f
 	pushl	AOUTL(%bp)    // Address of a.out headers
-0:
 	pushw	$0
 	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
 	pushw	$0
