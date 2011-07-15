@@ -585,7 +585,7 @@ void exec_image(char *image)
 			totalmem += mem;
 		}
 
-		if (i == 0 && (k_flags & K_HIGH)) {
+		if (i == KERNEL_IDX && (k_flags & K_HIGH)) {
 			/* Load the rest in extended memory. */
 			addr = mem[1].base;
 			limit = mem[1].base + mem[1].size;
