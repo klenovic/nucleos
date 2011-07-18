@@ -29,8 +29,6 @@
 	.set CS_SELECTOR,	6*8	// Kernel code
 	.set MCS_SELECTOR,	7*8	// Monitor code
 
-	.set ESC,		0x1B	// Escape character
-
 .section .text
 
 .globl halt_cpu
@@ -541,7 +539,6 @@ readsectors:
 	push	%bp
 	mov	%sp, %bp
 	movb	$0x02, DSKRW(%bp) // Code for a disk read
-rwsec:
 	push	%bx
 	push	%si
 	push	%di
@@ -1352,19 +1349,6 @@ int15:
 	popw	6(%si)        // ep->flags
 	pop	%bx
 	pop	%si           // Restore
-	ret
-
-// void scan_keyboard(void)
-//       Read keyboard character. Needs to be done in case one is waiting.
-.globl scan_keyboard
-scan_keyboard:
-	inb	$0x60
-	inb	$0x61
-	movb	%al, %ah
-	orb	$0x80, %al
-	outb	$0x61
-	movb	%ah, %al
-	outb	$0x61
 	ret
 
 .section .data
