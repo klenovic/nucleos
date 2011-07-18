@@ -10,7 +10,6 @@
 /*      bootimage.c - Load an image and start it.       Author: Kees J. Bot
  *                    19 Jan 1992
  */
-#define BIOS      1       /* Can only be used under the BIOS. */
 #include <nucleos/stddef.h>
 #include <nucleos/types.h>
 #include <nucleos/stat.h>
@@ -31,8 +30,6 @@
 #include "rawfs.h"
 #include "image.h"
 #include "boot.h"
-
-#define TRACE(msg) printf("%s:%d:%s",__FUNCTION__,__LINE__,msg);
 
 static int block_size = 0;
 
