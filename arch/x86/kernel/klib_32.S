@@ -39,10 +39,8 @@ monitor:
 //                             int86
 //===========================================================================
 // void int86();
-.globl int86          // let the monitor make an 8086 interrupt call
+.globl int86          // @nucleos: int86 is not supported
 int86:
-	cmpb	$0,mon_return  // is the monitor there?
-	jnz	0f
 	movb	$0x01, %ah     // an int 13 error seems appropriate
 	movb	%ah, reg86+ 0  // reg86.w.f = 1 (set carry flag)
 	movb	%ah, reg86+13  // reg86.b.ah = 0x01 = "invalid command"

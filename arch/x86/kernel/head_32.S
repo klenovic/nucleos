@@ -163,10 +163,6 @@ over_flags:
 	mov	%esp, %ebp
 	push	%esi
 	push	%edi
-	cmp	$0, 4(%ebp)	// monitor return vector is
-	jz	noret		// nonzero if return possible
-	incb	mon_return
-noret:
 	mov	%esp, mon_sp	// save stack pointer for later return
 
 	/* Copy the monitor global descriptor table to the address space of kernel and
@@ -187,9 +183,9 @@ copygdt:
 	mov	%eax, gdt+GDT_SELECTOR+2	// set base of GDT
 	lgdt	gdt+GDT_SELECTOR		// switch over to kernel GDT
 	/* Locate boot parameters, set up kernel segment registers and stack. */
-	mov	8(%ebp), %ebx			// boot parameters offset
-	mov	12(%ebp), %edx			// boot parameters length
-	mov	16(%ebp), %eax			// address of a.out headers
+	mov	4(%ebp), %ebx			// boot parameters offset
+	mov	8(%ebp), %edx			// boot parameters length
+	mov	12(%ebp), %eax			// address of a.out headers
 	mov	%eax, aout
 	mov	%ds, %ax			// kernel data
 	mov	%ax, %es
@@ -205,11 +201,10 @@ copygdt:
 	/* Call C startup code to set up a proper environment to run main(). */
 	push	%edx
 	push	%ebx
-	push	$SS_SELECTOR
 	push	$DS_SELECTOR
 	push	$CS_SELECTOR
-	call	prepare_kernel				// prepare_kernel(cs, ds, mds, parmoff, parmlen)
-	add	$5*4, %esp
+	call	prepare_kernel				// prepare_kernel(cs, ds, parmoff, parmlen)
+	add	$4*4, %esp
 
 	/* Reload gdtr, idtr and the segment registers to global descriptor table set */
 	/* up by prot_init(). */

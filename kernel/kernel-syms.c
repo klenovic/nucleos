@@ -57,7 +57,6 @@ u32_t system_hz;                         /* HZ value */
 
 /* Miscellaneous. */
 reg_t mon_ss, mon_sp;            /* boot monitor stack */
-int mon_return;                  /* true if we can return to monitor */
 int do_serial_debug;
 endpoint_t who_e;                /* message source endpoint */
 int who_p;                       /* message source proc */
