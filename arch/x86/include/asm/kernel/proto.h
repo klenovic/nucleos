@@ -95,7 +95,6 @@ void exception(struct exception_frame * frame);
 
 /* klib386.S */
 void level0(void (*func)(void));
-void monitor(void);
 void reset(void);
 void int86(void);
 

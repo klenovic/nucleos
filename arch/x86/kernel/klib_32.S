@@ -17,25 +17,6 @@
 
 .section .text
 //===========================================================================
-//                             monitor
-//===========================================================================
-// void monitor();
-// Return to the monitor.
-.globl monitor				// exit Minix and return to the monitor
-monitor:
-	mov	mon_sp, %esp		// restore monitor stack pointer
-	movw	$SS_SELECTOR, %dx	// monitor data segment
-	mov	%dx, %ds
-	mov	%dx, %es
-	mov	%dx, %fs
-	mov	%dx, %gs
-	mov	%dx, %ss
-	pop	%edi
-	pop	%esi
-	pop	%ebp
-	lretw				// return to the monitor
-
-//===========================================================================
 //                             int86
 //===========================================================================
 // void int86();
@@ -44,109 +25,6 @@ int86:
 	movb	$0x01, %ah     // an int 13 error seems appropriate
 	movb	%ah, reg86+ 0  // reg86.w.f = 1 (set carry flag)
 	movb	%ah, reg86+13  // reg86.b.ah = 0x01 = "invalid command"
-	ret
-0:      push	%ebp           // save C registers
-	push	%esi
-	push	%edi
-	push	%ebx
-	pushf			// save flags
-	cli			// no interruptions
-
-	inb	$INT2_CTLMASK
-	movb	%al, %ah
-	inb	$INT_CTLMASK
-	push	%eax                   // save interrupt masks
-	mov	irq_use, %eax          // map of in-use IRQ''s
-	and	$~[1<<CLOCK_IRQ], %eax // keep the clock ticking
-	outb	$INT_CTLMASK           // enable all unused IRQ''s and vv.
-	movb	%ah, %al
-	outb	$INT2_CTLMASK
-
-	mov	$SS_SELECTOR, %eax    // monitor data segment
-	mov	%ax, %ss
-	xchg	mon_sp, %esp          // switch stacks
-	push	reg86+36              // parameters used in INT call
-	push	reg86+32
-	push	reg86+28
-	push	reg86+24
-	push	reg86+20
-	push	reg86+16
-	push	reg86+12
-	push	reg86+ 8
-	push	reg86+ 4
-	push	reg86+ 0
-	mov	%ax, %ds              // remaining data selectors
-	mov	%ax, %es
-	mov	%ax, %fs
-	mov	%ax, %gs
-	push	%cs
-	push	$return                  // kernel return address and selector
-	ljmpw	*20+2*4+10*4+2*4(%esp)  // make the call
-return:
-	pop	reg86+ 0
-	pop	reg86+ 4
-	pop	reg86+ 8
-	pop	reg86+12
-	pop	reg86+16
-	pop	reg86+20
-	pop	reg86+24
-	pop	reg86+28
-	pop	reg86+32
-	pop	reg86+36
-	lgdt	gdt+GDT_SELECTOR      // reload global descriptor table
-	ljmp	$CS_SELECTOR, $csinit // restore everything
-csinit: 
-	mov	$DS_SELECTOR, %eax
-	mov	%ax, %ds
-	mov	%ax, %es
-	mov	%ax, %fs
-	mov	%ax, %gs
-	mov	%ax, %ss
-	xchg	mon_sp, %esp         // unswitch stacks
-	lidt	gdt+IDT_SELECTOR     // reload interrupt descriptor table
-
-#ifdef CONFIG_X86_LOCAL_APIC
-	cmpl	$0x0, lapic_addr
-	jne	3f
-	mov	$0, %ebx
-	jmp	4f
-3:
-	mov	$FLAT_DS_SELECTOR, %ebx
-	mov	%bx, %fs
-	movl	lapic_addr, %eax
-	add	$0x20, %eax
-	mov	%fs:(%eax), %ebx
-	and	$0xFF000000, %ebx
-	shr	$24, %ebx
-	movzb	%bl, %ebx
-
-4:
-	add	$apicid2cpuid, %ebx
-	movzb	(%ebx), %eax
-	shl	$3, %eax
-	mov	%eax, %ebx
-	add	$TSS_SELECTOR, %eax
-	addl	gdt+DESC_ACCESS, %eax
-	and	$~0x02, %eax
-	ltr	%bx     /* set TSS register */
-
-	mov	$DS_SELECTOR, %eax
-	mov	%ax, %fs
-#endif /* CONFIG_X86_LOCAL_APIC */
-
-	pop	%eax
-	outb	$INT_CTLMASK        // restore interrupt masks
-	movb	%ah, %al
-	outb	$INT2_CTLMASK
-
-6:
-	add	%ecx, lost_ticks    // record lost clock ticks
-
-	popf                        // restore flags
-	pop	%ebx                // restore C registers
-	pop	%edi
-	pop	%esi
-	pop	%ebp
 	ret
 
 //===========================================================================
