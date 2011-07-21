@@ -15,8 +15,8 @@ Defines the super block of swap partitions and some useful constants.
 Created:	Aug 2, 1992 by Philip Homburg
 */
 
-#ifndef __NUCLEOS_SWAP_H
-#define __NUCLEOS_SWAP_H
+#ifndef _NUCLEOS_SWAP_H
+#define _NUCLEOS_SWAP_H
 
 /* Two possible layouts for a partition with swapspace:
  *
@@ -50,4 +50,4 @@ typedef struct swap_hdr
 #define SH_VERSION	    1
 #define SH_PRIORITY	    0
 
-#endif /* __NUCLEOS_SWAP_H */
+#endif /* _NUCLEOS_SWAP_H */

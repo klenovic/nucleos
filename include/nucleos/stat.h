@@ -12,8 +12,8 @@
  * some file.  These calls are the only approved way to inspect i-nodes.
  */
 
-#ifndef __NUCLEOS_STAT_H
-#define __NUCLEOS_STAT_H
+#ifndef _NUCLEOS_STAT_H
+#define _NUCLEOS_STAT_H
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -101,4 +101,4 @@ struct kstat {
 
 #endif/* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_STAT_H */
+#endif /* _NUCLEOS_STAT_H */

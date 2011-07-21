@@ -20,8 +20,8 @@
  *    Adapted from tmr_settimer and tmr_clrtimer in src/kernel/clock.c. 
  *    Last modified: September 30, 2004.
  */
-#ifndef __NUCLEOS_TIMER_H
-#define __NUCLEOS_TIMER_H
+#ifndef _NUCLEOS_TIMER_H
+#define _NUCLEOS_TIMER_H
 
 #include <nucleos/limits.h>
 #include <nucleos/types.h>
@@ -67,4 +67,4 @@ void tmrs_exptimers(timer_t **tmrs, clock_t now, clock_t *new_head);
 clock_t tmrs_settimer(timer_t **tmrs, timer_t *tp, clock_t exp_time, tmr_func_t watchdog,
 		      clock_t *new_head);
 
-#endif /* __NUCLEOS_TIMER_H */
+#endif /* _NUCLEOS_TIMER_H */

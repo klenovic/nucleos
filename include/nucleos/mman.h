@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __NUCLEOS_MMAN_H
-#define __NUCLEOS_MMAN_H
+#ifndef _NUCLEOS_MMAN_H
+#define _NUCLEOS_MMAN_H
 
 #include <asm/mman.h>
 
@@ -38,4 +38,4 @@ u8_t vm_getrefcount(int endpt, void *addr);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_MMAN_H */
+#endif /* _NUCLEOS_MMAN_H */

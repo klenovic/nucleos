@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_SHM_H
-#define __NUCLEOS_SHM_H
+#ifndef _NUCLEOS_SHM_H
+#define _NUCLEOS_SHM_H
 
 #include <nucleos/types.h>
 #include <nucleos/ipc.h>
@@ -80,4 +80,4 @@ int shmdt(const void *__shmaddr);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_SHM_H */
+#endif /* _NUCLEOS_SHM_H */

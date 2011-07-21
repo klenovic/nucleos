@@ -33,8 +33,8 @@
  * Zero and negative values are widely used for OK and error responses.
  */
 
-#ifndef __NUCLEOS_COM_H
-#define __NUCLEOS_COM_H
+#ifndef _NUCLEOS_COM_H
+#define _NUCLEOS_COM_H
 
 #ifndef __ASSEMBLY__
 
@@ -1081,4 +1081,4 @@
 
 #endif /* __ASSEMBLY__ */
 
-#endif /* __NUCLEOS_COM_H */ 
+#endif /* _NUCLEOS_COM_H */ 

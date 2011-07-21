@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_VIDEO_H
-#define __NUCLEOS_VIDEO_H
+#ifndef _NUCLEOS_VIDEO_H
+#define _NUCLEOS_VIDEO_H
 
 /* Definitions used by the console driver. */
 #define MONO_BASE    0xB0000L   /* base of mono video memory */
@@ -43,4 +43,4 @@
 #define GA_VIDEO_ADDRESS        0xA0000L
 #define GA_FONT_SIZE            8192
 
-#endif /* __NUCLEOS_VIDEO_H */
+#endif /* _NUCLEOS_VIDEO_H */

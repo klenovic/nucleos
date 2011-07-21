@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_IPC_H
-#define __NUCLEOS_IPC_H
+#ifndef _NUCLEOS_IPC_H
+#define _NUCLEOS_IPC_H
 
 /* For gid_t, uid_t */
 #include <nucleos/types.h>
@@ -39,4 +39,4 @@ struct ipc_perm
 
 key_t ftok(const char *__path, int __id);
 
-#endif /* __NUCLEOS_IPC_H */
+#endif /* _NUCLEOS_IPC_H */

@@ -1,3 +1,12 @@
+/*
+ *  Copyright (C) 2011  Ladislav Klenovic <klenovic@nucleonsoft.com>
+ *
+ *  This file is part of Nucleos kernel.
+ *
+ *  Nucleos kernel is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, version 2 of the License.
+ */
 #ifndef _NUCLEOS_STRING_H
 #define _NUCLEOS_STRING_H
 
@@ -11,9 +20,6 @@
 #include <nucleos/types.h>	/* for size_t */
 #include <nucleos/stddef.h>	/* for NULL */
 #include <stdarg.h>
-
-extern char *strndup_user(const char __user *, long);
-extern void *memdup_user(const void __user *, size_t);
 
 /*
  * Include machine specific inline routines
@@ -127,5 +133,6 @@ static inline bool strstarts(const char *str, const char *prefix)
 {
 	return strncmp(str, prefix, strlen(prefix)) == 0;
 }
-#endif
+
+#endif /*  defined(__KERNEL__) || defined(__UKERNEL__) */
 #endif /* _NUCLEOS_STRING_H */

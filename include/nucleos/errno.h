@@ -9,8 +9,8 @@
  */
 /* For kernel and user-kernel return negative error values. */
 
-#ifndef __NUCLEOS_ERRNO_H
-#define __NUCLEOS_ERRNO_H
+#ifndef _NUCLEOS_ERRNO_H
+#define _NUCLEOS_ERRNO_H
 
 #include <asm/errno.h>
 
@@ -32,4 +32,4 @@
 #define EDONTREPLY		201  /* pseudo-code: don't send a reply */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_ERRNO_H */
+#endif /* _NUCLEOS_ERRNO_H */

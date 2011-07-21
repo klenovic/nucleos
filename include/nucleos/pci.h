@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_PCI_H
-#define __NUCLEOS_PCI_H
+#ifndef _NUCLEOS_PCI_H
+#define _NUCLEOS_PCI_H
 /* @nucleos: cleanup this header */
 /*
 pci.h
@@ -125,4 +125,4 @@ int pci_attr_r32_s(int devind, int port, u32_t *vp);
 int pci_slot_name_s(int devind, char **cpp);
 int pci_ids_s(int devind, u16_t *vidp, u16_t *didp);
 
-#endif /* __NUCLEOS_PCI_H */
+#endif /* _NUCLEOS_PCI_H */

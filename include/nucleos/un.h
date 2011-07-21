@@ -13,8 +13,8 @@ sys/un.h
 
 /* Open Group Base Specifications Issue 6 */
 
-#ifndef __NUCLEOS_UN_H
-#define __NUCLEOS_UN_H
+#ifndef _NUCLEOS_UN_H
+#define _NUCLEOS_UN_H
 
 struct sockaddr_un
 {
@@ -23,4 +23,4 @@ struct sockaddr_un
 };
 
 /* Note: UNIX domain sockets are not implemented! */
-#endif /* __NUCLEOS_UN_H */
+#endif /* _NUCLEOS_UN_H */

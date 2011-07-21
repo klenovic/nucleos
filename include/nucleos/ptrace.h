@@ -10,8 +10,8 @@
 /* <nucleos/ptrace.h>
  * definitions for ptrace(2) 
  */
-#ifndef __NUCLEOS_PTRACE_H
-#define __NUCLEOS_PTRACE_H
+#ifndef _NUCLEOS_PTRACE_H
+#define _NUCLEOS_PTRACE_H
 
 #include <asm/ptrace.h>
 
@@ -62,4 +62,4 @@ struct ptrace_range {
 long ptrace(int request, ...);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_PTRACE_H */
+#endif /* _NUCLEOS_PTRACE_H */

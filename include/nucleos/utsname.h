@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_UTSNAME_H
-#define __NUCLEOS_UTSNAME_H
+#ifndef _NUCLEOS_UTSNAME_H
+#define _NUCLEOS_UTSNAME_H
 
 #define __UTS_LEN	64
 
@@ -47,4 +47,4 @@ int sysuname(int _req, int _field, char *_value, size_t _len);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_UTSNAME_H */
+#endif /* _NUCLEOS_UTSNAME_H */

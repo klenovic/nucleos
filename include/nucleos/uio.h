@@ -13,8 +13,8 @@ sys/uio.h
 definitions for vector I/O operations
 */
 
-#ifndef __NUCLEOS_UIO_H
-#define __NUCLEOS_UIO_H
+#ifndef _NUCLEOS_UIO_H
+#define _NUCLEOS_UIO_H
 
 /* Open Group Base Specifications Issue 6 (not complete) */
 
@@ -31,4 +31,4 @@ ssize_t readv(int _fildes, const struct iovec *_iov, int _iovcnt);
 ssize_t writev(int _fildes, const struct iovec *_iov, int iovcnt);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_UIO_H */
+#endif /* _NUCLEOS_UIO_H */

@@ -11,8 +11,8 @@
  *								7 Dec 1995
  * Functions to manipulate 64 bit disk addresses.
  */
-#ifndef __NUCLEOS_U64_H
-#define __NUCLEOS_U64_H
+#ifndef _NUCLEOS_U64_H
+#define _NUCLEOS_U64_H
 
 #include <nucleos/types.h>
 
@@ -37,4 +37,4 @@ unsigned long ex64lo(u64_t i);
 unsigned long ex64hi(u64_t i);
 u64_t make64(unsigned long lo, unsigned long hi);
 
-#endif /* __NUCLEOS_U64_H */
+#endif /* _NUCLEOS_U64_H */

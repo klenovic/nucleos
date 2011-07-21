@@ -13,8 +13,8 @@ sys/svrctl.h
 Created:	Feb 15, 1994 by Philip Homburg <philip@cs.vu.nl>
 */
 
-#ifndef __NUCLEOS_SVRCTL_H
-#define __NUCLEOS_SVRCTL_H
+#ifndef _NUCLEOS_SVRCTL_H
+#define _NUCLEOS_SVRCTL_H
 
 #include <nucleos/types.h>
 #include <asm/svrctl.h>
@@ -57,4 +57,4 @@ struct sysgetenv {
 
 int svrctl(int _request, void *_data);
 
-#endif /* __NUCLEOS_SVRCTL_H */
+#endif /* _NUCLEOS_SVRCTL_H */

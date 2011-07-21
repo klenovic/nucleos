@@ -9,8 +9,8 @@
  */
 /* Prototypes for system library functions. */
 
-#ifndef __NUCLEOS_SYSLIB_H
-#define __NUCLEOS_SYSLIB_H
+#ifndef _NUCLEOS_SYSLIB_H
+#define _NUCLEOS_SYSLIB_H
 
 #include <nucleos/types.h>
 #include <nucleos/signal.h>
@@ -236,4 +236,4 @@ int sys_sprof(int action, int size, int freq, endpoint_t endpt, void *ctl_ptr, v
 int sys_cprof(int action, int size, endpoint_t endpt, void *ctl_ptr, void *mem_ptr);
 int sys_profbuf(void *ctl_ptr, void *mem_ptr);
 
-#endif /* __NUCLEOS_SYSLIB_H */
+#endif /* _NUCLEOS_SYSLIB_H */

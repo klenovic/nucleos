@@ -9,8 +9,8 @@
  */
 /* The <times.h> header is for time times() system call. */
 
-#ifndef __NUCLEOS_TIMES_H
-#define __NUCLEOS_TIMES_H
+#ifndef _NUCLEOS_TIMES_H
+#define _NUCLEOS_TIMES_H
 
 #include <nucleos/types.h>
 
@@ -26,4 +26,4 @@ struct tms {
 clock_t times(struct tms *_buffer);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_TIMES_H */
+#endif /* _NUCLEOS_TIMES_H */

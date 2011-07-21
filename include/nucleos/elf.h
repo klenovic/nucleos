@@ -27,8 +27,8 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef __NUCLEOS_ELF_H
-#define __NUCLEOS_ELF_H
+#ifndef _NUCLEOS_ELF_H
+#define _NUCLEOS_ELF_H
 
 #include <nucleos/types.h>
 
@@ -1582,4 +1582,4 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Keep this the last entry.  */
 #define R_ARM_NUM		256
 
-#endif	/* __ELF_H */
+#endif	/* _NUCLEOS_ELF_H */

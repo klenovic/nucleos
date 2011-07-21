@@ -9,8 +9,8 @@
  */
 /* The <nucleos/utime.h> header is used for the utime() system call. */
 
-#ifndef __NUCLEOS_UTIME_H
-#define __NUCLEOS_UTIME_H
+#ifndef _NUCLEOS_UTIME_H
+#define _NUCLEOS_UTIME_H
 
 #include <nucleos/types.h>
 
@@ -24,4 +24,4 @@ struct utimbuf {
 int utime(const char *_path, const struct utimbuf *_times);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_UTIME_H */
+#endif /* _NUCLEOS_UTIME_H */

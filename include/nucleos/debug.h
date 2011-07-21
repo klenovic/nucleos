@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_DEBUG_H
-#define __NUCLEOS_DEBUG_H
+#ifndef _NUCLEOS_DEBUG_H
+#define _NUCLEOS_DEBUG_H
 
 /* For reminders of things to be fixed. */
 #define FIXME(str) { \
@@ -10,4 +10,4 @@
 	} \
 }
 
-#endif /* __NUCLEOS_DEBUG_H */
+#endif /* _NUCLEOS_DEBUG_H */

@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_TIMEB_H
-#define __NUCLEOS_TIMEB_H
+#ifndef _NUCLEOS_TIMEB_H
+#define _NUCLEOS_TIMEB_H
 
 #include <nucleos/time.h>
 
@@ -15,4 +15,4 @@ struct timeb
 
 int ftime(struct timeb *__timebuf);
 
-#endif /* __NUCLEOS_TIMEB_H */
+#endif /* _NUCLEOS_TIMEB_H */

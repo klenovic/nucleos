@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_BITMAP_H
-#define __NUCLEOS_BITMAP_H
+#ifndef _NUCLEOS_BITMAP_H
+#define _NUCLEOS_BITMAP_H
 
 #include <nucleos/kernel.h>
 
@@ -28,4 +28,4 @@
 #define SET_BIT(map,bit) ( MAP_CHUNK(map,bit) |= (1 << CHUNK_OFFSET(bit) )
 #define UNSET_BIT(map,bit) ( MAP_CHUNK(map,bit) &= ~(1 << CHUNK_OFFSET(bit) )
 
-#endif /* __NUCLEOS_BITMAP_H */
+#endif /* _NUCLEOS_BITMAP_H */

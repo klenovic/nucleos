@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_TYPE_H
-#define __NUCLEOS_TYPE_H
+#ifndef _NUCLEOS_TYPE_H
+#define _NUCLEOS_TYPE_H
 
 #include <nucleos/types.h>
 #include <kernel/const.h>
@@ -188,4 +188,4 @@ struct k_randomness {
 	} bin[RANDOM_SOURCES];
 };
 
-#endif /* __NUCLEOS_TYPE_H */
+#endif /* _NUCLEOS_TYPE_H */

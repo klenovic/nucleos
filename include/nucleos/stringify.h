@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_STRINGIFY_H
-#define __NUCLEOS_STRINGIFY_H
+#ifndef _NUCLEOS_STRINGIFY_H
+#define _NUCLEOS_STRINGIFY_H
 
 /* Indirect stringification.  Doing two levels allows the parameter to be a
  * macro itself.  For example, compile with -DFOO=bar, __stringify(FOO)
@@ -21,4 +21,4 @@
 /** @brief Turn preprocessor symbol definition \a sym into string. */
 #define __stringify(x...)	__stringify_1(x)
 
-#endif /* !__NUCLEOS_STRINGIFY_H */
+#endif /* !_NUCLEOS_STRINGIFY_H */

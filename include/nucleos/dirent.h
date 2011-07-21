@@ -17,8 +17,8 @@
  * routines understand the so-called "flex" directory format too.
  */
 
-#ifndef __NUCLEOS_DIRENT_H
-#define __NUCLEOS_DIRENT_H
+#ifndef _NUCLEOS_DIRENT_H
+#define _NUCLEOS_DIRENT_H
 
 #include <nucleos/types.h>
 
@@ -102,4 +102,4 @@ int getdents(int _fildes, struct dirent *_buf, size_t _nbyte);
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_DIRENT_H */
+#endif /* _NUCLEOS_DIRENT_H */

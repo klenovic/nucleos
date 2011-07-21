@@ -60,5 +60,4 @@ static inline char _tolower(const char c)
 {
 	return c | 0x20;
 }
-
 #endif /* _NUCLEOS_CTYPE_H */
