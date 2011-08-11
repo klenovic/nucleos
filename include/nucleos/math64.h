@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* linux */
-#ifndef __NUCLEOS_MATH64_H
-#define __NUCLEOS_MATH64_H
+#ifndef _NUCLEOS_MATH64_H
+#define _NUCLEOS_MATH64_H
 
 #include <nucleos/types.h>
 #include <asm/div64.h>
@@ -119,4 +119,4 @@ __iter_div_u64_rem(u64 dividend, u32 divisor, u64 *remainder)
 	return ret;
 }
 
-#endif /* __NUCLEOS_MATH64_H */
+#endif /* _NUCLEOS_MATH64_H */
