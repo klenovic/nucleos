@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* linux */
-#ifndef __NULCEOS_BYTEORDER_GENERIC_H
-#define __NULCEOS_BYTEORDER_GENERIC_H
+#ifndef _NULCEOS_BYTEORDER_GENERIC_H
+#define _NULCEOS_BYTEORDER_GENERIC_H
 
 /*
  * linux/byteorder_generic.h
@@ -180,4 +180,4 @@ static inline void be64_add_cpu(__be64 *var, u64 val)
 	*var = cpu_to_be64(be64_to_cpu(*var) + val);
 }
 
-#endif /* __NULCEOS_BYTEORDER_GENERIC_H */
+#endif /* _NULCEOS_BYTEORDER_GENERIC_H */
