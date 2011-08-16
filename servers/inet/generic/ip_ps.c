@@ -128,7 +128,7 @@ acc_t *pack;
 	assert(ip_port_nr >= 0 && ip_port_nr < ip_conf_nr);
 	ip_port= &ip_port_table[ip_port_nr];
 	assert(ip_port->ip_dl_type == IPDL_PSIP);
-	if (nexthop == HTONL(0xffffffff))
+	if (nexthop == htonl(0xffffffff))
 		ip_arrived_broadcast(ip_port, pack);
 	else
 		ip_arrived(ip_port, pack);
@@ -162,7 +162,7 @@ int type;
 		 * This saves the application from having to to find out
 		 * if the destination is a subnet broadcast.
 		 */
-		dest= HTONL(0xffffffff);
+		dest= htonl(0xffffffff);
 	}
 
 	/* Note that allocating a packet may trigger a cleanup action,

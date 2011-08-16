@@ -468,13 +468,13 @@ size_t count;
 		pack= bf_delhead(pack, sizeof(nexthop));
 
 		/* Map multicast to broadcast */
-		if ((nexthop & HTONL(0xE0000000)) == HTONL(0xE0000000))
-			nexthop= HTONL(0xffffffff);
+		if ((nexthop & htonl(0xE0000000)) == htonl(0xE0000000))
+			nexthop= htonl(0xffffffff);
 	}
 	else
 	{
 		/* Assume point to point */
-		nexthop= HTONL(0x00000000);
+		nexthop= htonl(0x00000000);
 	}
 
 	if (psip_port->pp_flags & PPF_PROMISC)

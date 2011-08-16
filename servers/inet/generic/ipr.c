@@ -475,7 +475,7 @@ ipaddr_t mask;
 		/* Special hack to flush entries for an interface that
 		 * goes down.
 		 */
-		addr= mask= HTONL(0xffffffff);
+		addr= mask= htonl(0xffffffff);
 	}
 
 	for(i= 0, oroute= oroute_table; i<OROUTE_NR; i++, oroute++)
@@ -682,7 +682,7 @@ time_t timeout;
 	if (oroute->ort_mtu && mtu >= oroute->ort_mtu)
 		return;		/* Only decrease mtu */
 
-	result= ipr_add_oroute(port_nr, dest, HTONL(0xffffffff),
+	result= ipr_add_oroute(port_nr, dest, htonl(0xffffffff),
 		oroute->ort_gateway, timeout, oroute->ort_dist, mtu,
 		FALSE, 0, NULL);
 	assert(result == 0);
@@ -1189,7 +1189,7 @@ ipaddr_t mask;
 		/* Special hack to flush entries for an interface that
 		 * goes down.
 		 */
-		addr= mask= HTONL(0xffffffff);
+		addr= mask= htonl(0xffffffff);
 	}
 
 	for(i= 0, iroute= iroute_table; i<IROUTE_NR; i++, iroute++)

@@ -416,7 +416,7 @@ acc_t *data;
 
 	data= bf_packIffLess(data, IP_MIN_HDR_SIZE);
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(data);
-	DIFBLOCK(0x10, (ip_hdr->ih_dst & HTONL(0xf0000000)) == HTONL(0xe0000000),
+	DIFBLOCK(0x10, (ip_hdr->ih_dst & htonl(0xf0000000)) == htonl(0xe0000000),
 		printk("got multicast packet\n"));
 	ip_hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) << 2;
 
@@ -1058,7 +1058,7 @@ icmp_hdr_t *icmp_hdr;
 	{
 		addr= *(ipaddr_t *)bufp;
 		pref= ntohl(*(u32_t *)(bufp+4));
-		ipr_add_oroute(icmp_port->icp_ipport, HTONL(0L), HTONL(0L), 
+		ipr_add_oroute(icmp_port->icp_ipport, htonl(0L), htonl(0L), 
 			addr, lifetime ? lifetime * HZ : 1,
 			1, 0, 0, pref, NULL);
 	}

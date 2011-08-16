@@ -82,7 +82,6 @@
 #include <nucleos/sysutil.h>
 #include <nucleos/endpoint.h>
 #include <nucleos/timer.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 #include <ibm/pci.h>

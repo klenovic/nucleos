@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <nucleos/string.h>
 
-#include <net/hton.h>
 #include <net/nameser.h>
 #include <net/netdb.h>
 #include <net/in.h>

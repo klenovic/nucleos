@@ -54,9 +54,6 @@
 #include <stdlib.h>
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
-
-#include <net/hton.h>
-
 #include <net/netlib.h>
 #include <net/in.h>
 #include <net/inet.h>

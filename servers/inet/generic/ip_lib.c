@@ -210,12 +210,12 @@ nettype_t nettype;
 {
 	switch(nettype)
 	{
-	case IPNT_ZERO:		return HTONL(0x00000000);
+	case IPNT_ZERO:		return htonl(0x00000000);
 	case IPNT_CLASS_A:
-	case IPNT_LOCAL:	return HTONL(0xff000000);
-	case IPNT_CLASS_B:	return HTONL(0xffff0000);
-	case IPNT_CLASS_C:	return HTONL(0xffffff00);
-	default:		return HTONL(0xffffffff);
+	case IPNT_LOCAL:	return htonl(0xff000000);
+	case IPNT_CLASS_B:	return htonl(0xffff0000);
+	case IPNT_CLASS_C:	return htonl(0xffffff00);
+	default:		return htonl(0xffffffff);
 	}
 }
 

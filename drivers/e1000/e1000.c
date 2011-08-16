@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <nucleos/drivers.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 #include <servers/ds/ds.h>

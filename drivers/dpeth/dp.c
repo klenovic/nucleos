@@ -66,7 +66,6 @@
 #include <nucleos/drivers.h>
 #include <nucleos/keymap.h>
 #include <nucleos/endpoint.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 

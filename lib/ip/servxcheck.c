@@ -20,7 +20,6 @@
 #include <nucleos/unistd.h>
 #include <nucleos/time.h>
 #include <nucleos/ioctl.h>
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/tcp.h>
 #include <net/tcp_io.h>
@@ -171,7 +170,7 @@ int servxcheck(ipaddr_t peer, const char *service,
     ipaddr_t addr, mask;
 
     /* Localhost? */
-    if ((peer & HTONL(0xFF000000)) == HTONL(0x7F000000)) return 1;
+    if ((peer & htonl(0xFF000000)) == htonl(0x7F000000)) return 1;
 
     if ((fp= fopen(path_servacces, "r")) == 0) {
 	/* Succeed on error, fail if simply nonexistent. */

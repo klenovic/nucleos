@@ -905,7 +905,7 @@ size_t pack_size;
 	hash ^= (hash >> 8);
 	hash &= (ETH_TYPE_HASH_NR-1);
 
-	if (type == HTONS(ETH_VLAN_PROTO))
+	if (type == htons(ETH_VLAN_PROTO))
 	{
 		/* VLAN packet. Extract original ethernet packet */
 
@@ -1343,7 +1343,7 @@ acc_t *pack;
 	pack= bf_delhead(pack, 2*sizeof(ether_addr_t));
 	pack= bf_packIffLess(pack, sizeof(type));
 	type= *(u16_t *)ptr2acc_data(pack);
-	if (type == HTONS(ETH_VLAN_PROTO))
+	if (type == htons(ETH_VLAN_PROTO))
 	{
 		/* Packeted is already tagged. Should update vlan number.
 		 * For now, just discard packet.
@@ -1357,7 +1357,7 @@ acc_t *pack;
 
 	vh_acc= bf_memreq(sizeof(vlan_hdr_t));
 	vp= (vlan_hdr_t *)ptr2acc_data(vh_acc);
-	vp->vh_type= HTONS(ETH_VLAN_PROTO);
+	vp->vh_type= htons(ETH_VLAN_PROTO);
 	vp->vh_vlan= htons(vlan);
 
 	head_acc= bf_append(head_acc, vh_acc); vh_acc= NULL;

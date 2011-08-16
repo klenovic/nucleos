@@ -20,7 +20,6 @@
 
 #include <stdlib.h>
 #include <nucleos/drivers.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 #include <ibm/pci.h>

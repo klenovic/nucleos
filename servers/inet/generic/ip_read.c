@@ -222,8 +222,8 @@ assert (second->acc_length >= IP_MIN_HDR_SIZE);
 		return second;
 	}
 
-	if (!(second_hdr->ih_flags_fragoff & HTONS(IH_MORE_FRAGS)))
-		first_hdr->ih_flags_fragoff &= ~HTONS(IH_MORE_FRAGS);
+	if (!(second_hdr->ih_flags_fragoff & htons(IH_MORE_FRAGS)))
+		first_hdr->ih_flags_fragoff &= ~htons(IH_MORE_FRAGS);
 
 	second_datasize= second_offset+second_datasize-(first_offset+
 		first_datasize);
@@ -720,7 +720,7 @@ assert (pack->acc_length >= IP_MIN_HDR_SIZE);
 
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(pack);
 
-	DIFBLOCK(0x20, (ip_hdr->ih_dst & HTONL(0xf0000000)) == HTONL(0xe0000000),
+	DIFBLOCK(0x20, (ip_hdr->ih_dst & htonl(0xf0000000)) == htonl(0xe0000000),
 		printk("got multicast packet\n"));
 
 	ip_hdr_len= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) << 2;
@@ -806,7 +806,7 @@ ev_arg_t ev_arg;
 		}
 		next_port= &ip_port_table[iroute->irt_port];
 
-		if (ip_hdr->ih_flags_fragoff & HTONS(IH_DONT_FRAG))
+		if (ip_hdr->ih_flags_fragoff & htons(IH_DONT_FRAG))
 		{
 			req_mtu= bf_bufsize(pack);
 			if (req_mtu > next_port->ip_mtu ||
@@ -978,7 +978,7 @@ ipaddr_t dest;
 	ipaddr_t my_ipaddr, netmask, classmask;
 
 	/* Treat class D (multicast) address as broadcasts. */
-	if ((dest & HTONL(0xF0000000)) == HTONL(0xE0000000))
+	if ((dest & htonl(0xF0000000)) == htonl(0xE0000000))
 	{
 		return 1;
 	}
@@ -989,10 +989,10 @@ ipaddr_t dest;
 		return 1;
 	}
 	/* Two possibilities, 0 (iff IP_42BSD_BCAST) and -1 */
-	if (dest == HTONL((ipaddr_t)-1))
+	if (dest == htonl((ipaddr_t)-1))
 		return 1;
 #if IP_42BSD_BCAST
-	if (dest == HTONL((ipaddr_t)0))
+	if (dest == htonl((ipaddr_t)0))
 		return 1;
 #endif
 	netmask= ip_port->ip_subnetmask;

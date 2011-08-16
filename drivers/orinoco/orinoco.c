@@ -99,7 +99,6 @@ static tmra_ut or_watchdog;
 #include <stdlib.h>
 #include <nucleos/com.h>
 #include <nucleos/portio.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 #include <asm/servers/vm/vm.h>

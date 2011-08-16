@@ -552,11 +552,11 @@ nwio_ipconf_t *ipconf;
 		{
 		    ip_port->ip_subnetmask= ip_port->ip_classfulmask;
 		}
-		if (ipaddr == HTONL(0x00000000))
+		if (ipaddr == htonl(0x00000000))
 		{
 			/* Special case. Use 0.0.0.0 to shutdown interface. */
 			ip_port->ip_flags &= ~(IPF_IPADDRSET|IPF_NETMASKSET);
-			ip_port->ip_subnetmask= HTONL(0x00000000);
+			ip_port->ip_subnetmask= htonl(0x00000000);
 		}
 		(*ip_port->ip_dev_set_ipaddr)(ip_port);
 
