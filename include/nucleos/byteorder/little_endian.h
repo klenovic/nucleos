@@ -115,4 +115,4 @@ static inline __u16 __be16_to_cpup(const __be16 *p)
 #include <nucleos/byteorder/generic.h>
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /*_NUCLEOS_BYTEORDER_LITTLE_ENDIAN_H */
+#endif /* _NUCLEOS_BYTEORDER_LITTLE_ENDIAN_H */
