@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_CTYPE_H
-#define __NUCLEOS_CTYPE_H
+#ifndef _NUCLEOS_CTYPE_H
+#define _NUCLEOS_CTYPE_H
 /* @nucleos: linux (master: f72caf7) */
 /*
  * NOTE! This ctype does not handle EOF like the standard C
@@ -52,4 +52,13 @@ static inline unsigned char __toupper(unsigned char c)
 #define tolower(c)	__tolower(c)
 #define toupper(c)	__toupper(c)
 
-#endif /* __NUCLEOS_CTYPE_H */
+/*
+ * Fast implementation of tolower() for internal usage. Do not use in your
+ * code.
+ */
+static inline char _tolower(const char c)
+{
+	return c | 0x20;
+}
+
+#endif /* _NUCLEOS_CTYPE_H */

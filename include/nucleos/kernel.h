@@ -146,6 +146,24 @@ extern long long simple_strtoll(const char *,char **,unsigned int);
 #define strict_strtol   kstrtol
 #define strict_strtoull kstrtoull
 #define strict_strtoll  kstrtoll
+
+/*
+ * min()/max()/clamp() macros that also do
+ * strict type-checking.. See the
+ * "unnecessary" pointer comparison.
+ */
+#define min(x, y) ({				\
+	typeof(x) _min1 = (x);			\
+	typeof(y) _min2 = (y);			\
+	(void) (&_min1 == &_min2);		\
+	_min1 < _min2 ? _min1 : _min2; })
+
+#define max(x, y) ({				\
+	typeof(x) _max1 = (x);			\
+	typeof(y) _max2 = (y);			\
+	(void) (&_max1 == &_max2);		\
+	_max1 > _max2 ? _max1 : _max2; })
+
 #endif /* __ASSEMBLY__ */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
