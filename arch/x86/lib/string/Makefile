@@ -1,5 +1,10 @@
 lib-y := libnucc.a
-libnucc.a-obj-y := _memmove.o _strncat.o _strncmp.o _strncpy.o _strnlen.o bcmp.o \
-	       bcopy.o bzero.o index.o memchr.o memcmp.o memcpy.o memmove.o memset.o \
-	       rindex.o strcat.o strchr.o strcmp.o strcpy.o strlen.o strncat.o strncmp.o \
-	       strncpy.o strnlen.o strrchr.o
+
+libnucc.a-obj-y += memcpy_$(BITS).o
+
+ifeq ($(CONFIG_X86_32),y)
+        libnucc.a-obj-y += strstr_32.o
+        libnucc.a-obj-y += string_32.o
+endif
+
+ccflags-y := -D__UKERNEL__
