@@ -6,7 +6,9 @@ include include/asm-generic/Kbuild.asm
 # n/a header-y += boot.h
 header-y += bootparam.h
 # n/a header-y += debugreg.h
+header-y += e820.h
 header-y += fpu.h
+header-y += ist.h
 # n/a header-y += ldt.h
 # n/a header-y += msr-index.h
 # n/a header-y += prctl.h

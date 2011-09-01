@@ -62,7 +62,7 @@ int isokendpt_f(endpoint_t e, int *p, int f);
 #endif
 
 /* start.c */
-void cstart(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize);
+void prepare_kernel(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize);
 
 /* system.c */
 int get_priv(register struct proc *rc, int proc_type);
@@ -151,7 +151,6 @@ void halt_cpu(void);
 void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
-void arch_monitor(void);
 void arch_get_aout_headers(int i, struct exec *h);
 void restart(void);
 void read_tsc(u32_t *high, u32_t *low);

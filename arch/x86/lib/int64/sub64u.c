@@ -13,16 +13,16 @@
  * @brief Unsigned from 64 bit subtraction.
  * @note Assumes that i>j.
  */
-uint64_t sub64u(uint64_t i, unsigned j)
+u64 sub64u(u64 i, unsigned j)
 {
-  return (uint64_t)(i-j);
+	return (u64)(i-j);
 }
 
 /**
  * @brief Unsigned long from 64 bit subtraction.
  * @note Assumes that i>j.
  */
-uint64_t sub64ul(uint64_t i, unsigned long j)
+u64 sub64ul(u64 i, unsigned long j)
 {
-  return (uint64_t)(i-j);
+	return (u64)(i-j);
 }

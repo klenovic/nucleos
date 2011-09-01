@@ -143,7 +143,7 @@ acc_t *tcp_pack;
 	word_buf[1]= (ip_hdr->ih_src >> 16) & 0xffff;
 	word_buf[2]= ip_hdr->ih_dst & 0xffff;
 	word_buf[3]= (ip_hdr->ih_dst >> 16) & 0xffff;
-	word_buf[4]= HTONS(IPPROTO_TCP);
+	word_buf[4]= htons(IPPROTO_TCP);
 	word_buf[5]= htons(ntohs(ip_hdr->ih_length)-ip_hdr_len);
 	sum= oneC_sum(0, word_buf, sizeof(word_buf));
 
@@ -289,7 +289,7 @@ acc_t *data;
 	ip_hdr->ih_dst= tcp_conn->tc_remaddr;
 	ip_hdr->ih_flags_fragoff= 0;
 	if (tcp_conn->tc_flags & TCF_PMTU)
-		ip_hdr->ih_flags_fragoff |= HTONS(IH_DONT_FRAG);
+		ip_hdr->ih_flags_fragoff |= htons(IH_DONT_FRAG);
 
 	tcp_hdr->th_srcport= tcp_conn->tc_locport;
 	tcp_hdr->th_dstport= tcp_conn->tc_remport;

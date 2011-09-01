@@ -61,7 +61,6 @@
 #include <syslog.h>
 #include <nucleos/ioctl.h>
 #include <net/netlib.h>
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/udp.h>
 #include <net/udp_io.h>

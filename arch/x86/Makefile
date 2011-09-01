@@ -35,7 +35,7 @@ ifeq ($(CONFIG_X86_32),y)
         KBUILD_CFLAGS += $(cflags-y)
 endif
 
-boot := arch/x86/boot
+boot := arch/x86/boot/
 
 # speed up the build
 KBUILD_CFLAGS += -pipe

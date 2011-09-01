@@ -12,7 +12,7 @@
 /**
  * @brief 64 bit addition
  */
-uint64_t add64(uint64_t i, uint64_t j)
+u64 add64(u64 i, u64 j)
 {
-  return (uint64_t)(i+j);
+	return (u64)(i+j);
 }

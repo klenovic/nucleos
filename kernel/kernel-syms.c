@@ -37,7 +37,7 @@ struct machine machine;          /* machine information for users */
 struct kmessages kmess;          /* diagnostic messages in kernel */
 struct k_randomness krandom;     /* gather kernel random information */
 struct loadinfo kloadinfo;       /* status of load average */
-struct boot_param boot_param;    /* boot parameters */
+struct boot_params boot_params;    /* boot parameters */
 
 /* Process scheduling information and the kernel reentry count. */
 struct proc *proc_ptr;   /* pointer to currently running process */
@@ -64,7 +64,7 @@ int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
 char params_buffer[512];         /* boot monitor parameters */
-int kernel_in_panic;
+int kernel_in_panic = 0;
 int locklevel;
 u32_t magictest;
 

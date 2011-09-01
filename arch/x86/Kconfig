@@ -1,13 +1,29 @@
-# x86 configuration
-mainmenu "Nucleos Configuration for x86"
+# Select 32 or 64 bit
 
-# Select 32-bit
+# n/a
+config 64BIT
+	def_bool n
+
 config X86_32
-	def_bool y
+	def_bool !64BIT
+
+config X86_64
+	def_bool 64BIT
 
 ### Arch settings
 config X86
 	def_bool y
+
+# Link kernel with common I&D
+config ARCH_KERNEL_LINKAGE_COMID
+	def_bool y
+
+# Link servers/drivers with common I&D
+config ARCH_UKERNEL_LINKAGE_COMID
+	def_bool y
+
+# x86 configuration
+mainmenu "Nucleos Configuration for x86"
 
 config ARCH_DEFCONFIG
 	string
@@ -16,6 +32,12 @@ config ARCH_DEFCONFIG
 
 config ARCH_SELECT_MEMORY_MODEL
 	def_bool y
+
+config PAGE_OFFSET
+	hex
+	default 0x00000000
+	depends on X86_32
+
 
 config ARCH_SUPPORTS_OPTIMIZED_INLINING
 	def_bool y
@@ -79,6 +101,25 @@ config X86_IO_APIC
 	def_bool y
 	depends on SMP || X86_UP_APIC
 
+config PHYSICAL_START
+	hex "Physical address where the kernel is loaded"
+	default "0x1000000"
+	---help---
+	  This gives the physical address where the kernel is loaded.
+
+	  Don't change this unless you know what you are doing.
+
+config PHYSICAL_ALIGN
+	hex "Alignment value to which kernel should be aligned" if X86_32
+	default "0x1000000"
+	range 0x2000 0x1000000
+	---help---
+	  This value puts the alignment restrictions on physical address
+	  where kernel is loaded and run from. Kernel is compiled for an
+	  address which meets above alignment restriction.
+
+	  Don't change this unless you know what you are doing.
+
 endmenu
 
 menu "Bus options (PCI etc.)"
@@ -97,17 +138,6 @@ source "drivers/pci/Kconfig"
 
 endmenu
 
-# Link kernel with separate I&D
-config ARCH_KERNEL_LINKAGE_SEPID
-	def_bool y
-
-# Link servers with separate I&D
-config ARCH_SERVERS_LINKAGE_SEPID
-	def_bool y
-
-# Link drivers with separate I&D
-config ARCH_DRIVERS_LINKAGE_SEPID
-	def_bool y
 
 # Servers (includes also debug options if any)
 source "arch/x86/servers/Kconfig"

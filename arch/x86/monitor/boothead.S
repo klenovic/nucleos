@@ -86,8 +86,8 @@ sepID:
 
 // Clear bss
 	xor	%ax, %ax      // Zero
-	mov	$__bss, %di    // Start of bss is at end of data (defined by linker script)
-	mov	$__ebss, %cx   // End of bss (begin of heap)
+	mov	$_bss, %di    // Start of bss is at end of data (defined by linker script)
+	mov	$_ebss, %cx   // End of bss (begin of heap)
 	sub	%di, %cx      // Number of bss bytes
 	shr	$1, %cx       // Number of words
 	rep

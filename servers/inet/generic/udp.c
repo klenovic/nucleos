@@ -1027,7 +1027,7 @@ size_t pack_size;
 	udp_io_hdr->uih_dst_port= dst_port;
 	data_size = udp_size-UDP_HDR_SIZE;
 #if CONF_UDP_IO_NW_BYTE_ORDER
-	udp_io_hdr->uih_ip_opt_len= HTONS(0);
+	udp_io_hdr->uih_ip_opt_len= htons(0);
 	udp_io_hdr->uih_data_len= htons(data_size);
 #else
 	udp_io_hdr->uih_ip_opt_len= 0;
@@ -1314,7 +1314,7 @@ assert (!udp_port->up_wr_pack);
 
 	ip_hdr->ih_vers_ihl= (IP_MIN_HDR_SIZE+ip_opt_size) >> 2;
 	ip_hdr->ih_tos= UDP_TOS;
-	ip_hdr->ih_flags_fragoff= HTONS(UDP_IP_FLAGS);
+	ip_hdr->ih_flags_fragoff= htons(UDP_IP_FLAGS);
 	ip_hdr->ih_ttl= IP_DEF_TTL;
 	ip_hdr->ih_proto= IPPROTO_UDP;
 	if (flags & NWUO_RA_SET)

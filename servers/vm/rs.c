@@ -16,7 +16,7 @@
 
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <stdio.h>
 
 #include <servers/vm/glo.h>

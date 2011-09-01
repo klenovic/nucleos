@@ -19,10 +19,8 @@
 
 void kernel_panic(char *mess, int nr)
 {
-	/* The system has run aground of a fatal kernel error.
-	   Terminate execution. */
-	if (kernel_in_panic++)
-		arch_monitor();
+	/* But what if we are already in panic? */
+	kernel_in_panic++;
 
 	if (mess != NULL) {
 		printk("kernel panic: %s", mess);
@@ -37,5 +35,5 @@ void kernel_panic(char *mess, int nr)
 	util_stacktrace();
 
 	/* Abort Nucleos. */
-	nucleos_shutdown(NULL);
+	nucleos_shutdown(RBT_HALT);
 }

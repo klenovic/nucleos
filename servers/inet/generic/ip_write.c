@@ -144,7 +144,7 @@ size_t data_len;
 		ip_hdr->ih_tos= ip_fd->if_ipopt.nwio_tos;
 		ip_hdr->ih_flags_fragoff= 0;
 		if (ip_fd->if_ipopt.nwio_df)
-			ip_hdr->ih_flags_fragoff |= HTONS(IH_DONT_FRAG);
+			ip_hdr->ih_flags_fragoff |= htons(IH_DONT_FRAG);
 		ip_hdr->ih_ttl= ip_fd->if_ipopt.nwio_ttl;
 		ttl= ORTD_UNREACHABLE+1;		/* Don't check TTL */
 	}
@@ -183,7 +183,7 @@ size_t data_len;
 	ip_hdr->ih_vers_ihl= (ip_hdr->ih_vers_ihl & IH_IHL_MASK) |
 		(IP_VERSION << 4);
 	ip_hdr->ih_length= htons(data_len);
-	ip_hdr->ih_flags_fragoff &= ~HTONS(IH_FRAGOFF_MASK |
+	ip_hdr->ih_flags_fragoff &= ~htons(IH_FRAGOFF_MASK |
 		IH_FLAGS_UNUSED | IH_MORE_FRAGS);
 	if (ip_fd->if_ipopt.nwio_flags & NWIO_PROTOSPEC)
 		ip_hdr->ih_proto= ip_fd->if_ipopt.nwio_proto;
@@ -226,7 +226,7 @@ size_t data_len;
 	assert (data->acc_length >= IP_MIN_HDR_SIZE);
 	ip_hdr= (ip_hdr_t *)ptr2acc_data(data);
 
-	if (ip_hdr->ih_flags_fragoff & HTONS(IH_DONT_FRAG))
+	if (ip_hdr->ih_flags_fragoff & htons(IH_DONT_FRAG))
 	{
 		req_mtu= bf_bufsize(data);
 		if (req_mtu > ip_port->ip_mtu)
@@ -264,7 +264,7 @@ size_t data_len;
 		return 0;
 	}
 
-	if ((dstaddr & HTONL(0xe0000000)) == HTONL(0xe0000000))
+	if ((dstaddr & htonl(0xe0000000)) == htonl(0xe0000000))
 	{
 		if (dstaddr == (ipaddr_t)-1)
 		{
@@ -385,7 +385,7 @@ int mtu;
 	pack_siz= bf_bufsize(first_pack);
 	assert(pack_siz > mtu);
 
-	assert (!(first_hdr->ih_flags_fragoff & HTONS(IH_DONT_FRAG)));
+	assert (!(first_hdr->ih_flags_fragoff & htons(IH_DONT_FRAG)));
 
 	if (first_pack->acc_linkC != 1 ||
 		first_pack->acc_buffer->buf_linkC != 1)
@@ -485,10 +485,10 @@ int mtu;
 	assert(first_pack->acc_linkC == 1);
 	assert(first_pack->acc_buffer->buf_linkC == 1);
 
-	first_hdr->ih_flags_fragoff |= HTONS(IH_MORE_FRAGS);
+	first_hdr->ih_flags_fragoff |= htons(IH_MORE_FRAGS);
 	first_hdr->ih_length= htons(first_data_len+
 		first_hdr_len);
-	assert (!(second_hdr->ih_flags_fragoff & HTONS(IH_DONT_FRAG)));
+	assert (!(second_hdr->ih_flags_fragoff & htons(IH_DONT_FRAG)));
 
 	ip_hdr_chksum(first_hdr, first_hdr_len);
 	if (second_data_len+second_hdr_len <= mtu)

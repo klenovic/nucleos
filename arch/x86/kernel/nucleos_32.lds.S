@@ -13,22 +13,28 @@
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
-#include <asm/page.h>
+#include <asm/boot.h>
+#include <asm/page_types.h>
+
+#ifdef CONFIG_X86_32
+#define LOAD_OFFSET	__PAGE_OFFSET
+#endif
 
 SECTIONS
 {
 #ifdef CONFIG_KERNEL_LINKAGE_SEPID
+	_text = .;
 	.text 0 : AT (ADDR(.text)) {
-		__text = .;
 		*(.text.head)
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
-		__etext = SIZEOF(.text);
 	}
+	_etext = SIZEOF(.text);
 
+	_data = .;
 	.data 0 : AT (SIZEOF(.text)) {
-		__data = .;
+
 		SHORT(0x526f);					/* kernel data starts
 								   with this magic number */
 		. = (. == 0) ? PAGE_SIZE : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
@@ -37,29 +43,25 @@ SECTIONS
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-		__edata = SIZEOF(.data);
 	}
+	_edata = SIZEOF(.data);
 
+	_bss = .;
 	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		__bss = .;
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
-		__ebss = SIZEOF(.data) + SIZEOF(.bss);
 	}
-
-	__end = __ebss;
+	_ebss = SIZEOF(.data) + SIZEOF(.bss);
+	_end = _ebss;
 
 #else /* Common I&D */
 
-#define LOAD_OFFSET         __PAGE_OFFSET__
-#define LOAD_PHYSICAL_ADDR  __LOAD_PHYSICAL_ADDR__
-
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 
+	_text = .;
 	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
-		__text = .;
 		*(.text.head)
 		. = ALIGN(PAGE_SIZE);
 	}
@@ -68,39 +70,38 @@ SECTIONS
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
-		__etext = .;
 	}
+	_etext = .;
 
+	_data = .;
 	.rodata . : AT (ADDR(.rodata) - LOAD_OFFSET) {
-		__data = .;
+		_rodata = .;
 		/* kernel data starts with this magic number */
 		SHORT(0x526f);
-		__rodata = .;
 		*(.rodata)
 		*(.rodata.*)
 		. = ALIGN(PAGE_SIZE);
-		__erodata = .;
+		_erodata = .;
 	}
 
 	.data . : AT (ADDR(.data) - LOAD_OFFSET) {
 		*(.data)
 		*(.data.*)
 		. = ALIGN(PAGE_SIZE);
-		__edata = .;
 	}
+	_edata = .;
 
+	_bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-		__bss = .;
+
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
 		. = ALIGN(PAGE_SIZE);
-		__ebss = .;
 	}
-
-	__end = .;
+	_ebss = .;
+	_end = _ebss;
 #endif
-
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)

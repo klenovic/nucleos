@@ -21,10 +21,7 @@
 	.set BOOTOFF,		0x7C00	// 0x0000:BOOTOFF load a bootstrap here
 	.set BUFFER,		0x0600	// First free memory
 	.set PENTRYSIZE,	16	// Partition table entry size.
-	.set K_I386,		0x0001	// Call Minix in 386 mode
-	.set K_RET,		0x0020	// Returns to the monitor on reboot
 	.set K_INT86,		0x0040	// Requires generic INT support
-	.set K_MEML,		0x0080	// Pass a list of free memory
 
 	.set DS_SELECTOR,	3*8	// Kernel data selector
 	.set ES_SELECTOR,	4*8	// Flat 4 Gb
@@ -32,9 +29,15 @@
 	.set CS_SELECTOR,	6*8	// Kernel code
 	.set MCS_SELECTOR,	7*8	// Monitor code
 
-	.set ESC,		0x1B	// Escape character
-
 .section .text
+
+.globl halt_cpu
+halt_cpu:
+	sti
+	hlt
+	cli
+	ret
+
 // void exit(int status)
 // Exit the monitor by rebooting the system.
 .globl exit   // Make various compilers happy
@@ -505,8 +508,7 @@ dev_boundary:
 	ret
 
 // int readsectors(u32_t bufaddr, u32_t sector, u8_t count)
-// int writesectors(u32_t bufaddr, u32_t sector, u8_t count)
-//       Read/write several sectors from/to disk or floppy.  The buffer must
+//       Read several sectors fromo disk or floppy.  The buffer must
 //       be between 64K boundaries//  Count must fit in a byte.  The external
 //       variables device, sectors and secspcyl describe the disk and its
 //       geometry.  Returns 0 for success, otherwise the BIOS error code.
@@ -532,19 +534,11 @@ dev_boundary:
 #define COUNT	14	// 12
 #define DSKRW	15	// 13
 
-.globl writesectors
-writesectors:
-	push	%bp
-	mov	%sp, %bp
-	movb	$0x03, DSKRW(%bp) // Code for a disk write
-	jmp	rwsec
-
 .globl readsectors
 readsectors:
 	push	%bp
 	mov	%sp, %bp
 	movb	$0x02, DSKRW(%bp) // Code for a disk read
-rwsec:
 	push	%bx
 	push	%si
 	push	%di
@@ -646,98 +640,6 @@ badopen:
 	pop	%bp
 	ret
 
-// int getch(void);
-//       Read a character from the keyboard, and check for an expired timer.
-//       A carriage return is changed into a linefeed for UNIX compatibility.
-.globl getch
-getch:
-	xor	%ax, %ax
-	xchg	unchar, %ax   // Ungotten character?
-	test	%ax, %ax
-	jnz	gotch
-.Lgetch:
-//  hlt                   // Play dead until interrupted (see monitor_pause())
-	movb	$0x01, %ah    // Keyboard status
-	int	$0x16
-	jz	0f            // Nothing typed
-	xorb	%ah, %ah      // Read character from keyboard
-	int	$0x16
-	jmp	press         // Keypress
-0:
-	mov	line, %dx     // Serial line?
-	test	%dx, %dx
-	jz	0f
-	add	$5, %dx       // Line Status Register
-	inb	%dx
-	testb	$0x01, %al    // Data Ready?
-	jz	0f
-	mov	line, %dx
-	//add	0, %dx        // Receive Buffer Register
-	inb	%dx           // Get character
-	jmp	press
-0:
-	call	expired       // Timer expired?
-	test	%ax, %ax
-	jz	.Lgetch
-	mov	$ESC, %ax     // Return ESC
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-press:
-	cmpb	$0x0D, %al    // Carriage return?
-	jnz	nocr
-	movb	$0x0A, %al    // Change to linefeed
-nocr:
-	cmpb	$ESC, %al     // Escape typed?
-	jne	noesc
-	incw	varescape     // Set flag
-noesc:
-	xorb	%ah, %ah      // %ax = al
-gotch:
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-
-// int ungetch(c);
-//       Return a character to undo a getch().
-.globl ungetch
-ungetch:
-	push	%bx
-	mov	%sp, %bx
-	mov	6(%bx), %ax
-	mov	%ax, unchar
-	pop	%bx
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-
-// int escape(void);
-//       True if ESC has been typed.
-.globl escape
-escape:
-	movb	$0x01, %ah   // Keyboard status
-	int	$0x16
-	jz	escflg       // Keypress?
-	cmpb	$ESC, %al    // Escape typed?
-	jne	escflg
-	xorb	%ah, %ah     // Discard the escape
-	int	$0x16
-	incw	varescape    // Set flag
-escflg:
-	xor	%ax, %ax
-	xchg	varescape, %ax  // Escape typed flag
-	and	$0xffff, %eax   // Since function (or mon2abs) can be called
-	                        // from C source compiled by .code16gcc
-	                        // which checks %eax not just %ax. This will
-	                        // cleanup the garbage from higher bits.
-	ret
-
 // int putch(int c);
 //       Write a character in teletype mode.  The putk synonym is
 //       for the kernel printf function that uses it.
@@ -789,14 +691,6 @@ nulch:
 	                      // from C source compiled by .code16gcc
 	                      // which checks %eax not just %ax. This will
 	                      // cleanup the garbage from higher bits.
-	ret
-
-// void monitor_pause(void);
-//       Wait for an interrupt using the HLT instruction.  This either saves
-//       power, or tells an x86 emulator that nothing is happening right now.
-.globl monitor_pause
-monitor_pause:
-//  hlt
 	ret
 
 // void set_mode(unsigned mode);
@@ -1111,7 +1005,6 @@ bootstrap:
 ebxval:	.long 0
 
 minix:
-
 	push	%bx
 	push	%bp
 	mov	%sp, %bp          // Pointer to arguments
@@ -1124,46 +1017,6 @@ minix:
 	andb	$0xF0,0x043F      // Clear diskette motor status bits of BIOS
 	pop	%ds
 	cli                       // No more interruptions
-
-	testw	$K_I386, k_flags // Switch to 386 mode?
-	jnz	minix386
-
-// Call Minix in real mode.
-minix86:
-	testw	$K_MEML, k_flags  // New memory arrangements?
-	jz	0f
-	push	22(%bp)          // Address of a.out headers
-	push	20(%bp)
-0:
-	push	18(%bp)          // # bytes of boot parameters
-	push	16(%bp)          // Address of boot parameters
-
-	testw	$K_RET, k_flags  // Can the kernel return?
-	jz	noret86
-	xor	%dx, %dx          // If little ext mem then monitor not preserved
-	xor	%ax, %ax 
-	cmp	%ax, mon_return  // Minix can return to the monitor?
-	jz	0f
-	mov	%cs, %dx           // Monitor far return address
-	mov	$ret86, %ax
-0:
-	push	%dx              // Push monitor far return address or zero
-	push	%ax
-noret86:
-	mov	8(%bp), %ax
-	mov	10(%bp), %dx
-	call	abs2seg
-	push	%dx           // Kernel code segment
-	push	4(%bp)        // Kernel code offset
-	mov	12(%bp), %ax
-	mov	14(%bp), %dx
-	call	abs2seg
-	mov	%dx, %ds      // Kernel data segment
-	mov	%dx, %es      // Set %es to kernel data too
-	lretw                 // Make a far call to the kernel
-
-// Call Minix in 386 mode.
-minix386:
 	mov	%cs, %cs:cs_real-2     // Patch CS and DS into the instructions that
 	mov	%ds, %cs:ds_real-2     // reload them when switching back to real mode
 	mov	%cr0, %eax
@@ -1206,21 +1059,14 @@ minix386:
 0:
 	pushw	$bios13            // Far address to BIOS int 13 support
 1:
-	testw	$K_MEML, k_flags   // New memory arrangements?
-	jz	0f
 	pushl	AOUTL(%bp)    // Address of a.out headers
-0:
 	pushw	$0
 	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
 	pushw	$0
 	pushw	BOOTP(%bp)   // 32 bit address of parameters (%ss relative)
-
-	testw	$K_RET, k_flags // Can the kernel return?
-	jz	noret386
-	pushw	$MCS_SELECTOR
-	pushw	$ret386         // Monitor far return address
-noret386:
 	pushw	$0
+	pushw	$0		// monitor far return address "Monitor CS_SEGMENT:ret386"
+	pushw	$0		// @nucleos: monitor never entered on reboot/halt
 	pushw	$CS_SELECTOR
 	pushw	KOFFH(%bp)
 	pushw	KOFFL(%bp)       // 32 bit far address to kernel entry point
@@ -1231,13 +1077,6 @@ noret386:
 	mov	$ES_SELECTOR, %ax // Flat 4 Gb
 	mov	%ax, %es
 	lretl                     // Make a far call to the kernel
-
-// Minix-86 returns here on a halt or reboot.
-ret86:
-	mov	%ax, reboot_code+0
-	mov	%dx, reboot_code+2 // Return value (obsolete method)
-	jmp	return
-
 // Minix-386 returns here on a halt or reboot.
 ret386:
 	movl	%eax, reboot_code // Return value (obsolete method)
@@ -1512,26 +1351,13 @@ int15:
 	pop	%si           // Restore
 	ret
 
-// void scan_keyboard(void)
-//       Read keyboard character. Needs to be done in case one is waiting.
-.globl scan_keyboard
-scan_keyboard:
-	inb	$0x60
-	inb	$0x61
-	movb	%al, %ah
-	orb	$0x80, %al
-	outb	$0x61
-	movb	%ah, %al
-	outb	$0x61
-	ret
-
 .section .data
 nomem:		.ascii  "\nOut of%s\0"
 memwarn:	.ascii  "\nLow on"
 chmem:		.ascii  " memory, use chmem to increase the heap\n\0"
 
 	.p2align  1
-break:		.word  __end       // A fake heap pointer
+break:		.word  _end       // A fake heap pointer
 
 any_key:	.ascii  "\nHit any key to reboot\n\0"
 seclist:	.byte 18, 15, 9       // 1.44M, 1.2M, and 360K/720K floppy sec/track

@@ -13,7 +13,7 @@
  * @brief 64 bit subtraction.
  * @note Always returns a positive value |i-j|
  */
-uint64_t sub64(uint64_t i, uint64_t j)
+u64 sub64(u64 i, u64 j)
 {
- return (uint64_t)((i>=j) ? (i-j):(j-i));
+	return (u64)((i>=j) ? (i-j):(j-i));
 }

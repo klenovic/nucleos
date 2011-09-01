@@ -9,7 +9,7 @@ LDFLAGS_e1000.elf32 := -L$(lib-arch) -Llib \
 $(src)/e1000.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-e1000_a_flags   := $(CONFIG_DRIVERS_LINKAGE_TYPE)
+e1000_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
 e1000_a_hdrlen  := 0x20
 e1000_a_cpu     := i386
 e1000_stackheap := 128k

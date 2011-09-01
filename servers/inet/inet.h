@@ -34,7 +34,6 @@ typedef int ioreq_t;
 #include <nucleos/com.h>
 #include <nucleos/syslib.h>
 #include <nucleos/sysutil.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_hdr.h>
 #include <net/eth_io.h>

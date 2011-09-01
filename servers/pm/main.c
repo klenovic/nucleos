@@ -37,12 +37,12 @@
 #include <nucleos/string.h>
 #include <asm/kernel/const.h>
 #include <asm/kernel/types.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <servers/pm/mproc.h>
-#include "param.h"
-
 #include <kernel/const.h>
 #include <kernel/proc.h>
+
+#include "param.h"
 
 struct mproc mproc[NR_PROCS];
 
@@ -416,16 +416,11 @@ static void handle_fs_reply()
    * Handle its reply first.
    */
   if (call_nr == PM_REBOOT_REPLY) {
-	vir_bytes code_addr;
-	size_t code_size;
-
 	/* Ask the kernel to abort. All system services, including
 	 * the PM, will get a HARD_STOP notification. Await the
 	 * notification in the main loop.
 	 */
-	code_addr = (vir_bytes) monitor_code;
-	code_size = strlen(monitor_code) + 1;
-	sys_abort(abort_flag, PM_PROC_NR, code_addr, code_size);
+	sys_abort(abort_flag);
 
 	return;
   }

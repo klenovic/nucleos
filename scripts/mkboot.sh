@@ -17,7 +17,6 @@ bin_boot=
 bin_image=
 
 installboot=tools/installboot
-edparams=tools/edparams
 mkfs=tools/mkfs
 partition=tools/partition
 
@@ -293,7 +292,6 @@ case $action in
     rm -rf $tmp_dir
 
     sudo $installboot -d $dev -B $bin_bootblock -b /boot/boot -p $bin_boot || cleanup_exit 1
-    sudo $edparams $dev 'nucleos(1,Start Nucleos) { image=/boot/nucleos; boot; }; newnucleos(2,Start Custom Nucleos) { unset image; boot }; main() { echo By default, Nucleos will automatically load in 3 seconds.; echo Press ESC to enter the monitor for special configuration.; trap 3000 boot; menu; }; save' || cleanup_exit 1
     ;;
 
   installmbr)
@@ -387,7 +385,6 @@ case $action in
 
     echo "==> Patching boot code address and adding boot paramenters"
     sudo $installboot -d $dev -B $bin_bootblock -b /boot/boot -p $bin_boot || cleanup_exit 1
-    sudo $edparams $dev 'unset bootopts; unset servers; disable=inet; image=/boot/image/image; bootbig(1, Regular Nucleos (requires at least 16 MB RAM)) { image=/boot/image/image ; boot } bootsmall(2, Small Nucleos (intended for 8 MB systems)) { image=/boot/image/image_small ; boot } cdproberoot=1; unset rootdev; unset leader; leader() { echo \n--- Welcome to Nucleos. This is the boot monitor. ---\n\nChoose an option from the menu or press ESC if you need to do anything special.\nOtherwise I will boot with my defaults in 10 seconds.\n\n }; bootcd=1; main(){trap 10000 boot; menu; }; save' || cleanup_exit 1
     ;;
 
   fdboot)
@@ -440,16 +437,7 @@ case $action in
     #       host system ehrrrr...
     echo "==> Patching boot code address and boot paramenters"
     sudo $installboot -d $dev -B $bin_bootblock -b /boot/boot -p $bin_boot || cleanup_exit 1
-    pfile=fdbootparams
 
-    if [ -f $pfile ];  then
-      echo "Using floppy boot parameters from file $pfile."
-      sudo $edparams $dev "`cat $pfile`" || cleanup_exit 1
-    else
-      echo "Missing boot parameters."
-      cleanup_exit 1
-    fi
-    sudo $edparams $dev 'main(){delay 2000;boot}; save' || cleanup_exit 1
     echo "Test kernel installed on $dev"
     ;;
 esac

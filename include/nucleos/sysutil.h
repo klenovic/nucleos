@@ -10,6 +10,7 @@
 #ifndef __NUCLEOS_SYSUTIL_H
 #define __NUCLEOS_SYSUTIL_H
 
+#include <nucleos/type.h>
 #include <nucleos/kipc.h>
 
 /* Extra system library definitions to support device drivers and servers.
@@ -44,6 +45,7 @@ int env_get_param(char *key, char *value, int max_size);
 int env_prefix(char *env, char *prefix);
 void env_panic(char *key);
 int env_parse(char *env, char *fmt, int field, long *param, long min, long max);
+int env_memory_parse(struct memory *chunks, int nchunks);
 
 #define fkey_map(fkeys, sfkeys) fkey_ctl(FKEY_MAP, (fkeys), (sfkeys))
 #define fkey_unmap(fkeys, sfkeys) fkey_ctl(FKEY_UNMAP, (fkeys), (sfkeys))

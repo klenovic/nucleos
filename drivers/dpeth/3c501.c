@@ -22,7 +22,6 @@
 
 #include <nucleos/drivers.h>
 #include <nucleos/com.h>
-#include <net/hton.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
 #include "dp.h"

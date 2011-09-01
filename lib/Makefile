@@ -7,4 +7,6 @@ libdriver.a-obj-y := libdriver/
 libtimers.a-obj-y := timers/
 libnucc.a-obj-y := ansi/ ip/ math64/ other/ posix/ regex/ stdio/ sysvipc/
 
-libnucc.a-obj-y += ctype.o
+libnucc.a-obj-y += ctype.o kstrtox.o string.o
+CFLAGS_string.o += -D__KERNEL__
+CFLAGS_kstrtox.o += -D__KERNEL__

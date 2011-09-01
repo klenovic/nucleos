@@ -5,7 +5,7 @@ libnucc.a-obj-y := accept.o bind.o connect.o dhcp_gettag.o dhcp_settag.o domainn
 	                 gethnmadr.o gethostent.o gethostname.o getifaddrs.o getnetbyaddr.o \
 	                 getnetbyname.o getnetent.o getpeername.o getproto.o getprotoent.o \
 	                 getprotoname.o getservent.o getsockname.o getsockopt.o getsrvbyname.o \
-	                 getsrvbyport.o hton.o inet_addr.o inet_network.o inet_ntoa.o listen.o \
+	                 getsrvbyport.o inet_addr.o inet_network.o inet_ntoa.o listen.o \
 	                 memcspn.o oneC_sum.o rcmd.o recv.o recvfrom.o res_comp.o res_init.o \
 	                 res_mkquery.o res_query.o res_send.o ruserok.o send.o sendto.o servxcheck.o \
 	                 sethostent.o setsockopt.o shutdown.o socket.o strcasecmp.o

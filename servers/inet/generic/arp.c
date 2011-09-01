@@ -308,7 +308,7 @@ int for_ioctl;
 			ethopt= (struct nwio_ethopt *)ptr2acc_data(acc);
 			ethopt->nweo_flags= NWEO_COPY|NWEO_EN_BROAD|
 				NWEO_TYPESPEC;
-			ethopt->nweo_type= HTONS(ETH_ARP_PROTO);
+			ethopt->nweo_type= htons(ETH_ARP_PROTO);
 			return acc;
 		}
 	case APS_ARPMAIN:
@@ -483,7 +483,7 @@ arp_port_t *arp_port;
 			break;
 		arp_port->ap_sendlist= data->acc_ext_link;
 
-		if (arp_port->ap_ipaddr == HTONL(0x00000000))
+		if (arp_port->ap_ipaddr == htonl(0x00000000))
 		{
 			/* Interface is down */
 			printk(
@@ -551,12 +551,12 @@ acc_t *data;
 	memcpy(&spa, arp->a46_spa, sizeof(ipaddr_t));
 	memcpy(&tpa, arp->a46_tpa, sizeof(ipaddr_t));
 
-	if (arp->a46_hdr != HTONS(ARP_ETHERNET) ||
+	if (arp->a46_hdr != htons(ARP_ETHERNET) ||
 		arp->a46_hln != 6 ||
-		arp->a46_pro != HTONS(ETH_IP_PROTO) ||
+		arp->a46_pro != htons(ETH_IP_PROTO) ||
 		arp->a46_pln != 4)
 		return;
-	if (arp_port->ap_ipaddr == HTONL(0x00000000))
+	if (arp_port->ap_ipaddr == htonl(0x00000000))
 	{
 		/* Interface is down */
 #if DEBUG
@@ -570,7 +570,7 @@ acc_t *data;
 	cache= NULL;	/* lint */
 
 	do_reply= 0;
-	if (arp->a46_op != HTONS(ARP_REQUEST))
+	if (arp->a46_op != htons(ARP_REQUEST))
 		;	/* No need to reply */
 	else if (tpa == arp_port->ap_ipaddr)
 		do_reply= 1;
@@ -667,8 +667,8 @@ acc_t *data;
 		}
 
 		arp->a46_dstaddr= ce->ac_ethaddr;
-		arp->a46_hdr= HTONS(ARP_ETHERNET);
-		arp->a46_pro= HTONS(ETH_IP_PROTO);
+		arp->a46_hdr= htons(ARP_ETHERNET);
+		arp->a46_pro= htons(ETH_IP_PROTO);
 		arp->a46_hln= 6;
 		arp->a46_pln= 4;
 
@@ -1254,11 +1254,11 @@ timer_t *timer;
 	arp->a46_dstaddr.ea_addr[3]= 0xff;
 	arp->a46_dstaddr.ea_addr[4]= 0xff;
 	arp->a46_dstaddr.ea_addr[5]= 0xff;
-	arp->a46_hdr= HTONS(ARP_ETHERNET);
-	arp->a46_pro= HTONS(ETH_IP_PROTO);
+	arp->a46_hdr= htons(ARP_ETHERNET);
+	arp->a46_pro= htons(ETH_IP_PROTO);
 	arp->a46_hln= 6;
 	arp->a46_pln= 4;
-	arp->a46_op= HTONS(ARP_REQUEST);
+	arp->a46_op= htons(ARP_REQUEST);
 	arp->a46_sha= arp_port->ap_ethaddr;
 	memcpy (arp->a46_spa, &arp_port->ap_ipaddr, sizeof(ipaddr_t));
 	memset(&arp->a46_tha, '\0', sizeof(ether_addr_t));

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __ASM_X86_KERNEL_UACCESS_32_H
-#define __ASM_X86_KERNEL_UACCESS_32_H
+#ifndef _ASM_X86_KERNEL_UACCESS_32_H
+#define _ASM_X86_KERNEL_UACCESS_32_H
 
 /*
  * User space memory access functions
@@ -124,4 +124,4 @@ static inline long strnlen_user(struct proc *proc, const char __user *s, size_t 
 	return len;
 }
 
-#endif /*__ASM_X86_KERNEL_UACCESS_32_H */
+#endif /*_ASM_X86_KERNEL_UACCESS_32_H */

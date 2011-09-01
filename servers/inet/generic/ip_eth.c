@@ -174,7 +174,7 @@ int for_ioctl;
 			ethopt= (struct nwio_ethopt *)ptr2acc_data(acc);
 			ethopt->nweo_flags= NWEO_COPY|NWEO_EN_BROAD|
 				NWEO_EN_MULTI|NWEO_TYPESPEC;
-			ethopt->nweo_type= HTONS(ETH_IP_PROTO);
+			ethopt->nweo_type= htons(ETH_IP_PROTO);
 			return acc;
 		}
 

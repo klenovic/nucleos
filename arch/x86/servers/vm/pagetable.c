@@ -7,8 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#define VERBOSE 0
-
+#include <stdlib.h>
 #include <nucleos/unistd.h>
 #include <nucleos/com.h>
 #include <nucleos/const.h>
@@ -22,28 +21,20 @@
 #include <nucleos/syslib.h>
 #include <nucleos/safecopies.h>
 #include <nucleos/bitmap.h>
-#include <asm/cpufeature.h>
-
 #include <nucleos/errno.h>
-#include <stdlib.h>
-#include <assert.h>
 #include <nucleos/string.h>
-#include <env.h>
-#include <stdio.h>
 #include <nucleos/fcntl.h>
-#include <stdlib.h>
-
 #include <servers/vm/proto.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/util.h>
 #include <servers/vm/vm.h>
 #include <servers/vm/sanitycheck.h>
-
+#include <asm/cpufeature.h>
 #include <asm/servers/vm/memory.h>
 
 /* PDE used to map in kernel, kernel physical address. */
 static int id_map_high_pde = -1, pagedir_pde = -1;
-static u32_t global_bit = 0, pagedir_pde_val;
+static u32 global_bit = 0, pagedir_pde_val;
 
 static int proc_pde = 0;
 
@@ -61,7 +52,7 @@ struct vmproc *vmp = &vmproc[VM_PROC_NR];
 int missing_spares = SPAREPAGES;
 static struct {
 	void *page;
-	u32_t phys;
+	u32 phys;
 } sparepages[SPAREPAGES];
 
 #define MAX_KERNMAPPINGS 10
@@ -91,7 +82,7 @@ int kernmappings = 0;
 #define CLICK2PAGE(c) ((c) / CLICKSPERPAGE)
 
 /* Page table that contains pointers to all page directories. */
-u32_t page_directories_phys, *page_directories = NULL;
+u32 page_directories_phys, *page_directories = NULL;
 
 #if SANITYCHECKS
 /*===========================================================================*
@@ -140,9 +131,9 @@ void pt_sanitycheck(pt_t *pt, char *file, int line)
 static void *aalloc(size_t bytes)
 {
 /* Page-aligned malloc(). only used if vm_allocpage can't be used.  */
-	u32_t b;
+	u32 b;
 
-	b = (u32_t) malloc(I386_PAGE_SIZE + bytes);
+	b = (u32) malloc(I386_PAGE_SIZE + bytes);
 	if(!b) vm_panic("aalloc: out of memory", bytes);
 	b += I386_PAGE_SIZE - (b % I386_PAGE_SIZE);
 
@@ -152,15 +143,15 @@ static void *aalloc(size_t bytes)
 /*===========================================================================*
  *				findhole		     		     *
  *===========================================================================*/
-static u32_t findhole(pt_t *pt, u32_t vmin, u32_t vmax)
+static u32 findhole(pt_t *pt, u32 vmin, u32 vmax)
 {
 /* Find a space in the virtual address space of pageteble 'pt',
  * between page-aligned BYTE offsets vmin and vmax, to fit
  * a page in. Return byte offset.
  */
-	u32_t curv;
+	u32 curv;
 	int pde = 0, try_restart;
-	static u32_t lastv = 0;
+	static u32 lastv = 0;
 
 	/* Input sanity check. */
 	vm_assert(vmin + I386_PAGE_SIZE >= vmin);
@@ -169,7 +160,7 @@ static u32_t findhole(pt_t *pt, u32_t vmin, u32_t vmax)
 	vm_assert((vmax % I386_PAGE_SIZE) == 0);
 
 #if SANITYCHECKS
-	curv = ((u32_t) random()) % ((vmax - vmin)/I386_PAGE_SIZE);
+	curv = ((u32) random()) % ((vmax - vmin)/I386_PAGE_SIZE);
 	curv *= I386_PAGE_SIZE;
 	curv += vmin;
 #else
@@ -231,7 +222,7 @@ static void vm_freepages(vir_bytes vir, vir_bytes phys, int pages, int reason)
 /*===========================================================================*
  *				vm_getsparepage		     		     *
  *===========================================================================*/
-static void *vm_getsparepage(u32_t *phys)
+static void *vm_getsparepage(u32 *phys)
 {
 	int s;
 	vm_assert(missing_spares >= 0 && missing_spares <= SPAREPAGES);
@@ -298,7 +289,7 @@ void *vm_allocpage(phys_bytes *phys, int reason)
 
 	if(level > 1 || !(vmp->vm_flags & VMF_HASPT) || !meminit_done) {
 		void *s;
-		s=vm_getsparepage((u32_t*)phys);
+		s=vm_getsparepage((u32*)phys);
 		level--;
 		if(!s) {
 			util_stacktrace();
@@ -358,7 +349,7 @@ void vm_pagelock(void *vir, int lockflag)
 /* Mark a page allocated by vm_allocpage() unwritable, i.e. only for VM. */
 	vir_bytes m;
 	int r;
-	u32_t flags = I386_VM_PRESENT | I386_VM_USER;
+	u32 flags = I386_VM_PRESENT | I386_VM_USER;
 	pt_t *pt;
 
 	pt = &vmp->vm_pt;
@@ -385,11 +376,11 @@ void vm_pagelock(void *vir, int lockflag)
 /*===========================================================================*
  *				pt_ptalloc		     		     *
  *===========================================================================*/
-static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
+static int pt_ptalloc(pt_t *pt, int pde, u32 flags)
 {
 /* Allocate a page table and write its address into the page directory. */
 	int i;
-	u32_t pt_phys;
+	u32 pt_phys;
 
 	/* Argument must make sense. */
 	vm_assert(pde >= 0 && pde < I386_VM_DIR_ENTRIES);
@@ -422,7 +413,7 @@ static int pt_ptalloc(pt_t *pt, int pde, u32_t flags)
  *				pt_writemap		     		     *
  *===========================================================================*/
 int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
-	size_t bytes, u32_t flags, u32_t writemapflags)
+	size_t bytes, u32 flags, u32 writemapflags)
 {
 /* Write mapping into page table. Allocate a new page table if necessary. */
 /* Page directory and table entries for this virtual address. */
@@ -489,7 +480,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 
 	/* Now write in them. */
 	for(p = 0; p < pages; p++) {
-		u32_t entry;
+		u32 entry;
 		int pde = I386_VM_PDE(v);
 		int pte = I386_VM_PTE(v);
 
@@ -522,7 +513,7 @@ int pt_writemap(pt_t *pt, vir_bytes v, phys_bytes physaddr,
 		entry = (physaddr & I386_VM_ADDR_MASK) | flags;
 
 		if(verify) {
-			u32_t maskedentry;
+			u32 maskedentry;
 			maskedentry = pt->pt_pt[pde][pte];
 			maskedentry &= ~(I386_VM_ACC|I386_VM_DIRTY);
 			/* Verify pagetable entry. */
@@ -670,7 +661,7 @@ void pt_init(phys_bytes usedlimit)
         vir_bytes v, kpagedir;
         phys_bytes lo, hi; 
         vir_bytes extra_clicks;
-        u32_t moveup = 0;
+        u32 moveup = 0;
 	int global_bit_ok = 0;
 	int free_pde;
 	vir_bytes kernlimit;
@@ -784,7 +775,7 @@ void pt_init(phys_bytes usedlimit)
 		int kernmap_pde;
 		phys_bytes addr, len;
 		int flags, index = 0;
-		u32_t offset = 0;
+		u32 offset = 0;
 
 		kernmap_pde = free_pde++;
 		offset = kernmap_pde * I386_BIG_PAGE_SIZE;
@@ -871,7 +862,7 @@ void pt_init(phys_bytes usedlimit)
 int pt_bind(pt_t *pt, struct vmproc *who)
 {
 	int slot;
-	u32_t phys;
+	u32 phys;
 
 	/* Basic sanity checks. */
 	vm_assert(who);

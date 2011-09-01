@@ -9,40 +9,31 @@
  */
 
 /* This file contains some utility routines for VM.  */
-
-#include <asm/bootparam.h>
+#include <nucleos/sysutil.h>
 #include <nucleos/kernel.h>
-#include <nucleos/unistd.h>
-#include <nucleos/com.h>
-#include <nucleos/const.h>
-#include <servers/ds/ds.h>
 #include <nucleos/endpoint.h>
-#include <nucleos/minlib.h>
-#include <nucleos/type.h>
-#include <nucleos/kipc.h>
 #include <nucleos/sysutil.h>
 #include <nucleos/syslib.h>
 #include <nucleos/type.h>
 #include <nucleos/bitmap.h>
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
-#include <env.h>
-
 #include <servers/vm/proto.h>
 #include <servers/vm/glo.h>
 #include <servers/vm/util.h>
 #include <kernel/const.h>
 #include <kernel/types.h>
 #include <kernel/proc.h>
+#include <asm/bootparam.h>
 #include <asm/kernel/const.h>
 #include <asm/servers/vm/memory.h>
 
-/*===========================================================================*
- *                              get_mem_map                                  *
- *===========================================================================*/
-int get_mem_map(proc_nr, mem_map)
-int proc_nr;                                    /* process to get map of */
-struct mem_map *mem_map;                        /* put memory map here */
+/**
+ * Get proccess memory map
+ * @param proc_nr  process to get map of
+ * @param mem_map  put memory map here
+ */
+int get_mem_map(int proc_nr, struct mem_map *mem_map)
 {
 	struct proc p;
 	int s;
@@ -54,66 +45,66 @@ struct mem_map *mem_map;                        /* put memory map here */
 	return 0;
 }
 
-/*===========================================================================*
- *                              get_mem_chunks                               *
- *===========================================================================*/
-void get_mem_chunks(mem_chunks)
-struct memory *mem_chunks;                      /* store mem chunks here */ 
-{  
+/**
+ * Get memory chunks
+ * @param mem_chunks  store mem chunks here
+ */
+void get_mem_chunks(struct memory *mem_chunks)
+{
 /* Initialize the free memory list from the 'memory' boot variable.  Translate
  * the byte offsets and sizes in this list to clicks, properly truncated.
  */
-  phys_bytes base, size, limit;
-  int i;
-  struct memory *memp;
+	phys_bytes base, size, limit;
+	int i;
+	struct memory *memp;
 
-  /* Obtain and parse memory from system environment. */
-  if(env_memory_parse(mem_chunks, NR_MEMS) != 0) 
-        vm_panic("couldn't obtain memory chunks", NO_NUM); 
-   
-  /* Round physical memory to clicks. Round start up, round end down. */
-  for (i = 0; i < NR_MEMS; i++) {
-        memp = &mem_chunks[i];          /* next mem chunk is stored here */
-        base = mem_chunks[i].base;
-        size = mem_chunks[i].size;
-        limit = base + size;
-        base = (base + CLICK_SIZE-1) & ~(long)(CLICK_SIZE-1);
-        limit &= ~(long)(CLICK_SIZE-1);
-        if (limit <= base) {
-                memp->base = memp->size = 0;
-        } else { 
-                memp->base = base >> CLICK_SHIFT;
-                memp->size = (limit - base) >> CLICK_SHIFT;
-        }
-  }
-}  
+	/* Obtain and parse memory from system environment. */
+	if(env_memory_parse(mem_chunks, NR_MEMS) != 0) 
+		vm_panic("couldn't obtain memory chunks", NO_NUM);
 
-/*===========================================================================*
- *                              reserve_proc_mem                             *
- *===========================================================================*/
-void reserve_proc_mem(mem_chunks, map_ptr)
-struct memory *mem_chunks;                      /* store mem chunks here */
-struct mem_map *map_ptr;                        /* memory to remove */
+	/* Round physical memory to clicks. Round start up, round end down. */
+	for (i = 0; i < NR_MEMS; i++) {
+		memp = &mem_chunks[i];	/* next mem chunk is stored here */
+		base = mem_chunks[i].base;
+		size = mem_chunks[i].size;
+		limit = base + size;
+		base = (base + CLICK_SIZE-1) & ~(long)(CLICK_SIZE-1);
+		limit &= ~(long)(CLICK_SIZE-1);
+		if (limit <= base) {
+			memp->base = memp->size = 0;
+		} else {
+			memp->base = base >> CLICK_SHIFT;
+			memp->size = (limit - base) >> CLICK_SHIFT;
+		}
+	}
+}
+
+/**
+ * Reserve memory.
+ * @param mem_chunks  store mem chunks here
+ * @param map_ptr  memory to remove
+ */
+void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 {
 /* Remove server memory from the free memory list. The boot monitor
- * promises to put processes at the start of memory chunks. The 
+ * promises to put processes at the start of memory chunks. The
  * tasks all use same base address, so only the first task changes
  * the memory lists. The servers and init have their own memory
  * spaces and their memory will be removed from the list.
  */
-  struct memory *memp;
-  for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
-        if (memp->base == map_ptr[T].mem_phys) {
-                memp->base += map_ptr[T].mem_len + map_ptr[S].mem_vir;
-                memp->size -= map_ptr[T].mem_len + map_ptr[S].mem_vir;
-                break;
-        }
-  }
-  if (memp >= &mem_chunks[NR_MEMS])
-  {
-        vm_panic("reserve_proc_mem: can't find map in mem_chunks ",
-                map_ptr[T].mem_phys);
-  }
+	struct memory *memp;
+	for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
+		if (memp->base == map_ptr[T].mem_phys) {
+			memp->base += map_ptr[T].mem_len + map_ptr[S].mem_vir;
+			memp->size -= map_ptr[T].mem_len + map_ptr[S].mem_vir;
+			break;
+		}
+	}
+
+	if (memp >= &mem_chunks[NR_MEMS]) {
+		vm_panic("reserve_proc_mem: can't find map in mem_chunks ",
+		map_ptr[T].mem_phys);
+	}
 }
 
 #ifndef CONFIG_BUILTIN_INITRD
@@ -128,8 +119,8 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 {
 	int i;
 	int s;
-	int found = 0;
-	struct boot_param bootparam;
+	static int found = 0;
+	struct boot_params bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
 
@@ -142,7 +133,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 		panic("VM","Couldn't get boot parameters!",s);
 	}
 
-	initrd_base_clicks = (bootparam.initrd_base >> CLICK_SHIFT);
+	initrd_base_clicks = (bootparam.hdr.ramdisk_image >> CLICK_SHIFT);
 
 	/* Find initial ramdisk */
 	for (i=0; i<NR_MEMS; i++) {
@@ -158,7 +149,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	}
 
 	/* Round up the reserved memory */
-	initrd_size_clicks = ((bootparam.initrd_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
+	initrd_size_clicks = ((bootparam.hdr.ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
 
 	mem_chunks[i].base += initrd_size_clicks;
 	mem_chunks[i].size -= initrd_size_clicks;
@@ -167,68 +158,61 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 }
 #endif
 
-/*===========================================================================*
- *                              vm_isokendpt                           	     *
- *===========================================================================*/
 int vm_isokendpt(endpoint_t endpoint, int *proc)
 {
-        *proc = _ENDPOINT_P(endpoint);
-        if(*proc < 0 || *proc >= NR_PROCS)
-        	vm_panic("crazy slot number", *proc); 
-        if(*proc >= 0 && endpoint != vmproc[*proc].vm_endpoint) {
+	*proc = _ENDPOINT_P(endpoint);
+	if(*proc < 0 || *proc >= NR_PROCS)
+		vm_panic("crazy slot number", *proc);
+
+	if(*proc >= 0 && endpoint != vmproc[*proc].vm_endpoint)
                 return -EDEADSRCDST;
-        }
-        if(*proc >= 0 && !(vmproc[*proc].vm_flags & VMF_INUSE)) {
-                return -EDEADSRCDST;
-        }
-        return 0;
+
+	if(*proc >= 0 && !(vmproc[*proc].vm_flags & VMF_INUSE))
+		return -EDEADSRCDST;
+
+	return 0;
 }
 
 
 struct proc mytmpproc;
 
-/*===========================================================================*
- *                              get_stack_ptr                                *
- *===========================================================================*/
-int get_stack_ptr(proc_nr_e, sp)
-int proc_nr_e;                                  /* process to get sp of */   
-vir_bytes *sp;                                  /* put stack pointer here */
+/**
+ * Get stack pointer
+ * @param proc_nr_e  process to get sp of
+ * @param sp  put stack pointer here
+ */
+int get_stack_ptr(int proc_nr_e, vir_bytes *sp)
 {
-  int s; 
-  
-  if ((s=sys_getproc(&mytmpproc, proc_nr_e)) != 0)     
-        return(s);
-  *sp = mytmpproc.p_reg.sp;
-  return 0;
-}       
+	int s;
 
-/*===========================================================================*
- *                              brk                                          *
- *===========================================================================*/
+	if ((s=sys_getproc(&mytmpproc, proc_nr_e)) != 0)
+		return(s);
+
+	*sp = mytmpproc.p_reg.sp;
+
+	return 0;
+}
+
 extern void *__curbrk;
 
 /* Our brk() must redefine brk(). */
-int brk(brk_addr)
-void *brk_addr;
+int brk(void *brk_addr)
 {
-        int r;
+	int r;
 	struct vmproc *vmm = &vmproc[VM_PROC_NR];
 
-/* VM wants to call brk() itself. */
-        if((r=real_brk(vmm, (vir_bytes) brk_addr)) != 0)
+	/* VM wants to call brk() itself. */
+	if((r=real_brk(vmm, (vir_bytes) brk_addr)) != 0)
 		vm_panic("VM: brk() on myself failed\n", NO_NUM);
-        __curbrk = brk_addr;
-        return 0;
+
+	__curbrk = brk_addr;
+
+	return 0;
 }
 
-/*===========================================================================*
- *                              do_ctl                                        *
- *===========================================================================*/
 int do_ctl(kipc_msg_t *m)
 {
-	int pages, nodes;
 	int pr;
-	struct vmproc *vmp;
 
 	switch(m->VCTL_WHAT) {
 		case VCTLP_STATS_MEM:
@@ -245,4 +229,3 @@ int do_ctl(kipc_msg_t *m)
 
 	return 0;
 }
-

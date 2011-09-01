@@ -14,7 +14,6 @@
 #include <nucleos/stddef.h>
 #include <nucleos/string.h>
 #include <nucleos/types.h>
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/dhcp.h>
 

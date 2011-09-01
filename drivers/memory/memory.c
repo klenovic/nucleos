@@ -27,7 +27,7 @@
 #include <nucleos/drivers.h>
 #include <nucleos/driver.h>
 #include <asm/ioctls.h>
-#include <env.h>
+#include <nucleos/sysutil.h>
 #include <servers/ds/ds.h>
 #include <nucleos/vm.h>
 #include <nucleos/mman.h>
@@ -56,7 +56,7 @@ static struct device m_geom[NR_DEVS];  /* base and size of each device */
 static vir_bytes m_vaddrs[NR_DEVS];
 static int m_device;			/* current device */
 static struct kinfo kinfo;		/* kernel information */ 
-static struct boot_param boot_param;	/* boot parameters */
+static struct boot_params boot_params;	/* boot parameters */
 
 extern int errno;			/* error number for PM calls */
 
@@ -360,7 +360,7 @@ static void m_init()
   /* Initialize this task. All minor devices are initialized one by one. */
   int i, s;
 
-  if ((s=sys_getbootparam(&boot_param)) != 0) {
+  if ((s=sys_getbootparam(&boot_params)) != 0) {
       panic("MEM","Couldn't get kernel information.",s);
   }
 
@@ -375,8 +375,8 @@ static void m_init()
 #endif
 
 #ifndef CONFIG_BUILTIN_INITRD
-  initrd_base = boot_param.initrd_base;
-  initrd_size = boot_param.initrd_size;
+  initrd_base = boot_params.hdr.ramdisk_image;
+  initrd_size = boot_params.hdr.ramdisk_size;
 
   /* Map in kernel memory for /dev/imgrd. */
   m_geom[IMGRD_DEV].dv_base = cvul64(0);

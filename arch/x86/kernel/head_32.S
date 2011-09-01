@@ -208,7 +208,7 @@ copygdt:
 	push	$SS_SELECTOR
 	push	$DS_SELECTOR
 	push	$CS_SELECTOR
-	call	cstart				// cstart(cs, ds, mds, parmoff, parmlen)
+	call	prepare_kernel				// prepare_kernel(cs, ds, mds, parmoff, parmlen)
 	add	$5*4, %esp
 
 	/* Reload gdtr, idtr and the segment registers to global descriptor table set */

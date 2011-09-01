@@ -16,18 +16,7 @@
 #include <nucleos/unistd.h>
 #include <stdarg.h>
 
-int reboot(int how, ...)
+int reboot(int how)
 {
-	void *code = 0;
-	size_t size = 0;
-	va_list ap;
-
-	va_start(ap, how);
-	if (how == RBT_MONITOR) {
-		code = va_arg(ap, void*);
-		size = va_arg(ap, size_t);
-	}
-	va_end(ap);
-
-	return INLINE_SYSCALL(reboot, 3, how, code, size);
+	return INLINE_SYSCALL(reboot, 1, RBT_RESET);
 }

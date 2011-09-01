@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __ASM_X86_DIV64_H
-#define __ASM_X86_DIV64_H
+#ifndef _ASM_X86_DIV64_H
+#define _ASM_X86_DIV64_H
 
 #ifdef CONFIG_X86_32
 
@@ -66,4 +66,4 @@ static inline u64 div_u64_rem(u64 dividend, u32 divisor, u32 *remainder)
 # include <asm-generic/div64.h>
 #endif /* CONFIG_X86_32 */
 
-#endif /* __ASM_X86_DIV64_H */
+#endif /* _ASM_X86_DIV64_H */

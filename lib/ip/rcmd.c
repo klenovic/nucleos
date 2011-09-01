@@ -42,7 +42,6 @@
 #include <net/in.h>
 #include <net/tcp.h>
 #include <net/tcp_io.h>
-#include <net/hton.h>
 #include <net/netlib.h>
 
 #include <asm/ioctls.h>

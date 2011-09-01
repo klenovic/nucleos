@@ -34,8 +34,12 @@
 #include <kernel/debug.h>
 #include <kernel/clock.h>
 
-/* Prototype declarations for static functions. */
-static void announce(void);
+static void announce(void)
+{
+	/* Display the Nucleos startup banner. */
+	printk("\nNucleos %s Copyright (c) 2011, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
+		UTS_RELEASE);
+}
 
 void main(void)
 {
@@ -43,7 +47,7 @@ void main(void)
 	struct boot_image *ip;		/* boot image pointer */
 	register struct proc *rp;	/* process pointer */
 	register struct priv *sp;	/* privilege structure pointer */
-	register int i, j, s;
+	register int i, j;
 	int hdrindex;			/* index to array of a.out headers */
 	phys_clicks text_base;
 	vir_clicks text_clicks, data_clicks, st_clicks;
@@ -84,9 +88,8 @@ void main(void)
 	ktsb = (reg_t) t_stack;
 
 	for (i=0; i < NR_BOOT_PROCS; ++i) {
-	int schedulable_proc, proc_nr;
-	int ipc_to_m, kcalls;
-		bitchunk_t fv;
+		int schedulable_proc, proc_nr;
+		int ipc_to_m, kcalls;
 
 		ip = &image[i];				/* process' attributes */
 		rp = proc_addr(ip->proc_nr);		/* get process pointer */
@@ -273,19 +276,10 @@ void main(void)
 	restart();
 }
 
-static void announce(void)
-{
-	/* Display the Nucleos startup banner. */
-	printk("\nNucleos %s Copyright (c) 2010, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
-		UTS_RELEASE);
-}
-
 void prepare_shutdown(int how)
 {
 	/* This function prepares to shutdown Nucleos. */
 	static timer_t shutdown_timer;
-	register struct proc *rp;
-	kipc_msg_t m;
 
 	/* Continue after 1 second, to give processes a chance to get scheduled to
 	 * do shutdown work.  Set a watchog timer to call shutdown(). The timer
@@ -303,6 +297,6 @@ void nucleos_shutdown(timer_t *tp)
  * monitor), RBT_MONITOR (execute given code), RBT_RESET (hard reset).
  */
 	arch_stop_local_timer();
-  intr_init(INTS_ORIG, 0);
+	intr_init(INTS_ORIG, 0);
 	arch_shutdown(tp ? tmr_arg(tp)->ta_int : RBT_PANIC);
 }

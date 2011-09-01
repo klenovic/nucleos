@@ -27,7 +27,6 @@
 #include <nucleos/ctype.h>
 #include <nucleos/limits.h>
 #include <pwd.h>
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/netdb.h>
 #include <net/inet.h>

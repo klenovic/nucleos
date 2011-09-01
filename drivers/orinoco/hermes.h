@@ -31,7 +31,6 @@
 #include <nucleos/drivers.h>
 #include <net/ether.h>
 #include <net/eth_io.h>
-#include <net/hton.h>
 #include <stdarg.h>
 
 /*****************************************************************************

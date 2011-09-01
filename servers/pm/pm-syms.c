@@ -29,4 +29,4 @@ time_t boottime;	/* time when the system was booted (for reporting to VFS_PROC_N
 u32_t system_hz;	/* System clock frequency. */
 int report_reboot;	/* During reboot to report to VFS_PROC_NR that we are rebooting. */
 int abort_flag;
-char monitor_code[256];
+

@@ -21,6 +21,7 @@ define rule_create_image
 	rm -f $@; \
 	$(echo-cmd) $(cmd_$(1)); \
 	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
 endef
 
 # create final image from kernel and servers

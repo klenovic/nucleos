@@ -12,7 +12,7 @@
 /**
  * @brief Unsigned long by unsigned multiply giving 64 bit result
  */
-uint64_t mul64u(unsigned long i, unsigned j)
+u64 mul64u(unsigned long i, unsigned j)
 {
-  return (uint64_t)(i*j);
+	return (u64)(i*j);
 }

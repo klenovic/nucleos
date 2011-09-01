@@ -12,10 +12,12 @@
  * @file include/nucleos/types.h
  * @brief Data types (architecturally independent)
  */
-#ifndef __NUCLEOS_TYPES_H
-#define __NUCLEOS_TYPES_H
+#ifndef _NUCLEOS_TYPES_H
+#define _NUCLEOS_TYPES_H
 
 #include <asm/types.h>
+
+#ifndef __ASSEMBLY__
 #include <nucleos/posix_types.h>
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
@@ -134,10 +136,44 @@ typedef __u64		u_int64_t;
 typedef __s64		int64_t;
 #endif
 
-/* this is a special 64bit data type that is 8-byte aligned */
-#define aligned_u64 __u64 __attribute__((aligned(8)))
-#define aligned_be64 __be64 __attribute__((aligned(8)))
-#define aligned_le64 __le64 __attribute__((aligned(8)))
+/*
+ * Below are truly Nucleos-specific types that should never collide with
+ * any application/library that wants nucleos/types.h.
+ */
+
+#ifdef __CHECKER__
+#define __bitwise__ __attribute__((bitwise))
+#else
+#define __bitwise__
+#endif
+#ifdef __CHECK_ENDIAN__
+#define __bitwise __bitwise__
+#else
+#define __bitwise
+#endif
+
+typedef __u16 __bitwise __le16;
+typedef __u16 __bitwise __be16;
+typedef __u32 __bitwise __le32;
+typedef __u32 __bitwise __be32;
+typedef __u64 __bitwise __le64;
+typedef __u64 __bitwise __be64;
+
+typedef __u16 __bitwise __sum16;
+typedef __u32 __bitwise __wsum;
+
+/*
+ * aligned_u64 should be used in defining kernel<->userspace ABIs to avoid
+ * common 32/64-bit compat problems.
+ * 64-bit values align to 4-byte boundaries on x86_32 (and possibly other
+ * architectures) and to 8-byte boundaries on 64-bit architetures.  The new
+ * aligned_64 type enforces 8-byte alignment so that structs containing
+ * aligned_64 values have the same alignment on 32-bit and 64-bit architectures.
+ * No conversions are necessary between 32-bit user-space and a 64-bit kernel.
+ */
+#define __aligned_u64 __u64 __attribute__((aligned(8)))
+#define __aligned_be64 __be64 __attribute__((aligned(8)))
+#define __aligned_le64 __le64 __attribute__((aligned(8)))
 
 /* @nucleos: don't use these below (will be removed) */
 typedef u8  u8_t;	/* 8 bit type */
@@ -150,4 +186,5 @@ typedef s32 i32_t;	/* 32 bit signed type */
 typedef u64 u64_t;
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
-#endif /* __NUCLEOS_TYPES_H */
+#endif /*  __ASSEMBLY__ */
+#endif /* _NUCLEOS_TYPES_H */

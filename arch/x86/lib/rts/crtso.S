@@ -17,7 +17,7 @@
  * way.
  */
 #include <asm/servers/vm/vm.h>
-#include <asm/page.h> /* definition of PAGE_SHIFT */
+#include <asm/page_types.h> /* definition of PAGE_SHIFT */
 
 .section .text.init
 
@@ -34,7 +34,7 @@ _start:
 	 * magic number. If so then it is not redefined by the user.
 	 */
 	mov	$environ, %ebx
-	cmp	$__edata, %ebx		// within initialized data?
+	cmp	$_edata, %ebx		// within initialized data?
 	jae	0f
 	testb	$3, %bl			// aligned?
 	jnz	0f
@@ -70,15 +70,17 @@ __mainjump:
 unmap_page_zero:
 	// unmap 0-page code
 	push	$I386_PAGE_SIZE
-	push	_start
-	call	munmap_text	// munmap_text(crtso, I386_PAGE_SIZE)
+	push	$0
+	call	munmap_text	// munmap_text(0, I386_PAGE_SIZE)
 	add	$8, %esp
 
+#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
 	// unmap 0-page data
 	push	$I386_PAGE_SIZE
-	push	__data		// __data defined in linker script
-	call	munmap		// munmap(__data, I386_PAGE_SIZE)
+	push	$0
+	call	munmap		// munmap(0, I386_PAGE_SIZE)
 	add	$8, %esp
+#endif
 	ret
 
 .section .data

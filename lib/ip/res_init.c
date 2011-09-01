@@ -31,7 +31,6 @@
 #include <nucleos/string.h>
 #include <nucleos/unistd.h>
 
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/inet.h>
 #include <net/nameser.h>
@@ -162,7 +161,7 @@ res_init()
 	}
 	if (_res.nscount == 0) {
 		/* "localhost" is the default nameserver. */
-		_res.nsaddr_list[0]= HTONL(0x7F000001);
+		_res.nsaddr_list[0]= htonl(0x7F000001);
 		_res.nsport_list[0]= nameserver_port;
 		_res.nscount= 1;
 	}

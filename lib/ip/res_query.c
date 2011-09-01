@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <nucleos/string.h>
 
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/nameser.h>
 #include <net/netdb.h>

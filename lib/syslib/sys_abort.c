@@ -7,24 +7,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#include <nucleos/syslib.h>
 #include <stdarg.h>
+#include <nucleos/syslib.h>
 #include <nucleos/unistd.h>
 
-int sys_abort(int how, ...)
+int sys_abort(int how)
 {
-/* Something awful has happened.  Abandon ship. */
-
-  kipc_msg_t m;
-  va_list ap;
-
-  va_start(ap, how);
-  if ((m.ABRT_HOW = how) == RBT_MONITOR) {
-	m.ABRT_MON_ENDPT = va_arg(ap, int);
-	m.ABRT_MON_ADDR = va_arg(ap, char *);
-	m.ABRT_MON_LEN = va_arg(ap, size_t);
-  }
-  va_end(ap);
-
-  return(ktaskcall(SYSTASK, SYS_ABORT, &m));
+/* Something awful has happened. Abandon ship. */
+	kipc_msg_t m;
+	m.ABRT_HOW = how;
+	return(ktaskcall(SYSTASK, SYS_ABORT, &m));
 }

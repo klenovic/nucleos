@@ -343,41 +343,31 @@ int do_getepinfo()
  *===========================================================================*/
 int do_reboot()
 {
-  kipc_msg_t m;
-  int r;
-
-  /* Check permission to abort the system. */
-  if (mp->mp_effuid != SUPER_USER) return(-EPERM);
-
-  /* See how the system should be aborted. */
-  abort_flag = (unsigned) m_in.reboot_flag;
-  if (abort_flag >= RBT_INVALID) return(-EINVAL); 
-  if (RBT_MONITOR == abort_flag) {
+	kipc_msg_t m;
 	int r;
-	if(m_in.reboot_strlen >= sizeof(monitor_code))
-		return -EINVAL;
-	if((r = sys_datacopy(who_e, (vir_bytes) m_in.reboot_code,
-		ENDPT_SELF, (vir_bytes) monitor_code, m_in.reboot_strlen)) != 0)
-		return r;
-	monitor_code[m_in.reboot_strlen] = '\0';
-  }
-  else
-	monitor_code[0] = '\0';
 
-  /* Order matters here. When VFS_PROC_NR is told to reboot, it exits all its
-   * processes, and then would be confused if they're exited again by
-   * SIGKILL. So first kill, then reboot. 
-   */
+	/* Check permission to abort the system. */
+	if (mp->mp_effuid != SUPER_USER) return(-EPERM);
 
-  check_sig(-1, SIGKILL); 		/* kill all users except init */
-  sys_stop(INIT_PROC_NR);		/* stop init, but keep it around */
+	/* See how the system should be aborted. */
+	abort_flag = (unsigned) m_in.reboot_flag;
+	if (abort_flag >= RBT_INVALID)
+		return(-EINVAL);
 
-  /* Tell FS to reboot */
-  m.m_type = PM_REBOOT;
+	/* Order matters here. When VFS_PROC_NR is told to reboot, it exits all its
+	 * processes, and then would be confused if they're exited again by
+	 * SIGKILL. So first kill, then reboot. 
+	 */
 
-  tell_fs(&mproc[VFS_PROC_NR], &m);
+	check_sig(-1, SIGKILL); 		/* kill all users except init */
+	sys_stop(INIT_PROC_NR);		/* stop init, but keep it around */
 
-  return(SUSPEND);			/* don't reply to caller */
+	/* Tell FS to reboot */
+	m.m_type = PM_REBOOT;
+
+	tell_fs(&mproc[VFS_PROC_NR], &m);
+
+	return(SUSPEND);	/* don't reply to caller */
 }
 
 /*===========================================================================*

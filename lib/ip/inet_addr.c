@@ -29,7 +29,6 @@
 #include <nucleos/ctype.h>
 #include <nucleos/errno.h>
 
-#include <net/hton.h>
 #include <net/in.h>
 #include <net/inet.h>
 

@@ -12,7 +12,7 @@
 /**
  * @brief 64 bit subtraction giving unsigned
  */
-unsigned diff64(uint64_t i, uint64_t j)
+unsigned diff64(u64 i, u64 j)
 {
-  return (unsigned)(i-j);
+	return (unsigned)(i-j);
 }

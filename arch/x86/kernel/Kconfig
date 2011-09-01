@@ -1,7 +1,6 @@
 # Kernel options
 menu "Kernel options"
 
-comment "Only separated I&D linkage type is supported for now."
 choice
 	prompt "Type of linkage of kernel"
 	default KERNEL_LINKAGE_SEPID if ARCH_KERNEL_LINKAGE_SEPID
@@ -9,7 +8,6 @@ choice
 	  Choose the type of linkage for kernel.
 
 config KERNEL_LINKAGE_COMID
-	depends on !NULL_DEREFER
 	bool "Common I&D"
 	---help---
 	  This will link kernel with common I&D.
@@ -18,13 +16,34 @@ config KERNEL_LINKAGE_SEPID
 	bool "Separate I&D"
 	---help---
 	  This will link kernel with separate I&D.
+endchoice
 
+choice
+	prompt "Type of linkage of user-kernel"
+	default UKERNEL_LINKAGE_SEPID if ARCH_UKERNEL_LINKAGE_SEPID
+	---help---
+	  Choose the type of linkage for kernel.
+
+config UKERNEL_LINKAGE_COMID
+	bool "Common I&D"
+	---help---
+	  This will link servers with common I&D.
+
+config UKERNEL_LINKAGE_SEPID
+	bool "Separate I&D"
+	---help---
+	  This will link servers with separate I&D.
 endchoice
 
 config KERNEL_LINKAGE_TYPE
 	hex
 	default "0x00" if KERNEL_LINKAGE_COMID=y
 	default "0x20" if KERNEL_LINKAGE_SEPID=y
+
+config UKERNEL_LINKAGE_TYPE
+	hex
+	default "0x00" if UKERNEL_LINKAGE_COMID=y
+	default "0x20" if UKERNEL_LINKAGE_SEPID=y
 
 config KERNEL_BOOTSTACK_SIZE
 	int "Kernel stack size used for booting"
