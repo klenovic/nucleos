@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
  * three major activities: getting new work, processing the work, and
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
-	int error;
+	int error = 0;
 	int ind;
 	unsigned short test_endian = 1;
 
@@ -179,7 +179,6 @@ int main(int argc, char *argv[])
 		/* Must be a regular VFS request */
 		assert(src == VFS_PROC_NR && !unmountdone);
 
-		error = 0;
 		caller_uid = -1;	/* To trap errors */
 		caller_gid = -1;
 		req_nr = fs_m_in.m_type;
