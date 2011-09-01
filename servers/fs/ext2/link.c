@@ -193,7 +193,7 @@ int fs_rdlink()
 
   if (!S_ISLNK(rip->i_mode))
 	  r = -EACCES;
-  if (rip->i_size > MAX_FAST_SYMLINK_LENGTH) {
+  if (rip->i_size >= MAX_FAST_SYMLINK_LENGTH) {
   /* normal symlink */
 	if ((b = read_map(rip, (off_t) 0)) == NO_BLOCK) {
 		r = -EIO;
