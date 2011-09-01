@@ -368,7 +368,7 @@ char *suffix;			/* current remaining path. Has to point in the
 
   llen = (size_t) rip->i_size;
 
-  if (llen > MAX_FAST_SYMLINK_LENGTH) {
+  if (llen >= MAX_FAST_SYMLINK_LENGTH) {
 	/* normal symlink */
 	if ((blink = read_map(rip, (off_t) 0)) == NO_BLOCK)
 		return(-EIO);
@@ -421,7 +421,7 @@ char *suffix;			/* current remaining path. Has to point in the
   /* Everything is set, now copy the expanded link to user_path */
   memmove(user_path, sp, llen);
 
-  if (llen > MAX_FAST_SYMLINK_LENGTH)
+  if (llen >= MAX_FAST_SYMLINK_LENGTH)
 	put_block(bp, DIRECTORY_BLOCK);
 
   return(0);
@@ -602,9 +602,13 @@ int ftype;			 /* used when ENTER and
 				if (!HAS_COMPAT_FEATURE(ldir_ptr->i_sp,
 							COMPAT_DIR_INDEX))
 					ldir_ptr->i_flags &= ~EXT2_INDEX_FL;
-				ldir_ptr->i_last_dpos = pos;
-				ldir_ptr->i_last_dentry_size = conv2(le_CPU,
-								dp->d_rec_len);
+
+				if (pos < ldir_ptr->i_last_dpos) {
+					ldir_ptr->i_last_dpos = pos;
+					ldir_ptr->i_last_dentry_size =
+					conv2(le_CPU, dp->d_rec_len);
+				}
+
 				ldir_ptr->i_update |= CTIME | MTIME;
 				ldir_ptr->i_dirt = DIRTY;
 				/* Now we have cleared dentry, if it's not
