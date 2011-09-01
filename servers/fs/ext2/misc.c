@@ -20,7 +20,6 @@ int fs_sync()
  */
   struct ext2_inode *rip;
   struct buf *bp;
-  int r;
 
   assert(nr_bufs > 0);
   assert(buf);

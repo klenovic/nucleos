@@ -110,31 +110,6 @@ static void reply(endpoint_t who, kipc_msg_t *m_out)
 		printk("ext2(%d) was unable to send reply\n", SELF_E);
 }
 
-
-/*===========================================================================*
- *				cch_check				     *
- *===========================================================================*/
-static void cch_check(void)
-{
-	int i;
-
-	for (i = 0; i < NR_INODES; ++i) {
-		if (inode[i].i_count != cch[i] &&
-		    req_nr != REQ_GETNODE &&
-		    req_nr != REQ_PUTNODE &&
-		    req_nr != REQ_READSUPER &&
-		    req_nr != REQ_MOUNTPOINT &&
-		    req_nr != REQ_UNMOUNT &&
-		    req_nr != REQ_SYNC &&
-		    req_nr != REQ_LOOKUP) {
-			printk("ext2(%d) inode(%ul) cc: %d req_nr: %d\n", SELF_E,
-			       inode[i].i_num, inode[i].i_count - cch[i], req_nr);
-		}
-
-		cch[i] = inode[i].i_count;
-	}
-}
-
 int main(int argc, char *argv[])
 {
 /* This is the main routine of this service. The main loop consists of
@@ -194,7 +169,6 @@ int main(int argc, char *argv[])
 			error = -EINVAL;
 		} else {
 			error = (*fs_call_vec[ind])();
-			/*cch_check();*/
 		}
 
 		fs_m_out.m_type = error;
