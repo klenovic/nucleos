@@ -9,18 +9,15 @@
  */
 #include <nucleos/syslib.h>
 
-/*===========================================================================*
- *                                sys_int86				     *
- *===========================================================================*/
-int sys_int86(reg86p)
-struct reg86u *reg86p;
+int sys_int86(struct reg86u *reg86p)
 {
-    kipc_msg_t m;
-    int result;
+	kipc_msg_t m;
+	int result;
 
-    m.m_data4= (char *)reg86p;
+	m.m_data4= (char *)reg86p;
 
-    result = ktaskcall(SYSTASK, SYS_INT86, &m);
-    return(result);
+	result = ktaskcall(SYSTASK, SYS_INT86, &m);
+
+	return(result);
 }
 

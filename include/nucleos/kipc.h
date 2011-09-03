@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_KIPC_H
-#define __NUCLEOS_KIPC_H
+#ifndef _NUCLEOS_KIPC_H
+#define _NUCLEOS_KIPC_H
 
 /* System call numbers that are passed when trapping to the kernel. */
 #define KIPC_SEND	1	/* blocking send */
@@ -100,4 +100,4 @@ static inline int ktaskcall(endpoint_t who, int syscallnr, register kipc_msg_t *
 #endif /* __ASSEMBLY__ */
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_KIPC_H */
+#endif /* _NUCLEOS_KIPC_H */

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Linux */
-#ifndef __NUCLEOS_AUXVEC_H
-#define __NUCLEOS_AUXVEC_H
+#ifndef _NUCLEOS_AUXVEC_H
+#define _NUCLEOS_AUXVEC_H
 
 #include <asm/auxvec.h>
 
@@ -40,4 +40,4 @@
 #define AT_RANDOM		25	/* address of 16 random bytes */
 #define AT_EXECFN		31	/* filename of program */
 
-#endif /* __NUCLEOS_AUXVEC_H */
+#endif /* _NUCLEOS_AUXVEC_H */

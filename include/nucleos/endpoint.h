@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_ENDPOINT_H
-#define __NUCLEOS_ENDPOINT_H
+#ifndef _NUCLEOS_ENDPOINT_H
+#define _NUCLEOS_ENDPOINT_H
 
 #include <nucleos/com.h>
 #include <nucleos/limits.h>
@@ -31,4 +31,4 @@
 #define _ENDPOINT_P(e) \
 	((((e)+MAX_NR_TASKS) % _ENDPOINT_GENERATION_SIZE) - MAX_NR_TASKS)
 
-#endif /* __NUCLEOS_ENDPOINT_H */
+#endif /* _NUCLEOS_ENDPOINT_H */

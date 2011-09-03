@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_PATHS_H
-#define __NUCLEOS_PATHS_H
+#ifndef _NUCLEOS_PATHS_H
+#define _NUCLEOS_PATHS_H
 
 #define _PATH_DHCPCONF		"/etc/dhcp.conf"
 #define _PATH_DHCPPID		"/usr/run/dhcpd.pid"
@@ -30,4 +30,4 @@
 #define _PATH_MODULES_CONF	"/etc/modules.conf"
 #define _PATH_DEV		"/dev/"
 
-#endif /* __NUCLEOS_PATHS_H */
+#endif /* _NUCLEOS_PATHS_H */

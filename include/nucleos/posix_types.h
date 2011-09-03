@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_POSIX_TYPES_H
-#define __NUCLEOS_POSIX_TYPES_H
+#ifndef _NUCLEOS_POSIX_TYPES_H
+#define _NUCLEOS_POSIX_TYPES_H
 
 #include <nucleos/stddef.h>
 
@@ -44,4 +44,4 @@ typedef int __kernel_mqd_t;
 
 #include <asm/posix_types.h>
 
-#endif /* __NUCLEOS_POSIX_TYPES_H */
+#endif /* _NUCLEOS_POSIX_TYPES_H */

@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_SIGNAL_H
-#define __NUCLEOS_SIGNAL_H
+#ifndef _NUCLEOS_SIGNAL_H
+#define _NUCLEOS_SIGNAL_H
 
 #include <nucleos/types.h>
 #include <asm/signal.h>
@@ -47,4 +47,4 @@ int sigfillset(sigset_t *_set);
 int sigismember(const sigset_t *_set, int _sig);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_SIGNAL_H */
+#endif /* _NUCLEOS_SIGNAL_H */

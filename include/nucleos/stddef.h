@@ -9,8 +9,8 @@
  */
 /* The <nucleos/stddef.h> header defines certain commonly used macros. */
 
-#ifndef __NUCLEOS_STDDEF_H
-#define __NUCLEOS_STDDEF_H
+#ifndef _NUCLEOS_STDDEF_H
+#define _NUCLEOS_STDDEF_H
 
 #include <nucleos/compiler.h>
 
@@ -37,4 +37,4 @@ enum {
 
 #endif /* (__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_STDDEF_H */
+#endif /* _NUCLEOS_STDDEF_H */

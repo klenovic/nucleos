@@ -10,8 +10,8 @@
 /* <nucleos/mtio.h> magnetic tape commands			Author: Kees J. Bot
  */
 
-#ifndef __NUCLEOS_MTIO_H
-#define __NUCLEOS_MTIO_H
+#ifndef _NUCLEOS_MTIO_H
+#define _NUCLEOS_MTIO_H
 
 /* Tape operations: ioctl(fd, MTIOCTOP, &struct mtop) */
 
@@ -51,4 +51,4 @@ struct mtget {
 	off_t	mt_blksize;	/* Current block size. */
 };
 
-#endif /* __NUCLEOS_MTIO_H */
+#endif /* _NUCLEOS_MTIO_H */

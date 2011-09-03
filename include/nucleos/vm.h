@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* Prototypes and definitions for VM interface. */
-#ifndef __NUCLEOS_VM_H
-#define __NUCLEOS_VM_H
+#ifndef _NUCLEOS_VM_H
+#define _NUCLEOS_VM_H
 
 #include <nucleos/types.h>
 #include <nucleos/type.h>
@@ -34,4 +34,4 @@ int vm_ctl(int what, int param);
 int vm_set_priv(int procnr, void *buf);
 int vm_query_exit(int *endpt);
 
-#endif /* __NUCLEOS_VM_H */
+#endif /* _NUCLEOS_VM_H */

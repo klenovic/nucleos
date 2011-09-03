@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* For controlling tty modes. */
-#ifndef __NUCLEOS_TERMIOS_H
-#define __NUCLEOS_TERMIOS_H
+#ifndef _NUCLEOS_TERMIOS_H
+#define _NUCLEOS_TERMIOS_H
 
 #include <asm/termios.h>
 
@@ -29,4 +29,4 @@ int tcsetattr (int _filedes, int _opt_actions, const struct termios *_termios_p)
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */ 
 
-#endif /* __NUCLEOS_TERMIOS_H */
+#endif /* _NUCLEOS_TERMIOS_H */

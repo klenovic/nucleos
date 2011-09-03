@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __NUCLEOS_SELECT_H
-#define __NUCLEOS_SELECT_H
+#ifndef _NUCLEOS_SELECT_H
+#define _NUCLEOS_SELECT_H
 
 #include <nucleos/types.h>
 #include <nucleos/time.h>
@@ -21,5 +21,5 @@ struct timeval;
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
 #endif
 
-#endif /* __NUCLEOS_SELECT_H */
+#endif /* _NUCLEOS_SELECT_H */
 

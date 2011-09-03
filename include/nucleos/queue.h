@@ -39,8 +39,8 @@
  * $FreeBSD$
  */
 
-#ifndef __NUCLEOS_QUEUE_H
-#define __NUCLEOS_QUEUE_H
+#ifndef _NUCLEOS_QUEUE_H
+#define _NUCLEOS_QUEUE_H
 
 /* Minix doesn't have this file.
 #include <sys/cdefs.h>
@@ -592,4 +592,4 @@ struct {								\
 	QMD_TRACE_ELEM(&(elm)->field);					\
 } while (0)
 
-#endif /* __NUCLEOS_QUEUE_H */
+#endif /* _NUCLEOS_QUEUE_H */

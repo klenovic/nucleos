@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_SEM_H
-#define __NUCLEOS_SEM_H
+#ifndef _NUCLEOS_SEM_H
+#define _NUCLEOS_SEM_H
 
 #include <nucleos/types.h>
 #include <nucleos/ipc.h>
@@ -78,4 +78,4 @@ struct  seminfo
 
 #endif /* __USE_MISC */
 
-#endif /* __NUCLEOS_SEM_H */
+#endif /* _NUCLEOS_SEM_H */

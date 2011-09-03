@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* linux */
-#ifndef __NUCLEOS_SWAB_H
-#define __NUCLEOS_SWAB_H
+#ifndef _NUCLEOS_SWAB_H
+#define _NUCLEOS_SWAB_H
 
 #include <nucleos/types.h>
 #include <nucleos/compiler.h>
@@ -306,4 +306,4 @@ static inline void __swahb32s(__u32 *p)
 # define swahb32s __swahb32s
 #endif /* __KERNEL__ */
 
-#endif /* __NUCLEOS_SWAB_H */
+#endif /* _NUCLEOS_SWAB_H */

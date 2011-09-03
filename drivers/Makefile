@@ -1,9 +1,7 @@
 # Makefile for all device drivers.
-obj-y := amddev/ at_wini/ audio/ bios_wini/ dpeth/ dp8390/ floppy/ fxp/ \
+obj-y := amddev/ at_wini/ audio/ dpeth/ dp8390/ floppy/ fxp/ \
 	 lance/ log/ memory/ orinoco/ pci/ printer/ random/ readclock/ \
 	 rtl8139/ sb16/ tty/ ti1225/ filter/ rtl8169/ e1000/
-
-#subdir-y-flags := not-sort
 
 DRV_PAGE_OFFSET    = 0
 DRV_PAGE_ALIGNMENT = 0

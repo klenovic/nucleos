@@ -1,5 +1,5 @@
-#ifndef __NUCLEOS_MAGIC_H
-#define __NUCLEOS_MAGIC_H
+#ifndef _NUCLEOS_MAGIC_H
+#define _NUCLEOS_MAGIC_H
 
 #define ADFS_SUPER_MAGIC	0xadf5
 #define AFFS_SUPER_MAGIC	0xadff
@@ -59,4 +59,4 @@
 #define DEVPTS_SUPER_MAGIC	0x1cd1
 #define SOCKFS_MAGIC		0x534F434B
 
-#endif /* __NUCLEOS_MAGIC_H */
+#endif /* _NUCLEOS_MAGIC_H */

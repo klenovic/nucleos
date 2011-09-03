@@ -12,8 +12,8 @@
  * values are byte offsets into the jmp_buf and sigjmp_buf structures.
  */
 
-#ifndef __NUCLEOS_JMP_BUF_H
-#define __NUCLEOS_JMP_BUF_H
+#ifndef _NUCLEOS_JMP_BUF_H
+#define _NUCLEOS_JMP_BUF_H
 
 #ifdef __GNUC__
 
@@ -33,4 +33,4 @@
 
 #endif /* __GNUC__ */
 
-#endif /* __NUCLEOS_JMP_BUF_H */
+#endif /* _NUCLEOS_JMP_BUF_H */

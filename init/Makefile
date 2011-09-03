@@ -7,7 +7,6 @@ CFLAGS_initrd.o := -D__UKERNEL__
 
 # These below must exist before we start to create initrd
 bin-y := $(srctree)/drivers/at_wini \
-	 $(srctree)/drivers/bios_wini \
 	 $(srctree)/drivers/floppy \
 	 $(srctree)/drivers/pci \
 	 $(srctree)/servers/fs/minixfs/minixfs \

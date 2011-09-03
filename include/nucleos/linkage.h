@@ -12,8 +12,8 @@
  * @file include/nucleos/linkage.h
  * @brief linkage defs
  */
-#ifndef __NUCLEOS_LINKAGE_H
-#define __NUCLEOS_LINKAGE_H
+#ifndef _NUCLEOS_LINKAGE_H
+#define _NUCLEOS_LINKAGE_H
 
 #include <nucleos/compiler.h>
 #include <asm/linkage.h>
@@ -110,4 +110,4 @@
 #define ATTRIB_NORET	__attribute__((noreturn))
 #define NORET_AND	noreturn,
 
-#endif /* !__NUCLEOS_LINKAGE_H */
+#endif /* !_NUCLEOS_LINKAGE_H */

@@ -22,8 +22,8 @@
  *				+---------------------+
  */
 
-#ifndef __NUCLEOS_WAIT_H
-#define __NUCLEOS_WAIT_H
+#ifndef _NUCLEOS_WAIT_H
+#define _NUCLEOS_WAIT_H
 
 #define WNOHANG		1	/* do not wait for child to exit */
 #define WUNTRACED	2	/* for job control; not implemented */
@@ -44,4 +44,4 @@ pid_t wait(int *_stat_loc);
 pid_t waitpid(pid_t _pid, int *_stat_loc, int _options);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_WAIT_H */
+#endif /* _NUCLEOS_WAIT_H */

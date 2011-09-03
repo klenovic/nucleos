@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __NUCLEOS_SAFECOPIES_H
-#define __NUCLEOS_SAFECOPIES_H
+#ifndef _NUCLEOS_SAFECOPIES_H
+#define _NUCLEOS_SAFECOPIES_H
 
 #include <nucleos/types.h>
 #include <nucleos/type.h>
@@ -93,4 +93,4 @@ void cpf_reload(void);
 	priv(rp)->s_grant_table= (ptr);		\
 	priv(rp)->s_grant_entries= (entries);
 
-#endif	/* __NUCLEOS_SAFECOPIES_H */
+#endif	/* _NUCLEOS_SAFECOPIES_H */

@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 /* linux */
-#ifndef __NUCLEOS_BYTEORDER_BIG_ENDIAN_H
-#define __NUCLEOS_BYTEORDER_BIG_ENDIAN_H
+#ifndef _NUCLEOS_BYTEORDER_BIG_ENDIAN_H
+#define _NUCLEOS_BYTEORDER_BIG_ENDIAN_H
 
 #ifndef __BIG_ENDIAN
 #define __BIG_ENDIAN 4321
@@ -115,4 +115,4 @@ static inline __u16 __be16_to_cpup(const __be16 *p)
 #include <linux/byteorder/generic.h>
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_BYTEORDER_BIG_ENDIAN_H */
+#endif /* _NUCLEOS_BYTEORDER_BIG_ENDIAN_H */

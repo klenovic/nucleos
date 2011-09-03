@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_SYSUTIL_H
-#define __NUCLEOS_SYSUTIL_H
+#ifndef _NUCLEOS_SYSUTIL_H
+#define _NUCLEOS_SYSUTIL_H
 
 #include <nucleos/type.h>
 #include <nucleos/kipc.h>
@@ -96,4 +96,4 @@ typedef struct util_timingdata util_timingdata_t;
 void read_tsc_64(u64_t *t);
 void read_tsc(u32_t *hi, u32_t *lo);
 
-#endif /* __NUCLEOS_SYSUTIL_H */
+#endif /* _NUCLEOS_SYSUTIL_H */

@@ -11,8 +11,8 @@
  * @file include/nucleos/binfmts.h
  * @brief handling of various binary formats
  */ 
-#ifndef __NUCLEOS_BINFMTS_H
-#define __NUCLEOS_BINFMTS_H
+#ifndef _NUCLEOS_BINFMTS_H
+#define _NUCLEOS_BINFMTS_H
 
 #include <nucleos/string.h>
 #include <nucleos/types.h>
@@ -151,4 +151,4 @@ static inline void unregister_binfmt(struct nucleos_binfmt *binfmt)
 
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_BINFMTS_H */
+#endif /* _NUCLEOS_BINFMTS_H */

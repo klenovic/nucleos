@@ -14,8 +14,8 @@
  * definitions for mount(2) 
  */
 
-#ifndef __NUCLEOS_MOUNT_H
-#define __NUCLEOS_MOUNT_H
+#ifndef _NUCLEOS_MOUNT_H
+#define _NUCLEOS_MOUNT_H
 
 #define MS_RDONLY	0x001	/* Mount device read only */
 #define MS_REUSE	0x002	/* Tell RS to try reusing binary from memory */
@@ -23,4 +23,4 @@
 int mount(char *_spec, char *_name, int _mountflags, char *type, char *args);
 int umount(const char *_name);
 
-#endif /* __NUCLEOS_MOUNT_H */
+#endif /* _NUCLEOS_MOUNT_H */

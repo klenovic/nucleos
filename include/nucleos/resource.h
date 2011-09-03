@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_RESOURCE_H
-#define __NUCLEOS_RESOURCE_H
+#ifndef _NUCLEOS_RESOURCE_H
+#define _NUCLEOS_RESOURCE_H
 
 /* Priority range for the get/setpriority() interface.
  * It isn't a mapping on the internal minix scheduling
@@ -26,4 +26,4 @@ int getpriority(int, int);
 int setpriority(int, int, int);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_RESOURCE_H */
+#endif /* _NUCLEOS_RESOURCE_H */

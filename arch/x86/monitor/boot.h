@@ -60,7 +60,6 @@ typedef struct {		/* One chunk of free memory. */
 } memory;
 
 memory mem[3];		/* List of available memory. */
-int mon_return;		/* Monitor stays in memory? */
 
 typedef struct bios_env
 {

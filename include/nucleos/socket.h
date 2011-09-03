@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_SOCKET_H
-#define __NUCLEOS_SOCKET_H
+#ifndef _NUCLEOS_SOCKET_H
+#define _NUCLEOS_SOCKET_H
 
 /* Can we include <nucleos/types.h> here or do we need an additional header that is
  * safe to include?
@@ -81,4 +81,4 @@ int socket(int _domain, int _type, int _protocol);
 #define PF_UNIX	AF_UNIX
 #define PF_INET	AF_INET
 
-#endif /* __NUCLEOS_SOCKET_H */
+#endif /* _NUCLEOS_SOCKET_H */

@@ -12,8 +12,8 @@
  *  Feb 13 1995			Author: Michel R. Prevenier 
  */
 
-#ifndef __NUCLEOS_SOUND_H
-#define __NUCLEOS_SOUND_H
+#ifndef _NUCLEOS_SOUND_H
+#define _NUCLEOS_SOUND_H
 
 /* ------- Mixer stuff ------- */
 
@@ -51,4 +51,4 @@ struct inout_ctrl
   enum InputState 	right;
 };
 
-#endif /* __NUCLEOS_SOUND_H */
+#endif /* _NUCLEOS_SOUND_H */

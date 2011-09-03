@@ -208,8 +208,9 @@ void initialize(void)
    * and also keep the BIOS data area safe (1.5K), plus a bit extra for
    * where we may have to put a.out headers for older kernels.
    */
-  if ((mon_return = (mem[1].size > 512*1024L))) 
+  if (mem[1].size > 512*1024L) {
     mem[0].size = newaddr;
+  }
 
   mem[0].base += 2048;
   mem[0].size -= 2048;

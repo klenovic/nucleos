@@ -1051,26 +1051,16 @@ minix:
 	mov	%ax, p_mcs_desc+2
 	movb	%dl, p_mcs_desc+4
 
-	push	$MCS_SELECTOR
-	testw	$K_INT86, k_flags  // Generic INT86 support?
-	jz	0f
-	push	$int86             // Far address to INT86 support
-	jmp	1f
-0:
-	pushw	$bios13            // Far address to BIOS int 13 support
-1:
 	pushl	AOUTL(%bp)    // Address of a.out headers
 	pushw	$0
 	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
 	pushw	$0
 	pushw	BOOTP(%bp)   // 32 bit address of parameters (%ss relative)
+
 	pushw	$0
-	pushw	$0		// monitor far return address "Monitor CS_SEGMENT:ret386"
-	pushw	$0		// @nucleos: monitor never entered on reboot/halt
 	pushw	$CS_SELECTOR
 	pushw	KOFFH(%bp)
 	pushw	KOFFL(%bp)       // 32 bit far address to kernel entry point
-
 	call	real2prot         // Switch to protected mode
 	mov	$DS_SELECTOR, %ax // Kernel data
 	mov	%ax, %ds

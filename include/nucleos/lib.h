@@ -11,8 +11,8 @@
  * All the C files in the lib subdirectories include it.
  */
 
-#ifndef __NUCLEOS_LIB_H
-#define __NUCLEOS_LIB_H
+#ifndef _NUCLEOS_LIB_H
+#define _NUCLEOS_LIB_H
 
 /* The following are so basic, all the lib files get them automatically. */
 #include <nucleos/types.h>
@@ -26,4 +26,4 @@
 #include <nucleos/kipc.h>
 #include <asm/syscall.h>
 
-#endif /* __NUCLEOS_LIB_H */
+#endif /* _NUCLEOS_LIB_H */

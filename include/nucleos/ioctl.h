@@ -7,9 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_IOCTL_H
-#define __NUCLEOS_IOCTL_H
+#ifndef _NUCLEOS_IOCTL_H
+#define _NUCLEOS_IOCTL_H
 
 #include <asm/ioctl.h>
 
-#endif /* __NUCLEOS_IOCTL_H */
+#endif /* _NUCLEOS_IOCTL_H */

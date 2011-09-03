@@ -14,8 +14,8 @@
  * This limits the number of ugly #ifdefs somewhat.  The programs must
  * be restricted to performing just one service, of course.
  */
-#ifndef __NUCLEOS_ASYNCHIO_H
-#define __NUCLEOS_ASYNCHIO_H
+#ifndef _NUCLEOS_ASYNCHIO_H
+#define _NUCLEOS_ASYNCHIO_H
 
 #include <nucleos/time.h>
 
@@ -41,4 +41,4 @@ int asyn_wait(asynchio_t *_asyn, int _flags, struct timeval *to);
 int asyn_synch(asynchio_t *_asyn, int _fd);
 int asyn_close(asynchio_t *_asyn, int _fd);
 
-#endif /* __NUCLEOS_ASYNCHIO_H */
+#endif /* _NUCLEOS_ASYNCHIO_H */

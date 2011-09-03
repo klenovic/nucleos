@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_VFSIF_H
-#define __NUCLEOS_VFSIF_H
+#ifndef _NUCLEOS_VFSIF_H
+#define _NUCLEOS_VFSIF_H
 
 #include <nucleos/types.h>
 #include <nucleos/limits.h>
@@ -124,4 +124,4 @@ typedef struct {
 #define REQ_STATVFS	(VFS_BASE + 32)
 #define NREQS		33
 
-#endif /* __NUCLEOS_VFSIF_H */
+#endif /* _NUCLEOS_VFSIF_H */

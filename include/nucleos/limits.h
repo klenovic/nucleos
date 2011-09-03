@@ -12,8 +12,8 @@
  * the number of characters in a file name.
  */
 
-#ifndef __NUCLEOS_LIMITS_H
-#define __NUCLEOS_LIMITS_H
+#ifndef _NUCLEOS_LIMITS_H
+#define _NUCLEOS_LIMITS_H
 
 /* Minimum sizes required by the POSIX P1003.1 standard (Table 2-3). */
 #define _POSIX_ARG_MAX		4096	/* exec() may have 4K worth of args */
@@ -66,4 +66,4 @@
 				 * a pathname in the absence of a loop.
 				 */
 
-#endif /* __NUCLEOS_LIMITS_H */
+#endif /* _NUCLEOS_LIMITS_H */

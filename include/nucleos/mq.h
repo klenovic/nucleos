@@ -15,8 +15,8 @@ Created:	Jan 3, 1992 by Philip Homburg
 Copyright 1995 Philip Homburg
 */
 
-#ifndef __NUCLEOS_MQ_H
-#define __NUCLEOS_MQ_H
+#ifndef _NUCLEOS_MQ_H
+#define _NUCLEOS_MQ_H
 
 typedef struct mq
 {
@@ -29,4 +29,4 @@ mq_t *mq_get(void);
 void mq_free(mq_t *mq);
 void mq_init(void);
 
-#endif /* __NUCLEOS_MQ_H */
+#endif /* _NUCLEOS_MQ_H */

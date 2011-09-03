@@ -7,8 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_DMAP_H
-#define __NUCLEOS_DMAP_H
+#ifndef _NUCLEOS_DMAP_H
+#define _NUCLEOS_DMAP_H
 
 #include <nucleos/kipc.h>
 
@@ -51,4 +51,4 @@ enum dev_style { STYLE_DEV, STYLE_NDEV, STYLE_TTY, STYLE_CLONE };
 #define LOG_MAJOR		  15	/* major device for log driver */
 #  define IS_KLOG_DEV		   0	/* minor device for /dev/klog */
 
-#endif /* __NUCLEOS_DMAP_H */
+#endif /* _NUCLEOS_DMAP_H */

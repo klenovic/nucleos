@@ -9,8 +9,8 @@
  */
 /* Data for fstatfs() call. */
 
-#ifndef __NUCLEOS_STATFS_H
-#define __NUCLEOS_STATFS_H
+#ifndef _NUCLEOS_STATFS_H
+#define _NUCLEOS_STATFS_H
 
 #include <nucleos/types.h>
 #include <asm/statfs.h>
@@ -41,4 +41,4 @@ int fstatfs(int fd, struct statfs *st);
 int statvfs(const char *path, struct statfs *st);
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
-#endif /* __NUCLEOS_STATFS_H */
+#endif /* _NUCLEOS_STATFS_H */

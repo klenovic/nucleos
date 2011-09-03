@@ -12,8 +12,8 @@
  * Place of a partition on disk and the disk geometry,
  * for use with the DIOCGETP and DIOCSETP ioctl's.
  */
-#ifndef __NUCLEOS_PARTITION_H
-#define __NUCLEOS_PARTITION_H
+#ifndef _NUCLEOS_PARTITION_H
+#define _NUCLEOS_PARTITION_H
 
 #include <nucleos/types.h>
 
@@ -25,4 +25,4 @@ struct partition {
 	unsigned sectors;
 };
 
-#endif /* __NUCLEOS_PARTITION_H */
+#endif /* _NUCLEOS_PARTITION_H */

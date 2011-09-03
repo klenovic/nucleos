@@ -50,11 +50,10 @@ static char *get_value(const char *params, const char *name)
  * @brief Perform system initializations prior to calling main().
  * @param cs  kernel code segment
  * @param ds  kernel data segment
- * @param mds  monitor data segment
  * @param parmoff  boot parameters offset
  * @param parmsize  boot parameters length
  */
-void prepare_kernel(u16 cs, u16 ds, u16 mds, u16 parmoff, u16 parmsize)
+void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 {
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by loader.

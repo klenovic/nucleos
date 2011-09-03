@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __NUCLEOS_SYSINFO_H
-#define __NUCLEOS_SYSINFO_H
+#ifndef _NUCLEOS_SYSINFO_H
+#define _NUCLEOS_SYSINFO_H
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
 
@@ -27,4 +27,4 @@ ssize_t getsysinfo_up(endpoint_t who, int what, size_t size, void *where);
 #define SIU_SYSTEMHZ	2	/* retrieve system clock frequency */
 #define SIU_IDLETSC	3	/* retrieve cumulative idle timestamp count */
 
-#endif /* __NUCLEOS_SYSINFO_H */
+#endif /* _NUCLEOS_SYSINFO_H */

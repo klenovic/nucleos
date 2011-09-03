@@ -7,9 +7,9 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __NUCLEOS_FCNTL_H
-#define __NUCLEOS_FCNTL_H
+#ifndef _NUCLEOS_FCNTL_H
+#define _NUCLEOS_FCNTL_H
 
 #include <asm/fcntl.h>
 
-#endif /* __NUCLEOS_FCNTL_H */
+#endif /* _NUCLEOS_FCNTL_H */

@@ -9,8 +9,8 @@
  */
 /* The <dir.h> header gives the layout of a directory. */
 
-#ifndef __NUCLEOS_DIR_H
-#define __NUCLEOS_DIR_H
+#ifndef _NUCLEOS_DIR_H
+#define _NUCLEOS_DIR_H
 
 #include <nucleos/types.h>
 
@@ -25,4 +25,4 @@ struct direct {
 	char d_name[DIRSIZ];
 };
 
-#endif /* __NUCLEOS_DIR_H */
+#endif /* _NUCLEOS_DIR_H */
