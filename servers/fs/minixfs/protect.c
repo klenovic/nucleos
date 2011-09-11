@@ -14,7 +14,19 @@
 #include <servers/fs/minixfs/super.h>
 #include <nucleos/vfsif.h>
 
-static in_group(gid_t grp);
+static int in_group(gid_t grp)
+{
+	int i;
+
+	if (credentials.vu_ngroups > NGROUPS_MAX)
+		return -EINVAL;
+
+	for (i = 0; i < credentials.vu_ngroups; i++)
+		if (credentials.vu_sgroups[i] == grp)
+			return 0;
+
+	return -EINVAL;
+}
 
 /*===========================================================================*
  *				fs_chmod				     *
@@ -141,6 +153,7 @@ int forbidden(register struct minix_inode *rip, mode_t access_desired)
   } else {
 	if (caller_uid == rip->i_uid) shift = 6;	/* owner */
 	else if (caller_gid == rip->i_gid ) shift = 3;	/* group */
+	else if (in_group(rip->i_gid) == 0) shift = 3;	/* other groups */
 	else shift = 0;					/* other */
 	perm_bits = (bits >> shift) & (R_BIT | W_BIT | X_BIT);
   }
@@ -183,6 +196,3 @@ struct minix_inode *ip;		/* ptr to inode whose file sys is to be cked */
   sp = ip->i_sp;
   return(sp->s_rd_only ? -EROFS : 0);
 }
-
-
-

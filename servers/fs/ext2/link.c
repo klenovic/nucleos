@@ -179,7 +179,7 @@ int fs_unlink()
 int fs_rdlink()
 {
   block_t b;                   /* block containing link text */
-  struct buf *bp;              /* buffer containing link text */
+  struct buf *bp = 0;          /* buffer containing link text */
   char* link_text;             /* either bp->b_data or rip->i_block */
   register struct ext2_inode *rip;  /* target inode */
   register int r;              /* return value */
@@ -191,9 +191,7 @@ int fs_rdlink()
   if( (rip = get_inode(fs_dev, (ino_t) fs_m_in.REQ_INODE_NR)) == NULL)
 	  return(-EINVAL);
 
-  if (!S_ISLNK(rip->i_mode))
-	  r = -EACCES;
-  if (rip->i_size > MAX_FAST_SYMLINK_LENGTH) {
+  if (rip->i_size >= MAX_FAST_SYMLINK_LENGTH) {
   /* normal symlink */
 	if ((b = read_map(rip, (off_t) 0)) == NO_BLOCK) {
 		r = -EIO;
@@ -215,7 +213,6 @@ int fs_rdlink()
   /* We can safely cast to unsigned, because copylen is guaranteed to be
      below max file size */
 	copylen = min( copylen, (unsigned) rip->i_size);
-	bp = get_block(rip->i_dev, b, NORMAL);
 	r = sys_safecopyto(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,
 	                   (vir_bytes) 0, (vir_bytes) link_text,
 			   (size_t) copylen, D);
@@ -349,12 +346,17 @@ int fs_rename()
 	old_ip = NULL;
 	if (r == -EENTERMOUNT) r = -EXDEV;	/* should this fail at all? */
 	else if (r == -ELEAVEMOUNT) r = -EINVAL;	/* rename on dot-dot */
+  } else if (old_ip == NULL) {
+	return(err_code);
   }
 
+
   /* Get new dir inode */
-  if( (new_dirp = get_inode(fs_dev, (ino_t) fs_m_in.REQ_REN_NEW_DIR)) == NULL)
-	r = err_code;
-  else {
+  if( (new_dirp = get_inode(fs_dev, (ino_t) fs_m_in.REQ_REN_NEW_DIR)) == NULL) {
+	put_inode(old_ip);
+	put_inode(old_dirp);
+	return(err_code);
+  } else {
 	if (new_dirp->i_links_count == 0) { /* Dir does not actually exist */
 		put_inode(old_ip);
 		put_inode(old_dirp);
@@ -559,6 +561,8 @@ off_t newsize;			/* inode must become this size */
 	return(-EINVAL);
   if (newsize > rip->i_sp->s_max_size)	/* don't let inode grow too big */
 	return(-EFBIG);
+  if (rip->i_size == newsize)
+	return(0);
 
   /* Free the actual space if truncating. */
   if (newsize < rip->i_size) {
@@ -693,7 +697,6 @@ int half;
   } else {
 	len = offset;
 	pos -= offset;
-	offset = 0;
   }
 
   zeroblock_range(rip, pos, len);
