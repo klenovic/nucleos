@@ -428,7 +428,7 @@ void exec_image(char *image)
 	limit = mem[1].base + mem[1].size;
 
 	/* Allocate and clear the area where the headers will be placed.
-	 * The headers are placed below 1M at (1M - - PROCESS_MAX * A_MINHDR).
+	 * The headers are placed below 1M at (1M - PROCESS_MAX * A_MINHDR).
 	 * Note that we will need some additional space here for real-mode kernel.
 	 */
 	aout_hdrs_addr = mem[0].base + mem[0].size - PROCESS_MAX * A_MINHDR;
