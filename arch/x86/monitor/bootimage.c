@@ -373,13 +373,30 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 	return 1;
 }
 
+/* Load image from disk into memory `packed_image_addr' */
+int load_image(char *packed_image_addr)
+{
+	return 0;
+}
+
+/* Extract packet image from address packed_image_addr to address extract_image_addr */
+int extract_image(char *extract_image_addr, char *packed_image_addr)
+{
+	return 0;
+}
+
+int boot_image(char *extrackt_image_addr)
+{
+	return 0;
+}
+
 void exec_image(char *image)
 /* Get a Nucleos image into core, patch it up and execute. */
 {
 	int i;
 	struct image_header hdr;
 	char *buf;
-	u32_t vsec, addr, limit, aout, n, totalmem = 0;
+	u32_t vsec, addr, limit, n, totalmem = 0;
 	struct process *procp;    /* Process under construction. */
 	long a_text, a_data, a_bss, a_stack;
 	int banner= 0;
@@ -389,7 +406,9 @@ void exec_image(char *image)
 	char params[SECTOR_SIZE];
 	extern char *sbrk(int);
 	char *verb;
-	int verbose = 0;
+	u16 kdata_magic_num = 0;
+	u32 aout_hdrs_addr;
+	int verbose = 1;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
 	(void) sbrk(0);
@@ -403,18 +422,19 @@ void exec_image(char *image)
 
 	vsec = 0;           /* Load this sector from image next. */
 
-	addr = mem[0].base; /* Into this memory block. */
-	limit = mem[0].base + mem[0].size;
+	addr = mem[1].base; /* Load the image into this memory block. This should be
+			     * above 1M and the code should run in protected mode.
+			     */
+	limit = mem[1].base + mem[1].size;
 
-	if (limit > caddr)
-		limit= caddr;
-
-	/* Allocate and clear the area where the headers will be placed. */
-	limit -= PROCESS_MAX * A_MINHDR;
-	aout = limit;
+	/* Allocate and clear the area where the headers will be placed.
+	 * The headers are placed below 1M at (1M - - PROCESS_MAX * A_MINHDR).
+	 * Note that we will need some additional space here for real-mode kernel.
+	 */
+	aout_hdrs_addr = mem[0].base + mem[0].size - PROCESS_MAX * A_MINHDR;
 
 	/* Clear the area where the headers will be placed. */
-	raw_clear(aout, PROCESS_MAX * A_MINHDR);
+	raw_clear(aout_hdrs_addr, PROCESS_MAX * A_MINHDR);
 
 	/* Read the many different processes: */
 	for (i= 0; vsec < image_size; i++) {
@@ -466,7 +486,7 @@ void exec_image(char *image)
 		 */
 		hdr.process.a_syms = addr;
 
-		raw_copy(aout + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
+		raw_copy(aout_hdrs_addr + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
 
 		if (!banner && verbose) {
 			printf("       cs         ds     text     data      bss");
@@ -581,12 +601,6 @@ void exec_image(char *image)
 			printf("%s ", hdr.name);
 			totalmem += mem;
 		}
-
-		if (i == KERNEL_IDX && (k_flags & K_HIGH)) {
-			/* Load the rest in extended memory. */
-			addr = mem[1].base;
-			limit = mem[1].base + mem[1].size;
-		}
 	}
 
 	if(!verbose)
@@ -598,8 +612,9 @@ void exec_image(char *image)
 		return;
 	}
 
-	/* Check the kernel magic number. */
-	if (get_word(process[KERNEL_IDX].data + MAGIC_OFF) != KERNEL_D_MAGIC) {
+	/* Check the kernel magic number (located in data section). */
+	raw_copy(mon2abs(&kdata_magic_num), process[KERNEL_IDX].data + MAGIC_OFF, 2);
+	if (kdata_magic_num != KERNEL_D_MAGIC) {
 		printf("Kernel magic number is incorrect (0x%x)\n", get_word(process[KERNEL_IDX].data + MAGIC_OFF));
 		errno= 0;
 		return;
@@ -632,7 +647,7 @@ void exec_image(char *image)
 	dev_close();
 
 	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
-	      sizeof(params), aout);
+	      sizeof(params), aout_hdrs_addr);
 
 	printf("Error while booting kernel!\n");
 
