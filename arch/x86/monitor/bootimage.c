@@ -615,7 +615,7 @@ void exec_image(char *image)
 	/* Check the kernel magic number (located in data section). */
 	raw_copy(mon2abs(&kdata_magic_num), process[KERNEL_IDX].data + MAGIC_OFF, 2);
 	if (kdata_magic_num != KERNEL_D_MAGIC) {
-		printf("Kernel magic number is incorrect (0x%x)\n", get_word(process[KERNEL_IDX].data + MAGIC_OFF));
+		printf("Kernel magic number is incorrect (0x%x)\n", kdata_magic_num);
 		errno= 0;
 		return;
 	}
