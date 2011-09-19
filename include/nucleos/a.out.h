@@ -12,7 +12,8 @@
 #ifndef _NUCLEOS_AOUT_H
 #define _NUCLEOS_AOUT_H
 
-struct	exec {			/* a.out header */
+/** a.out header */
+struct exec {
   unsigned char	a_magic[2];	/* magic number */
   unsigned char	a_flags;	/* flags, see below */
   unsigned char	a_cpu;		/* cpu id */
@@ -54,8 +55,6 @@ struct	exec {			/* a.out header */
 #define A_NSYM	0x04	/* new style symbol table */
 #define A_IMG   0x08	/* image instead of executable (e.g. root VFS_PROC_NR) */
 #define A_EXEC	0x10	/* executable */
-#define A_PURE	0x40	/* pure text */		/* not used */
-#define A_TOVLY	0x80	/* text overlay */	/* not used */
 
 /* Offsets of various things. */
 #define A_MINHDR	32
