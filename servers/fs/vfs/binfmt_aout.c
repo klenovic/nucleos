@@ -106,7 +106,7 @@ static int aout_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 		return -1;
 #endif
 
-	if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0)
+	if ((hdr.a_flags & ~(A_NSYM | A_EXEC)) != 0)
 		return -1;
 
 	memcpy(param->buf, &hdr, hdr.a_hdrlen);
@@ -129,7 +129,7 @@ static int aout_load_binary(struct nucleos_binprm *param)
 
 	hdr = (struct exec*)param->buf;
 
-	param->ex.sep_id = !!(hdr->a_flags & A_SEP);	/* separate I & D or not */
+	param->ex.sep_id = 0;	/* @nucleos: useless, will be removed */
 
 	/* Get text and data sizes. */
 	param->ex.text_bytes = (vir_bytes) hdr->a_text;	/* text size in bytes */

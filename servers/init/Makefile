@@ -10,7 +10,7 @@ LDFLAGS_init.elf32 := -L$(lib-arch) -Llib \
 $(src)/init.elf32: servers/server_32.lds 
 
 # Create in minix3's aout format
-init_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+init_a_flags   := 0x00
 init_a_hdrlen  := 0x20
 init_a_cpu     := i386
 init_stackheap := 64k

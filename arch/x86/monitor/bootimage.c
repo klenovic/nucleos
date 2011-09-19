@@ -213,9 +213,6 @@ u32_t proc_size(struct image_header *hdr)
 	if (hdr->process.a_flags & A_PAL)
 		len+= hdr->process.a_hdrlen;
 
-	if (hdr->process.a_flags & A_SEP)
-		len= align(len, SECTOR_SIZE);
-
 	len= align(len + hdr->process.a_data, SECTOR_SIZE);
 
 	return len >> SECTOR_SHIFT;
@@ -505,9 +502,7 @@ void exec_image(char *image)
 
 		if (k_flags & K_CHMEM) {
 			a_stack = hdr.process.a_total - a_data - a_bss;
-
-			if (!(hdr.process.a_flags & A_SEP))
-				a_stack -= a_text;
+			a_stack -= a_text;
 		} else {
 			a_stack = 0;
 		}
@@ -526,25 +521,10 @@ void exec_image(char *image)
 		if (hdr.process.a_flags & A_UZP)
 			procp->cs -= click_size;
 
-		/* Separate I&D: two segments.  Common I&D: only one. */
-		if (hdr.process.a_flags & A_SEP) {
-			/* Read the text segment. */
-			if (!get_segment(&vsec, &a_text, &addr, limit))
-				return;
-
-			/* The data segment follows. */
-			procp->ds = addr;
-
-			if (hdr.process.a_flags & A_UZP)
-				procp->ds -= click_size;
-
-			procp->data = addr;
-		} else {
-			/* Add text to data to form one segment. */
-			procp->data = addr + a_text;
-			procp->ds = procp->cs;
-			a_data += a_text;
-		}
+		/* Add text to data to form one segment. */
+		procp->data = addr + a_text;
+		procp->ds = procp->cs;
+		a_data += a_text;
 
 		/* Read the data segment. */
 		if (!get_segment(&vsec, &a_data, &addr, limit))

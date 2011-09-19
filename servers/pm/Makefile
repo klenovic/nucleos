@@ -34,7 +34,7 @@ LDFLAGS_pm.elf32 := -L$(lib-arch) -Llib \
 $(src)/pm.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-pm_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+pm_a_flags   := 0x00
 pm_a_hdrlen  := 0x20
 pm_a_cpu     := i386
 pm_stackheap := 32k

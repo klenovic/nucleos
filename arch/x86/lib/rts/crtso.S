@@ -73,14 +73,6 @@ unmap_page_zero:
 	push	$0
 	call	munmap_text	// munmap_text(0, I386_PAGE_SIZE)
 	add	$8, %esp
-
-#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
-	// unmap 0-page data
-	push	$I386_PAGE_SIZE
-	push	$0
-	call	munmap		// munmap(0, I386_PAGE_SIZE)
-	add	$8, %esp
-#endif
 	ret
 
 .section .data

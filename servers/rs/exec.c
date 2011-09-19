@@ -360,9 +360,9 @@ int *hdrlenp;
   if (hdr.a_cpu != A_I8086 && hdr.a_cpu != A_I80386) return(-ENOEXEC);
 #endif
 
-  if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(-ENOEXEC);
+  if ((hdr.a_flags & ~(A_NSYM | A_EXEC)) != 0) return(-ENOEXEC);
 
-  *sep_id = !!(hdr.a_flags & A_SEP);	    /* separate I & D or not */
+  *sep_id = 0;	/* @nucleos: useless, will be removed */
 
   /* Get text and data sizes. */
   *text_bytes = (vir_bytes) hdr.a_text;	/* text size in bytes */

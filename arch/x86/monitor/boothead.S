@@ -25,7 +25,6 @@
 	.set A_DATA,	12
 	.set A_BSS,	16
 	.set A_TOTAL,	24
-	.set A_SEP,	0x20 		// Separate I&D flag
 	.set A_HDRLEN,	__HDRLEN__ 	// header length
 
 // Imported variables and functions:
@@ -58,15 +57,11 @@ bootcode_start:
 	mov	$LOADSEG, %ax
 	mov	%ax, %ds	// %ds = header
 	movb	A_FLAGS, %al
-	testb	$A_SEP, %al	// Separate I&D?
-	jnz	sepID
-comID:
 	xor	%ax, %ax
 	xchg	A_TEXT, %ax	// No text
 	add	%ax, A_DATA	// Treat all text as data
 				// total = text + data + bss + heap + stack
 				// linked from the same starting point
-sepID:
 	mov	A_TOTAL, %ax	// Total nontext memory usage
 	and	$0xFFFE, %ax	// Round down to even
 	mov	%ax, A_TOTAL  // total - text = data + bss + heap + stack

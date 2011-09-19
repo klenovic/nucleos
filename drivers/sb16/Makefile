@@ -10,7 +10,7 @@ LDFLAGS_sb16_dsp.elf32 := -L$(lib-arch) -Llib \
 $(src)/sb16_dsp.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-sb16_dsp_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+sb16_dsp_a_flags   := 0x00
 sb16_dsp_a_hdrlen  := 0x20
 sb16_dsp_a_cpu     := i386
 sb16_dsp_stackheap := 128k
@@ -28,7 +28,7 @@ LDFLAGS_sb16_mixer.elf32 := -L$(lib-arch) -Llib \
 $(src)/sb16_mixer.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-sb16_mixer_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+sb16_mixer_a_flags   := 0x00
 sb16_mixer_a_hdrlen  := 0x20
 sb16_mixer_a_cpu     := i386
 sb16_mixer_stackheap := 128k

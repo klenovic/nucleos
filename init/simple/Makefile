@@ -36,42 +36,42 @@ $(src)/service.elf32: servers/server_32.lds
 $(src)/sysenv.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-cdprobe_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+cdprobe_a_flags   := 0x00
 cdprobe_a_hdrlen  := 0x20
 cdprobe_a_cpu     := i386
 cdprobe_stackheap := 112k
 
 e2a-y := cdprobe.elf32,cdprobe
 
-dev2name_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+dev2name_a_flags   := 0x00
 dev2name_a_hdrlen  := 0x20
 dev2name_a_cpu     := i386
 dev2name_stackheap := 16k
 
 e2a-y += dev2name.elf32,dev2name
 
-loadramdisk_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+loadramdisk_a_flags   := 0x00
 loadramdisk_a_hdrlen  := 0x20
 loadramdisk_a_cpu     := i386
 loadramdisk_stackheap := 16k
 
 e2a-y += loadramdisk.elf32,loadramdisk
 
-newroot_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+newroot_a_flags   := 0x00
 newroot_a_hdrlen  := 0x20
 newroot_a_cpu     := i386
 newroot_stackheap := 128k
 
 e2a-y += newroot.elf32,newroot
 
-service_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+service_a_flags   := 0x00
 service_a_hdrlen  := 0x20
 service_a_cpu     := i386
 service_stackheap := 128k
 
 e2a-y += service.elf32,service
 
-sysenv_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+sysenv_a_flags   := 0x00
 sysenv_a_hdrlen  := 0x20
 sysenv_a_cpu     := i386
 sysenv_stackheap := 16k

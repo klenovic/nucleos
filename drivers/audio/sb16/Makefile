@@ -11,7 +11,7 @@ LDFLAGS_sb16.elf32 := -L$(lib-arch) -Llib \
 $(src)/sb16.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-sb16_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+sb16_a_flags   := 0x00
 sb16_a_hdrlen  := 0x20
 sb16_a_cpu     := i386
 sb16_stackheap := 512k

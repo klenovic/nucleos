@@ -14,42 +14,6 @@ OUTPUT_ARCH("i386")
 
 SECTIONS
 {
-#ifdef CONFIG_BOOTMONITOR_LINKAGE_SEPID
-/* For linkage type with separated I&D */
-	_text = .;
-	.text 0 : AT (ADDR(.text)) {
-		*(.text.head)
-		*(.text)
-		*(.text.*)
-		. = ALIGN(0x10);
-	}
-	_etext = SIZEOF(.text);
-
-	_data = .;
-	.data 0 : AT (SIZEOF(.text)) {
-	/* Since plenty of legacy code does null pointer
-	   dereferencing (*NULL). This hack ensures that
-	   *NULL==0. */
-		LONG(0);
-		*(.rodata)
-		*(.rodata.*)
-		*(.data)
-		*(.data.*)
-		. = ALIGN(0x10);
-	}
-	_edata = SIZEOF(.data);
-
-	_bss = .;
-	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		*(.bss)
-		*(.bss.*)
-		*(COMMON)
-		. = ALIGN(0x10);
-	}
-	_ebss = SIZEOF(.data) + SIZEOF(.bss);
-	_end = _ebss;
-
-#else /* Common I&D */
 	_text = . ;
 	.text ORIGIN : AT (ADDR(.text) - ORIGIN) { /* Text */
 		*(.text.head)
@@ -81,7 +45,7 @@ SECTIONS
 
 	/* start of heap + stack */
 	_end = _ebss ;
-#endif
+
 	/DISCARD/ : {
 		*(*)
 		*(.comment)

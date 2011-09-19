@@ -10,7 +10,7 @@ LDFLAGS_tty.elf32 := -L$(lib-arch) -Llib \
 $(src)/tty.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-tty_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+tty_a_flags   := 0x00
 tty_a_hdrlen  := 0x20
 tty_a_cpu     := i386
 tty_stackheap := 16k

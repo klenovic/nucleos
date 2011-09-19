@@ -22,42 +22,6 @@ OUTPUT_ARCH("i386")
 
 SECTIONS
 {
-#ifdef CONFIG_KERNEL_LINKAGE_SEPID
-	_text = .;
-	.text 0 : AT (ADDR(.text)) {
-		*(.text.head)
-		*(.text)
-		*(.text.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_etext = SIZEOF(.text);
-
-	_data = .;
-	.data 0 : AT (SIZEOF(.text)) {
-
-		SHORT(0x526f);					/* kernel data starts
-								   with this magic number */
-		. = (. == 0) ? PAGE_SIZE : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
-		*(.rodata)
-		*(.rodata.*)
-		*(.data)
-		*(.data.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_edata = SIZEOF(.data);
-
-	_bss = .;
-	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		*(.bss)
-		*(.bss.*)
-		*(COMMON)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_ebss = SIZEOF(.data) + SIZEOF(.bss);
-	_end = _ebss;
-
-#else /* Common I&D */
-
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 
 	_text = .;
@@ -101,7 +65,7 @@ SECTIONS
 	}
 	_ebss = .;
 	_end = _ebss;
-#endif
+
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)

@@ -28,7 +28,7 @@ LDFLAGS_kernel.elf32 := -N -S -e $(KERN_ENTRY) \
 			-Tarch/x86/kernel/nucleos_32.lds
 
 # Create in minix3's aout format
-kernel_a_flags   := $(CONFIG_KERNEL_LINKAGE_TYPE)
+kernel_a_flags   := 0x00
 kernel_a_hdrlen  := 0x20
 kernel_a_cpu     := i386
 kernel_stackheap := 0

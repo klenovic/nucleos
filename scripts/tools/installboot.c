@@ -392,18 +392,6 @@ int read_iheader_aout(int talk, char *proc, FILE *procf, struct MNX(image_header
   total_data+= phdr->a_data;
   total_bss+= phdr->a_bss;
 
-  if (phdr->a_cpu == A_I8086) {
-    long data= phdr->a_data + phdr->a_bss;
-
-    if (!(phdr->a_flags & A_SEP))
-      data+= phdr->a_text;
-
-    if (phdr->a_text >= 65536)
-      big |= 1;
-    if (data >= 65536)
-      big |= 2;
-  }
-
   if (big) {
     fprintf(stderr, "%s will crash, %s%s%s segment%s larger then 64K\n", proc,
                                                     (big & 1) ? "text" : "",
@@ -507,18 +495,7 @@ void make_image_aout(char *image, char **procv)
       phdr.a_text+= phdr.a_hdrlen;
     }
 
-    /* Copy text and data of proc to image. */
-    if (phdr.a_flags & A_SEP) {
-      /* Separate I&D: pad text & data separately. */
-
-      copyexec(proc, procf, image, imagef, phdr.a_text);
-      copyexec(proc, procf, image, imagef, phdr.a_data);
-    } else {
-      /* Common I&D: keep text and data together. */
-
-      copyexec(proc, procf, image, imagef,
-            phdr.a_text + phdr.a_data);
-    }
+    copyexec(proc, procf, image, imagef, phdr.a_text + phdr.a_data);
 
     /* Done with proc. */
     (void) fclose(procf);
@@ -596,13 +573,7 @@ void extract_image_aout(char *image)
       bwrite(procf, ihdr.name, &ihdr.process, phdr.a_hdrlen);
     }
 
-    /* Extract text and data segments. */
-    if (phdr.a_flags & A_SEP) {
-      extractexec(imagef, image, procf, ihdr.name, phdr.a_text, &len);
-      extractexec(imagef, image, procf, ihdr.name, phdr.a_data, &len);
-    } else {
-      extractexec(imagef, image, procf, ihdr.name, phdr.a_text + phdr.a_data, &len);
-    }
+    extractexec(imagef, image, procf, ihdr.name, phdr.a_text + phdr.a_data, &len);
 
     if (fclose(procf) == EOF) fatal(ihdr.name);
   }

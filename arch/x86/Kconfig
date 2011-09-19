@@ -14,14 +14,6 @@ config X86_64
 config X86
 	def_bool y
 
-# Link kernel with common I&D
-config ARCH_KERNEL_LINKAGE_COMID
-	def_bool y
-
-# Link servers/drivers with common I&D
-config ARCH_UKERNEL_LINKAGE_COMID
-	def_bool y
-
 # x86 configuration
 mainmenu "Nucleos Configuration for x86"
 

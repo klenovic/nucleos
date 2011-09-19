@@ -173,11 +173,8 @@ void main(void)
 		data_clicks = (e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
 		st_clicks= (e_hdr.a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
 
-		if (!(e_hdr.a_flags & A_SEP)) {
-			data_clicks = (e_hdr.a_text + e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1)
-				       >> CLICK_SHIFT;
-			text_clicks = 0;	   /* common I&D */
-		}
+		data_clicks = (e_hdr.a_text + e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
+		text_clicks = 0;
 
 		rp->p_memmap[T].mem_phys = text_base;
 		rp->p_memmap[T].mem_len  = text_clicks;

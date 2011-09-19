@@ -18,7 +18,7 @@ LDFLAGS_iso9660fs.elf32 := -L$(lib-arch) -Llib \
 $(src)/iso9660fs.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-iso9660fs_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+iso9660fs_a_flags   := 0x00
 iso9660fs_a_hdrlen  := 0x20
 iso9660fs_a_cpu     := i386
 iso9660fs_stackheap := 64k

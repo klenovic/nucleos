@@ -16,40 +16,6 @@ ENTRY(_start)
 
 SECTIONS
 {
-#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
-/* For servers linked with separated I&D */
-	_text = .;
-	.text 0 : AT (ADDR(.text)) {
-		*(.text.head)
-		KEEP(*(.text.init))
-		*(.text)
-		*(.text.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_etext = SIZEOF(.text);
-
-	_data = .;
-	.data 0 : AT (SIZEOF(.text)) {
-		. = (. == 0) ? (PAGE_SIZE) : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
-		*(.rodata)
-		*(.rodata.*)
-		*(.data)
-		*(.data.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_edata = SIZEOF(.data);
-
-	_bss = .;
-	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		*(.bss)
-		*(.bss.*)
-		*(COMMON)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_ebss = SIZEOF(.data) + SIZEOF(.bss);
-	_end = _ebss;
-
-#else /* Common I&D */
 #define LOAD_OFFSET		__PAGE_OFFSET__
 #define LOAD_PHYSICAL_ADDR	__LOAD_PHYSICAL_ADDR__
 
@@ -89,7 +55,7 @@ SECTIONS
 	}
 	_ebss = .;
 	_end = _ebss;
-#endif
+
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)
