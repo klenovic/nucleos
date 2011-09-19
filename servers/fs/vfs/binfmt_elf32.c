@@ -52,7 +52,6 @@ typedef struct elf32_exec_info {
 	uint32_t entry_point;
 	uint32_t symtab_size;
 	uint32_t strtab_size;
-	uint8_t sep_id;
 } elf32_exec_info_t;
 
 static int elf32_check_binfmt(struct nucleos_binprm *param, struct vnode *vp);
@@ -198,23 +197,13 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 	elf32_dump_exec(&exec);
 #endif
 
-	param->ex.sep_id = exec.sep_id;	/* separate I & D or not */
-
 	/* Get text and data sizes. */
 	param->ex.text_bytes = (vir_bytes) exec.text_size;	/* text size in bytes */
 	param->ex.data_bytes = (vir_bytes) exec.data_size;	/* data size in bytes */
 	param->ex.bss_bytes  = (vir_bytes) exec.bss_size;	/* bss size in bytes */
-
-	/* compute total bytes to allocate for prog */
-	if (exec.sep_id)
-		param->ex.tot_bytes  = exec.data_size + exec.bss_size + STACKSIZE;
-	else {
-		param->ex.tot_bytes  = exec.text_size + exec.data_size + exec.bss_size + STACKSIZE;
-
-		/* If I & D space is not separated, it is all considered data. Text = 0 */
-		param->ex.data_bytes += exec.text_size;
-		param->ex.text_bytes = 0;
-	}	
+	param->ex.tot_bytes  = exec.text_size + exec.data_size + exec.bss_size + STACKSIZE;
+	param->ex.data_bytes += exec.text_size;
+	param->ex.text_bytes = 0;
 
 	/* entry point of process */
 	param->ex.entry_point = exec.entry_point;
@@ -235,7 +224,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 		return err;
 	}
 
-	/* address inside process (important in case of common I&D) */
+	/* address inside process */
 	vir_bytes addr_off = 0;
 	elf32_shdr_t* sh = 0;
 
@@ -249,7 +238,7 @@ static int elf32_load_binary(struct nucleos_binprm *param)
 			    ((sh->sh_flags & SHF_EXECINSTR) || (~sh->sh_flags & SHF_WRITE)))  {
 				/* .text and read-only sections */
 				err = elf32_read_seg(param->vp, sh->sh_offset, addr_off, param->proc_e,
-						     (exec.sep_id) ? T : D , sh->sh_size);
+						     D, sh->sh_size);
 				if (err) {
 					app_err("Can't load text section\n");
 					return err;
@@ -536,11 +525,6 @@ static int elf32_map_exec(elf32_exec_info_t *exec, elf32_ehdr_t *ehdr, elf32_phd
 		}
 	}
 
-	if (exec->text_vstart == exec->data_vstart)
-		exec->sep_id = 1;
-	else
-		exec->sep_id = 0;
-
 	return 0;
 }
 
@@ -664,7 +648,6 @@ static void elf32_dump_exec(elf32_exec_info_t* e)
 	printk("bss_vstart=0x%x  ", e->bss_vstart);
 	printk("bss_size=0x%x\n", e->bss_size);
 	printk("entry_point=0x%x  ", e->entry_point);
-	printk("sep_id=0x%x\n", e->sep_id);
 
 	return;
 }
@@ -733,7 +716,6 @@ static void elf32_dump_exec_newmem(struct exec_newmem *ex)
 	printk("bss_bytes: 0x%x ", ex->bss_bytes);
 	printk("tot_bytes: 0x%x ", ex->tot_bytes);
 	printk("args_bytes: 0x%x\n", ex->args_bytes);
-	printk("sep_id: 0x%x ", ex->sep_id);
 	printk("st_dev: 0x%x ", ex->st_dev);
 	printk("st_ino: 0x%x ", ex->st_ino);
 	printk("st_ctime: 0x%x ", ex->st_ctime);

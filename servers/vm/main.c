@@ -249,9 +249,6 @@ static void vm_init(void)
 		vmp->vm_stacktop =
 			CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_vir +
 				vmp->vm_arch.vm_seg[S].mem_len);
-
-		if (vmp->vm_arch.vm_seg[T].mem_len != 0)
-			vmp->vm_flags |= VMF_SEPARATE;
 	}
 
 #ifndef CONFIG_BUILTIN_INITRD

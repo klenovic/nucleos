@@ -396,7 +396,7 @@ vir_bytes bytes;                /* # of bytes to be copied */
  
   if (seg != T)
         seg = (vc < rp->p_memmap[D].mem_vir + rp->p_memmap[D].mem_len ? D : S);
-  else if (rp->p_memmap[T].mem_len == 0)	/* common I&D? */
+  else if (rp->p_memmap[T].mem_len == 0)
         seg = D;				/* ptrace needs this */
  
   if ((vir_addr>>CLICK_SHIFT) >= rp->p_memmap[seg].mem_vir +

@@ -129,8 +129,6 @@ static int aout_load_binary(struct nucleos_binprm *param)
 
 	hdr = (struct exec*)param->buf;
 
-	param->ex.sep_id = 0;	/* @nucleos: useless, will be removed */
-
 	/* Get text and data sizes. */
 	param->ex.text_bytes = (vir_bytes) hdr->a_text;	/* text size in bytes */
 	param->ex.data_bytes = (vir_bytes) hdr->a_data;	/* data size in bytes */
@@ -140,11 +138,8 @@ static int aout_load_binary(struct nucleos_binprm *param)
 	if (param->ex.tot_bytes == 0)
 		return -1;
 
-	if (!param->ex.sep_id) {
-		/* If I & D space is not separated, it is all considered data. Text=0 */
-		param->ex.data_bytes += param->ex.text_bytes;
-		param->ex.text_bytes = 0;
-	}
+	param->ex.data_bytes += param->ex.text_bytes;
+	param->ex.text_bytes = 0;
 
 	/* entry point of process */
 	param->ex.entry_point = hdr->a_entry;

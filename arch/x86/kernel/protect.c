@@ -262,7 +262,7 @@ void alloc_segments(struct proc *rp)
 
 	data_bytes = (phys_bytes) (rp->p_memmap[S].mem_vir + rp->p_memmap[S].mem_len) << CLICK_SHIFT;
 	if (rp->p_memmap[T].mem_len == 0)
-		code_bytes = data_bytes;	/* common I&D, poor protect */
+		code_bytes = data_bytes;
 	else
 		code_bytes = (phys_bytes) rp->p_memmap[T].mem_len << CLICK_SHIFT;
 

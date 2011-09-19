@@ -34,16 +34,6 @@
 .extern k_flags                                // Special kernel flags
 .extern mem                                    // Free memory list
 
-/*
-  Common I&D is when everything, code and data, is linked from the same
-  starting point.  So code address 0 and data address 0 both address the
-  first byte of the program.  All segment registers have the same value,
-  pointing to that first byte.
-
-  Separate I&D is when code and data are separate.  The data segment also
-  starts at address 0.  The data segment registers have a different value
-  from the code segment, pointing to byte 0 of data.
-*/
 // Set segment registers and stack pointer using the programs own header//
 // The header is either 32 bytes (short form) or 48 bytes (long form).  The
 // bootblock will jump to address 0x10030 in both cases, calling one of the
@@ -170,14 +160,7 @@ no_ext:
 // Time to switch to a higher level language (not much higher)
 	call	boot
 
-/* @nucleos:
-	In case of separate I&D it is really important to place into correct
-	section otherwise it is placed into .text section which different 
-	segment.
-*/
-
 .section .rodata
-
 	.p2align  1
 c60:	.word  60              // Constants for MUL and DIV
 c1024:	.word  1024
