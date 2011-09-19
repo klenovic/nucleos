@@ -166,7 +166,7 @@ extern int fsok;	/* True if the boot device contains an VFS_PROC_NR. */
 u32_t lowsec;	/* Offset to the file system on the boot device. */
 
 /* Called by boot.c: */
-void bootminix(void);		/* Load and start a Minix image. */
+void boot_nucleos(void);		/* Load and start a Nucleos image. */
 
 /* Called by bootimage.c: */
 /* Report a read error. */

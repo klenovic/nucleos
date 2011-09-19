@@ -190,21 +190,6 @@ int params2params(char *params, size_t psize)
 	return 1;
 }
 
-int selected(char *name)
-/* True iff name has no label or the proper label. */
-{
-	char *colon, *label;
-	int cmp;
-
-	if ((colon= strchr(name, ':')) == 0) return 1;
-	if ((label= b_value("label")) == 0) return 1;
-
-	*colon= 0;
-	cmp= strcmp(label, name);
-	*colon= ':';
-	return cmp == 0;
-}
-
 u32_t proc_size(struct image_header *hdr)
 /* Return the size of a process in sectors as found in an image. */
 {
@@ -382,11 +367,6 @@ int extract_image(char *extract_image_addr, char *packed_image_addr)
 	return 0;
 }
 
-int boot_image(char *extrackt_image_addr)
-{
-	return 0;
-}
-
 void exec_image(char *image)
 /* Get a Nucleos image into core, patch it up and execute. */
 {
@@ -454,10 +434,8 @@ void exec_image(char *image)
 			if (BADMAG(hdr.process)) {
 				errno = ENOEXEC;
 				return;
-			}
-
-			/* Check the optional label on the process. */
-			if (selected(hdr.name)) break;
+			} else
+				break;
 
 			/* Bad label, skip this process. */
 			vsec += proc_size(&hdr);
@@ -819,10 +797,7 @@ static unsigned long select_initrd(char* initrd)
 	return size;
 }
 
-void bootminix(void)
-/* Load Minix and run it.  (Given the size of this program it is surprising
- * that it ever gets to that.)
- */
+void boot_nucleos(void)
 {
 	char *image;
 

@@ -668,7 +668,7 @@ void boot(void)
 	/* Get environment variables from the parameter sector. */
 	get_parameters();
 
-	bootminix();
+	boot_nucleos();
 
 	/* @nucleos: only in case of error */
 	while (1) halt_cpu();
