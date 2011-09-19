@@ -1,6 +1,0 @@
-menu "Legacy boot monitor"
-
-config BOOT_VERBOSE
-	bool "Boot verbose"
-	default y
-endmenu

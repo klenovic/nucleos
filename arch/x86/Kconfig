@@ -137,9 +137,6 @@ source "arch/x86/servers/Kconfig"
 # Drivers (includes also debug options if any)
 source "drivers/Kconfig"
 
-# Legacy boot monitor
-source "arch/x86/monitor/Kconfig"
-
 menu "Linkage"
 # @nucleos: add some usefull configs
 endmenu
