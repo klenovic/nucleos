@@ -381,14 +381,13 @@ void exec_image(char *image)
 	u16_t mode;
 	char *console;
 	char params[SECTOR_SIZE];
-	extern char *sbrk(int);
 	char *verb;
 	u16 kdata_magic_num = 0;
 	u32 aout_hdrs_addr;
 	int verbose = 1;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
-	(void) sbrk(0);
+	sbrk(0);
 
 	if ((verb= b_value("verbose")) != 0 && a2l(verb) > 0)
 		verbose = 1;
@@ -612,29 +611,24 @@ void exec_image(char *image)
 	return;
 }
 
-ino_t latest_version(char *version, struct stat *stp)
-/* Recursively read the current directory, selecting the newest image on
- * the way up.  (One can't use r_stat while reading a directory.)
+/**
+ * Recursively read the current directory
+ * Note: One can't use r_stat while reading a directory.
  */
+ino_t latest_version(char *version, struct stat *stp)
 {
 	char name[NAME_MAX + 1];
 	ino_t ino, newest;
-	time_t mtime;
 
-	if ((ino= r_readdir(name)) == 0) {
-		stp->st_mtime= 0;
+	if ((ino= r_readdir(name)) == 0)
 		return 0;
-	}
 
-	newest= latest_version(version, stp);
-	mtime= stp->st_mtime;
+	newest = latest_version(version, stp);
 	r_stat(ino, stp);
 
-	if (S_ISREG(stp->st_mode) && stp->st_mtime > mtime) {
+	if (S_ISREG(stp->st_mode)) {
 		newest= ino;
 		strcpy(version, name);
-	} else {
-		stp->st_mtime= mtime;
 	}
 
 	return newest;
@@ -650,23 +644,11 @@ char *select_image(char *image)
 	ino_t image_ino;
 	struct stat st;
 
-	image= strcpy(malloc((strlen(image) + 1 + NAME_MAX + 1)
-	           * sizeof(char)), image);
+	image = strcpy(malloc((strlen(image) + 1 + NAME_MAX + 1)*sizeof(char)), image);
 
-	fsok= r_super(&block_size) != 0;
+	fsok = r_super(&block_size) != 0;
 
-	if (!fsok || (image_ino= r_lookup(ROOT_INO, image)) == 0) {
-		char *size;
-
-		if (numprefix(image, &size) && *size++ == ':' && numeric(size)) {
-			vir2sec= flat_vir2sec;
-			image_off= a2l(image);
-			image_size= a2l(size);
-			strcpy(image, "Minix");
-
-			return image;
-		}
-
+	if (!fsok || (image_ino = r_lookup(ROOT_INO, image)) == 0) {
 		if (!fsok)
 			printf("No image selected\n");
 		else
@@ -685,20 +667,22 @@ char *select_image(char *image)
 			goto bail_out;
 		}
 
-		(void) r_readdir(dots);
-		(void) r_readdir(dots); /* "." & ".." */
+		r_readdir(dots);
+		r_readdir(dots); /* "." & ".." */
 		*version++= '/';
 		*version= 0;
 
-		if ((image_ino= latest_version(version, &st)) == 0) {
+		if ((image_ino = latest_version(version, &st)) == 0) {
 			printf("There are no images in %s\n", image);
+
 			goto bail_out;
 		}
+
 		r_stat(image_ino, &st);
 	}
 
-	vir2sec= file_vir2sec;
-	image_size= (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
+	vir2sec = file_vir2sec;
+	image_size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
 
 	return image;
 
