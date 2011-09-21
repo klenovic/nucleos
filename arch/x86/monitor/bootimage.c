@@ -56,7 +56,6 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 
 /* Some kernels have extra features: */
 #define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
-#define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
 #define K_ALL		0x01FF /* All feature bits this monitor supports. */
 
