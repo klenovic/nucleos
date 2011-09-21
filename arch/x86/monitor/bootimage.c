@@ -474,12 +474,10 @@ void exec_image(char *image)
 		a_data = hdr.process.a_data;
 		a_bss = hdr.process.a_bss;
 
-		if (k_flags & K_CHMEM) {
-			a_stack = hdr.process.a_total - a_data - a_bss;
-			a_stack -= a_text;
-		} else {
+		if (k_flags & K_CHMEM)
+			a_stack = hdr.process.a_total - a_data - a_bss - a_text;
+		else
 			a_stack = 0;
-		}
 
 		/* Collect info about the process to be. */
 		procp->cs = addr;
