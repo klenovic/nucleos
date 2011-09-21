@@ -55,7 +55,6 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 #define click_shift	clck_shft       /* 7 char clash with click_size. */
 
 /* Some kernels have extra features: */
-#define K_CLAIM		0x0002 /* I will acquire my own bss pages, thank you. */
 #define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
 #define K_HIGH		0x0008 /* Load mm, fs, etc. in extended memory. */
 #define K_INT86		0x0040 /* Requires generic INT support. */
@@ -506,10 +505,6 @@ void exec_image(char *image)
 		/* Read the data segment. */
 		if (!get_segment(&vsec, &a_data, &addr, limit))
 			return;
-
-		/* Make space for bss and stack unless... */
-		if (i != KERNEL_IDX && (k_flags & K_CLAIM))
-			a_bss = a_stack = 0;
 
 		if (verbose) {
 			printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
