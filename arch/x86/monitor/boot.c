@@ -27,6 +27,7 @@
 #include <nucleos/minlib.h>
 #include <nucleos/syslib.h>
 #include <nucleos/video.h>
+#include <nucleos/param.h>
 #include <kernel/const.h>
 #include <kernel/types.h>
 #include <ibm/partition.h>
@@ -476,7 +477,6 @@ void get_parameters(void)
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
   b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
   b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(HZ));
-
   processor = getprocessor();
 
   if(processor == 1586)

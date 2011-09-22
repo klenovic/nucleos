@@ -31,7 +31,6 @@
 .extern caddr, daddr, runsize, edata, end      // Runtime environment
 .extern device                                 // BIOS device number
 .extern rem_part                               // To pass partition info
-.extern k_flags                                // Special kernel flags
 .extern mem                                    // Free memory list
 
 // Set segment registers and stack pointer using the programs own header//

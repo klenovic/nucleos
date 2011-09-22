@@ -116,13 +116,6 @@
 .globl hwint14
 .globl hwint15
 
-/* @nucleos: All these flags are used and defined by monitor. So this
-	     can lead into inconsistence if we change something there
-	     but forget to change also here! */
-
-/* legacy features (see monitor sources) */
-#define K_FLAGS			0x01FD
-
 #ifdef CONFIG_BUILTIN_INITRD
 #define K_BUILTIN_INITRD	0x0001
 #else
@@ -144,12 +137,6 @@ nucleos_startup:                // this is the entry point for the Nucleos kerne
 
 	jmp	over_flags	// skip over the next few bytes
 	.word	CLICK_SHIFT	// for the monitor: memory granularity
-flags:
-	.word	K_FLAGS		// boot monitor flags:
-				//      call in 386 mode, make bss, make stack,
-				//      load high, do not patch, will return,
-				//      uses generic INT, memory vector,
-				//      new boot code return
 flags_ext:
 	.word	K_FLAGS_EXT	// boot monitor extended flags:
 				//      built in initrd (in memory driver)

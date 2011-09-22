@@ -54,15 +54,10 @@ int load_initrd(char* initrd, unsigned long loadaddr);
 
 #define click_shift	clck_shft       /* 7 char clash with click_size. */
 
-/* Some kernels have extra features: */
-#define K_CHMEM		0x0004 /* This kernel listens to chmem for its stack size. */
-#define K_ALL		0x01FF /* All feature bits this monitor supports. */
-
-/* Some new features */
+/* Load the initial ramdisk */
 #define K_BUILTIN_INITRD	0x0001 /* Kernel has builtin initrd (inside memory driver). */
 
 /* Data about the different processes. */
-
 #define PROCESS_MAX	16      /* Must match the space in kernel/mpx.x */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
 
@@ -78,13 +73,8 @@ int n_procs;        /* Number of processes. */
 /* Magic numbers in process' data space. */
 #define MAGIC_OFF	0       /* Offset of magic # in data seg. */
 #define CLICK_OFF	2       /* Offset in kernel text to click_shift. */
-#define FLAGS_OFF	       4       /* Offset in kernel text to flags. */
-#define FLAGS_EXT_OFF	   6       /* Offset in kernel text to extended flags. */
-#define KERNEL_D_MAGIC	  0x526F  /* Kernel magic number. */
-
-/* Offsets of sizes to be patched into kernel and fs. */
-#define P_SIZ_OFF	       0       /* Process' sizes into kernel data. */
-#define P_INIT_OFF	      4       /* Init cs & sizes into fs data. */
+#define FLAGS_EXT_OFF	4       /* Offset in kernel text to extended flags. */
+#define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
 #define between(a, c, z)	((unsigned) ((c) - (a)) <= ((z) - (a)))
 
@@ -143,7 +133,6 @@ void raw_clear(u32_t addr, u32_t count)
 #define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
 unsigned click_shift;
 unsigned click_size;    /* click_size = Smallest kernel memory object. */
-unsigned k_flags;       /* Not all kernels are created equal. */
 unsigned short k_flags_ext;   /* Extended flags. */
 u32_t reboot_code;            /* Obsolete reboot code return pointer. */
 
@@ -292,14 +281,7 @@ int get_clickshift(u32_t ksec, struct image_header *hdr)
 		textp += hdr->process.a_hdrlen;
 
 	click_shift = * (u16_t *) (textp + CLICK_OFF);
-	k_flags = *((u16_t*)(textp + FLAGS_OFF));
 	k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
-
-	if ((k_flags & ~K_ALL) != 0) {
-		printf("%s requires features this monitor doesn't offer\n",
-			hdr->name);
-		return 0;
-	}
 
 	if (click_shift < HCLICK_SHIFT || click_shift > 16) {
 		printf("%s click size is bad (click_shift=%d)\n", hdr->name,click_shift);
@@ -373,7 +355,6 @@ void exec_image(char *image)
 	u32_t vsec, addr, limit, n, totalmem = 0;
 	struct process *procp;    /* Process under construction. */
 	long a_text, a_data, a_bss, a_stack;
-	int banner= 0;
 	long processor= a2l(b_value("processor"));
 	u16_t mode;
 	char *console;
@@ -459,25 +440,15 @@ void exec_image(char *image)
 
 		raw_copy(aout_hdrs_addr + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
 
-		if (!banner && verbose) {
-			printf("       cs         ds     text     data      bss");
-
-			if (k_flags & K_CHMEM)
-				printf("    stack");
-
-			putch('\n');
-			banner= 1;
-		}
+		if (((verbose) ? (verbose++) : 0) == 1)
+			printf("       cs         ds     text     data      bss    stack\n");
 
 		/* Segment sizes. */
 		a_text = hdr.process.a_text;
 		a_data = hdr.process.a_data;
 		a_bss = hdr.process.a_bss;
 
-		if (k_flags & K_CHMEM)
-			a_stack = hdr.process.a_total - a_data - a_bss - a_text;
-		else
-			a_stack = 0;
+		a_stack = hdr.process.a_total - a_data - a_bss - a_text;
 
 		/* Collect info about the process to be. */
 		procp->cs = addr;
@@ -509,7 +480,7 @@ void exec_image(char *image)
 				hdr.process.a_bss);
 		}
 
-		if ((k_flags & K_CHMEM) && verbose)
+		if (verbose)
 			printf(" %8ld", a_stack);
 
 		/* Note that a_data may be negative now, but we can look at it
