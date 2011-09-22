@@ -12,7 +12,7 @@
 #ifndef _AOUT_H
 #define _AOUT_H
 
-struct	exec {			/* a.out header */
+struct exec {			/* a.out header */
   unsigned char	a_magic[2];	/* magic number */
   unsigned char	a_flags;	/* flags, see below */
   unsigned char	a_cpu;		/* cpu id */
