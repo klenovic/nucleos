@@ -102,7 +102,6 @@ void raw_clear(u32_t addr, u32_t count)
 /* Align a to a multiple of n (a power of 2): */
 #define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
 unsigned short k_flags_ext;   /* Extended flags. */
-u32_t reboot_code;            /* Obsolete reboot code return pointer. */
 
 int params2params(char *params, size_t psize)
 /* Repackage the environment settings for the kernel. */

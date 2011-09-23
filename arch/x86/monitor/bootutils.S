@@ -1069,7 +1069,6 @@ minix:
 	lretl                     // Make a far call to the kernel
 // Minix-386 returns here on a halt or reboot.
 ret386:
-	movl	%eax, reboot_code // Return value (obsolete method)
 	call	prot2real         // Switch to real mode
 
 return:
