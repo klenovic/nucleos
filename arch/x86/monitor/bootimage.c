@@ -74,34 +74,6 @@ int n_procs;        /* Number of processes. */
 #define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
-#define between(a, c, z)	((unsigned) ((c) - (a)) <= ((z) - (a)))
-
-void pretty_image(char *image)
-/* Pretty print the name of the image to load.  Translate '/' and '_' to
- * space, first letter goes uppercase.  An 'r' before a digit prints as
- * 'revision'.  E.g. 'minix/1.6.16r10' -> 'Minix 1.6.16 revision 10'.
- * The idea is that the part before the 'r' is the official Minix release
- * and after the 'r' you can put version numbers for your own changes.
- */
-{
-	int up= 0, c;
-
-	while ((c= *image++) != 0) {
-		if (c == '/' || c == '_') c= ' ';
-
-		if (c == 'r' && between('0', *image, '9')) {
-			printf(" revision ");
-			continue;
-		}
-
-		if (!up && between('a', c, 'z')) c= c - 'a' + 'A';
-
-		if (between('A', c, 'Z')) up= 1;
-
-		putch(c);
-	}
-}
-
 void raw_clear(u32_t addr, u32_t count)
 /* Clear "count" bytes at absolute address "addr". */
 {
@@ -357,9 +329,7 @@ void exec_image(char *image)
 	if ((verb= b_value("verbose")) != 0 && a2l(verb) > 0)
 		verbose = 1;
 
-	printf("\nLoading ");
-	pretty_image(image);
-	printf(".\n");
+	printf("\nLoading image '%s'\n", image);
 
 	vsec = 0;           /* Load this sector from image next. */
 
