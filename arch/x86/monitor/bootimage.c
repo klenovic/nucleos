@@ -645,7 +645,7 @@ bail_out:
 #define SUPER_V3_MAGIC_OFFSET  0x418
 
 /* Load the initial ramdisk at absolute address */
-int load_initrd(char* initrd, unsigned long loadaddr)
+int load_initrd(char* initrd, unsigned long load_addr)
 {
 	struct exec initrd_hdr;
 	unsigned long initrd_base = 0;
@@ -654,6 +654,8 @@ int load_initrd(char* initrd, unsigned long loadaddr)
 	unsigned short super_v3_magic = 0;
 	int j=0;
 	char* buf = 0;
+
+	printf("Loading initrd %s at 0x%x ...", initrd, load_addr);
 
 	if ((nvsec = select_initrd(initrd)) > 0) {
 		buf = get_sector(0);
@@ -672,7 +674,7 @@ int load_initrd(char* initrd, unsigned long loadaddr)
 			return -1;
 		}
 
-		initrd_base = loadaddr;
+		initrd_base = load_addr;
 		initrd_size = initrd_hdr.a_data;
 
 		/* Clear the area where initrd will be placed. */
@@ -692,8 +694,6 @@ int load_initrd(char* initrd, unsigned long loadaddr)
 			printf("error: Can't find MINIX3 super magic (%s)\n", initrd);
 			return -1;
 		}
-
-		printf("Loading initrd %s at 0x%x ...", initrd, initrd_base);
 
 		/* Let to know to kernel */
 		b_setvar(E_SPECIAL|E_VAR, "initrdbase", ul2a10(initrd_base));
