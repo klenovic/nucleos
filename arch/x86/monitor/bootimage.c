@@ -27,6 +27,7 @@
 #include <kernel/const.h>
 #include <kernel/types.h>
 #include <ibm/partition.h>
+#include <asm/page_types.h>
 #include "rawfs.h"
 #include "image.h"
 #include "boot.h"
@@ -52,8 +53,6 @@ static unsigned long select_initrd(char* initrd);
 /* Load the initial ramdisk at absolute address */
 int load_initrd(char* initrd, unsigned long loadaddr);
 
-#define click_shift	clck_shft       /* 7 char clash with click_size. */
-
 /* Load the initial ramdisk */
 #define K_BUILTIN_INITRD	0x0001 /* Kernel has builtin initrd (inside memory driver). */
 
@@ -72,8 +71,7 @@ int n_procs;        /* Number of processes. */
 
 /* Magic numbers in process' data space. */
 #define MAGIC_OFF	0       /* Offset of magic # in data seg. */
-#define CLICK_OFF	2       /* Offset in kernel text to click_shift. */
-#define FLAGS_EXT_OFF	4       /* Offset in kernel text to extended flags. */
+#define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
 #define between(a, c, z)	((unsigned) ((c) - (a)) <= ((z) - (a)))
@@ -131,8 +129,6 @@ void raw_clear(u32_t addr, u32_t count)
 
 /* Align a to a multiple of n (a power of 2): */
 #define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
-unsigned click_shift;
-unsigned click_size;    /* click_size = Smallest kernel memory object. */
 unsigned short k_flags_ext;   /* Extended flags. */
 u32_t reboot_code;            /* Obsolete reboot code return pointer. */
 
@@ -280,16 +276,7 @@ int get_clickshift(u32_t ksec, struct image_header *hdr)
 	if (hdr->process.a_flags & A_PAL)
 		textp += hdr->process.a_hdrlen;
 
-	click_shift = * (u16_t *) (textp + CLICK_OFF);
 	k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
-
-	if (click_shift < HCLICK_SHIFT || click_shift > 16) {
-		printf("%s click size is bad (click_shift=%d)\n", hdr->name,click_shift);
-		errno = 0;
-		return 0;
-	}
-
-	click_size= 1 << click_shift;
 
 	return 1;
 }
@@ -309,12 +296,12 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 			cnt= SECTOR_SIZE;
 		}
 
-		if (*addr + click_size > limit) {
+		if (*addr + PAGE_SIZE > limit) {
 			errno = ENOMEM;
 			return 0;
 		}
 
-		n= click_size;
+		n = PAGE_SIZE;
 
 		if (n > cnt) n= cnt;
 
@@ -326,7 +313,7 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 	}
 
 	/* Zero extend to a click. */
-	n= align(*addr, click_size) - *addr;
+	n= align(*addr, PAGE_SIZE) - *addr;
 	raw_clear(*addr, n);
 	*addr+= n;
 	*size-= n;
@@ -430,7 +417,7 @@ void exec_image(char *image)
 			if (!get_clickshift(vsec, &hdr))
 				return;
 
-			addr = align(addr, click_size);
+			addr = align(addr, PAGE_SIZE);
 		}
 
 		/* Save a copy of the header for the kernel, with a_syms
@@ -462,7 +449,7 @@ void exec_image(char *image)
 			a_text += hdr.process.a_hdrlen;
 
 		if (hdr.process.a_flags & A_UZP)
-			procp->cs -= click_size;
+			procp->cs -= PAGE_SIZE;
 
 		/* Add text to data to form one segment. */
 		procp->data = addr + a_text;
@@ -489,7 +476,7 @@ void exec_image(char *image)
 
 		/* Compute the number of bss clicks left. */
 		a_bss += a_data;
-		n = align(a_bss, click_size);
+		n = align(a_bss, PAGE_SIZE);
 		a_bss -= n;
 
 		/* Zero out bss. */
@@ -503,7 +490,7 @@ void exec_image(char *image)
 
 		/* And the number of stack clicks. */
 		a_stack += a_bss;
-		n = align(a_stack, click_size);
+		n = align(a_stack, PAGE_SIZE);
 		a_stack -= n;
 
 		/* Add space for the stack. */

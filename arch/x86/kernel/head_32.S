@@ -136,7 +136,6 @@ nucleos_startup:                // this is the entry point for the Nucleos kerne
 		     cool. */
 
 	jmp	over_flags	// skip over the next few bytes
-	.word	CLICK_SHIFT	// for the monitor: memory granularity
 flags_ext:
 	.word	K_FLAGS_EXT	// boot monitor extended flags:
 				//      built in initrd (in memory driver)
