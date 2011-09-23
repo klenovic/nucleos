@@ -237,22 +237,6 @@ char *get_sector(u32_t vsec)
 	return buf;
 }
 
-int get_clickshift(u32_t ksec, struct image_header *hdr)
-/* Get the click shift and special flags from kernel text. */
-{
-	char *textp;
-
-	if ((textp = get_sector(ksec)) == 0)
-		return 0;
-
-	if (hdr->process.a_flags & A_PAL)
-		textp += hdr->process.a_hdrlen;
-
-	k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
-
-	return 1;
-}
-
 int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 /* Read *size bytes starting at virtual sector *vsec to memory at *addr. */
 {
@@ -384,9 +368,12 @@ void exec_image(char *image)
 
 		/* Get the click shift from the kernel text segment. */
 		if (i == KERNEL_IDX) {
-			if (!get_clickshift(vsec, &hdr))
+			char *textp;
+
+			if ((textp = get_sector(vsec)) == 0)
 				return;
 
+			k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
 			addr = align(addr, PAGE_SIZE);
 		}
 
