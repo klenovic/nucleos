@@ -130,17 +130,12 @@
 //===========================================================================
 .globl nucleos_startup
 nucleos_startup:                // this is the entry point for the Nucleos kernel
-	/* @nucleos: Do not put anything here otherwise boot will not find CLICK_SHIFT
-		     These "magic" numbers look a bit jerky and unflexible... passing
-		     kernel options/features via commad line or something similar would be
-		     cool. */
-
+	/* @nucleos: Do not put anything here. */
 	jmp	over_flags	// skip over the next few bytes
 flags_ext:
 	.word	K_FLAGS_EXT	// boot monitor extended flags:
 				//      built in initrd (in memory driver)
 	nop			// extra byte to sync up disassembler
-
 over_flags:
 	// Set up a C stack frame on the monitor stack.  (The monitor sets cs and ds
 	// right.  The ss descriptor still references the monitor data segment.)
