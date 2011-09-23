@@ -186,51 +186,56 @@ u32_t flat_vir2sec(u32_t vsec)
 
 char *get_sector(u32_t vsec)
 /* Read a sector "vsec" from the image into memory and return its address.
- * Return 0 on error.  (This routine tries to read an entire track, so
- * the next request is usually satisfied from the track buffer.)
+ * Return null on error.
  */
 {
 	u32_t sec;
 	int r;
-#define SECBUFS 1
-	static char buf[SECBUFS * SECTOR_SIZE];
+
+	static char buf[SECTOR_SIZE];
 	static size_t count;      /* Number of sectors in the buffer. */
 	static u32_t bufsec;      /* First Sector now in the buffer. */
 
-	if (vsec == 0) count= 0;  /* First sector; initialize. */
+	/* First sector; initialize. */
+	if (vsec == 0)
+		count = 0;
 
-	if ((sec= (*vir2sec)(vsec)) == -1) return 0;
+	if ((sec = (*vir2sec)(vsec)) == -1)
+		return 0;
 
 	if (sec == 0) {
 		/* A hole. */
-		count= 0;
+		count = 0;
 		memset(buf, 0, SECTOR_SIZE);
 		return buf;
 	}
 
 	/* Can we return a sector from the buffer? */
-	if ((sec - bufsec) < count) {
+	if ((sec - bufsec) < count)
 		return buf + ((size_t) (sec - bufsec) << SECTOR_SHIFT);
-	}
 
 	/* Not in the buffer. */
-	count= 0;
-	bufsec= sec;
+	count = 1;
+	bufsec = sec;
 
-	/* Read a whole track if possible. */
-	while (++count < SECBUFS && !dev_boundary(bufsec + count)) {
-		vsec++;
-		if ((sec= (*vir2sec)(vsec)) == -1) break;
+	do {
+		if (dev_boundary(bufsec + count))
+			break;
+
+		if ((sec = (*vir2sec)(++vsec)) == -1)
+			break;
 
 		/* Consecutive? */
-		if (sec != bufsec + count) break;
-	}
+		if (sec != bufsec + count)
+			break;
+	} while (0);
 
 	/* Actually read the sectors. */
-	if ((r= readsectors(mon2abs(buf), bufsec, count)) != 0) {
+	if ((r = readsectors(mon2abs(buf), bufsec, count)) != 0) {
 		readerr(bufsec, r);
-		count= 0;
-		errno= 0;
+		count = 0;
+		errno = 0;
+
 		return 0;
 	}
 
@@ -240,39 +245,29 @@ char *get_sector(u32_t vsec)
 int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 /* Read *size bytes starting at virtual sector *vsec to memory at *addr. */
 {
-	char* buf=0;
-	size_t cnt, n;
+	char* buf;
+	size_t n;
 
-	cnt= 0;
 	while (*size > 0) {
-		if (cnt == 0) {
-			if ((buf= get_sector((*vsec)++)) == 0)
-				return 0;
-
-			cnt= SECTOR_SIZE;
-		}
+		if ((buf = get_sector((*vsec)++)) == 0)
+			return 0;
 
 		if (*addr + PAGE_SIZE > limit) {
 			errno = ENOMEM;
 			return 0;
 		}
 
-		n = PAGE_SIZE;
-
-		if (n > cnt) n= cnt;
-
-		raw_copy(*addr, mon2abs(buf), n);
-		*addr+= n;
-		*size-= n;
-		buf+= n;
-		cnt-= n;
+		raw_copy(*addr, mon2abs(buf), SECTOR_SIZE);
+		*addr += SECTOR_SIZE;
+		*size -= SECTOR_SIZE;
+		buf += SECTOR_SIZE;
 	}
 
-	/* Zero extend to a click. */
-	n= align(*addr, PAGE_SIZE) - *addr;
+	/* Zero extend to a page size */
+	n = align(*addr, PAGE_SIZE) - *addr;
 	raw_clear(*addr, n);
-	*addr+= n;
-	*size-= n;
+	*addr += n;
+	*size -= n;
 
 	return 1;
 }
