@@ -7,6 +7,8 @@ boot.elf32-obj-y := boot.o boothead.o bootimage.o bootutils.o rawfs.o \
 BOOT_ORG    = 0x0000
 BOOT_ENTRY  = bootcode_entry
 HDRLEN      = 0x20
+MAX_BOOT_SIZE = 0x3f
+BOOT_OFF = 0x0001
 
 # %.c files
 ccflags-y := -D__KERNEL__ -include arch/$(SRCARCH)/include/asm/code16gcc.h
@@ -38,7 +40,10 @@ e2a-y += boot.elf32,boot
 ### bootblock
 app-y += bootblock.elf32
 bootblock.elf32-obj-y := bootblock.o
-ASFLAGS_bootblock.o += -D__NOAUTO_OP16_PREFIX__ -D__HDRLEN__=$(HDRLEN)
+ASFLAGS_bootblock.o += -D__NOAUTO_OP16_PREFIX__ \
+		       -D__HDRLEN__=$(HDRLEN) \
+		       -D__MAX_BOOT_SIZE__=$(MAX_BOOT_SIZE) \
+		       -D__BOOT_OFF__=$(BOOT_OFF)
 
 BOOTBLOCK_ORG   = 0x0000
 BOOTBLOCK_ENTRY = bootblock_entry

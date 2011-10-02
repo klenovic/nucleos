@@ -25,7 +25,7 @@ define rule_create_image
 endef
 
 # create final image from kernel and servers
-$(src)/image: scripts/tools/installboot scripts/tools/mkimage
+$(src)/image: scripts/tools/mkimage
 $(src)/image: $(bin-y) FORCE
 	$(call if_changed_rule,create_image)
 

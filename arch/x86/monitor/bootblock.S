@@ -108,7 +108,7 @@ success:
 	movb	$2, %dh			// Load number of heads for multiply
 
 loadboot:
-// Load /boot from the boot device
+// Load /boot from the specified offset
 	movb	(%di), %al		// %al = (%di) = sectors per track
 	mulb	%dh			// %dh = heads, %ax = heads * sectors
 	mov	%ax, SECPCYL(%bp)	// Sectors per cylinder = heads * sectors
@@ -121,8 +121,6 @@ load:
 	mov	1(%si), %ax		// Get next sector number: low 16 bits
 	movb	3(%si), %dl		// Bits 16-23 for your up to 8GB partition
 	xorb	%dh, %dh		// %dx:%ax = sector within partition
-	add	lowsec+0(%bp), %ax
-	adc	lowsec+2(%bp), %dx	// %dx:%ax = sector within drive
 	cmp	$[1024*255*63-255]>>16, %dx	// Near 8G limit?
 	jae	bigdisk
 	divw	SECPCYL(%bp)	// %ax = cylinder, %dx = sector within cylinder
@@ -160,7 +158,6 @@ bigdisk:
 	movb	$0x42, %ah		// Extended read
 	int	$0x13
 	pop	%si			// Restore %si to point to the addresses array
-	//jmp   rdeval
 rdeval:
 	jc	error		// Jump on disk read error
 	movb	%cl,%al		// Restore %al = sectors read
@@ -233,4 +230,7 @@ ext_rw:
 	.long	0		// Starting block number high 32 bits
 
 	.p2align	1
-addresses: .byte 'b','0','0','7'
+
+addresses:
+.byte __MAX_BOOT_SIZE__
+.word __BOOT_OFF__
