@@ -118,7 +118,7 @@ cleanup_exit()
 }
 
 # Check arguments.
-while getopts "a:b:B:hi:m:o:" OPT "$@"
+while getopts "b:B:hi:m:o:" OPT "$@"
 do
 	case "$OPT" in
 	b) # specifies boot binary
