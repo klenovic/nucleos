@@ -14,12 +14,13 @@ OUTPUT_ARCH("i386")
 
 ENTRY(_start)
 
-SECTIONS
-{
 #define LOAD_OFFSET		__PAGE_OFFSET__
 #define LOAD_PHYSICAL_ADDR	__LOAD_PHYSICAL_ADDR__
 
+SECTIONS
+{
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
+
 	_text = .;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
 		*(.text.head)

@@ -7,9 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-/* Note: This is exactly like using `--oformat BFDNAME' on the command line. If
-	 both are used, the command line option takes precedence. */
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
@@ -25,12 +22,8 @@ SECTIONS
 	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 
 	_text = .;
-	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
-		*(.text.head)
-		. = ALIGN(PAGE_SIZE);
-	}
-
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
+		*(.text.head)
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
@@ -57,7 +50,6 @@ SECTIONS
 
 	_bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
