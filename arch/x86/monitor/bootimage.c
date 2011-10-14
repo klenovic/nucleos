@@ -37,6 +37,10 @@
 /* Check VFS_PROC_NR magic */
 #define SUPER_V3_MAGIC         0x4d5a
 #define SUPER_V3_MAGIC_OFFSET  0x418
+/* Magic numbers in process' data space. */
+#define MAGIC_OFF	0       /* Offset of magic # in data seg. */
+#define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
+#define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
 static int block_size = 0;
 static off_t image_size;
@@ -65,13 +69,10 @@ struct process {  /* Per-process memory adresses. */
 	u32_t ds;       /* Data segment. */
 	u32_t data;     /* To access the data segment. */
 	u32_t end;      /* End of this process, size = (end - cs). */
-} process[PROCESS_MAX];
-int n_procs;        /* Number of processes. */
+};
 
-/* Magic numbers in process' data space. */
-#define MAGIC_OFF	0       /* Offset of magic # in data seg. */
-#define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
-#define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
+static struct process process[PROCESS_MAX];
+static int n_procs;        /* Number of processes. */
 
 static void raw_clear(u32_t addr, u32_t count)
 /* Clear "count" bytes at absolute address "addr". */
@@ -150,7 +151,6 @@ static u32_t proc_size(struct image_header *hdr)
 
 	return len >> SECTOR_SHIFT;
 }
-
 
 static u32_t file_vir2sec(u32_t vsec)
 /* Translate a virtual sector number to an absolute disk sector. */
