@@ -39,8 +39,6 @@
 #define arraylimit(a)     ((a) + arraysize(a))
 #define between(a, c, z)  ((unsigned) ((c) - (a)) <= ((z) - (a)))
 
-int serial_line = -1;
-
 u16_t vid_port;                /* Video i/o port. */
 u32_t vid_mem_base;    /* Video memory base address. */
 u32_t vid_mem_size;    /* Video memory size. */

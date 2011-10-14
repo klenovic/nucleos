@@ -32,12 +32,17 @@
 #include "image.h"
 #include "boot.h"
 
-static int block_size = 0;
+/* Align a to a multiple of n (a power of 2): */
+#define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
+/* Check VFS_PROC_NR magic */
+#define SUPER_V3_MAGIC         0x4d5a
+#define SUPER_V3_MAGIC_OFFSET  0x418
 
-extern int serial_line;
-extern u16_t vid_port;         /* Video i/o port. */
-extern u32_t vid_mem_base;     /* Video memory base address. */
-extern u32_t vid_mem_size;     /* Video memory size. */
+static int block_size = 0;
+static off_t image_size;
+static unsigned short k_flags_ext;   /* Extended flags. */
+static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
+static int serial_line = -1;
 
 #ifndef CONFIG_BUILTIN_INITRD
 /* Path specified by configuration */
@@ -46,12 +51,6 @@ extern u32_t vid_mem_size;     /* Video memory size. */
 /* just define some value (default) */
 #define INITRD "/boot/initrd"
 #endif
-
-/* select/check given  initrd path*/
-static unsigned long select_initrd(char* initrd);
-
-/* Load the initial ramdisk at absolute address */
-int load_initrd(char* initrd, unsigned long loadaddr);
 
 /* Load the initial ramdisk */
 #define K_BUILTIN_INITRD	0x0001 /* Kernel has builtin initrd (inside memory driver). */
@@ -74,7 +73,7 @@ int n_procs;        /* Number of processes. */
 #define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
-void raw_clear(u32_t addr, u32_t count)
+static void raw_clear(u32_t addr, u32_t count)
 /* Clear "count" bytes at absolute address "addr". */
 {
 	static char zeros[128];
@@ -99,11 +98,7 @@ void raw_clear(u32_t addr, u32_t count)
 	}
 }
 
-/* Align a to a multiple of n (a power of 2): */
-#define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
-unsigned short k_flags_ext;   /* Extended flags. */
-
-int params2params(char *params, size_t psize)
+static int params2params(char *params, size_t psize)
 /* Repackage the environment settings for the kernel. */
 {
 	size_t i, n;
@@ -143,7 +138,7 @@ int params2params(char *params, size_t psize)
 	return 1;
 }
 
-u32_t proc_size(struct image_header *hdr)
+static u32_t proc_size(struct image_header *hdr)
 /* Return the size of a process in sectors as found in an image. */
 {
 	u32_t len= hdr->process.a_text;
@@ -156,10 +151,8 @@ u32_t proc_size(struct image_header *hdr)
 	return len >> SECTOR_SHIFT;
 }
 
-off_t image_off, image_size;
-u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
 
-u32_t file_vir2sec(u32_t vsec)
+static u32_t file_vir2sec(u32_t vsec)
 /* Translate a virtual sector number to an absolute disk sector. */
 {
 	off_t blk;
@@ -177,13 +170,7 @@ u32_t file_vir2sec(u32_t vsec)
 	return blk == 0 ? 0 : lowsec + blk * RATIO(block_size) + vsec % RATIO(block_size);
 }
 
-u32_t flat_vir2sec(u32_t vsec)
-/* Simply add an absolute sector offset to vsec. */
-{
-	return lowsec + image_off + vsec;
-}
-
-char *get_sector(u32_t vsec)
+static char *get_sector(u32_t vsec)
 /* Read a sector "vsec" from the image into memory and return its address.
  * Return null on error.
  */
@@ -241,7 +228,7 @@ char *get_sector(u32_t vsec)
 	return buf;
 }
 
-int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
+static int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 /* Read *size bytes starting at virtual sector *vsec to memory at *addr. */
 {
 	char* buf;
@@ -271,19 +258,94 @@ int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 	return 1;
 }
 
-/* Load image from disk into memory `packed_image_addr' */
-int load_image(char *packed_image_addr)
+/* select/check given  initrd path*/
+static unsigned long select_initrd(char* initrd)
 {
+	ino_t initrd_ino;
+	struct stat st;
+	unsigned long size;
+
+	fsok = (r_super(&block_size) != 0);
+	initrd_ino = r_lookup(ROOT_INO, initrd);
+
+	if (!fsok || !initrd_ino) {
+		printf("error: initrd %s: %s\n", initrd, unix_err(errno));
+		return 0;
+	}
+
+	r_stat(initrd_ino, &st);
+
+	vir2sec = file_vir2sec;
+	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
+
+	return size;
+}
+
+/* Load the initial ramdisk at absolute address */
+static int load_initrd(char* initrd, unsigned long load_addr)
+{
+	struct exec initrd_hdr;
+	unsigned long initrd_base = 0;
+	long initrd_size = 0;
+	int nvsec = 0;
+	unsigned short super_v3_magic = 0;
+	int j=0;
+	char* buf = 0;
+
+	printf("Loading initrd %s at 0x%x ...", initrd, load_addr);
+
+	if ((nvsec = select_initrd(initrd)) > 0) {
+		buf = get_sector(0);
+
+		if (!buf) {
+			printf("error: can't get sector (%s)\n", initrd);
+			return -1;
+		}
+
+		/* For header check */
+		memcpy(&initrd_hdr, buf, sizeof(initrd_hdr));
+
+		/* Finish if not aout or not an image */
+		if (BADMAG(initrd_hdr) || !(initrd_hdr.a_flags & A_IMG)) {
+			printf("error: bad header (%s)\n", initrd);
+			return -1;
+		}
+
+		initrd_base = load_addr;
+		initrd_size = initrd_hdr.a_data;
+
+		/* Clear the area where initrd will be placed. */
+		raw_clear(initrd_base, initrd_size);
+
+		/* Copy first sector but skip the header */
+		raw_copy(initrd_base, mon2abs(get_sector(0) + initrd_hdr.a_hdrlen), SECTOR_SIZE - initrd_hdr.a_hdrlen);
+
+		for (j=1; j<nvsec; j++) {
+			raw_copy(initrd_base + (j*SECTOR_SIZE - initrd_hdr.a_hdrlen), mon2abs(get_sector(j)), SECTOR_SIZE);
+		}
+
+		/* We will get from extented memroy */
+		raw_copy(mon2abs(&super_v3_magic), initrd_base + SUPER_V3_MAGIC_OFFSET, 2);
+
+		if (super_v3_magic != SUPER_V3_MAGIC) {
+			printf("error: Can't find MINIX3 super magic (%s)\n", initrd);
+			return -1;
+		}
+
+		/* Let to know to kernel */
+		b_setvar(E_SPECIAL|E_VAR, "initrdbase", ul2a10(initrd_base));
+		b_setvar(E_SPECIAL|E_VAR, "initrdsize", ul2a10(initrd_size));
+
+		printf("done\n");
+	} else {
+		printf("error: can't load initrd\n");
+		return -1;
+	}
+
 	return 0;
 }
 
-/* Extract packet image from address packed_image_addr to address extract_image_addr */
-int extract_image(char *extract_image_addr, char *packed_image_addr)
-{
-	return 0;
-}
-
-void exec_image(char *image)
+static void exec_image(char *image)
 /* Get a Nucleos image into core, patch it up and execute. */
 {
 	int i;
@@ -515,7 +577,7 @@ void exec_image(char *image)
  * Recursively read the current directory
  * Note: One can't use r_stat while reading a directory.
  */
-ino_t latest_version(char *version, struct stat *stp)
+static ino_t latest_version(char *version, struct stat *stp)
 {
 	char name[NAME_MAX + 1];
 	ino_t ino, newest;
@@ -534,7 +596,7 @@ ino_t latest_version(char *version, struct stat *stp)
 	return newest;
 }
 
-char *select_image(char *image)
+static char *select_image(char *image)
 /* Look image up on the filesystem, if it is a file then we're done, but
  * if its a directory then we want the newest file in that directory.  If
  * it doesn't exist at all, then see if it is 'number:number' and get the
@@ -589,96 +651,6 @@ char *select_image(char *image)
 bail_out:
 	free(image);
 	return 0;
-}
-
-/* Check VFS_PROC_NR magic */
-#define SUPER_V3_MAGIC         0x4d5a
-#define SUPER_V3_MAGIC_OFFSET  0x418
-
-/* Load the initial ramdisk at absolute address */
-int load_initrd(char* initrd, unsigned long load_addr)
-{
-	struct exec initrd_hdr;
-	unsigned long initrd_base = 0;
-	long initrd_size = 0;
-	int nvsec = 0;
-	unsigned short super_v3_magic = 0;
-	int j=0;
-	char* buf = 0;
-
-	printf("Loading initrd %s at 0x%x ...", initrd, load_addr);
-
-	if ((nvsec = select_initrd(initrd)) > 0) {
-		buf = get_sector(0);
-
-		if (!buf) {
-			printf("error: can't get sector (%s)\n", initrd);
-			return -1;
-		}
-
-		/* For header check */
-		memcpy(&initrd_hdr, buf, sizeof(initrd_hdr));
-
-		/* Finish if not aout or not an image */
-		if (BADMAG(initrd_hdr) || !(initrd_hdr.a_flags & A_IMG)) {
-			printf("error: bad header (%s)\n", initrd);
-			return -1;
-		}
-
-		initrd_base = load_addr;
-		initrd_size = initrd_hdr.a_data;
-
-		/* Clear the area where initrd will be placed. */
-		raw_clear(initrd_base, initrd_size);
-
-		/* Copy first sector but skip the header */
-		raw_copy(initrd_base, mon2abs(get_sector(0) + initrd_hdr.a_hdrlen), SECTOR_SIZE - initrd_hdr.a_hdrlen);
-
-		for (j=1; j<nvsec; j++) {
-			raw_copy(initrd_base + (j*SECTOR_SIZE - initrd_hdr.a_hdrlen), mon2abs(get_sector(j)), SECTOR_SIZE);
-		}
-
-		/* We will get from extented memroy */
-		raw_copy(mon2abs(&super_v3_magic), initrd_base + SUPER_V3_MAGIC_OFFSET, 2);
-
-		if (super_v3_magic != SUPER_V3_MAGIC) {
-			printf("error: Can't find MINIX3 super magic (%s)\n", initrd);
-			return -1;
-		}
-
-		/* Let to know to kernel */
-		b_setvar(E_SPECIAL|E_VAR, "initrdbase", ul2a10(initrd_base));
-		b_setvar(E_SPECIAL|E_VAR, "initrdsize", ul2a10(initrd_size));
-
-		printf("done\n");
-	} else {
-		printf("error: can't load initrd\n");
-		return -1;
-	}
-
-	return 0;
-}
-
-static unsigned long select_initrd(char* initrd)
-{
-	ino_t initrd_ino;
-	struct stat st;
-	unsigned long size;
-
-	fsok = (r_super(&block_size) != 0);
-	initrd_ino = r_lookup(ROOT_INO, initrd);
-
-	if (!fsok || !initrd_ino) {
-		printf("error: initrd %s: %s\n", initrd, unix_err(errno));
-		return 0;
-	}
-
-	r_stat(initrd_ino, &st);
-
-	vir2sec = file_vir2sec;
-	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
-
-	return size;
 }
 
 void boot_nucleos(void)
