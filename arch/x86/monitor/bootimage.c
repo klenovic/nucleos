@@ -43,7 +43,6 @@
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
 static int block_size = 0;
-static off_t image_size;
 static unsigned short k_flags_ext;   /* Extended flags. */
 static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
 static int serial_line = -1;
@@ -343,8 +342,8 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 }
 
 /* Get a Nucleos image into core */
-static struct process *load_image(const u32 image_addr, const u32 aout_hdrs_addr, const u32 limit,
-				  struct process *procs)
+static struct process *load_image(const u32 image_addr, u32 image_size, const u32 aout_hdrs_addr,
+				  const u32 limit, struct process *procs)
 {
 	int i;
 	struct image_header hdr;
@@ -429,7 +428,7 @@ static struct process *load_image(const u32 image_addr, const u32 aout_hdrs_addr
 		/* Process may be page aligned so that the text segment contains
 		 * the header, or have an unmapped zero page against vaxisms.
 		 */
-		procp->entry= hdr.process.a_entry;
+		procp->entry = hdr.process.a_entry;
 
 		if (hdr.process.a_flags & A_PAL)
 			a_text += hdr.process.a_hdrlen;
@@ -577,8 +576,9 @@ static ino_t latest_version(char *version, struct stat *stp)
 	return newest;
 }
 
-/* Look image up on the filesystem, if it is a file then we're done. */
-static char *select_image(char *image)
+/* Look image up on the filesystem, if it is a file then we're done.
+ * Setup the found image size. */
+static char *select_image(char *image, u32 *image_size)
 {
 	ino_t image_ino;
 	struct stat st;
@@ -626,7 +626,7 @@ static char *select_image(char *image)
 		return 0;
 	}
 
-	image_size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
+	*image_size = ((st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT);
 
 	return image;
 }
@@ -635,10 +635,11 @@ int boot_nucleos(void)
 {
 	char *image_name;
 	u32 image_addr;
+	u32 image_size;
 	u32 aout_hdrs_addr;
 	u32 limit;
 
-	if ((image_name = select_image(b_value("image"))) == 0)
+	if ((image_name = select_image(b_value("image"), &image_size)) == 0)
 		return -1;
 
 	/* Load the image into this memory block. This should be
@@ -666,9 +667,9 @@ int boot_nucleos(void)
 	}
 
 	printf("\nLoading image '%s'\n", image_name);
-	if (!load_image(image_addr, aout_hdrs_addr, limit, procs)) {
-		printf("Can't load image %s (image addr: 0x%x, aout headers addr: 0x%x)\n",
-		        image_addr, aout_hdrs_addr);
+	if (!load_image(image_addr, image_size, aout_hdrs_addr, limit, procs)) {
+		printf("Can't load image %s at 0x%x, (size: %dB aout headers addr: 0x%x)\n",
+		        image_addr, image_size, aout_hdrs_addr);
 		return -1;
 	}
 
