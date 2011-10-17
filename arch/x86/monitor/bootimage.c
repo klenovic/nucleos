@@ -348,7 +348,8 @@ static struct process *load_image(const u32 image_addr, u32 image_size, const u3
 	int i;
 	struct image_header hdr;
 	char *buf;
-	u32_t vsec, n, totalmem = 0;
+	u32_t vsec, totalmem = 0;
+	u32 seg_size;
 	u32 addr;
 	struct process *procp;
 	long a_text, a_data, a_bss, a_stack;
@@ -455,36 +456,35 @@ static struct process *load_image(const u32 image_addr, u32 image_size, const u3
 		if (verbose)
 			printf(" %8ld", a_stack);
 
-		/* Note that a_data may be negative now, but we can look at it
-		 * as -a_data bss bytes.
-		 */
-
 		/* Compute the number of bss clicks left. */
 		a_bss += a_data;
-		n = align(a_bss, PAGE_SIZE);
-		a_bss -= n;
+		seg_size = align(a_bss, PAGE_SIZE);
 
-		/* Zero out bss. */
-		if (addr + n > limit) {
+		if (addr + seg_size > limit) {
 			printf("Not enough memory to load image\n");
 			return 0;
 		}
 
-		raw_clear(addr, n);
-		addr += n;
+		/* It may be that the a_bss will be negative here because
+		 * the seg_size was aligned to the closest page size count. */
+		a_bss -= seg_size;
+
+		/* Zero out bss. */
+		raw_clear(addr, seg_size);
+		addr += seg_size;
 
 		/* And the number of stack clicks. */
 		a_stack += a_bss;
-		n = align(a_stack, PAGE_SIZE);
-		a_stack -= n;
+		seg_size = align(a_stack, PAGE_SIZE);
+		a_stack -= seg_size;
 
 		/* Add space for the stack. */
-		addr += n;
+		addr += seg_size;
 
 		/* Process endpoint. */
 		procp->end = addr;
 
-		if(verbose)
+		if (verbose)
 			printf("  %s\n", hdr.name);
 		else {
 			u32_t mem;
