@@ -71,7 +71,7 @@ struct process {  /* Per-process memory adresses. */
 	u32_t end;      /* End of this process, size = (end - cs). */
 };
 
-static struct process process[PROCESS_MAX];
+static struct process procs[PROCESS_MAX];
 static int n_procs;        /* Number of processes. */
 
 static void raw_clear(u32_t addr, u32_t count)
@@ -99,8 +99,8 @@ static void raw_clear(u32_t addr, u32_t count)
 	}
 }
 
-static int params2params(char *params, size_t psize)
 /* Repackage the environment settings for the kernel. */
+static int params2params(char *params, size_t psize)
 {
 	size_t i, n;
 	environment *e;
@@ -139,8 +139,8 @@ static int params2params(char *params, size_t psize)
 	return 1;
 }
 
-static u32_t proc_size(struct image_header *hdr)
 /* Return the size of a process in sectors as found in an image. */
+static u32_t proc_size(struct image_header *hdr)
 {
 	u32_t len= hdr->process.a_text;
 
@@ -152,20 +152,16 @@ static u32_t proc_size(struct image_header *hdr)
 	return len >> SECTOR_SHIFT;
 }
 
-static u32_t file_vir2sec(u32_t vsec)
 /* Translate a virtual sector number to an absolute disk sector. */
+static u32_t file_vir2sec(u32_t vsec)
 {
 	off_t blk;
 
-	if(!block_size) {
-		errno = 0;
+	if(!block_size)
 		return -1;
-	}
 
-	if ((blk= r_vir2abs(vsec / RATIO(block_size))) == -1) {
-		errno= EIO;
+	if ((blk = r_vir2abs(vsec / RATIO(block_size))) == -1)
 		return -1;
-	}
 
 	return blk == 0 ? 0 : lowsec + blk * RATIO(block_size) + vsec % RATIO(block_size);
 }
@@ -220,8 +216,6 @@ static char *get_sector(u32_t vsec)
 	if ((r = readsectors(mon2abs(buf), bufsec, count)) != 0) {
 		readerr(bufsec, r);
 		count = 0;
-		errno = 0;
-
 		return 0;
 	}
 
@@ -238,10 +232,8 @@ static int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 		if ((buf = get_sector((*vsec)++)) == 0)
 			return 0;
 
-		if (*addr + PAGE_SIZE > limit) {
-			errno = ENOMEM;
+		if (*addr + PAGE_SIZE > limit)
 			return 0;
-		}
 
 		raw_copy(*addr, mon2abs(buf), SECTOR_SIZE);
 		*addr += SECTOR_SIZE;
@@ -276,6 +268,11 @@ static unsigned long select_initrd(char* initrd)
 	r_stat(initrd_ino, &st);
 
 	vir2sec = file_vir2sec;
+	if (vir2sec < 0) {
+		printf("Bad block size or unsuspected EOF\n");
+		return 0;
+	}
+
 	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
 
 	return size;
@@ -345,69 +342,52 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 	return 0;
 }
 
-static void exec_image(char *image)
-/* Get a Nucleos image into core, patch it up and execute. */
+/* Get a Nucleos image into core */
+static struct process *load_image(const u32 image_addr, const u32 aout_hdrs_addr, const u32 limit,
+				  struct process *procs)
 {
 	int i;
 	struct image_header hdr;
 	char *buf;
-	u32_t vsec, addr, limit, n, totalmem = 0;
-	struct process *procp;    /* Process under construction. */
+	u32_t vsec, n, totalmem = 0;
+	u32 addr;
+	struct process *procp;
 	long a_text, a_data, a_bss, a_stack;
 	long processor= a2l(b_value("processor"));
-	u16_t mode;
-	char *console;
-	char params[SECTOR_SIZE];
 	char *verb;
-	u16 kdata_magic_num = 0;
-	u32 aout_hdrs_addr;
 	int verbose = 1;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
 	sbrk(0);
 
-	if ((verb= b_value("verbose")) != 0 && a2l(verb) > 0)
+	if ((verb = b_value("verbose")) != 0 && a2l(verb) > 0)
 		verbose = 1;
-
-	printf("\nLoading image '%s'\n", image);
 
 	vsec = 0;           /* Load this sector from image next. */
 
-	addr = mem[1].base; /* Load the image into this memory block. This should be
-			     * above 1M and the code should run in protected mode.
-			     */
-	limit = mem[1].base + mem[1].size;
-
-	/* Allocate and clear the area where the headers will be placed.
-	 * The headers are placed below 1M at (1M - PROCESS_MAX * A_MINHDR).
-	 * Note that we will need some additional space here for real-mode kernel.
-	 */
-	aout_hdrs_addr = mem[0].base + mem[0].size - PROCESS_MAX * A_MINHDR;
-
-	/* Clear the area where the headers will be placed. */
-	raw_clear(aout_hdrs_addr, PROCESS_MAX * A_MINHDR);
+	addr = image_addr;
+	procp = procs;
 
 	/* Read the many different processes: */
-	for (i= 0; vsec < image_size; i++) {
+	for (i = 0; vsec < image_size; i++) {
 		u32_t startaddr;
 		startaddr = addr;
-		if (i == PROCESS_MAX) {
-			printf("There are more then %d programs in %s\n", PROCESS_MAX, image);
-			errno= 0;
-			return;
-		}
 
-		procp= &process[i];
+		if (i == PROCESS_MAX) {
+			printf("There are more then %d programs in image\n", PROCESS_MAX);
+			return 0;
+		}
 
 		/* Read header. */
 		for (;;) {
-			if ((buf= get_sector(vsec++)) == 0) return;
+			if ((buf = get_sector(vsec++)) == 0)
+				return 0;
 
 			memcpy(&hdr, buf, sizeof(hdr));
 
 			if (BADMAG(hdr.process)) {
-				errno = ENOEXEC;
-				return;
+				printf("Image contains a bad program header\n");
+				return 0;
 			} else
 				break;
 
@@ -418,8 +398,7 @@ static void exec_image(char *image)
 		/* Sanity check: an 8086 can't run a 386 kernel. */
 		if (hdr.process.a_cpu == A_I80386 && processor < 386) {
 			printf("You can't run a 386 kernel on this 80%ld\n", processor);
-			errno= 0;
-			return;
+			return 0;
 		}
 
 		/* Get the click shift from the kernel text segment. */
@@ -427,10 +406,9 @@ static void exec_image(char *image)
 			char *textp;
 
 			if ((textp = get_sector(vsec)) == 0)
-				return;
+				return 0;
 
 			k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
-			addr = align(addr, PAGE_SIZE);
 		}
 
 		/* Save a copy of the header for the kernel, with a_syms
@@ -471,7 +449,7 @@ static void exec_image(char *image)
 
 		/* Read the data segment. */
 		if (!get_segment(&vsec, &a_data, &addr, limit))
-			return;
+			return 0;
 
 		if (verbose) {
 			printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
@@ -494,8 +472,8 @@ static void exec_image(char *image)
 
 		/* Zero out bss. */
 		if (addr + n > limit) {
-			errno = ENOMEM;
-			return;
+			printf("Not enough memory to load image\n");
+			return 0;
 		}
 
 		raw_clear(addr, n);
@@ -507,36 +485,30 @@ static void exec_image(char *image)
 		a_stack -= n;
 
 		/* Add space for the stack. */
-		addr+= n;
+		addr += n;
 
 		/* Process endpoint. */
-		procp->end= addr;
+		procp->end = addr;
 
 		if(verbose)
 			printf("  %s\n", hdr.name);
 		else {
 			u32_t mem;
-			mem = addr-startaddr;
+			mem = addr - startaddr;
 			printf("%s ", hdr.name);
 			totalmem += mem;
 		}
+
+		/* next process image */
+		procp++;
 	}
 
 	if(!verbose)
 		printf("(%dk)\n", totalmem/1024);
 
-	if ((n_procs= i) == 0) {
-		printf("There are no programs in %s\n", image);
-		errno= 0;
-		return;
-	}
-
-	/* Check the kernel magic number (located in data section). */
-	raw_copy(mon2abs(&kdata_magic_num), process[KERNEL_IDX].data + MAGIC_OFF, 2);
-	if (kdata_magic_num != KERNEL_D_MAGIC) {
-		printf("Kernel magic number is incorrect (0x%x)\n", kdata_magic_num);
-		errno= 0;
-		return;
+	if ((n_procs = i) == 0) {
+		printf("There are no programs in image\n");
+		return 0;
 	}
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
@@ -544,33 +516,47 @@ static void exec_image(char *image)
 	if (!(k_flags_ext & K_BUILTIN_INITRD)) {
 		printf("not builtin.\n");
 		if (load_initrd(INITRD, addr) < 0)
-			return;
+			return 0;
 	} else {
 		printf("builtin.\n");
 	}
 
-	/* Translate the boot parameters to what Minix likes best. */
-	if (!params2params(params, sizeof(params))) {
-		errno = 0;
-		return;
-	}
-
-	/* Set the video to the required mode. */
-	if ((console= b_value("console")) == 0 || (mode= a2x(console)) == 0) {
-		mode= strcmp(b_value("chrome"), "color") == 0 ? COLOR_MODE : MONO_MODE;
-	}
-
-	set_mode(mode);
-
 	/* Close the disk. */
 	dev_close();
 
-	minix(process[KERNEL_IDX].entry, process[KERNEL_IDX].cs, process[KERNEL_IDX].ds, params,
+	return procs;
+}
+
+static int exec_image(struct process *procs, u32 aout_hdrs_addr)
+{
+	u16_t mode;
+	char *console;
+	char params[SECTOR_SIZE];
+	u16 kdata_magic_num = 0;
+
+	/* Check the kernel magic number (located in data section). */
+	raw_copy(mon2abs(&kdata_magic_num), procs[KERNEL_IDX].data + MAGIC_OFF, 2);
+	if (kdata_magic_num != KERNEL_D_MAGIC) {
+		printf("Kernel magic number is incorrect (0x%x)\n", kdata_magic_num);
+		return -1;
+	}
+
+	/* Translate the boot parameters for kernel. */
+	if (!params2params(params, sizeof(params))) {
+		printf("Can't translate boot parameters!");
+		return -1;
+	}
+
+	/* Set the video to the required mode. */
+	if ((console = b_value("console")) == 0 || (mode= a2x(console)) == 0)
+		mode = strcmp(b_value("chrome"), "color") == 0 ? COLOR_MODE : MONO_MODE;
+
+	set_mode(mode);
+
+	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, params,
 	      sizeof(params), aout_hdrs_addr);
 
-	printf("Error while booting kernel!\n");
-
-	return;
+	return -1;
 }
 
 /**
@@ -596,12 +582,8 @@ static ino_t latest_version(char *version, struct stat *stp)
 	return newest;
 }
 
+/* Look image up on the filesystem, if it is a file then we're done. */
 static char *select_image(char *image)
-/* Look image up on the filesystem, if it is a file then we're done, but
- * if its a directory then we want the newest file in that directory.  If
- * it doesn't exist at all, then see if it is 'number:number' and get the
- * image from that absolute offset off the disk.
- */
 {
 	ino_t image_ino;
 	struct stat st;
@@ -615,7 +597,7 @@ static char *select_image(char *image)
 			printf("No image selected\n");
 		else
 			printf("Can't load %s: %s\n", image, unix_err(errno));
-		goto bail_out;
+		return 0;
 	}
 
 	r_stat(image_ino, &st);
@@ -626,7 +608,7 @@ static char *select_image(char *image)
 
 		if (!S_ISDIR(st.st_mode)) {
 			printf("%s: %s\n", image, unix_err(ENOTDIR));
-			goto bail_out;
+			return 0;
 		}
 
 		r_readdir(dots);
@@ -637,28 +619,49 @@ static char *select_image(char *image)
 		if ((image_ino = latest_version(version, &st)) == 0) {
 			printf("There are no images in %s\n", image);
 
-			goto bail_out;
+			return 0;;
 		}
 
 		r_stat(image_ino, &st);
 	}
 
 	vir2sec = file_vir2sec;
+	if (vir2sec < 0) {
+		printf("Bad block size or unsuspected EOF\n");
+		return 0;
+	}
+
 	image_size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
 
 	return image;
-
-bail_out:
-	free(image);
-	return 0;
 }
 
-void boot_nucleos(void)
+int boot_nucleos(void)
 {
-	char *image;
+	char *image_name;
+	u32 image_addr;
+	u32 aout_hdrs_addr;
+	u32 limit;
 
-	if ((image = select_image(b_value("image"))) == 0)
-		return;
+	if ((image_name = select_image(b_value("image"))) == 0)
+		return -1;
+
+	/* Load the image into this memory block. This should be
+	 * above 1M and the code should run in protected mode.
+	 */
+	image_addr = mem[1].base;
+	image_addr = align(image_addr, PAGE_SIZE);
+
+	limit = mem[1].base + mem[1].size;
+
+	/* Allocate and clear the area where the headers will be placed.
+	 * The headers are placed below 1M at (1M - PROCESS_MAX * A_MINHDR).
+	 * Note that we will need some additional space here for real-mode kernel.
+	 */
+	aout_hdrs_addr = mem[0].base + mem[0].size - PROCESS_MAX * A_MINHDR;
+
+	/* Clear the area where the headers will be placed. */
+	raw_clear(aout_hdrs_addr, PROCESS_MAX * A_MINHDR);
 
 	if (serial_line >= 0) {
 		char linename[2];
@@ -667,20 +670,17 @@ void boot_nucleos(void)
 		b_setvar(E_VAR, SERVARNAME, linename);
 	}
 
-	exec_image(image);
-
-	switch (errno) {
-	case ENOEXEC:
-		printf("%s contains a bad program header\n", image);
-		break;
-	case ENOMEM:
-		printf("Not enough memory to load %s\n", image);
-		break;
-	case EIO:
-		 printf("Unsuspected EOF on %s\n", image);
-	case 0:
-	  /* No error or error already reported. */;
+	printf("\nLoading image '%s'\n", image_name);
+	if (!load_image(image_addr, aout_hdrs_addr, limit, procs)) {
+		printf("Can't load image %s (image addr: 0x%x, aout headers addr: 0x%x)\n",
+		        image_addr, aout_hdrs_addr);
+		return -1;
 	}
 
-	free(image);
+	if (exec_image(procs, aout_hdrs_addr) < 0) {
+		printf("Can't execute image %s\n", image_name);
+		return -1;
+	}
+
+	return 0;
 }

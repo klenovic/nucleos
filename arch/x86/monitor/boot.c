@@ -666,7 +666,8 @@ void boot(void)
 	/* Get environment variables from the parameter sector. */
 	get_parameters();
 
-	boot_nucleos();
+	if (boot_nucleos() < 0)
+		printf("Error while booting kernel\n");
 
 	/* @nucleos: only in case of error */
 	while (1) halt_cpu();
