@@ -353,18 +353,13 @@ static struct process *load_image(const u32 image_addr, const u32 aout_hdrs_addr
 	u32 addr;
 	struct process *procp;
 	long a_text, a_data, a_bss, a_stack;
-	long processor= a2l(b_value("processor"));
-	char *verb;
+	long processor = a2l(b_value("processor"));
 	int verbose = 1;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
 	sbrk(0);
 
-	if ((verb = b_value("verbose")) != 0 && a2l(verb) > 0)
-		verbose = 1;
-
-	vsec = 0;           /* Load this sector from image next. */
-
+	vsec = 0;		/* Load this sector from image next. */
 	addr = image_addr;
 	procp = procs;
 
