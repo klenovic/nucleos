@@ -63,11 +63,11 @@ static int serial_line = -1;
 #define KERNEL_IDX	0       /* The first process is the kernel. */
 
 struct process {  /* Per-process memory adresses. */
-	u32_t entry;    /* Entry point. */
-	u32_t cs;       /* Code segment. */
-	u32_t ds;       /* Data segment. */
-	u32_t data;     /* To access the data segment. */
-	u32_t end;      /* End of this process, size = (end - cs). */
+	u32 entry;	/* Entry point. */
+	u32 cs;		/* Code segment. */
+	u32 ds;		/* Data segment. */
+	u32 data;	/* Data start */
+	u32 end;	/* End of this process, size = (end - cs). */
 };
 
 static struct process procs[PROCESS_MAX];
@@ -141,12 +141,9 @@ static int params2params(char *params, size_t psize)
 /* Return the size of a process in sectors as found in an image. */
 static u32_t proc_size(struct image_header *hdr)
 {
-	u32_t len= hdr->process.a_text;
+	u32_t len = hdr->process.a_text;
 
-	if (hdr->process.a_flags & A_PAL)
-		len+= hdr->process.a_hdrlen;
-
-	len= align(len + hdr->process.a_data, SECTOR_SIZE);
+	len = align(len + hdr->process.a_data, SECTOR_SIZE);
 
 	return len >> SECTOR_SHIFT;
 }
@@ -221,32 +218,28 @@ static char *get_sector(u32_t vsec)
 	return buf;
 }
 
-static int get_segment(u32_t *vsec, long *size, u32_t *addr, u32_t limit)
 /* Read *size bytes starting at virtual sector *vsec to memory at *addr. */
+static int get_segment(u32 vsec_start, u32 seg_size, u32 seg_addr, u32 limit)
 {
 	char* buf;
-	size_t n;
+	u32 addr = seg_addr;
+	u32 size = 0;
+	u32 vsec = vsec_start;
 
-	while (*size > 0) {
-		if ((buf = get_sector((*vsec)++)) == 0)
+	while (size < seg_size) {
+		if ((buf = get_sector(vsec++)) == 0)
 			return 0;
 
-		if (*addr + PAGE_SIZE > limit)
+		if (addr + PAGE_SIZE > limit)
 			return 0;
 
-		raw_copy(*addr, mon2abs(buf), SECTOR_SIZE);
-		*addr += SECTOR_SIZE;
-		*size -= SECTOR_SIZE;
-		buf += SECTOR_SIZE;
+		raw_copy(addr, mon2abs(buf), SECTOR_SIZE);
+
+		addr += SECTOR_SIZE;
+		size += SECTOR_SIZE;
 	}
 
-	/* Zero extend to a page size */
-	n = align(*addr, PAGE_SIZE) - *addr;
-	raw_clear(*addr, n);
-	*addr += n;
-	*size -= n;
-
-	return 1;
+	return size;
 }
 
 /* select/check given  initrd path*/
@@ -317,7 +310,8 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 		raw_copy(initrd_base, mon2abs(get_sector(0) + initrd_hdr.a_hdrlen), SECTOR_SIZE - initrd_hdr.a_hdrlen);
 
 		for (j=1; j<nvsec; j++) {
-			raw_copy(initrd_base + (j*SECTOR_SIZE - initrd_hdr.a_hdrlen), mon2abs(get_sector(j)), SECTOR_SIZE);
+			raw_copy(initrd_base + (j*SECTOR_SIZE - initrd_hdr.a_hdrlen),
+				 mon2abs(get_sector(j)), SECTOR_SIZE);
 		}
 
 		/* We will get from extented memroy */
@@ -342,17 +336,16 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 }
 
 /* Get a Nucleos image into core */
-static struct process *load_image(const u32 image_addr, u32 image_size, const u32 aout_hdrs_addr,
-				  const u32 limit, struct process *procs)
+static struct process *load_image(u32 image_addr, u32 image_size, u32 aout_hdrs_addr,
+				  u32 limit, struct process *procs)
 {
 	int i;
 	struct image_header hdr;
 	char *buf;
 	u32_t vsec, totalmem = 0;
-	u32 seg_size;
 	u32 addr;
 	struct process *procp;
-	long a_text, a_data, a_bss, a_stack;
+	u32 text_data_size, text_size, bss_size, stack_size;
 	long processor = a2l(b_value("processor"));
 	int verbose = 1;
 
@@ -416,70 +409,58 @@ static struct process *load_image(const u32 image_addr, u32 image_size, const u3
 		if (((verbose) ? (verbose++) : 0) == 1)
 			printf("       cs         ds     text     data      bss    stack\n");
 
-		/* Segment sizes. */
-		a_text = hdr.process.a_text;
-		a_data = hdr.process.a_data;
-		a_bss = hdr.process.a_bss;
+		/* Supposed (minimal) segment sizes. */
+		text_size = hdr.process.a_text;
+		/* Add text to data to form one segment. */
+		text_data_size = hdr.process.a_text + hdr.process.a_data;
+		bss_size = hdr.process.a_bss;
+		stack_size = hdr.process.a_total - text_data_size - bss_size;
 
-		a_stack = hdr.process.a_total - a_data - a_bss - a_text;
+		/* needed just for accessing kernel magic number in data segment */
+		procp->data = addr + text_size;
 
 		/* Collect info about the process to be. */
 		procp->cs = addr;
-
-		/* Process may be page aligned so that the text segment contains
-		 * the header, or have an unmapped zero page against vaxisms.
-		 */
+		procp->ds = procp->cs;
 		procp->entry = hdr.process.a_entry;
 
-		if (hdr.process.a_flags & A_PAL)
-			a_text += hdr.process.a_hdrlen;
-
-		if (hdr.process.a_flags & A_UZP)
-			procp->cs -= PAGE_SIZE;
-
-		/* Add text to data to form one segment. */
-		procp->data = addr + a_text;
-		procp->ds = procp->cs;
-		a_data += a_text;
-
-		/* Read the data segment. */
-		if (!get_segment(&vsec, &a_data, &addr, limit))
+		/* Read the text/data segment. */
+		text_data_size = get_segment(vsec, text_data_size, addr, limit);
+		if (!text_data_size)
 			return 0;
 
-		if (verbose) {
-			printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
-				procp->cs, procp->ds,
-				hdr.process.a_text, hdr.process.a_data,
-				hdr.process.a_bss);
-		}
+		/* move on next sectors */
+		vsec += (align(text_data_size, SECTOR_SIZE)/SECTOR_SIZE);
 
-		if (verbose)
-			printf(" %8ld", a_stack);
+		text_data_size = align(text_data_size, PAGE_SIZE);
 
-		/* Compute the number of bss clicks left. */
-		a_bss += a_data;
-		seg_size = align(a_bss, PAGE_SIZE);
+		/* bss start address */
+		addr += text_data_size;
+		bss_size = align(bss_size, PAGE_SIZE);
 
-		if (addr + seg_size > limit) {
+		if (addr + bss_size > limit) {
 			printf("Not enough memory to load image\n");
 			return 0;
 		}
 
-		/* It may be that the a_bss will be negative here because
-		 * the seg_size was aligned to the closest page size count. */
-		a_bss -= seg_size;
-
 		/* Zero out bss. */
-		raw_clear(addr, seg_size);
-		addr += seg_size;
+		raw_clear(addr, bss_size);
 
-		/* And the number of stack clicks. */
-		a_stack += a_bss;
-		seg_size = align(a_stack, PAGE_SIZE);
-		a_stack -= seg_size;
+		/* stack start address, align to page size  */
+		addr += bss_size;
+		stack_size = align(stack_size, PAGE_SIZE);
 
-		/* Add space for the stack. */
-		addr += seg_size;
+		if (verbose) {
+			printf("0x%07lx  0x%07lx %8ld %8ld %8ld",
+				procp->cs, procp->ds, text_size,
+				(text_data_size - text_size), bss_size);
+		}
+
+		if (verbose)
+			printf(" %8ld", stack_size);
+
+		/* end of stack */
+		addr += stack_size;
 
 		/* Process endpoint. */
 		procp->end = addr;
