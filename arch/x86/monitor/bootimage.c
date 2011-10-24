@@ -468,10 +468,8 @@ static struct process *load_image(u32 image_addr, u32 image_size, u32 aout_hdrs_
 		if (verbose)
 			printf("  %s\n", hdr.name);
 		else {
-			u32_t mem;
-			mem = addr - startaddr;
 			printf("%s ", hdr.name);
-			totalmem += mem;
+			totalmem += (addr - startaddr);
 		}
 
 		/* next process image */
