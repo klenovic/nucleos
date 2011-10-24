@@ -516,6 +516,8 @@ static int exec_image(struct process *procs, u32 aout_hdrs_addr)
 		return -1;
 	}
 
+	memset(params, 0, sizeof(params));
+
 	/* Translate the boot parameters for kernel. */
 	if (!params2params(params, sizeof(params))) {
 		printf("Can't translate boot parameters!");
