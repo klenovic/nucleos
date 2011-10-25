@@ -167,10 +167,7 @@ void main(void)
 
 		/* Convert addresses to clicks and build process memory map */
 		text_base = e_hdr.a_syms >> CLICK_SHIFT;
-		text_clicks = (e_hdr.a_text + CLICK_SIZE-1) >> CLICK_SHIFT;
-		data_clicks = (e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
 		st_clicks= (e_hdr.a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
-
 		data_clicks = (e_hdr.a_text + e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
 		text_clicks = 0;
 
