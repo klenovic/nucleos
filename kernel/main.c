@@ -179,8 +179,11 @@ void main(void)
 		rp->p_memmap[S].mem_vir  = st_clicks;
 		rp->p_memmap[S].mem_len  = 0;
 
-		/* Patch the non-kernel process' entry points since it doesn't have to be
-		 * at address 0.
+		/* Patch (override) the non-kernel process' entry points in image table. The
+		 * image table is located in kernel/kernel_syms.c. The kernel processes like
+		 * IDLE, SYSTEM, CLOCK, HARDWARE are not changed because they are part of kernel
+		 * and the entry points are set at compilation time. In case of IDLE or HARDWARE
+		 * the entry point can be ignored becasue they never run (set RTS_PROC_STOP).
 		 */
 		if (!iskerneln(proc_nr(rp)))
 			ip->initial_pc = (task_t*)e_hdr.a_entry;
@@ -212,9 +215,15 @@ void main(void)
 		if(ip->flags & PROC_FULLVM)
 			RTS_SET(rp, RTS_VMINHIBIT);
 
-		if (rp->p_nr == HARDWARE) RTS_SET(rp, RTS_PROC_STOP);
-		/* IDLE task is never put on a run queue as it is never ready to run */
-		if (rp->p_nr == IDLE) RTS_SET(rp, RTS_PROC_STOP);
+		/* IDLE & HARDWARE task is never put on a run queue as it is
+		 * never ready to run.
+		 */
+		if (rp->p_nr == HARDWARE)
+			RTS_SET(rp, RTS_PROC_STOP);
+
+		if (rp->p_nr == IDLE)
+			RTS_SET(rp, RTS_PROC_STOP);
+
 		RTS_UNSET(rp, RTS_SLOT_FREE); /* remove RTS_SLOT_FREE and schedule */
 		alloc_segments(rp);
 	} /* for */
