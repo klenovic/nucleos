@@ -59,7 +59,6 @@ static int serial_line = -1;
 #define K_BUILTIN_INITRD	0x0001 /* Kernel has builtin initrd (inside memory driver). */
 
 /* Data about the different processes. */
-#define PROCESS_MAX	16      /* Must match the space in kernel/mpx.x */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
 
 struct process {  /* Per-process memory adresses. */
@@ -70,7 +69,7 @@ struct process {  /* Per-process memory adresses. */
 	u32 end;	/* End of this process, size = (end - cs). */
 };
 
-static struct process procs[PROCESS_MAX];
+static struct process procs[MAX_IMG_PROCS_COUNT];
 static int n_procs;        /* Number of processes. */
 
 static void raw_clear(u32_t addr, u32_t count)
@@ -361,8 +360,8 @@ static struct process *load_image(u32 image_addr, u32 image_size, u32 aout_hdrs_
 		u32_t startaddr;
 		startaddr = addr;
 
-		if (i == PROCESS_MAX) {
-			printf("There are more then %d programs in image\n", PROCESS_MAX);
+		if (i == MAX_IMG_PROCS_COUNT) {
+			printf("There are more then %d programs in image\n", MAX_IMG_PROCS_COUNT);
 			return 0;
 		}
 
@@ -632,13 +631,13 @@ int boot_nucleos(void)
 	limit = mem[1].base + mem[1].size;
 
 	/* Allocate and clear the area where the headers will be placed.
-	 * The headers are placed below 1M at (1M - PROCESS_MAX * A_MINHDR).
+	 * The headers are placed below 1M at (1M - MAX_IMG_PROCS_COUNT * A_MINHDR).
 	 * Note that we will need some additional space here for real-mode kernel.
 	 */
-	aout_hdrs_addr = mem[0].base + mem[0].size - PROCESS_MAX * A_MINHDR;
+	aout_hdrs_addr = mem[0].base + mem[0].size - MAX_IMG_PROCS_COUNT * A_MINHDR;
 
 	/* Clear the area where the headers will be placed. */
-	raw_clear(aout_hdrs_addr, PROCESS_MAX * A_MINHDR);
+	raw_clear(aout_hdrs_addr, MAX_IMG_PROCS_COUNT * A_MINHDR);
 
 	if (serial_line >= 0) {
 		char linename[2];

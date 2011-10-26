@@ -44,7 +44,6 @@
 
 /* Message passing constants. */
 #define MESS_SIZE	(sizeof(message))	/* might need usizeof from VFS_PROC_NR here */
-#define NIL_MESS	((kipc_msg_t *) 0)	/* null pointer */
 
 /* Memory related constants. */
 #define SEGMENT_TYPE	0xFF00	/* bit mask to get segment type */
@@ -102,6 +101,7 @@
 */
 #define NR_MEMS		8
 
+#define MAX_IMG_PROCS_COUNT	16
 
 /* Click to byte conversions (and vice versa). */
 #define HCLICK_SHIFT	4	/* log2 of HCLICK_SIZE */
