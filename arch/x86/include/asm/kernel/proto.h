@@ -8,8 +8,8 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-#ifndef __ASM_X86_KERNEL_PROTO_H
-#define __ASM_X86_KERNEL_PROTO_H
+#ifndef _ASM_X86_KERNEL_PROTO_H
+#define _ASM_X86_KERNEL_PROTO_H
 
 #ifdef __KERNEL__
 
@@ -157,10 +157,14 @@ struct tss_s {
 /*	u8_t iomap[0]; */
 };
 
+/* early boot stack */
+extern void *k_boot_stktop;
+
 extern struct tss_s tss;
 
-extern void *k_boot_stktop;
-void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu);
+/* TSS stack */
+extern void *tss_stack_top;
+void tss_init(struct tss_s *tss, void *tss_stack, unsigned cpu);
 
 void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type);
 void i8259_disable(void);
@@ -173,4 +177,4 @@ int prot_set_kern_seg_limit(vir_bytes limit);
 void printseg(char *banner, int iscs, struct proc *pr, u32_t selector);
 
 #endif /* __KERNEL__ */
-#endif /* __ASM_X86_KERNEL_PROTO_H */
+#endif /* _ASM_X86_KERNEL_PROTO_H */

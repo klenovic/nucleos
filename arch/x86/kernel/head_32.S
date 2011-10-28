@@ -124,6 +124,9 @@
 
 #define K_FLAGS_EXT		K_BUILTIN_INITRD
 
+/* Early kernel stack size */
+#define KSTACK_BOOT_SIZE	1024
+
 .section .text.head
 //===========================================================================
 //                         nucleos_startup
@@ -634,8 +637,10 @@ level0_call:
  * This stack is used temporarily for booting only. We switch to a proper kernel
  * stack after the first trap to kernel
  */
-k_stack:
-	.space CONFIG_KERNEL_BOOTSTACK_SIZE
-/* Top of kernel stack */
+	.space KSTACK_BOOT_SIZE
 .globl k_boot_stktop
 k_boot_stktop:
+
+	.space PAGE_SIZE
+.globl tss_stack_top
+tss_stack_top:

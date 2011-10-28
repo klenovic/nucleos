@@ -1,13 +1,6 @@
 # Kernel options
 menu "Kernel options"
 
-config KERNEL_BOOTSTACK_SIZE
-	int "Kernel stack size used for booting"
-	default 4096
-	---help---
-	  Specify the kernel stack size while booting. The kernel
-	  switches to proper stack after the first trap to kernel.
-
 # common kernel configs
 source "kernel/Kconfig"
 

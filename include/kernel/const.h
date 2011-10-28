@@ -93,7 +93,6 @@
  * the maximum needed by any given driver. The number of interrupt hooks may
  * be incremented on systems with many device drivers.
  */
-#define K_STACK_BYTES	CONFIG_KERNEL_STACK_SIZE
 #define VDEVIO_BUF_SIZE	CONFIG_KERNEL_VDEVIO_BUF_SIZE
 #define VCOPY_VEC_SIZE	CONFIG_KERNEL_VCOPY_VEC_SIZE
 #define NR_IRQ_HOOKS	CONFIG_KERNEL_NR_IRQ_HOOKS

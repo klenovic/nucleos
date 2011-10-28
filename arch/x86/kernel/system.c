@@ -151,7 +151,7 @@ void arch_init(void)
 
 	idt_init();
 
-	tss_init(&tss, &k_boot_stktop, 0);
+	tss_init(&tss, &tss_stack_top, 0);
 
 #if defined(CONFIG_X86_LOCAL_APIC) && !defined(CONFIG_SMP)
 	if (config_no_apic) {
