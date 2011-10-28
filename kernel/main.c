@@ -52,10 +52,12 @@ void main(void)
 	phys_clicks text_base;
 	vir_clicks text_clicks, data_clicks, st_clicks;
 	reg_t ktsb;			/* kernel task stack base */
-	struct exec e_hdr;		/* for a copy of an a.out header */
+	struct exec *e_hdr = 0;		/* for a copy of an a.out header */
 
 	/* Global value to test segment sanity. */
 	magictest = MAGICTEST;
+
+	arch_copy_aout_headers();
 
 	/* Clear the process table. Anounce each slot as empty and set up mappings 
 	 * for proc_addr() and proc_nr() macros. Do the same for the table with 
@@ -163,12 +165,12 @@ void main(void)
 		/* Architecture-specific way to find out aout header of this
 		 * boot process.
 		 */
-		arch_get_aout_headers(hdrindex, &e_hdr);
+		e_hdr = arch_get_aout_header(hdrindex);
 
 		/* Convert addresses to clicks and build process memory map */
-		text_base = e_hdr.a_syms >> CLICK_SHIFT;
-		st_clicks= (e_hdr.a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
-		data_clicks = (e_hdr.a_text + e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
+		text_base = e_hdr->a_syms >> CLICK_SHIFT;
+		st_clicks= (e_hdr->a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
+		data_clicks = (e_hdr->a_text + e_hdr->a_data + e_hdr->a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
 		text_clicks = 0;
 
 		rp->p_memmap[T].mem_phys = text_base;
@@ -186,7 +188,7 @@ void main(void)
 		 * the entry point can be ignored becasue they never run (set RTS_PROC_STOP).
 		 */
 		if (!iskerneln(proc_nr(rp)))
-			ip->initial_pc = (task_t*)e_hdr.a_entry;
+			ip->initial_pc = (task_t*)e_hdr->a_entry;
 
 		/* Set initial register values.  The processor status word for tasks 
 		 * is different from that of other processes because tasks can

@@ -67,14 +67,18 @@ void arch_shutdown(int how)
 }
 
 /* address of a.out headers, set in mpx386.s */
-phys_bytes aout;
+phys_bytes __kimage_aout_headers;
+static u8 kimage_aout_headers[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
-void arch_get_aout_headers(int i, struct exec *h)
+void arch_copy_aout_headers(void)
 {
-	/* The bootstrap loader created an array of the a.out headers at
-	 * absolute address 'aout'. Get one element to h.
-	 */
-	phys_copy(vir2phys(h), aout + i * A_MINHDR, (phys_bytes) A_MINHDR);
+	phys_copy(vir2phys(kimage_aout_headers), __kimage_aout_headers,
+		  (phys_bytes)A_MINHDR*MAX_IMG_PROCS_COUNT);
+}
+
+struct exec *arch_get_aout_header(int i)
+{
+	return (struct exec*)(kimage_aout_headers + i*A_MINHDR);
 }
 
 void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)

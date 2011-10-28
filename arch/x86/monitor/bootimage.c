@@ -335,7 +335,7 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 }
 
 /* Get a Nucleos image into core */
-static struct process *load_image(u32 image_addr, u32 image_size, u32 aout_hdrs_addr,
+static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_buf,
 				  u32 limit, struct process *procs)
 {
 	int i;
@@ -403,7 +403,7 @@ static struct process *load_image(u32 image_addr, u32 image_size, u32 aout_hdrs_
 		 */
 		hdr.process.a_syms = addr;
 
-		raw_copy(aout_hdrs_addr + i * A_MINHDR, mon2abs(&hdr.process), A_MINHDR);
+		memcpy(aout_hdrs_buf + i*A_MINHDR, &hdr.process, A_MINHDR);
 
 		if (((verbose) ? (verbose++) : 0) == 1)
 			printf("       cs         ds     text     data      bss    stack\n");
@@ -611,12 +611,13 @@ static char *select_image(char *image, u32 *image_size)
 	return image;
 }
 
+static u8 aout_hdrs_buf[MAX_IMG_PROCS_COUNT*A_MINHDR];
+
 int boot_nucleos(void)
 {
 	char *image_name;
 	u32 image_addr;
 	u32 image_size;
-	u32 aout_hdrs_addr;
 	u32 limit;
 
 	if ((image_name = select_image(b_value("image"), &image_size)) == 0)
@@ -630,15 +631,6 @@ int boot_nucleos(void)
 
 	limit = mem[1].base + mem[1].size;
 
-	/* Allocate and clear the area where the headers will be placed.
-	 * The headers are placed below 1M at (1M - MAX_IMG_PROCS_COUNT * A_MINHDR).
-	 * Note that we will need some additional space here for real-mode kernel.
-	 */
-	aout_hdrs_addr = mem[0].base + mem[0].size - MAX_IMG_PROCS_COUNT * A_MINHDR;
-
-	/* Clear the area where the headers will be placed. */
-	raw_clear(aout_hdrs_addr, MAX_IMG_PROCS_COUNT * A_MINHDR);
-
 	if (serial_line >= 0) {
 		char linename[2];
 		linename[0] = serial_line + '0';
@@ -646,14 +638,17 @@ int boot_nucleos(void)
 		b_setvar(E_VAR, SERVARNAME, linename);
 	}
 
+	/* Clear the area where the headers will be placed. */
+	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
+
 	printf("\nLoading image '%s'\n", image_name);
-	if (!load_image(image_addr, image_size, aout_hdrs_addr, limit, procs)) {
-		printf("Can't load image %s at 0x%x, (size: %dB aout headers addr: 0x%x)\n",
-		        image_addr, image_size, aout_hdrs_addr);
+	if (!load_image(image_addr, image_size, aout_hdrs_buf, limit, procs)) {
+		printf("Can't load image %s at 0x%x, (size: %dB)\n",
+		        image_addr, image_size);
 		return -1;
 	}
 
-	if (exec_image(procs, aout_hdrs_addr) < 0) {
+	if (exec_image(procs, mon2abs(aout_hdrs_buf)) < 0) {
 		printf("Can't execute image %s\n", image_name);
 		return -1;
 	}
