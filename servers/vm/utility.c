@@ -95,8 +95,11 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 	struct memory *memp;
 	for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
 		if (memp->base == map_ptr[T].mem_phys) {
-			memp->base += map_ptr[T].mem_len + map_ptr[S].mem_vir;
-			memp->size -= map_ptr[T].mem_len + map_ptr[S].mem_vir;
+			u32 mem_size = map_ptr[S].mem_phys - map_ptr[T].mem_phys;
+
+			memp->base += mem_size;
+			memp->size -= mem_size;
+
 			break;
 		}
 	}
@@ -123,6 +126,7 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	struct boot_params bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
+	struct mem_map initrd_mm[3];
 
 	/* Don't enter if the ramdisk has been found already */
 	if (found)
@@ -135,24 +139,19 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 
 	initrd_base_clicks = (bootparam.hdr.ramdisk_image >> CLICK_SHIFT);
 
-	/* Find initial ramdisk */
-	for (i=0; i<NR_MEMS; i++) {
-		if (mem_chunks[i].base == initrd_base_clicks) {
-			found = 1;
-			break;
-		}
-	}
-
-	if (!found) {
-		printk("VM: Couldn't find initial ramdisk at 0x%x\n", initrd_base_clicks);
-		return -ENXIO;
-	}
-
 	/* Round up the reserved memory */
 	initrd_size_clicks = ((bootparam.hdr.ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
 
-	mem_chunks[i].base += initrd_size_clicks;
-	mem_chunks[i].size -= initrd_size_clicks;
+	/* Fake the initrd as process with text_base = data_base,
+	 * stack_base = text_base + text_size and stack_size = 0
+	 */
+	initrd_mm[T].mem_phys = initrd_base_clicks;
+	initrd_mm[D].mem_phys = initrd_mm[T].mem_phys;
+	initrd_mm[S].mem_phys = initrd_mm[T].mem_phys + initrd_size_clicks;
+
+	reserve_proc_mem(mem_chunks, initrd_mm);
+
+	found = 1;
 
 	return 0;
 }
