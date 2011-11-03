@@ -120,7 +120,6 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
  */
 int reserve_initrd_mem(struct memory *mem_chunks)
 {
-	int i;
 	int s;
 	static int found = 0;
 	struct boot_params bootparam;
