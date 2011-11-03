@@ -93,10 +93,10 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
  * spaces and their memory will be removed from the list.
  */
 	struct memory *memp;
+	u32 mem_size = map_ptr[S].mem_phys - map_ptr[T].mem_phys;
+
 	for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
 		if (memp->base == map_ptr[T].mem_phys) {
-			u32 mem_size = map_ptr[S].mem_phys - map_ptr[T].mem_phys;
-
 			memp->base += mem_size;
 			memp->size -= mem_size;
 
