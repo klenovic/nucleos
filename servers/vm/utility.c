@@ -86,21 +86,39 @@ void get_mem_chunks(struct memory *mem_chunks)
  */
 void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 {
-/* Remove server memory from the free memory list. The boot monitor
- * promises to put processes at the start of memory chunks. The
- * tasks all use same base address, so only the first task changes
- * the memory lists. The servers and init have their own memory
- * spaces and their memory will be removed from the list.
- */
 	struct memory *memp;
 	u64 proc_phys_start = map_ptr[T].mem_phys;
 	u64 proc_phys_end = map_ptr[S].mem_phys;
 	u64 proc_phys_size = proc_phys_end - proc_phys_start;
 
 	for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
-		if (memp->base == proc_phys_start) {
+		/* If at the beginning then just move the base */
+		if (proc_phys_start == memp->base) {
 			memp->base += proc_phys_size;
 			memp->size -= proc_phys_size;
+
+			break;
+		}
+
+		if (proc_phys_start > memp->base &&
+		    proc_phys_start <= memp->base + memp->size) {
+			struct memory *mp;
+
+			if (mem_chunks[NR_MEMS - 1].size > 0 ||
+			    memp == &mem_chunks[NR_MEMS - 1] )
+				vm_panic("reserve_proc_mem: no enough free memory chunks",
+					  proc_phys_start);
+
+			/* copy the memory info into the next slot */
+			for (mp = &mem_chunks[NR_MEMS - 1]; mp > memp; mp--)
+				memcpy(mp, (mp - 1), sizeof(*mp));
+
+			/* adjust the boundaries of the next adjacent region (process view) */
+			(memp + 1)->size = memp->base + memp->size - proc_phys_end;
+			(memp + 1)->base = proc_phys_end;
+
+			/* shrink the size of the previous adjacent region (process view) */
+			memp->size = proc_phys_start - memp->base;
 
 			break;
 		}
