@@ -147,7 +147,6 @@ over_flags:
 	mov	%esp, %ebp
 	push	%esi
 	push	%edi
-	mov	%esp, mon_sp	// save stack pointer for later return
 
 	/* Copy the monitor global descriptor table to the address space of kernel and
 	   switch over to it.  Prot_init() can then update it with immediate effect. */

@@ -46,7 +46,6 @@ extern int irq_use;				/* map of all in-use irq's */
 extern u32_t system_hz;				/* HZ value */
 
 /* Miscellaneous. */
-extern reg_t mon_ss, mon_sp;		/* boot monitor stack */
 extern int do_serial_debug;
 extern endpoint_t who_e;		/* message source endpoint */
 extern int who_p;			/* message source proc */
