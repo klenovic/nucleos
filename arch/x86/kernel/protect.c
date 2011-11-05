@@ -37,7 +37,24 @@ struct segdesc_s gdt[GDT_SIZE];
 static struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
 struct tss_s tss;			/* zero init */
 
-static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size);
+static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size)
+{
+	/* Fill in the size fields (base, limit and granularity) of a descriptor. */
+	segdp->base_low = base;
+	segdp->base_middle = base >> BASE_MIDDLE_SHIFT;
+	segdp->base_high = base >> BASE_HIGH_SHIFT;
+
+	--size;		/* convert to a limit, 0 size means 4G */
+	if (size > BYTE_GRAN_MAX) {
+		segdp->limit_low = size >> PAGE_GRAN_SHIFT;
+		segdp->granularity = GRANULAR | (size >> (PAGE_GRAN_SHIFT + GRANULARITY_SHIFT));
+	} else {
+		segdp->limit_low = size;
+		segdp->granularity = size >> GRANULARITY_SHIFT;
+	}
+
+	segdp->granularity |= DEFAULT;        /* means BIG for data seg */
+}
 
 void enable_iop(struct proc *pp)
 {
@@ -219,24 +236,6 @@ void idt_init(void)
 	idt_copy_vectors(gate_table_pic);
 }
 
-static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size)
-{
-	/* Fill in the size fields (base, limit and granularity) of a descriptor. */
-	segdp->base_low = base;
-	segdp->base_middle = base >> BASE_MIDDLE_SHIFT;
-	segdp->base_high = base >> BASE_HIGH_SHIFT;
-
-	--size;		/* convert to a limit, 0 size means 4G */
-	if (size > BYTE_GRAN_MAX) {
-		segdp->limit_low = size >> PAGE_GRAN_SHIFT;
-		segdp->granularity = GRANULAR | (size >> (PAGE_GRAN_SHIFT + GRANULARITY_SHIFT));
-	} else {
-		segdp->limit_low = size;
-		segdp->granularity = size >> GRANULARITY_SHIFT;
-	}
-
-	segdp->granularity |= DEFAULT;        /* means BIG for data seg */
-}
 
 void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type)
 {
