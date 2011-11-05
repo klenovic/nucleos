@@ -20,10 +20,10 @@
 #define INT_GATE_TYPE   (INT_286_GATE | DESC_386_BIT)
 #define TSS_TYPE        (AVL_286_TSS  | DESC_386_BIT)
 
-struct desctableptr_s {
-	char limit[sizeof(u16)];
-	char base[sizeof(u32)];     /* really u24_t + pad for 286 */
-};
+struct gdt_ptr {
+	u16 limit;
+	u32 base;
+} __attribute__((packed));
 
 struct gatedesc_s {
 	u16 offset_low;
@@ -118,7 +118,7 @@ void prot_init(void)
 /* Set up tables for protected mode.
  * All GDT slots are allocated at compile time.
  */
-	struct desctableptr_s *dtp;
+	struct gdt_ptr *dtp;
 	unsigned ldt_index;
 	register struct proc *rp;
 
@@ -135,13 +135,13 @@ void prot_init(void)
 	kinfo.data_size = ((kinfo.data_size+CLICK_SIZE-1)/CLICK_SIZE) * CLICK_SIZE;
 
 	/* Build gdt and idt pointers in GDT where the BIOS expects them. */
-	dtp = (struct desctableptr_s *) &gdt[GDT_INDEX];
-	* (u16 *) dtp->limit = (sizeof gdt) - 1;
-	* (u32 *) dtp->base = vir2phys(gdt);
+	dtp = (struct gdt_ptr*)&gdt[GDT_INDEX];
+	dtp->limit = (sizeof(gdt)) - 1;
+	dtp->base = vir2phys(gdt);
 
-	dtp= (struct desctableptr_s *) &gdt[IDT_INDEX];
-	* (u16 *) dtp->limit = (sizeof idt) - 1;
-	* (u32 *) dtp->base = vir2phys(idt);
+	dtp= (struct gdt_ptr*)&gdt[IDT_INDEX];
+	dtp->limit = (sizeof(idt)) - 1;
+	dtp->base = vir2phys(idt);
 
 	/* Build segment descriptors for tasks and interrupt handlers. */
 	init_codeseg(&gdt[CS_INDEX], kinfo.code_base, kinfo.code_size, INTR_PRIVILEGE);
@@ -168,7 +168,7 @@ void prot_init(void)
 	gdt[TSS_INDEX].access = PRESENT | (INTR_PRIVILEGE << DPL_SHIFT) | TSS_TYPE;
 
 	/* Complete building of main TSS. */
-	tss.iobase = sizeof tss;	/* empty i/o permissions map */
+	tss.iobase = sizeof(tss);	/* empty i/o permissions map */
 }
 
 void idt_copy_vectors(struct gate_table_s * first)
