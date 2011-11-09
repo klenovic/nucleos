@@ -644,7 +644,7 @@ int boot_nucleos(void)
 	printf("\nLoading image '%s'\n", image_name);
 	if (!load_image(image_addr, image_size, aout_hdrs_buf, limit, procs)) {
 		printf("Can't load image %s at 0x%x, (size: %dB)\n",
-		        image_addr, image_size);
+		        image_name, image_addr, image_size*SECTOR_SIZE);
 		return -1;
 	}
 
