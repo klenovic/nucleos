@@ -15,8 +15,8 @@
  * Use `__NOAUTO_OP16_PREFIX__' if you do want to add address and size
  * prefixes automatically by gcc (see gcc manual affected instructions).
  */
-#ifndef __ASM_X86_CODE16GCC_H
-#define __ASM_X86_CODE16GCC_H
+#ifndef _ASM_X86_CODE16GCC_H
+#define _ASM_X86_CODE16GCC_H
 
 #ifndef __ASSEMBLY__
   __asm__(".code16gcc");
@@ -24,10 +24,10 @@
 
   #ifndef __NOAUTO_OP16_PREFIX__
     .code16gcc
-  #else  /* __NOAUTO_OP16_PREFIX__ */
+  #else
     .code16
   #endif /* __NOAUTO_OP16_PREFIX__ */
 
 #endif /* __ASSEMBLY__ */
 
-#endif /* __ASM_X86_CODE16GCC_H */
+#endif /* _ASM_X86_CODE16GCC_H */
