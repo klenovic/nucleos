@@ -88,7 +88,7 @@ bs_die:
 	# invoke the BIOS reset code...
 	ljmp	$0xf000,$0xfff0
 
-	.section ".bsdata", "aw"
+	.section ".bsdata", "ax"
 bugger_off_msg:
 	.ascii  "Direct booting from floppy is no longer supported.\r\n"
 	.ascii  "Please use a boot loader program instead.\r\n"
@@ -99,7 +99,7 @@ bugger_off_msg:
 	# Kernel attributes; used by setup.  This is part 1 of the
 	# header, from the old boot sector.
 
-	.section ".header", "a"
+	.section ".header", "ax"
 	.globl hdr
 hdr:
 setup_sects:	.byte 0			/* Filled in by build.c */
@@ -291,7 +291,7 @@ copygdt:
 
 	call	nucleos_startup
 
-	.section ".initdata", "a"
+	.section ".initdata", "ax"
 	.p2align 2
 
 	.globl params_size
@@ -303,7 +303,7 @@ params_offset: .long 0
 	.globl mon_ds
 mon_ds: .long 0
 
-	.section ".bss", "aw"
+	.section ".bss", "ax"
 /*
  * This stack is used temporarily for booting only. We switch to a proper kernel
  * stack after the first trap to kernel
