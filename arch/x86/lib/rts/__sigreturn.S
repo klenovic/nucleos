@@ -11,9 +11,9 @@
  * It calls __sigreturn, which is the normal "system call" routine.
  * Both __sigreturn and sigreturn are needed.
  */
-.section .text
+	.section ".text", "ax"
 
-.globl __sigreturn
+	.globl __sigreturn
 __sigreturn:
 	add $16, %esp
 	jmp sigreturn

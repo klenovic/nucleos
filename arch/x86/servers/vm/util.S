@@ -8,15 +8,14 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-.section .text
-
-.globl i386_invlpg
+	.section ".text", "ax"
 
 //===========================================================================
 //                              i386_invlpg
 //===========================================================================
 // void i386_invlpg(u32_t addr)
 // Tell the processor to invalidate a tlb entry at virtual address addr.
+	.globl i386_invlpg
 i386_invlpg:
 	push	%ebp
 	mov	%esp, %ebp

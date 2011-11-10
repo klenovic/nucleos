@@ -9,12 +9,12 @@
  */
 //       getprocessor() - determine processor type
 // based on code by Kees J. Bot
-.section .text
+	.section ".text", "ax"
 
 // int getprocessor(void);
 //       Return 386, 486, 586, ...
 
-.globl getprocessor
+	.globl getprocessor
 getprocessor:
         push    %ebp
         mov     %esp, %ebp

@@ -15,7 +15,7 @@
 // expects to be preserved (ebx, esi, edi, ebp, esp, segment registers, and
 // direction bit in the flags).
 
-.section .text
+	.section ".text", "ax"
 //===========================================================================
 //                             int86
 //===========================================================================
@@ -532,5 +532,5 @@ __phys_strnlen_fault_in_kernel:	/* kernel can send us here */
 	pop	%es
 	ret
 
-.section .data
+	.section ".data", "aw"
 idt_zero: .long 0, 0

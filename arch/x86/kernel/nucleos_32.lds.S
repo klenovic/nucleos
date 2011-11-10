@@ -19,9 +19,21 @@ OUTPUT_ARCH("i386")
 
 SECTIONS
 {
-	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-
+	. = 0;
 	_text = .;
+	/* Future 16-bit real-mode kernel */
+	.bstext		: { *(.bstext) }
+	.bsdata		: { *(.bsdata) }
+
+	. = 497;
+	.header		: { *(.header) }
+	.entrytext	: { *(.entrytext) }
+	.inittext	: { *(.inittext) }
+	.initdata	: { *(.initdata) }
+	__end_init = .;
+
+	/* The 32-bit kernel */
+	. += LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
 		*(.text.head)
 		*(.text)

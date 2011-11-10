@@ -9,8 +9,8 @@
  */
 // based on code by Philip Homburg <philip@cs.vu.nl>
 
-.section .text
-.globl longjmp
+	.section ".text", "ax"
+	.globl longjmp
 longjmp:
 	movl	4(%esp), %eax		// jmp_buf
 	cmpl	$0, 0(%eax)			// save mask?

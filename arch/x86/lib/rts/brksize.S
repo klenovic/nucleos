@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-.section .data /* place it into .data section */
+	.section ".data", "aw" /* place it into .data section */
 
-.globl __curbrk
+	.globl __curbrk
 __curbrk: .long _ebss

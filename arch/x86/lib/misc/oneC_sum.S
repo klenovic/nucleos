@@ -13,10 +13,10 @@
 // See RFC 1071, "Computing the Internet checksum"
 // See also the C version of this code.
 
-.section .text
+	.section ".text", "ax"
 
-.globl oneC_sum
         .p2align  4
+	.globl oneC_sum
 oneC_sum:
         push    %ebp
         mov     %esp, %ebp
@@ -83,6 +83,6 @@ done:   rol     %cl, %eax                 // Undo the rotation at the beginning
         pop     %ebp
         ret
 
-.section .rodata
-        .p2align  2
+	.section ".rodata", "a"
+	.p2align  2
 mask:   .long  0x000000FF, 0x0000FFFF, 0x00FFFFFF

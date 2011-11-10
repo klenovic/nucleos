@@ -10,11 +10,11 @@
 /*      bootimage.c - Load an image and start it.       Author: Kees J. Bot
  *                    19 Jan 1992
  */
+#include <stdlib.h>
+#include <stdio.h>
 #include <nucleos/stddef.h>
 #include <nucleos/types.h>
 #include <nucleos/stat.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <nucleos/limits.h>
 #include <nucleos/string.h>
 #include <nucleos/errno.h>
@@ -28,6 +28,7 @@
 #include <kernel/types.h>
 #include <ibm/partition.h>
 #include <asm/page_types.h>
+#include <asm/bootparam.h>
 #include "rawfs.h"
 #include "image.h"
 #include "boot.h"
@@ -43,7 +44,6 @@
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
 
 static int block_size = 0;
-static unsigned short k_flags_ext;   /* Extended flags. */
 static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
 static int serial_line = -1;
 
@@ -388,16 +388,6 @@ static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_
 			return 0;
 		}
 
-		/* Get the click shift from the kernel text segment. */
-		if (i == KERNEL_IDX) {
-			char *textp;
-
-			if ((textp = get_sector(vsec)) == 0)
-				return 0;
-
-			k_flags_ext = *((u16_t*)(textp + FLAGS_EXT_OFF));
-		}
-
 		/* Save a copy of the header for the kernel, with a_syms
 		 * misused as the address where the process is loaded at.
 		 */
@@ -484,13 +474,21 @@ static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_
 	}
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
-	printf("Initial ramdisk...");
-	if (!(k_flags_ext & K_BUILTIN_INITRD)) {
-		printf("not builtin.\n");
-		if (load_initrd(INITRD, addr) < 0)
+	u32 ramdisk_image = addr;
+	u32 ramdisk_size = select_initrd(INITRD);
+
+	if (ramdisk_size) {
+		if (load_initrd(INITRD, ramdisk_image) < 0)
 			return 0;
+
+		/* fill the header */
+		raw_copy(image_addr + offsetof(struct setup_header, ramdisk_image) + SECTOR_SIZE,
+			 mon2abs(&ramdisk_image), sizeof(ramdisk_image));
+
+		raw_copy(image_addr + offsetof(struct setup_header, ramdisk_size) + SECTOR_SIZE,
+			 mon2abs(&ramdisk_size), sizeof(ramdisk_size));
 	} else {
-		printf("builtin.\n");
+		printf("Ramdisk not found.\n");
 	}
 
 	/* Close the disk. */
