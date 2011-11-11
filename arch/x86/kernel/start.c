@@ -7,7 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/* First C file used by the kernel. */
 #include <stdlib.h>
 #include <nucleos/string.h>
 #include <nucleos/utsrelease.h>
@@ -58,16 +57,18 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by loader.
  */
-	register char *value;				/* value in key=value pair */
+	register char *value;	/* value in key=value pair */
 	int h;
 	extern char _text, _etext;
 	extern char _data, _end;
 
 	/* Record where the kernel and the monitor are. */
 	kinfo.code_base = seg2phys(cs);
-	kinfo.code_size = (phys_bytes)((char*)&_etext - (char*)&_text); /* size of code segment */
+	/* size of code segment (includes also the boot code) */
+	kinfo.code_size = (phys_bytes)((char*)&_etext - (char*)&_text);
 	kinfo.data_base = seg2phys(ds);
-	kinfo.data_size = (phys_bytes)((char*)&_end - (char*)&_data); /* size of data segment */
+	/* size of data segment */
+	kinfo.data_size = (phys_bytes)((char*)&_end - (char*)&_data);
 
 	/* protection initialization. */
 	prot_init();
@@ -95,7 +96,7 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 		kloadinfo.proc_load_history[h] = 0;
 
 	/* Processor? Decide if mode is protected for older machines. */
-	machine.processor=atoi(get_value(params_buffer, "processor")); 
+	machine.processor=atoi(get_value(params_buffer, "processor"));
 
 	/* XT, AT or MCA bus? */
 	value = get_value(params_buffer, "bus");
@@ -151,8 +152,6 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 	if(value)
 		boot_params.hdr.ramdisk_size = atoi(value);
 #endif
-	/* Return to assembler code to switch to protected mode (if 286), 
-	 * reload selectors and call main().
-	 */
+	/* Return to assembler code reload selectors and call main(). */
 	intr_init(INTS_NUCLEOS, 0);
 }

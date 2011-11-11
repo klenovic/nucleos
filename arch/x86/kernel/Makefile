@@ -5,7 +5,7 @@ kernel.elf32-obj-y += arch_do_vmctl.o clock.o do_int86.o do_iopenable.o \
 		      do_readbios.o do_sdevio.o exception.o i8259.o \
 		      klib_32.o memory.o head_32.o protect.o setup.o \
 		      system.o map_scall.o kernel-syms.o header.o version.o \
-		      apic/built-in.o
+		      start.o apic/built-in.o
 
 ccflags-y := -D__KERNEL__
 asflags-y := -D__KERNEL__
