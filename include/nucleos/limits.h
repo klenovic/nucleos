@@ -44,13 +44,9 @@
 #define CHILD_MAX	_NO_LIMIT	/* MINIX does not limit children */
 #define OPEN_MAX	32		/* # open files a process may have */
 
-#if 0
-#define LINK_MAX	CHAR_MAX	/* # links a file may have (V1 file system ) */
-#else
 #define LINK_MAX	32767  /* # links a file may have (V2 or better file system)
 				* @nucleos: the value of SHORT_MAX
 				*/
-#endif
 
 #define MAX_CANON	255	/* size of the canonical input queue */
 #define MAX_INPUT	255	/* size of the type-ahead buffer */
