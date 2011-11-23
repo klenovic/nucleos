@@ -30,14 +30,12 @@
 #include <servers/vm/sanitycheck.h>
 #include <servers/vm/region.h>
 
-/*===========================================================================*
- *				do_fork					     *
- *===========================================================================*/
+static pt_t origpt;
+
 int do_fork(kipc_msg_t *msg)
 {
   int r, proc, s, childproc, fullvm;
   struct vmproc *vmp, *vmc;
-  pt_t origpt;
   vir_bytes msgaddr;
 
   SANITYCHECK(SCL_FUNCTIONS);
@@ -176,4 +174,3 @@ int do_fork(kipc_msg_t *msg)
   SANITYCHECK(SCL_FUNCTIONS);
   return 0;
 }
-
