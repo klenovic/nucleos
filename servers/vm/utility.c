@@ -131,6 +131,8 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 }
 
 #ifndef CONFIG_BUILTIN_INITRD
+static struct boot_params bootparam;
+
 /* @brief Remove initial ramdisk from the free memory list.
  * @param mem_chunks  list of memory chunks
  * @return 0 on success or -ENXIO on failure
@@ -142,7 +144,6 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 {
 	int s;
 	static int found = 0;
-	struct boot_params bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
 	struct mem_map initrd_mm[3];
