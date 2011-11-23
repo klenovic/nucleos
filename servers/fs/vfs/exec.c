@@ -151,6 +151,8 @@ static int patch_stack(struct vnode *vp, char *stack, vir_bytes *stk_bytes)
 	char *buf;
 
 	buf = malloc(_MAX_BLOCK_SIZE);
+	if (!buf)
+		return -ENOMEM;
 
 	/* Make user_fullpath the new argv[0]. */
 	if (!insert_arg(stack, stk_bytes, user_fullpath, REPLACE)) return(-ENOMEM);
