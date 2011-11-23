@@ -303,7 +303,7 @@ params_offset: .long 0
 	.globl mon_ds
 mon_ds: .long 0
 
-	.section ".bss", "ax"
+	.section ".bss", "wa"
 /*
  * This stack is used temporarily for booting only. We switch to a proper kernel
  * stack after the first trap to kernel
