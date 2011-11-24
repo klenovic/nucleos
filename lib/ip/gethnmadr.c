@@ -25,10 +25,11 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <stdlib.h>
+#include <stdio.h>
 #include <nucleos/types.h>
 #include <nucleos/ctype.h>
 #include <nucleos/errno.h>
-#include <stdio.h>
 #include <nucleos/string.h>
 
 #include <net/nameser.h>
@@ -37,6 +38,7 @@
 #include <net/inet.h>
 #include <net/resolv.h>
 #include <net/socket.h>
+#include <asm/byteorder.h>
 
 #define	MAXALIASES	35
 #define	MAXADDRS	35
@@ -286,8 +288,12 @@ gethostbyaddr(addr, len, type)
 	int n;
 	querybuf_t buf;
 	register struct hostent *hp;
-	char qbuf[MAXDNAME];
-	
+	char *qbuf;
+
+	qbuf = malloc(MAXDNAME);
+	if (!qbuf)
+		return NULL;
+
 	if (type != AF_INET)
 		return ((struct hostent *) NULL);
 	(void)sprintf(qbuf, "%u.%u.%u.%u.in-addr.arpa",
