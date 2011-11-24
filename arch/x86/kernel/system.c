@@ -81,20 +81,20 @@ struct exec *arch_get_aout_header(int i)
 	return (struct exec*)(kimage_aout_headers + i*A_MINHDR);
 }
 
-void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)
+static void tss_init(struct tss_s *tss, void *kernel_stack, unsigned cpu)
 {
 	/*
 	 * make space for process pointer and cpu id and point to the first
 	 * usable word
 	 */
-	tss->sp0 = ((unsigned) kernel_stack) - 2 * sizeof(void *);
+	tss->sp0 = ((unsigned) kernel_stack) - 2*sizeof(void*);
 	tss->ss0 = DS_SELECTOR;
 
 	/*
 	 * set the cpu id at the top of the stack so we know on which cpu is
 	 * this stak in use when we trap to kernel
 	 */
-	*((reg_t *)(tss->sp0 + 1 * sizeof(reg_t))) = cpu;
+	*((reg_t*)(tss->sp0 + 1*sizeof(reg_t))) = cpu;
 }
 
 void arch_init(void)

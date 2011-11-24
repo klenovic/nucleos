@@ -164,7 +164,6 @@ extern struct tss_s tss;
 
 /* TSS stack */
 extern void *tss_stack_top;
-void tss_init(struct tss_s *tss, void *tss_stack, unsigned cpu);
 
 void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type);
 void i8259_disable(void);
