@@ -112,7 +112,7 @@ static inline __u16 __be16_to_cpup(const __be16 *p)
 #define __be16_to_cpus(x) do { (void)(x); } while (0)
 
 #if defined(__KERNEL__) || defined(__UKERNEL__)
-#include <linux/byteorder/generic.h>
+#include <nucleos/byteorder/generic.h>
 #endif /* defined(__KERNEL__) || defined(__UKERNEL__) */
 
 #endif /* _NUCLEOS_BYTEORDER_BIG_ENDIAN_H */
