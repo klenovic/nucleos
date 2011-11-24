@@ -20,6 +20,7 @@
  *   do_getsetpriority: get/set process priority
  *   do_svrctl: process manager control
  */
+#include <stdlib.h>
 #include <nucleos/kernel.h>
 #include "pm.h"
 #include <nucleos/unistd.h>
@@ -43,17 +44,6 @@
 #include "param.h"
 
 extern struct utsname uts_val;
-
-static char *uts_tbl[] = {
-  NULL,			/* No kernel architecture */
-  uts_val.machine,
-  NULL,			/* No hostname */
-  uts_val.nodename,
-  uts_val.release,
-  uts_val.version,
-  uts_val.sysname,
-  NULL,			/* No bus */			/* No bus */
-};
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 unsigned long calls_stats[NR_syscalls];
@@ -137,7 +127,7 @@ int do_getsysinfo()
   vir_bytes src_addr, dst_addr;
   struct kinfo kinfo;
   struct loadinfo loadinfo;
-  struct pciinfo pciinfo;
+  struct pciinfo *pciinfo;
   static struct proc proctab[NR_PROCS+NR_TASKS];
   size_t len;
   int s, r;
@@ -178,11 +168,21 @@ int do_getsysinfo()
         len = sizeof(struct loadinfo);
         break;
   case SI_PCI_INFO:			/* PCI info is obtained via PM */
-        if ((r=getpciinfo(&pciinfo)) != 0)
-			return r;
-        src_addr = (vir_bytes) &pciinfo;
-        len = sizeof(struct pciinfo);
-        break;
+	pciinfo = malloc(sizeof(struct pciinfo));
+	if (!pciinfo) {
+		printk("PM: no enough memory!\n");
+		return -ENOMEM;
+	}
+
+	if ((r = getpciinfo(pciinfo)) != 0) {
+		free(pciinfo);
+		return r;
+	}
+
+	src_addr = (vir_bytes)pciinfo;
+	len = sizeof(struct pciinfo);
+	break;
+
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
   case SI_CALL_STATS:
   	src_addr = (vir_bytes) calls_stats;
@@ -344,7 +344,6 @@ int do_getepinfo()
 int do_reboot()
 {
 	kipc_msg_t m;
-	int r;
 
 	/* Check permission to abort the system. */
 	if (mp->mp_effuid != SUPER_USER) return(-EPERM);
@@ -610,7 +609,7 @@ int scall_setpriority(void)
 		else
 			rmp = mp; /* current process */
 
-		if (rmp != NIL_PROC)
+		if (rmp != 0)
 			error = 0;
 		break;
 
