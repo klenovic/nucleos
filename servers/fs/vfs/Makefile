@@ -28,7 +28,7 @@ ifdef CONFIG_VFS_AOUT_BINFMT
 $(appname)_a_flags   := 0x00
 $(appname)_a_hdrlen  := 0x20
 $(appname)_a_cpu     := i386
-$(appname)_stackheap := 16k
+$(appname)_stackheap := 64k
 
 e2a-y := $(appname).elf32,$(appname)
 endif

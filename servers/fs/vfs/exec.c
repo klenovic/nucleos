@@ -149,13 +149,20 @@ static int patch_stack(struct vnode *vp, char *stack, vir_bytes *stk_bytes)
 	u64_t new_pos;
 	unsigned int cum_io_incr;
 	char *buf;
+	int err = 0;
 
 	buf = malloc(_MAX_BLOCK_SIZE);
-	if (!buf)
-		return -ENOMEM;
+	if (!buf) {
+		printk("No memory\n");
+		err = -ENOMEM;
+		goto err_patch_stack;
+	}
 
 	/* Make user_fullpath the new argv[0]. */
-	if (!insert_arg(stack, stk_bytes, user_fullpath, REPLACE)) return(-ENOMEM);
+	if (!insert_arg(stack, stk_bytes, user_fullpath, REPLACE)) {
+		err = -ENOMEM;
+		goto err_patch_stack;
+	}
 
 	pos = 0;	/* Read from the start of the file */
 
@@ -163,50 +170,67 @@ static int patch_stack(struct vnode *vp, char *stack, vir_bytes *stk_bytes)
 	r = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(pos),
 			  READING, VFS_PROC_NR, buf, _MAX_BLOCK_SIZE, &new_pos, &cum_io_incr);
 
-	if (r != 0) return r;
+	if (r != 0) {
+		err = r;
+		goto err_patch_stack;
+	}
 
 	n = vp->v_size;
 
 	if (n > _MAX_BLOCK_SIZE)
 		n = _MAX_BLOCK_SIZE;
 
-	if (n < 2) return -ENOEXEC;
+	if (n < 2) {
+		err = -ENOEXEC;
+		goto err_patch_stack;
+	}
 
 	sp = &(buf[2]);				/* just behind the #! */
 	n -= 2;
 
-	if (n > PATH_MAX) n = PATH_MAX;
+	if (n > PATH_MAX)
+		n = PATH_MAX;
 
 	/* Use the user_fullpath variable for temporary storage */
 	memcpy(user_fullpath, sp, n);
 
-	if ((sp = memchr(user_fullpath, '\n', n)) == NULL) /* must be a proper line */
-		return(-ENOEXEC);
+	/* must be a proper line */
+	if ((sp = memchr(user_fullpath, '\n', n)) == NULL) {
+		err = -ENOEXEC;
+		goto err_patch_stack;
+	}
 
 	/* Move sp backwards through script[], prepending each string to stack. */
 	for (;;) {
 		/* skip spaces behind argument. */
 		while (sp > user_fullpath && (*--sp == ' ' || *sp == '\t'));
 
-		if (sp == user_fullpath) break;
+		if (sp == user_fullpath)
+			break;
 
 		sp[1] = 0;
 
 		/* Move to the start of the argument. */
-		while (sp > user_fullpath && sp[-1] != ' ' && sp[-1] != '\t') --sp;
+		while (sp > user_fullpath && sp[-1] != ' ' && sp[-1] != '\t')
+			--sp;
 
 		interp = sp;
 
-		if (!insert_arg(stack, stk_bytes, sp, INSERT)) return(-ENOMEM);
+		if (!insert_arg(stack, stk_bytes, sp, INSERT)) {
+			err = -ENOMEM;
+			goto err_patch_stack;
+		}
 	}
 
 	/* Round *stk_bytes up to the size of a pointer for alignment contraints. */
-	*stk_bytes= ((*stk_bytes + PTRSIZE - 1) / PTRSIZE) * PTRSIZE;
+	*stk_bytes = ((*stk_bytes + PTRSIZE - 1) / PTRSIZE) * PTRSIZE;
 
 	if (interp != user_fullpath)
 		memmove(user_fullpath, interp, strlen(interp)+1);
 
-	return 0;
+err_patch_stack:
+	free(buf);
+	return err;
 }
 
 /**
