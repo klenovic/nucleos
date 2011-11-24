@@ -578,7 +578,7 @@ int elf32_read_phdrs(elf32_phdr_t **phdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 	/* allocate space for program headers */
 	*phdrs = (elf32_phdr_t*)malloc(phdrs_sz);
 
-	if (!phdrs) {
+	if (!(*phdrs)) {
 		app_err("Can't allocate memory for program segment headers");
 		return -ENOMEM;
 	}
@@ -618,7 +618,7 @@ int elf32_read_shdrs(elf32_shdr_t **shdrs, elf32_ehdr_t *ehdr, struct vnode *vp)
 	/* allocate space for segment headers */
 	*shdrs = (elf32_shdr_t*)malloc(shdrs_sz);
 
-	if (!shdrs) {
+	if (!(*shdrs)) {
 		app_err("Can't allocate memory for section headers\n");
 		return 0;
 	}
