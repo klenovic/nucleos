@@ -70,8 +70,6 @@ int main(void)
   kipc_msg_t m;					/* request message */
   int call_nr, who_e,who_p;			/* call number and caller */
   int result;                 			/* result to return */
-  sigset_t sigset;				/* system signal set */
-  int s;
 
   /* Initialize the server, then go to work. */
   init_server();
@@ -618,7 +616,6 @@ static void init_server(void)
 static void sig_handler()
 {
   sigset_t sigset;
-  int sig;
 
   /* Try to obtain signal set from PM. */
   if (getsigset(&sigset) != 0) return;
