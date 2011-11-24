@@ -15,6 +15,6 @@ $(src)/is.elf32: servers/server_32.lds
 is_a_flags   := 0x00
 is_a_hdrlen  := 0x20
 is_a_cpu     := i386
-is_stackheap := 32k
+is_stackheap := 64k
 
 e2a-y := is.elf32,is
