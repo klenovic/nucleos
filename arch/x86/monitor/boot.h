@@ -81,7 +81,7 @@ u32_t mon2abs(void *ptr);
 u32_t vec2abs(vector *vec);
 
 /* Copy bytes from anywhere to anywhere (extended memory too) */
-void raw_copy(u32_t dstaddr, u32_t srcaddr, u32_t count);
+void raw_copy(u32 dstaddr, u32 srcaddr, u32 count);
 
 #define MAX_GETWORD_ADDR 0xfffff
 
