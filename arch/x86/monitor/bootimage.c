@@ -35,17 +35,15 @@
 
 /* Align a to a multiple of n (a power of 2): */
 #define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
+
 /* Check VFS_PROC_NR magic */
 #define SUPER_V3_MAGIC         0x4d5a
 #define SUPER_V3_MAGIC_OFFSET  0x418
+
 /* Magic numbers in process' data space. */
 #define MAGIC_OFF	0       /* Offset of magic # in data seg. */
 #define FLAGS_EXT_OFF	2       /* Offset in kernel text to extended flags. */
 #define KERNEL_D_MAGIC	0x526F  /* Kernel magic number. */
-
-static int block_size = 0;
-static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
-static int serial_line = -1;
 
 #ifndef CONFIG_BUILTIN_INITRD
 /* Path specified by configuration */
@@ -60,6 +58,11 @@ static int serial_line = -1;
 
 /* Data about the different processes. */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
+#define KERNEL_IMAGE_PATH	"/boot/image"
+
+static int block_size = 0;
+static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
+static int serial_line = -1;
 
 struct process {  /* Per-process memory adresses. */
 	u32 entry;	/* Entry point. */
@@ -70,7 +73,6 @@ struct process {  /* Per-process memory adresses. */
 };
 
 static struct process procs[MAX_IMG_PROCS_COUNT];
-static int n_procs;        /* Number of processes. */
 
 static void raw_clear(u32_t addr, u32_t count)
 /* Clear "count" bytes at absolute address "addr". */
@@ -135,16 +137,6 @@ static int params2params(char *params, size_t psize)
 
 	params[i]= 0;   /* End marked with empty string. */
 	return 1;
-}
-
-/* Return the size of a process in sectors as found in an image. */
-static u32_t proc_size(struct image_header *hdr)
-{
-	u32_t len = hdr->process.a_text;
-
-	len = align(len + hdr->process.a_data, SECTOR_SIZE);
-
-	return len >> SECTOR_SHIFT;
 }
 
 /* Translate a virtual sector number to an absolute disk sector. */
@@ -215,30 +207,6 @@ static char *get_sector(u32_t vsec)
 	}
 
 	return buf;
-}
-
-/* Read *size bytes starting at virtual sector *vsec to memory at *addr. */
-static int get_segment(u32 vsec_start, u32 seg_size, u32 seg_addr, u32 limit)
-{
-	char* buf;
-	u32 addr = seg_addr;
-	u32 size = 0;
-	u32 vsec = vsec_start;
-
-	while (size < seg_size) {
-		if ((buf = get_sector(vsec++)) == 0)
-			return 0;
-
-		if (addr + PAGE_SIZE > limit)
-			return 0;
-
-		raw_copy(addr, mon2abs(buf), SECTOR_SIZE);
-
-		addr += SECTOR_SIZE;
-		size += SECTOR_SIZE;
-	}
-
-	return size;
 }
 
 /* select/check given  initrd path*/
@@ -334,52 +302,93 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 	return 0;
 }
 
-/* Get a Nucleos image into core */
-static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_buf,
-				  u32 limit, struct process *procs)
+/* select/check given  initrd path*/
+static unsigned long select_kimage(char* kimage)
 {
-	int i;
+	ino_t kimage_ino;
+	struct stat st;
+	unsigned long size;
+
+	fsok = (r_super(&block_size) != 0);
+	kimage_ino = r_lookup(ROOT_INO, kimage);
+
+	if (!fsok || !kimage_ino) {
+		printf("error: kernel image %s: %s\n", kimage, unix_err(errno));
+		return 0;
+	}
+
+	r_stat(kimage_ino, &st);
+
+	vir2sec = file_vir2sec;
+	if (vir2sec < 0) {
+		printf("Bad block size or unsuspected EOF\n");
+		return 0;
+	}
+
+	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
+
+	return (size * SECTOR_SIZE);
+}
+
+static int load_kimage(char* kimage, u32 load_addr, u32 kimage_size, u32 limit)
+{
+	int nvsec = kimage_size/SECTOR_SIZE;
+	int i = 0;
+
+	printf("Loading kernel image '%s' at 0x%x (size %dKiB)...", kimage, load_addr, kimage_size/1024);
+
+	/* Clear the area where initrd will be placed. */
+	raw_clear(load_addr, kimage_size);
+
+	for (i = 0; i < nvsec; i++) {
+		char *buf = get_sector(i);
+
+		if (!buf)
+			return -1;
+
+		raw_copy(load_addr + i*SECTOR_SIZE, mon2abs(buf), SECTOR_SIZE);
+	}
+
+	printf("done\n");
+
+	return 0;
+}
+
+static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
+					     u8 *aout_hdrs_buf, struct process *procs)
+{
 	struct image_header hdr;
-	char *buf;
-	u32_t vsec, totalmem = 0;
+	u32 kernel_space_end = 0;
 	u32 addr;
 	struct process *procp;
 	u32 text_data_size, text_size, bss_size, stack_size;
+	u32 bss_addr;
 	long processor = a2l(b_value("processor"));
 	int verbose = 1;
+	int proc_count = 0;
 
 	/* The stack is pretty deep here, so check if heap and stack collide. */
 	sbrk(0);
 
-	vsec = 0;		/* Load this sector from image next. */
-	addr = image_addr;
+	addr = kimage_addr;
 	procp = procs;
 
 	/* Read the many different processes: */
-	for (i = 0; vsec < image_size; i++) {
-		u32_t startaddr;
-		startaddr = addr;
+	while (kimage_size) {
+		u32_t start_addr;
+		start_addr = addr;
 
-		if (i == MAX_IMG_PROCS_COUNT) {
+		if (++proc_count == MAX_IMG_PROCS_COUNT) {
 			printf("There are more then %d programs in image\n", MAX_IMG_PROCS_COUNT);
 			return 0;
 		}
 
 		/* Read header. */
-		for (;;) {
-			if ((buf = get_sector(vsec++)) == 0)
-				return 0;
+		raw_copy(mon2abs(&hdr), addr, sizeof(hdr));
 
-			memcpy(&hdr, buf, sizeof(hdr));
-
-			if (BADMAG(hdr.process)) {
-				printf("Image contains a bad program header\n");
-				return 0;
-			} else
-				break;
-
-			/* Bad label, skip this process. */
-			vsec += proc_size(&hdr);
+		if (BADMAG(hdr.process)) {
+			printf("Image contains a bad program header\n");
+			return 0;
 		}
 
 		/* Sanity check: an 8086 can't run a 386 kernel. */
@@ -387,13 +396,16 @@ static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_
 			printf("You can't run a 386 kernel on this 80%ld\n", processor);
 			return 0;
 		}
-
 		/* Save a copy of the header for the kernel, with a_syms
 		 * misused as the address where the process is loaded at.
 		 */
 		hdr.process.a_syms = addr;
 
-		memcpy(aout_hdrs_buf + i*A_MINHDR, &hdr.process, A_MINHDR);
+		memcpy(aout_hdrs_buf + (proc_count - 1)*A_MINHDR, &hdr.process, A_MINHDR);
+
+		/* get rid of header of size SECTOR_SIZE */
+		raw_copy(start_addr, start_addr + SECTOR_SIZE, kimage_size - SECTOR_SIZE);
+		kimage_size -= SECTOR_SIZE;
 
 		if (((verbose) ? (verbose++) : 0) == 1)
 			printf("       cs         ds     text     data      bss    stack\n");
@@ -413,27 +425,17 @@ static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_
 		procp->ds = procp->cs;
 		procp->entry = hdr.process.a_entry;
 
-		/* Read the text/data segment. */
-		text_data_size = get_segment(vsec, text_data_size, addr, limit);
-		if (!text_data_size)
-			return 0;
-
-		/* move on next sectors */
-		vsec += (align(text_data_size, SECTOR_SIZE)/SECTOR_SIZE);
-
 		text_data_size = align(text_data_size, PAGE_SIZE);
 
 		/* bss start address */
 		addr += text_data_size;
+		bss_addr = addr;
 		bss_size = align(bss_size, PAGE_SIZE);
 
 		if (addr + bss_size > limit) {
-			printf("Not enough memory to load image\n");
+			printf("Not enough memory to unpack the image\n");
 			return 0;
 		}
-
-		/* Zero out bss. */
-		raw_clear(addr, bss_size);
 
 		/* stack start address, align to page size  */
 		addr += bss_size;
@@ -453,48 +455,36 @@ static struct process *load_image(u32 image_addr, u32 image_size, u8 *aout_hdrs_
 
 		/* Process endpoint. */
 		procp->end = addr;
+		kernel_space_end = addr;
 
 		if (verbose)
 			printf("  %s\n", hdr.name);
-		else {
-			printf("%s ", hdr.name);
-			totalmem += (addr - startaddr);
-		}
+
+		/* copy the rest of the code and data at end of current one */
+		u32 next_kimage_addr = start_addr + text_data_size;
+
+		kimage_size -= text_data_size;
+
+		if (next_kimage_addr + kimage_size > addr) {
+			if (next_kimage_addr + kimage_size > limit) {
+				printf("Not enough memory to unpacki the image!\n");
+				return 0;
+			}
+
+			raw_copy(next_kimage_addr + kimage_size, next_kimage_addr, kimage_size);
+			raw_copy(addr, next_kimage_addr + kimage_size, kimage_size);
+		} else
+			raw_copy(addr, next_kimage_addr, kimage_size);
+
+		/* Zero out bss. */
+		raw_clear(bss_addr, bss_size);
 
 		/* next process image */
 		procp++;
 	}
 
-	if(!verbose)
-		printf("(%dk)\n", totalmem/1024);
-
-	if ((n_procs = i) == 0) {
-		printf("There are no programs in image\n");
-		return 0;
-	}
-
-	/* Check whether we are loading kernel with memory which has builtin initrd. */
-	u32 ramdisk_image = addr;
-	u32 ramdisk_size = select_initrd(INITRD);
-
-	if (ramdisk_size) {
-		if (load_initrd(INITRD, ramdisk_image) < 0)
-			return 0;
-
-		/* fill the header */
-		raw_copy(image_addr + offsetof(struct setup_header, ramdisk_image) + SECTOR_SIZE,
-			 mon2abs(&ramdisk_image), sizeof(ramdisk_image));
-
-		raw_copy(image_addr + offsetof(struct setup_header, ramdisk_size) + SECTOR_SIZE,
-			 mon2abs(&ramdisk_size), sizeof(ramdisk_size));
-	} else {
-		printf("Ramdisk not found.\n");
-	}
-
-	/* Close the disk. */
-	dev_close();
-
-	return procs;
+	/* Return the end of kernel space */
+	return kernel_space_end;
 }
 
 static int exec_image(struct process *procs, u32 aout_hdrs_addr)
@@ -531,101 +521,25 @@ static int exec_image(struct process *procs, u32 aout_hdrs_addr)
 	return -1;
 }
 
-/**
- * Recursively read the current directory
- * Note: One can't use r_stat while reading a directory.
- */
-static ino_t latest_version(char *version, struct stat *stp)
-{
-	char name[NAME_MAX + 1];
-	ino_t ino, newest;
-
-	if ((ino= r_readdir(name)) == 0)
-		return 0;
-
-	newest = latest_version(version, stp);
-	r_stat(ino, stp);
-
-	if (S_ISREG(stp->st_mode)) {
-		newest= ino;
-		strcpy(version, name);
-	}
-
-	return newest;
-}
-
-/* Look image up on the filesystem, if it is a file then we're done.
- * Setup the found image size. */
-static char *select_image(char *image, u32 *image_size)
-{
-	ino_t image_ino;
-	struct stat st;
-
-	image = strcpy(malloc((strlen(image) + 1 + NAME_MAX + 1)*sizeof(char)), image);
-
-	fsok = r_super(&block_size) != 0;
-
-	if (!fsok || (image_ino = r_lookup(ROOT_INO, image)) == 0) {
-		if (!fsok)
-			printf("No image selected\n");
-		else
-			printf("Can't load %s: %s\n", image, unix_err(errno));
-		return 0;
-	}
-
-	r_stat(image_ino, &st);
-
-	if (!S_ISREG(st.st_mode)) {
-		char *version= image + strlen(image);
-		char dots[NAME_MAX + 1];
-
-		if (!S_ISDIR(st.st_mode)) {
-			printf("%s: %s\n", image, unix_err(ENOTDIR));
-			return 0;
-		}
-
-		r_readdir(dots);
-		r_readdir(dots); /* "." & ".." */
-		*version++= '/';
-		*version= 0;
-
-		if ((image_ino = latest_version(version, &st)) == 0) {
-			printf("There are no images in %s\n", image);
-
-			return 0;;
-		}
-
-		r_stat(image_ino, &st);
-	}
-
-	vir2sec = file_vir2sec;
-	if (vir2sec < 0) {
-		printf("Bad block size or unsuspected EOF\n");
-		return 0;
-	}
-
-	*image_size = ((st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT);
-
-	return image;
-}
-
 static u8 aout_hdrs_buf[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
 int boot_nucleos(void)
 {
-	char *image_name;
-	u32 image_addr;
-	u32 image_size;
+	char *kimage_name;
+	u32 kimage_addr;
+	u32 kimage_size;
 	u32 limit;
+	u32 kernel_end;
 
-	if ((image_name = select_image(b_value("image"), &image_size)) == 0)
+	kimage_name = KERNEL_IMAGE_PATH;
+	if ((kimage_size = select_kimage(kimage_name)) == 0)
 		return -1;
 
 	/* Load the image into this memory block. This should be
 	 * above 1M and the code should run in protected mode.
 	 */
-	image_addr = mem[1].base;
-	image_addr = align(image_addr, PAGE_SIZE);
+	kimage_addr = mem[1].base;
+	kimage_addr = align(kimage_addr, PAGE_SIZE);
 
 	limit = mem[1].base + mem[1].size;
 
@@ -639,15 +553,41 @@ int boot_nucleos(void)
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
 
-	printf("\nLoading image '%s'\n", image_name);
-	if (!load_image(image_addr, image_size, aout_hdrs_buf, limit, procs)) {
-		printf("Can't load image %s at 0x%x, (size: %dB)\n",
-		        image_name, image_addr, image_size*SECTOR_SIZE);
+	if (load_kimage(kimage_name, kimage_addr, kimage_size, limit) < 0) {
+		printf("Can't load kernel image %s at 0x%x, (size: %dKiB)\n",
+		       kimage_name, kimage_addr, kimage_size/1024);
 		return -1;
 	}
 
+	kernel_end = unpack_kimage_inplace(kimage_addr, kimage_size, limit, aout_hdrs_buf, procs);
+	if (!kernel_end) {
+		printf("Couldn't unpack the kernel!\n");
+		return -1;
+	}
+
+	/* Check whether we are loading kernel with memory which has builtin initrd. */
+	u32 ramdisk_image = kernel_end;
+	u32 ramdisk_size = select_initrd(INITRD);
+
+	if (ramdisk_size) {
+		if (load_initrd(INITRD, ramdisk_image) < 0)
+			return -1;
+
+		/* fill the header */
+		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_image) + SECTOR_SIZE,
+			 mon2abs(&ramdisk_image), sizeof(ramdisk_image));
+
+		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_size) + SECTOR_SIZE,
+			 mon2abs(&ramdisk_size), sizeof(ramdisk_size));
+	} else {
+		printf("Ramdisk not found.\n");
+	}
+
+	/* Close the disk. */
+	dev_close();
+
 	if (exec_image(procs, mon2abs(aout_hdrs_buf)) < 0) {
-		printf("Can't execute image %s\n", image_name);
+		printf("Can't execute image %s\n", kimage_name);
 		return -1;
 	}
 

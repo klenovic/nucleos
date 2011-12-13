@@ -220,10 +220,9 @@ if [ ! -z $bin_image ]; then
 	sudo mount -t minix $dev $tmp_dir || cleanup_exit 1
 
 	sudo mkdir -p $tmp_dir/boot
-	sudo mkdir -p $tmp_dir/boot/image
 
 	echo "==> Installing image '$bin_image' ..."
-	sudo cp -p $bin_image $tmp_dir/boot/image/image || cleanup_exit 1
+	sudo cp -p $bin_image $tmp_dir/boot/image || cleanup_exit 1
 
 	sudo umount $tmp_dir || cleanup_exit 1
 	rm -rf $tmp_dir
