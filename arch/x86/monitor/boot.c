@@ -501,9 +501,6 @@ void get_parameters(void)
 
   b_setvar(E_SPECIAL|E_VAR, "memory", params);
 
-  /* Variables boot needs: */
-  b_setvar(E_SPECIAL|E_VAR, "image", "boot/image");
-
   return;
 }
 
