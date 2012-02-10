@@ -279,8 +279,8 @@ static void pm_init()
    * Parse the list of free memory chunks. This list is what the boot monitor 
    * reported, but it must be corrected for the kernel and system processes.
    */
-  if ((s=sys_getmonparams(monitor_params, sizeof(monitor_params))) != 0)
-      panic(__FILE__,"get monitor params failed",s);
+  if ((s=sys_get_cmdline_params(cmd_line_params, sizeof(cmd_line_params))) != 0)
+      panic(__FILE__,"get command-line params failed",s);
   if ((s=sys_getkinfo(&kinfo)) != 0)
       panic(__FILE__,"get kernel info failed",s);
 

@@ -74,7 +74,7 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 	prot_init();
 
 	/* Copy the boot parameters to the local buffer. */
-	arch_get_params(params_buffer, sizeof(params_buffer));
+	arch_get_params(cmd_line_params, sizeof(cmd_line_params));
 
 	/* Record miscellaneous information for user-space servers. */
 	kinfo.nr_procs = NR_PROCS;
@@ -96,10 +96,10 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 		kloadinfo.proc_load_history[h] = 0;
 
 	/* Processor? Decide if mode is protected for older machines. */
-	machine.processor=atoi(get_value(params_buffer, "processor"));
+	machine.processor=atoi(get_value(cmd_line_params, "processor"));
 
 	/* XT, AT or MCA bus? */
-	value = get_value(params_buffer, "bus");
+	value = get_value(cmd_line_params, "bus");
 	if (value == NIL_PTR || strcmp(value, "at") == 0) {
 		machine.pc_at = TRUE;			/* PC-AT compatible hardware */
 	} else if (strcmp(value, "mca") == 0) {
@@ -107,7 +107,7 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 	}
 
 	/* Type of VDU: */
-	value = get_value(params_buffer, "video");	/* EGA or VGA video unit */
+	value = get_value(cmd_line_params, "video");	/* EGA or VGA video unit */
 
 	if (strcmp(value, "ega") == 0)
 		machine.vdu_ega = TRUE;
@@ -116,7 +116,7 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 		machine.vdu_vga = machine.vdu_ega = TRUE;
 
 	/* Get clock tick frequency. */
-	value = get_value(params_buffer, "hz");
+	value = get_value(cmd_line_params, "hz");
 
 	if(value)
 		system_hz = atoi(value);
@@ -127,13 +127,13 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 		system_hz = HZ;
 	}
 
-	value = get_value(params_buffer, SERVARNAME);
+	value = get_value(cmd_line_params, SERVARNAME);
 
 	if(value && atoi(value) == 0)
 		do_serial_debug=1;
 
 #ifdef CONFIG_X86_LOCAL_APIC
-	value = get_value(params_buffer, "no_apic");
+	value = get_value(cmd_line_params, "no_apic");
 	if(value)
 		config_no_apic = atoi(value);
 	else
@@ -142,18 +142,18 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 
 #ifndef CONFIG_BUILTIN_INITRD
 	/* Initial ramdisk */
-	value = get_value(params_buffer, "initrdbase");
+	value = get_value(cmd_line_params, "initrdbase");
 
 	if(value)
 		boot_params.hdr.ramdisk_image = atoi(value);
 
-	value = get_value(params_buffer, "initrdsize");
+	value = get_value(cmd_line_params, "initrdsize");
 
 	if(value)
 		boot_params.hdr.ramdisk_size = atoi(value);
 #endif
 
-	value = get_value(params_buffer, "aout_hdrs_addr");
+	value = get_value(cmd_line_params, "aout_hdrs_addr");
 	if (value)
 		__kimage_aout_headers = (u32)atoi(value);
 	else

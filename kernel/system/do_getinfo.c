@@ -109,9 +109,9 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		break;
 	}
 
-	case GET_MONPARAMS:
-		src_vir = (vir_bytes) params_buffer;
-		length = sizeof(params_buffer);
+	case GET_CMDLINE_PARAMS:
+		src_vir = (vir_bytes)cmd_line_params;
+		length = sizeof(cmd_line_params);
 		break;
 
 	case GET_RANDOMNESS:

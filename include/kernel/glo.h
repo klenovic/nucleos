@@ -16,6 +16,7 @@
 #include <kernel/const.h>
 #include <kernel/debug.h>
 #include <asm/bootparam.h>
+#include <asm/setup.h>
 #include <asm/kernel/types.h>
 #include <asm/kernel/glo.h>
 
@@ -51,7 +52,7 @@ extern endpoint_t who_e;		/* message source endpoint */
 extern int who_p;			/* message source proc */
 extern int sys_call_code;		/* kernel call number in SYSTEM */
 extern time_t boottime;
-extern char params_buffer[512];		/* boot monitor parameters */
+extern char cmd_line_params[COMMAND_LINE_SIZE];		/* boot monitor parameters */
 extern int kernel_in_panic;		/* true if panic is in progress */
 extern int locklevel;
 #define MAGICTEST 0xC0FFEE23

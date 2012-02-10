@@ -504,7 +504,7 @@
 #   define GET_IMAGE	   1	/* get system image table */
 #   define GET_PROCTAB	   2	/* get kernel process table */
 #   define GET_RANDOMNESS  3	/* get randomness buffer */
-#   define GET_MONPARAMS   4	/* get monitor parameters */
+#   define GET_CMDLINE_PARAMS   4	/* get kernel command line */
 #   define GET_KENV	   5	/* get kernel environment string */
 #   define GET_IRQHOOKS	   6	/* get the IRQ table */
 #   define GET_KMESSAGES   7	/* get kernel messages */

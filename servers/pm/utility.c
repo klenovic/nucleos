@@ -78,7 +78,7 @@ const char *name;
   register const char *namep;
   register char *envp;
 
-  for (envp = (char *) monitor_params; *envp != 0;) {
+  for (envp = (char *) cmd_line_params; *envp != 0;) {
 	for (namep = name; *namep != 0 && *namep == *envp; namep++, envp++)
 		;
 	if (*namep == '\0' && *envp == '=') 

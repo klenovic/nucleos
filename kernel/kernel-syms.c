@@ -26,6 +26,7 @@
 #include <kernel/priv.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
+#include <asm/setup.h>
 
 /* Variables relating to shutting down MINIX. */
 char kernel_exception;           /* TRUE after system exceptions */
@@ -61,7 +62,7 @@ endpoint_t who_e;                /* message source endpoint */
 int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
-char params_buffer[512];         /* boot monitor parameters */
+char cmd_line_params[COMMAND_LINE_SIZE];	/* kernel command-line */
 int kernel_in_panic = 0;
 int locklevel;
 u32_t magictest;

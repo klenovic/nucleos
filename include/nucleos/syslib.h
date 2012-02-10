@@ -169,7 +169,7 @@ int sys_segctl(int *index, u16_t *seg, vir_bytes *off, phys_bytes phys, vir_byte
 #define sys_getimage(dst)	sys_getinfo(GET_IMAGE, dst, 0,0,0)
 #define sys_getirqhooks(dst)	sys_getinfo(GET_IRQHOOKS, dst, 0,0,0)
 #define sys_getirqactids(dst)	sys_getinfo(GET_IRQACTIDS, dst, 0,0,0)
-#define sys_getmonparams(v,vl)	sys_getinfo(GET_MONPARAMS, v,vl, 0,0)
+#define sys_get_cmdline_params(v,vl)	sys_getinfo(GET_CMDLINE_PARAMS, v,vl, 0,0)
 #define sys_getschedinfo(v1,v2)	sys_getinfo(GET_SCHEDINFO, v1,0, v2,0)
 #define sys_getlocktimings(dst)	sys_getinfo(GET_LOCKTIMING, dst, 0,0,0)
 #define sys_getpriv(dst, nr)   sys_getinfo(GET_PRIV, dst, 0,0, nr)

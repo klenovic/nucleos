@@ -16,7 +16,7 @@
 /* Global variables. */
 struct mproc *mp;	/* ptr to 'mproc' slot of current process */
 int procs_in_use;	/* how many processes are marked as IN_USE */
-char monitor_params[128*sizeof(char *)];	/* boot monitor parameters */
+char cmd_line_params[COMMAND_LINE_SIZE];	/* boot monitor parameters */
 struct kinfo kinfo;				/* kernel information */
 
 /* The parameters of the call are kept here. */

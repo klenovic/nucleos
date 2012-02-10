@@ -17,6 +17,7 @@
 #include <kernel/types.h>
 #include <kernel/proc.h>
 #include <asm/irq_vectors.h>
+#include <asm/setup.h>
 
 #define LINES 22
 
@@ -148,23 +149,21 @@ kmessages_dmp_free_buf1:
 	return;
 }
 
-/*===========================================================================*
- *				monparams_dmp				     *
- *===========================================================================*/
-void monparams_dmp()
+static char cmd_line_params[COMMAND_LINE_SIZE];
+
+void cmdline_params_dmp()
 {
-  char val[1024];
   char *e;
   int r;
 
   /* Try to get a copy of the boot monitor parameters. */
-  if ((r = sys_getmonparams(val, sizeof(val))) != 0) {
+  if ((r = sys_get_cmdline_params(cmd_line_params, sizeof(cmd_line_params))) != 0) {
       report("IS","warning: couldn't get copy of monitor params", r);
       return;
   }
 
   /* Append new lines to the result. */
-  e = val;
+  e = cmd_line_params;
   do {
 	e += strlen(e);
 	*e++ = '\n';
@@ -172,7 +171,7 @@ void monparams_dmp()
 
   /* Finally, print the result. */
   printk("Dump of kernel environment strings set by boot monitor.\n");
-  printk("\n%s\n", val);
+  printk("\n%s\n", cmd_line_params);
 }
 
 /*===========================================================================*

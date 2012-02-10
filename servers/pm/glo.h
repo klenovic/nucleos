@@ -10,10 +10,12 @@
 #ifndef __PM_GLO_H
 #define __PM_GLO_H
 
+#include <asm/setup.h>
+
 /* Global variables. */
 extern struct mproc *mp;	/* ptr to 'mproc' slot of current process */
 extern int procs_in_use;	/* how many processes are marked as IN_USE */
-extern char monitor_params[128*sizeof(char *)];	/* boot monitor parameters */
+extern char cmd_line_params[COMMAND_LINE_SIZE];	/* boot monitor parameters */
 extern struct kinfo kinfo;	/* kernel information */
 
 /* Misc.c */
