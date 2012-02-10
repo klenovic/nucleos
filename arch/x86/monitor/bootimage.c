@@ -573,21 +573,28 @@ int boot_nucleos(void)
 
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
 	u32 ramdisk_image = kernel_end;
-	u32 ramdisk_size = select_initrd(INITRD);
+
+	/* The select_initrd() returns number of sectors. Skip the sector with a header. */
+	u32 ramdisk_size = (select_initrd(INITRD) - 1) * SECTOR_SIZE;
 
 	if (ramdisk_size) {
 		if (load_initrd(INITRD, ramdisk_image) < 0)
 			return -1;
 
 		/* fill the header */
-		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_image) + SECTOR_SIZE,
+		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_image) + 0x1f1,
 			 mon2abs(&ramdisk_image), sizeof(ramdisk_image));
 
-		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_size) + SECTOR_SIZE,
+		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_size) + 0x1f1,
 			 mon2abs(&ramdisk_size), sizeof(ramdisk_size));
 	} else {
 		printf("Ramdisk not found.\n");
 	}
+
+	/* fill the header */
+	u32 cmd_line_params_addr = (u32)mon2abs(cmd_line_params);
+	raw_copy(kimage_addr + offsetof(struct setup_header, cmd_line_ptr) + 0x1f1,
+		 mon2abs(&cmd_line_params_addr), sizeof(&cmd_line_params_addr));
 
 	/* Close the disk. */
 	dev_close();

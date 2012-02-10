@@ -45,6 +45,9 @@ static char *get_value(const char *params, const char *name)
 	return 0;
 }
 
+extern struct setup_header hdr;
+extern void arch_copy_cmdline_params(char *cmdline_buf, struct boot_params *params);
+
 /**
  * @brief Perform system initializations prior to calling main().
  * @param cs  kernel code segment
@@ -52,7 +55,7 @@ static char *get_value(const char *params, const char *name)
  * @param parmoff  boot parameters offset
  * @param parmsize  boot parameters length
  */
-void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
+void prepare_kernel(u16 cs, u16 ds)
 {
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by loader.
@@ -73,8 +76,11 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 	/* protection initialization. */
 	prot_init();
 
-	/* Copy the boot parameters to the local buffer. */
-	arch_get_params(cmd_line_params, sizeof(cmd_line_params));
+	/* copy header from kernel image into boot params */
+	memcpy(&boot_params.hdr, &hdr, sizeof(hdr));
+
+	/* Copy command line params into the local buffer. */
+	arch_copy_cmdline_params(cmd_line_params, &boot_params);
 
 	/* Record miscellaneous information for user-space servers. */
 	kinfo.nr_procs = NR_PROCS;

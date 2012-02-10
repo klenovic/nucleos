@@ -406,6 +406,14 @@ void cons_seth(int pos, int n)
 /* Saved by mpx386.s into these variables. */
 u32_t params_size, params_offset, mon_ds;
 
+void arch_copy_cmdline_params(char *buf, struct boot_params *params)
+{
+	if (!buf)
+		kernel_panic("Invalid buffer address for command-line params", NO_NUM);
+
+	phys_copy(vir2phys(buf), params->hdr.cmd_line_ptr, COMMAND_LINE_SIZE);
+}
+
 int arch_get_params(char *params, int maxsize)
 {
 	phys_copy(vir2phys(params),seg2phys(mon_ds) + params_offset,
