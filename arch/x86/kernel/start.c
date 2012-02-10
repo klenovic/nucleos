@@ -146,19 +146,6 @@ void prepare_kernel(u16 cs, u16 ds)
 		config_no_apic = 0;
 #endif
 
-#ifndef CONFIG_BUILTIN_INITRD
-	/* Initial ramdisk */
-	value = get_value(cmd_line_params, "initrdbase");
-
-	if(value)
-		boot_params.hdr.ramdisk_image = atoi(value);
-
-	value = get_value(cmd_line_params, "initrdsize");
-
-	if(value)
-		boot_params.hdr.ramdisk_size = atoi(value);
-#endif
-
 	value = get_value(cmd_line_params, "aout_hdrs_addr");
 	if (value)
 		__kimage_aout_headers = (u32)atoi(value);

@@ -291,10 +291,6 @@ static int load_initrd(char* initrd, unsigned long load_addr)
 			return -1;
 		}
 
-		/* Let to know to kernel */
-		b_setvar(E_SPECIAL|E_VAR, "initrdbase", ul2a10(initrd_base));
-		b_setvar(E_SPECIAL|E_VAR, "initrdsize", ul2a10(initrd_size));
-
 		printf("done\n");
 	} else {
 		printf("error: can't load initrd\n");
