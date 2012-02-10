@@ -61,9 +61,6 @@ int isokendpt_f(endpoint_t e, int *p, int f);
 #define isokendpt_d(e, p, f) isokendpt_f((e), (p), (f))
 #endif
 
-/* start.c */
-void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize);
-
 /* system.c */
 int get_priv(register struct proc *rc, int proc_type);
 void set_sendto_bit(struct proc *rc, int id);
