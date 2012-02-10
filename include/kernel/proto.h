@@ -157,7 +157,6 @@ void arch_stop_profile_clock(void);
 void arch_ack_profile_clock(void);
 void do_ser_debug(void);
 int arch_get_params(char *parm, int max);
-int arch_set_params(char *parm, int max);
 int arch_pre_exec(struct proc *pr, u32_t, u32_t);
 int arch_umap(struct proc *pr, vir_bytes, vir_bytes, int, phys_bytes *);
 int arch_do_vmctl(kipc_msg_t *m_ptr, struct proc *p);
