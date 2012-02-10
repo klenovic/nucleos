@@ -414,14 +414,6 @@ int arch_get_params(char *params, int maxsize)
 	return 0;
 }
 
-int arch_set_params(char *params, int size)
-{
-	if(size > params_size)
-		return -E2BIG;
-	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params), size);
-	return 0;
-}
-
 void arch_do_syscall(struct proc *proc)
 {
 	/* Perform a previously postponed system call. */
