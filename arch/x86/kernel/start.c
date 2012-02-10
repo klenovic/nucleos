@@ -152,6 +152,13 @@ void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize)
 	if(value)
 		boot_params.hdr.ramdisk_size = atoi(value);
 #endif
+
+	value = get_value(params_buffer, "aout_hdrs_addr");
+	if (value)
+		__kimage_aout_headers = (u32)atoi(value);
+	else
+		kernel_panic("AOUT headerrs address is not set", NO_NUM);
+
 	/* Return to assembler code reload selectors and call main(). */
 	intr_init(INTS_NUCLEOS, 0);
 }

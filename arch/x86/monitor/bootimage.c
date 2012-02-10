@@ -550,6 +550,9 @@ int boot_nucleos(void)
 		b_setvar(E_VAR, SERVARNAME, linename);
 	}
 
+	/* save the aout headers address into params */
+	b_setvar(E_SPECIAL|E_VAR, "aout_hdrs_addr", ul2a10(mon2abs(aout_hdrs_buf)));
+
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
 

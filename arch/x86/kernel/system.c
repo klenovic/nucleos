@@ -66,12 +66,15 @@ void arch_shutdown(int how)
 	while(1) level0(halt_cpu);
 }
 
-/* address of a.out headers, set in mpx386.s */
-phys_bytes __kimage_aout_headers;
+/* address of a.out headers, set in start.c */
+u32 __kimage_aout_headers = 0;
 static u8 kimage_aout_headers[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
 void arch_copy_aout_headers(void)
 {
+	if (!__kimage_aout_headers)
+		kernel_panic("Invalid AOUT headers address", NO_NUM);
+
 	phys_copy(vir2phys(kimage_aout_headers), __kimage_aout_headers,
 		  (phys_bytes)A_MINHDR*MAX_IMG_PROCS_COUNT);
 }
