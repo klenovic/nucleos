@@ -163,7 +163,7 @@ void prepare_kernel(u16 cs, u16 ds)
 	if (value)
 		__kimage_aout_headers = (u32)atoi(value);
 	else
-		kernel_panic("AOUT headerrs address is not set", NO_NUM);
+		kernel_panic("AOUT headers address is not set", NO_NUM);
 
 	/* Return to assembler code reload selectors and call main(). */
 	intr_init(INTS_NUCLEOS, 0);
