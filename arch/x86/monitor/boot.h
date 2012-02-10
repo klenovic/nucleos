@@ -128,8 +128,7 @@ u32_t get_tick(void);
 void bootstrap(int device, struct part_entry *entry);
 
 /* Start Minix. */
-void minix(u32_t koff, u32_t kcs, u32_t kds,
-           char *bootparams, size_t paramsize, u32_t aout);
+void minix(u32_t koff, u32_t kcs, u32_t kds, char *bootparams, size_t paramsize);
 
 void int15(bios_env_t *);
 

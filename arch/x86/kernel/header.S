@@ -276,7 +276,6 @@ copygdt:
 	/* Locate boot parameters, set up kernel segment registers and stack. */
 	mov	4(%ebp), %ebx			// boot parameters offset
 	mov	8(%ebp), %edx			// boot parameters length
-	mov	12(%ebp), %eax			// address of a.out headers
 	mov	%ds, %ax			// kernel data
 	mov	%ax, %es
 	mov	%ax, %fs

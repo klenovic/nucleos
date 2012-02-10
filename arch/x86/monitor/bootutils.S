@@ -1051,7 +1051,6 @@ minix:
 	mov	%ax, p_mcs_desc+2
 	movb	%dl, p_mcs_desc+4
 
-	pushl	AOUTL(%bp)    // Address of a.out headers
 	pushw	$0
 	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
 	pushw	$0

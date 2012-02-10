@@ -487,7 +487,7 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	return kernel_space_end;
 }
 
-static int exec_image(struct process *procs, u32 aout_hdrs_addr)
+static int exec_image(struct process *procs)
 {
 	u16_t mode;
 	char *console;
@@ -516,7 +516,7 @@ static int exec_image(struct process *procs, u32 aout_hdrs_addr)
 	set_mode(mode);
 
 	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, params,
-	      sizeof(params), aout_hdrs_addr);
+	      sizeof(params));
 
 	return -1;
 }
@@ -589,7 +589,7 @@ int boot_nucleos(void)
 	/* Close the disk. */
 	dev_close();
 
-	if (exec_image(procs, mon2abs(aout_hdrs_buf)) < 0) {
+	if (exec_image(procs) < 0) {
 		printf("Can't execute image %s\n", kimage_name);
 		return -1;
 	}
