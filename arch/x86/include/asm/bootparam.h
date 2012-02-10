@@ -7,11 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/**
- * @file arch/x86/include/asm/bootparam.h
- * @brief Boot parameters
- * @details Interfaces to handle the x86 boot parameters.
- */
 #ifndef _ASM_X86_BOOTPARAM_H
 #define _ASM_X86_BOOTPARAM_H
 

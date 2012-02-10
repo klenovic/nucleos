@@ -29,6 +29,8 @@
 #include <ibm/partition.h>
 #include <asm/page_types.h>
 #include <asm/bootparam.h>
+#include <asm/setup.h>
+
 #include "rawfs.h"
 #include "image.h"
 #include "boot.h"
@@ -487,11 +489,12 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	return kernel_space_end;
 }
 
+static char cmd_line_params[COMMAND_LINE_SIZE];
+
 static int exec_image(struct process *procs)
 {
 	u16_t mode;
 	char *console;
-	char params[SECTOR_SIZE];
 	u16 kdata_magic_num = 0;
 
 	/* Check the kernel magic number (located in data section). */
@@ -501,10 +504,10 @@ static int exec_image(struct process *procs)
 		return -1;
 	}
 
-	memset(params, 0, sizeof(params));
+	memset(cmd_line_params, 0, sizeof(cmd_line_params));
 
 	/* Translate the boot parameters for kernel. */
-	if (!params2params(params, sizeof(params))) {
+	if (!params2params(cmd_line_params, sizeof(cmd_line_params))) {
 		printf("Can't translate boot parameters!");
 		return -1;
 	}
@@ -515,8 +518,8 @@ static int exec_image(struct process *procs)
 
 	set_mode(mode);
 
-	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, params,
-	      sizeof(params));
+	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, cmd_line_params,
+	      sizeof(cmd_line_params));
 
 	return -1;
 }
