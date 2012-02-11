@@ -48,12 +48,34 @@ static char *get_value(const char *params, const char *name)
 extern struct setup_header hdr;
 extern void arch_copy_cmdline_params(char *cmdline_buf, struct boot_params *params);
 
+static char *cmdline_buf_to_string(char* cmdline_str, const char *cmdline_buf)
+{
+	int i;
+
+	for (i = 0; i < COMMAND_LINE_SIZE - 2; i++) {
+		if (cmdline_buf[i] == 0 && cmdline_buf[i + 1] == 0)
+			break;
+
+		/* single 0 indicates new option */
+		if (cmdline_buf[i] == 0)
+			cmdline_str[i] = ' ';
+		else
+			cmdline_str[i] = cmdline_buf[i];
+	}
+
+	/* trim */
+	if (i == COMMAND_LINE_SIZE - 1) {
+		cmdline_str[i - 1] = 0;
+		cmdline_str[i] = 0;
+	}
+
+	return cmdline_str;
+}
+
 /**
  * @brief Perform system initializations prior to calling main().
  * @param cs  kernel code segment
  * @param ds  kernel data segment
- * @param parmoff  boot parameters offset
- * @param parmsize  boot parameters length
  */
 void prepare_kernel(u16 cs, u16 ds)
 {
@@ -151,6 +173,12 @@ void prepare_kernel(u16 cs, u16 ds)
 		__kimage_aout_headers = (u32)atoi(value);
 	else
 		kernel_panic("AOUT headers address is not set", NO_NUM);
+
+	/* clear the buffer */
+	memset(cmd_line_params_str, 0, COMMAND_LINE_SIZE);
+
+	/* convert to a regular string */
+	cmdline_buf_to_string(cmd_line_params_str, cmd_line_params);
 
 	/* Return to assembler code reload selectors and call main(). */
 	intr_init(INTS_NUCLEOS, 0);

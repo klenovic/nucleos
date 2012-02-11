@@ -52,7 +52,8 @@ extern endpoint_t who_e;		/* message source endpoint */
 extern int who_p;			/* message source proc */
 extern int sys_call_code;		/* kernel call number in SYSTEM */
 extern time_t boottime;
-extern char cmd_line_params[COMMAND_LINE_SIZE];		/* boot monitor parameters */
+extern char cmd_line_params[COMMAND_LINE_SIZE];		/* boot parameters */
+extern char cmd_line_params_str[COMMAND_LINE_SIZE];	/* boot parameters string */
 extern int kernel_in_panic;		/* true if panic is in progress */
 extern int locklevel;
 #define MAGICTEST 0xC0FFEE23

@@ -39,6 +39,8 @@ static void announce(void)
 	/* Display the Nucleos startup banner. */
 	printk("\nNucleos %s Copyright (c) 2011, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
 		UTS_RELEASE);
+
+	printk("Command line: %s\n", cmd_line_params_str);
 }
 
 void main(void)

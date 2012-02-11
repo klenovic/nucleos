@@ -62,7 +62,10 @@ endpoint_t who_e;                /* message source endpoint */
 int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
+
 char cmd_line_params[COMMAND_LINE_SIZE];	/* kernel command-line */
+char cmd_line_params_str[COMMAND_LINE_SIZE];	/* kernel command-line string */
+
 int kernel_in_panic = 0;
 int locklevel;
 u32_t magictest;
