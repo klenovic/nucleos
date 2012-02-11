@@ -101,46 +101,6 @@ static void raw_clear(u32_t addr, u32_t count)
 	}
 }
 
-/* Repackage the environment settings for the kernel. */
-static int params2params(char *params, size_t psize)
-{
-	size_t i, n;
-	environment *e;
-	char *name, *value;
-	dev_t dev;
-
-	i= 0;
-	for (e= env; e != 0; e= e->next) {
-		name= e->name;
-		value= e->value;
-
-		if (!(e->flags & E_VAR)) continue;
-
-		if (e->flags & E_DEV) {
-			if ((dev= name2dev(value)) == -1) return 0;
-			value= ul2a10((u16_t) dev);
-		}
-
-		n= i + strlen(name) + 1 + strlen(value) + 1;
-
-		if (n < psize) {
-			strcpy(params + i, name);
-			strcat(params + i, "=");
-			strcat(params + i, value);
-		}
-
-		i= n;
-	}
-
-	if (i >= psize) {
-		printf("Too many boot parameters\n");
-		return 0;
-	}
-
-	params[i]= 0;   /* End marked with empty string. */
-	return 1;
-}
-
 /* Translate a virtual sector number to an absolute disk sector. */
 static u32_t file_vir2sec(u32_t vsec)
 {
@@ -485,7 +445,12 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	return kernel_space_end;
 }
 
+/* Avoid multi-spaces here */
+char *cmdline = "rootdev=769 ramimagedev=769 ramsize=0 hz=60 processor=686 bus=at"
+		"video=vga chrome=color memory=800:94A40,100000:FF00000";
+
 static char cmd_line_params[COMMAND_LINE_SIZE];
+static int cmdline_len = 0;
 
 static int exec_image(struct process *procs)
 {
@@ -497,14 +462,6 @@ static int exec_image(struct process *procs)
 	raw_copy(mon2abs(&kdata_magic_num), procs[KERNEL_IDX].data + MAGIC_OFF, 2);
 	if (kdata_magic_num != KERNEL_D_MAGIC) {
 		printf("Kernel magic number is incorrect (0x%x)\n", kdata_magic_num);
-		return -1;
-	}
-
-	memset(cmd_line_params, 0, sizeof(cmd_line_params));
-
-	/* Translate the boot parameters for kernel. */
-	if (!params2params(cmd_line_params, sizeof(cmd_line_params))) {
-		printf("Can't translate boot parameters!");
 		return -1;
 	}
 
@@ -548,9 +505,6 @@ int boot_nucleos(void)
 		b_setvar(E_VAR, SERVARNAME, linename);
 	}
 
-	/* save the aout headers address into params */
-	b_setvar(E_SPECIAL|E_VAR, "aout_hdrs_addr", ul2a10(mon2abs(aout_hdrs_buf)));
-
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
 
@@ -586,13 +540,43 @@ int boot_nucleos(void)
 		printf("Ramdisk not found.\n");
 	}
 
+	/* Close the disk. */
+	dev_close();
+
+	/* Setup command-line for kernel */
+	memset(cmd_line_params, 0, COMMAND_LINE_SIZE);
+
+	/* Add static command-line string. The 2 trailing zeros indicates the
+	 * end of command line.
+	 */
+	if (strlen(cmd_line_params) > COMMAND_LINE_SIZE - 2)
+		return -1;
+
+	memcpy(cmd_line_params, cmdline, strlen(cmdline));
+	cmdline_len = strlen(cmd_line_params);
+
+	/* add aout headers address */
+	char *val = ul2a10(mon2abs(aout_hdrs_buf));
+	char *opt = " aout_hdrs_addr=";
+
+	if (cmdline_len + strlen(opt) + strlen(val) > COMMAND_LINE_SIZE - 2)
+		return -1;
+
+	memcpy(cmd_line_params + cmdline_len, opt, strlen(opt));
+	cmdline_len = strlen(cmd_line_params);
+	memcpy(cmd_line_params + cmdline_len, val, strlen(val));
+	cmdline_len = strlen(cmd_line_params);
+
+	/* Translate the command-line for kernel. DON'T ADD ANY NEW OPTIONS */
+	int j = 0;
+	for (j = 0; j < cmdline_len; j++)
+		if (cmd_line_params[j] == ' ')
+			cmd_line_params[j] = 0;
+
 	/* fill the header */
 	u32 cmd_line_params_addr = (u32)mon2abs(cmd_line_params);
 	raw_copy(kimage_addr + offsetof(struct setup_header, cmd_line_ptr) + 0x1f1,
 		 mon2abs(&cmd_line_params_addr), sizeof(&cmd_line_params_addr));
-
-	/* Close the disk. */
-	dev_close();
 
 	if (exec_image(procs) < 0) {
 		printf("Can't execute image %s\n", kimage_name);
