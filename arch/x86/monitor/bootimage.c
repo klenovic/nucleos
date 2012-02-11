@@ -514,8 +514,7 @@ static int exec_image(struct process *procs)
 
 	set_mode(mode);
 
-	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, cmd_line_params,
-	      sizeof(cmd_line_params));
+	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds);
 
 	return -1;
 }

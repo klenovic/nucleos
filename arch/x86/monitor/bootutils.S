@@ -1052,11 +1052,6 @@ minix:
 	movb	%dl, p_mcs_desc+4
 
 	pushw	$0
-	pushw	PARAMS(%bp)  // 32 bit size of parameters on stack
-	pushw	$0
-	pushw	BOOTP(%bp)   // 32 bit address of parameters (%ss relative)
-
-	pushw	$0
 	pushw	$CS_SELECTOR
 	pushw	KOFFH(%bp)
 	pushw	KOFFL(%bp)       // 32 bit far address to kernel entry point
