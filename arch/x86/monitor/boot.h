@@ -128,7 +128,7 @@ u32_t get_tick(void);
 void bootstrap(int device, struct part_entry *entry);
 
 /* Start Minix. */
-void minix(u32_t koff, u32_t kcs, u32_t kds);
+void minix(u32 koff, u32 kcs, u32 kds, u32 boot_params);
 
 void int15(bios_env_t *);
 
@@ -162,6 +162,8 @@ int b_setvar(int flags, char *name, char *value);
 void b_unset(char *name);
 
 extern int fsok;	/* True if the boot device contains an VFS_PROC_NR. */
+struct boot_params boot_params;
+
 u32_t lowsec;	/* Offset to the file system on the boot device. */
 
 /* Called by boot.c: */

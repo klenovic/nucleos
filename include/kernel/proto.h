@@ -149,7 +149,6 @@ void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
 struct exec *arch_get_aout_header(int i);
-void arch_copy_aout_headers(void);
 void restart(void);
 void read_tsc(u32_t *high, u32_t *low);
 int arch_init_profile_clock(u32_t freq);

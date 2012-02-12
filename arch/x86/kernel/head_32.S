@@ -117,12 +117,13 @@
 //                         nucleos_startup
 //===========================================================================
 .globl nucleos_startup
-nucleos_startup:                // this is the entry point for the Nucleos kernel
+nucleos_startup:
 	/* Call C startup code to set up a proper environment to run main(). */
+	push	params_offset
 	push	$DS_SELECTOR
 	push	$CS_SELECTOR
-	call	prepare_kernel	/* prepare_kernel(cs, ds) */
-	add	$4*2, %esp
+	call	prepare_kernel	/* prepare_kernel(cs, ds, boot_params) */
+	add	$4*3, %esp
 
 	/* Reload gdtr, idtr and the segment registers to global descriptor table set */
 	/* up by prot_init(). */

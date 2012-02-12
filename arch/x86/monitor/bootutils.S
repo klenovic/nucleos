@@ -1051,6 +1051,7 @@ minix:
 	mov	%ax, p_mcs_desc+2
 	movb	%dl, p_mcs_desc+4
 
+	pushl	BOOTP(%bp)  // 32 bit size of parameters on stack
 	pushw	$0
 	pushw	$CS_SELECTOR
 	pushw	KOFFH(%bp)

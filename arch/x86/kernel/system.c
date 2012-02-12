@@ -67,15 +67,14 @@ void arch_shutdown(int how)
 }
 
 /* address of a.out headers, set in start.c */
-u32 __kimage_aout_headers = 0;
 static u8 kimage_aout_headers[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
-void arch_copy_aout_headers(void)
+void arch_copy_aout_headers(struct boot_params *params)
 {
-	if (!__kimage_aout_headers)
+	if (!params || !params->nucleos_kludge.aout_hdrs_addr)
 		kernel_panic("Invalid AOUT headers address", NO_NUM);
 
-	phys_copy(vir2phys(kimage_aout_headers), __kimage_aout_headers,
+	phys_copy(vir2phys(kimage_aout_headers), params->nucleos_kludge.aout_hdrs_addr,
 		  (phys_bytes)A_MINHDR*MAX_IMG_PROCS_COUNT);
 }
 
@@ -412,6 +411,14 @@ void arch_copy_cmdline_params(char *buf, struct boot_params *params)
 		kernel_panic("Invalid buffer address for command-line params", NO_NUM);
 
 	phys_copy(vir2phys(buf), params->hdr.cmd_line_ptr, COMMAND_LINE_SIZE);
+}
+
+void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params)
+{
+	if (!params)
+		kernel_panic("Invalid buffer address for boot params", NO_NUM);
+
+	phys_copy(vir2phys(params), real_mode_params, sizeof(struct boot_params));
 }
 
 int arch_get_params(char *params, int maxsize)

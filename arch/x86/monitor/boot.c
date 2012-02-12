@@ -32,6 +32,7 @@
 #include <kernel/types.h>
 #include <ibm/partition.h>
 #include <ibm/bios.h>
+#include <asm/bootparam.h>
 #include "rawfs.h"
 #include "boot.h"
 
@@ -42,6 +43,8 @@
 u16_t vid_port;                /* Video i/o port. */
 u32_t vid_mem_base;    /* Video memory base address. */
 u32_t vid_mem_size;    /* Video memory size. */
+
+struct boot_params boot_params;
 
 int fsok= -1;     /* File system state.  Initially unknown. */
 
@@ -458,9 +461,6 @@ void get_parameters(void)
   char params[SECTOR_SIZE + 1];
   int processor;
   memory *mp;
-  static char bus_type[][4] = {
-    "xt", "at", "mca"
-  };
   static char vid_type[][4] = {
     "mda", "cga", "ega", "ega", "vga", "vga"
   };
@@ -474,17 +474,31 @@ void get_parameters(void)
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
   b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
   b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
-  b_setvar(E_SPECIAL|E_VAR, "hz", __stringify(HZ));
-  processor = getprocessor();
 
-  if(processor == 1586)
-    processor = 686;
+  /* HZ */
+	boot_params.nucleos_kludge.system_hz = HZ;
 
-  b_setvar(E_SPECIAL|E_VAR, "processor", ul2a10(processor));
-  b_setvar(E_SPECIAL|E_VAR, "bus", bus_type[get_bus()]);
-  b_setvar(E_SPECIAL|E_VAR, "video", vid_type[get_video()]);
-  b_setvar(E_SPECIAL|E_VAR, "chrome", vid_chrome[get_video() & 1]);
+	/* processor */
+	processor = getprocessor();
 
+	if (processor == 1586)
+		processor = 686;
+
+	boot_params.nucleos_kludge.processor = processor;
+
+	/* bus */
+	if (get_bus())
+		boot_params.nucleos_kludge.pc_at = 1;
+
+	/* video */
+	u32 vid = get_video();
+	if (vid == 2 || vid == 3)
+		boot_params.nucleos_kludge.vdu_ega = 1;
+	else
+		boot_params.nucleos_kludge.vdu_vga = 1;
+
+
+  /* memory */
   params[0]= 0;
 
   for (mp= mem; mp < arraylimit(mem); mp++) {
@@ -659,6 +673,8 @@ void boot(void)
 {
 	/* Initialize tables. */
 	initialize();
+
+	memset(&boot_params, 0, sizeof(boot_params));
 
 	/* Get environment variables from the parameter sector. */
 	get_parameters();

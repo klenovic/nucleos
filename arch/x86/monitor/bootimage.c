@@ -313,7 +313,7 @@ static int load_kimage(char* kimage, u32 load_addr, u32 kimage_size, u32 limit)
 }
 
 static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
-					     u8 *aout_hdrs_buf, struct process *procs)
+				 u8 *aout_hdrs_buf, struct process *procs)
 {
 	struct image_header hdr;
 	u32 kernel_space_end = 0;
@@ -321,7 +321,7 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	struct process *procp;
 	u32 text_data_size, text_size, bss_size, stack_size;
 	u32 bss_addr;
-	long processor = a2l(b_value("processor"));
+	long processor = boot_params.nucleos_kludge.processor;
 	int verbose = 1;
 	int proc_count = 0;
 
@@ -446,16 +446,13 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 }
 
 /* Avoid multi-spaces here */
-char *cmdline = "rootdev=769 ramimagedev=769 ramsize=0 hz=60 processor=686 bus=at"
-		"video=vga chrome=color memory=800:94A40,100000:FF00000";
+char *cmdline = "rootdev=769 ramimagedev=769 memory=800:94A40,100000:FF00000";
 
 static char cmd_line_params[COMMAND_LINE_SIZE];
 static int cmdline_len = 0;
 
 static int exec_image(struct process *procs)
 {
-	u16_t mode;
-	char *console;
 	u16 kdata_magic_num = 0;
 
 	/* Check the kernel magic number (located in data section). */
@@ -466,12 +463,12 @@ static int exec_image(struct process *procs)
 	}
 
 	/* Set the video to the required mode. */
-	if ((console = b_value("console")) == 0 || (mode= a2x(console)) == 0)
-		mode = strcmp(b_value("chrome"), "color") == 0 ? COLOR_MODE : MONO_MODE;
+	if (boot_params.nucleos_kludge.vdu_vga)
+		set_mode(COLOR_MODE);
+	else
+		set_mode(MONO_MODE);
 
-	set_mode(mode);
-
-	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds);
+	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, mon2abs(&boot_params));
 
 	return -1;
 }
@@ -556,16 +553,7 @@ int boot_nucleos(void)
 	cmdline_len = strlen(cmd_line_params);
 
 	/* add aout headers address */
-	char *val = ul2a10(mon2abs(aout_hdrs_buf));
-	char *opt = " aout_hdrs_addr=";
-
-	if (cmdline_len + strlen(opt) + strlen(val) > COMMAND_LINE_SIZE - 2)
-		return -1;
-
-	memcpy(cmd_line_params + cmdline_len, opt, strlen(opt));
-	cmdline_len = strlen(cmd_line_params);
-	memcpy(cmd_line_params + cmdline_len, val, strlen(val));
-	cmdline_len = strlen(cmd_line_params);
+	boot_params.nucleos_kludge.aout_hdrs_addr = mon2abs(aout_hdrs_buf);
 
 	/* Translate the command-line for kernel. DON'T ADD ANY NEW OPTIONS */
 	int j = 0;

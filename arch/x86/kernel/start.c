@@ -45,8 +45,10 @@ static char *get_value(const char *params, const char *name)
 	return 0;
 }
 
+extern void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params);
 extern struct setup_header hdr;
 extern void arch_copy_cmdline_params(char *cmdline_buf, struct boot_params *params);
+extern void arch_copy_aout_headers(struct boot_params *params);
 
 static char *cmdline_buf_to_string(char* cmdline_str, const char *cmdline_buf)
 {
@@ -76,8 +78,9 @@ static char *cmdline_buf_to_string(char* cmdline_str, const char *cmdline_buf)
  * @brief Perform system initializations prior to calling main().
  * @param cs  kernel code segment
  * @param ds  kernel data segment
+ * @param param  physical address of boot parameters
  */
-void prepare_kernel(u16 cs, u16 ds)
+void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 {
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by loader.
@@ -98,8 +101,14 @@ void prepare_kernel(u16 cs, u16 ds)
 	/* protection initialization. */
 	prot_init();
 
+	/* copy boot params */
+	arch_copy_boot_params(&boot_params, real_mode_params);
+
 	/* copy header from kernel image into boot params */
 	memcpy(&boot_params.hdr, &hdr, sizeof(hdr));
+
+	/* copy aout headers */
+	arch_copy_aout_headers(&boot_params);
 
 	/* Copy command line params into the local buffer. */
 	arch_copy_cmdline_params(cmd_line_params, &boot_params);
@@ -124,33 +133,18 @@ void prepare_kernel(u16 cs, u16 ds)
 		kloadinfo.proc_load_history[h] = 0;
 
 	/* Processor? Decide if mode is protected for older machines. */
-	machine.processor=atoi(get_value(cmd_line_params, "processor"));
-
-	/* XT, AT or MCA bus? */
-	value = get_value(cmd_line_params, "bus");
-	if (value == NIL_PTR || strcmp(value, "at") == 0) {
-		machine.pc_at = TRUE;			/* PC-AT compatible hardware */
-	} else if (strcmp(value, "mca") == 0) {
-		machine.pc_at = machine.ps_mca = TRUE;	/* PS/2 with micro channel */
-	}
+	machine.processor = boot_params.nucleos_kludge.processor;
+	machine.pc_at = boot_params.nucleos_kludge.pc_at;	/* PC-AT compatible hardware */
 
 	/* Type of VDU: */
-	value = get_value(cmd_line_params, "video");	/* EGA or VGA video unit */
-
-	if (strcmp(value, "ega") == 0)
-		machine.vdu_ega = TRUE;
-
-	if (strcmp(value, "vga") == 0)
-		machine.vdu_vga = machine.vdu_ega = TRUE;
+	machine.vdu_ega = boot_params.nucleos_kludge.vdu_ega;
+	machine.vdu_vga = boot_params.nucleos_kludge.vdu_vga;
 
 	/* Get clock tick frequency. */
-	value = get_value(cmd_line_params, "hz");
-
-	if(value)
-		system_hz = atoi(value);
+	system_hz = boot_params.nucleos_kludge.system_hz;
 
 	/* sanity check */
-	if(!value || system_hz < 2 || system_hz > 50000) {
+	if(system_hz < 2 || system_hz > 50000) {
 		printk("Wrong value of HZ=0x%x, using default HZ=0x%x\n", system_hz, HZ);
 		system_hz = HZ;
 	}
@@ -168,11 +162,7 @@ void prepare_kernel(u16 cs, u16 ds)
 		config_no_apic = 0;
 #endif
 
-	value = get_value(cmd_line_params, "aout_hdrs_addr");
-	if (value)
-		__kimage_aout_headers = (u32)atoi(value);
-	else
-		kernel_panic("AOUT headers address is not set", NO_NUM);
+	__kimage_aout_headers = boot_params.nucleos_kludge.aout_hdrs_addr;
 
 	/* clear the buffer */
 	memset(cmd_line_params_str, 0, COMMAND_LINE_SIZE);

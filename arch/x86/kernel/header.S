@@ -273,17 +273,18 @@ copygdt:
 	add	$gdt, %eax			// eax = vir2phys(gdt)
 	mov	%eax, gdt+GDT_SELECTOR+2	// set base of GDT
 	lgdt	gdt+GDT_SELECTOR		// switch over to kernel GDT
+
 	/* Locate boot parameters, set up kernel segment registers and stack. */
 	mov	4(%ebp), %ebx			// boot parameters offset
-	mov	8(%ebp), %edx			// boot parameters length
+
 	mov	%ds, %ax			// kernel data
 	mov	%ax, %es
 	mov	%ax, %fs
 	mov	%ax, %gs
 	mov	%ax, %ss
 	mov	$k_boot_stktop, %esp		// set sp to point to the top of kernel stack
+
 	/* Save boot parameters into these global variables for i386 code */
-	mov	%edx, params_size
 	mov	%ebx, params_offset
 	movl	$SS_SELECTOR, mon_ds
 
@@ -291,9 +292,6 @@ copygdt:
 
 	.section ".initdata", "ax"
 	.p2align 2
-
-	.globl params_size
-params_size: .long 0
 
 	.globl params_offset
 params_offset: .long 0

@@ -99,6 +99,22 @@ struct efi_info {
 	__u32 efi_memmap_hi;
 };
 
+
+struct nucleos_boot_kludge {
+	u32 aout_hdrs_addr;
+	u32 system_hz;
+
+	/* struct machine */
+	u8 pc_at;
+	u8 vdu_vga;
+	u8 vdu_ega;
+
+	u32 processor;
+	u32 kimage_aout_headers;
+	u8 no_apic;
+} __attribute__((packed));
+
+
 /* The so-called "zeropage" */
 struct boot_params {
 	struct screen_info screen_info;			/* 0x000 */
@@ -126,7 +142,8 @@ struct boot_params {
 	struct e820entry e820_map[E820MAX];		/* 0x2d0 */
 	__u8  _pad8[48];				/* 0xcd0 */
 	struct edd_info eddbuf[EDDMAXNR];		/* 0xd00 */
-	__u8  _pad9[276];				/* 0xeec */
+	struct nucleos_boot_kludge nucleos_kludge;	/* 0xeec */
+	__u8  _pad9[256];				/* 0xf00 */
 } __attribute__((packed));
 
 enum {
