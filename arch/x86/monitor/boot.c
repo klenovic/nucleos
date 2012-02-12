@@ -458,24 +458,18 @@ unsigned a2x(char *a)
 
 void get_parameters(void)
 {
-  char params[SECTOR_SIZE + 1];
-  int processor;
-  memory *mp;
-  static char vid_type[][4] = {
-    "mda", "cga", "ega", "ega", "vga", "vga"
-  };
-  static char vid_chrome[][6] = {
-    "mono", "color"
-  };
+	char params[SECTOR_SIZE + 1];
+	int processor;
+	int vid;
+	memory *mp;
 
-  memset(params,0,sizeof(params));
+	memset(params,0,sizeof(params));
 
-  /* Variables that Minix needs: */
-  b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
-  b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
-  b_setvar(E_SPECIAL|E_VAR, "ramsize", "0");
+	/* Variables that Minix needs: */
+	b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
+	b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
 
-  /* HZ */
+	/* HZ */
 	boot_params.nucleos_kludge.system_hz = HZ;
 
 	/* processor */
@@ -491,31 +485,30 @@ void get_parameters(void)
 		boot_params.nucleos_kludge.pc_at = 1;
 
 	/* video */
-	u32 vid = get_video();
+	vid = get_video();
 	if (vid == 2 || vid == 3)
 		boot_params.nucleos_kludge.vdu_ega = 1;
 	else
 		boot_params.nucleos_kludge.vdu_vga = 1;
 
+	/* memory */
+	params[0]= 0;
 
-  /* memory */
-  params[0]= 0;
+	for (mp = mem; mp < arraylimit(mem); mp++) {
+		if (mp->size == 0)
+			continue;
 
-  for (mp= mem; mp < arraylimit(mem); mp++) {
-    if (mp->size == 0)
-      continue;
+		if (params[0] != 0)
+			strcat(params, ",");
 
-    if (params[0] != 0) 
-      strcat(params, ",");
+		strcat(params, ul2a(mp->base, 0x10));
+		strcat(params, ":");
+		strcat(params, ul2a(mp->size, 0x10));
+	}
 
-    strcat(params, ul2a(mp->base, 0x10));
-    strcat(params, ":");
-    strcat(params, ul2a(mp->size, 0x10));
-  }
+	b_setvar(E_SPECIAL|E_VAR, "memory", params);
 
-  b_setvar(E_SPECIAL|E_VAR, "memory", params);
-
-  return;
+	return;
 }
 
 int numprefix(char *s, char **ps)
