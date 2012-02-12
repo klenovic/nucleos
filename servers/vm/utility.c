@@ -24,7 +24,6 @@
 #include <kernel/const.h>
 #include <kernel/types.h>
 #include <kernel/proc.h>
-#include <asm/bootparam.h>
 #include <asm/kernel/const.h>
 #include <asm/servers/vm/memory.h>
 
@@ -58,12 +57,11 @@ void get_mem_chunks(struct memory *mem_chunks)
 	int i;
 	struct memory *memp;
 
-	/* Obtain and parse memory from system environment. */
-	if(env_memory_parse(mem_chunks, NR_MEMS) != 0) 
-		vm_panic("couldn't obtain memory chunks", NO_NUM);
-
 	/* Round physical memory to clicks. Round start up, round end down. */
 	for (i = 0; i < NR_MEMS; i++) {
+		if (!mem_chunks[i].size)
+			continue;
+
 		memp = &mem_chunks[i];	/* next mem chunk is stored here */
 		base = mem_chunks[i].base;
 		size = mem_chunks[i].size;
@@ -131,8 +129,6 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 }
 
 #ifndef CONFIG_BUILTIN_INITRD
-static struct boot_params bootparam;
-
 /* @brief Remove initial ramdisk from the free memory list.
  * @param mem_chunks  list of memory chunks
  * @return 0 on success or -ENXIO on failure
@@ -140,7 +136,8 @@ static struct boot_params bootparam;
  *          boot monitor. It is very important to reserve initrd memory
  *          right after the boot image was reserved.
  */
-int reserve_initrd_mem(struct memory *mem_chunks)
+int reserve_initrd_mem(struct memory *mem_chunks, phys_bytes ramdisk_image,
+		       phys_bytes ramdisk_size)
 {
 	int s;
 	static int found = 0;
@@ -152,15 +149,10 @@ int reserve_initrd_mem(struct memory *mem_chunks)
 	if (found)
 		return 0;
 
-	/* The initrd is put right after boot image */
-	if ((s = sys_getbootparam(&bootparam)) != 0) {
-		panic("VM","Couldn't get boot parameters!",s);
-	}
-
-	initrd_base_clicks = (bootparam.hdr.ramdisk_image >> CLICK_SHIFT);
+	initrd_base_clicks = (ramdisk_image >> CLICK_SHIFT);
 
 	/* Round up the reserved memory */
-	initrd_size_clicks = ((bootparam.hdr.ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
+	initrd_size_clicks = ((ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
 
 	/* Fake the initrd as process with text_base = data_base,
 	 * stack_base = text_base + text_size and stack_size = 0

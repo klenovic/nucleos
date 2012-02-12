@@ -446,7 +446,7 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 }
 
 /* Avoid multi-spaces here */
-char *cmdline = "rootdev=769 ramimagedev=769 memory=800:94A40,100000:FF00000";
+char *cmdline = "rootdev=769 ramimagedev=769";
 
 static char cmd_line_params[COMMAND_LINE_SIZE];
 static int cmdline_len = 0;

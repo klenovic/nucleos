@@ -54,12 +54,7 @@ u32_t runsize;   /* Size of this program. */
 
 u16_t device;    /* Drive being booted from. */
 
-typedef struct {		/* One chunk of free memory. */
-	u32_t	base;		/* Start byte. */
-	u32_t	size;		/* Number of bytes. */
-} memory;
-
-memory mem[3];		/* List of available memory. */
+struct memory mem[NR_MEMS];	/* List of available memory. */
 
 typedef struct bios_env
 {

@@ -11,6 +11,7 @@
 #define _ASM_X86_BOOTPARAM_H
 
 #include <nucleos/types.h>
+#include <nucleos/type.h>
 #include <nucleos/screen_info.h>
 #include <nucleos/apm_bios.h>
 #include <nucleos/edd.h>
@@ -112,6 +113,7 @@ struct nucleos_boot_kludge {
 	u32 processor;
 	u32 kimage_aout_headers;
 	u8 no_apic;
+	struct memory mem[NR_MEMS];
 } __attribute__((packed));
 
 
@@ -143,7 +145,7 @@ struct boot_params {
 	__u8  _pad8[48];				/* 0xcd0 */
 	struct edd_info eddbuf[EDDMAXNR];		/* 0xd00 */
 	struct nucleos_boot_kludge nucleos_kludge;	/* 0xeec */
-	__u8  _pad9[256];				/* 0xf00 */
+	__u8  _pad9[0x1000 - 0xeec - sizeof(struct nucleos_boot_kludge)];
 } __attribute__((packed));
 
 enum {
