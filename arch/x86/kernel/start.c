@@ -162,8 +162,6 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 		config_no_apic = 0;
 #endif
 
-	__kimage_aout_headers = boot_params.nucleos_kludge.aout_hdrs_addr;
-
 	/* clear the buffer */
 	memset(cmd_line_params_str, 0, COMMAND_LINE_SIZE);
 

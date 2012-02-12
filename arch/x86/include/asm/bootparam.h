@@ -155,9 +155,4 @@ enum {
 	X86_NR_SUBARCHS,
 };
 
-#ifdef __KERNEL__
-/* address of a.out headers */
-u32 __kimage_aout_headers;
-#endif /* __KERNEL__ */
-
 #endif /* _ASM_X86_BOOTPARAM_H */
