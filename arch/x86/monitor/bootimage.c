@@ -32,7 +32,6 @@
 #include <asm/setup.h>
 
 #include "rawfs.h"
-#include "image.h"
 #include "boot.h"
 
 /* Align a to a multiple of n (a power of 2): */
@@ -66,12 +65,20 @@ static int block_size = 0;
 static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
 static int serial_line = -1;
 
-struct process {  /* Per-process memory adresses. */
+/* Per-process memory adresses. */
+struct process {
 	u32 entry;	/* Entry point. */
 	u32 cs;		/* Code segment. */
 	u32 ds;		/* Data segment. */
 	u32 data;	/* Data start */
 	u32 end;	/* End of this process, size = (end - cs). */
+};
+
+#define IM_NAME_MAX 63
+
+struct image_header {
+	char name[IM_NAME_MAX + 1];	/* Null terminated. */
+	struct exec process;
 };
 
 static struct process procs[MAX_IMG_PROCS_COUNT];
