@@ -1,4 +1,6 @@
 # Create image from executables (kernel & servers)
+hostprogs-y := tools/build
+
 # NOTE: KEEP THE ORDER AS IN kernel/kernel-syms.c!
 bin-y := arch/$(SRCARCH)/kernel/kernel
 bin-y += servers/pm/pm
@@ -25,7 +27,7 @@ define rule_create_image
 endef
 
 # create final image from kernel and servers
-$(src)/image: scripts/tools/mkimage
+$(src)/image: $(obj)/tools/build scripts/tools/mkimage
 $(src)/image: $(bin-y) FORCE
 	$(call if_changed_rule,create_image)
 
