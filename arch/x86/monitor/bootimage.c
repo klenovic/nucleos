@@ -63,7 +63,6 @@
 
 static int block_size = 0;
 static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
-static int serial_line = -1;
 
 /* Per-process memory adresses. */
 struct process {
@@ -500,13 +499,6 @@ int boot_nucleos(void)
 	kimage_addr = align(kimage_addr, PAGE_SIZE);
 
 	limit = mem[1].base + mem[1].size;
-
-	if (serial_line >= 0) {
-		char linename[2];
-		linename[0] = serial_line + '0';
-		linename[1] = '\0';
-		b_setvar(E_VAR, SERVARNAME, linename);
-	}
 
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
