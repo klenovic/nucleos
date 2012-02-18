@@ -529,119 +529,130 @@ dev_t name2dev(char *name)
  * what device to boot without interpreting device numbers.
  */
 {
-  dev_t dev;
-  ino_t ino;
-  struct stat st;
-  char *n, *s;
+	dev_t dev;
+	ino_t ino;
+	struct stat st;
+	char *n, *s;
 
-  /* "boot *d0p2" means: make partition 2 active before you boot it. */
-  if ((activate= (name[0] == '*'))) name++;
+	/* "boot *d0p2" means: make partition 2 active before you boot it. */
+	if ((activate = (name[0] == '*'))) name++;
 
-  /* The special name "bootdev" must be translated to the boot device. */
-  if (strcmp(name, "bootdev") == 0) {
-    if (bootdev.device == -1) {
-      printf("The boot device could not be named\n");
-      errno= 0;
-      return -1;
-    }
-    name= bootdev.name;
-  }
+	/* The special name "bootdev" must be translated to the boot device. */
+	if (strcmp(name, "bootdev") == 0) {
+		if (bootdev.device == -1) {
+			printf("The boot device could not be named\n");
+			errno = 0;
+			return -1;
+		}
 
-  /* If our boot device doesn't have a file system, or we want to know
-   * what a name means for the BIOS, then we need to interpret the
-   * device name ourselves: "fd" = floppy, "c0d0" = hard disk, etc.
-   */
-  tmpdev.device= tmpdev.primary= tmpdev.secondary= -1;
-  dev= -1;
-  n= name;
-  if (strncmp(n, "/dev/", 5) == 0) n+= 5;
+		name = bootdev.name;
+	}
 
-  if (strcmp(n, "ram") == 0) {
-    dev= DEV_RAM;
-  } else
-  if (n[0] == 'f' && n[1] == 'd' && numeric(n+2)) {
-    /* Floppy. */
-    tmpdev.device= a2l(n+2);
-    dev= DEV_FD0 + tmpdev.device;
-  } else
-  if ((n[0] == 'h' || n[0] == 's') && n[1] == 'd' && numprefix(n+2, &s)
-    && (*s == 0 || (between('a', *s, 'd') && s[1] == 0))
-  ) {
-    /* Old style hard disk (backwards compatibility.) */
-    dev= a2l(n+2);
-    tmpdev.device= dev / (1 + NR_PARTITIONS);
-    tmpdev.primary= (dev % (1 + NR_PARTITIONS)) - 1;
-    if (*s != 0) {
-      /* Subpartition. */
-      tmpdev.secondary= *s - 'a';
-      dev= minor_p0s0
-        + (tmpdev.device * NR_PARTITIONS
-          + tmpdev.primary) * NR_PARTITIONS
-        + tmpdev.secondary;
-    }
-    tmpdev.device+= 0x80;
-    dev+= n[0] == 'h' ? dev_cNd0[0] : dev_cNd0[2];
-  } else {
-    /* Hard disk. */
-    int ctrlr= 0;
+	/* If our boot device doesn't have a file system, or we want to know
+	 * what a name means for the BIOS, then we need to interpret the
+	 * device name ourselves: "fd" = floppy, "c0d0" = hard disk, etc.
+	 */
+	tmpdev.device = tmpdev.primary = tmpdev.secondary = -1;
+	dev = -1;
+	n = name;
 
-    if (n[0] == 'c' && between('0', n[1], '4')) {
-      ctrlr= (n[1] - '0');
-      tmpdev.device= 0;
-      n+= 2;
-    }
-    if (n[0] == 'd' && between('0', n[1], '7')) {
-      tmpdev.device= (n[1] - '0');
-      n+= 2;
-      if (n[0] == 'p' && between('0', n[1], '3')) {
-        tmpdev.primary= (n[1] - '0');
-        n+= 2;
-        if (n[0] == 's' && between('0', n[1], '3')) {
-          tmpdev.secondary= (n[1] - '0');
-          n+= 2;
-        }
-      }
-    }
-    if (*n == 0) {
-      dev= dev_cNd0[ctrlr];
-      if (tmpdev.secondary < 0) {
-        dev += tmpdev.device * (NR_PARTITIONS+1)
-          + (tmpdev.primary + 1);
-      } else {
-        dev += minor_p0s0
-          + (tmpdev.device * NR_PARTITIONS
-              + tmpdev.primary) * NR_PARTITIONS
-          + tmpdev.secondary;
-      }
-      tmpdev.device+= 0x80;
-    }
-  }
+	if (strncmp(n, "/dev/", 5) == 0)
+		n += 5;
 
-  /* Look the name up on the boot device for the UNIX device number. */
-  if (fsok == -1) fsok= r_super(&block_size) != 0;
-  if (fsok) {
-    /* The current working directory is "/dev". */
-    ino= r_lookup(r_lookup(ROOT_INO, "dev"), name);
+	if (strcmp(n, "ram") == 0) {
+		dev = DEV_RAM;
+	} else if (n[0] == 'f' && n[1] == 'd' && numeric(n+2)) {
+		/* Floppy. */
+		tmpdev.device = a2l(n+2);
+		dev = DEV_FD0 + tmpdev.device;
+	} else  if ((n[0] == 'h' || n[0] == 's') && n[1] == 'd' &&
+		    numprefix(n+2, &s) && (*s == 0 ||
+		    (between('a', *s, 'd') && s[1] == 0))) {
+		/* Old style hard disk (backwards compatibility.) */
+		dev = a2l(n+2);
+		tmpdev.device = dev / (1 + NR_PARTITIONS);
+		tmpdev.primary = (dev % (1 + NR_PARTITIONS)) - 1;
 
-    if (ino != 0) {
-      /* Name has been found, extract the device number. */
-      r_stat(ino, &st);
-      if (!S_ISBLK(st.st_mode)) {
-        printf("%s is not a block device\n", name);
-        errno= 0;
-        return (dev_t) -1;
-      }
-      dev= st.st_rdev;
-    }
-  }
+		if (*s != 0) {
+			/* Subpartition. */
+			tmpdev.secondary = *s - 'a';
+			dev = minor_p0s0 + (tmpdev.device * NR_PARTITIONS +
+			      tmpdev.primary) * NR_PARTITIONS + tmpdev.secondary;
+		}
 
-  if (tmpdev.primary < 0) activate= 0;    /* Careful now! */
+		tmpdev.device += 0x80;
+		dev += n[0] == 'h' ? dev_cNd0[0] : dev_cNd0[2];
+	} else {
+		/* Hard disk. */
+		int ctrlr = 0;
 
-  if (dev == -1) {
-    printf("Can't recognize '%s' as a device\n", name);
-    errno= 0;
-  }
-  return dev;
+		if (n[0] == 'c' && between('0', n[1], '4')) {
+			ctrlr= (n[1] - '0');
+			tmpdev.device= 0;
+			n += 2;
+		}
+
+		if (n[0] == 'd' && between('0', n[1], '7')) {
+			tmpdev.device= (n[1] - '0');
+			n += 2;
+
+			if (n[0] == 'p' && between('0', n[1], '3')) {
+				tmpdev.primary= (n[1] - '0');
+				n += 2;
+
+				if (n[0] == 's' && between('0', n[1], '3')) {
+					tmpdev.secondary = (n[1] - '0');
+					n += 2;
+				}
+			}
+		}
+
+		if (*n == 0) {
+			dev = dev_cNd0[ctrlr];
+			if (tmpdev.secondary < 0) {
+				dev += tmpdev.device * (NR_PARTITIONS+1) +
+				       (tmpdev.primary + 1);
+			} else {
+				dev += minor_p0s0 + (tmpdev.device * NR_PARTITIONS +
+				       tmpdev.primary) * NR_PARTITIONS + tmpdev.secondary;
+			}
+
+			tmpdev.device += 0x80;
+		}
+	}
+
+	/* Look the name up on the boot device for the UNIX device number. */
+	if (fsok == -1)
+		fsok = r_super(&block_size) != 0;
+
+	if (fsok) {
+		/* The current working directory is "/dev". */
+		ino = r_lookup(r_lookup(ROOT_INO, "dev"), name);
+
+		if (ino != 0) {
+			/* Name has been found, extract the device number. */
+			r_stat(ino, &st);
+
+			if (!S_ISBLK(st.st_mode)) {
+				printf("%s is not a block device\n", name);
+				errno = 0;
+
+				return (dev_t) -1;
+			}
+
+			dev = st.st_rdev;
+		}
+	}
+
+	if (tmpdev.primary < 0)
+		activate = 0;	/* Careful now! */
+
+	if (dev == -1) {
+		printf("Can't recognize '%s' as a device\n", name);
+		errno = 0;
+	}
+
+	return dev;
 }
 
 void boot(void)
