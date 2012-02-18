@@ -26,7 +26,7 @@ static void tell(int fd, ...)
 	char *s;
 
 	va_start(ap, fd);
-	while ((s= va_arg(ap, char *)) != 0) {
+	while ((s = va_arg(ap, char *)) != 0) {
 		(void) write(fd, s, strlen(s));
 	}
 
@@ -55,15 +55,15 @@ int main(int argc, char **argv)
 
 	do {
 		if (i < argc) {
-			sysgetenv.key= argv[i];
-			sysgetenv.keylen= strlen(sysgetenv.key) + 1;
+			sysgetenv.key = argv[i];
+			sysgetenv.keylen = strlen(sysgetenv.key) + 1;
 		} else {
-			sysgetenv.key= 0;
-			sysgetenv.keylen= 0;
+			sysgetenv.key = 0;
+			sysgetenv.keylen = 0;
 		}
 
-		sysgetenv.val= val;
-		sysgetenv.vallen= sizeof(val);
+		sysgetenv.val = buf;
+		sysgetenv.vallen = sizeof(buf);
 
 		if (svrctl(MMGETPARAM, &sysgetenv) == -1) {
 			if (errno == ESRCH) {
