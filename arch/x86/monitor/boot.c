@@ -461,10 +461,6 @@ void get_parameters(void)
 	int processor;
 	int vid;
 
-	/* Variables that Minix needs: */
-	b_setvar(E_SPECIAL|E_VAR|E_DEV, "rootdev", "c0d0p0");
-	b_setvar(E_SPECIAL|E_VAR|E_DEV, "ramimagedev", "c0d0p0");
-
 	/* HZ */
 	boot_params.nucleos_kludge.system_hz = HZ;
 
