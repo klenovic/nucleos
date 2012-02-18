@@ -20,6 +20,8 @@
 #include <nucleos/string.h>
 #include <asm/ioctls.h>
 
+static char buf[1024];
+
 static void tell(int fd, ...)
 {
 	va_list ap;
@@ -39,7 +41,7 @@ int main(int argc, char **argv)
 	int i = 1;
 	int ex = 0;
 	char *e;
-	char val[1024];
+
 
 	while (i < argc && argv[i][0] == '-') {
 		char *opt = argv[i++] + 1;
