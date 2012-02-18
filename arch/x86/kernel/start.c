@@ -45,8 +45,9 @@ static char *get_value(const char *params, const char *name)
 	return 0;
 }
 
-extern void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params);
 extern struct setup_header hdr;
+
+extern void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params);
 extern void arch_copy_cmdline_params(char *cmdline_buf, struct boot_params *params);
 extern void arch_copy_aout_headers(struct boot_params *params);
 
