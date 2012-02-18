@@ -27,12 +27,6 @@
 	.set A_TOTAL,	24
 	.set A_HDRLEN,	__HDRLEN__ 	// header length
 
-// Imported variables and functions:
-.extern caddr, daddr, runsize, edata, end      // Runtime environment
-.extern device                                 // BIOS device number
-.extern rem_part                               // To pass partition info
-.extern mem                                    // Free memory list
-
 // Set segment registers and stack pointer using the programs own header//
 // The header is either 32 bytes (short form) or 48 bytes (long form).  The
 // bootblock will jump to address 0x10030 in both cases, calling one of the
