@@ -7,12 +7,8 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-#ifndef __ARCH_X86_BOOT_BOOT_H
-#define __ARCH_X86_BOOT_BOOT_H
-
-#ifndef DEBUG
-#define DEBUG 0
-#endif
+#ifndef _ARCH_X86_BOOT_BOOT_H
+#define _ARCH_X86_BOOT_BOOT_H
 
 /* Constants describing the metal: */
 
@@ -151,11 +147,6 @@ typedef struct environment {
 
 environment *env;/* Lists the environment. */
 
-/* Get/set the value of a variable. */
-char *b_value(char *name);
-int b_setvar(int flags, char *name, char *value);
-void b_unset(char *name);
-
 extern int fsok;	/* True if the boot device contains an VFS_PROC_NR. */
 struct boot_params boot_params;
 
@@ -191,4 +182,4 @@ char *unix_err(int err);
 
 void readblock(off_t, char *, int);
 void delay(char *);
-#endif /* __ARCH_X86_BOOT_BOOT_H */
+#endif /* _ARCH_X86_BOOT_BOOT_H */

@@ -2,7 +2,7 @@
 ### boot aka boot monitor
 app-y      += boot.elf32
 boot.elf32-obj-y := boot.o boothead.o bootimage.o bootutils.o rawfs.o \
-	            errno.o malloc.o printf.o
+	            errno.o printf.o
 
 BOOT_ORG    = 0x0000
 BOOT_ENTRY  = bootcode_entry

@@ -301,110 +301,6 @@ void initialize(void)
     vid_mem_size = EGA_SIZE;
 }
 
-void sfree(char *s)
-/* Free a non-null string. */
-{
-  if (s != 0) free(s);
-}
-
-char *copystr(char *s)
-/* Copy a non-null string using malloc. */
-{
-  char *c;
-
-  if (*s == 0)
-     return "";
-
-  c = malloc((strlen(s) + 1) * sizeof(char));
-  strcpy(c, s);
-
-  return c;
-}
-
-int is_default(environment *e)
-{
-  return (e->flags & E_SPECIAL) && e->defval == 0;
-}
-
-environment** searchenv(char *name)
-{
-  environment **aenv= &env;
-
-  while (*aenv != 0 && strcmp((*aenv)->name, name) != 0) {
-    aenv= &(*aenv)->next;
-  }
-
-  return aenv;
-}
-
-#define b_getenv(name)  (*searchenv(name))
-/* Return the environment *structure* belonging to name, or 0 if not found. */
-
-char *b_value(char *name)
-/* The value of a variable. */
-{
-  environment *e= b_getenv(name);
-
-  return e == 0 || !(e->flags & E_VAR) ? 0 : e->value;
-}
-
-char *b_body(char *name)
-/* The value of a function. */
-{
-  environment *e= b_getenv(name);
-
-  return e == 0 || !(e->flags & E_FUNCTION) ? 0 : e->value;
-}
-
-int b_setenv(int flags, char *name, char *arg, char *value)
-/* Change the value of an environment variable.  Returns the flags of the
- * variable if you are not allowed to change it, 0 otherwise.
- */
-{
-  environment **aenv, *e;
-
-  if (*(aenv= searchenv(name)) == 0) {
-    e = malloc(sizeof(*e));
-    e->name = copystr(name);
-    e->flags = flags;
-    e->defval = 0;
-    e->next = 0;
-    *aenv = e;
-  } else {
-    e= *aenv;
-
-    /* Don't change special variables to functions or vv. */
-    if (e->flags & E_SPECIAL
-      && (e->flags & E_FUNCTION) != (flags & E_FUNCTION)
-    ) return e->flags;
-
-    e->flags = (e->flags & E_STICKY) | flags;
-    if (is_default(e)) {
-      e->defval = e->value;
-    } else {
-      sfree(e->value);
-    }
-    sfree(e->arg);
-  }
-
-  e->arg = copystr(arg);
-  e->value = copystr(value);
-
-  return 0;
-}
-
-int b_setvar(int flags, char *name, char *value)
-/* Set variable or simple function. */
-{
-  int r;
-
-  if((r=b_setenv(flags, name, "", value))) {
-    return r;
-  }
-
-  return r;
-}
-
 long a2l(char *a)
 /* Cheap atol(). */
 {
@@ -531,7 +427,8 @@ dev_t name2dev(char *name)
 	char *n, *s;
 
 	/* "boot *d0p2" means: make partition 2 active before you boot it. */
-	if ((activate = (name[0] == '*'))) name++;
+	if ((activate = (name[0] == '*')))
+		name++;
 
 	/* The special name "bootdev" must be translated to the boot device. */
 	if (strcmp(name, "bootdev") == 0) {
