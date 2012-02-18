@@ -558,7 +558,14 @@ int boot_nucleos(void)
 	for (j = 0; j < cmdline_len; j++)
 		if (cmd_line_params[j] == ' ')
 			cmd_line_params[j] = 0;
-
+#if 0
+int i=0;
+for (i=0; i<150; i++)
+	if (cmd_line_params[i] != 0)
+		putch(cmd_line_params[i]);
+	else
+		putch(' ');
+#endif
 	/* fill the header */
 	u32 cmd_line_params_addr = (u32)mon2abs(cmd_line_params);
 	raw_copy(kimage_addr + offsetof(struct setup_header, cmd_line_ptr) + 0x1f1,

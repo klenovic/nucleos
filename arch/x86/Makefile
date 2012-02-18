@@ -42,7 +42,6 @@ KBUILD_CFLAGS += -pipe
 
 core-y += arch/$(SRCARCH)/kernel/
 core-y += arch/$(SRCARCH)/servers/
-core-y += arch/$(SRCARCH)/monitor/
 core-y += arch/$(SRCARCH)/boot/
 libs-y += arch/$(SRCARCH)/lib/
 
