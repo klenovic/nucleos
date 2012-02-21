@@ -421,14 +421,6 @@ void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params)
 	phys_copy(vir2phys(params), real_mode_params, sizeof(struct boot_params));
 }
 
-int arch_get_params(char *params, int maxsize)
-{
-	phys_copy(vir2phys(params),seg2phys(mon_ds) + params_offset,
-		MIN(maxsize, params_size));
-	params[maxsize-1] = '\0';
-	return 0;
-}
-
 void arch_do_syscall(struct proc *proc)
 {
 	/* Perform a previously postponed system call. */
