@@ -7,39 +7,16 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-/*      bootimage.c - Load an image and start it.       Author: Kees J. Bot
- *                    19 Jan 1992
- */
-#include <stdlib.h>
-#include <stdio.h>
-#include <nucleos/stddef.h>
 #include <nucleos/types.h>
-#include <nucleos/stat.h>
-#include <nucleos/limits.h>
 #include <nucleos/string.h>
-#include <nucleos/errno.h>
 #include <nucleos/a.out.h>
-#include <nucleos/const.h>
-#include <nucleos/type.h>
-#include <nucleos/syslib.h>
-#include <nucleos/tty.h>
-#include <nucleos/video.h>
-#include <kernel/const.h>
-#include <kernel/types.h>
-#include <ibm/partition.h>
 #include <asm/page_types.h>
 #include <asm/bootparam.h>
 #include <asm/setup.h>
-
-#include "rawfs.h"
 #include "boot.h"
 
 /* Align a to a multiple of n (a power of 2): */
 #define align(a, n)	(((u32_t)(a) + ((u32_t)(n) - 1)) & (~((u32_t)(n) - 1)))
-
-/* Check VFS_PROC_NR magic */
-#define SUPER_V3_MAGIC         0x4d5a
-#define SUPER_V3_MAGIC_OFFSET  0x418
 
 /* Magic numbers in process' data space. */
 #define MAGIC_OFF	0       /* Offset of magic # in data seg. */
@@ -59,12 +36,6 @@
 
 /* Data about the different processes. */
 #define KERNEL_IDX	0       /* The first process is the kernel. */
-#define KERNEL_IMAGE_PATH	"/boot/image"
-
-#if 0
-static int block_size = 0;
-static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
-#endif
 
 /* Per-process memory adresses. */
 struct process {
@@ -108,219 +79,6 @@ static void raw_clear(u32_t addr, u32_t count)
 		zct*= 2;
 	}
 }
-
-#if 0
-/* Translate a virtual sector number to an absolute disk sector. */
-static u32_t file_vir2sec(u32_t vsec)
-{
-	off_t blk;
-
-	if(!block_size)
-		return -1;
-
-	if ((blk = r_vir2abs(vsec / RATIO(block_size))) == -1)
-		return -1;
-
-	return blk == 0 ? 0 : lowsec + blk * RATIO(block_size) + vsec % RATIO(block_size);
-}
-
-static char *get_sector(u32_t vsec)
-/* Read a sector "vsec" from the image into memory and return its address.
- * Return null on error.
- */
-{
-	u32_t sec;
-	int r;
-
-	static char buf[SECTOR_SIZE];
-	static size_t count;      /* Number of sectors in the buffer. */
-	static u32_t bufsec;      /* First Sector now in the buffer. */
-
-	/* First sector; initialize. */
-	if (vsec == 0)
-		count = 0;
-
-	if ((sec = (*vir2sec)(vsec)) == -1)
-		return 0;
-
-	if (sec == 0) {
-		/* A hole. */
-		count = 0;
-		memset(buf, 0, SECTOR_SIZE);
-		return buf;
-	}
-
-	/* Can we return a sector from the buffer? */
-	if ((sec - bufsec) < count)
-		return buf + ((size_t) (sec - bufsec) << SECTOR_SHIFT);
-
-	/* Not in the buffer. */
-	count = 1;
-	bufsec = sec;
-
-	do {
-		if (dev_boundary(bufsec + count))
-			break;
-
-		if ((sec = (*vir2sec)(++vsec)) == -1)
-			break;
-
-		/* Consecutive? */
-		if (sec != bufsec + count)
-			break;
-	} while (0);
-
-	/* Actually read the sectors. */
-	if ((r = readsectors(mon2abs(buf), bufsec, count)) != 0) {
-		readerr(bufsec, r);
-		count = 0;
-		return 0;
-	}
-
-	return buf;
-}
-
-/* select/check given  initrd path*/
-static unsigned long select_initrd(char* initrd)
-{
-	ino_t initrd_ino;
-	struct stat st;
-	unsigned long size;
-
-	fsok = (r_super(&block_size) != 0);
-	initrd_ino = r_lookup(ROOT_INO, initrd);
-
-	if (!fsok || !initrd_ino) {
-		printf("error: initrd %s: %s\n", initrd, unix_err(errno));
-		return 0;
-	}
-
-	r_stat(initrd_ino, &st);
-
-	vir2sec = file_vir2sec;
-	if (vir2sec < 0) {
-		printf("Bad block size or unsuspected EOF\n");
-		return 0;
-	}
-
-	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
-
-	return size;
-}
-
-/* Load the initial ramdisk at absolute address */
-static int load_initrd(char* initrd, unsigned long load_addr)
-{
-	struct exec initrd_hdr;
-	unsigned long initrd_base = 0;
-	long initrd_size = 0;
-	int nvsec = 0;
-	unsigned short super_v3_magic = 0;
-	int j=0;
-	char* buf = 0;
-
-	printf("Loading initrd %s at 0x%x ...", initrd, load_addr);
-
-	if ((nvsec = select_initrd(initrd)) > 0) {
-		buf = get_sector(0);
-
-		if (!buf) {
-			printf("error: can't get sector (%s)\n", initrd);
-			return -1;
-		}
-
-		/* For header check */
-		memcpy(&initrd_hdr, buf, sizeof(initrd_hdr));
-
-		/* Finish if not aout or not an image */
-		if (BADMAG(initrd_hdr) || !(initrd_hdr.a_flags & A_IMG)) {
-			printf("error: bad header (%s)\n", initrd);
-			return -1;
-		}
-
-		initrd_base = load_addr;
-		initrd_size = initrd_hdr.a_data;
-
-		/* Clear the area where initrd will be placed. */
-		raw_clear(initrd_base, initrd_size);
-
-		/* Copy first sector but skip the header */
-		raw_copy(initrd_base, mon2abs(get_sector(0) + initrd_hdr.a_hdrlen), SECTOR_SIZE - initrd_hdr.a_hdrlen);
-
-		for (j=1; j<nvsec; j++) {
-			raw_copy(initrd_base + (j*SECTOR_SIZE - initrd_hdr.a_hdrlen),
-				 mon2abs(get_sector(j)), SECTOR_SIZE);
-		}
-
-		/* We will get from extented memroy */
-		raw_copy(mon2abs(&super_v3_magic), initrd_base + SUPER_V3_MAGIC_OFFSET, 2);
-
-		if (super_v3_magic != SUPER_V3_MAGIC) {
-			printf("error: Can't find MINIX3 super magic (%s)\n", initrd);
-			return -1;
-		}
-
-		printf("done\n");
-	} else {
-		printf("error: can't load initrd\n");
-		return -1;
-	}
-
-	return 0;
-}
-
-/* select/check given  initrd path*/
-static unsigned long select_kimage(char* kimage)
-{
-	ino_t kimage_ino;
-	struct stat st;
-	unsigned long size;
-
-	fsok = (r_super(&block_size) != 0);
-	kimage_ino = r_lookup(ROOT_INO, kimage);
-
-	if (!fsok || !kimage_ino) {
-		printf("error: kernel image %s: %s\n", kimage, unix_err(errno));
-		return 0;
-	}
-
-	r_stat(kimage_ino, &st);
-
-	vir2sec = file_vir2sec;
-	if (vir2sec < 0) {
-		printf("Bad block size or unsuspected EOF\n");
-		return 0;
-	}
-
-	size = (st.st_size + SECTOR_SIZE - 1) >> SECTOR_SHIFT;
-
-	return (size * SECTOR_SIZE);
-}
-
-static int load_kimage(char* kimage, u32 load_addr, u32 kimage_size, u32 limit)
-{
-	int nvsec = kimage_size/SECTOR_SIZE;
-	int i = 0;
-
-	printf("Loading kernel image '%s' at 0x%x (size %dKiB)...", kimage, load_addr, kimage_size/1024);
-
-	/* Clear the area where initrd will be placed. */
-	raw_clear(load_addr, kimage_size);
-
-	for (i = 0; i < nvsec; i++) {
-		char *buf = get_sector(i);
-
-		if (!buf)
-			return -1;
-
-		raw_copy(load_addr + i*SECTOR_SIZE, mon2abs(buf), SECTOR_SIZE);
-	}
-
-	printf("done\n");
-
-	return 0;
-}
-#endif
 
 static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 				 u8 *aout_hdrs_buf, struct process *procs)
@@ -455,12 +213,6 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	return kernel_space_end;
 }
 
-/* Avoid multi-spaces here */
-#if 0
-char *cmdline = "rootdev=/dev/c0d0p0 ramimagedev=/dev/c0d0p0";
-static int cmdline_len = 0;
-#endif
-
 static char cmd_line_params[COMMAND_LINE_SIZE];
 
 static int exec_image(struct process *procs)
@@ -493,11 +245,7 @@ int boot_nucleos(void)
 	u32 kimage_size;
 	u32 limit;
 	u32 kernel_end;
-#if 0
-	kimage_name = KERNEL_IMAGE_PATH;
-	if ((kimage_size = select_kimage(kimage_name)) == 0)
-		return -1;
-#endif
+
 	/* Load the image into this memory block. This should be
 	 * above 1M and the code should run in protected mode.
 	 */
@@ -508,13 +256,7 @@ int boot_nucleos(void)
 
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
-#if 0
-	if (load_kimage(kimage_name, kimage_addr, kimage_size, limit) < 0) {
-		printf("Can't load kernel image %s at 0x%x, (size: %dKiB)\n",
-		       kimage_name, kimage_addr, kimage_size/1024);
-		return -1;
-	}
-#endif
+
 	/* hdr.syssize filled by build.c */
 	kimage_size = hdr.syssize;
 	kimage_size = kimage_size * 16 - 4;
@@ -524,66 +266,12 @@ int boot_nucleos(void)
 		printf("Couldn't unpack the kernel!\n");
 		return -1;
 	}
-#if 0
-	/* Check whether we are loading kernel with memory which has builtin initrd. */
-	u32 ramdisk_image = kernel_end;
 
-	/* The select_initrd() returns number of sectors. Skip the sector with a header. */
-	u32 ramdisk_size = (select_initrd(INITRD) - 1) * SECTOR_SIZE;
-
-	if (ramdisk_size) {
-		if (load_initrd(INITRD, ramdisk_image) < 0)
-			return -1;
-
-		/* fill the header */
-		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_image) + 0x1f1,
-			 mon2abs(&ramdisk_image), sizeof(ramdisk_image));
-
-		raw_copy(kimage_addr + offsetof(struct setup_header, ramdisk_size) + 0x1f1,
-			 mon2abs(&ramdisk_size), sizeof(ramdisk_size));
-	} else {
-		printf("Ramdisk not found.\n");
-	}
-
-	/* Close the disk. */
-	dev_close();
-#endif
 	/* Setup command-line for kernel */
 	memset(cmd_line_params, 0, COMMAND_LINE_SIZE);
 
-#if 0
-	/* Add static command-line string. The 2 trailing zeros indicates the
-	 * end of command line.
-	 */
-	if (strlen(cmd_line_params) > COMMAND_LINE_SIZE - 2)
-		return -1;
-
-	memcpy(cmd_line_params, cmdline, strlen(cmdline));
-	cmdline_len = strlen(cmd_line_params);
-#endif
-
 	/* add aout headers address */
 	boot_params.nucleos_kludge.aout_hdrs_addr = mon2abs(aout_hdrs_buf);
-
-#if 0
-	/* Translate the command-line for kernel. DON'T ADD ANY NEW OPTIONS */
-	int j = 0;
-	for (j = 0; j < cmdline_len; j++)
-		if (cmd_line_params[j] == ' ')
-			cmd_line_params[j] = 0;
-
-int i=0;
-for (i=0; i<150; i++)
-	if (cmd_line_params[i] != 0)
-		putch(cmd_line_params[i]);
-	else
-		putch(' ');
-
-	/* fill the header */
-	u32 cmd_line_params_addr = (u32)mon2abs(cmd_line_params);
-	raw_copy(kimage_addr + offsetof(struct setup_header, cmd_line_ptr) + 0x1f1,
-		 mon2abs(&cmd_line_params_addr), sizeof(&cmd_line_params_addr));
-#endif
 
 	/* save header into boot parameters */
 	memcpy(&boot_params.hdr, &hdr, sizeof(hdr));

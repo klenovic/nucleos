@@ -236,66 +236,6 @@ copydone:
 	pop	%bp
 	ret
 
-// u16_t get_word(u32_t addr);
-// void put_word(u32_t addr, u16_t word);
-//       Read or write a 16 bits word at an arbitrary location.
-/*
-	---> stack grows --->
-	------------+---2b----+----2b----+-2b-+-2b--+
-	stack minix | addrH   |   addrL  | RA | %bx |
-	------------+---------+----------+----+-----+
-	  offset    |         8          4    2     0
-
-	------------+---2b----+----2b----+-4b-+-2b--+
-	stack minix | addrH   |   addrL  | RA | %bx |
-	------------+---------+----------+----+-----+
-	  offset    |         8          6    2     0
- */
-.globl get_word
-get_word:
-	push	%bx
-	mov	%sp, %bx
-	call	gp_getaddr     // this puts 4 byte RA in case of .code16gcc
-	mov	%ds:(%bx), %ax // Word to get from addr
-	jmp	gp_ret
-
-/*
-	---> stack grows --->
-	------------+---2b----+----2b----+----2b----+-2b-+-2b--+
-	stack minix |  word   |   addrH  |   addrL  | RA | %bx |
-	------------+---------+----------+----------+----+-----+
-	  offset    |         8          6          4    2     0
-
-	------------+---4b----+----2b----+----2b----+-4b-+-2b--+
-	stack minix |  word   |   addrH  |   addrL  | RA | %bx |
-	------------+---------+----------+----------+----+-----+
-	  offset    |         10         8          6    2     0
- */
-.globl put_word
-put_word:
-	push	%bx
-	mov	%sp, %bx     // (0)%bx, (2)RA, (6)word, (10)addrL, (12)addrH
-	pushw	10(%bx)      // Word to store at addr
-	call	gp_getaddr   // this puts 4 byte RA in case of .code16gcc
-	popw	(%bx)        // Store the word
-	jmp	gp_ret
-gp_getaddr:
-	mov	6(%bx), %ax  // low word
-	mov	8(%bx), %dx  // high word
-	call	abs2seg
-	mov	%ax, %bx
-	mov	%dx, %ds      // %ds:bx = addr
-	ret
-gp_ret:
-	push	%es
-	pop	%ds           // Restore %ds
-	pop	%bx
-	and	$0xffff, %eax // Since function (or mon2abs) can be called
-	                      // from C source compiled by .code16gcc
-	                      // which checks %eax not just %ax. This will
-	                      // cleanup the garbage from higher bits.
-	ret
-
 // void relocate(void);
 //       After the program has copied itself to a safer place, it needs to change
 //       the segment registers.  Caddr has already been set to the new location.
@@ -946,33 +886,6 @@ got_video:
 	                      // which checks %eax not just %ax. This will
 	                      // cleanup the garbage from higher bits.
 	ret
-
-
-// Functions to leave the boot monitor.
-.globl bootstrap              // Call another bootstrap
-// void _bootstrap(int device, struct part_entry *entry)
-//       Call another bootstrap routine to boot MS-DOS for instance.  (No real
-//       need for that anymore, now that you can format floppies under Minix).
-//       The bootstrap must have been loaded at BOOTSEG from "device".
-bootstrap:
-	push	%bx
-	call	restore_video
-	mov	%sp, %bx
-	movb	6(%bx), %dl        // Device to boot from
-	mov	10(%bx), %si        // %ds:%si = partition table entry
-	xor	%ax, %ax
-	mov	%ax, %es           // Vector segment
-	mov	$BUFFER, %di      // es:di = buffer in low core
-	mov	$PENTRYSIZE, %cx  // %cx = size of partition table entry
-	rep	movsb                   // Copy the entry to low core
-	mov	$BUFFER, %si      // es:%si = partition table entry
-	mov	%ax, %ds           // Some bootstraps need zero segment registers
-	cli
-	mov	%ax, %ss
-	mov	$BOOTOFF, %sp     // This should do it
-	sti
-	pop	%bx
-	ljmp	$0,$BOOTOFF         // Back to where the BIOS loads the boot code
 
 .globl minix                  // Call Minix
 // void minix(u32_t koff, u32_t kcs, u32_t kds,
