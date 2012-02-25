@@ -93,9 +93,6 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	int verbose = 1;
 	int proc_count = 0;
 
-	/* The stack is pretty deep here, so check if heap and stack collide. */
-	sbrk(0);
-
 	addr = kimage_addr;
 	procp = procs;
 
