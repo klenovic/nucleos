@@ -19,61 +19,11 @@
 #include <asm/bootparam.h>
 #include <asm/kernel/const.h>
 
-/**
- * @brief Get environment value
- * @param params  pointer to boot monitor parameters
- * @param name  key to look up (string)
- * @return pointer to value (constant string) on succes otherwise 0
- */
-static char *get_value(const char *params, const char *name)
-{
-/* Get environment value - kernel version of getenv to avoid setting up the
- * usual environment array.
- */
-	register const char *namep;
-	register char *envp;
-
-	for (envp = (char *) params; *envp != 0;) {
-		for (namep = name; *namep != 0 && *namep == *envp; namep++, envp++);
-
-		if (*namep == '\0' && *envp == '=')
-			return(envp + 1);
-
-		while (*envp++ != 0);
-	}
-
-	return 0;
-}
-
 extern struct setup_header hdr;
 
 extern void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params);
 extern void arch_copy_cmdline_params(char *cmdline_buf, struct boot_params *params);
 extern void arch_copy_aout_headers(struct boot_params *params);
-
-static char *cmdline_buf_to_string(char* cmdline_str, const char *cmdline_buf)
-{
-	int i;
-
-	for (i = 0; i < COMMAND_LINE_SIZE - 2; i++) {
-		if (cmdline_buf[i] == 0 && cmdline_buf[i + 1] == 0)
-			break;
-
-		/* single 0 indicates new option */
-		if (cmdline_buf[i] == 0)
-			cmdline_str[i] = ' ';
-		else
-			cmdline_str[i] = cmdline_buf[i];
-	}
-
-	/* trim */
-	if (i == COMMAND_LINE_SIZE - 1) {
-		cmdline_str[i - 1] = 0;
-		cmdline_str[i] = 0;
-	}
-
-	return cmdline_str;
-}
 
 /**
  * @brief Perform system initializations prior to calling main().
@@ -86,8 +36,9 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 /* Perform system initializations prior to calling main(). Most settings are
  * determined with help of the environment strings passed by loader.
  */
-	register char *value;	/* value in key=value pair */
+	char value[64];	/* value in key=value pair */
 	int h;
+	int ret;
 	extern char _text, _etext;
 	extern char _data, _end;
 
@@ -104,9 +55,6 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 
 	/* copy boot params */
 	arch_copy_boot_params(&boot_params, real_mode_params);
-
-	/* copy header from kernel image into boot params */
-	memcpy(&boot_params.hdr, &hdr, sizeof(hdr));
 
 	/* copy aout headers */
 	arch_copy_aout_headers(&boot_params);
@@ -150,14 +98,14 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 		system_hz = HZ;
 	}
 
-	value = get_value(cmd_line_params, SERVARNAME);
+	ret = get_param_value(cmd_line_params, SERVARNAME, value);
 
-	if(value && atoi(value) == 0)
+	if (ret && atoi(value) == 0)
 		do_serial_debug=1;
 
 #ifdef CONFIG_X86_LOCAL_APIC
-	value = get_value(cmd_line_params, "no_apic");
-	if(value)
+	ret = get_param_value(cmd_line_params, "no_apic", value);
+	if(ret)
 		config_no_apic = atoi(value);
 	else
 		config_no_apic = 0;
@@ -165,9 +113,6 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 
 	/* clear the buffer */
 	memset(cmd_line_params_str, 0, COMMAND_LINE_SIZE);
-
-	/* convert to a regular string */
-	cmdline_buf_to_string(cmd_line_params_str, cmd_line_params);
 
 	/* Return to assembler code reload selectors and call main(). */
 	intr_init(INTS_NUCLEOS, 0);

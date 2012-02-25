@@ -40,7 +40,7 @@ static void announce(void)
 	printk("\nNucleos %s Copyright (c) 2011, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
 		UTS_RELEASE);
 
-	printk("Command line: %s\n", cmd_line_params_str);
+	printk("Command line: %s\n", cmd_line_params);
 }
 
 void main(void)

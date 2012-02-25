@@ -183,6 +183,7 @@ void initialize(void)
   int r, p;
   u32_t masterpos;
 
+#if 0
   /* Copy the boot program to the far end of low memory, this must be
    * done to get out of the way of Minix, and to put the data area
    * cleanly inside a 64K chunk if using BIOS I/O (no DMA problems).
@@ -216,6 +217,7 @@ void initialize(void)
 
   mem[0].base += 2048;
   mem[0].size -= 2048;
+#endif
 
   /* Find out what the boot device and partition was. */
   bootdev.name[0]= 0;
@@ -551,8 +553,9 @@ dev_t name2dev(char *name)
 void boot(void)
 {
 	/* Initialize tables. */
+#if 0
 	initialize();
-
+#endif
 	memset(&boot_params, 0, sizeof(boot_params));
 
 	/* Get environment variables from the parameter sector. */

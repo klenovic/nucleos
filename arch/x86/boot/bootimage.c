@@ -61,8 +61,10 @@
 #define KERNEL_IDX	0       /* The first process is the kernel. */
 #define KERNEL_IMAGE_PATH	"/boot/image"
 
+#if 0
 static int block_size = 0;
 static u32_t (*vir2sec)(u32_t vsec);   /* Where is a sector on disk? */
+#endif
 
 /* Per-process memory adresses. */
 struct process {
@@ -107,6 +109,7 @@ static void raw_clear(u32_t addr, u32_t count)
 	}
 }
 
+#if 0
 /* Translate a virtual sector number to an absolute disk sector. */
 static u32_t file_vir2sec(u32_t vsec)
 {
@@ -317,6 +320,7 @@ static int load_kimage(char* kimage, u32 load_addr, u32 kimage_size, u32 limit)
 
 	return 0;
 }
+#endif
 
 static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 				 u8 *aout_hdrs_buf, struct process *procs)
@@ -338,7 +342,7 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 	procp = procs;
 
 	/* Read the many different processes: */
-	while (kimage_size) {
+	while (kimage_size > 1024) {
 		u32_t start_addr;
 		start_addr = addr;
 
@@ -452,9 +456,12 @@ static u32 unpack_kimage_inplace(u32 kimage_addr, u32 kimage_size, u32 limit,
 }
 
 /* Avoid multi-spaces here */
+#if 0
 char *cmdline = "rootdev=/dev/c0d0p0 ramimagedev=/dev/c0d0p0";
-static char cmd_line_params[COMMAND_LINE_SIZE];
 static int cmdline_len = 0;
+#endif
+
+static char cmd_line_params[COMMAND_LINE_SIZE];
 
 static int exec_image(struct process *procs)
 {
@@ -482,16 +489,15 @@ static u8 aout_hdrs_buf[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
 int boot_nucleos(void)
 {
-	char *kimage_name;
 	u32 kimage_addr;
 	u32 kimage_size;
 	u32 limit;
 	u32 kernel_end;
-
+#if 0
 	kimage_name = KERNEL_IMAGE_PATH;
 	if ((kimage_size = select_kimage(kimage_name)) == 0)
 		return -1;
-
+#endif
 	/* Load the image into this memory block. This should be
 	 * above 1M and the code should run in protected mode.
 	 */
@@ -502,19 +508,23 @@ int boot_nucleos(void)
 
 	/* Clear the area where the headers will be placed. */
 	memset(aout_hdrs_buf, 0, MAX_IMG_PROCS_COUNT*A_MINHDR);
-
+#if 0
 	if (load_kimage(kimage_name, kimage_addr, kimage_size, limit) < 0) {
 		printf("Can't load kernel image %s at 0x%x, (size: %dKiB)\n",
 		       kimage_name, kimage_addr, kimage_size/1024);
 		return -1;
 	}
+#endif
+	/* hdr.syssize filled by build.c */
+	kimage_size = hdr.syssize;
+	kimage_size = kimage_size * 16 - 4;
 
 	kernel_end = unpack_kimage_inplace(kimage_addr, kimage_size, limit, aout_hdrs_buf, procs);
 	if (!kernel_end) {
 		printf("Couldn't unpack the kernel!\n");
 		return -1;
 	}
-
+#if 0
 	/* Check whether we are loading kernel with memory which has builtin initrd. */
 	u32 ramdisk_image = kernel_end;
 
@@ -537,10 +547,11 @@ int boot_nucleos(void)
 
 	/* Close the disk. */
 	dev_close();
-
+#endif
 	/* Setup command-line for kernel */
 	memset(cmd_line_params, 0, COMMAND_LINE_SIZE);
 
+#if 0
 	/* Add static command-line string. The 2 trailing zeros indicates the
 	 * end of command line.
 	 */
@@ -549,30 +560,39 @@ int boot_nucleos(void)
 
 	memcpy(cmd_line_params, cmdline, strlen(cmdline));
 	cmdline_len = strlen(cmd_line_params);
+#endif
 
 	/* add aout headers address */
 	boot_params.nucleos_kludge.aout_hdrs_addr = mon2abs(aout_hdrs_buf);
 
+#if 0
 	/* Translate the command-line for kernel. DON'T ADD ANY NEW OPTIONS */
 	int j = 0;
 	for (j = 0; j < cmdline_len; j++)
 		if (cmd_line_params[j] == ' ')
 			cmd_line_params[j] = 0;
-#if 0
+
 int i=0;
 for (i=0; i<150; i++)
 	if (cmd_line_params[i] != 0)
 		putch(cmd_line_params[i]);
 	else
 		putch(' ');
-#endif
+
 	/* fill the header */
 	u32 cmd_line_params_addr = (u32)mon2abs(cmd_line_params);
 	raw_copy(kimage_addr + offsetof(struct setup_header, cmd_line_ptr) + 0x1f1,
 		 mon2abs(&cmd_line_params_addr), sizeof(&cmd_line_params_addr));
+#endif
+
+	/* save header into boot parameters */
+	memcpy(&boot_params.hdr, &hdr, sizeof(hdr));
+
+	/* copy the command-line on safer place */
+	raw_copy(mon2abs(cmd_line_params), boot_params.hdr.cmd_line_ptr, COMMAND_LINE_SIZE);
 
 	if (exec_image(procs) < 0) {
-		printf("Can't execute image %s\n", kimage_name);
+		printf("Can't execute image\n");
 		return -1;
 	}
 

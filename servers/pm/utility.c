@@ -70,26 +70,6 @@ int no_sys()
 }
 
 /*===========================================================================*
- *				find_param				     *
- *===========================================================================*/
-char *find_param(name)
-const char *name;
-{
-  register const char *namep;
-  register char *envp;
-
-  for (envp = (char *) cmd_line_params; *envp != 0;) {
-	for (namep = name; *namep != 0 && *namep == *envp; namep++, envp++)
-		;
-	if (*namep == '\0' && *envp == '=') 
-		return(envp + 1);
-	while (*envp++ != 0)
-		;
-  }
-  return(NULL);
-}
-
-/*===========================================================================*
  *				find_proc  				     *
  *===========================================================================*/
 struct mproc *find_proc(lpid)

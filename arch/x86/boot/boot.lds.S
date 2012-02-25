@@ -14,13 +14,22 @@ OUTPUT_ARCH("i386")
 
 SECTIONS
 {
-	_text = . ;
-	.text ORIGIN : AT (ADDR(.text) - ORIGIN) { /* Text */
-		*(.text.head)
+	. = 0;
+	_text = .;
+	.bstext		: { *(.bstext) }
+	.bsdata		: { *(.bsdata) }
+
+	. = 497;
+	.header		: { *(.header) }
+	.entrytext	: { *(.entrytext) }
+	.inittext	: { *(.inittext) }
+	.initdata	: { *(.initdata) }
+	__end_init = .;
+
+	.text		: {
 		*(.text)
 		*(.text.*)
-		. = ALIGN(0x10) ; /* round up the size of segment */
-	}
+	 }
 	_etext = . ;
 
 	_data = . ;

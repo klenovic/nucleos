@@ -40,6 +40,8 @@ typedef struct vector {
 	u16 segment;
 } vector;
 
+extern struct setup_header hdr;
+
 vector rem_part;	/* Boot partition table entry. */
 u32 caddr, daddr;	/* Code and data address of the boot program. */
 u32 runsize;		/* Size of this program. */

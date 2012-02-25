@@ -26,19 +26,36 @@ define rule_create_image
 	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
 endef
 
-# create final image from kernel and servers
+# create kernel image from kernel and servers binaries
 $(src)/image: $(obj)/tools/build scripts/tools/mkimage
 $(src)/image: $(bin-y) FORCE
 	$(call if_changed_rule,create_image)
 
 targets += image
 
+quiet_cmd_create_kimage = GEN     $@
+      cmd_create_kimage = $(obj)/tools/build $(obj)/.tmp.boot.rawbin $(obj)/image > $@
+
+define rule_create_kimage
+	rm -f $@; \
+	$(echo-cmd) $(cmd_$(1)); \
+	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
+endef
+
+# create a final image
+$(src)/kimage: $(obj)/.tmp.boot.rawbin
+$(src)/kimage: $(obj)/tools/build $(obj)/image FORCE
+	$(call if_changed_rule,create_kimage)
+
+targets += kimage
+
 app-y      += boot.elf32
 boot.elf32-obj-y := boot.o boothead.o bootimage.o bootutils.o rawfs.o \
 	            errno.o printf.o
 
 BOOT_ORG    = 0x0000
-BOOT_ENTRY  = bootcode_entry
+BOOT_ENTRY  = _start
 HDRLEN      = 0x20
 MAX_BOOT_SIZE = 0x3f
 BOOT_OFF = 0x0001

@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
 		mountflags |= MS_REUSE;
 		dev = argv[2];
 	}
-	
-	r = mount(dev, "/", mountflags, NULL, NULL);
+
+	r = mount(dev, "/", mountflags, "ext2", NULL);
 	if (r != 0) {
 		fprintf(stderr, "newroot: mount failed: %s\n",strerror(errno));
 		exit(1);
