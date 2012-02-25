@@ -232,7 +232,7 @@ static int exec_image(struct process *procs)
 	else
 		set_mode(MONO_MODE);
 
-	minix(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, mon2abs(&boot_params));
+	pm_nucleos(procs[KERNEL_IDX].entry, procs[KERNEL_IDX].cs, procs[KERNEL_IDX].ds, mon2abs(&boot_params));
 
 	return -1;
 }

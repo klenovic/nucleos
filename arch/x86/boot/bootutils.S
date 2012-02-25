@@ -887,37 +887,29 @@ got_video:
 	                      // cleanup the garbage from higher bits.
 	ret
 
-.globl minix                  // Call Minix
-// void minix(u32_t koff, u32_t kcs, u32_t kds,
-//            char *bootparams, size_t paramsize, u32_t aout);
-//       Call Minix.
+	.globl pm_nucleos
+// void nucleos(u32_t koff, u32_t kcs, u32_t kds, char *bootparams);
 /*
-	---> stack grows --->
-	------------+--2b---+--2b---+-----2b-----+-----2b------+---2b----+---2b----+---2b-----+---2b-----+---2b-----+---2b-----+-2b-+--2b-+
-	stack minix | aoutH | aoutL | paramsize  | bootparams  |  kdsH   |  kdsL   |  kcsH    |  kcsL    |   koffH  |   koffL  | RA | %bp |
-	------------+-------+-------+------------+-------------+---------+---------+----------+----------+----------+----------+----+-----+
-	  offset    |       22      20           18            16        14        12         10         8          6          4    2     0
-
 	------------+--2b---+--2b---+-----4b-----+-----4b------+---2b----+---2b----+---2b-----+---2b-----+---2b-----+---2b-----+-4b-+--2b-+--2b-+
 	  code16gcc | aoutH | aoutL | paramsize  | bootparams  |  kdsH   |  kdsL   |  kcsH    |  kcsL    |   koffH  |   koffL  | RA | %bx | %bp |
 	------------+-------+-------+------------+-------------+---------+---------+----------+----------+----------+----------+----+--2b-+--2b-+
 	  offset    |       30      28           24            20        18        16         14         12         10         8    4     2     0
  */
 /*		code16gcc | minix3 */
-#define KOFFL	8	 //  4
-#define KOFFH	10	 //  6
-#define KCSL	12	 //  8
-#define KCSH	14	 // 10
-#define KDSL	16	 // 12
-#define KDSH	18	 // 14
-#define BOOTP	20	 // 16
-#define PARAMS	24	 // 18
-#define AOUTL	28	 // 20
-#define AOUTH	30	 // 22
+#define KOFFL	8
+#define KOFFH	10
+#define KCSL	12
+#define KCSH	14
+#define KDSL	16
+#define KDSH	18
+#define BOOTP	20
+#define PARAMS	24
+#define AOUTL	28
+#define AOUTH	30
 
 ebxval:	.long 0
 
-minix:
+pm_nucleos:
 	push	%bx
 	push	%bp
 	mov	%sp, %bp          // Pointer to arguments
@@ -975,9 +967,11 @@ minix:
 	mov	$ES_SELECTOR, %ax // Flat 4 Gb
 	mov	%ax, %es
 	lretl                     // Make a far call to the kernel
-// Minix-386 returns here on a halt or reboot.
+// should never get here
 ret386:
-	call	prot2real         // Switch to real mode
+1:
+	call halt_cpu
+	jmp 1b
 
 return:
 	mov	%bp, %sp    // Pop parameters

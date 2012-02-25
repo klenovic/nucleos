@@ -66,8 +66,8 @@ u16 get_video(void);
 /* Current value of the clock tick counter. */
 u32 get_tick(void);
 
-/* Start Minix. */
-void minix(u32 koff, u32 kcs, u32 kds, u32 boot_params);
+/* Start Nucleos */
+void pm_nucleos(u32 koff, u32 kcs, u32 kds, u32 boot_params);
 
 /* Called by boot.c: */
 int boot_nucleos(void);	/* Load and start a Nucleos image. */
