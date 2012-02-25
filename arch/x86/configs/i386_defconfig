@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Nucleos kernel version: 1.1.0-alpha6
-# Fri Oct 28 19:12:02 2011
+# Sat Feb 25 14:39:47 2012
 #
 # CONFIG_64BIT is not set
 CONFIG_X86_32=y
@@ -36,6 +36,7 @@ CONFIG_KERNEL_MESSAGES_BUFFER_SIZE=10000
 # Kernel hacking
 #
 CONFIG_BOOT_VERBOSE=y
+CONFIG_FRAME_WARN=1024
 CONFIG_DEBUG_KERNEL=y
 CONFIG_DEBUG_KERNEL_IPC_WARNINGS=y
 # CONFIG_DEBUG_KERNEL_SCHED_CHECK is not set
@@ -106,8 +107,8 @@ CONFIG_VFS_AOUT_BINFMT=y
 #
 # Memory
 #
-# CONFIG_BUILTIN_INITRD is not set
-CONFIG_INITRD_TARGET_PATH="/boot/initrd"
+CONFIG_BUILTIN_INITRD=y
+CONFIG_INITRD_FSIMG_SOURCE="init/initrd.minixfs"
 
 #
 # Serial devices and TTY
