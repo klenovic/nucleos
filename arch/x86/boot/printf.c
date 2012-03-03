@@ -10,10 +10,9 @@
 /*	printf() - system services printf()		Author: Kees J. Bot
  *								15 Jan 1994
  */
-#define nil 0
+#include <stdarg.h>
 #include <nucleos/kernel.h>
 #include <nucleos/types.h>
-#include <stdarg.h>
 #include <nucleos/stddef.h>
 #include <nucleos/limits.h>
 
@@ -21,7 +20,7 @@
 #define count_putch(c) do { charcount++; putch(c); } while(0)
 
 /* Printf() uses putch() to print characters. */
-void putch(int c);
+extern void putch(int c);
 
 int printf(const char *fmt,...)
 {
