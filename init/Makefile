@@ -47,7 +47,10 @@ initrd_files_to_copy := $(srctree)/servers/fs/minixfs/minixfs:$(initrd_dir)/sbin
 			$(src)/modules.conf:$(initrd_dir)/etc
 
 quiet_cmd_gen_initrd.ext2 = GEN     $@
-      cmd_gen_initrd.ext2 = $(srctree)/scripts/generate_initrd.sh '$(initrd_dir)' '$(initrd_dir_list)' '$(initrd_files_to_copy)' $(initrd_device_table) $@
+      cmd_gen_initrd.ext2 = $(srctree)/scripts/generate_initrd.sh '$(initrd_dir)' \
+								  '$(initrd_dir_list)' \
+								  '$(initrd_files_to_copy)' \
+								   $(initrd_device_table) $@
 
 $(src)/initrd.ext2: $(addprefix $(src)/,$(scripts)) $(bin-y) FORCE
 	$(call if_changed,gen_initrd.ext2)
