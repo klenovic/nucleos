@@ -51,7 +51,7 @@ $(src)/kimage: $(obj)/tools/build $(obj)/image FORCE
 targets += kimage
 
 app-y      += boot.elf32
-boot.elf32-obj-y := boot.o boothead.o bootimage.o bootutils.o errno.o printf.o
+boot.elf32-obj-y := boot.o header.o bootimage.o bootutils.o printf.o
 
 BOOT_ORG    = 0x0000
 BOOT_ENTRY  = _start
