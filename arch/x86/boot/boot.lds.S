@@ -43,17 +43,15 @@ SECTIONS
 	}
 	_edata = . ;
 
-	_bss = . ;
+	. = ALIGN(16);
 	.bss . : AT (ADDR(.bss) - ORIGIN) {
+		__bss_start = .;
 		*(.bss)
-		*(.bss.*)
 		*(COMMON)
-		. = ALIGN(0x10) ;
+		__bss_end = .;
 	}
-	_ebss = . ;
-
-	/* start of heap + stack */
-	_end = _ebss ;
+	. = ALIGN(16);
+	_end = .;
 
 	/DISCARD/ : {
 		*(*)

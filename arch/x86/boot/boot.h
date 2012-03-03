@@ -11,6 +11,7 @@
 #define _ARCH_X86_BOOT_BOOT_H
 
 #define SECTOR_SIZE	512
+#define STACK_SIZE	512	/* Minimum number of bytes for stack */
 
 /* BIOS video modes. */
 #define MONO_MODE	0x07	/* 80x25 monochrome. */

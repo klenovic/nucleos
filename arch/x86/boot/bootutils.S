@@ -25,6 +25,64 @@
 	.set MCS_SELECTOR,	7*8	// Monitor code
 
 .section .text
+/* Determine available memory as a list of (base,size) pairs as follows:
+   mem[0] = low memory, mem[1] = memory between 1M and 16M, mem[2] = memory
+   above 16M.  Last two coalesced into mem[1] if adjacent.
+
+   void get_memory_map(int processor)
+ */
+	.globl get_memory_map
+get_memory_map:
+	push	%bp
+	mov	%sp, %bp
+	push	%bx
+	push	%si
+	push	%di
+	/* the used processor */
+	mov	6(%bp), %ax
+	mov	$mem, %di		// %di = memory list
+	int	$0x12			// Returns low memory size (in K) in %ax
+	mulw	c1024
+	mov	%ax, 4(%di)		// mem[0].size = low memory size in bytes
+	mov	%dx, 6(%di)
+	cmp	$286, %ax		// Only 286s and above have extended memory
+	jb	no_ext
+	cmp	$486, %ax		// Assume 486s were the first to have >64M
+	jb	small_ext		// (It helps to be paranoid when using the BIOS)
+big_ext:
+	mov	$0xE801, %ax		// Code for get memory size for >64M
+	int	$0x15			// %ax = mem at 1M per 1K, %bx = mem at 16M per 64K
+	jnc	got_ext
+small_ext:
+	movb	$0x88, %ah		// Code for get extended memory size
+	clc				// Carry will stay clear if call exists
+	int	$0x15			// Returns size (in K) in %ax for AT''s
+	jc	no_ext
+	test	%ax, %ax		// An AT with no extended memory?
+	jz	no_ext
+	xor	%bx, %bx		// %bx = mem above 16M per 64K = 0
+got_ext:
+	mov	%ax, %cx		// %cx = copy of ext mem at 1M
+	movw	$0x0010, 10(%di)	// mem[1].base = 0x00100000 (1M)
+	mulw	c1024
+	mov	%ax, 12(%di)		// mem[1].size = "ext mem at 1M" * 1024
+	mov	%dx, 14(%di)
+	test	%bx, %bx
+	jz	no_ext			// No more ext mem above 16M?
+	cmp	$15*1024, %cx		// Chunks adjacent? (precisely 15M at 1M?)
+	je	adj_ext
+	movw	$0x0100, 18(%di)	// mem[2].base = 0x01000000 (16M)
+	mov	%bx, 22(%di)		// mem[2].size = "ext mem at 16M" * 64K
+	jmp	no_ext
+adj_ext:
+	add	%bx, 14(%di)		// Add ext mem above 16M to mem below 16M
+no_ext:
+	pop	%di
+	pop	%si
+	pop	%bx
+	pop	%bp
+	ret
+
 
 .globl halt_cpu
 halt_cpu:
@@ -739,6 +797,9 @@ p_mcs_desc:
 	// Monitor code segment descriptor (64 kb flat)
 	.word 0xFFFF, UNSET
 	.byte UNSET, 0x9A, 0x00, 0x00
+
+.section .rodata
+c1024:  .word  1024
 
 .section .bss
 	.comm	old_vid_mode, 2  // Video mode at startup
