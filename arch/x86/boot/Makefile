@@ -23,18 +23,15 @@ define rule_create_image
 	rm -f $@; \
 	$(echo-cmd) $(cmd_$(1)); \
 	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
-	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
 endef
 
 # create kernel image from kernel and servers binaries
-$(src)/image: $(obj)/tools/build scripts/tools/mkimage
-$(src)/image: $(bin-y) FORCE
+$(src)/.tmp.image: $(obj)/tools/build scripts/tools/mkimage
+$(src)/.tmp.image: $(bin-y) FORCE
 	$(call if_changed_rule,create_image)
 
-targets += image
-
 quiet_cmd_create_kimage = GEN     $@
-      cmd_create_kimage = $(obj)/tools/build $(obj)/.tmp.boot.rawbin $(obj)/image > $@
+      cmd_create_kimage = $(obj)/tools/build $(obj)/.tmp.boot.rawbin $(obj)/.tmp.image > $@
 
 define rule_create_kimage
 	rm -f $@; \
@@ -45,7 +42,7 @@ endef
 
 # create a final image
 $(src)/kimage: $(obj)/.tmp.boot.rawbin
-$(src)/kimage: $(obj)/tools/build $(obj)/image FORCE
+$(src)/kimage: $(obj)/tools/build $(obj)/.tmp.image FORCE
 	$(call if_changed_rule,create_kimage)
 
 targets += kimage
