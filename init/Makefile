@@ -6,9 +6,9 @@ CFLAGS_initrd.o := -D__UKERNEL__
 # ---------------------------------------------------------------------------
 
 # These below must exist before we start to create initrd
-bin-y := $(srctree)/drivers/at_wini \
-	 $(srctree)/drivers/floppy \
-	 $(srctree)/drivers/pci \
+bin-y := $(srctree)/drivers/at_wini/at_wini \
+	 $(srctree)/drivers/floppy/floppy \
+	 $(srctree)/drivers/pci/pci \
 	 $(srctree)/servers/fs/minixfs/minixfs \
 	 $(srctree)/servers/fs/ext2/ext2 \
 	 $(src)/sh \
@@ -19,22 +19,44 @@ bin-y := $(srctree)/drivers/at_wini \
 	 $(src)/simple/service \
 	 $(src)/simple/sysenv
 
-scripts := modules.conf mtab passwd proto.gen rc
+scripts := modules.conf mtab passwd rc device_table.txt
 
-targets += initrd.minixfs initrd
+targets += initrd.ext2 initrd
 
-quiet_cmd_gen_initrd.minixfs = GEN     $@
-      cmd_gen_initrd.minixfs = $(srctree)/scripts/tools/mkfs $@ -p $(src)/proto.gen
+initrd_dir := $(src)/.initrd
+initrd_dir_list := $(initrd_dir)/etc \
+		   $(initrd_dir)/sbin \
+		   $(initrd_dir)/bin
+initrd_device_table=$(src)/device_table.txt
 
-$(src)/initrd.minixfs: $(srctree)/scripts/tools/mkfs
-$(src)/initrd.minixfs: $(addprefix $(src)/,$(scripts)) $(bin-y) FORCE
-	$(call if_changed,gen_initrd.minixfs)
+initrd_files_to_copy := $(srctree)/servers/fs/minixfs/minixfs:$(initrd_dir)/sbin \
+			$(srctree)/servers/fs/ext2/ext2:$(initrd_dir)/sbin \
+			$(srctree)/drivers/at_wini/at_wini:$(initrd_dir)/bin \
+			$(srctree)/drivers/floppy/floppy:$(initrd_dir)/bin \
+			$(srctree)/drivers/pci/pci:$(initrd_dir)/bin \
+			$(src)/sh:$(initrd_dir)/bin \
+			$(src)/simple/cdprobe:$(initrd_dir)/bin \
+			$(src)/simple/dev2name:$(initrd_dir)/bin \
+			$(src)/simple/loadramdisk:$(initrd_dir)/bin \
+			$(src)/simple/newroot:$(initrd_dir)/bin \
+			$(src)/simple/service:$(initrd_dir)/bin \
+			$(src)/simple/sysenv:$(initrd_dir)/bin \
+			$(src)/mtab:$(initrd_dir)/etc \
+			$(src)/passwd:$(initrd_dir)/etc \
+			$(src)/rc:$(initrd_dir)/etc \
+			$(src)/modules.conf:$(initrd_dir)/etc
+
+quiet_cmd_gen_initrd.ext2 = GEN     $@
+      cmd_gen_initrd.ext2 = $(srctree)/scripts/generate_initrd.sh '$(initrd_dir)' '$(initrd_dir_list)' '$(initrd_files_to_copy)' $(initrd_device_table) $@
+
+$(src)/initrd.ext2: $(addprefix $(src)/,$(scripts)) $(bin-y) FORCE
+	$(call if_changed,gen_initrd.ext2)
 
 quiet_cmd_gen_initrd = GEN     $@
       cmd_gen_initrd = $(srctree)/scripts/tools/mkinitrd -i $< -o $@
 
 $(src)/initrd: $(srctree)/scripts/tools/mkinitrd
-$(src)/initrd: $(src)/initrd.minixfs FORCE
+$(src)/initrd: $(src)/initrd.ext2 FORCE
 	$(call if_changed,gen_initrd)
 
 targets += $(scripts) $(src)/sh
@@ -57,6 +79,7 @@ obj-y += initrd.o
 __initrd_path := $(patsubst "%",%,$(CONFIG_INITRD_FSIMG_SOURCE))
 initrd_path := $(strip $(if $(patsubst /%,%,$(__initrd_path)),$(__initrd_path), \
 			    $(__initrd_path)))
+initrd_path := init/initrd.ext2
 
 targets += initrd.h
 
@@ -88,5 +111,6 @@ $(src)/.tmp.rebuild.memdrv: $(src)/initrd.o FORCE
 	$(call if_changed_rule,rebuild_memdrv)
 endif
 
-clean-files := initrd initrd.minixfs initrd.h
+clean-dirs := $(objtree)/$(initrd_dir)/
+clean-files := initrd initrd.ext2 initrd.h
 clean-files += $(scripts) sh

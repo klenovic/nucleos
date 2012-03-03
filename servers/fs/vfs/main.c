@@ -38,10 +38,10 @@
 #include <nucleos/vfsif.h>
 #include <nucleos/time.h>
 #include <nucleos/types.h>
+#include <servers/fs/vfs/fproc.h>
 #include <asm/ioctls.h>
 
 #include "file.h"
-#include <servers/fs/vfs/fproc.h>
 #include "param.h"
 #include "vmnt.h"
 #include "vnode.h"
@@ -475,27 +475,23 @@ static void init_root(void)
 	struct dmap *dp;
 	char *label;
 	kipc_msg_t m;
-  struct node_details res;
+	struct node_details res;
 
 	/* Open the root device. */
 	root_dev = DEV_IMGRD;
-	ROOT_FS_E = MFS_PROC_NR;
+	ROOT_FS_E = EXT2_PROC_NR;
 
 	/* Wait FS login message */
 	if (last_login_fs_e != ROOT_FS_E) {
 		/* Wait FS login message */
 		if (kipc_module_call(KIPC_RECEIVE, 0, ROOT_FS_E, &m) != 0) {
-			printk("VFS: Error receiving login request from FS_e %d\n", 
-				ROOT_FS_E);
-			panic(__FILE__, "Error receiving login request from root filesystem\n",
-			      ROOT_FS_E);
+			printk("VFS: Error receiving login request from FS_e %d\n", ROOT_FS_E);
+			panic(__FILE__, "Error receiving login request from root filesystem\n", ROOT_FS_E);
 		}
 
 		if (m.m_type != KCNR_FS_READY) {
-			printk("VFS: Invalid login request from FS_e %d\n", 
-				ROOT_FS_E);
-			panic(__FILE__, "Error receiving login request from root filesystem\n",
-			      ROOT_FS_E);
+			printk("VFS: Invalid login request from FS_e %d\n", ROOT_FS_E);
+			panic(__FILE__, "Error receiving login request from root filesystem\n", ROOT_FS_E);
 		}
 	}
 
@@ -506,12 +502,11 @@ static void init_root(void)
 		vmp->m_dev = NO_DEV;
 
 	vmp = &vmnt[0];
- 
+
 	/* We'll need a vnode for the root inode, check whether there is one */
-  if ((root_node = get_free_vnode()) == NIL_VNODE) 
+	if ((root_node = get_free_vnode()) == NIL_VNODE)
 		panic(__FILE__,"Cannot get free vnode", r);
 
-	
 	/* Get driver process' endpoint */
 	dp = &dmap[(root_dev >> MAJOR) & BYTE];
 
@@ -526,26 +521,25 @@ static void init_root(void)
 	}
 
 	/* Issue request */
-	r = req_readsuper(ROOT_FS_E, label, root_dev, 0 /*!readonly*/,
-	1 /*isroot*/, &res);
+	r = req_readsuper(ROOT_FS_E, label, root_dev, 0 /*!readonly*/, 1 /*isroot*/, &res);
 	if (r != 0) {
 		panic(__FILE__,"Cannot read superblock from root", r);
 	}
-	
+
 	/* Fill in root node's fields */
-  root_node->v_fs_e = res.fs_e;
-  root_node->v_inode_nr = res.inode_nr;
-  root_node->v_mode = res.fmode;
-  root_node->v_size = res.fsize;
+	root_node->v_fs_e = res.fs_e;
+	root_node->v_inode_nr = res.inode_nr;
+	root_node->v_mode = res.fmode;
+	root_node->v_size = res.fsize;
 	root_node->v_sdev = NO_DEV;
 	root_node->v_fs_count = 1;
 	root_node->v_ref_count = 1;
 
 	/* Fill in max file size and blocksize for the vmnt */
-  vmp->m_fs_e = res.fs_e;
+	vmp->m_fs_e = res.fs_e;
 	vmp->m_dev = root_dev;
 	vmp->m_flags = 0;
-	
+
 	/* Root node is indeed on the partition */
 	root_node->v_vmnt = vmp;
 	root_node->v_dev = vmp->m_dev;
