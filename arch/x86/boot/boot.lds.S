@@ -10,8 +10,6 @@
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
-#define ORIGIN  __ORIGIN__
-
 SECTIONS
 {
 	. = 0;
@@ -26,25 +24,16 @@ SECTIONS
 	.initdata	: { *(.initdata) }
 	__end_init = .;
 
-	.text		: {
-		*(.text)
-		*(.text.*)
-	 }
-	_etext = . ;
-
-	_data = . ;
-	.data . : AT (ADDR(.data) - ORIGIN) {
-		*(.data)
-		*(.data.*)
-		*(.rodata) /* read-only data */
-		*(.rodata.*)
-		*(.rom)
-		. = ALIGN(0x10) ;
-	}
-	_edata = . ;
+	.text		: { *(.text*) }
 
 	. = ALIGN(16);
-	.bss . : AT (ADDR(.bss) - ORIGIN) {
+	.rodata		: { *(.rodata*) }
+
+	. = ALIGN(16);
+	.data		: { *(.data*) }
+
+	. = ALIGN(16);
+	.bss 		: {
 		__bss_start = .;
 		*(.bss)
 		*(COMMON)
@@ -60,4 +49,13 @@ SECTIONS
 		*(.note)
 		*(.note.*)
 	}
+
+	/*
+	 * The ASSERT() sink to . is intentional, for binutils 2.14 compatibility:
+	 */
+	. = ASSERT(_end <= 0x8000, "Setup too big!");
+	. = ASSERT(hdr == 0x1f1, "The setup header has the wrong offset!");
+
+	/* Necessary for the very-old-loader check to work... */
+	. = ASSERT(__end_init <= 5*512, "init sections too big!");
 }
