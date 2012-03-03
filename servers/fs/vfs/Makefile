@@ -25,10 +25,10 @@ $(src)/$(appname).elf32: servers/server_32.lds
 
 ifdef CONFIG_VFS_AOUT_BINFMT
 # Create in minix3's aout format
-$(appname)_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+$(appname)_a_flags   := 0x00
 $(appname)_a_hdrlen  := 0x20
 $(appname)_a_cpu     := i386
-$(appname)_stackheap := 16k
+$(appname)_stackheap := 64k
 
 e2a-y := $(appname).elf32,$(appname)
 endif

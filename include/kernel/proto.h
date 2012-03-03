@@ -61,9 +61,6 @@ int isokendpt_f(endpoint_t e, int *p, int f);
 #define isokendpt_d(e, p, f) isokendpt_f((e), (p), (f))
 #endif
 
-/* start.c */
-void prepare_kernel(u16 cs, u16 ds, u16 parmoff, u16 parmsize);
-
 /* system.c */
 int get_priv(register struct proc *rc, int proc_type);
 void set_sendto_bit(struct proc *rc, int id);
@@ -151,7 +148,7 @@ void halt_cpu(void);
 void arch_init(void);
 void ser_putc(char);
 void arch_shutdown(int);
-void arch_get_aout_headers(int i, struct exec *h);
+struct exec *arch_get_aout_header(int i);
 void restart(void);
 void read_tsc(u32_t *high, u32_t *low);
 int arch_init_profile_clock(u32_t freq);
@@ -159,7 +156,6 @@ void arch_stop_profile_clock(void);
 void arch_ack_profile_clock(void);
 void do_ser_debug(void);
 int arch_get_params(char *parm, int max);
-int arch_set_params(char *parm, int max);
 int arch_pre_exec(struct proc *pr, u32_t, u32_t);
 int arch_umap(struct proc *pr, vir_bytes, vir_bytes, int, phys_bytes *);
 int arch_do_vmctl(kipc_msg_t *m_ptr, struct proc *p);

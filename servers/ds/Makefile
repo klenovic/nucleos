@@ -12,7 +12,7 @@ LDFLAGS_ds.elf32 := -L$(lib-arch) -Llib \
 $(src)/ds.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-ds_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+ds_a_flags   := 0x00
 ds_a_hdrlen  := 0x20
 ds_a_cpu     := i386
 ds_stackheap := 16k

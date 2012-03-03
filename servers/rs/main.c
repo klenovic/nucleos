@@ -70,8 +70,6 @@ int main(void)
   kipc_msg_t m;					/* request message */
   int call_nr, who_e,who_p;			/* call number and caller */
   int result;                 			/* result to return */
-  sigset_t sigset;				/* system signal set */
-  int s;
 
   /* Initialize the server, then go to work. */
   init_server();
@@ -315,6 +313,9 @@ int call_base;                  /* the base offset for the calls */
   }
 }
 
+static struct boot_image boot_image_tab[NR_BOOT_PROCS];
+static struct mproc mproc_tab[NR_PROCS];
+
 /*===========================================================================*
  *				init_server                                  *
  *===========================================================================*/
@@ -326,8 +327,6 @@ static void init_server(void)
   int s,i,j;
   int nr_image_srvs, nr_image_priv_srvs;
   struct rproc *rp;
-  struct boot_image image[NR_BOOT_PROCS];
-  struct mproc mproc[NR_PROCS];
   struct exec header;
   struct boot_image_priv *boot_image_priv;
   struct boot_image_sys *boot_image_sys;
@@ -337,9 +336,8 @@ static void init_server(void)
   env_parse("rs_verbose", "d", 0, &rs_verbose, 0, 1);
 
   /* Get a copy of the boot image table. */
-  if ((s = sys_getimage(image)) != 0) {
+  if ((s = sys_getimage(boot_image_tab)) != 0)
       panic("RS", "unable to get copy of boot image table", s);
-  }
 
   /* Determine the number of system services in the boot image table and
    * compute the size required for the boot image buffer.
@@ -347,7 +345,7 @@ static void init_server(void)
   nr_image_srvs = 0;
   boot_image_buffer_size = 0;
   for(i=0;i<NR_BOOT_PROCS;i++) {
-      ip = &image[i];
+      ip = &boot_image_tab[i];
 
       /* System services only. */
       if(!isbootsrvprocn(_ENDPOINT_P(ip->endpoint))) {
@@ -356,7 +354,7 @@ static void init_server(void)
       nr_image_srvs++;
 
       /* Lookup the corresponding entry in the boot image sys table. */
-      boot_image_info_lookup(ip->endpoint, image,
+      boot_image_info_lookup(ip->endpoint, boot_image_tab,
           NULL, NULL, &boot_image_sys, NULL);
 
       /* If we must keep a copy of this system service, read the header
@@ -392,7 +390,7 @@ static void init_server(void)
   /* Allocate boot image buffer. */
   if(boot_image_buffer_size > 0) {
       boot_image_buffer = rs_startup_sbrk(boot_image_buffer_size);
-      if(boot_image_buffer == (char *) -1) {
+      if (boot_image_buffer == (char *)-1) {
           panic("RS", "unable to allocate boot image buffer", NO_NUM);
       }
   }
@@ -413,7 +411,7 @@ static void init_server(void)
       }
 
       /* Lookup the corresponding entries in other tables. */
-      boot_image_info_lookup(boot_image_priv->endpoint, image,
+      boot_image_info_lookup(boot_image_priv->endpoint, boot_image_tab,
           &ip, NULL, &boot_image_sys, &boot_image_dev);
       rp = &rproc[boot_image_priv - boot_image_priv_table];
 
@@ -423,7 +421,7 @@ static void init_server(void)
       rp->r_exec_len = 0;
       rp->r_exec = NULL;
       if(boot_image_sys->flags & SF_USE_COPY) {
-          exec_image_copy(ip - image, ip, rp);
+          exec_image_copy(ip - boot_image_tab, ip, rp);
       }
 
       /*
@@ -509,7 +507,7 @@ static void init_server(void)
       }
 
       /* Lookup the corresponding entry in the boot image table. */
-      boot_image_info_lookup(boot_image_priv->endpoint, image,
+      boot_image_info_lookup(boot_image_priv->endpoint, boot_image_tab,
           &ip, NULL, NULL, NULL);
 
       /* Allow the process to run. */
@@ -522,7 +520,7 @@ static void init_server(void)
    * Complete the initialization of the system process table in collaboration
    * with other system processes.
    */
-  if ((s = getsysinfo(PM_PROC_NR, SI_PROC_TAB, mproc)) != 0) {
+  if ((s = getsysinfo(PM_PROC_NR, SI_PROC_TAB, mproc_tab)) != 0) {
       panic("RS", "unable to get copy of PM process table", s);
   }
   for (i=0; boot_image_priv_table[i].endpoint != NULL_BOOT_NR; i++) {
@@ -539,8 +537,8 @@ static void init_server(void)
       /* Get pid from PM process table. */
       rp->r_pid = NO_PID;
       for (j = 0; j < NR_PROCS; j++) {
-          if (mproc[j].mp_endpoint == rp->r_proc_nr_e) {
-              rp->r_pid = mproc[j].mp_pid;
+          if (mproc_tab[j].mp_endpoint == rp->r_proc_nr_e) {
+              rp->r_pid = mproc_tab[j].mp_pid;
               break;
           }
       }
@@ -618,7 +616,6 @@ static void init_server(void)
 static void sig_handler()
 {
   sigset_t sigset;
-  int sig;
 
   /* Try to obtain signal set from PM. */
   if (getsigset(&sigset) != 0) return;

@@ -26,6 +26,7 @@
 #include <kernel/priv.h>
 #include <kernel/kernel.h>
 #include <kernel/proc.h>
+#include <asm/setup.h>
 
 /* Variables relating to shutting down MINIX. */
 char kernel_exception;           /* TRUE after system exceptions */
@@ -56,13 +57,15 @@ int irq_use;                             /* map of all in-use irq's */
 u32_t system_hz;                         /* HZ value */
 
 /* Miscellaneous. */
-reg_t mon_ss, mon_sp;            /* boot monitor stack */
 int do_serial_debug;
 endpoint_t who_e;                /* message source endpoint */
 int who_p;                       /* message source proc */
 int sys_call_code;               /* kernel call number in SYSTEM */
 time_t boottime;
-char params_buffer[512];         /* boot monitor parameters */
+
+char cmd_line_params[COMMAND_LINE_SIZE];	/* kernel command-line */
+char cmd_line_params_str[COMMAND_LINE_SIZE];	/* kernel command-line string */
+
 int kernel_in_panic = 0;
 int locklevel;
 u32_t magictest;
@@ -112,7 +115,7 @@ char *t_stack[TOT_STACK_SPACE / sizeof(char*)];
 
 struct boot_image image[] = {
 	/* process nr, pc, flags, qs,  queue, stack,   name */
-	{IDLE,       NULL,     0,  0,      0, IDL_S, "idle"    },
+	{IDLE,          0,     0,  0,      0, IDL_S, "idle"    },
 	{CLOCK,clock_task,     0,  8, TASK_Q, TSK_S, "clock"   },
 	{SYSTEM, sys_task,     0,  8, TASK_Q, TSK_S, "system"  },
 	{HARDWARE,      0,     0,  8, TASK_Q, HRD_S, "kernel"  },

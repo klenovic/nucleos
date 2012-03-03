@@ -15,12 +15,12 @@
 
 static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname, char *frame,
 		    int frame_len);
-static int read_header(char *exec, size_t exec_len, int *sep_id, vir_bytes *text_bytes,
+static int read_header(char *exec, size_t exec_len, vir_bytes *text_bytes,
 		       vir_bytes *data_bytes, vir_bytes *bss_bytes, phys_bytes *tot_bytes,
 		       vir_bytes *pc, int *hdrlenp);
 static int exec_newmem(int proc_e, vir_bytes text_bytes, vir_bytes data_bytes,
 		       vir_bytes bss_bytes, vir_bytes tot_bytes, vir_bytes frame_len,
-		       int sep_id, dev_t st_dev, ino_t st_ino, time_t st_ctime,
+		       dev_t st_dev, ino_t st_ino, time_t st_ctime,
 		       char *progname, int new_uid, int new_gid, vir_bytes *stack_topp,
 		       int *load_textp, int *allow_setuidp, vir_bytes entry_point);
 static int exec_restart(int proc_e, int result);
@@ -132,7 +132,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	char *frame, int frame_len)
 {
 	int r;
-	int hdrlen, sep_id, load_text, allow_setuid;
+	int hdrlen, load_text, allow_setuid;
 	int need_restart, error;
 	vir_bytes stack_top, vsp;
 	vir_bytes text_bytes, data_bytes, bss_bytes, pc;
@@ -145,8 +145,8 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	error= 0;
 
 	/* Read the file header and extract the segment sizes. */
-	r = read_header(exec, exec_len, &sep_id,
-		&text_bytes, &data_bytes, &bss_bytes, 
+	r = read_header(exec, exec_len,
+		&text_bytes, &data_bytes, &bss_bytes,
 		&tot_bytes, &pc, &hdrlen);
 	if (r != 0)
 	{
@@ -159,7 +159,7 @@ static int do_exec(int proc_e, char *exec, size_t exec_len, char *progname,
 	new_gid= getgid();
 	/* XXX what should we use to identify the executable? */
 	r= exec_newmem(proc_e, text_bytes, data_bytes, bss_bytes, tot_bytes,
-		frame_len, sep_id, 0 /*dev*/, proc_e /*inum*/, 0 /*ctime*/, 
+		frame_len, 0 /*dev*/, proc_e /*inum*/, 0 /*ctime*/,
 		progname, new_uid, new_gid, &stack_top, &load_text,
 		&allow_setuid, pc);
 	if (r != 0)
@@ -221,7 +221,7 @@ fail:
  *				exec_newmem				     *
  *===========================================================================*/
 static int exec_newmem(proc_e, text_bytes, data_bytes, bss_bytes, tot_bytes,
-	frame_len, sep_id, st_dev, st_ino, st_ctime, progname,
+	frame_len, st_dev, st_ino, st_ctime, progname,
 	new_uid, new_gid, stack_topp, load_textp, allow_setuidp, entry_point)
 int proc_e;
 vir_bytes text_bytes;
@@ -229,7 +229,6 @@ vir_bytes data_bytes;
 vir_bytes bss_bytes;
 vir_bytes tot_bytes;
 vir_bytes frame_len;
-int sep_id;
 dev_t st_dev;
 ino_t st_ino;
 time_t st_ctime;
@@ -250,7 +249,6 @@ vir_bytes entry_point;
 	e.bss_bytes = bss_bytes;
 	e.tot_bytes = tot_bytes;
 	e.args_bytes = frame_len;
-	e.sep_id = sep_id;
 	e.st_dev = st_dev;
 	e.st_ino = st_ino;
 	e.st_ctime = st_ctime;
@@ -303,11 +301,10 @@ int result;
 /*===========================================================================*
  *				read_header				     *
  *===========================================================================*/
-static int read_header(exec, exec_len, sep_id, text_bytes, data_bytes,
+static int read_header(exec, exec_len, text_bytes, data_bytes,
 	bss_bytes, tot_bytes, pc, hdrlenp)
 char *exec;			/* executable image */
 size_t exec_len;		/* size of the image */
-int *sep_id;			/* true iff sep I&D */
 vir_bytes *text_bytes;		/* place to return text size */
 vir_bytes *data_bytes;		/* place to return initialized data size */
 vir_bytes *bss_bytes;		/* place to return bss size */
@@ -360,9 +357,7 @@ int *hdrlenp;
   if (hdr.a_cpu != A_I8086 && hdr.a_cpu != A_I80386) return(-ENOEXEC);
 #endif
 
-  if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0) return(-ENOEXEC);
-
-  *sep_id = !!(hdr.a_flags & A_SEP);	    /* separate I & D or not */
+  if ((hdr.a_flags & ~(A_NSYM | A_EXEC)) != 0) return(-ENOEXEC);
 
   /* Get text and data sizes. */
   *text_bytes = (vir_bytes) hdr.a_text;	/* text size in bytes */
@@ -371,12 +366,8 @@ int *hdrlenp;
   *tot_bytes  = hdr.a_total;		/* total bytes to allocate for prog */
   if (*tot_bytes == 0) return(-ENOEXEC);
 
-  if (!*sep_id) {
-	/* If I & D space is not separated, it is all considered data. Text=0*/
-	*data_bytes += *text_bytes;
-	*text_bytes = 0;
-  }
-
+  *data_bytes += *text_bytes;
+  *text_bytes = 0;
   *pc = hdr.a_entry;	/* initial address to start execution */
   *hdrlenp = hdr.a_hdrlen & BYTE;		/* header length */
 

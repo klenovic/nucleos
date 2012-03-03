@@ -12,7 +12,7 @@
 
 #include <nucleos/linkage.h>
 
-.section .text
+	.section ".text", "ax"
 
 // int getprocessor(void);
 //      Return 86, 186, 286, 386, 486, 586, ...

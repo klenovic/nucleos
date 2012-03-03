@@ -18,7 +18,7 @@ LDFLAGS_ext2.elf32 := -L$(lib-arch) -Llib \
 $(src)/ext2.elf32: servers/server_32.lds
 
 # Create in minix3's aout format
-ext2_a_flags := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+ext2_a_flags := 0x00
 ext2_a_hdrlen := 0x20
 ext2_a_cpu := i386
 ext2_stackheap := 128kb

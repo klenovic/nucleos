@@ -19,11 +19,9 @@
 #include <asm/servers/vm/vm.h>
 #include <asm/page_types.h> /* definition of PAGE_SHIFT */
 
-.section .text.init
+	.section ".text.init", "ax"
 
-.globl __mainjump, unmap_page_zero
-
-.globl _start
+	.globl _start
 _start:
 	xor	%ebp, %ebp		// clear for backtrace of core files
 	mov	(%esp), %eax		// argc
@@ -56,7 +54,8 @@ _start:
 	setz	_fpu_present	// True if not set
 	jmp __mainjump
 
-.p2align PAGE_SHIFT
+	.p2align PAGE_SHIFT
+	.globl __mainjump
 __mainjump:
 	// unmap zero pages
 	call	unmap_page_zero
@@ -67,27 +66,20 @@ __mainjump:
 	hlt		// force a trap if exit fails
 
 /* unmap */
+	.globl unmap_page_zero
 unmap_page_zero:
 	// unmap 0-page code
 	push	$I386_PAGE_SIZE
 	push	$0
 	call	munmap_text	// munmap_text(0, I386_PAGE_SIZE)
 	add	$8, %esp
-
-#ifdef CONFIG_UKERNEL_LINKAGE_SEPID
-	// unmap 0-page data
-	push	$I386_PAGE_SIZE
-	push	$0
-	call	munmap		// munmap(0, I386_PAGE_SIZE)
-	add	$8, %esp
-#endif
 	ret
 
-.section .data
-.globl _penviron
+	.section ".data", "aw"
+	.globl _penviron
 _penviron:
 	.long  _penvp                 // Pointer to environ, or hidden pointer
 
-.section .bss
+	.section ".bss", "aw"
 	.lcomm _penvp, 4             // Hidden environment vector
 	.lcomm _fpu_present, 4       // FPU present flag

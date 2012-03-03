@@ -30,14 +30,12 @@
 #include <servers/vm/sanitycheck.h>
 #include <servers/vm/region.h>
 
-/*===========================================================================*
- *				do_fork					     *
- *===========================================================================*/
+static pt_t origpt;
+
 int do_fork(kipc_msg_t *msg)
 {
   int r, proc, s, childproc, fullvm;
   struct vmproc *vmp, *vmc;
-  pt_t origpt;
   vir_bytes msgaddr;
 
   SANITYCHECK(SCL_FUNCTIONS);
@@ -128,11 +126,7 @@ int do_fork(kipc_msg_t *msg)
 	s = sys_abscopy(parent_abs, child_abs, prog_bytes);
 	if (s < 0) vm_panic("do_fork can't copy", s);
 
-	/* A separate I&D child keeps the parents text segment.  The data and stack
-	* segments must refer to the new copy.
-	*/
-	if (!(vmc->vm_flags & VMF_SEPARATE))
-		vmc->vm_arch.vm_seg[T].mem_phys = child_base;
+	vmc->vm_arch.vm_seg[T].mem_phys = child_base;
 	vmc->vm_arch.vm_seg[D].mem_phys = child_base;
 	vmc->vm_arch.vm_seg[S].mem_phys = vmc->vm_arch.vm_seg[D].mem_phys +
            (vmp->vm_arch.vm_seg[S].mem_vir - vmp->vm_arch.vm_seg[D].mem_vir);
@@ -144,7 +138,7 @@ int do_fork(kipc_msg_t *msg)
   }
 
   /* Only inherit these flags. */
-  vmc->vm_flags &= (VMF_INUSE|VMF_SEPARATE|VMF_HASPT);
+  vmc->vm_flags &= (VMF_INUSE|VMF_HASPT);
 
   /* inherit the priv call bitmaps */
   memcpy(&vmc->vm_call_priv_mask, &vmp->vm_call_priv_mask,
@@ -180,4 +174,3 @@ int do_fork(kipc_msg_t *msg)
   SANITYCHECK(SCL_FUNCTIONS);
   return 0;
 }
-

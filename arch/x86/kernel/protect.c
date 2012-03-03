@@ -20,10 +20,10 @@
 #define INT_GATE_TYPE   (INT_286_GATE | DESC_386_BIT)
 #define TSS_TYPE        (AVL_286_TSS  | DESC_386_BIT)
 
-struct desctableptr_s {
-	char limit[sizeof(u16)];
-	char base[sizeof(u32)];     /* really u24_t + pad for 286 */
-};
+struct gdt_ptr {
+	u16 limit;
+	u32 base;
+} __attribute__((packed));
 
 struct gatedesc_s {
 	u16 offset_low;
@@ -37,7 +37,24 @@ struct segdesc_s gdt[GDT_SIZE];
 static struct gatedesc_s idt[IDT_SIZE];	/* zero-init so none present */
 struct tss_s tss;			/* zero init */
 
-static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size);
+static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size)
+{
+	/* Fill in the size fields (base, limit and granularity) of a descriptor. */
+	segdp->base_low = base;
+	segdp->base_middle = base >> BASE_MIDDLE_SHIFT;
+	segdp->base_high = base >> BASE_HIGH_SHIFT;
+
+	--size;		/* convert to a limit, 0 size means 4G */
+	if (size > BYTE_GRAN_MAX) {
+		segdp->limit_low = size >> PAGE_GRAN_SHIFT;
+		segdp->granularity = GRANULAR | (size >> (PAGE_GRAN_SHIFT + GRANULARITY_SHIFT));
+	} else {
+		segdp->limit_low = size;
+		segdp->granularity = size >> GRANULARITY_SHIFT;
+	}
+
+	segdp->granularity |= DEFAULT;        /* means BIG for data seg */
+}
 
 void enable_iop(struct proc *pp)
 {
@@ -118,7 +135,7 @@ void prot_init(void)
 /* Set up tables for protected mode.
  * All GDT slots are allocated at compile time.
  */
-	struct desctableptr_s *dtp;
+	struct gdt_ptr *dtp;
 	unsigned ldt_index;
 	register struct proc *rp;
 
@@ -135,13 +152,13 @@ void prot_init(void)
 	kinfo.data_size = ((kinfo.data_size+CLICK_SIZE-1)/CLICK_SIZE) * CLICK_SIZE;
 
 	/* Build gdt and idt pointers in GDT where the BIOS expects them. */
-	dtp = (struct desctableptr_s *) &gdt[GDT_INDEX];
-	* (u16 *) dtp->limit = (sizeof gdt) - 1;
-	* (u32 *) dtp->base = vir2phys(gdt);
+	dtp = (struct gdt_ptr*)&gdt[GDT_INDEX];
+	dtp->limit = (sizeof(gdt)) - 1;
+	dtp->base = vir2phys(gdt);
 
-	dtp= (struct desctableptr_s *) &gdt[IDT_INDEX];
-	* (u16 *) dtp->limit = (sizeof idt) - 1;
-	* (u32 *) dtp->base = vir2phys(idt);
+	dtp= (struct gdt_ptr*)&gdt[IDT_INDEX];
+	dtp->limit = (sizeof(idt)) - 1;
+	dtp->base = vir2phys(idt);
 
 	/* Build segment descriptors for tasks and interrupt handlers. */
 	init_codeseg(&gdt[CS_INDEX], kinfo.code_base, kinfo.code_size, INTR_PRIVILEGE);
@@ -168,7 +185,7 @@ void prot_init(void)
 	gdt[TSS_INDEX].access = PRESENT | (INTR_PRIVILEGE << DPL_SHIFT) | TSS_TYPE;
 
 	/* Complete building of main TSS. */
-	tss.iobase = sizeof tss;	/* empty i/o permissions map */
+	tss.iobase = sizeof(tss);	/* empty i/o permissions map */
 }
 
 void idt_copy_vectors(struct gate_table_s * first)
@@ -219,24 +236,6 @@ void idt_init(void)
 	idt_copy_vectors(gate_table_pic);
 }
 
-static void sdesc(struct segdesc_s *segdp, phys_bytes base, vir_bytes size)
-{
-	/* Fill in the size fields (base, limit and granularity) of a descriptor. */
-	segdp->base_low = base;
-	segdp->base_middle = base >> BASE_MIDDLE_SHIFT;
-	segdp->base_high = base >> BASE_HIGH_SHIFT;
-
-	--size;		/* convert to a limit, 0 size means 4G */
-	if (size > BYTE_GRAN_MAX) {
-		segdp->limit_low = size >> PAGE_GRAN_SHIFT;
-		segdp->granularity = GRANULAR | (size >> (PAGE_GRAN_SHIFT + GRANULARITY_SHIFT));
-	} else {
-		segdp->limit_low = size;
-		segdp->granularity = size >> GRANULARITY_SHIFT;
-	}
-
-	segdp->granularity |= DEFAULT;        /* means BIG for data seg */
-}
 
 void int_gate(unsigned vec_nr, vir_bytes offset, unsigned dpl_type)
 {
@@ -262,7 +261,7 @@ void alloc_segments(struct proc *rp)
 
 	data_bytes = (phys_bytes) (rp->p_memmap[S].mem_vir + rp->p_memmap[S].mem_len) << CLICK_SHIFT;
 	if (rp->p_memmap[T].mem_len == 0)
-		code_bytes = data_bytes;	/* common I&D, poor protect */
+		code_bytes = data_bytes;
 	else
 		code_bytes = (phys_bytes) rp->p_memmap[T].mem_len << CLICK_SHIFT;
 

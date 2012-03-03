@@ -51,7 +51,8 @@ void mem_init(struct memory *chunks);
 int get_mem_map(int proc_nr, struct mem_map *mem_map);
 void get_mem_chunks(struct memory *mem_chunks);
 void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr);
-int reserve_initrd_mem(struct memory *mem_chunks);
+int reserve_initrd_mem(struct memory *mem_chunks, phys_bytes ramdisk_image,
+		       phys_bytes ramdisk_size);
 int vm_isokendpt(endpoint_t ep, int *proc);
 int get_stack_ptr(int proc_nr, vir_bytes *sp);
 int do_ctl(kipc_msg_t *);

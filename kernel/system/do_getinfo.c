@@ -39,7 +39,7 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 	int proc_nr, nr_e, nr, r;
 	struct proc *caller;
 	int wipe_rnd_bin = -1;
-	struct exec e_hdr;
+
 	int len = 0;
 	static struct k_randomness copy;	/* copy to keep counters */
 	int i = 0;
@@ -109,9 +109,9 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		break;
 	}
 
-	case GET_MONPARAMS:
-		src_vir = (vir_bytes) params_buffer;
-		length = sizeof(params_buffer);
+	case GET_CMDLINE_PARAMS:
+		src_vir = (vir_bytes)cmd_line_params;
+		length = sizeof(cmd_line_params);
 		break;
 
 	case GET_RANDOMNESS:
@@ -174,6 +174,8 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 
 	case GET_AOUTHEADER: {
 		int hdrindex, index = m_ptr->I_VAL_LEN2_E;
+		struct exec *e_hdr;
+
 		if(index < 0 || index >= NR_BOOT_PROCS) {
 			return -EINVAL;
 		}
@@ -182,9 +184,9 @@ register kipc_msg_t *m_ptr;	/* pointer to request message */
 		} else {
 			hdrindex = 1 + index-NR_TASKS;
 		}
-		arch_get_aout_headers(hdrindex, &e_hdr);
-		length = sizeof(e_hdr);
-		src_vir = (vir_bytes) &e_hdr;
+		e_hdr = arch_get_aout_header(hdrindex);
+		length = sizeof(*e_hdr);
+		src_vir = (vir_bytes)e_hdr;
 		break;
 	}
 

@@ -9,7 +9,7 @@ LDFLAGS_amddev.elf32 := -L$(lib-arch) -Llib \
 $(src)/amddev.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-amddev_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+amddev_a_flags   := 0x00
 amddev_a_hdrlen  := 0x20
 amddev_a_cpu     := i386
 amddev_stackheap := 320k

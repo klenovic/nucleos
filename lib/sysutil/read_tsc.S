@@ -7,13 +7,13 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-.section .text
+	.section ".text", "ax"
 
-.globl	read_tsc	// read the cycle counter (Pentium and up)
+	.globl	read_tsc	// read the cycle counter (Pentium and up)
 //===========================================================================
 // void read_tsc(unsigned long *high, unsigned long *low);
 // Read the cycle counter of the CPU. Pentium and up. 
-.p2align 4
+	.p2align 4
 read_tsc:
 	push %edx
 	push %eax
@@ -31,7 +31,7 @@ read_tsc:
 //===========================================================================*
 // PUBLIC void read_host_time_ns(unsigned long *high, unsigned long *low);
 // access real time in ns from host in vmware.
-.p2align 4
+	.p2align 4
 read_host_time_ns:
 	push %edx
 	push %eax

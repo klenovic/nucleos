@@ -1,6 +1,10 @@
 ### Kernel hacking/debugging (kernel generic + arch.specific)
 menu "Kernel hacking"
 
+config BOOT_VERBOSE
+	bool "Boot verbose"
+	default y
+
 ### common kernel debug options
 source "kernel/Kconfig.debug"
 

@@ -39,6 +39,8 @@ static void announce(void)
 	/* Display the Nucleos startup banner. */
 	printk("\nNucleos %s Copyright (c) 2011, Ladislav Klenovic <klenovic@nucleonsoft.com>\n",
 		UTS_RELEASE);
+
+	printk("Command line: %s\n", cmd_line_params);
 }
 
 void main(void)
@@ -52,7 +54,7 @@ void main(void)
 	phys_clicks text_base;
 	vir_clicks text_clicks, data_clicks, st_clicks;
 	reg_t ktsb;			/* kernel task stack base */
-	struct exec e_hdr;		/* for a copy of an a.out header */
+	struct exec *e_hdr = 0;		/* for a copy of an a.out header */
 
 	/* Global value to test segment sanity. */
 	magictest = MAGICTEST;
@@ -113,43 +115,41 @@ void main(void)
 			/* Assign privilege structure. Force a static privilege id. */
 			(void) get_priv(rp, static_priv_id(proc_nr));
 
-		/* Priviliges for kernel tasks. */
-		if(iskerneln(proc_nr)) {
-			/* Privilege flags. */
-			priv(rp)->s_flags = (proc_nr == IDLE ? IDL_F : TSK_F);
-			/* Allowed traps. */
-			priv(rp)->s_trap_mask = (proc_nr == CLOCK
-				|| proc_nr == SYSTEM  ? CSK_T : TSK_T);
-			ipc_to_m = TSK_M;                  /* allowed targets */
-			kcalls = TSK_KC;                   /* allowed kernel calls */
-		}
-		/* Priviliges for the root system process. */
-		else if(isrootsysn(proc_nr)) {
-			priv(rp)->s_flags= RSYS_F;         /* privilege flags */
-			priv(rp)->s_trap_mask= RSYS_T;     /* allowed traps */
-			ipc_to_m = RSYS_M;                 /* allowed targets */
-			kcalls = RSYS_KC;                  /* allowed kernel calls */
+			/* Priviliges for kernel tasks. */
+			if(iskerneln(proc_nr)) {
+				/* Privilege flags. */
+				priv(rp)->s_flags = (proc_nr == IDLE ? IDL_F : TSK_F);
+				/* Allowed traps. */
+				priv(rp)->s_trap_mask = (proc_nr == CLOCK
+					|| proc_nr == SYSTEM  ? CSK_T : TSK_T);
+				ipc_to_m = TSK_M;                  /* allowed targets */
+				kcalls = TSK_KC;                   /* allowed kernel calls */
+			} else if(isrootsysn(proc_nr)) {
+			/* Priviliges for the root system process. */
+				priv(rp)->s_flags= RSYS_F;         /* privilege flags */
+				priv(rp)->s_trap_mask= RSYS_T;     /* allowed traps */
+				ipc_to_m = RSYS_M;                 /* allowed targets */
+				kcalls = RSYS_KC;                  /* allowed kernel calls */
+			}
+
+			/* Fill in target mask. */
+			for (j=0; j < NR_SYS_PROCS; j++) {
+				if (ipc_to_m & (1 << j))
+					set_sendto_bit(rp, j);
+				else
+					unset_sendto_bit(rp, j);
+			}
+
+			/* Fill in kernel call mask. */
+			for(j = 0; j < CALL_MASK_SIZE; j++) {
+				priv(rp)->s_k_call_mask[j] = (kcalls == NO_C ? 0 : (~0));
+			}
+		} else {
+			/*Don't let the process run for now. */
+			RTS_SET(rp, RTS_NO_PRIV);
 		}
 
-		/* Fill in target mask. */
-		for (j=0; j < NR_SYS_PROCS; j++) {
-			if (ipc_to_m & (1 << j))
-				set_sendto_bit(rp, j);
-		else
-			unset_sendto_bit(rp, j);
-		}
-
-		/* Fill in kernel call mask. */
-		for(j = 0; j < CALL_MASK_SIZE; j++) {
-			priv(rp)->s_k_call_mask[j] = (kcalls == NO_C ? 0 : (~0));
-		}
-	}
-	else {
-		/*Don't let the process run for now. */
-		RTS_SET(rp, RTS_NO_PRIV);
-	}
-
-	if (iskerneln(proc_nr)) {               /* part of the kernel? */
+		if (iskerneln(proc_nr)) {               /* part of the kernel? */
 			if (ip->stksize > 0) {		/* HARDWARE stack size is 0 */
 				rp->p_priv->s_stack_guard = (reg_t *) ktsb;
 				*rp->p_priv->s_stack_guard = STACK_GUARD;
@@ -159,25 +159,19 @@ void main(void)
 			rp->p_reg.sp = ktsb;	/* this task's initial stack ptr */
 			hdrindex = 0;		/* all use the first a.out header */
 		} else {
-		hdrindex = 1 + i-NR_TASKS;	/* system/user processes */
+			hdrindex = 1 + i-NR_TASKS;	/* system/user processes */
 		}
 
 		/* Architecture-specific way to find out aout header of this
 		 * boot process.
 		 */
-		arch_get_aout_headers(hdrindex, &e_hdr);
+		e_hdr = arch_get_aout_header(hdrindex);
 
 		/* Convert addresses to clicks and build process memory map */
-		text_base = e_hdr.a_syms >> CLICK_SHIFT;
-		text_clicks = (e_hdr.a_text + CLICK_SIZE-1) >> CLICK_SHIFT;
-		data_clicks = (e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
-		st_clicks= (e_hdr.a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
-
-		if (!(e_hdr.a_flags & A_SEP)) {
-			data_clicks = (e_hdr.a_text + e_hdr.a_data + e_hdr.a_bss + CLICK_SIZE-1)
-				       >> CLICK_SHIFT;
-			text_clicks = 0;	   /* common I&D */
-		}
+		text_base = e_hdr->a_syms >> CLICK_SHIFT;
+		st_clicks= (e_hdr->a_total + CLICK_SIZE-1) >> CLICK_SHIFT;
+		data_clicks = (e_hdr->a_text + e_hdr->a_data + e_hdr->a_bss + CLICK_SIZE-1) >> CLICK_SHIFT;
+		text_clicks = 0;
 
 		rp->p_memmap[T].mem_phys = text_base;
 		rp->p_memmap[T].mem_len  = text_clicks;
@@ -187,11 +181,14 @@ void main(void)
 		rp->p_memmap[S].mem_vir  = st_clicks;
 		rp->p_memmap[S].mem_len  = 0;
 
-		/* Patch the non-kernel process' entry points since it doesn't have to be
-		 * at address 0.
+		/* Patch (override) the non-kernel process' entry points in image table. The
+		 * image table is located in kernel/kernel_syms.c. The kernel processes like
+		 * IDLE, SYSTEM, CLOCK, HARDWARE are not changed because they are part of kernel
+		 * and the entry points are set at compilation time. In case of IDLE or HARDWARE
+		 * the entry point can be ignored becasue they never run (set RTS_PROC_STOP).
 		 */
 		if (!iskerneln(proc_nr(rp)))
-			ip->initial_pc = (task_t*)e_hdr.a_entry;
+			ip->initial_pc = (task_t*)e_hdr->a_entry;
 
 		/* Set initial register values.  The processor status word for tasks 
 		 * is different from that of other processes because tasks can
@@ -201,16 +198,17 @@ void main(void)
 		rp->p_reg.psw = (iskerneln(proc_nr)) ? INIT_TASK_PSW : INIT_PSW;
 
 		/* Initialize the server stack pointer. Take it down one word
-		 * to give crtso.s something to use as "argc".
+		 * to give crtso.s something to use as "argc","argv" and "envp".
 		 */
 		if (isusern(proc_nr)) {		/* user-space process? */
 			rp->p_reg.sp = (rp->p_memmap[S].mem_vir + rp->p_memmap[S].mem_len)
 					<< CLICK_SHIFT;
-			rp->p_reg.sp -= sizeof(reg_t);
+			rp->p_reg.sp -= 3*sizeof(reg_t);
 		}
 
-	/* scheduling functions depend on proc_ptr pointing somewhere. */
-	if(!proc_ptr) proc_ptr = rp;
+		/* scheduling functions depend on proc_ptr pointing somewhere. */
+		if(!proc_ptr)
+			proc_ptr = rp;
 
 		/* If this process has its own page table, VM will set the
 		 * PT up and manage it. VM will signal the kernel when it has
@@ -219,12 +217,18 @@ void main(void)
 		if(ip->flags & PROC_FULLVM)
 			RTS_SET(rp, RTS_VMINHIBIT);
 
-		if (rp->p_nr == HARDWARE) RTS_SET(rp, RTS_PROC_STOP);
-		/* IDLE task is never put on a run queue as it is never ready to run */
-		if (rp->p_nr == IDLE) RTS_SET(rp, RTS_PROC_STOP);
+		/* IDLE & HARDWARE task is never put on a run queue as it is
+		 * never ready to run.
+		 */
+		if (rp->p_nr == HARDWARE)
+			RTS_SET(rp, RTS_PROC_STOP);
+
+		if (rp->p_nr == IDLE)
+			RTS_SET(rp, RTS_PROC_STOP);
+
 		RTS_UNSET(rp, RTS_SLOT_FREE); /* remove RTS_SLOT_FREE and schedule */
 		alloc_segments(rp);
-	}
+	} /* for */
 
 	/* Architecture-dependent initialization. */
 	arch_init();

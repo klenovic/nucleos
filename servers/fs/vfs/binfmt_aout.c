@@ -7,6 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
+#include <stdlib.h>
 #include "fs.h"
 #include <nucleos/stat.h>
 #include <nucleos/kernel.h>
@@ -106,7 +107,7 @@ static int aout_check_binfmt(struct nucleos_binprm *param, struct vnode *vp)
 		return -1;
 #endif
 
-	if ((hdr.a_flags & ~(A_NSYM | A_EXEC | A_SEP)) != 0)
+	if ((hdr.a_flags & ~(A_NSYM | A_EXEC)) != 0)
 		return -1;
 
 	memcpy(param->buf, &hdr, hdr.a_hdrlen);
@@ -129,8 +130,6 @@ static int aout_load_binary(struct nucleos_binprm *param)
 
 	hdr = (struct exec*)param->buf;
 
-	param->ex.sep_id = !!(hdr->a_flags & A_SEP);	/* separate I & D or not */
-
 	/* Get text and data sizes. */
 	param->ex.text_bytes = (vir_bytes) hdr->a_text;	/* text size in bytes */
 	param->ex.data_bytes = (vir_bytes) hdr->a_data;	/* data size in bytes */
@@ -140,11 +139,8 @@ static int aout_load_binary(struct nucleos_binprm *param)
 	if (param->ex.tot_bytes == 0)
 		return -1;
 
-	if (!param->ex.sep_id) {
-		/* If I & D space is not separated, it is all considered data. Text=0 */
-		param->ex.data_bytes += param->ex.text_bytes;
-		param->ex.text_bytes = 0;
-	}
+	param->ex.data_bytes += param->ex.text_bytes;
+	param->ex.text_bytes = 0;
 
 	/* entry point of process */
 	param->ex.entry_point = hdr->a_entry;
@@ -187,25 +183,32 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
  * a segment is padded out to a click multiple, and the data segment is only
  * partially initialized.
  */
-	int err;
+	int err = 0;
 	unsigned n, k;
 	u64_t new_pos;
 	unsigned int cum_io;
-	char buf[1024];
 
 	/* Make sure that the file is big enough */
-	if (vp->v_size < off+seg_bytes) {
+	if (vp->v_size < off+seg_bytes)
 		return -EIO;
-	}
 
 	if (seg != D) {
+		char *buf = 0;
+
 		/* We have to use a copy loop until safecopies support segments */
 		k = 0;
+
+		buf = malloc(1024);
+		if (!buf) {
+			printk("Not enough memory!\n");
+			return -ENOMEM;
+		}
+
 		while (k < seg_bytes) {
-			n= seg_bytes - k;
+			n = seg_bytes - k;
 
 			if (n > sizeof(buf))
-				n= sizeof(buf);
+				n = sizeof(buf);
 
 #if CONFIG_DEBUG_VFS_AOUT
 			printk("read_seg for user %d, seg %d: buf 0x%x, size %d, pos %d\n",
@@ -219,27 +222,30 @@ static int aout_read_seg(struct vnode *vp, off_t off, int proc_e, int seg, phys_
 
 			if (err) {
 				printk("VFS: read_seg: req_readwrite failed (text)\n");
-				return err;
+				goto aout_free_buf;
 			}
 
 			if (cum_io != n) {
 				printk("read_seg segment has not been read properly by exec()\n");
-				return -EIO;
+				err = -EIO;
+				goto aout_free_buf;
 			}
 
 			err = sys_vircopy(VFS_PROC_NR, D, (vir_bytes)buf, proc_e, seg, k, n);
 
 			if (err) {
 				printk("VFS: read_seg: copy failed (text)\n");
-				return err;
+				goto aout_free_buf;
 			}
 
 			k += n;
 		}
 
-		return 0;
-	}
+aout_free_buf:
+		free(buf);
 
+		return err;
+	}
 
 	/* Issue request */
 	err = req_readwrite(vp->v_fs_e, vp->v_inode_nr, cvul64(off),
@@ -272,7 +278,7 @@ static int aout_exec_newmem(vir_bytes *stack_topp, int *load_textp, int *allow_s
 
 	m.m_type = KCNR_EXEC_NEWMEM;
 	m.EXC_NM_PROC = proc_e;
-	m.EXC_NM_PTR = (char *)ex;
+	m.EXC_NM_PTR = (s32)ex;
 
 	err = kipc_module_call(KIPC_SENDREC, 0, PM_PROC_NR, &m);
 

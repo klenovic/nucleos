@@ -20,6 +20,7 @@
  *   do_getsetpriority: get/set process priority
  *   do_svrctl: process manager control
  */
+#include <stdlib.h>
 #include <nucleos/kernel.h>
 #include "pm.h"
 #include <nucleos/unistd.h>
@@ -43,17 +44,6 @@
 #include "param.h"
 
 extern struct utsname uts_val;
-
-static char *uts_tbl[] = {
-  NULL,			/* No kernel architecture */
-  uts_val.machine,
-  NULL,			/* No hostname */
-  uts_val.nodename,
-  uts_val.release,
-  uts_val.version,
-  uts_val.sysname,
-  NULL,			/* No bus */			/* No bus */
-};
 
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
 unsigned long calls_stats[NR_syscalls];
@@ -137,7 +127,7 @@ int do_getsysinfo()
   vir_bytes src_addr, dst_addr;
   struct kinfo kinfo;
   struct loadinfo loadinfo;
-  struct pciinfo pciinfo;
+  struct pciinfo *pciinfo;
   static struct proc proctab[NR_PROCS+NR_TASKS];
   size_t len;
   int s, r;
@@ -178,11 +168,21 @@ int do_getsysinfo()
         len = sizeof(struct loadinfo);
         break;
   case SI_PCI_INFO:			/* PCI info is obtained via PM */
-        if ((r=getpciinfo(&pciinfo)) != 0)
-			return r;
-        src_addr = (vir_bytes) &pciinfo;
-        len = sizeof(struct pciinfo);
-        break;
+	pciinfo = malloc(sizeof(struct pciinfo));
+	if (!pciinfo) {
+		printk("PM: no enough memory!\n");
+		return -ENOMEM;
+	}
+
+	if ((r = getpciinfo(pciinfo)) != 0) {
+		free(pciinfo);
+		return r;
+	}
+
+	src_addr = (vir_bytes)pciinfo;
+	len = sizeof(struct pciinfo);
+	break;
+
 #ifdef CONFIG_DEBUG_SERVERS_SYSCALL_STATS
   case SI_CALL_STATS:
   	src_addr = (vir_bytes) calls_stats;
@@ -344,7 +344,6 @@ int do_getepinfo()
 int do_reboot()
 {
 	kipc_msg_t m;
-	int r;
 
 	/* Check permission to abort the system. */
 	if (mp->mp_effuid != SUPER_USER) return(-EPERM);
@@ -377,13 +376,6 @@ int do_svrctl()
 {
   int s, req;
   vir_bytes ptr;
-#define MAX_LOCAL_PARAMS 2
-  static struct {
-  	char name[30];
-  	char value[30];
-  } local_param_overrides[MAX_LOCAL_PARAMS];
-  static int local_params = 0;
-
   req = m_in.svrctl_req;
   ptr = (vir_bytes) m_in.svrctl_argp;
 
@@ -392,11 +384,11 @@ int do_svrctl()
 
   /* Control operations local to the PM. */
   switch(req) {
-  case MMSETPARAM:
   case MMGETPARAM: {
       struct sysgetenv sysgetenv;
       char search_key[64];
-      char *val_start;
+      char val_start[64];
+      char *value;
       size_t val_len;
       size_t copy_len;
 
@@ -404,39 +396,10 @@ int do_svrctl()
       if (sys_datacopy(who_e, ptr, ENDPT_SELF, (vir_bytes) &sysgetenv, 
               sizeof(sysgetenv)) != 0) return(-EFAULT);  
 
-      /* Set a param override? */
-      if (req == MMSETPARAM) {
-  	if (local_params >= MAX_LOCAL_PARAMS) return -ENOSPC;
-  	if (sysgetenv.keylen <= 0
-  	 || sysgetenv.keylen >=
-  	 	 sizeof(local_param_overrides[local_params].name)
-  	 || sysgetenv.vallen <= 0
-  	 || sysgetenv.vallen >=
-  	 	 sizeof(local_param_overrides[local_params].value))
-  		return -EINVAL;
-  		
-          if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
-            ENDPT_SELF, (vir_bytes) local_param_overrides[local_params].name,
-               sysgetenv.keylen)) != 0)
-               	return s;
-          if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.val,
-            ENDPT_SELF, (vir_bytes) local_param_overrides[local_params].value,
-              sysgetenv.vallen)) != 0)
-               	return s;
-            local_param_overrides[local_params].name[sysgetenv.keylen] = '\0';
-            local_param_overrides[local_params].value[sysgetenv.vallen] = '\0';
-
-  	local_params++;
-
-  	return 0;
-      }
-
       if (sysgetenv.keylen == 0) {	/* copy all parameters */
-          val_start = monitor_params;
-          val_len = sizeof(monitor_params);
-      } 
-      else {				/* lookup value for key */
-      	  int p;
+          value = cmd_line_params;
+          val_len = sizeof(cmd_line_params);
+      } else {				/* lookup value for key */
           /* Try to get a copy of the requested key. */
           if (sysgetenv.keylen > sizeof(search_key)) return(-EINVAL);
           if ((s = sys_datacopy(who_e, (vir_bytes) sysgetenv.key,
@@ -447,15 +410,11 @@ int do_svrctl()
            * First check local overrides.
            */
           search_key[sysgetenv.keylen-1]= '\0';
-          for(p = 0; p < local_params; p++) {
-          	if (!strcmp(search_key, local_param_overrides[p].name)) {
-          		val_start = local_param_overrides[p].value;
-          		break;
-          	}
-          }
-          if (p >= local_params && (val_start = find_param(search_key)) == NULL)
+
+          if (!get_param_value(cmd_line_params, search_key, val_start))
                return(-ESRCH);
           val_len = strlen(val_start) + 1;
+          value = val_start;
       }
 
       /* See if it fits in the client's buffer. */
@@ -464,7 +423,7 @@ int do_svrctl()
 
       /* Value found, make the actual copy (as far as possible). */
       copy_len = MIN(val_len, sysgetenv.vallen); 
-      if ((s=sys_datacopy(ENDPT_SELF, (vir_bytes) val_start, 
+      if ((s=sys_datacopy(ENDPT_SELF, (vir_bytes) value,
               who_e, (vir_bytes) sysgetenv.val, copy_len)) != 0)
           return(s);
 
@@ -610,7 +569,7 @@ int scall_setpriority(void)
 		else
 			rmp = mp; /* current process */
 
-		if (rmp != NIL_PROC)
+		if (rmp != 0)
 			error = 0;
 		break;
 

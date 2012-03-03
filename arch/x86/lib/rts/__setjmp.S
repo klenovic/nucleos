@@ -9,7 +9,7 @@
  */
 // based on code by Philip Homburg <philip@cs.vu.nl>
 
-.section .text
+	.section ".text", "ax"
 .globl __setjmp
 __setjmp:
 	movl	4(%esp), %eax		// jmp_buf

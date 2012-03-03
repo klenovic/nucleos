@@ -24,7 +24,6 @@ Created:	Feb 15, 1994 by Philip Homburg <philip@cs.vu.nl>
 #define MMSWAPON	_IOW('M',  5, struct mmswapon)
 #define MMSWAPOFF	_IO ('M',  6)
 #define MMGETPARAM	_IOW('M',  5, struct sysgetenv)
-#define MMSETPARAM	_IOR('M',  7, struct sysgetenv)
 
 /* VFS_PROC_NR controls. */
 #define FSSIGNON	_IOW('F',  2, struct fssignon)

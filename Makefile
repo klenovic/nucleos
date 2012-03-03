@@ -335,6 +335,10 @@ KBUILD_CFLAGS += -fomit-frame-pointer
 KBUILD_CXXFLAGS += -fomit-frame-pointer
 endif
 
+ifneq ($(CONFIG_FRAME_WARN),0)
+KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
+endif
+
 # arch Makefile may override CC so keep this after arch Makefile is included
 NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
 CHECKFLAGS     += $(NOSTDINC_FLAGS)
@@ -424,15 +428,15 @@ export cc-install-dir cc-include-dir \
 ifeq ($(KBUILD_EXTMOD),)
 # Here we have setup in this Makefile plus expanded in arch Makefile
 # @klenovic: keep the libs as first for now
-nucleos-dirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y)
-nucleos-alldirs := $(libs-y) $(drivers-y) $(servers-y) $(core-y) \
-		   $(libs-) $(drivers-) $(servers-) $(core-)
+nucleos-dirs := $(patsubst %/,%,$(libs-y) $(drivers-y) $(servers-y) $(core-y))
+nucleos-alldirs := $(patsubst %/,%,$(libs-y) $(drivers-y) $(servers-y) $(core-y) \
+		   $(libs-) $(drivers-) $(servers-) $(core-))
 
 # build object files
 __build: $(nucleos-dirs)
 
-# create kernel
-kernel: __all
+# create kernel image
+image: __all
 
 # explicit goal to create tools
 # Note that we must compile the `fixdep' too
@@ -506,7 +510,7 @@ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
 #
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)
-clean-dirs      := $(addprefix _clean_,$(srctree) $(nucleos-alldirs))
+clean-dirs      := $(addprefix _clean_,$(patsubst %/,%,$(srctree) $(nucleos-alldirs)))
 
 PHONY += $(clean-dirs) clean archclean
 

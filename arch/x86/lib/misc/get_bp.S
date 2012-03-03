@@ -11,7 +11,7 @@
 // return EBP in EAX
 // based on code by Philip Homburg
 
-.section .text
+	.section ".text", "ax"
 
 .globl get_bp
 get_bp:

@@ -15,15 +15,19 @@ Configure devices on the PCI bus
 
 Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 */
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <nucleos/string.h>
+#include <nucleos/sysutil.h>
 #include <nucleos/drivers.h>
+#include <nucleos/com.h>
 #include <nucleos/pci.h>
+#include <nucleos/syslib.h>
 #include <assert.h>
 #include <ibm/pci.h>
-#include <asm/servers/vm/vm.h>
-#include <nucleos/com.h>
 #include <servers/rs/rs.h>
-#include <nucleos/syslib.h>
+#include <asm/servers/vm/vm.h>
+#include <asm/bootparam.h>
 
 #include "pci_amd.h"
 #include "pci_intel.h"
@@ -31,11 +35,6 @@ Created:	Jan 2000 by Philip Homburg <philip@cs.vu.nl>
 #include "pci_via.h"
 
 #define irq_mode_pci(irq) ((void)0)
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <nucleos/string.h>
-#include <nucleos/sysutil.h>
 
 #define PBT_INTEL_HOST	 1
 #define PBT_PCIBRIDGE	 2
@@ -1251,41 +1250,38 @@ static void complete_bridges()
 /*===========================================================================*
  *				complete_bars				     *
  *===========================================================================*/
+static struct boot_params bootparam;
+
 static void complete_bars(void)
 {
 	int i, j, r, bar_nr, reg;
 	u32_t memgap_low, memgap_high, iogap_low, iogap_high, io_high,
 		base, size, v32, diff1, diff2;
-	char *cp, *next;
-	char memstr[256];
+	struct memory *mem;
 
-	r= env_get_param("memory", memstr, sizeof(memstr));
-	if (r != 0)
-		panic("pci", "env_get_param failed", r);
-	
-	/* Set memgap_low to just above physical memory */
-	memgap_low= 0;
-	cp= memstr;
-	while (*cp != '\0')
-	{
-		base= strtoul(cp, &next, 16);
-		if (!(*next) || next == cp || *next != ':')
-			goto bad_mem_string;
-		cp= next+1;
-		size= strtoul(cp, &next, 16);
-		if (next == cp || (*next != ',' && *next != '\0'))
-		if (!*next)
-			goto bad_mem_string;
-		if (base+size > memgap_low)
-			memgap_low= base+size;
-
-		if (*next)
-			cp= next+1;
-		else
-			break;
+	r = sys_getbootparam(&bootparam);
+	if (r) {
+		panic("pci","Couldn't get boot parameters!", r);
 	}
 
-	memgap_high= 0xfe000000;	/* Leave space for the CPU (APIC) */
+	mem = bootparam.nucleos_kludge.mem;
+
+	/* Set memgap_low to just above physical memory */
+	memgap_low = 0;
+
+	for (i = 0; i < NR_MEMS; i++) {
+		mem = bootparam.nucleos_kludge.mem + i;
+		if (!mem->size)
+			continue;
+
+		base = mem->base;
+		size = mem->size;
+
+		if (base + size > memgap_low)
+			memgap_low = base + size;
+	}
+
+	memgap_high = 0xfe000000;	/* Leave space for the CPU (APIC) */
 
 	if (debug)
 	{
@@ -1466,10 +1462,6 @@ static void complete_bars(void)
 		}
 	}
 	return;
-
-bad_mem_string:
-	printk("PCI: bad memory environment string '%s'\n", memstr);
-	panic(NULL, NULL, NO_NUM);
 }
 
 /*===========================================================================*

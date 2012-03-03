@@ -66,31 +66,37 @@ void arch_shutdown(int how)
 	while(1) level0(halt_cpu);
 }
 
-/* address of a.out headers, set in mpx386.s */
-phys_bytes aout;
+/* address of a.out headers, set in start.c */
+static u8 kimage_aout_headers[MAX_IMG_PROCS_COUNT*A_MINHDR];
 
-void arch_get_aout_headers(int i, struct exec *h)
+void arch_copy_aout_headers(struct boot_params *params)
 {
-	/* The bootstrap loader created an array of the a.out headers at
-	 * absolute address 'aout'. Get one element to h.
-	 */
-	phys_copy(vir2phys(h), aout + i * A_MINHDR, (phys_bytes) A_MINHDR);
+	if (!params || !params->nucleos_kludge.aout_hdrs_addr)
+		kernel_panic("Invalid AOUT headers address", NO_NUM);
+
+	phys_copy(vir2phys(kimage_aout_headers), params->nucleos_kludge.aout_hdrs_addr,
+		  (phys_bytes)A_MINHDR*MAX_IMG_PROCS_COUNT);
 }
 
-void tss_init(struct tss_s * tss, void * kernel_stack, unsigned cpu)
+struct exec *arch_get_aout_header(int i)
+{
+	return (struct exec*)(kimage_aout_headers + i*A_MINHDR);
+}
+
+static void tss_init(struct tss_s *tss, void *kernel_stack, unsigned cpu)
 {
 	/*
 	 * make space for process pointer and cpu id and point to the first
 	 * usable word
 	 */
-	tss->sp0 = ((unsigned) kernel_stack) - 2 * sizeof(void *);
+	tss->sp0 = ((unsigned) kernel_stack) - 2*sizeof(void*);
 	tss->ss0 = DS_SELECTOR;
 
 	/*
 	 * set the cpu id at the top of the stack so we know on which cpu is
 	 * this stak in use when we trap to kernel
 	 */
-	*((reg_t *)(tss->sp0 + 1 * sizeof(reg_t))) = cpu;
+	*((reg_t*)(tss->sp0 + 1*sizeof(reg_t))) = cpu;
 }
 
 void arch_init(void)
@@ -151,7 +157,7 @@ void arch_init(void)
 
 	idt_init();
 
-	tss_init(&tss, &k_boot_stktop, 0);
+	tss_init(&tss, &tss_stack_top, 0);
 
 #if defined(CONFIG_X86_LOCAL_APIC) && !defined(CONFIG_SMP)
 	if (config_no_apic) {
@@ -399,20 +405,20 @@ void cons_seth(int pos, int n)
 /* Saved by mpx386.s into these variables. */
 u32_t params_size, params_offset, mon_ds;
 
-int arch_get_params(char *params, int maxsize)
+void arch_copy_cmdline_params(char *buf, struct boot_params *params)
 {
-	phys_copy(vir2phys(params),seg2phys(mon_ds) + params_offset,
-		MIN(maxsize, params_size));
-	params[maxsize-1] = '\0';
-	return 0;
+	if (!buf)
+		kernel_panic("Invalid buffer address for command-line params", NO_NUM);
+
+	phys_copy(vir2phys(buf), params->hdr.cmd_line_ptr, COMMAND_LINE_SIZE);
 }
 
-int arch_set_params(char *params, int size)
+void arch_copy_boot_params(struct boot_params *params, u32 real_mode_params)
 {
-	if(size > params_size)
-		return -E2BIG;
-	phys_copy(seg2phys(mon_ds) + params_offset, vir2phys(params), size);
-	return 0;
+	if (!params)
+		kernel_panic("Invalid buffer address for boot params", NO_NUM);
+
+	phys_copy(vir2phys(params), real_mode_params, sizeof(struct boot_params));
 }
 
 void arch_do_syscall(struct proc *proc)

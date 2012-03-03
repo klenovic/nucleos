@@ -53,7 +53,6 @@ time_t ctime;
   struct vmproc *vmp;
   for (vmp = &vmproc[0]; vmp < &vmproc[NR_PROCS]; vmp++) {
         if (!(vmp->vm_flags & VMF_INUSE)) continue;
-        if (!(vmp->vm_flags & VMF_SEPARATE)) continue;
         if (vmp->vm_flags & VMF_HASPT) continue;
         if (vmp == vmp_ign) continue;
         if (vmp->vm_ino != ino) continue;
@@ -116,7 +115,7 @@ int do_exec_newmem(kipc_msg_t *msg)
 		return(-ENOEXEC); /* stack must be at least 1 click */
 	}
 
-	dvir = (args.sep_id ? 0 : tc);
+	dvir = tc;
 	s_vir = dvir + (totc - sc);
 
 	r = (dvir + dc > s_vir) ? -ENOMEM : 0;
@@ -155,12 +154,6 @@ int do_exec_newmem(kipc_msg_t *msg)
 	vmp->vm_ino = args.st_ino;
 	vmp->vm_dev = args.st_dev;
 	vmp->vm_ctime = args.st_ctime;
-
-	/* set/clear separate I&D flag */
-	if (args.sep_id)
-		vmp->vm_flags |= VMF_SEPARATE;	
-	else
-		vmp->vm_flags &= ~VMF_SEPARATE;
 
 	msg->VMEN_STACK_TOP = (void *) stack_top;
 	msg->VMEN_FLAGS = 0;

@@ -90,10 +90,6 @@
 .globl machine_check
 .globl simd_exception
 
-.globl params_size
-.globl params_offset
-.globl mon_ds
-
 .globl schedcheck
 .globl dirtypde
 .globl lazy_fpu
@@ -116,95 +112,18 @@
 .globl hwint14
 .globl hwint15
 
-/* @nucleos: All these flags are used and defined by monitor. So this
-	     can lead into inconsistence if we change something there
-	     but forget to change also here! */
-
-/* legacy features (see monitor sources) */
-#define K_FLAGS			0x01FD
-
-#ifdef CONFIG_BUILTIN_INITRD
-#define K_BUILTIN_INITRD	0x0001
-#else
-#define K_BUILTIN_INITRD	0x0000
-#endif
-
-#define K_FLAGS_EXT		K_BUILTIN_INITRD
-
-.section .text.head
+	.section ".text.head", "ax"
 //===========================================================================
 //                         nucleos_startup
 //===========================================================================
 .globl nucleos_startup
-nucleos_startup:                // this is the entry point for the Nucleos kernel
-	/* @nucleos: Do not put anything here otherwise boot will not find CLICK_SHIFT
-		     These "magic" numbers look a bit jerky and unflexible... passing
-		     kernel options/features via commad line or something similar would be
-		     cool. */
-
-	jmp	over_flags	// skip over the next few bytes
-	.word	CLICK_SHIFT	// for the monitor: memory granularity
-flags:
-	.word	K_FLAGS		// boot monitor flags:
-				//      call in 386 mode, make bss, make stack,
-				//      load high, do not patch, will return,
-				//      uses generic INT, memory vector,
-				//      new boot code return
-flags_ext:
-	.word	K_FLAGS_EXT	// boot monitor extended flags:
-				//      built in initrd (in memory driver)
-	nop			// extra byte to sync up disassembler
-
-over_flags:
-	// Set up a C stack frame on the monitor stack.  (The monitor sets cs and ds
-	// right.  The ss descriptor still references the monitor data segment.)
-	movzwl	%sp, %esp	// monitor stack is a 16 bit stack
-	push	%ebp
-	mov	%esp, %ebp
-	push	%esi
-	push	%edi
-	mov	%esp, mon_sp	// save stack pointer for later return
-
-	/* Copy the monitor global descriptor table to the address space of kernel and
-	   switch over to it.  Prot_init() can then update it with immediate effect. */
-	sgdt	gdt+GDT_SELECTOR		// get the monitor gdtr
-	mov	gdt+GDT_SELECTOR+2, %esi	// absolute address of GDT
-	mov	$gdt, %ebx			// address of kernel GDT
-	mov	$8*8, %ecx			// copying eight descriptors
-copygdt:
-	movb	%es:(%esi), %al
-	movb	%al, (%ebx)
-	inc	%esi
-	inc	%ebx
-	loop	copygdt
-	mov	gdt+DS_SELECTOR+2, %eax		// base of kernel data
-	and	$0x00FFFFFF, %eax		// only 24 bits
-	add	$gdt, %eax			// eax = vir2phys(gdt)
-	mov	%eax, gdt+GDT_SELECTOR+2	// set base of GDT
-	lgdt	gdt+GDT_SELECTOR		// switch over to kernel GDT
-	/* Locate boot parameters, set up kernel segment registers and stack. */
-	mov	4(%ebp), %ebx			// boot parameters offset
-	mov	8(%ebp), %edx			// boot parameters length
-	mov	12(%ebp), %eax			// address of a.out headers
-	mov	%eax, aout
-	mov	%ds, %ax			// kernel data
-	mov	%ax, %es
-	mov	%ax, %fs
-	mov	%ax, %gs
-	mov	%ax, %ss
-	mov	$k_boot_stktop, %esp		// set sp to point to the top of kernel stack
-	/* Save boot parameters into these global variables for i386 code */
-	mov	%edx, params_size
-	mov	%ebx, params_offset
-	movl	$SS_SELECTOR, mon_ds
-
+nucleos_startup:
 	/* Call C startup code to set up a proper environment to run main(). */
-	push	%edx
-	push	%ebx
+	push	params_offset
 	push	$DS_SELECTOR
 	push	$CS_SELECTOR
-	call	prepare_kernel				// prepare_kernel(cs, ds, parmoff, parmlen)
-	add	$4*4, %esp
+	call	prepare_kernel	/* prepare_kernel(cs, ds, boot_params) */
+	add	$4*3, %esp
 
 	/* Reload gdtr, idtr and the segment registers to global descriptor table set */
 	/* up by prot_init(). */
@@ -226,7 +145,7 @@ csinit:
 
 	jmp	main				// main()
 
-.section .text
+	.section ".text", "ax"
 //===========================================================================
 //                             interrupt handlers
 //             interrupt handlers for 386 32-bit protected mode
@@ -647,14 +566,8 @@ level0_call:
 	call	*%eax
 	jmp	restart
 
-.section .bss
+	.section ".bss","aw"
 
-/*
- * This stack is used temporarily for booting only. We switch to a proper kernel
- * stack after the first trap to kernel
- */
-k_stack:
-	.space CONFIG_KERNEL_BOOTSTACK_SIZE
-/* Top of kernel stack */
-.globl k_boot_stktop
-k_boot_stktop:
+	.space PAGE_SIZE
+	.globl tss_stack_top
+tss_stack_top:

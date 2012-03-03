@@ -61,7 +61,7 @@ res_init()
 	register FILE *fp;
 	register char *cp, **pp;
 	register int n;
-	char buf[BUFSIZ];
+	char *buf;
 	int haveenv = 0;
 	int havesearch = 0;
 	struct servent* servent;
@@ -87,6 +87,10 @@ res_init()
 		(void)strncpy(_res.defdname, cp, sizeof(_res.defdname));
 		haveenv++;
 	}
+
+	buf = malloc(BUFSIZ);
+	if (!buf)
+		return -1;
 
 	if ((fp = fopen(_PATH_RESCONF, "r")) != NULL) {
 	    /* read the config file */
@@ -187,5 +191,8 @@ res_init()
 		*pp++ = 0;
 	}
 	_res.options |= RES_INIT;
+
+	free(buf);
+
 	return (0);
 }

@@ -142,7 +142,6 @@ struct exec_newmem
 	vir_bytes tot_bytes;
 	vir_bytes args_bytes;
 	vir_bytes entry_point;
-	int sep_id;
 	dev_t st_dev;
 	ino_t st_ino;
 	time_t st_ctime;

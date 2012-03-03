@@ -2,6 +2,7 @@
 #include <asm/apic.h>
 #include <asm/ptrace_abi.h>
 
+	.section ".text", "ax"
 .globl	apic_hwint00	/*  handlers for hardware interrupts */
 .globl	apic_hwint01
 .globl	apic_hwint02
@@ -162,11 +163,11 @@ lapic_ap_timer_int_handler:
 
 #ifdef CONFIG_DEBUG_X86_LOCAL_APIC
 
-.data
+	.section ".rodata", "a"
 lapic_intr_dummy_handler_msg:
 .ascii "UNHABLED APIC interrupt vector %d\n"
 
-.text
+	.section ".text", "ax"
 
 #define lapic_intr_dummy_handler(vect)			\
 	pushl	$vect;					\

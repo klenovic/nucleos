@@ -10,82 +10,85 @@
 /*	sysenv 1.0 - request system boot parameter	Author: Kees J. Bot
  *								23 Dec 2000
  */
-#define nil ((void*)0)
+#include <stdarg.h>
+#include <stdlib.h>
 #include <nucleos/type.h>
 #include <nucleos/types.h>
 #include <nucleos/svrctl.h>
-#include <stdarg.h>
-#include <stdlib.h>
 #include <nucleos/unistd.h>
 #include <nucleos/errno.h>
 #include <nucleos/string.h>
 #include <asm/ioctls.h>
 
-#define NIL ((char*)0)
+static char buf[1024];
 
 static void tell(int fd, ...)
 {
-    va_list ap;
-    char *s;
+	va_list ap;
+	char *s;
 
-    va_start(ap, fd);
-    while ((s= va_arg(ap, char *)) != NIL) {
-	(void) write(fd, s, strlen(s));
-    }
-    va_end(ap);
+	va_start(ap, fd);
+	while ((s = va_arg(ap, char *)) != 0) {
+		(void) write(fd, s, strlen(s));
+	}
+
+	va_end(ap);
 }
 
 int main(int argc, char **argv)
 {
-    struct sysgetenv sysgetenv;
-    int i;
-    int ex= 0;
-    char *e;
-    char val[1024];
+	struct sysgetenv sysgetenv;
+	int i = 1;
+	int ex = 0;
+	char *e;
 
-    i= 1;
-    while (i < argc && argv[i][0] == '-') {
-	char *opt= argv[i++]+1;
 
-	if (opt[0] == '-' && opt[1] == 0) break;	/* -- */
+	while (i < argc && argv[i][0] == '-') {
+		char *opt = argv[i++] + 1;
 
-	if (*opt != 0) {
-	    tell(2, "Usage: sysenv [name ...]\n", NIL);
-	    exit(1);
-	}
-    }
+		if (opt[0] == '-' && opt[1] == 0)
+			break;	/* -- */
 
-    do {
-	if (i < argc) {
-	    sysgetenv.key= argv[i];
-	    sysgetenv.keylen= strlen(sysgetenv.key) + 1;
-	} else {
-	    sysgetenv.key= nil;
-	    sysgetenv.keylen= 0;
-	}
-	sysgetenv.val= val;
-	sysgetenv.vallen= sizeof(val);
-
-	if (svrctl(MMGETPARAM, &sysgetenv) == -1) {
-	    if (errno == ESRCH) {
-		ex |= 2;
-	    } else {
-		ex |= 1;
-		tell(2, "sysenv: ", strerror(errno), "\n", NIL);
-	    }
-	    continue;
+		if (*opt != 0) {
+			tell(2, "Usage: sysenv [name ...]\n", 0);
+			exit(1);
+		}
 	}
 
-	e= sysgetenv.val;
 	do {
-	    e += strlen(e);
-	    *e++ = '\n';
-	} while (i == argc && *e != 0);
+		if (i < argc) {
+			sysgetenv.key = argv[i];
+			sysgetenv.keylen = strlen(sysgetenv.key) + 1;
+		} else {
+			sysgetenv.key = 0;
+			sysgetenv.keylen = 0;
+		}
 
-	if (write(1, sysgetenv.val, e - sysgetenv.val) < 0) {
-	    ex |= 1;
-	    tell(2, "sysenv: ", strerror(errno), "\n", NIL);
-	}
-    } while (++i < argc);
-    return ex;
+		sysgetenv.val = buf;
+		sysgetenv.vallen = sizeof(buf);
+
+		if (svrctl(MMGETPARAM, &sysgetenv) == -1) {
+			if (errno == ESRCH) {
+				ex |= 2;
+			} else {
+				ex |= 1;
+				tell(2, "sysenv: ", strerror(errno), "\n", 0);
+			}
+			continue;
+		}
+
+		e = sysgetenv.val;
+
+		do {
+			e += strlen(e);
+			*e++ = '\n';
+		} while (i == argc && *e != 0);
+
+		if (write(1, sysgetenv.val, e - sysgetenv.val) < 0) {
+			ex |= 1;
+			tell(2, "sysenv: ", strerror(errno), "\n", 0);
+		}
+	} while (++i < argc);
+
+	return ex;
 }

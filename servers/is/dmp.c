@@ -29,7 +29,7 @@ struct hook_entry {
 	{ F2,   memmap_dmp, "Process memory maps" },
 	{ F3,	image_dmp, "System image" },
 	{ F4,	privileges_dmp, "Process privileges" },
-	{ F5,	monparams_dmp, "Boot monitor parameters" },
+	{ F5,	cmdline_params_dmp, "Kernel command-line parameters" },
 	{ F6,	irqtab_dmp, "IRQ hooks and policies" },
 	{ F7,	kmessages_dmp, "Kernel messages" },
 	{ F8,	vm_dmp, "VM status" },

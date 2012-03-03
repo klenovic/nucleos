@@ -34,10 +34,12 @@
 #include <kernel/proc.h>
 #include <asm/servers/vm/memory.h>
 #include <asm/kernel/types.h>
+#include <asm/bootparam.h>
 
 extern int missing_spares;
 
 struct vmproc vmproc[VMP_NR];
+struct boot_params bootparam;
 
 #if SANITYCHECKS
 int nocheck;
@@ -186,6 +188,14 @@ static void vm_init(void)
 	struct boot_image *ip;
 	phys_bytes limit = 0;
 
+	/* The initrd is put right after boot image */
+	if ((s = sys_getbootparam(&bootparam)) != 0) {
+		panic("VM","Couldn't get boot parameters!",s);
+	}
+
+	/* get what setup found out */
+	memcpy(mem_chunks, bootparam.nucleos_kludge.mem, sizeof(bootparam.nucleos_kludge.mem));
+
 	/* Get chunks of available memory. */
 	get_mem_chunks(mem_chunks);
 
@@ -249,9 +259,6 @@ static void vm_init(void)
 		vmp->vm_stacktop =
 			CLICK2ABS(vmp->vm_arch.vm_seg[S].mem_vir +
 				vmp->vm_arch.vm_seg[S].mem_len);
-
-		if (vmp->vm_arch.vm_seg[T].mem_len != 0)
-			vmp->vm_flags |= VMF_SEPARATE;
 	}
 
 #ifndef CONFIG_BUILTIN_INITRD
@@ -259,7 +266,8 @@ static void vm_init(void)
 	   have reserved memory for boot image otherwise it may happen that initrd
 	   will be overwritten by other process (in arch_init_vm).
 	 */
-	if ((s = reserve_initrd_mem(mem_chunks)) < 0) {
+	if ((s = reserve_initrd_mem(mem_chunks, bootparam.hdr.ramdisk_image,
+	    bootparam.hdr.ramdisk_size)) < 0) {
 		panic("VM", "Couldn't reserve memory for initial ramdisk!", s);
 	}
 #endif

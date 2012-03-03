@@ -8,13 +8,13 @@
  *  the Free Software Foundation, version 2 of the License.
  */
 
-.section .text
+	.section ".text", "ax"
 
 /* _cpuid() - interface to cpuid instruction
  * void _cpuid(u32_t eax, u32_t *eax, u32_t *ebx, u32_t *ecx, u32_t *edx);
  */
 
-.globl _cpuid
+	.globl _cpuid
 _cpuid:
 	push	%ebp
 

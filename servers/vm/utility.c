@@ -24,7 +24,6 @@
 #include <kernel/const.h>
 #include <kernel/types.h>
 #include <kernel/proc.h>
-#include <asm/bootparam.h>
 #include <asm/kernel/const.h>
 #include <asm/servers/vm/memory.h>
 
@@ -58,12 +57,11 @@ void get_mem_chunks(struct memory *mem_chunks)
 	int i;
 	struct memory *memp;
 
-	/* Obtain and parse memory from system environment. */
-	if(env_memory_parse(mem_chunks, NR_MEMS) != 0) 
-		vm_panic("couldn't obtain memory chunks", NO_NUM);
-
 	/* Round physical memory to clicks. Round start up, round end down. */
 	for (i = 0; i < NR_MEMS; i++) {
+		if (!mem_chunks[i].size)
+			continue;
+
 		memp = &mem_chunks[i];	/* next mem chunk is stored here */
 		base = mem_chunks[i].base;
 		size = mem_chunks[i].size;
@@ -86,17 +84,40 @@ void get_mem_chunks(struct memory *mem_chunks)
  */
 void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
 {
-/* Remove server memory from the free memory list. The boot monitor
- * promises to put processes at the start of memory chunks. The
- * tasks all use same base address, so only the first task changes
- * the memory lists. The servers and init have their own memory
- * spaces and their memory will be removed from the list.
- */
 	struct memory *memp;
+	u64 proc_phys_start = map_ptr[T].mem_phys;
+	u64 proc_phys_end = map_ptr[S].mem_phys;
+	u64 proc_phys_size = proc_phys_end - proc_phys_start;
+
 	for (memp = mem_chunks; memp < &mem_chunks[NR_MEMS]; memp++) {
-		if (memp->base == map_ptr[T].mem_phys) {
-			memp->base += map_ptr[T].mem_len + map_ptr[S].mem_vir;
-			memp->size -= map_ptr[T].mem_len + map_ptr[S].mem_vir;
+		/* If at the beginning then just move the base */
+		if (proc_phys_start == memp->base) {
+			memp->base += proc_phys_size;
+			memp->size -= proc_phys_size;
+
+			break;
+		}
+
+		if (proc_phys_start > memp->base &&
+		    proc_phys_start <= memp->base + memp->size) {
+			struct memory *mp;
+
+			if (mem_chunks[NR_MEMS - 1].size > 0 ||
+			    memp == &mem_chunks[NR_MEMS - 1] )
+				vm_panic("reserve_proc_mem: no enough free memory chunks",
+					  proc_phys_start);
+
+			/* copy the memory info into the next slot */
+			for (mp = &mem_chunks[NR_MEMS - 1]; mp > memp; mp--)
+				memcpy(mp, (mp - 1), sizeof(*mp));
+
+			/* adjust the boundaries of the next adjacent region (process view) */
+			(memp + 1)->size = memp->base + memp->size - proc_phys_end;
+			(memp + 1)->base = proc_phys_end;
+
+			/* shrink the size of the previous adjacent region (process view) */
+			memp->size = proc_phys_start - memp->base;
+
 			break;
 		}
 	}
@@ -115,44 +136,34 @@ void reserve_proc_mem(struct memory *mem_chunks, struct mem_map *map_ptr)
  *          boot monitor. It is very important to reserve initrd memory
  *          right after the boot image was reserved.
  */
-int reserve_initrd_mem(struct memory *mem_chunks)
+int reserve_initrd_mem(struct memory *mem_chunks, phys_bytes ramdisk_image,
+		       phys_bytes ramdisk_size)
 {
-	int i;
 	int s;
 	static int found = 0;
-	struct boot_params bootparam;
 	phys_bytes initrd_base_clicks;
 	phys_bytes initrd_size_clicks;
+	struct mem_map initrd_mm[3];
 
 	/* Don't enter if the ramdisk has been found already */
 	if (found)
 		return 0;
 
-	/* The initrd is put right after boot image */
-	if ((s = sys_getbootparam(&bootparam)) != 0) {
-		panic("VM","Couldn't get boot parameters!",s);
-	}
-
-	initrd_base_clicks = (bootparam.hdr.ramdisk_image >> CLICK_SHIFT);
-
-	/* Find initial ramdisk */
-	for (i=0; i<NR_MEMS; i++) {
-		if (mem_chunks[i].base == initrd_base_clicks) {
-			found = 1;
-			break;
-		}
-	}
-
-	if (!found) {
-		printk("VM: Couldn't find initial ramdisk at 0x%x\n", initrd_base_clicks);
-		return -ENXIO;
-	}
+	initrd_base_clicks = (ramdisk_image >> CLICK_SHIFT);
 
 	/* Round up the reserved memory */
-	initrd_size_clicks = ((bootparam.hdr.ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
+	initrd_size_clicks = ((ramdisk_size + CLICK_SIZE - 1) >> CLICK_SHIFT);
 
-	mem_chunks[i].base += initrd_size_clicks;
-	mem_chunks[i].size -= initrd_size_clicks;
+	/* Fake the initrd as process with text_base = data_base,
+	 * stack_base = text_base + text_size and stack_size = 0
+	 */
+	initrd_mm[T].mem_phys = initrd_base_clicks;
+	initrd_mm[D].mem_phys = initrd_mm[T].mem_phys;
+	initrd_mm[S].mem_phys = initrd_mm[T].mem_phys + initrd_size_clicks;
+
+	reserve_proc_mem(mem_chunks, initrd_mm);
+
+	found = 1;
 
 	return 0;
 }

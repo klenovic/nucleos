@@ -10,7 +10,7 @@ LDFLAGS_printer.elf32 := -L$(lib-arch) -Llib \
 $(src)/printer.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-printer_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+printer_a_flags   := 0x00
 printer_a_hdrlen  := 0x20
 printer_a_cpu     := i386
 printer_stackheap := 256k

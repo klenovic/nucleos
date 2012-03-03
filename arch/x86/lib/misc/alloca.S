@@ -10,10 +10,10 @@
 //       alloca() - allocate space on the stack
 // based on code by Kees J. Bot
 
-.section .text
+	.section ".text", "ax"
 
 	.p2align  4
-.globl alloca
+	.globl alloca
 alloca:
 	pop	%ecx             // Return address
 	pop	%eax             // Bytes to allocate

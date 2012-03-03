@@ -9,7 +9,7 @@ LDFLAGS_dp8390.elf32 := -L$(lib-arch) -Llib \
 $(src)/dp8390.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-dp8390_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+dp8390_a_flags   := 0x00
 dp8390_a_hdrlen  := 0x20
 dp8390_a_cpu     := i386
 dp8390_stackheap := 64k

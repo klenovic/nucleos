@@ -13,7 +13,7 @@ LDFLAGS_memory.elf32 := -L$(lib-arch) -Llib \
 $(src)/memory.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-memory_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+memory_a_flags   := 0x00
 memory_a_hdrlen  := 0x20
 memory_a_cpu     := i386
 memory_stackheap := 8k

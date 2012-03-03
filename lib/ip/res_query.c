@@ -36,6 +36,7 @@
 #include <net/nameser.h>
 #include <net/netdb.h>
 #include <net/resolv.h>
+#include <asm/byteorder.h>
 
 #define bcopy(s,d,l) memcpy(d,s,l)
 
@@ -135,7 +136,7 @@ res_query(name, class, type, answer, anslen)
  * Only useful for queries in the same name hierarchy as the local host
  * (not, for example, for host address-to-name lookups in domain in-addr.arpa).
  */
-res_search(name, class, type, answer, anslen)
+int res_search(name, class, type, answer, anslen)
 	char *name;		/* domain name */
 	int class, type;	/* class and type of query */
 	u_char *answer;		/* buffer to put answer */
@@ -209,8 +210,7 @@ res_search(name, class, type, answer, anslen)
  * Perform a call on res_query on the concatenation of name and domain,
  * removing a trailing dot from name if domain is NULL.
  */
-int
-res_querydomain(name, domain, class, type, answer, anslen)
+int res_querydomain(name, domain, class, type, answer, anslen)
 	char *name, *domain;
 	int class, type;	/* class and type of query */
 	u_char *answer;		/* buffer to put answer */
@@ -250,12 +250,19 @@ hostalias(name)
 	register char *C1, *C2;
 	FILE *fp;
 	char *file;
-	char buf[BUFSIZ];
+	char *buf;
 	static char abuf[MAXDNAME];
 
 	file = getenv("HOSTALIASES");
 	if (file == NULL || (fp = fopen(file, "r")) == NULL)
 		return (NULL);
+
+	buf = malloc(BUFSIZ);
+	if (!buf) {
+		h_errno = ENOMEM;
+		return NULL;
+	}
+
 	buf[sizeof(buf) - 1] = '\0';
 	while (fgets(buf, sizeof(buf), fp)) {
 		for (C1 = buf; *C1 && !isspace((int)*C1); ++C1);
@@ -269,10 +276,13 @@ hostalias(name)
 			for (C2 = C1 + 1; *C2 && !isspace((int)*C2); ++C2);
 			abuf[sizeof(abuf) - 1] = *C2 = '\0';
 			(void)strncpy(abuf, C1, sizeof(abuf) - 1);
+			free(buf);
 			fclose(fp);
 			return (abuf);
 		}
 	}
+
+	free(buf);
 	fclose(fp);
 	return (NULL);
 }

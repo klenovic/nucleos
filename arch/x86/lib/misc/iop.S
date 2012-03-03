@@ -9,11 +9,11 @@
  */
 // based on Kees J. Bot code
 
-.section .text
+	.section ".text", "ax"
 
 //       inb() - Input one byte
 //       unsigned inb(u16 port);
-.globl inb
+	.globl inb
 inb:
         push    %ebp
         mov     %esp,%ebp
@@ -25,7 +25,7 @@ inb:
 
 //       inl() - Input one dword
 //       unsigned inl(u16 port);
-.globl inl
+	.globl inl
 inl:
         push    %ebp
         mov     %esp,%ebp
@@ -36,7 +36,7 @@ inl:
 
 //       insb() - Input a byte array
 //       void insb(u16 port, void *buf, size_t count);
-.globl insb
+	.globl insb
 insb:
         push    %ebp
         mov     %esp,%ebp
@@ -52,7 +52,7 @@ insb:
 
 //       insl() - Input a dword array
 //       void insl(u16 port, void *buf, size_t count);
-.globl insl
+	.globl insl
 insl:
         push    %ebp
         mov     %esp,%ebp
@@ -69,7 +69,7 @@ insl:
 
 //       insw() - Input a word array
 //       void insw(u16 port, void *buf, size_t count);
-.globl insw
+	.globl insw
 insw:
         push    %ebp
         mov     %esp,%ebp
@@ -87,19 +87,19 @@ insw:
 //       intr_disable(), intr_enable - Disable/Enable hardware interrupts.
 //       void intr_disable(void);
 //       void intr_enable(void);
-.globl intr_disable
+	.globl intr_disable
 intr_disable:
         cli
         ret
 
-.globl intr_enable
+	.globl intr_enable
 intr_enable:
         sti
         ret
 
 //       inw() - Input one word
 //       unsigned inw(u16 port);
-.globl inw
+	.globl inw
 inw:
         push    %ebp
         mov     %esp,%ebp
@@ -111,7 +111,7 @@ inw:
 
 //       outb() - Output one byte
 //       void outb(u16 port, u8 value);
-.globl outb
+	.globl outb
 outb:
         push    %ebp
         mov     %esp,%ebp
@@ -123,7 +123,7 @@ outb:
 
 //       outl() - Output one dword
 //       void outl(u16 port, u32_t value);
-.globl outl
+	.globl outl
 outl:
         push    %ebp
         mov     %esp,%ebp
@@ -135,7 +135,7 @@ outl:
 
 //       outsb() - Output a byte array
 //       void outsb(u16 port, void *buf, size_t count);
-.globl outsb
+	.globl outsb
 outsb:
         push    %ebp
         mov     %esp,%ebp
@@ -151,7 +151,7 @@ outsb:
 
 //       outsl() - Output a dword array
 //       void outsl(u16 port, void *buf, size_t count);
-.globl outsl
+	.globl outsl
 outsl:
         push    %ebp
         mov     %esp,%ebp
@@ -168,7 +168,7 @@ outsl:
 
 //       outsw() - Output a word array
 //       void outsw(u16 port, void *buf, size_t count);
-.globl outsw
+	.globl outsw
 outsw:
         push    %ebp
         mov     %esp,%ebp
@@ -185,7 +185,7 @@ outsw:
 
 //       outw() - Output one word
 //       void outw(u16 port, u16 value);
-.globl outw
+	.globl outw
 outw:
         push    %ebp
         mov     %esp,%ebp

@@ -7,9 +7,6 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, version 2 of the License.
  */
-
-/* Note: This is exactly like using `--oformat BFDNAME' on the command line. If
-	 both are used, the command line option takes precedence. */
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH("i386")
 
@@ -22,51 +19,23 @@ OUTPUT_ARCH("i386")
 
 SECTIONS
 {
-#ifdef CONFIG_KERNEL_LINKAGE_SEPID
+	. = 0;
 	_text = .;
-	.text 0 : AT (ADDR(.text)) {
-		*(.text.head)
-		*(.text)
-		*(.text.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_etext = SIZEOF(.text);
+	/* Future 16-bit real-mode kernel */
+	.bstext		: { *(.bstext) }
+	.bsdata		: { *(.bsdata) }
 
-	_data = .;
-	.data 0 : AT (SIZEOF(.text)) {
+	. = 497;
+	.header		: { *(.header) }
+	.entrytext	: { *(.entrytext) }
+	.inittext	: { *(.inittext) }
+	.initdata	: { *(.initdata) }
+	__end_init = .;
 
-		SHORT(0x526f);					/* kernel data starts
-								   with this magic number */
-		. = (. == 0) ? PAGE_SIZE : ALIGN(PAGE_SIZE);	/* fist data page unmaped */
-		*(.rodata)
-		*(.rodata.*)
-		*(.data)
-		*(.data.*)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_edata = SIZEOF(.data);
-
-	_bss = .;
-	.bss . : AT (SIZEOF(.text) + SIZEOF(.data)) {
-		*(.bss)
-		*(.bss.*)
-		*(COMMON)
-		. = ALIGN(PAGE_SIZE);
-	}
-	_ebss = SIZEOF(.data) + SIZEOF(.bss);
-	_end = _ebss;
-
-#else /* Common I&D */
-
-	. = LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
-
-	_text = .;
-	.text.head . : AT (ADDR(.text.head) - LOAD_OFFSET) {
-		*(.text.head)
-		. = ALIGN(PAGE_SIZE);
-	}
-
+	/* The 32-bit kernel */
+	. += LOAD_OFFSET + LOAD_PHYSICAL_ADDR;
 	.text . : AT (ADDR(.text) - LOAD_OFFSET) {
+		*(.text.head)
 		*(.text)
 		*(.text.*)
 		. = ALIGN(PAGE_SIZE);
@@ -93,7 +62,6 @@ SECTIONS
 
 	_bss = .;
 	.bss . : AT (ADDR(.bss) - LOAD_OFFSET) {
-
 		*(.bss)
 		*(.bss.*)
 		*(COMMON)
@@ -101,7 +69,7 @@ SECTIONS
 	}
 	_ebss = .;
 	_end = _ebss;
-#endif
+
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.comment)

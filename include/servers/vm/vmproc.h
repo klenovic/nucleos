@@ -62,7 +62,6 @@ struct vmproc {
 
 /* Bits for vm_flags */
 #define VMF_INUSE	0x001	/* slot contains a process */
-#define VMF_SEPARATE	0x002	/* separate i&d */
 #define VMF_HASPT	0x004	/* has private page table */
 #define VMF_EXITING	0x008	/* PM is cleaning up this process */
 #define VMF_HAS_DMA	0x010	/* Process directly or indirectly granted

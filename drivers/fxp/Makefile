@@ -10,7 +10,7 @@ LDFLAGS_fxp.elf32 := -L$(lib-arch) -Llib \
 $(src)/fxp.elf32: drivers/driver_32.lds
 
 # Create in minix3's aout format
-fxp_a_flags   := $(CONFIG_UKERNEL_LINKAGE_TYPE)
+fxp_a_flags   := 0x00
 fxp_a_hdrlen  := 0x20
 fxp_a_cpu     := i386
 fxp_stackheap := 4k

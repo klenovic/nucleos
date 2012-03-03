@@ -9,6 +9,7 @@
  */
 #include "sysutil.h"
 #include <nucleos/string.h>
+#include <asm/setup.h>
 
 static int argc = 0;
 static char **argv = NULL;
@@ -35,7 +36,7 @@ char *value;				/* where to store value */
 int max_len;				/* maximum length of value */
 {
   kipc_msg_t m;
-  static char mon_params[128*sizeof(char *)];	/* copy parameters here */
+  static char mon_params[COMMAND_LINE_SIZE];	/* copy parameters here */
   char *key_value;
   int i, s, keylen;
 
@@ -60,7 +61,7 @@ int max_len;				/* maximum length of value */
 
   /* Get copy of boot monitor parameters. */
   m.m_type = SYS_GETINFO;
-  m.I_REQUEST = GET_MONPARAMS;
+  m.I_REQUEST = GET_CMDLINE_PARAMS;
   m.I_ENDPT = ENDPT_SELF;
   m.I_VAL_LEN = sizeof(mon_params);
   m.I_VAL_PTR = mon_params;

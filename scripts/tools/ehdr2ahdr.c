@@ -316,11 +316,7 @@ wrong_size:
 	ahdr.a_data     = input_exec_elf32.data_size;
 	ahdr.a_bss      = input_exec_elf32.bss_size;
 
-	if (!(flags & A_SEP)) /* Common I&D */
-		ahdr.a_total = ahdr.a_text + ahdr.a_data + ahdr.a_bss + stackheap;
-	else /* separate I&D */
-		ahdr.a_total = ahdr.a_data + ahdr.a_bss + stackheap;
-
+	ahdr.a_total = ahdr.a_text + ahdr.a_data + ahdr.a_bss + stackheap;
 	ahdr.a_entry = input_exec_elf32.initial_ip;
 
 	if (flags & A_NSYM) {

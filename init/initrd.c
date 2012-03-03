@@ -11,7 +11,7 @@
 #include <nucleos/stddef.h>
 
 /* Compile ramdisk translated to array of chars. */
-__section(".data.initrd") unsigned char initrd[] =
+__section(".data.initrd, \"aw\"") unsigned char initrd[] =
 {
 	/* Automatically generated (see Makefile) */
 	#include "initrd.h"
