@@ -1,7 +1,7 @@
 VERSION = 1
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = -alpha8
+EXTRAVERSION = -alpha9
 NAME = Get the ball rolling!
 
 # put scripts' path into searchpath and don't print "Entering directory"
