@@ -23,8 +23,8 @@
  * will eventually be rewritten to the disk.
  */
 
-#include <nucleos/dir.h>			/* need struct direct */
 #include <nucleos/dirent.h>
+#include <servers/fs/minixfs/dir.h>	/* need struct direct */
 
 union fsdata_u {
 	char b__data[_MAX_BLOCK_SIZE];		/* ordinary user data */

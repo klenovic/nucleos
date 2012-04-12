@@ -58,10 +58,8 @@ typedef struct __iobuf {
 
 #define	FOPEN_MAX	20
 
-#include <nucleos/dir.h>
-#define	FILENAME_MAX	DIRSIZ
-
 #define	TMP_MAX		999
+#define FILENAME_MAX	255
 #define	L_tmpnam	(sizeof("/tmp/") + FILENAME_MAX)
 #define __STDIO_VA_LIST__	void *
 
