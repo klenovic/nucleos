@@ -14,7 +14,6 @@
 #ifndef __SERVERS_FS_EXT2_BUF_H
 #define __SERVERS_FS_EXT2_BUF_H
 
-#include <nucleos/dir.h>            /* need struct direct */
 #include <nucleos/dirent.h>
 #include <servers/fs/ext2/type.h>
 
