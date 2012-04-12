@@ -49,7 +49,7 @@ void report(char *problem, char *message)
 	fprintf(stderr, "   %s\n\n", message);
 }
 
-void dump_exec_elf32(MNX(exec_elf32_t)* e)
+void dump_exec_elf32(nucs_exec_elf32_t* e)
 {
 	printf("typetype=0x%x  ",e->type);
 	printf("version=0x%x\n",e->version);
@@ -70,7 +70,7 @@ void dump_exec_elf32(MNX(exec_elf32_t)* e)
 	return;
 }
 
-void dump_aout(struct MNX(exec)* ahdr)
+void dump_aout(struct nucs_exec* ahdr)
 {
 	printf("magic: 0x%x 0x%x ",ahdr->a_magic[0],ahdr->a_magic[1]);     /* magic number */
 	printf("flags: 0x%x ",ahdr->a_flags);        /* flags, see below */
@@ -96,7 +96,7 @@ void dump_aout(struct MNX(exec)* ahdr)
 	return;
 }
 
-int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shdrs, struct MNX(exec_elf32)* exec);
+int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shdrs, struct nucs_exec_elf32* exec);
 
 /* default header length */
 #define HDRLEN     0x20
@@ -106,8 +106,8 @@ int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shd
 /* Main program. */
 int main(int argc, char **argv)
 {
-	struct MNX(exec) ahdr;   // minix aout header
-	struct MNX(exec_elf32) input_exec_elf32;
+	struct nucs_exec ahdr;   // minix aout header
+	struct nucs_exec_elf32 input_exec_elf32;
 	struct stat st_input;
 	elf32_ehdr_t ehdr;
 	elf32_phdr_t* phdrs = 0;
@@ -332,7 +332,7 @@ wrong_size:
 	return 0;
 }
 
-int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shdrs, struct MNX(exec_elf32)* exec)
+int create_exec_elf32(elf32_ehdr_t* ehdr, elf32_phdr_t* phdrs, elf32_shdr_t* shdrs, struct nucs_exec_elf32* exec)
 {
 	int i = 0;
 

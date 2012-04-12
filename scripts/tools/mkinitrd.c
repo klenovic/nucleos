@@ -52,7 +52,7 @@ void usage(char *progname)
 /* Main program. */
 int main(int argc, char **argv)
 {
-	struct MNX(exec) ahdr;   // minix aout header
+	struct nucs_exec ahdr;
 	struct stat st_input;
 	int fd_in;
 	int fd_out;

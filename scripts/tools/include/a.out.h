@@ -12,25 +12,25 @@
 #ifndef _AOUT_H
 #define _AOUT_H
 
-struct	MNX(exec) {			/* a.out header */
-  unsigned char	a_magic[2];	/* magic number */
-  unsigned char	a_flags;	/* flags, see below */
-  unsigned char	a_cpu;		/* cpu id */
-  unsigned char	a_hdrlen;	/* length of header */
-  unsigned char	a_unused;	/* reserved for future use */
+struct nucs_exec {			/* a.out header */
+  unsigned char a_magic[2];	/* magic number */
+  unsigned char a_flags;	/* flags, see below */
+  unsigned char a_cpu;		/* cpu id */
+  unsigned char a_hdrlen;	/* length of header */
+  unsigned char a_unused;	/* reserved for future use */
   unsigned short a_version;	/* version stamp (not used at present) */
-  int		a_text;		/* size of text segement in bytes */
-  int		a_data;		/* size of data segment in bytes */
-  int		a_bss;		/* size of bss segment in bytes */
-  int		a_entry;	/* entry point */
-  int		a_total;	/* total memory allocated */
-  int		a_syms;		/* size of symbol table */
+  int a_text;		/* size of text segement in bytes */
+  int a_data;		/* size of data segment in bytes */
+  int a_bss;		/* size of bss segment in bytes */
+  int a_entry;	/* entry point */
+  int a_total;	/* total memory allocated */
+  int a_syms;		/* size of symbol table */
 
   /* SHORT FORM ENDS HERE */
-  int		a_trsize;	/* text relocation size */
-  int		a_drsize;	/* data relocation size */
-  int		a_tbase;	/* text relocation base */
-  int		a_dbase;	/* data relocation base */
+  int a_trsize;	/* text relocation size */
+  int a_drsize;	/* data relocation size */
+  int a_tbase;	/* text relocation base */
+  int a_dbase;	/* data relocation base */
 };
 
 #define A_MAGIC0      (unsigned char) 0x01
@@ -74,10 +74,10 @@ static inline int is_aout(char* e)
 #define A_SYMPOS(X)	(A_TRELPOS(X) + (A_HASRELS(X) ? \
   			((X).a_trsize + (X).a_drsize) : 0))
 
-struct MNX(reloc) {
-  long r_vaddr;			/* virtual address of reference */
-  unsigned short r_symndx;	/* internal segnum or extern symbol num */
-  unsigned short r_type;	/* relocation type */
+struct nucs_reloc {
+	long r_vaddr;			/* virtual address of reference */
+	unsigned short r_symndx;	/* internal segnum or extern symbol num */
+	unsigned short r_type;	/* relocation type */
 };
 
 /* r_tyep values: */
@@ -97,12 +97,12 @@ struct MNX(reloc) {
 #define S_DATA		((unsigned short)-3)
 #define S_BSS		((unsigned short)-4)
 
-struct MNX(nlist) {			/* symbol table entry */
-  char n_name[8];		/* symbol name */
-  long n_value;			/* value */
-  unsigned char	n_sclass;	/* storage class */
-  unsigned char	n_numaux;	/* number of auxiliary entries (not used) */
-  unsigned short n_type;	/* language base and derived type (not used) */
+struct nucs_nlist {			/* symbol table entry */
+	char n_name[8];		/* symbol name */
+	long n_value;			/* value */
+	unsigned char	n_sclass;	/* storage class */
+	unsigned char	n_numaux;	/* number of auxiliary entries (not used) */
+	unsigned short n_type;	/* language base and derived type (not used) */
 };
 
 /* Low bits of storage class (section). */
