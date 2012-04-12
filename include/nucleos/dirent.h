@@ -85,8 +85,6 @@ typedef struct {
 						 */
 } DIR;
 
-#define _DIRENT_NAME_LEN 61
-
 /* Function Prototypes. */
 int closedir(DIR *_dirp);
 DIR *opendir(const char *_dirname);
