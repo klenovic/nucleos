@@ -20,8 +20,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "include/elfparse.h"
-#include "include/a.out.h"
+#include "elfparse.h"
+#include "a.out.h"
 
 #define DO_TRACE     0
 

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "include/a.out.h"
+#include "a.out.h"
 
 void usage(char *progname)
 {

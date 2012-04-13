@@ -15,9 +15,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "include/elfparse.h"
-#include "include/elf.h"
-#include "include/exec.h"
+#include "elfparse.h"
+#include "elf.h"
+#include "exec.h"
 
 elf32_ehdr_t* get_elf32_ehdr(char* buf, elf32_ehdr_t* ehdr)
 {
