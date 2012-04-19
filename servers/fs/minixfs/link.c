@@ -24,9 +24,9 @@
 #define SAME 1000
 
 static int remove_dir(struct minix_inode *rldirp,
-                      struct minix_inode *rip, char dir_name[NAME_MAX]);
+                      struct minix_inode *rip, char dir_name[MINIXFS_NAME_MAX]);
 static int unlink_file(struct minix_inode *dirp,
-                       struct minix_inode *rip, char file_name[NAME_MAX]);
+                       struct minix_inode *rip, char file_name[MINIXFS_NAME_MAX]);
 static off_t nextblock(off_t pos, int zonesize);
 static void zeroblock_half(struct minix_inode *i, off_t p, int l);
 static void zeroblock_range(struct minix_inode *i, off_t p, off_t h);
@@ -45,7 +45,7 @@ int fs_link()
 
   struct minix_inode *ip, *rip;
   register int r;
-  char string[NAME_MAX];
+  char string[MINIXFS_NAME_MAX];
   struct minix_inode *new_ip;
   phys_bytes len;
 
@@ -122,7 +122,7 @@ int fs_unlink()
   register struct minix_inode *rip;
   struct minix_inode *rldirp;
   int r;
-  char string[NAME_MAX];
+  char string[MINIXFS_NAME_MAX];
   phys_bytes len;
   
   /* Copy the last component */
@@ -216,7 +216,7 @@ int fs_rdlink()
 static int remove_dir(rldirp, rip, dir_name)
 struct minix_inode *rldirp;		 	/* parent directory */
 struct minix_inode *rip;			/* directory to be removed */
-char dir_name[NAME_MAX];		/* name of directory to be removed */
+char dir_name[MINIXFS_NAME_MAX];		/* name of directory to be removed */
 {
   /* A directory file has to be removed. Five conditions have to met:
    * 	- The file must be a directory
@@ -252,7 +252,7 @@ char dir_name[NAME_MAX];		/* name of directory to be removed */
 static int unlink_file(dirp, rip, file_name)
 struct minix_inode *dirp;		/* parent directory of file */
 struct minix_inode *rip;		/* inode of file, may be NIL_INODE too. */
-char file_name[NAME_MAX];	/* name of file to be removed */
+char file_name[MINIXFS_NAME_MAX];	/* name of file to be removed */
 {
 /* Unlink 'file_name'; rip must be the inode of 'file_name' or NIL_INODE. */
 
@@ -294,7 +294,7 @@ int fs_rename()
   int r = 0;				/* error flag; initially no error */
   int odir, ndir;			/* TRUE iff {old|new} file is dir */
   int same_pdir;			/* TRUE iff parent dirs are the same */
-  char old_name[NAME_MAX], new_name[NAME_MAX];
+  char old_name[MINIXFS_NAME_MAX], new_name[MINIXFS_NAME_MAX];
   ino_t numb;
   phys_bytes len;
   int r1;

@@ -594,9 +594,9 @@ int fs_getdents(void)
 			continue;	/* Entry is not in use */
 
 		/* Compute the length of the name */
-		cp= memchr(dp->d_name, '\0', NAME_MAX);
+		cp= memchr(dp->d_name, '\0', MINIXFS_NAME_MAX);
 		if (cp == NULL)
-			len= NAME_MAX;
+			len= MINIXFS_NAME_MAX;
 		else
 			len= cp-dp->d_name;
 		

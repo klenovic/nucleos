@@ -30,6 +30,8 @@
  */
 #define usizeof(t)	((unsigned) sizeof(t))
 
+#define MINIXFS_NAME_MAX	60
+
 /* Miscellaneous constants */
 #define SU_UID		((uid_t) 0)	/* super_user's uid_t */
 #define SERVERS_UID	((uid_t) 11)	/* who may do FSSIGNON */

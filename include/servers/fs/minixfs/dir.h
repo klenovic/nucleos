@@ -9,20 +9,20 @@
  */
 /* The <dir.h> header gives the layout of a directory. */
 
-#ifndef _NUCLEOS_DIR_H
-#define _NUCLEOS_DIR_H
+#ifndef _SERVERS_FS_MINIXFS_DIR_H
+#define _SERVERS_FS_MINIXFS_DIR_H
 
 #include <nucleos/types.h>
 
 #define DIRBLKSIZ	512	/* size of directory block */
 
-#ifndef DIRSIZ
-#define DIRSIZ		60
+#ifndef MINIXFS_DIRSIZ
+#define MINIXFS_DIRSIZ		60
 #endif
 
 struct direct {
 	ino_t d_ino;
-	char d_name[DIRSIZ];
+	char d_name[MINIXFS_DIRSIZ];
 };
 
-#endif /* _NUCLEOS_DIR_H */
+#endif /* _SERVERS_FS_MINIXFS_DIR_H */

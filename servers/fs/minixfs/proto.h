@@ -84,9 +84,9 @@ int fs_slink(void);
 /* path.c */
 int fs_lookup(void);
 struct minix_inode *advance(struct minix_inode *dirp,
-				char string[NAME_MAX], int chk_perm);
+				char string[MINIXFS_NAME_MAX], int chk_perm);
 int search_dir(struct minix_inode *ldir_ptr,
-			char string [NAME_MAX], ino_t *numb, int flag,
+			char string [MINIXFS_NAME_MAX], ino_t *numb, int flag,
 			int check_permissions);
 
 /* protect.c */
