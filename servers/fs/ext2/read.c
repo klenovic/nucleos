@@ -599,9 +599,8 @@ int fs_getdents(void)
 		if (d_desc->d_ino == 0)
 			continue; /* Entry is not in use */
 
-		if (d_desc->d_name_len > NAME_MAX ||
-		    d_desc->d_name_len > EXT2_NAME_MAX) {
-			len = min(NAME_MAX, EXT2_NAME_MAX);
+		if (d_desc->d_name_len > NAME_MAX) {
+			len = NAME_MAX;
 		} else {
 			len = d_desc->d_name_len;
 		}

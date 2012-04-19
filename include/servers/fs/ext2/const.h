@@ -20,8 +20,6 @@
  */
 #define usizeof(t)	((unsigned) sizeof(t))
 
-#define EXT2_NAME_MAX	255
-
 /* Miscellaneous constants */
 #define SU_UID		((uid_t) 0)	/* super_user's uid_t */
 #define NORMAL		0		/* forces get_block to do disk read */

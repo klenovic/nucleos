@@ -35,7 +35,7 @@ int fs_create()
 
   /* Copy the last component (i.e., file name) */
   len = fs_m_in.REQ_PATH_LEN; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   err_code = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,
@@ -85,7 +85,7 @@ int fs_mknod()
 
   /* Copy the last component and set up caller's user and group id */
   len = fs_m_in.REQ_PATH_LEN; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   err_code = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,
@@ -123,7 +123,7 @@ int fs_mkdir()
 
   /* Copy the last component and set up caller's user and group id */
   len = fs_m_in.REQ_PATH_LEN; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   err_code = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,
@@ -198,7 +198,7 @@ int fs_slink()
 
   /* Copy the link name's last component */
   len = fs_m_in.REQ_PATH_LEN;
-  if (len > NAME_MAX || len > EXT2_NAME_MAX)
+  if (len > NAME_MAX)
 	return(-ENAMETOOLONG);
 
   r = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,

@@ -461,7 +461,7 @@ char string[NAME_MAX+1];	/* component extracted from 'old_name' */
 
   len = (size_t) (ep - cp);
 
-  if (len > NAME_MAX || len > EXT2_NAME_MAX) {
+  if (len > NAME_MAX) {
   	err_code = -ENAMETOOLONG;
 	return(NULL);
   }

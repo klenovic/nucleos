@@ -39,7 +39,7 @@ int fs_link()
 
   /* Copy the link name's last component */
   len = fs_m_in.REQ_PATH_LEN; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   r = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT, 0,
@@ -127,7 +127,7 @@ int fs_unlink()
 
   /* Copy the last component */
   len = fs_m_in.REQ_PATH_LEN; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   r = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_GRANT,
@@ -316,7 +316,7 @@ int fs_rename()
 
   /* Copy the last component of the old name */
   len = fs_m_in.REQ_REN_LEN_OLD; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   r = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_REN_GRANT_OLD,
@@ -326,7 +326,7 @@ int fs_rename()
 
   /* Copy the last component of the new name */
   len = fs_m_in.REQ_REN_LEN_NEW; /* including trailing '\0' */
-  if (len > NAME_MAX + 1 || len > EXT2_NAME_MAX + 1)
+  if (len > NAME_MAX + 1)
 	return(-ENAMETOOLONG);
 
   r = sys_safecopyfrom(VFS_PROC_NR, (cp_grant_id_t) fs_m_in.REQ_REN_GRANT_NEW,
