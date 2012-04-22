@@ -411,7 +411,7 @@ int do_svrctl()
            */
           search_key[sysgetenv.keylen-1]= '\0';
 
-          if (!get_param_value(cmd_line_params, search_key, val_start))
+          if (!parse_bootparam_value(cmd_line_params, search_key, val_start))
                return(-ESRCH);
           val_len = strlen(val_start) + 1;
           value = val_start;

@@ -2,13 +2,13 @@
 #include <asm/setup.h>
 
 /**
- * @brief Get environment value
+ * @brief Parse boot parameter value
  * @param params[in]  pointer to command line parameters
  * @param name[in]  key to look up (string)
  * @param value[out]  key value (string)
  * @return 1 on success otherwise 0
  */
-int get_param_value(const char *params, const char *name, char *value)
+int parse_bootparam_value(const char *params, const char *name, char *value)
 {
 	int i = 0;
 	int start = 0;

@@ -98,13 +98,13 @@ void prepare_kernel(u16 cs, u16 ds, u32 real_mode_params)
 		system_hz = HZ;
 	}
 
-	ret = get_param_value(cmd_line_params, SERVARNAME, value);
+	ret = parse_bootparam_value(cmd_line_params, SERVARNAME, value);
 
 	if (ret && atoi(value) == 0)
 		do_serial_debug=1;
 
 #ifdef CONFIG_X86_LOCAL_APIC
-	ret = get_param_value(cmd_line_params, "no_apic", value);
+	ret = parse_bootparam_value(cmd_line_params, "no_apic", value);
 	if(ret)
 		config_no_apic = atoi(value);
 	else
